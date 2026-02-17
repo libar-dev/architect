@@ -3,6 +3,9 @@
  * @libar-docs-core @libar-docs-config
  * @libar-docs-pattern ConfigResolver
  * @libar-docs-status active
+ * @libar-docs-arch-layer application
+ * @libar-docs-arch-context config
+ * @libar-docs-arch-role service
  * @libar-docs-uses ProjectConfigTypes, DeliveryProcessFactory, ConfigurationDefaults
  * @libar-docs-used-by ConfigLoader
  *
@@ -123,6 +126,7 @@ export function resolveProjectConfig(
     generatorOverrides,
     contextInferenceRules,
     workflowPath,
+    ...(raw.codecOptions !== undefined && { codecOptions: raw.codecOptions }),
     referenceDocConfigs,
   };
 

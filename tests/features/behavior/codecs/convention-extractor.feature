@@ -1,6 +1,9 @@
+@libar-docs
 @behavior @convention-extractor
 @libar-docs-pattern:ConventionExtractorTesting
-@libar-docs-product-area:Codec
+@libar-docs-status:completed
+@libar-docs-implements:ReferenceDocShowcase
+@libar-docs-product-area:Generation
 Feature: Convention Extractor
 
   Extracts convention content from MasterDataset decision records
@@ -100,3 +103,61 @@ Feature: Convention Extractor
         """
       When extracting conventions for tag "fsm-rules"
       Then the first rule has no code examples
+
+  Rule: TypeScript JSDoc conventions are extracted alongside Gherkin
+
+    @happy-path
+    Scenario: TypeScript pattern with heading sections produces multiple rules
+      Given a TypeScript pattern with convention "fsm-rules" and heading sections
+      When extracting conventions for tag "fsm-rules"
+      Then 1 convention bundle is returned
+      And the bundle has 2 rules
+      And the first rule name is "Valid State Transitions"
+      And the first rule has invariant "Only defined FSM transitions are allowed."
+      And the second rule name is "Terminal States Are Immutable"
+
+    @happy-path
+    Scenario: TypeScript pattern without headings becomes single rule
+      Given a TypeScript pattern "FsmRules" with convention "fsm-rules" and description:
+        """
+        **Invariant:** Only valid transitions are allowed.
+        **Rationale:** Prevents accidental state corruption.
+        """
+      When extracting conventions for tag "fsm-rules"
+      Then 1 convention bundle is returned
+      And the bundle has 1 rule
+      And the first rule name is "FsmRules"
+      And the first rule has invariant "Only valid transitions are allowed."
+
+    @happy-path
+    Scenario: TypeScript and Gherkin conventions merge in same bundle
+      Given a pattern "ADR006" tagged with convention "fsm-rules" with rule "Protection Levels"
+      And a TypeScript pattern "TsConventions" with convention "fsm-rules" and description:
+        """
+        ## Transition Rules
+        **Invariant:** Only valid FSM transitions are allowed.
+        """
+      When extracting conventions for tag "fsm-rules"
+      Then 1 convention bundle is returned
+      And the bundle has 2 source decisions
+      And the bundle has 2 rules
+
+    @edge-case
+    Scenario: TypeScript pattern with convention but empty description
+      Given a TypeScript pattern with convention "fsm-rules" and empty description
+      When extracting conventions for tag "fsm-rules"
+      Then the convention result is empty
+
+    @edge-case
+    Scenario: TypeScript description with tables is extracted correctly
+      Given a TypeScript pattern with convention "fsm-rules" and table description
+      When extracting conventions for tag "fsm-rules"
+      Then the first rule has 1 table
+      And the table has 2 data rows
+
+    @edge-case
+    Scenario: TypeScript description with code examples
+      Given a TypeScript pattern with convention "fsm-rules" and mermaid description
+      When extracting conventions for tag "fsm-rules"
+      Then the first rule has 1 code example
+      And the code example has language "mermaid"

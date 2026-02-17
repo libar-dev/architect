@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:PrdImplementationSectionTesting
+@libar-docs-status:completed
+@libar-docs-product-area:Generation
 @libar-docs-implements:PrdImplementationSection
 Feature: PRD Implementation Section
 
@@ -13,6 +17,10 @@ Feature: PRD Implementation Section
   # ===========================================================================
 
   Rule: Implementation files appear in pattern docs via @libar-docs-implements
+
+    **Invariant:** Any TypeScript file with a matching @libar-docs-implements tag must appear in the pattern document's Implementations section with a working file link.
+    **Rationale:** Implementation discovery relies on tag-based linking — missing entries break traceability between specs and code.
+    **Verified by:** Implementations section renders with file links, Implementation includes description when available
 
     Scenario: Implementations section renders with file links
       Given a pattern "EventStoreDurability" defined with:
@@ -46,6 +54,10 @@ Feature: PRD Implementation Section
 
   Rule: Multiple implementations are listed alphabetically
 
+    **Invariant:** When multiple files implement the same pattern, they must be listed in ascending file path order.
+    **Rationale:** Deterministic ordering ensures stable document output across regeneration runs.
+    **Verified by:** Multiple implementations sorted by file path
+
     Scenario: Multiple implementations sorted by file path
       Given a pattern "MultiImplPattern" defined with:
         | Field | Value |
@@ -69,6 +81,9 @@ Feature: PRD Implementation Section
 
   Rule: Patterns without implementations omit the section
 
+    **Invariant:** The Implementations heading must not appear in pattern documents when no implementing files exist.
+    **Verified by:** No implementations section when none exist
+
     Scenario: No implementations section when none exist
       Given a pattern "NoImplPattern" defined with:
         | Field | Value |
@@ -83,6 +98,10 @@ Feature: PRD Implementation Section
   # ===========================================================================
 
   Rule: Implementation references use relative file links
+
+    **Invariant:** Implementation file links must be relative paths starting from the patterns output directory.
+    **Rationale:** Absolute paths break when documentation is viewed from different locations; relative paths ensure portability.
+    **Verified by:** Links are relative from patterns directory
 
     Scenario: Links are relative from patterns directory
       Given a pattern "LinkTestPattern" defined with:

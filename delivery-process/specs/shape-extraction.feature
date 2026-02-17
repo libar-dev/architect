@@ -4,7 +4,7 @@
 @libar-docs-unlock-reason:Fix-code-fence-formatting-per-PR-review
 @libar-docs-phase:26
 @libar-docs-effort:2d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Annotation
 @libar-docs-enables:DocGenerationProofOfConcept
 @libar-docs-business-value:eliminates-type-duplication-in-documentation
 @libar-docs-priority:high
@@ -12,7 +12,7 @@ Feature: TypeScript Shape Extraction for Documentation
 
   **Problem:**
   Documentation comments duplicate type definitions that exist in the same file.
-  When interfaces change, the JSDoc examples drift. Maintaining two copies of the
+  As interfaces change, the JSDoc examples drift. Maintaining two copies of the
   same type information violates DRY and creates documentation rot.
 
   **Relationship to Documentation Generation:**

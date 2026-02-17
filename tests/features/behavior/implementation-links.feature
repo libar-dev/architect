@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:ImplementationLinkPathNormalization
+@libar-docs-status:completed
+@libar-docs-product-area:Generation
 Feature: Implementation Link Path Normalization
 
   Links to implementation files in generated pattern documents should have
@@ -12,6 +16,10 @@ Feature: Implementation Link Path Normalization
   # ===========================================================================
 
   Rule: Repository prefixes are stripped from implementation paths
+
+    **Invariant:** Implementation file paths must not contain repository-level prefixes like "libar-platform/" or "monorepo/".
+    **Rationale:** Generated links are relative to the output directory; repository prefixes produce broken paths.
+    **Verified by:** Strip libar-platform prefix from implementation paths, Strip monorepo prefix from implementation paths, Preserve paths without repository prefix
 
     Scenario: Strip libar-platform prefix from implementation paths
       Given a pattern with implementation:
@@ -41,6 +49,9 @@ Feature: Implementation Link Path Normalization
 
   Rule: All implementation links in a pattern are normalized
 
+    **Invariant:** Every implementation link in a pattern document must have its path normalized, regardless of how many implementations exist.
+    **Verified by:** Multiple implementations with mixed prefixes
+
     Scenario: Multiple implementations with mixed prefixes
       Given a pattern with implementations:
         | file | description |
@@ -60,6 +71,9 @@ Feature: Implementation Link Path Normalization
   # ===========================================================================
 
   Rule: normalizeImplPath strips known prefixes
+
+    **Invariant:** normalizeImplPath removes only recognized repository prefixes from the start of a path and leaves all other path segments unchanged.
+    **Verified by:** Strips libar-platform/ prefix, Strips monorepo/ prefix, Returns unchanged path without known prefix, Only strips prefix at start of path
 
     Scenario: Strips libar-platform/ prefix
       Given file path "libar-platform/packages/core/src/file.ts"

@@ -1,6 +1,8 @@
 @libar-docs
+@libar-docs-pattern:UsesTagTesting
 @libar-docs-status:active
 @libar-docs-implements:PatternRelationshipModel
+@libar-docs-product-area:Annotation
 @pattern-relationships
 Feature: Uses Tag Extraction
 
@@ -12,6 +14,9 @@ Feature: Uses Tag Extraction
   # ===========================================================================
 
   Rule: Uses tag is defined in taxonomy registry
+
+    **Invariant:** The uses and used-by tags must be registered in the taxonomy with CSV format and dependency-related purpose descriptions.
+    **Verified by:** Uses tag exists in registry, Used-by tag exists in registry
 
     @unit
     Scenario: Uses tag exists in registry
@@ -34,6 +39,9 @@ Feature: Uses Tag Extraction
   # ===========================================================================
 
   Rule: Uses tag is extracted from TypeScript files
+
+    **Invariant:** The AST parser must extract single and comma-separated uses values from TypeScript JSDoc annotations.
+    **Verified by:** Single uses value extracted, Multiple uses values extracted as CSV
 
     @acceptance-criteria @happy-path
     Scenario: Single uses value extracted
@@ -71,6 +79,9 @@ Feature: Uses Tag Extraction
 
   Rule: Used-by tag is extracted from TypeScript files
 
+    **Invariant:** The AST parser must extract single and comma-separated used-by values from TypeScript JSDoc annotations.
+    **Verified by:** Single used-by value extracted, Multiple used-by values extracted as CSV
+
     @acceptance-criteria @happy-path
     Scenario: Single used-by value extracted
       Given a TypeScript file with content:
@@ -107,6 +118,9 @@ Feature: Uses Tag Extraction
 
   Rule: Uses relationships are stored in relationship index
 
+    **Invariant:** All declared uses and usedBy relationships must be stored in the relationship index as explicitly declared entries.
+    **Verified by:** Uses relationships stored in relationship index, UsedBy relationships stored explicitly
+
     The relationship index stores uses and usedBy relationships directly
     from pattern metadata. Unlike implements, these are explicit declarations.
 
@@ -133,6 +147,9 @@ Feature: Uses Tag Extraction
   # ===========================================================================
 
   Rule: Schemas validate uses field correctly
+
+    **Invariant:** DocDirective and RelationshipEntry schemas must accept uses and usedBy fields as valid CSV string values.
+    **Verified by:** DocDirective schema accepts uses, RelationshipEntry schema accepts usedBy
 
     @unit
     Scenario: DocDirective schema accepts uses

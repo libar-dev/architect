@@ -1,7 +1,9 @@
+@libar-docs
+@libar-docs-pattern:ReportingCodecTesting
+@libar-docs-status:completed
+@libar-docs-product-area:Generation
 @libar-docs-implements:CodecBehaviorTesting
 @behavior @reporting-codecs
-@libar-docs-pattern:ReportingCodecTesting
-@libar-docs-product-area:Codec
 Feature: Reporting Document Codecs
   The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
   transform MasterDataset into RenderableDocuments for reporting outputs.
@@ -24,6 +26,10 @@ Feature: Reporting Document Codecs
   # ═══════════════════════════════════════════════════════════════════════════
 
   Rule: ChangelogCodec follows Keep a Changelog format
+
+    **Invariant:** Releases must be sorted by semver descending, unreleased patterns grouped under "[Unreleased]", and change types follow the standard order (Added, Changed, Deprecated, Removed, Fixed, Security).
+    **Rationale:** Keep a Changelog is an industry standard format — following it ensures the output is immediately familiar to developers.
+    **Verified by:** Decode empty dataset produces changelog header only, Unreleased section shows active and vNEXT patterns, Release sections sorted by semver descending, Quarter fallback for patterns without release, Earlier section for undated patterns, Category mapping to change types, Exclude unreleased when option disabled, Change type sections follow standard order
 
     @happy-path @edge-case
     Scenario: Decode empty dataset produces changelog header only
@@ -101,6 +107,10 @@ Feature: Reporting Document Codecs
 
   Rule: TraceabilityCodec maps timeline patterns to behavior tests
 
+    **Invariant:** Coverage statistics must show total timeline phases, those with behavior tests, those missing, and a percentage. Gaps must be surfaced prominently.
+    **Rationale:** Traceability ensures every planned pattern has executable verification — gaps represent unverified claims about system behavior.
+    **Verified by:** No timeline patterns produces empty message, Coverage statistics show totals and percentage, Coverage gaps table shows missing coverage, Covered phases in collapsible section, Exclude gaps when option disabled, Exclude stats when option disabled, Exclude covered when option disabled, Verified behavior files indicated in output
+
     @happy-path @edge-case
     Scenario: No timeline patterns produces empty message
       Given a MasterDataset with no timeline patterns
@@ -164,6 +174,10 @@ Feature: Reporting Document Codecs
   # ═══════════════════════════════════════════════════════════════════════════
 
   Rule: OverviewCodec provides project architecture summary
+
+    **Invariant:** The overview must include architecture sections from overview-tagged patterns, pattern summary with progress percentage, and timeline summary with phase counts.
+    **Rationale:** The architecture overview is the primary entry point for understanding the project — it must provide a complete picture at a glance.
+    **Verified by:** Decode empty dataset produces minimal overview, Architecture section from overview-tagged patterns, Patterns summary with progress bar, Timeline summary with phase counts, Exclude architecture when option disabled, Exclude patterns summary when option disabled, Exclude timeline summary when option disabled, Multiple overview patterns create multiple architecture subsections
 
     @happy-path @edge-case
     Scenario: Decode empty dataset produces minimal overview

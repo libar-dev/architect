@@ -1,4 +1,8 @@
 @libar-docs
+@libar-docs-pattern:TaxonomyCodecTesting
+@libar-docs-implements:TaxonomyCodec
+@libar-docs-status:completed
+@libar-docs-product-area:Generation
 Feature: Taxonomy Document Codec
 
   Validates the Taxonomy Codec that transforms MasterDataset into a
@@ -13,8 +17,9 @@ Feature: Taxonomy Document Codec
 
   Rule: Document metadata is correctly set
 
-    The taxonomy document has standard metadata fields for title, purpose,
-    and detail level that describe the generated content.
+    **Invariant:** The taxonomy document must have the title "Taxonomy Reference", a descriptive purpose string, and a detail level reflecting the generateDetailFiles option.
+    **Rationale:** Document metadata drives the table of contents and navigation in generated doc sites — incorrect metadata produces broken links and misleading titles.
+    **Verified by:** Document title is Taxonomy Reference, Document purpose describes tag taxonomy, Detail level reflects generateDetailFiles option
 
     @acceptance-criteria @unit
     Scenario: Document title is Taxonomy Reference
@@ -37,8 +42,9 @@ Feature: Taxonomy Document Codec
 
   Rule: Categories section is generated from TagRegistry
 
-    The categories section lists all configured tag categories with their
-    domain, priority, and description in a sortable table.
+    **Invariant:** The categories section must render all categories from the configured TagRegistry as a table, with optional linkOut to detail files when progressive disclosure is enabled.
+    **Rationale:** Categories are the primary navigation structure in the taxonomy — missing categories leave developers unable to find the correct annotation tags.
+    **Verified by:** Categories section is included in output, Category table has correct columns, LinkOut to detail file when generateDetailFiles enabled
 
     @acceptance-criteria @unit
     Scenario: Categories section is included in output
@@ -62,8 +68,9 @@ Feature: Taxonomy Document Codec
 
   Rule: Metadata tags can be grouped by domain
 
-    The groupByDomain option organizes metadata tags into subsections
-    by their semantic domain (Core, Relationship, Timeline, etc.).
+    **Invariant:** When groupByDomain is enabled, metadata tags must be organized into domain-specific subsections; when disabled, a single flat table must be rendered.
+    **Rationale:** Domain grouping improves scannability for large tag sets (21 categories in ddd-es-cqrs) while flat mode is simpler for small presets (3 categories in generic).
+    **Verified by:** With groupByDomain enabled tags are grouped into subsections, With groupByDomain disabled single table rendered
 
     @acceptance-criteria @unit
     Scenario: With groupByDomain enabled tags are grouped into subsections
@@ -82,9 +89,9 @@ Feature: Taxonomy Document Codec
 
   Rule: Tags are classified into domains by hardcoded mapping
 
-    The domain classification is intentionally hardcoded for documentation
-    stability. Core, Relationship, Timeline, ADR, and Architecture tags
-    have specific domain assignments.
+    **Invariant:** Tags must be classified into domains (Core, Relationship, Timeline, etc.) using a hardcoded mapping, with unrecognized tags placed in an "Other Tags" group.
+    **Rationale:** Domain classification is stable across releases — hardcoding prevents miscategorization from user config errors while the "Other" fallback handles future tag additions gracefully.
+    **Verified by:** Core tags correctly classified, Relationship tags correctly classified, Timeline tags correctly classified, ADR prefix matching works, Unknown tags go to Other Tags group
 
     @acceptance-criteria @unit
     Scenario: Core tags correctly classified
@@ -122,8 +129,9 @@ Feature: Taxonomy Document Codec
 
   Rule: Optional sections can be disabled via codec options
 
-    The codec supports disabling format types, presets, and architecture
-    diagram sections for compact output generation.
+    **Invariant:** Format Types, Presets, and Architecture sections must each be independently disableable via their respective codec option flags.
+    **Rationale:** Not all projects need all sections — disabling irrelevant sections reduces generated document size and prevents confusion from inapplicable content.
+    **Verified by:** includeFormatTypes disabled excludes Format Types section, includePresets disabled excludes Presets section, includeArchDiagram disabled excludes Architecture section
 
     @acceptance-criteria @unit
     Scenario: includeFormatTypes disabled excludes Format Types section
@@ -146,8 +154,9 @@ Feature: Taxonomy Document Codec
 
   Rule: Detail files are generated for progressive disclosure
 
-    The generateDetailFiles option creates additional files for
-    categories, metadata tags, and format types with detailed content.
+    **Invariant:** When generateDetailFiles is enabled, the codec must produce additional detail files (one per domain group) alongside the main taxonomy document; when disabled, no additional files are created.
+    **Rationale:** Progressive disclosure keeps the main document scannable while providing deep-dive content in linked pages — monolithic documents become unwieldy for large tag sets.
+    **Verified by:** generateDetailFiles creates 3 additional files, Detail files have correct paths, generateDetailFiles disabled creates no additional files
 
     @acceptance-criteria @unit
     Scenario: generateDetailFiles creates 3 additional files
@@ -170,8 +179,9 @@ Feature: Taxonomy Document Codec
 
   Rule: Format types are documented with descriptions and examples
 
-    The Format Types section documents all supported tag value formats
-    with descriptions and examples for each type.
+    **Invariant:** All 6 format types must be documented with descriptions and usage examples in the generated taxonomy.
+    **Rationale:** Format types control how tag values are parsed — undocumented formats force developers to guess the correct syntax, leading to annotation errors.
+    **Verified by:** All 6 format types are documented
 
     @acceptance-criteria @unit
     Scenario: All 6 format types are documented

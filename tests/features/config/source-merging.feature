@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:SourceMerging
+@libar-docs-status:completed
+@libar-docs-product-area:Configuration
 @behavior @config
 Feature: Source Merging - Per-Generator Override Resolution
   mergeSourcesForGenerator computes effective sources for a specific
@@ -19,6 +23,10 @@ Feature: Source Merging - Per-Generator Override Resolution
 
   Rule: No override returns base unchanged
 
+    **Invariant:** When no source overrides are provided, the merged result must be identical to the base source configuration.
+    **Rationale:** The merge function must be safe to call unconditionally — returning modified results without overrides would corrupt default source paths.
+    **Verified by:** No override returns base sources
+
     @happy-path
     Scenario: No override returns base sources
       Given base sources with one typescript and one features glob
@@ -27,6 +35,10 @@ Feature: Source Merging - Per-Generator Override Resolution
       Then merged sources should equal base sources
 
   Rule: Feature overrides control feature source selection
+
+    **Invariant:** additionalFeatures must append to base feature sources while replaceFeatures must completely replace them, and these two options are mutually exclusive.
+    **Rationale:** Projects need both additive and replacement strategies — additive for extending (monorepo packages), replacement for narrowing (focused generation runs).
+    **Verified by:** additionalFeatures appended to base features, replaceFeatures replaces base features entirely, Empty replaceFeatures does NOT replace
 
     @happy-path
     Scenario: additionalFeatures appended to base features
@@ -51,6 +63,10 @@ Feature: Source Merging - Per-Generator Override Resolution
 
   Rule: TypeScript source overrides append additional input
 
+    **Invariant:** additionalInput must append to (not replace) the base TypeScript source paths.
+    **Rationale:** TypeScript sources are always additive — the base sources contain core patterns that must always be included alongside project-specific additions.
+    **Verified by:** additionalInput appended to typescript sources
+
     @happy-path
     Scenario: additionalInput appended to typescript sources
       Given base sources with one typescript and one features glob
@@ -59,6 +75,10 @@ Feature: Source Merging - Per-Generator Override Resolution
       Then merged typescript should have 2 entries
 
   Rule: Combined overrides apply together
+
+    **Invariant:** Feature overrides and TypeScript overrides must compose independently when both are provided simultaneously.
+    **Rationale:** Real configs often specify both feature and TypeScript overrides — they must not interfere with each other or produce order-dependent results.
+    **Verified by:** additionalFeatures and additionalInput combined
 
     @happy-path
     Scenario: additionalFeatures and additionalInput combined
@@ -69,6 +89,10 @@ Feature: Source Merging - Per-Generator Override Resolution
       And merged typescript should have 2 entries
 
   Rule: Exclude is always inherited from base
+
+    **Invariant:** The exclude patterns must always come from the base configuration, never from overrides.
+    **Rationale:** Exclude patterns are a safety mechanism — allowing overrides to modify excludes could accidentally include sensitive or generated files in the scan.
+    **Verified by:** Exclude always inherited
 
     @happy-path
     Scenario: Exclude always inherited

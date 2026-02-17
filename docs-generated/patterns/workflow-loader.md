@@ -13,14 +13,13 @@
 
 ## Description
 
-Loads and validates workflow configuration from JSON files in the catalogue.
-Supports loading by name from catalogue/workflows/ or by explicit path.
+Provides the default 6-phase workflow as an inline constant and loads
+custom workflow overrides from JSON files via `--workflow <path>`.
 
 ### When to Use
 
-- Use at pipeline startup to load workflow configuration
-- Use when validating custom workflow configuration files
-- Use when loading default 6-phase-standard workflow
+- Use `loadDefaultWorkflow()` at pipeline startup (synchronous, infallible)
+- Use `loadWorkflowFromPath()` for custom `--workflow <file>` overrides
 
 ---
 

@@ -1,5 +1,8 @@
 @libar-docs
+@libar-docs-pattern:ImplementsTagProcessing
+@libar-docs-status:completed
 @libar-docs-implements:PatternRelationshipModel
+@libar-docs-product-area:Annotation
 Feature: Implements Tag Extraction and Processing
 
   Tests for the @libar-docs-implements tag which links implementation files
@@ -10,6 +13,9 @@ Feature: Implements Tag Extraction and Processing
   # ===========================================================================
 
   Rule: Implements tag is defined in taxonomy registry
+
+    **Invariant:** The implements tag must exist in the taxonomy registry with CSV format.
+    **Verified by:** Implements tag exists in registry
 
     The tag registry defines `implements` with CSV format, enabling the
     data-driven AST parser to automatically extract it.
@@ -27,6 +33,9 @@ Feature: Implements Tag Extraction and Processing
   # ===========================================================================
 
   Rule: Files can implement a single pattern
+
+    **Invariant:** The AST parser must extract a single implements value and preserve it through the extraction pipeline.
+    **Verified by:** Parse implements with single pattern, Implements preserved through extraction pipeline
 
     @unit
     Scenario: Parse implements with single pattern
@@ -54,6 +63,9 @@ Feature: Implements Tag Extraction and Processing
 
   Rule: Files can implement multiple patterns using CSV format
 
+    **Invariant:** The AST parser must split CSV implements values into individual pattern references with whitespace trimming.
+    **Verified by:** Parse implements with multiple patterns, CSV values are trimmed
+
     @unit
     Scenario: Parse implements with multiple patterns
       Given a TypeScript file with content:
@@ -78,6 +90,9 @@ Feature: Implements Tag Extraction and Processing
   # ===========================================================================
 
   Rule: Transform builds implementedBy reverse lookup
+
+    **Invariant:** The transform must compute an implementedBy reverse index so spec patterns know which files implement them.
+    **Verified by:** Single implementation creates reverse lookup, Multiple implementations aggregate
 
     @unit
     Scenario: Single implementation creates reverse lookup
@@ -104,6 +119,9 @@ Feature: Implements Tag Extraction and Processing
   # ===========================================================================
 
   Rule: Schemas validate implements field correctly
+
+    **Invariant:** The Zod schemas must accept implements and implementedBy fields with correct array-of-string types.
+    **Verified by:** DocDirective schema accepts implements, RelationshipEntry schema accepts implementedBy
 
     @unit
     Scenario: DocDirective schema accepts implements

@@ -33,6 +33,7 @@
 import type { TagRegistry, ExtractedPattern } from '../validation-schemas/index.js';
 import type { ResolvedConfig } from '../config/project-config.js';
 import type { Result } from '../types/index.js';
+import type { CodecOptions } from '../renderable/generate.js';
 /**
  * Options for documentation generation
  */
@@ -85,6 +86,12 @@ export interface GenerateOptions {
         pattern: string;
         context: string;
     }>;
+    /**
+     * Per-codec options passed through to codec factories.
+     * Merged with any options the orchestrator computes (e.g., PR changes).
+     * Computed options take precedence over user-provided options.
+     */
+    codecOptions?: CodecOptions;
 }
 /**
  * Result of documentation generation
@@ -230,6 +237,8 @@ export interface GenerateFromConfigOptions {
     readonly changedFiles?: string[];
     /** Release version filter for PR Changes generator */
     readonly releaseFilter?: string;
+    /** Per-codec options (merged with config-level codecOptions, CLI takes precedence) */
+    readonly codecOptions?: CodecOptions;
 }
 /**
  * Generate documentation from a fully resolved config.

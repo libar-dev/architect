@@ -113,7 +113,7 @@ function parseDirectiveTable(table: DataTableRow[]): Partial<DocDirective> {
 
 const feature = await loadFeature('tests/features/lint/lint-rules.feature');
 
-describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
+describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
   AfterEachScenario(() => {
     state = null;
   });
@@ -128,121 +128,123 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // missing-pattern-name rule
   // ===========================================================================
 
-  Scenario('Detect missing pattern name', ({ Given, When, Then, And }) => {
-    Given('a directive without patternName', () => {
-      state!.directive = createTestDirective();
+  Rule('Files must declare an explicit pattern name', ({ RuleScenario }) => {
+    RuleScenario('Detect missing pattern name', ({ Given, When, Then, And }) => {
+      Given('a directive without patternName', () => {
+        state!.directive = createTestDirective();
+      });
+
+      When('I apply the missing-pattern-name rule', () => {
+        state!.violation = missingPatternName.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
+
+      Then('a violation should be detected', () => {
+        expect(state!.violation).not.toBeNull();
+      });
+
+      And('the violation severity should be {string}', (_ctx: unknown, severity: string) => {
+        expect(state!.violation?.severity).toBe(severity);
+      });
+
+      And('the violation message should contain {string}', (_ctx: unknown, text: string) => {
+        expect(state!.violation?.message).toContain(text);
+      });
     });
 
-    When('I apply the missing-pattern-name rule', () => {
-      state!.violation = missingPatternName.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
+    RuleScenario('Detect empty string pattern name', ({ Given, When, Then, And }) => {
+      Given('a directive with patternName {string}', (_ctx: unknown, patternName: string) => {
+        state!.directive = createTestDirective({ patternName });
+      });
+
+      When('I apply the missing-pattern-name rule', () => {
+        state!.violation = missingPatternName.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
+
+      Then('a violation should be detected', () => {
+        expect(state!.violation).not.toBeNull();
+      });
+
+      And('the violation severity should be {string}', (_ctx: unknown, severity: string) => {
+        expect(state!.violation?.severity).toBe(severity);
+      });
     });
 
-    Then('a violation should be detected', () => {
-      expect(state!.violation).not.toBeNull();
+    RuleScenario('Detect whitespace-only pattern name', ({ Given, When, Then, And }) => {
+      Given('a directive with patternName {string}', (_ctx: unknown, patternName: string) => {
+        state!.directive = createTestDirective({ patternName });
+      });
+
+      When('I apply the missing-pattern-name rule', () => {
+        state!.violation = missingPatternName.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
+
+      Then('a violation should be detected', () => {
+        expect(state!.violation).not.toBeNull();
+      });
+
+      And('the violation severity should be {string}', (_ctx: unknown, severity: string) => {
+        expect(state!.violation?.severity).toBe(severity);
+      });
     });
 
-    And('the violation severity should be {string}', (_ctx: unknown, severity: string) => {
-      expect(state!.violation?.severity).toBe(severity);
+    RuleScenario('Accept valid pattern name', ({ Given, When, Then }) => {
+      Given('a directive with patternName {string}', (_ctx: unknown, patternName: string) => {
+        state!.directive = createTestDirective({ patternName });
+      });
+
+      When('I apply the missing-pattern-name rule', () => {
+        state!.violation = missingPatternName.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
+
+      Then('no violation should be detected', () => {
+        expect(state!.violation).toBeNull();
+      });
     });
 
-    And('the violation message should contain {string}', (_ctx: unknown, text: string) => {
-      expect(state!.violation?.message).toContain(text);
-    });
-  });
+    RuleScenario('Include file and line in violation', ({ Given, When, Then, And }) => {
+      Given('a directive without patternName', () => {
+        state!.directive = createTestDirective();
+      });
 
-  Scenario('Detect empty string pattern name', ({ Given, When, Then, And }) => {
-    Given('a directive with patternName {string}', (_ctx: unknown, patternName: string) => {
-      state!.directive = createTestDirective({ patternName });
-    });
+      And('the file path is {string}', (_ctx: unknown, filePath: string) => {
+        state!.filePath = filePath;
+      });
 
-    When('I apply the missing-pattern-name rule', () => {
-      state!.violation = missingPatternName.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
-    });
+      And('the line number is {int}', (_ctx: unknown, lineNumber: number) => {
+        state!.lineNumber = lineNumber;
+      });
 
-    Then('a violation should be detected', () => {
-      expect(state!.violation).not.toBeNull();
-    });
+      When('I apply the missing-pattern-name rule', () => {
+        state!.violation = missingPatternName.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
 
-    And('the violation severity should be {string}', (_ctx: unknown, severity: string) => {
-      expect(state!.violation?.severity).toBe(severity);
-    });
-  });
+      Then('the violation should have file {string}', (_ctx: unknown, file: string) => {
+        expect(state!.violation?.file).toBe(file);
+      });
 
-  Scenario('Detect whitespace-only pattern name', ({ Given, When, Then, And }) => {
-    Given('a directive with patternName {string}', (_ctx: unknown, patternName: string) => {
-      state!.directive = createTestDirective({ patternName });
-    });
-
-    When('I apply the missing-pattern-name rule', () => {
-      state!.violation = missingPatternName.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
-    });
-
-    Then('a violation should be detected', () => {
-      expect(state!.violation).not.toBeNull();
-    });
-
-    And('the violation severity should be {string}', (_ctx: unknown, severity: string) => {
-      expect(state!.violation?.severity).toBe(severity);
-    });
-  });
-
-  Scenario('Accept valid pattern name', ({ Given, When, Then }) => {
-    Given('a directive with patternName {string}', (_ctx: unknown, patternName: string) => {
-      state!.directive = createTestDirective({ patternName });
-    });
-
-    When('I apply the missing-pattern-name rule', () => {
-      state!.violation = missingPatternName.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
-    });
-
-    Then('no violation should be detected', () => {
-      expect(state!.violation).toBeNull();
-    });
-  });
-
-  Scenario('Include file and line in violation', ({ Given, When, Then, And }) => {
-    Given('a directive without patternName', () => {
-      state!.directive = createTestDirective();
-    });
-
-    And('the file path is {string}', (_ctx: unknown, filePath: string) => {
-      state!.filePath = filePath;
-    });
-
-    And('the line number is {int}', (_ctx: unknown, lineNumber: number) => {
-      state!.lineNumber = lineNumber;
-    });
-
-    When('I apply the missing-pattern-name rule', () => {
-      state!.violation = missingPatternName.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
-    });
-
-    Then('the violation should have file {string}', (_ctx: unknown, file: string) => {
-      expect(state!.violation?.file).toBe(file);
-    });
-
-    And('the violation should have line {int}', (_ctx: unknown, line: number) => {
-      expect(state!.violation?.line).toBe(line);
+      And('the violation should have line {int}', (_ctx: unknown, line: number) => {
+        expect(state!.violation?.line).toBe(line);
+      });
     });
   });
 
@@ -250,89 +252,111 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // missing-status rule
   // ===========================================================================
 
-  Scenario('Detect missing status', ({ Given, When, Then, And }) => {
-    Given('a directive without status', () => {
-      state!.directive = createTestDirective();
-    });
+  Rule('Files should declare a lifecycle status', ({ RuleScenario }) => {
+    RuleScenario('Detect missing status', ({ Given, When, Then, And }) => {
+      Given('a directive without status', () => {
+        state!.directive = createTestDirective();
+      });
 
-    When('I apply the missing-status rule', () => {
-      state!.violation = missingStatus.check(state!.directive, state!.filePath, state!.lineNumber);
-    });
+      When('I apply the missing-status rule', () => {
+        state!.violation = missingStatus.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
 
-    Then('a violation should be detected', () => {
-      expect(state!.violation).not.toBeNull();
-    });
+      Then('a violation should be detected', () => {
+        expect(state!.violation).not.toBeNull();
+      });
 
-    And('the violation severity should be {string}', (_ctx: unknown, severity: string) => {
-      expect(state!.violation?.severity).toBe(severity);
-    });
+      And('the violation severity should be {string}', (_ctx: unknown, severity: string) => {
+        expect(state!.violation?.severity).toBe(severity);
+      });
 
-    And('the violation message should contain {string}', (_ctx: unknown, text: string) => {
-      expect(state!.violation?.message).toContain(text);
-    });
-  });
-
-  Scenario('Accept completed status', ({ Given, When, Then }) => {
-    Given('a directive with status {string}', (_ctx: unknown, status: string) => {
-      state!.directive = createTestDirective({
-        status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
+      And('the violation message should contain {string}', (_ctx: unknown, text: string) => {
+        expect(state!.violation?.message).toContain(text);
       });
     });
 
-    When('I apply the missing-status rule', () => {
-      state!.violation = missingStatus.check(state!.directive, state!.filePath, state!.lineNumber);
-    });
+    RuleScenario('Accept completed status', ({ Given, When, Then }) => {
+      Given('a directive with status {string}', (_ctx: unknown, status: string) => {
+        state!.directive = createTestDirective({
+          status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
+        });
+      });
 
-    Then('no violation should be detected', () => {
-      expect(state!.violation).toBeNull();
-    });
-  });
+      When('I apply the missing-status rule', () => {
+        state!.violation = missingStatus.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
 
-  Scenario('Accept active status', ({ Given, When, Then }) => {
-    Given('a directive with status {string}', (_ctx: unknown, status: string) => {
-      state!.directive = createTestDirective({
-        status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
+      Then('no violation should be detected', () => {
+        expect(state!.violation).toBeNull();
       });
     });
 
-    When('I apply the missing-status rule', () => {
-      state!.violation = missingStatus.check(state!.directive, state!.filePath, state!.lineNumber);
-    });
+    RuleScenario('Accept active status', ({ Given, When, Then }) => {
+      Given('a directive with status {string}', (_ctx: unknown, status: string) => {
+        state!.directive = createTestDirective({
+          status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
+        });
+      });
 
-    Then('no violation should be detected', () => {
-      expect(state!.violation).toBeNull();
-    });
-  });
+      When('I apply the missing-status rule', () => {
+        state!.violation = missingStatus.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
 
-  Scenario('Accept roadmap status', ({ Given, When, Then }) => {
-    Given('a directive with status {string}', (_ctx: unknown, status: string) => {
-      state!.directive = createTestDirective({
-        status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
+      Then('no violation should be detected', () => {
+        expect(state!.violation).toBeNull();
       });
     });
 
-    When('I apply the missing-status rule', () => {
-      state!.violation = missingStatus.check(state!.directive, state!.filePath, state!.lineNumber);
-    });
+    RuleScenario('Accept roadmap status', ({ Given, When, Then }) => {
+      Given('a directive with status {string}', (_ctx: unknown, status: string) => {
+        state!.directive = createTestDirective({
+          status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
+        });
+      });
 
-    Then('no violation should be detected', () => {
-      expect(state!.violation).toBeNull();
-    });
-  });
+      When('I apply the missing-status rule', () => {
+        state!.violation = missingStatus.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
 
-  Scenario('Accept deferred status', ({ Given, When, Then }) => {
-    Given('a directive with status {string}', (_ctx: unknown, status: string) => {
-      state!.directive = createTestDirective({
-        status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
+      Then('no violation should be detected', () => {
+        expect(state!.violation).toBeNull();
       });
     });
 
-    When('I apply the missing-status rule', () => {
-      state!.violation = missingStatus.check(state!.directive, state!.filePath, state!.lineNumber);
-    });
+    RuleScenario('Accept deferred status', ({ Given, When, Then }) => {
+      Given('a directive with status {string}', (_ctx: unknown, status: string) => {
+        state!.directive = createTestDirective({
+          status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
+        });
+      });
 
-    Then('no violation should be detected', () => {
-      expect(state!.violation).toBeNull();
+      When('I apply the missing-status rule', () => {
+        state!.violation = missingStatus.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
+
+      Then('no violation should be detected', () => {
+        expect(state!.violation).toBeNull();
+      });
     });
   });
 
@@ -340,66 +364,68 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // missing-when-to-use rule
   // ===========================================================================
 
-  Scenario('Detect missing whenToUse', ({ Given, When, Then, And }) => {
-    Given('a directive without whenToUse', () => {
-      state!.directive = createTestDirective();
+  Rule('Files should document when to use the pattern', ({ RuleScenario }) => {
+    RuleScenario('Detect missing whenToUse', ({ Given, When, Then, And }) => {
+      Given('a directive without whenToUse', () => {
+        state!.directive = createTestDirective();
+      });
+
+      When('I apply the missing-when-to-use rule', () => {
+        state!.violation = missingWhenToUse.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
+
+      Then('a violation should be detected', () => {
+        expect(state!.violation).not.toBeNull();
+      });
+
+      And('the violation severity should be {string}', (_ctx: unknown, severity: string) => {
+        expect(state!.violation?.severity).toBe(severity);
+      });
+
+      And('the violation message should contain {string}', (_ctx: unknown, text: string) => {
+        expect(state!.violation?.message).toContain(text);
+      });
     });
 
-    When('I apply the missing-when-to-use rule', () => {
-      state!.violation = missingWhenToUse.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
+    RuleScenario('Detect empty whenToUse array', ({ Given, When, Then }) => {
+      Given('a directive with empty whenToUse array', () => {
+        state!.directive = createTestDirective({ whenToUse: [] });
+      });
+
+      When('I apply the missing-when-to-use rule', () => {
+        state!.violation = missingWhenToUse.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
+
+      Then('a violation should be detected', () => {
+        expect(state!.violation).not.toBeNull();
+      });
     });
 
-    Then('a violation should be detected', () => {
-      expect(state!.violation).not.toBeNull();
-    });
+    RuleScenario('Accept whenToUse with content', ({ Given, When, Then }) => {
+      Given('a directive with whenToUse:', (_ctx: unknown, table: DataTableRow[]) => {
+        const values = table.map((row) => row.value);
+        state!.directive = createTestDirective({ whenToUse: values });
+      });
 
-    And('the violation severity should be {string}', (_ctx: unknown, severity: string) => {
-      expect(state!.violation?.severity).toBe(severity);
-    });
+      When('I apply the missing-when-to-use rule', () => {
+        state!.violation = missingWhenToUse.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
 
-    And('the violation message should contain {string}', (_ctx: unknown, text: string) => {
-      expect(state!.violation?.message).toContain(text);
-    });
-  });
-
-  Scenario('Detect empty whenToUse array', ({ Given, When, Then }) => {
-    Given('a directive with empty whenToUse array', () => {
-      state!.directive = createTestDirective({ whenToUse: [] });
-    });
-
-    When('I apply the missing-when-to-use rule', () => {
-      state!.violation = missingWhenToUse.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
-    });
-
-    Then('a violation should be detected', () => {
-      expect(state!.violation).not.toBeNull();
-    });
-  });
-
-  Scenario('Accept whenToUse with content', ({ Given, When, Then }) => {
-    Given('a directive with whenToUse:', (_ctx: unknown, table: DataTableRow[]) => {
-      const values = table.map((row) => row.value);
-      state!.directive = createTestDirective({ whenToUse: values });
-    });
-
-    When('I apply the missing-when-to-use rule', () => {
-      state!.violation = missingWhenToUse.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
-    });
-
-    Then('no violation should be detected', () => {
-      expect(state!.violation).toBeNull();
+      Then('no violation should be detected', () => {
+        expect(state!.violation).toBeNull();
+      });
     });
   });
 
@@ -407,36 +433,8 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // tautological-description rule
   // ===========================================================================
 
-  Scenario('Detect description that equals pattern name', ({ Given, When, Then, And }) => {
-    Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
-      const overrides = parseDirectiveTable(table);
-      state!.directive = createTestDirective(overrides);
-    });
-
-    When('I apply the tautological-description rule', () => {
-      state!.violation = tautologicalDescription.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
-    });
-
-    Then('a violation should be detected', () => {
-      expect(state!.violation).not.toBeNull();
-    });
-
-    And('the violation severity should be {string}', (_ctx: unknown, severity: string) => {
-      expect(state!.violation?.severity).toBe(severity);
-    });
-
-    And('the violation message should contain {string}', (_ctx: unknown, text: string) => {
-      expect(state!.violation?.message).toContain(text);
-    });
-  });
-
-  Scenario(
-    'Detect description that is pattern name with punctuation',
-    ({ Given, When, Then, And }) => {
+  Rule('Descriptions must not repeat the pattern name', ({ RuleScenario }) => {
+    RuleScenario('Detect description that equals pattern name', ({ Given, When, Then, And }) => {
       Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
         const overrides = parseDirectiveTable(table);
         state!.directive = createTestDirective(overrides);
@@ -457,138 +455,171 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
       And('the violation severity should be {string}', (_ctx: unknown, severity: string) => {
         expect(state!.violation?.severity).toBe(severity);
       });
-    }
-  );
 
-  Scenario('Detect short description starting with pattern name', ({ Given, When, Then }) => {
-    Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
-      const overrides = parseDirectiveTable(table);
-      state!.directive = createTestDirective(overrides);
+      And('the violation message should contain {string}', (_ctx: unknown, text: string) => {
+        expect(state!.violation?.message).toContain(text);
+      });
     });
 
-    When('I apply the tautological-description rule', () => {
-      state!.violation = tautologicalDescription.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
+    RuleScenario(
+      'Detect description that is pattern name with punctuation',
+      ({ Given, When, Then, And }) => {
+        Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
+          const overrides = parseDirectiveTable(table);
+          state!.directive = createTestDirective(overrides);
+        });
+
+        When('I apply the tautological-description rule', () => {
+          state!.violation = tautologicalDescription.check(
+            state!.directive,
+            state!.filePath,
+            state!.lineNumber
+          );
+        });
+
+        Then('a violation should be detected', () => {
+          expect(state!.violation).not.toBeNull();
+        });
+
+        And('the violation severity should be {string}', (_ctx: unknown, severity: string) => {
+          expect(state!.violation?.severity).toBe(severity);
+        });
+      }
+    );
+
+    RuleScenario('Detect short description starting with pattern name', ({ Given, When, Then }) => {
+      Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
+        const overrides = parseDirectiveTable(table);
+        state!.directive = createTestDirective(overrides);
+      });
+
+      When('I apply the tautological-description rule', () => {
+        state!.violation = tautologicalDescription.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
+
+      Then('a violation should be detected', () => {
+        expect(state!.violation).not.toBeNull();
+      });
     });
 
-    Then('a violation should be detected', () => {
-      expect(state!.violation).not.toBeNull();
-    });
-  });
+    RuleScenario(
+      'Accept description with substantial content after name',
+      ({ Given, When, Then }) => {
+        Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
+          const overrides = parseDirectiveTable(table);
+          state!.directive = createTestDirective(overrides);
+        });
 
-  Scenario('Accept description with substantial content after name', ({ Given, When, Then }) => {
-    Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
-      const overrides = parseDirectiveTable(table);
-      state!.directive = createTestDirective(overrides);
-    });
+        When('I apply the tautological-description rule', () => {
+          state!.violation = tautologicalDescription.check(
+            state!.directive,
+            state!.filePath,
+            state!.lineNumber
+          );
+        });
 
-    When('I apply the tautological-description rule', () => {
-      state!.violation = tautologicalDescription.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
-    });
+        Then('no violation should be detected', () => {
+          expect(state!.violation).toBeNull();
+        });
+      }
+    );
 
-    Then('no violation should be detected', () => {
-      expect(state!.violation).toBeNull();
-    });
-  });
+    RuleScenario('Accept meaningfully different description', ({ Given, When, Then }) => {
+      Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
+        const overrides = parseDirectiveTable(table);
+        state!.directive = createTestDirective(overrides);
+      });
 
-  Scenario('Accept meaningfully different description', ({ Given, When, Then }) => {
-    Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
-      const overrides = parseDirectiveTable(table);
-      state!.directive = createTestDirective(overrides);
-    });
+      When('I apply the tautological-description rule', () => {
+        state!.violation = tautologicalDescription.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
 
-    When('I apply the tautological-description rule', () => {
-      state!.violation = tautologicalDescription.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
-    });
-
-    Then('no violation should be detected', () => {
-      expect(state!.violation).toBeNull();
-    });
-  });
-
-  Scenario('Ignore empty descriptions', ({ Given, When, Then }) => {
-    Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
-      const overrides = parseDirectiveTable(table);
-      state!.directive = createTestDirective(overrides);
+      Then('no violation should be detected', () => {
+        expect(state!.violation).toBeNull();
+      });
     });
 
-    When('I apply the tautological-description rule', () => {
-      state!.violation = tautologicalDescription.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
+    RuleScenario('Ignore empty descriptions', ({ Given, When, Then }) => {
+      Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
+        const overrides = parseDirectiveTable(table);
+        state!.directive = createTestDirective(overrides);
+      });
+
+      When('I apply the tautological-description rule', () => {
+        state!.violation = tautologicalDescription.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
+
+      Then('no violation should be detected', () => {
+        expect(state!.violation).toBeNull();
+      });
     });
 
-    Then('no violation should be detected', () => {
-      expect(state!.violation).toBeNull();
-    });
-  });
+    RuleScenario('Ignore missing pattern name', ({ Given, When, Then }) => {
+      Given('a directive with description {string}', (_ctx: unknown, description: string) => {
+        state!.directive = createTestDirective({ description });
+      });
 
-  Scenario('Ignore missing pattern name', ({ Given, When, Then }) => {
-    Given('a directive with description {string}', (_ctx: unknown, description: string) => {
-      state!.directive = createTestDirective({ description });
-    });
+      When('I apply the tautological-description rule', () => {
+        state!.violation = tautologicalDescription.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
 
-    When('I apply the tautological-description rule', () => {
-      state!.violation = tautologicalDescription.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
-    });
-
-    Then('no violation should be detected', () => {
-      expect(state!.violation).toBeNull();
-    });
-  });
-
-  Scenario('Skip headings when finding first line', ({ Given, When, Then }) => {
-    Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
-      const overrides = parseDirectiveTable(table);
-      state!.directive = createTestDirective(overrides);
+      Then('no violation should be detected', () => {
+        expect(state!.violation).toBeNull();
+      });
     });
 
-    When('I apply the tautological-description rule', () => {
-      state!.violation = tautologicalDescription.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
+    RuleScenario('Skip headings when finding first line', ({ Given, When, Then }) => {
+      Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
+        const overrides = parseDirectiveTable(table);
+        state!.directive = createTestDirective(overrides);
+      });
+
+      When('I apply the tautological-description rule', () => {
+        state!.violation = tautologicalDescription.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
+
+      Then('no violation should be detected', () => {
+        expect(state!.violation).toBeNull();
+      });
     });
 
-    Then('no violation should be detected', () => {
-      expect(state!.violation).toBeNull();
-    });
-  });
+    RuleScenario('Skip "When to use" sections when finding first line', ({ Given, When, Then }) => {
+      Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
+        const overrides = parseDirectiveTable(table);
+        state!.directive = createTestDirective(overrides);
+      });
 
-  Scenario('Skip "When to use" sections when finding first line', ({ Given, When, Then }) => {
-    Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
-      const overrides = parseDirectiveTable(table);
-      state!.directive = createTestDirective(overrides);
-    });
+      When('I apply the tautological-description rule', () => {
+        state!.violation = tautologicalDescription.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
 
-    When('I apply the tautological-description rule', () => {
-      state!.violation = tautologicalDescription.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
-    });
-
-    Then('no violation should be detected', () => {
-      expect(state!.violation).toBeNull();
+      Then('no violation should be detected', () => {
+        expect(state!.violation).toBeNull();
+      });
     });
   });
 
@@ -596,104 +627,106 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // missing-relationships rule
   // ===========================================================================
 
-  Scenario('Detect missing relationship tags', ({ Given, When, Then, And }) => {
-    Given('a directive without relationship tags', () => {
-      state!.directive = createTestDirective();
+  Rule('Files should declare relationship tags', ({ RuleScenario }) => {
+    RuleScenario('Detect missing relationship tags', ({ Given, When, Then, And }) => {
+      Given('a directive without relationship tags', () => {
+        state!.directive = createTestDirective();
+      });
+
+      When('I apply the missing-relationships rule', () => {
+        state!.violation = missingRelationships.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
+
+      Then('a violation should be detected', () => {
+        expect(state!.violation).not.toBeNull();
+      });
+
+      And('the violation severity should be {string}', (_ctx: unknown, severity: string) => {
+        expect(state!.violation?.severity).toBe(severity);
+      });
+
+      And('the violation message should contain {string}', (_ctx: unknown, text: string) => {
+        expect(state!.violation?.message).toContain(text);
+      });
     });
 
-    When('I apply the missing-relationships rule', () => {
-      state!.violation = missingRelationships.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
+    RuleScenario('Detect empty uses array', ({ Given, When, Then }) => {
+      Given('a directive with empty uses array', () => {
+        state!.directive = createTestDirective({ uses: [] });
+      });
+
+      When('I apply the missing-relationships rule', () => {
+        state!.violation = missingRelationships.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
+
+      Then('a violation should be detected', () => {
+        expect(state!.violation).not.toBeNull();
+      });
     });
 
-    Then('a violation should be detected', () => {
-      expect(state!.violation).not.toBeNull();
+    RuleScenario('Accept uses with content', ({ Given, When, Then }) => {
+      Given('a directive with uses:', (_ctx: unknown, table: DataTableRow[]) => {
+        const values = table.map((row) => row.value);
+        state!.directive = createTestDirective({ uses: values });
+      });
+
+      When('I apply the missing-relationships rule', () => {
+        state!.violation = missingRelationships.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
+
+      Then('no violation should be detected', () => {
+        expect(state!.violation).toBeNull();
+      });
     });
 
-    And('the violation severity should be {string}', (_ctx: unknown, severity: string) => {
-      expect(state!.violation?.severity).toBe(severity);
+    RuleScenario('Accept usedBy with content', ({ Given, When, Then }) => {
+      Given('a directive with usedBy:', (_ctx: unknown, table: DataTableRow[]) => {
+        const values = table.map((row) => row.value);
+        state!.directive = createTestDirective({ usedBy: values });
+      });
+
+      When('I apply the missing-relationships rule', () => {
+        state!.violation = missingRelationships.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
+
+      Then('no violation should be detected', () => {
+        expect(state!.violation).toBeNull();
+      });
     });
 
-    And('the violation message should contain {string}', (_ctx: unknown, text: string) => {
-      expect(state!.violation?.message).toContain(text);
-    });
-  });
+    RuleScenario('Accept both uses and usedBy', ({ Given, When, Then }) => {
+      Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
+        const overrides = parseDirectiveTable(table);
+        state!.directive = createTestDirective(overrides);
+      });
 
-  Scenario('Detect empty uses array', ({ Given, When, Then }) => {
-    Given('a directive with empty uses array', () => {
-      state!.directive = createTestDirective({ uses: [] });
-    });
+      When('I apply the missing-relationships rule', () => {
+        state!.violation = missingRelationships.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        );
+      });
 
-    When('I apply the missing-relationships rule', () => {
-      state!.violation = missingRelationships.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
-    });
-
-    Then('a violation should be detected', () => {
-      expect(state!.violation).not.toBeNull();
-    });
-  });
-
-  Scenario('Accept uses with content', ({ Given, When, Then }) => {
-    Given('a directive with uses:', (_ctx: unknown, table: DataTableRow[]) => {
-      const values = table.map((row) => row.value);
-      state!.directive = createTestDirective({ uses: values });
-    });
-
-    When('I apply the missing-relationships rule', () => {
-      state!.violation = missingRelationships.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
-    });
-
-    Then('no violation should be detected', () => {
-      expect(state!.violation).toBeNull();
-    });
-  });
-
-  Scenario('Accept usedBy with content', ({ Given, When, Then }) => {
-    Given('a directive with usedBy:', (_ctx: unknown, table: DataTableRow[]) => {
-      const values = table.map((row) => row.value);
-      state!.directive = createTestDirective({ usedBy: values });
-    });
-
-    When('I apply the missing-relationships rule', () => {
-      state!.violation = missingRelationships.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
-    });
-
-    Then('no violation should be detected', () => {
-      expect(state!.violation).toBeNull();
-    });
-  });
-
-  Scenario('Accept both uses and usedBy', ({ Given, When, Then }) => {
-    Given('a directive with:', (_ctx: unknown, table: DataTableRow[]) => {
-      const overrides = parseDirectiveTable(table);
-      state!.directive = createTestDirective(overrides);
-    });
-
-    When('I apply the missing-relationships rule', () => {
-      state!.violation = missingRelationships.check(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber
-      );
-    });
-
-    Then('no violation should be detected', () => {
-      expect(state!.violation).toBeNull();
+      Then('no violation should be detected', () => {
+        expect(state!.violation).toBeNull();
+      });
     });
   });
 
@@ -701,58 +734,60 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // Default Rules Collection
   // ===========================================================================
 
-  Scenario('Default rules contains all 8 rules', ({ When, Then }) => {
-    When('I check the default rules collection', () => {
-      state!.rules = defaultRules;
+  Rule('Default rules collection is complete and well-ordered', ({ RuleScenario }) => {
+    RuleScenario('Default rules contains all 8 rules', ({ When, Then }) => {
+      When('I check the default rules collection', () => {
+        state!.rules = defaultRules;
+      });
+
+      Then('it should contain {int} rules', (_ctx: unknown, count: number) => {
+        expect(state!.rules).toHaveLength(count);
+      });
     });
 
-    Then('it should contain {int} rules', (_ctx: unknown, count: number) => {
-      expect(state!.rules).toHaveLength(count);
-    });
-  });
+    RuleScenario('Default rules have unique IDs', ({ When, Then }) => {
+      When('I check the default rules collection', () => {
+        state!.rules = defaultRules;
+      });
 
-  Scenario('Default rules have unique IDs', ({ When, Then }) => {
-    When('I check the default rules collection', () => {
-      state!.rules = defaultRules;
-    });
-
-    Then('all rule IDs should be unique', () => {
-      const ids = state!.rules.map((r) => r.id);
-      const uniqueIds = new Set(ids);
-      expect(uniqueIds.size).toBe(ids.length);
-    });
-  });
-
-  Scenario('Default rules are ordered by severity', ({ When, Then, And }) => {
-    When('I check the default rules collection', () => {
-      state!.rules = defaultRules;
+      Then('all rule IDs should be unique', () => {
+        const ids = state!.rules.map((r) => r.id);
+        const uniqueIds = new Set(ids);
+        expect(uniqueIds.size).toBe(ids.length);
+      });
     });
 
-    Then('errors should come before warnings', () => {
-      const severities = state!.rules.map((r) => r.severity);
-      const lastError = severities.lastIndexOf('error');
-      const firstWarning = severities.indexOf('warning');
-      expect(lastError).toBeLessThan(firstWarning);
+    RuleScenario('Default rules are ordered by severity', ({ When, Then, And }) => {
+      When('I check the default rules collection', () => {
+        state!.rules = defaultRules;
+      });
+
+      Then('errors should come before warnings', () => {
+        const severities = state!.rules.map((r) => r.severity);
+        const lastError = severities.lastIndexOf('error');
+        const firstWarning = severities.indexOf('warning');
+        expect(lastError).toBeLessThan(firstWarning);
+      });
+
+      And('warnings should come before info', () => {
+        const severities = state!.rules.map((r) => r.severity);
+        const lastWarning = severities.lastIndexOf('warning');
+        const firstInfo = severities.indexOf('info');
+        expect(lastWarning).toBeLessThan(firstInfo);
+      });
     });
 
-    And('warnings should come before info', () => {
-      const severities = state!.rules.map((r) => r.severity);
-      const lastWarning = severities.lastIndexOf('warning');
-      const firstInfo = severities.indexOf('info');
-      expect(lastWarning).toBeLessThan(firstInfo);
-    });
-  });
+    RuleScenario('Default rules include all named rules', ({ When, Then }) => {
+      When('I check the default rules collection', () => {
+        state!.rules = defaultRules;
+      });
 
-  Scenario('Default rules include all named rules', ({ When, Then }) => {
-    When('I check the default rules collection', () => {
-      state!.rules = defaultRules;
-    });
-
-    Then('it should include all rules:', (_ctx: unknown, table: DataTableRow[]) => {
-      const ruleIds = state!.rules.map((r) => r.id);
-      for (const row of table) {
-        expect(ruleIds).toContain(row.ruleId);
-      }
+      Then('it should include all rules:', (_ctx: unknown, table: DataTableRow[]) => {
+        const ruleIds = state!.rules.map((r) => r.id);
+        for (const row of table) {
+          expect(ruleIds).toContain(row.ruleId);
+        }
+      });
     });
   });
 
@@ -760,41 +795,43 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // Filter by Severity
   // ===========================================================================
 
-  Scenario('Filter returns all rules for info severity', ({ When, Then }) => {
-    When('I filter rules by minimum severity {string}', (_ctx: unknown, severity: string) => {
-      state!.filteredRules = filterRulesBySeverity(defaultRules, severity as LintSeverity);
+  Rule('Rules can be filtered by minimum severity', ({ RuleScenario }) => {
+    RuleScenario('Filter returns all rules for info severity', ({ When, Then }) => {
+      When('I filter rules by minimum severity {string}', (_ctx: unknown, severity: string) => {
+        state!.filteredRules = filterRulesBySeverity(defaultRules, severity as LintSeverity);
+      });
+
+      Then('I should get {int} rules', (_ctx: unknown, count: number) => {
+        expect(state!.filteredRules).toHaveLength(count);
+      });
     });
 
-    Then('I should get {int} rules', (_ctx: unknown, count: number) => {
-      expect(state!.filteredRules).toHaveLength(count);
-    });
-  });
+    RuleScenario('Filter excludes info rules for warning severity', ({ When, Then, And }) => {
+      When('I filter rules by minimum severity {string}', (_ctx: unknown, severity: string) => {
+        state!.filteredRules = filterRulesBySeverity(defaultRules, severity as LintSeverity);
+      });
 
-  Scenario('Filter excludes info rules for warning severity', ({ When, Then, And }) => {
-    When('I filter rules by minimum severity {string}', (_ctx: unknown, severity: string) => {
-      state!.filteredRules = filterRulesBySeverity(defaultRules, severity as LintSeverity);
-    });
+      Then('I should get {int} rules', (_ctx: unknown, count: number) => {
+        expect(state!.filteredRules).toHaveLength(count);
+      });
 
-    Then('I should get {int} rules', (_ctx: unknown, count: number) => {
-      expect(state!.filteredRules).toHaveLength(count);
-    });
-
-    And('none should have severity {string}', (_ctx: unknown, severity: string) => {
-      expect(state!.filteredRules.every((r) => r.severity !== severity)).toBe(true);
-    });
-  });
-
-  Scenario('Filter returns only errors for error severity', ({ When, Then, And }) => {
-    When('I filter rules by minimum severity {string}', (_ctx: unknown, severity: string) => {
-      state!.filteredRules = filterRulesBySeverity(defaultRules, severity as LintSeverity);
+      And('none should have severity {string}', (_ctx: unknown, severity: string) => {
+        expect(state!.filteredRules.every((r) => r.severity !== severity)).toBe(true);
+      });
     });
 
-    Then('I should get {int} rules', (_ctx: unknown, count: number) => {
-      expect(state!.filteredRules).toHaveLength(count);
-    });
+    RuleScenario('Filter returns only errors for error severity', ({ When, Then, And }) => {
+      When('I filter rules by minimum severity {string}', (_ctx: unknown, severity: string) => {
+        state!.filteredRules = filterRulesBySeverity(defaultRules, severity as LintSeverity);
+      });
 
-    And('all should have severity {string}', (_ctx: unknown, severity: string) => {
-      expect(state!.filteredRules.every((r) => r.severity === severity)).toBe(true);
+      Then('I should get {int} rules', (_ctx: unknown, count: number) => {
+        expect(state!.filteredRules).toHaveLength(count);
+      });
+
+      And('all should have severity {string}', (_ctx: unknown, severity: string) => {
+        expect(state!.filteredRules.every((r) => r.severity === severity)).toBe(true);
+      });
     });
   });
 });

@@ -106,7 +106,7 @@ function buildDataset(): void {
 
 function runGenerator(): void {
   buildDataset();
-  const codec = createBusinessRulesCodec({ detailLevel: 'detailed' });
+  const codec = createBusinessRulesCodec({ detailLevel: 'detailed', generateDetailFiles: false });
   state!.document = codec.decode(state!.dataset!);
   state!.markdown = renderToMarkdown(state!.document);
 }

@@ -183,8 +183,9 @@ function buildRequirementsDocument(
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
 
-  // Get PRD patterns (patterns with product metadata)
-  let prdPatterns = dataset.bySource.prd;
+  // Get PRD patterns (patterns with product metadata), excluding ADR/PDR decisions
+  // (decisions belong to the ADR codec, not requirements)
+  let prdPatterns = dataset.bySource.prd.filter((p) => p.adr === undefined);
 
   // Apply status filter if specified
   if (options.filterStatus.length > 0) {

@@ -3,7 +3,7 @@
 @libar-docs-status:completed
 @libar-docs-unlock-reason:Fix-deliverable-gate-description-preservation-tag-parsing
 @libar-docs-phase:25b
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:DataAPI
 @libar-docs-effort:3d
 @libar-docs-priority:high
 @libar-docs-depends-on:DataAPIOutputShaping,DataAPIStubIntegration

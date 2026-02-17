@@ -9,9 +9,9 @@
 
 | Metric | Value |
 | --- | --- |
-| Completed Patterns | 104 |
-| Completed Phases | 2 |
-| Total Phases | 13 |
+| Completed Patterns | 207 |
+| Completed Phases | 4 |
+| Total Phases | 19 |
 
 ---
 
@@ -40,21 +40,39 @@
 
 </details>
 
+<details>
+<summary>✅ DeclarationLevelShapeTagging (1 patterns)</summary>
+
+| Pattern | Description |
+| --- | --- |
+| Declaration Level Shape Tagging | The current shape extraction system operates at file granularity. |
+
+</details>
+
+<details>
+<summary>✅ CrossCuttingDocumentInclusion (1 patterns)</summary>
+
+| Pattern | Description |
+| --- | --- |
+| Cross Cutting Document Inclusion | The reference doc codec assembles content from four sources, each with its own selection mechanism: conventionTags... |
+
+</details>
+
 ---
 
 ## Recent Completions
 
-- ✅ Codec Driven Reference Generation (Phase 27)
-- ✅ Data API Architecture Queries (Phase 25)
-- ✅ Data API Context Assembly (Phase 25)
-- ✅ Data API Output Shaping (Phase 25)
-- ✅ Data API Design Session Support (Phase 25)
-- ✅ Data API Stub Integration (Phase 25)
-- ✅ Doc Generation Proof Of Concept (Phase 27)
-- ✅ Gherkin Rules Support (Phase 100)
-- ✅ Mvp Workflow Implementation (Phase 99)
-- ✅ Pattern Relationship Model (Phase 99)
+- ✅ Composite Codec Testing
+- ✅ Convention Extractor Testing
+- ✅ Dedent Helper
+- ✅ Planning Codec Testing
+- ✅ Pr Changes Codec Testing
+- ✅ Reference Codec Testing
+- ✅ Reference Generator Testing
+- ✅ Reporting Codec Testing
+- ✅ Requirements Adr Codec Testing
+- ✅ Session Codec Testing
 
-Showing 10 of 104 completed patterns. See quarterly files for full history.
+Showing 10 of 207 completed patterns. See quarterly files for full history.
 
 ---

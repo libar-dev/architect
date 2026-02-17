@@ -6,14 +6,14 @@
 
 ## Summary
 
-**Progress:** [███████████░░░░░░░░░] 4/7 (57%)
+**Progress:** [███████████░░░░░░░░░] 5/9 (56%)
 
 | Status | Count |
 | --- | --- |
-| ✅ Completed | 4 |
+| ✅ Completed | 5 |
 | 🚧 Active | 0 |
-| 📋 Planned | 3 |
-| **Total** | 7 |
+| 📋 Planned | 4 |
+| **Total** | 9 |
 
 ---
 
@@ -568,7 +568,241 @@ _Verified by: Git command failure returns Result error, Malformed diff lines are
 
 ---
 
+### 📋 Test Content Blocks
+
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Business Value | test what generators capture |
+
+This feature demonstrates what content blocks are captured and rendered
+  by the PRD generator. Use this as a reference for writing rich specs.
+
+  **Overview**
+
+  The delivery process supports **rich Markdown** in descriptions:
+  - Bullet points work
+  - *Italics* and **bold** work
+  - `inline code` works
+
+  **Custom Section**
+
+  You can create any section you want using bold headers.
+  This content will appear in the PRD Description section.
+
+#### Acceptance Criteria
+
+**Scenario with DocString for rich content**
+
+- Given a system in initial state
+- When the user provides the following configuration:
+- Then the system accepts the configuration
+
+```markdown
+**Configuration Details**
+
+This DocString contains **rich Markdown content** that will be
+rendered in the Acceptance Criteria section.
+
+- Option A: enabled
+- Option B: disabled
+
+Use DocStrings when you need multi-line content blocks.
+```
+
+**Scenario with DataTable for structured data**
+
+- Given the following user permissions:
+- When the user attempts an action
+- Then access is granted based on permissions
+
+| Permission | Level | Description |
+| --- | --- | --- |
+| read | basic | Can view resources |
+| write | elevated | Can modify resources |
+| admin | full | Can manage all settings |
+
+**Simple scenario under second rule**
+
+- Given a precondition
+- When an action occurs
+- Then the expected outcome happens
+
+**Scenario with examples table**
+
+- Given a value of <input>
+- When processed
+- Then the result is <output>
+
+#### Business Rules
+
+**Business rules appear as a separate section**
+
+Rule descriptions provide context for why this business rule exists.
+    You can include multiple paragraphs here.
+
+    This is a second paragraph explaining edge cases or exceptions.
+
+_Verified by: Scenario with DocString for rich content, Scenario with DataTable for structured data_
+
+**Multiple rules create multiple Business Rule entries**
+
+Each Rule keyword creates a separate entry in the Business Rules section.
+    This helps organize complex features into logical business domains.
+
+_Verified by: Simple scenario under second rule, Scenario with examples table_
+
+---
+
 ## ✅ Completed Patterns
+
+### ✅ Config Based Workflow Definition
+
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Effort | 2h |
+| Business Value | eliminate broken workflow loading |
+
+**Problem:**
+  Every `pnpm process:query` and `pnpm docs:*` invocation prints:
+  `Failed to load default workflow (6-phase-standard): Workflow file not found`
+
+  The `loadDefaultWorkflow()` function resolves to `catalogue/workflows/`
+  which does not exist. The directory was deleted during monorepo extraction.
+  The system already degrades gracefully (workflow = undefined), but the
+  warning is noise for both human CLI use and future hook consumers (HUD).
+
+  The old `6-phase-standard.json` conflated three concerns:
+  - Taxonomy vocabulary (status names) — already in `src/taxonomy/`
+  - FSM behavior (transitions) — already in `src/validation/fsm/`
+  - Workflow structure (phases) — orphaned, no proper home
+
+  **Solution:**
+  Inline the default workflow as a constant in `workflow-loader.ts`, built
+  from canonical taxonomy values. Make `loadDefaultWorkflow()` synchronous.
+  Preserve `loadWorkflowFromPath()` for custom `--workflow <file>` overrides.
+
+  The workflow definition uses only the 4 canonical statuses from ADR-001
+  (roadmap, active, completed, deferred) — not the stale 5-status set from
+  the deleted JSON (which included non-canonical `implemented` and `partial`).
+
+  Phase definitions (Inception, Elaboration, Session, Construction,
+  Validation, Retrospective) move from a missing JSON file to an inline
+  constant, making the default workflow always available without file I/O.
+
+  Design Decisions (DS-1, 2026-02-15):
+
+  | ID | Decision | Rationale |
+  | DD-1 | Inline constant in workflow-loader.ts, not preset integration | Minimal correct fix, zero type regression risk. Preset integration deferred. |
+  | DD-2 | Constant satisfies existing WorkflowConfig type | Reuse createLoadedWorkflow() from workflow-config.ts. No new types needed. |
+  | DD-3 | Remove dead code: getCatalogueWorkflowsPath, loadWorkflowConfig, DEFAULT_WORKFLOW_NAME | Dead since monorepo extraction. Public API break is safe (function always threw). |
+  | DD-4 | loadDefaultWorkflow() returns LoadedWorkflow synchronously | Infallible constant needs no async or error handling. |
+  | DD-5 | Amend ADR-001 with canonical phase definitions | Phase names are canonical values; fits existing governance in ADR-001. |
+
+#### Dependencies
+
+- Depends on: MvpWorkflowImplementation
+
+#### Acceptance Criteria
+
+**Default workflow loads without warning**
+
+- Given the delivery-process package with no workflow JSON file
+- When the process-api runs an overview command
+- Then no workflow warning appears in output
+- And the overview displays progress, active phases, and blocking info
+
+**Workflow constant uses canonical statuses only**
+
+- Given the inline DEFAULT_WORKFLOW_CONFIG constant
+- Then it defines exactly 4 statuses: roadmap, active, completed, deferred
+- And it defines 6 phases with order 1 through 6
+- And each status name exists in PROCESS_STATUS_VALUES from taxonomy
+
+**Custom workflow file overrides default**
+
+- Given a project with workflowPath set to a custom JSON file
+- When the orchestrator loads workflow configuration
+- Then it uses the custom workflow from the file path
+- And the default inline workflow is not used
+
+#### Business Rules
+
+**Default workflow is built from an inline constant**
+
+**Invariant:** `loadDefaultWorkflow()` returns a `LoadedWorkflow` without
+    file system access. It cannot fail. The default workflow constant uses
+    only canonical status values from `src/taxonomy/status-values.ts`.
+
+    **Rationale:** The file-based loading path (`catalogue/workflows/`) has
+    been dead code since monorepo extraction. Both callers (orchestrator,
+    process-api) already handle the failure gracefully, proving the system
+    works without it. Making the function synchronous and infallible removes
+    the try-catch ceremony and the warning noise.
+
+    **Verified by:** Default workflow loads without warning,
+    Workflow constant uses canonical statuses only
+
+    Implementation approach:
+
+    | Step | Change | Impact |
+    | Add DEFAULT_WORKFLOW_CONFIG constant | WorkflowConfig literal with 4 statuses, 6 phases | New code in workflow-loader.ts |
+    | Change loadDefaultWorkflow() to sync | Returns createLoadedWorkflow(DEFAULT_WORKFLOW_CONFIG) | Signature: Promise to sync |
+    | Remove dead code paths | Delete getCatalogueWorkflowsPath, loadWorkflowConfig, DEFAULT_WORKFLOW_NAME, dead imports | workflow-loader.ts cleanup |
+    | Remove loadWorkflowConfig from public API | Update src/config/index.ts exports | Breaking change (safe: function always threw) |
+    | Update orchestrator call site | Remove await and try-catch (lines 410-418) | orchestrator.ts |
+    | Update process-api call site | Remove await and try-catch (lines 549-555) | process-api.ts |
+
+_Verified by: Default workflow loads without warning, Workflow constant uses canonical statuses only_
+
+**Custom workflow files still work via --workflow flag**
+
+**Invariant:** `loadWorkflowFromPath()` remains available for projects
+    that need custom workflow definitions. The `--workflow <file>` CLI flag
+    and `workflowPath` config field continue to work.
+
+    **Rationale:** The inline default replaces file-based *default* loading,
+    not file-based *custom* loading. Projects may define custom phases or
+    additional statuses via JSON files.
+
+    **Verified by:** Custom workflow file overrides default
+
+_Verified by: Custom workflow file overrides default_
+
+**FSM validation and Process Guard are not affected**
+
+**Invariant:** The FSM transition matrix, protection levels, and Process
+    Guard rules remain hardcoded in `src/validation/fsm/` and
+    `src/lint/process-guard/`. They do not read from `LoadedWorkflow`.
+
+    **Rationale:** FSM and workflow are separate concerns. FSM enforces
+    status transitions (4-state model from PDR-005). Workflow defines phase
+    structure (6-phase USDP). The workflow JSON declared `transitionsTo` on
+    its statuses, but no code ever read those values — the FSM uses its own
+    `VALID_TRANSITIONS` constant. This separation is correct and intentional.
+
+    Blast radius analysis confirmed zero workflow imports in:
+    - src/validation/fsm/ (4 files)
+    - src/lint/process-guard/ (5 files)
+    - src/taxonomy/ (all files)
+
+**Workflow as a configurable preset field is deferred**
+
+Adding `workflow` as a field on `DeliveryProcessConfig` (presets) and
+    `DeliveryProcessProjectConfig` (project config) is a natural next step
+    but NOT required for the MVP fix.
+
+    The inline constant in `workflow-loader.ts` resolves the warning. Moving
+    workflow into the preset/config system enables:
+    - Different presets with different default phases (e.g., 3-phase generic)
+    - Per-project phase customization in delivery-process.config.ts
+    - Phase definitions appearing in generated documentation
+
+    See ideation artifact for design options:
+    delivery-process/ideations/2026-02-15-workflow-config-and-fsm-extensibility.feature
+
+---
 
 ### ✅ Mvp Workflow Implementation
 
@@ -1177,13 +1411,13 @@ _Verified by: Protection level from status, Completed file modification without 
 
 Optional session files (`delivery-process/sessions/*.feature`) explicitly
     declare which specs are in-scope for modification during a work session.
-    When active, modifications outside scope trigger warnings or errors.
+    If active, modifications outside scope trigger warnings or errors.
 
 _Verified by: Session file defines modification scope, Modifying spec outside active session scope warns, Modifying explicitly excluded spec fails, No active session allows all modifications_
 
 **Status transitions follow PDR-005 FSM**
 
-When a file's status changes, the transition must be valid per PDR-005.
+Status changes in a file must follow a valid transition per PDR-005.
     This extends phase-state-machine.feature to the linter context.
 
 _Verified by: Valid status transitions, Invalid status transitions_

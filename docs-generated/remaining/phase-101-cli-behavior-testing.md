@@ -31,6 +31,7 @@ These patterns can be started immediately:
 | Status | planned |
 | Effort | 3d |
 | Business Value | ensure cli commands work correctly with all argument combinations |
+| Dependencies | ADR002GherkinOnlyTesting |
 
 **Problem:**
   All 5 CLI commands (generate-docs, lint-patterns, lint-process, validate-patterns,

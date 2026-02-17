@@ -32,6 +32,12 @@ process hygiene issues that lead to documentation drift.
 - CI pipeline to enforce documentation standards
 - Code review checklists for documentation quality
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`anti-patterns.feature`](../../tests/features/validation/anti-patterns.feature) - Detects violations of the dual-source documentation architecture and
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

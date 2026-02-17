@@ -35,7 +35,7 @@ export { GeneratorRegistry, generatorRegistry } from './registry.js';
 export { CodecBasedGenerator, createCodecGenerator, DOCUMENT_TYPES, type DocumentType, } from './codec-based.js';
 export { generateDocumentation, mergePatterns, type GenerateOptions, type GenerateResult, type GeneratedFile, type GenerationError, type GenerationWarning, } from './orchestrator.js';
 export { transformToMasterDataset, type RawDataset, type RuntimeMasterDataset, } from './pipeline/index.js';
-export { LIBAR_REFERENCE_CONFIGS } from './built-in/reference-generators.js';
+export { createProductAreaConfigs, PRODUCT_AREA_VALUES, type ProductAreaConfigOptions, } from './built-in/reference-generators.js';
 /**
  * NOTE: Built-in generators are NOT auto-registered.
  * Import './built-in/index.js' explicitly to register them:

@@ -4,7 +4,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:100
 @libar-docs-effort:2d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Validation
 @libar-docs-business-value:filter-work-by-risk-and-priority
 @libar-docs-priority:medium
 Feature: Progressive Governance - Opt-in Richness Where It Matters

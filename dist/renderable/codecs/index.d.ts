@@ -39,4 +39,6 @@ export { TaxonomyDocumentCodec, createTaxonomyCodec, type TaxonomyCodecOptions, 
 export { ValidationRulesCodec, createValidationRulesCodec, type ValidationRulesCodecOptions, DEFAULT_VALIDATION_RULES_OPTIONS, } from './validation-rules.js';
 export { extractConventions, type ConventionBundle, type ConventionRuleContent, type ConventionTable, } from './convention-extractor.js';
 export { createReferenceCodec, type ReferenceDocConfig, type ReferenceCodecOptions, } from './reference.js';
+export { type ShapeSelector } from './shape-matcher.js';
+export { createCompositeCodec, composeDocuments, type CompositeCodecOptions, type ComposeOptions, } from './composite.js';
 //# sourceMappingURL=index.d.ts.map

@@ -32,6 +32,20 @@
   | User Experience | Clear error messages for invalid usage |
   | CI/CD Integration | Predictable exit codes for automation |
 
+## Dependencies
+
+- Depends on: ADR002GherkinOnlyTesting
+
+## Implementations
+
+Files that implement this pattern:
+
+- [`generate-docs.feature`](../../tests/features/cli/generate-docs.feature) - Command-line interface for generating documentation from annotated TypeScript.
+- [`generate-tag-taxonomy.feature`](../../tests/features/cli/generate-tag-taxonomy.feature) - Command-line interface for generating TAG_TAXONOMY.md from tag registry configuration.
+- [`lint-patterns.feature`](../../tests/features/cli/lint-patterns.feature) - Command-line interface for validating pattern annotation quality.
+- [`lint-process.feature`](../../tests/features/cli/lint-process.feature) - Command-line interface for validating changes against delivery process rules.
+- [`validate-patterns.feature`](../../tests/features/cli/validate-patterns.feature) - Command-line interface for cross-validating TypeScript patterns vs Gherkin feature files.
+
 ## Acceptance Criteria
 
 **Generate specific document type**

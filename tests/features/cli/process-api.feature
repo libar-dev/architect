@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:ProcessApiCli
+@libar-docs-status:completed
+@libar-docs-product-area:DataAPI
 @libar-docs-implements:ProcessStateAPICLI
 @cli @process-api
 Feature: process-api CLI
@@ -385,3 +389,105 @@ Feature: process-api CLI
       When running "process-api -i 'src/**/*.ts' arch blocking"
       Then exit code is 0
       And stdout JSON data is an array
+
+  # ============================================================================
+  # RULE 17: Rules Subcommand
+  # ============================================================================
+
+  Rule: CLI rules subcommand queries business rules and invariants
+
+    **Invariant:** The rules subcommand returns structured business rules extracted from Gherkin Rule: blocks, grouped by product area and phase, with parsed invariant and rationale annotations.
+
+    **Rationale:** Live business rule queries replace static generated markdown, enabling on-demand filtering by product area, pattern, and invariant presence.
+
+    **Verified by:** Rules returns business rules from feature files, Rules filters by product area, Rules with count modifier returns totals, Rules with names-only returns flat array
+
+    @happy-path
+    Scenario: Rules returns business rules from feature files
+      Given TypeScript files with pattern annotations
+      And Gherkin feature files with business rules
+      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules"
+      Then exit code is 0
+      And stdout JSON data has fields:
+        | field            |
+        | totalRules       |
+        | totalInvariants  |
+        | productAreas     |
+
+    @happy-path
+    Scenario: Rules filters by product area
+      Given TypeScript files with pattern annotations
+      And Gherkin feature files with business rules
+      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --product-area Validation"
+      Then exit code is 0
+      And stdout JSON data has field "productAreas"
+
+    @happy-path
+    Scenario: Rules with count modifier returns totals
+      Given TypeScript files with pattern annotations
+      And Gherkin feature files with business rules
+      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --count"
+      Then exit code is 0
+      And stdout JSON data has fields:
+        | field            |
+        | totalRules       |
+        | totalInvariants  |
+
+    @happy-path
+    Scenario: Rules with names-only returns flat array
+      Given TypeScript files with pattern annotations
+      And Gherkin feature files with business rules
+      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --names-only"
+      Then exit code is 0
+      And stdout JSON data is an array
+
+    @validation
+    Scenario: Rules filters by pattern name
+      Given TypeScript files with pattern annotations
+      And Gherkin feature files with business rules
+      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --pattern CoreUtilsTest --count"
+      Then exit code is 0
+      And stdout JSON data has field values:
+        | field           | value |
+        | totalRules      | 2     |
+        | totalInvariants | 1     |
+
+    @validation
+    Scenario: Rules with only-invariants excludes rules without invariants
+      Given TypeScript files with pattern annotations
+      And Gherkin feature files with business rules
+      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --only-invariants --count"
+      Then exit code is 0
+      And stdout JSON data has field values:
+        | field           | value |
+        | totalRules      | 3     |
+        | totalInvariants | 3     |
+
+    @edge-case
+    Scenario: Rules product area filter excludes non-matching areas
+      Given TypeScript files with pattern annotations
+      And Gherkin feature files with business rules
+      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --product-area Validation --count"
+      Then exit code is 0
+      And stdout JSON data has field values:
+        | field      | value |
+        | totalRules | 2     |
+
+    @edge-case
+    Scenario: Rules for non-existent product area returns hint
+      Given TypeScript files with pattern annotations
+      And Gherkin feature files with business rules
+      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --product-area NonExistent --count"
+      Then exit code is 0
+      And stdout JSON data has field "hint"
+
+    @edge-case
+    Scenario: Rules combines product area and only-invariants filters
+      Given TypeScript files with pattern annotations
+      And Gherkin feature files with business rules
+      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --product-area CoreTypes --only-invariants --count"
+      Then exit code is 0
+      And stdout JSON data has field values:
+        | field           | value |
+        | totalRules      | 1     |
+        | totalInvariants | 1     |

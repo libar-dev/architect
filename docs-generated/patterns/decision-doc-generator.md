@@ -38,6 +38,12 @@ documents (ADR/PDR in .feature format):
 - Depends on: DecisionDocCodec
 - Depends on: SourceMapper
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`decision-doc-generator.feature`](../../tests/features/doc-generation/decision-doc-generator.feature) - The Decision Doc Generator orchestrates the full documentation generation
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

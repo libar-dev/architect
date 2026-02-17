@@ -1,6 +1,10 @@
+@libar-docs
 @libar-docs-implements:ProcessGuardLinter
-@behavior @process-guard @libar-docs-pattern:ProcessGuard
+@behavior @process-guard @libar-docs-pattern:ProcessGuardTesting
+@libar-docs-status:completed
 @libar-docs-product-area:Validation
+@libar-docs-depends-on:PhaseStateMachineValidation,AntiPatternDetector
+@libar-docs-include:reference-sample
 Feature: Process Guard Linter
   Pure validation functions for enforcing delivery process rules per PDR-005.
   All validation follows the Decider pattern: (state, changes, options) => result.
@@ -26,6 +30,10 @@ Feature: Process Guard Linter
   # ==========================================================================
 
   Rule: Completed files require unlock-reason to modify
+
+    **Invariant:** A completed spec file cannot be modified unless it carries an @libar-docs-unlock-reason tag.
+    **Rationale:** Completed work represents validated, shipped functionality — accidental modification risks regression.
+    **Verified by:** Completed file with unlock-reason passes validation, Completed file without unlock-reason fails validation, Protection levels and unlock requirement, File transitioning to completed does not require unlock-reason
 
     @happy-path @rule:completed-protection
     Scenario: Completed file with unlock-reason passes validation
@@ -77,6 +85,10 @@ Feature: Process Guard Linter
 
   Rule: Status transitions must follow PDR-005 FSM
 
+    **Invariant:** Status changes must follow the directed graph: roadmap->active->completed, roadmap<->deferred, active->roadmap.
+    **Rationale:** The FSM prevents skipping required stages (e.g., roadmap->completed bypasses implementation).
+    **Verified by:** Valid transitions pass validation, Invalid transitions fail validation
+
     @happy-path @rule:invalid-status-transition
     Scenario Outline: Valid transitions pass validation
       Given a file "specs/feature.feature" with status "<from>"
@@ -115,6 +127,10 @@ Feature: Process Guard Linter
   # ==========================================================================
 
   Rule: Active specs cannot add new deliverables
+
+    **Invariant:** A spec in active status cannot have deliverables added that were not present when it entered active.
+    **Rationale:** Scope-locking active work prevents mid-sprint scope creep that derails delivery commitments.
+    **Verified by:** Active spec with no deliverable changes passes, Active spec adding deliverable fails validation, Roadmap spec can add deliverables freely, Removing deliverable produces warning, Deliverable status change does not trigger scope-creep, Multiple deliverable status changes pass validation
 
     @happy-path @rule:scope-creep
     Scenario: Active spec with no deliverable changes passes
@@ -173,6 +189,10 @@ Feature: Process Guard Linter
 
   Rule: Files outside active session scope trigger warnings
 
+    **Invariant:** Files modified outside the active session's declared scope produce a session-scope warning.
+    **Rationale:** Session scoping keeps focus on planned work and makes accidental cross-cutting changes visible.
+    **Verified by:** File in session scope passes validation, File outside session scope triggers warning, No active session means all files in scope, ignoreSession flag suppresses session warnings
+
     @happy-path @rule:session-scope
     Scenario: File in session scope passes validation
       Given an active session "session-2026-01"
@@ -214,6 +234,10 @@ Feature: Process Guard Linter
 
   Rule: Explicitly excluded files trigger errors
 
+    **Invariant:** Files explicitly excluded from a session cannot be modified, producing a session-excluded error.
+    **Rationale:** Exclusion is stronger than scope — it marks files that must NOT be touched during this session.
+    **Verified by:** Excluded file triggers error, Non-excluded file passes validation, ignoreSession flag suppresses excluded errors
+
     @rule:session-excluded
     Scenario: Excluded file triggers error
       Given an active session "session-2026-01"
@@ -246,6 +270,10 @@ Feature: Process Guard Linter
   # ==========================================================================
 
   Rule: Multiple rules validate independently
+
+    **Invariant:** Each validation rule evaluates independently — a single file can produce violations from multiple rules.
+    **Rationale:** Independent evaluation ensures no rule masks another, giving complete diagnostic output.
+    **Verified by:** Multiple violations from different rules, Strict mode promotes warnings to errors, Clean change produces empty violations
 
     @integration
     Scenario: Multiple violations from different rules

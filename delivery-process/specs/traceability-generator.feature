@@ -3,7 +3,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:18
 @libar-docs-effort:2d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Generation
 Feature: Traceability Generator - Map Rules to Scenarios
 
   **Business Value:** Provide audit-ready traceability matrices that demonstrate

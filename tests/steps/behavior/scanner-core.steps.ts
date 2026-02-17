@@ -53,7 +53,7 @@ function initState(): ScannerCoreState {
 
 const feature = await loadFeature('tests/features/behavior/scanner-core.feature');
 
-describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
+describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
   // Cleanup
   // ---------------------------------------------------------------------------
@@ -102,456 +102,464 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   }
 
   // ---------------------------------------------------------------------------
-  // Scenario: Scan files and extract directives
+  // Rule: scanPatterns extracts directives from TypeScript files
   // ---------------------------------------------------------------------------
 
-  Scenario('Scan files and extract directives', ({ Given, When, Then, And }) => {
-    Given(
-      'a file {string} with content:',
-      async (_: unknown, filePath: string, content: string) => {
-        await createFile(filePath, content);
-      }
-    );
+  Rule('scanPatterns extracts directives from TypeScript files', ({ RuleScenario }) => {
+    RuleScenario('Scan files and extract directives', ({ Given, When, Then, And }) => {
+      Given(
+        'a file {string} with content:',
+        async (_: unknown, filePath: string, content: string) => {
+          await createFile(filePath, content);
+        }
+      );
 
-    When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
-      await runScan(pattern);
-    });
+      When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
+        await runScan(pattern);
+      });
 
-    Then('the scan should succeed with {int} file', (_: unknown, count: number) => {
-      expect(state!.scanSucceeded).toBe(true);
-      expect(state!.scanResult!.files).toHaveLength(count);
-    });
+      Then('the scan should succeed with {int} file', (_: unknown, count: number) => {
+        expect(state!.scanSucceeded).toBe(true);
+        expect(state!.scanResult!.files).toHaveLength(count);
+      });
 
-    And('the scan should have {int} errors', (_: unknown, count: number) => {
-      expect(state!.scanResult!.errors).toHaveLength(count);
-    });
+      And('the scan should have {int} errors', (_: unknown, count: number) => {
+        expect(state!.scanResult!.errors).toHaveLength(count);
+      });
 
-    And(
-      'file {string} should have {int} directive',
-      (_: unknown, fileName: string, count: number) => {
-        const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
-        expect(file).toBeDefined();
-        expect(file!.directives).toHaveLength(count);
-      }
-    );
+      And(
+        'file {string} should have {int} directive',
+        (_: unknown, fileName: string, count: number) => {
+          const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
+          expect(file).toBeDefined();
+          expect(file!.directives).toHaveLength(count);
+        }
+      );
 
-    And('the directive should have tag {string}', (_: unknown, tag: string) => {
-      const directive = state!.scanResult!.files[0]!.directives[0]!;
-      expect(directive.directive.tags).toContain(tag);
-    });
-
-    And('the directive should have {int} export', (_: unknown, count: number) => {
-      const directive = state!.scanResult!.files[0]!.directives[0]!;
-      expect(directive.exports).toHaveLength(count);
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // Scenario: Skip files without directives
-  // ---------------------------------------------------------------------------
-
-  Scenario('Skip files without directives', ({ Given, When, Then, And }) => {
-    Given(
-      'a file {string} with content:',
-      async (_: unknown, filePath: string, content: string) => {
-        await createFile(filePath, content);
-      }
-    );
-
-    When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
-      await runScan(pattern);
-    });
-
-    Then('the scan should succeed with {int} files', (_: unknown, count: number) => {
-      expect(state!.scanSucceeded).toBe(true);
-      expect(state!.scanResult!.files).toHaveLength(count);
-    });
-
-    And('the scan should have {int} errors', (_: unknown, count: number) => {
-      expect(state!.scanResult!.errors).toHaveLength(count);
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // Scenario: Collect errors for files that fail to parse
-  // ---------------------------------------------------------------------------
-
-  Scenario('Collect errors for files that fail to parse', ({ Given, When, Then, And }) => {
-    Given(
-      'a file {string} with content:',
-      async (_: unknown, filePath: string, content: string) => {
-        await createFile(filePath, content);
-      }
-    );
-
-    // And is used for additional files
-    And('a file {string} with content:', async (_: unknown, filePath: string, content: string) => {
-      await createFile(filePath, content);
-    });
-
-    When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
-      await runScan(pattern);
-    });
-
-    Then('the scan should succeed with {int} file', (_: unknown, count: number) => {
-      expect(state!.scanSucceeded).toBe(true);
-      expect(state!.scanResult!.files).toHaveLength(count);
-    });
-
-    And('file {string} should be in the results', (_: unknown, fileName: string) => {
-      const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
-      expect(file).toBeDefined();
-    });
-
-    And('the scan should have {int} error', (_: unknown, count: number) => {
-      expect(state!.scanResult!.errors).toHaveLength(count);
-    });
-
-    And('the error should reference file {string}', (_: unknown, fileName: string) => {
-      expect(state!.scanResult!.errors[0]!.file).toContain(fileName);
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // Scenario: Always return Ok result even with broken files
-  // ---------------------------------------------------------------------------
-
-  Scenario('Always return Ok result even with broken files', ({ Given, When, Then, And }) => {
-    Given(
-      'a file {string} with content:',
-      async (_: unknown, filePath: string, content: string) => {
-        await createFile(filePath, content);
-      }
-    );
-
-    And('a file {string} with content:', async (_: unknown, filePath: string, content: string) => {
-      await createFile(filePath, content);
-    });
-
-    When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
-      await runScan(pattern);
-    });
-
-    Then('the scan should succeed with {int} files', (_: unknown, count: number) => {
-      expect(state!.scanSucceeded).toBe(true);
-      expect(state!.scanResult!.files).toHaveLength(count);
-    });
-
-    And('the scan should have {int} errors', (_: unknown, count: number) => {
-      expect(state!.scanResult!.errors).toHaveLength(count);
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // Scenario: Handle multiple files with multiple directives each
-  // ---------------------------------------------------------------------------
-
-  Scenario('Handle multiple files with multiple directives each', ({ Given, When, Then, And }) => {
-    Given(
-      'a file {string} with content:',
-      async (_: unknown, filePath: string, content: string) => {
-        await createFile(filePath, content);
-      }
-    );
-
-    And('a file {string} with content:', async (_: unknown, filePath: string, content: string) => {
-      await createFile(filePath, content);
-    });
-
-    When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
-      await runScan(pattern);
-    });
-
-    Then('the scan should succeed with {int} files', (_: unknown, count: number) => {
-      expect(state!.scanSucceeded).toBe(true);
-      expect(state!.scanResult!.files).toHaveLength(count);
-    });
-
-    And('the scan should have {int} errors', (_: unknown, count: number) => {
-      expect(state!.scanResult!.errors).toHaveLength(count);
-    });
-
-    And(
-      'file {string} should have {int} directives',
-      (_: unknown, fileName: string, count: number) => {
-        const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
-        expect(file).toBeDefined();
-        expect(file!.directives).toHaveLength(count);
-      }
-    );
-
-    And(
-      'file {string} should have {int} directive',
-      (_: unknown, fileName: string, count: number) => {
-        const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
-        expect(file).toBeDefined();
-        expect(file!.directives).toHaveLength(count);
-      }
-    );
-  });
-
-  // ---------------------------------------------------------------------------
-  // Scenario: Return empty results when no patterns match
-  // ---------------------------------------------------------------------------
-
-  Scenario('Return empty results when no patterns match', ({ When, Then, And }) => {
-    When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
-      await runScan(pattern);
-    });
-
-    Then('the scan should succeed with {int} files', (_: unknown, count: number) => {
-      expect(state!.scanSucceeded).toBe(true);
-      expect(state!.scanResult!.files).toHaveLength(count);
-    });
-
-    And('the scan should have {int} errors', (_: unknown, count: number) => {
-      expect(state!.scanResult!.errors).toHaveLength(count);
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // Scenario: Respect exclusion patterns
-  // ---------------------------------------------------------------------------
-
-  Scenario('Respect exclusion patterns', ({ Given, When, Then, And }) => {
-    Given(
-      'a file {string} with content:',
-      async (_: unknown, filePath: string, content: string) => {
-        await createFile(filePath, content);
-      }
-    );
-
-    And('a file {string} with content:', async (_: unknown, filePath: string, content: string) => {
-      await createFile(filePath, content);
-    });
-
-    When(
-      'scanning with pattern {string} excluding {string}',
-      async (_: unknown, pattern: string, exclude: string) => {
-        await runScan(pattern, [exclude]);
-      }
-    );
-
-    Then('the scan should succeed with {int} file', (_: unknown, count: number) => {
-      expect(state!.scanSucceeded).toBe(true);
-      expect(state!.scanResult!.files).toHaveLength(count);
-    });
-
-    And('file {string} should be in the results', (_: unknown, fileName: string) => {
-      const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
-      expect(file).toBeDefined();
-    });
-
-    And('file {string} should not be in the results', (_: unknown, pathPart: string) => {
-      const file = state!.scanResult!.files.find((f) => f.filePath.includes(pathPart));
-      expect(file).toBeUndefined();
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // Scenario: Extract complete directive information
-  // ---------------------------------------------------------------------------
-
-  Scenario('Extract complete directive information', ({ Given, When, Then, And }) => {
-    Given(
-      'a file {string} with content:',
-      async (_: unknown, filePath: string, content: string) => {
-        await createFile(filePath, content);
-      }
-    );
-
-    When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
-      await runScan(pattern);
-    });
-
-    Then('the scan should succeed with {int} file', (_: unknown, count: number) => {
-      expect(state!.scanSucceeded).toBe(true);
-      expect(state!.scanResult!.files).toHaveLength(count);
-    });
-
-    And('the scan should have {int} errors', (_: unknown, count: number) => {
-      expect(state!.scanResult!.errors).toHaveLength(count);
-    });
-
-    And(
-      'the directive should have tags {string} and {string}',
-      (_: unknown, tag1: string, tag2: string) => {
+      And('the directive should have tag {string}', (_: unknown, tag: string) => {
         const directive = state!.scanResult!.files[0]!.directives[0]!;
-        expect(directive.directive.tags).toContain(tag1);
-        expect(directive.directive.tags).toContain(tag2);
-      }
-    );
+        expect(directive.directive.tags).toContain(tag);
+      });
 
-    And('the directive description should contain {string}', (_: unknown, text: string) => {
-      const directive = state!.scanResult!.files[0]!.directives[0]!;
-      expect(directive.directive.description).toContain(text);
-    });
-
-    And('the directive description should also contain {string}', (_: unknown, text: string) => {
-      const directive = state!.scanResult!.files[0]!.directives[0]!;
-      expect(directive.directive.description).toContain(text);
-    });
-
-    And('the directive should have {int} example', (_: unknown, count: number) => {
-      const directive = state!.scanResult!.files[0]!.directives[0]!;
-      expect(directive.directive.examples).toHaveLength(count);
-    });
-
-    And('the directive example should contain {string}', (_: unknown, text: string) => {
-      const directive = state!.scanResult!.files[0]!.directives[0]!;
-      expect(directive.directive.examples[0]).toContain(text);
-    });
-
-    And('the directive code should contain {string}', (_: unknown, text: string) => {
-      const directive = state!.scanResult!.files[0]!.directives[0]!;
-      expect(directive.code).toContain(text);
-    });
-
-    And('the directive code should also contain {string}', (_: unknown, text: string) => {
-      const directive = state!.scanResult!.files[0]!.directives[0]!;
-      expect(directive.code).toContain(text);
-    });
-
-    And(
-      'the directive should have {int} export named {string} of type {string}',
-      (_: unknown, count: number, name: string, type: string) => {
+      And('the directive should have {int} export', (_: unknown, count: number) => {
         const directive = state!.scanResult!.files[0]!.directives[0]!;
         expect(directive.exports).toHaveLength(count);
-        expect(directive.exports[0]!.name).toBe(name);
-        expect(directive.exports[0]!.type).toBe(type);
-      }
-    );
+      });
+    });
+
+    RuleScenario('Skip files without directives', ({ Given, When, Then, And }) => {
+      Given(
+        'a file {string} with content:',
+        async (_: unknown, filePath: string, content: string) => {
+          await createFile(filePath, content);
+        }
+      );
+
+      When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
+        await runScan(pattern);
+      });
+
+      Then('the scan should succeed with {int} files', (_: unknown, count: number) => {
+        expect(state!.scanSucceeded).toBe(true);
+        expect(state!.scanResult!.files).toHaveLength(count);
+      });
+
+      And('the scan should have {int} errors', (_: unknown, count: number) => {
+        expect(state!.scanResult!.errors).toHaveLength(count);
+      });
+    });
+
+    RuleScenario('Extract complete directive information', ({ Given, When, Then, And }) => {
+      Given(
+        'a file {string} with content:',
+        async (_: unknown, filePath: string, content: string) => {
+          await createFile(filePath, content);
+        }
+      );
+
+      When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
+        await runScan(pattern);
+      });
+
+      Then('the scan should succeed with {int} file', (_: unknown, count: number) => {
+        expect(state!.scanSucceeded).toBe(true);
+        expect(state!.scanResult!.files).toHaveLength(count);
+      });
+
+      And('the scan should have {int} errors', (_: unknown, count: number) => {
+        expect(state!.scanResult!.errors).toHaveLength(count);
+      });
+
+      And(
+        'the directive should have tags {string} and {string}',
+        (_: unknown, tag1: string, tag2: string) => {
+          const directive = state!.scanResult!.files[0]!.directives[0]!;
+          expect(directive.directive.tags).toContain(tag1);
+          expect(directive.directive.tags).toContain(tag2);
+        }
+      );
+
+      And('the directive description should contain {string}', (_: unknown, text: string) => {
+        const directive = state!.scanResult!.files[0]!.directives[0]!;
+        expect(directive.directive.description).toContain(text);
+      });
+
+      And('the directive description should also contain {string}', (_: unknown, text: string) => {
+        const directive = state!.scanResult!.files[0]!.directives[0]!;
+        expect(directive.directive.description).toContain(text);
+      });
+
+      And('the directive should have {int} example', (_: unknown, count: number) => {
+        const directive = state!.scanResult!.files[0]!.directives[0]!;
+        expect(directive.directive.examples).toHaveLength(count);
+      });
+
+      And('the directive example should contain {string}', (_: unknown, text: string) => {
+        const directive = state!.scanResult!.files[0]!.directives[0]!;
+        expect(directive.directive.examples[0]).toContain(text);
+      });
+
+      And('the directive code should contain {string}', (_: unknown, text: string) => {
+        const directive = state!.scanResult!.files[0]!.directives[0]!;
+        expect(directive.code).toContain(text);
+      });
+
+      And('the directive code should also contain {string}', (_: unknown, text: string) => {
+        const directive = state!.scanResult!.files[0]!.directives[0]!;
+        expect(directive.code).toContain(text);
+      });
+
+      And(
+        'the directive should have {int} export named {string} of type {string}',
+        (_: unknown, count: number, name: string, type: string) => {
+          const directive = state!.scanResult!.files[0]!.directives[0]!;
+          expect(directive.exports).toHaveLength(count);
+          expect(directive.exports[0]!.name).toBe(name);
+          expect(directive.exports[0]!.type).toBe(type);
+        }
+      );
+    });
   });
 
   // ---------------------------------------------------------------------------
-  // Scenario: Handle files with quick directive check optimization
+  // Rule: scanPatterns collects errors without aborting
   // ---------------------------------------------------------------------------
 
-  Scenario('Handle files with quick directive check optimization', ({ Given, When, Then, And }) => {
-    Given(
-      'a file {string} with content:',
-      async (_: unknown, filePath: string, content: string) => {
-        await createFile(filePath, content);
-      }
-    );
+  Rule('scanPatterns collects errors without aborting', ({ RuleScenario }) => {
+    RuleScenario('Collect errors for files that fail to parse', ({ Given, When, Then, And }) => {
+      Given(
+        'a file {string} with content:',
+        async (_: unknown, filePath: string, content: string) => {
+          await createFile(filePath, content);
+        }
+      );
 
-    And('a file {string} with content:', async (_: unknown, filePath: string, content: string) => {
-      await createFile(filePath, content);
-    });
+      And(
+        'a file {string} with content:',
+        async (_: unknown, filePath: string, content: string) => {
+          await createFile(filePath, content);
+        }
+      );
 
-    When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
-      await runScan(pattern);
-    });
+      When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
+        await runScan(pattern);
+      });
 
-    Then('the scan should succeed with {int} file', (_: unknown, count: number) => {
-      expect(state!.scanSucceeded).toBe(true);
-      expect(state!.scanResult!.files).toHaveLength(count);
-    });
+      Then('the scan should succeed with {int} file', (_: unknown, count: number) => {
+        expect(state!.scanSucceeded).toBe(true);
+        expect(state!.scanResult!.files).toHaveLength(count);
+      });
 
-    And('file {string} should be in the results', (_: unknown, fileName: string) => {
-      const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
-      expect(file).toBeDefined();
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // Scenario: Skip files without @libar-docs file-level opt-in
-  // ---------------------------------------------------------------------------
-
-  Scenario('Skip files without @libar-docs file-level opt-in', ({ Given, When, Then, And }) => {
-    Given(
-      'a file {string} with content:',
-      async (_: unknown, filePath: string, content: string) => {
-        await createFile(filePath, content);
-      }
-    );
-
-    And('a file {string} with content:', async (_: unknown, filePath: string, content: string) => {
-      await createFile(filePath, content);
-    });
-
-    When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
-      await runScan(pattern);
-    });
-
-    Then('the scan should succeed with {int} file', (_: unknown, count: number) => {
-      expect(state!.scanSucceeded).toBe(true);
-      expect(state!.scanResult!.files).toHaveLength(count);
-    });
-
-    And('file {string} should be in the results', (_: unknown, fileName: string) => {
-      const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
-      expect(file).toBeDefined();
-    });
-
-    And('the scan should have {int} errors', (_: unknown, count: number) => {
-      expect(state!.scanResult!.errors).toHaveLength(count);
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // Scenario: Not confuse @libar-docs-* with @libar-docs opt-in
-  // ---------------------------------------------------------------------------
-
-  Scenario('Not confuse @libar-docs-* with @libar-docs opt-in', ({ Given, When, Then, And }) => {
-    Given(
-      'a file {string} with content:',
-      async (_: unknown, filePath: string, content: string) => {
-        await createFile(filePath, content);
-      }
-    );
-
-    When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
-      await runScan(pattern);
-    });
-
-    Then('the scan should succeed with {int} files', (_: unknown, count: number) => {
-      expect(state!.scanSucceeded).toBe(true);
-      expect(state!.scanResult!.files).toHaveLength(count);
-    });
-
-    And('the scan should have {int} errors', (_: unknown, count: number) => {
-      expect(state!.scanResult!.errors).toHaveLength(count);
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // Scenario: Detect @libar-docs opt-in combined with section tags
-  // ---------------------------------------------------------------------------
-
-  Scenario('Detect @libar-docs opt-in combined with section tags', ({ Given, When, Then, And }) => {
-    Given(
-      'a file {string} with content:',
-      async (_: unknown, filePath: string, content: string) => {
-        await createFile(filePath, content);
-      }
-    );
-
-    When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
-      await runScan(pattern);
-    });
-
-    Then('the scan should succeed with {int} file', (_: unknown, count: number) => {
-      expect(state!.scanSucceeded).toBe(true);
-      expect(state!.scanResult!.files).toHaveLength(count);
-    });
-
-    And(
-      'file {string} should have {int} directive',
-      (_: unknown, fileName: string, count: number) => {
+      And('file {string} should be in the results', (_: unknown, fileName: string) => {
         const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
         expect(file).toBeDefined();
-        expect(file!.directives).toHaveLength(count);
+      });
+
+      And('the scan should have {int} error', (_: unknown, count: number) => {
+        expect(state!.scanResult!.errors).toHaveLength(count);
+      });
+
+      And('the error should reference file {string}', (_: unknown, fileName: string) => {
+        expect(state!.scanResult!.errors[0]!.file).toContain(fileName);
+      });
+    });
+
+    RuleScenario('Always return Ok result even with broken files', ({ Given, When, Then, And }) => {
+      Given(
+        'a file {string} with content:',
+        async (_: unknown, filePath: string, content: string) => {
+          await createFile(filePath, content);
+        }
+      );
+
+      And(
+        'a file {string} with content:',
+        async (_: unknown, filePath: string, content: string) => {
+          await createFile(filePath, content);
+        }
+      );
+
+      When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
+        await runScan(pattern);
+      });
+
+      Then('the scan should succeed with {int} files', (_: unknown, count: number) => {
+        expect(state!.scanSucceeded).toBe(true);
+        expect(state!.scanResult!.files).toHaveLength(count);
+      });
+
+      And('the scan should have {int} errors', (_: unknown, count: number) => {
+        expect(state!.scanResult!.errors).toHaveLength(count);
+      });
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Rule: Pattern matching and exclusion filtering
+  // ---------------------------------------------------------------------------
+
+  Rule('Pattern matching and exclusion filtering', ({ RuleScenario }) => {
+    RuleScenario('Return empty results when no patterns match', ({ When, Then, And }) => {
+      When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
+        await runScan(pattern);
+      });
+
+      Then('the scan should succeed with {int} files', (_: unknown, count: number) => {
+        expect(state!.scanSucceeded).toBe(true);
+        expect(state!.scanResult!.files).toHaveLength(count);
+      });
+
+      And('the scan should have {int} errors', (_: unknown, count: number) => {
+        expect(state!.scanResult!.errors).toHaveLength(count);
+      });
+    });
+
+    RuleScenario('Respect exclusion patterns', ({ Given, When, Then, And }) => {
+      Given(
+        'a file {string} with content:',
+        async (_: unknown, filePath: string, content: string) => {
+          await createFile(filePath, content);
+        }
+      );
+
+      And(
+        'a file {string} with content:',
+        async (_: unknown, filePath: string, content: string) => {
+          await createFile(filePath, content);
+        }
+      );
+
+      When(
+        'scanning with pattern {string} excluding {string}',
+        async (_: unknown, pattern: string, exclude: string) => {
+          await runScan(pattern, [exclude]);
+        }
+      );
+
+      Then('the scan should succeed with {int} file', (_: unknown, count: number) => {
+        expect(state!.scanSucceeded).toBe(true);
+        expect(state!.scanResult!.files).toHaveLength(count);
+      });
+
+      And('file {string} should be in the results', (_: unknown, fileName: string) => {
+        const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
+        expect(file).toBeDefined();
+      });
+
+      And('file {string} should not be in the results', (_: unknown, pathPart: string) => {
+        const file = state!.scanResult!.files.find((f) => f.filePath.includes(pathPart));
+        expect(file).toBeUndefined();
+      });
+    });
+
+    RuleScenario(
+      'Handle multiple files with multiple directives each',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a file {string} with content:',
+          async (_: unknown, filePath: string, content: string) => {
+            await createFile(filePath, content);
+          }
+        );
+
+        And(
+          'a file {string} with content:',
+          async (_: unknown, filePath: string, content: string) => {
+            await createFile(filePath, content);
+          }
+        );
+
+        When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
+          await runScan(pattern);
+        });
+
+        Then('the scan should succeed with {int} files', (_: unknown, count: number) => {
+          expect(state!.scanSucceeded).toBe(true);
+          expect(state!.scanResult!.files).toHaveLength(count);
+        });
+
+        And('the scan should have {int} errors', (_: unknown, count: number) => {
+          expect(state!.scanResult!.errors).toHaveLength(count);
+        });
+
+        And(
+          'file {string} should have {int} directives',
+          (_: unknown, fileName: string, count: number) => {
+            const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
+            expect(file).toBeDefined();
+            expect(file!.directives).toHaveLength(count);
+          }
+        );
+
+        And(
+          'file {string} should have {int} directive',
+          (_: unknown, fileName: string, count: number) => {
+            const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
+            expect(file).toBeDefined();
+            expect(file!.directives).toHaveLength(count);
+          }
+        );
+      }
+    );
+  });
+
+  // ---------------------------------------------------------------------------
+  // Rule: File opt-in requirement gates scanning
+  // ---------------------------------------------------------------------------
+
+  Rule('File opt-in requirement gates scanning', ({ RuleScenario }) => {
+    RuleScenario(
+      'Handle files with quick directive check optimization',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a file {string} with content:',
+          async (_: unknown, filePath: string, content: string) => {
+            await createFile(filePath, content);
+          }
+        );
+
+        And(
+          'a file {string} with content:',
+          async (_: unknown, filePath: string, content: string) => {
+            await createFile(filePath, content);
+          }
+        );
+
+        When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
+          await runScan(pattern);
+        });
+
+        Then('the scan should succeed with {int} file', (_: unknown, count: number) => {
+          expect(state!.scanSucceeded).toBe(true);
+          expect(state!.scanResult!.files).toHaveLength(count);
+        });
+
+        And('file {string} should be in the results', (_: unknown, fileName: string) => {
+          const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
+          expect(file).toBeDefined();
+        });
       }
     );
 
-    And('the directive should have tag {string}', (_: unknown, tag: string) => {
-      const directive = state!.scanResult!.files[0]!.directives[0]!;
-      expect(directive.directive.tags).toContain(tag);
-    });
+    RuleScenario(
+      'Skip files without @libar-docs file-level opt-in',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a file {string} with content:',
+          async (_: unknown, filePath: string, content: string) => {
+            await createFile(filePath, content);
+          }
+        );
 
-    And('the scan should have {int} errors', (_: unknown, count: number) => {
-      expect(state!.scanResult!.errors).toHaveLength(count);
-    });
+        And(
+          'a file {string} with content:',
+          async (_: unknown, filePath: string, content: string) => {
+            await createFile(filePath, content);
+          }
+        );
+
+        When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
+          await runScan(pattern);
+        });
+
+        Then('the scan should succeed with {int} file', (_: unknown, count: number) => {
+          expect(state!.scanSucceeded).toBe(true);
+          expect(state!.scanResult!.files).toHaveLength(count);
+        });
+
+        And('file {string} should be in the results', (_: unknown, fileName: string) => {
+          const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
+          expect(file).toBeDefined();
+        });
+
+        And('the scan should have {int} errors', (_: unknown, count: number) => {
+          expect(state!.scanResult!.errors).toHaveLength(count);
+        });
+      }
+    );
+
+    RuleScenario(
+      'Not confuse @libar-docs-* with @libar-docs opt-in',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a file {string} with content:',
+          async (_: unknown, filePath: string, content: string) => {
+            await createFile(filePath, content);
+          }
+        );
+
+        When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
+          await runScan(pattern);
+        });
+
+        Then('the scan should succeed with {int} files', (_: unknown, count: number) => {
+          expect(state!.scanSucceeded).toBe(true);
+          expect(state!.scanResult!.files).toHaveLength(count);
+        });
+
+        And('the scan should have {int} errors', (_: unknown, count: number) => {
+          expect(state!.scanResult!.errors).toHaveLength(count);
+        });
+      }
+    );
+
+    RuleScenario(
+      'Detect @libar-docs opt-in combined with section tags',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a file {string} with content:',
+          async (_: unknown, filePath: string, content: string) => {
+            await createFile(filePath, content);
+          }
+        );
+
+        When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
+          await runScan(pattern);
+        });
+
+        Then('the scan should succeed with {int} file', (_: unknown, count: number) => {
+          expect(state!.scanSucceeded).toBe(true);
+          expect(state!.scanResult!.files).toHaveLength(count);
+        });
+
+        And(
+          'file {string} should have {int} directive',
+          (_: unknown, fileName: string, count: number) => {
+            const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
+            expect(file).toBeDefined();
+            expect(file!.directives).toHaveLength(count);
+          }
+        );
+
+        And('the directive should have tag {string}', (_: unknown, tag: string) => {
+          const directive = state!.scanResult!.files[0]!.directives[0]!;
+          expect(directive.directive.tags).toContain(tag);
+        });
+
+        And('the scan should have {int} errors', (_: unknown, count: number) => {
+          expect(state!.scanResult!.errors).toHaveLength(count);
+        });
+      }
+    );
   });
 });

@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:PrChangesOptions
+@libar-docs-status:completed
+@libar-docs-product-area:Generation
 @libar-docs-implements:GeneratorInfrastructureTesting
 Feature: PR Changes Options
 
@@ -13,6 +17,10 @@ Feature: PR Changes Options
   # ===========================================================================
 
   Rule: Orchestrator supports PR changes generation options
+
+    **Invariant:** PR changes output includes only patterns matching the changed files list, the release version filter, or both (OR logic when combined).
+    **Rationale:** PR-scoped documentation must reflect exactly what changed, avoiding noise from unrelated patterns.
+    **Verified by:** PR changes filters to explicit file list, PR changes filters by release version, Combined filters use OR logic
 
     @acceptance-criteria @happy-path
     Scenario: PR changes filters to explicit file list

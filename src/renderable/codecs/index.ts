@@ -213,3 +213,13 @@ export {
   type ReferenceDocConfig,
   type ReferenceCodecOptions,
 } from './reference.js';
+
+export { type ShapeSelector } from './shape-matcher.js';
+
+// Composite (multi-codec assembly)
+export {
+  createCompositeCodec,
+  composeDocuments,
+  type CompositeCodecOptions,
+  type ComposeOptions,
+} from './composite.js';

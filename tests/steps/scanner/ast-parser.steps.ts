@@ -33,7 +33,7 @@ let state: AstParserScenarioState | null = null;
 
 const feature = await loadFeature('tests/features/scanner/ast-parser.feature');
 
-describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
+describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
   // Lifecycle Hooks
   // ---------------------------------------------------------------------------
@@ -435,346 +435,390 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   };
 
   // ---------------------------------------------------------------------------
-  // Scenario Definitions
+  // Rule: Export types are correctly identified from TypeScript declarations
   // ---------------------------------------------------------------------------
 
-  // Export Type Detection Scenarios
-  Scenario('Parse function export with directive', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive should have tag {string}', thenDirectiveShouldHaveTag);
-    And('the directive description should contain {string}', thenDescriptionShouldContain);
-    And('the first export should be:', thenFirstExportShouldBe);
-  });
-
-  Scenario('Parse type export with directive', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive should have tags:', thenDirectiveShouldHaveTags);
-    And('the first export should be:', thenFirstExportShouldBe);
-  });
-
-  Scenario('Parse interface export with directive', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the first export should be:', thenFirstExportShouldBe);
-  });
-
-  Scenario('Parse const export with directive', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the first export should be:', thenFirstExportShouldBe);
-  });
-
-  Scenario('Parse class export with directive', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the first export should be:', thenFirstExportShouldBe);
-  });
-
-  Scenario('Parse enum export with directive', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the first export should be:', thenFirstExportShouldBe);
-    And('the directive code should contain {string}', thenCodeShouldContain);
-  });
-
-  Scenario('Parse const enum export with directive', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the first export should be:', thenFirstExportShouldBe);
-    And('the directive code should contain {string}', thenCodeShouldContain);
-  });
-
-  Scenario('Parse abstract class export with directive', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the first export should be:', thenFirstExportShouldBe);
-  });
-
-  Scenario('Parse arrow function export with directive', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the first export should be:', thenFirstExportShouldBe);
-  });
-
-  Scenario('Parse async function export with directive', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the first export should be:', thenFirstExportShouldBe);
-    And('the directive code should contain {string}', thenCodeShouldContain);
-  });
-
-  Scenario('Parse generic function export with directive', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the first export should be:', thenFirstExportShouldBe);
-    And('the directive code should contain {string}', thenCodeShouldContain);
-  });
-
-  Scenario('Parse default export with directive', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the first export should be:', thenFirstExportShouldBe);
-  });
-
-  Scenario('Parse re-exports with directive', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('{int} exports should be found', thenExportCountShouldBe);
-    And('the exports should include names:', thenExportsShouldIncludeNames);
-  });
-
-  Scenario('Parse multiple exports in single statement', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('{int} exports should be found', thenExportCountShouldBe);
-    And('the exports should include names:', thenExportsShouldIncludeNames);
-  });
-
-  Scenario('Parse multiple directives in same file', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directives should be found', thenDirectiveCountShouldBe);
-    And('the directives should have details:', thenDirectivesShouldHaveDetails);
-  });
-
-  // Metadata Extraction Scenarios
-  Scenario('Extract examples from directive', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive should have {int} examples', thenDirectiveShouldHaveExampleCount);
-    And('the examples should contain:', thenExamplesShouldContain);
-  });
-
-  Scenario('Extract multi-line description', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive description should contain all:', thenDescriptionShouldContainAll);
-  });
-
-  Scenario('Track line numbers correctly', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive position should be:', thenPositionShouldBe);
-  });
-
-  Scenario('Extract function signature information', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And(
-      'the first export signature should contain {string}',
-      thenFirstExportSignatureShouldContain
-    );
-  });
-
-  Scenario('Ignore @param and @returns in description', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive description should be {string}', thenDescriptionShouldBe);
-    And('the directive description should not contain any:', thenDescriptionShouldNotContainAny);
-  });
-
-  // Tag Extraction Scenarios
-  Scenario('Extract multiple tags from directive section', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive should have {int} tags', thenDirectiveShouldHaveTagCount);
-    And('the directive should have tags:', thenDirectiveShouldHaveTags);
-  });
-
-  Scenario('Extract tag with description on same line', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive should have {int} tag', thenDirectiveShouldHaveTagCount);
-    And('the directive should have tag {string}', thenDirectiveShouldHaveTag);
-  });
-
-  Scenario('NOT extract tags mentioned in description', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive should have {int} tag', thenDirectiveShouldHaveTagCount);
-    And('the directive should have tag {string}', thenDirectiveShouldHaveTag);
-    And('the directive should not have any tags:', thenDirectiveShouldNotHaveAnyTags);
-  });
-
-  Scenario('NOT extract tags mentioned in @example sections', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive should have {int} tag', thenDirectiveShouldHaveTagCount);
-    And('the directive should have tag {string}', thenDirectiveShouldHaveTag);
-    And('the directive should not have any tags:', thenDirectiveShouldNotHaveAnyTags);
-  });
-
-  // When to Use Scenarios
-  Scenario(
-    'Extract When to Use heading format with bullet points',
-    ({ Given, When, Then, And }) => {
+  Rule('Export types are correctly identified from TypeScript declarations', ({ RuleScenario }) => {
+    RuleScenario('Parse function export with directive', ({ Given, When, Then, And }) => {
       Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
       When('the file is parsed for directives', whenFileIsParsed);
       Then('{int} directive should be found', thenDirectiveCountShouldBe);
-      And('the directive whenToUse should have {int} items', thenWhenToUseShouldHaveItemCount);
+      And('the directive should have tag {string}', thenDirectiveShouldHaveTag);
+      And('the directive description should contain {string}', thenDescriptionShouldContain);
+      And('the first export should be:', thenFirstExportShouldBe);
+    });
+
+    RuleScenario('Parse type export with directive', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the directive should have tags:', thenDirectiveShouldHaveTags);
+      And('the first export should be:', thenFirstExportShouldBe);
+    });
+
+    RuleScenario('Parse interface export with directive', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the first export should be:', thenFirstExportShouldBe);
+    });
+
+    RuleScenario('Parse const export with directive', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the first export should be:', thenFirstExportShouldBe);
+    });
+
+    RuleScenario('Parse class export with directive', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the first export should be:', thenFirstExportShouldBe);
+    });
+
+    RuleScenario('Parse enum export with directive', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the first export should be:', thenFirstExportShouldBe);
+      And('the directive code should contain {string}', thenCodeShouldContain);
+    });
+
+    RuleScenario('Parse const enum export with directive', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the first export should be:', thenFirstExportShouldBe);
+      And('the directive code should contain {string}', thenCodeShouldContain);
+    });
+
+    RuleScenario('Parse abstract class export with directive', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the first export should be:', thenFirstExportShouldBe);
+    });
+
+    RuleScenario('Parse arrow function export with directive', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the first export should be:', thenFirstExportShouldBe);
+    });
+
+    RuleScenario('Parse async function export with directive', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the first export should be:', thenFirstExportShouldBe);
+      And('the directive code should contain {string}', thenCodeShouldContain);
+    });
+
+    RuleScenario('Parse generic function export with directive', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the first export should be:', thenFirstExportShouldBe);
+      And('the directive code should contain {string}', thenCodeShouldContain);
+    });
+
+    RuleScenario('Parse default export with directive', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the first export should be:', thenFirstExportShouldBe);
+    });
+
+    RuleScenario('Parse re-exports with directive', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('{int} exports should be found', thenExportCountShouldBe);
+      And('the exports should include names:', thenExportsShouldIncludeNames);
+    });
+
+    RuleScenario('Parse multiple exports in single statement', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('{int} exports should be found', thenExportCountShouldBe);
+      And('the exports should include names:', thenExportsShouldIncludeNames);
+    });
+
+    RuleScenario('Parse multiple directives in same file', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directives should be found', thenDirectiveCountShouldBe);
+      And('the directives should have details:', thenDirectivesShouldHaveDetails);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Rule: Metadata is correctly extracted from JSDoc comments
+  // ---------------------------------------------------------------------------
+
+  Rule('Metadata is correctly extracted from JSDoc comments', ({ RuleScenario }) => {
+    RuleScenario('Extract examples from directive', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the directive should have {int} examples', thenDirectiveShouldHaveExampleCount);
+      And('the examples should contain:', thenExamplesShouldContain);
+    });
+
+    RuleScenario('Extract multi-line description', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the directive description should contain all:', thenDescriptionShouldContainAll);
+    });
+
+    RuleScenario('Track line numbers correctly', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the directive position should be:', thenPositionShouldBe);
+    });
+
+    RuleScenario('Extract function signature information', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And(
+        'the first export signature should contain {string}',
+        thenFirstExportSignatureShouldContain
+      );
+    });
+
+    RuleScenario('Ignore @param and @returns in description', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the directive description should be {string}', thenDescriptionShouldBe);
+      And('the directive description should not contain any:', thenDescriptionShouldNotContainAny);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Rule: Tags are extracted only from the directive section
+  // ---------------------------------------------------------------------------
+
+  Rule(
+    'Tags are extracted only from the directive section, not from description or examples',
+    ({ RuleScenario }) => {
+      RuleScenario('Extract multiple tags from directive section', ({ Given, When, Then, And }) => {
+        Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+        When('the file is parsed for directives', whenFileIsParsed);
+        Then('{int} directive should be found', thenDirectiveCountShouldBe);
+        And('the directive should have {int} tags', thenDirectiveShouldHaveTagCount);
+        And('the directive should have tags:', thenDirectiveShouldHaveTags);
+      });
+
+      RuleScenario('Extract tag with description on same line', ({ Given, When, Then, And }) => {
+        Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+        When('the file is parsed for directives', whenFileIsParsed);
+        Then('{int} directive should be found', thenDirectiveCountShouldBe);
+        And('the directive should have {int} tag', thenDirectiveShouldHaveTagCount);
+        And('the directive should have tag {string}', thenDirectiveShouldHaveTag);
+      });
+
+      RuleScenario('NOT extract tags mentioned in description', ({ Given, When, Then, And }) => {
+        Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+        When('the file is parsed for directives', whenFileIsParsed);
+        Then('{int} directive should be found', thenDirectiveCountShouldBe);
+        And('the directive should have {int} tag', thenDirectiveShouldHaveTagCount);
+        And('the directive should have tag {string}', thenDirectiveShouldHaveTag);
+        And('the directive should not have any tags:', thenDirectiveShouldNotHaveAnyTags);
+      });
+
+      RuleScenario(
+        'NOT extract tags mentioned in @example sections',
+        ({ Given, When, Then, And }) => {
+          Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+          When('the file is parsed for directives', whenFileIsParsed);
+          Then('{int} directive should be found', thenDirectiveCountShouldBe);
+          And('the directive should have {int} tag', thenDirectiveShouldHaveTagCount);
+          And('the directive should have tag {string}', thenDirectiveShouldHaveTag);
+          And('the directive should not have any tags:', thenDirectiveShouldNotHaveAnyTags);
+        }
+      );
+    }
+  );
+
+  // ---------------------------------------------------------------------------
+  // Rule: When to Use sections are extracted in all supported formats
+  // ---------------------------------------------------------------------------
+
+  Rule('When to Use sections are extracted in all supported formats', ({ RuleScenario }) => {
+    RuleScenario(
+      'Extract When to Use heading format with bullet points',
+      ({ Given, When, Then, And }) => {
+        Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+        When('the file is parsed for directives', whenFileIsParsed);
+        Then('{int} directive should be found', thenDirectiveCountShouldBe);
+        And('the directive whenToUse should have {int} items', thenWhenToUseShouldHaveItemCount);
+        And('the directive whenToUse should contain:', thenWhenToUseShouldContain);
+      }
+    );
+
+    RuleScenario('Extract When to use inline format', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the directive whenToUse should have {int} item', thenWhenToUseShouldHaveItemCount);
       And('the directive whenToUse should contain:', thenWhenToUseShouldContain);
-    }
-  );
+    });
 
-  Scenario('Extract When to use inline format', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive whenToUse should have {int} item', thenWhenToUseShouldHaveItemCount);
-    And('the directive whenToUse should contain:', thenWhenToUseShouldContain);
-  });
+    RuleScenario(
+      'Extract asterisk bullets in When to Use section',
+      ({ Given, When, Then, And }) => {
+        Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+        When('the file is parsed for directives', whenFileIsParsed);
+        Then('{int} directive should be found', thenDirectiveCountShouldBe);
+        And('the directive whenToUse should contain:', thenWhenToUseShouldContain);
+      }
+    );
 
-  Scenario('Extract asterisk bullets in When to Use section', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive whenToUse should contain:', thenWhenToUseShouldContain);
-  });
-
-  Scenario('Not set whenToUse when section is missing', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive whenToUse should be undefined', thenWhenToUseShouldBeUndefined);
-  });
-
-  // Relationship Tag Scenarios
-  Scenario('Extract @libar-docs-uses with single value', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive uses should contain:', thenUsesShouldContain);
-  });
-
-  Scenario('Extract @libar-docs-uses with comma-separated values', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive uses should have {int} items', thenUsesShouldHaveItemCount);
-    And('the directive uses should contain:', thenUsesShouldContain);
-  });
-
-  Scenario('Extract @libar-docs-used-by with single value', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive usedBy should contain:', thenUsedByShouldContain);
-  });
-
-  Scenario(
-    'Extract @libar-docs-used-by with comma-separated values',
-    ({ Given, When, Then, And }) => {
+    RuleScenario('Not set whenToUse when section is missing', ({ Given, When, Then, And }) => {
       Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
       When('the file is parsed for directives', whenFileIsParsed);
       Then('{int} directive should be found', thenDirectiveCountShouldBe);
-      And('the directive usedBy should have {int} items', thenUsedByShouldHaveItemCount);
-      And('the directive usedBy should contain:', thenUsedByShouldContain);
-    }
-  );
-
-  Scenario('Extract both uses and usedBy from same directive', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive uses should contain:', thenUsesShouldContain);
-    And('the directive usedBy should contain:', thenUsedByShouldContain);
+      And('the directive whenToUse should be undefined', thenWhenToUseShouldBeUndefined);
+    });
   });
 
-  Scenario('NOT capture uses/usedBy values in description', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive description should start with {string}', thenDescriptionShouldStartWith);
-    And(
-      'the directive description should not start with any:',
-      thenDescriptionShouldNotStartWithAny
+  // ---------------------------------------------------------------------------
+  // Rule: Relationship tags extract uses and usedBy dependencies
+  // ---------------------------------------------------------------------------
+
+  Rule('Relationship tags extract uses and usedBy dependencies', ({ RuleScenario }) => {
+    RuleScenario('Extract @libar-docs-uses with single value', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the directive uses should contain:', thenUsesShouldContain);
+    });
+
+    RuleScenario(
+      'Extract @libar-docs-uses with comma-separated values',
+      ({ Given, When, Then, And }) => {
+        Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+        When('the file is parsed for directives', whenFileIsParsed);
+        Then('{int} directive should be found', thenDirectiveCountShouldBe);
+        And('the directive uses should have {int} items', thenUsesShouldHaveItemCount);
+        And('the directive uses should contain:', thenUsesShouldContain);
+      }
     );
-    And('the directive uses should contain:', thenUsesShouldContain);
-    And('the directive usedBy should contain:', thenUsedByShouldContain);
+
+    RuleScenario('Extract @libar-docs-used-by with single value', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the directive usedBy should contain:', thenUsedByShouldContain);
+    });
+
+    RuleScenario(
+      'Extract @libar-docs-used-by with comma-separated values',
+      ({ Given, When, Then, And }) => {
+        Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+        When('the file is parsed for directives', whenFileIsParsed);
+        Then('{int} directive should be found', thenDirectiveCountShouldBe);
+        And('the directive usedBy should have {int} items', thenUsedByShouldHaveItemCount);
+        And('the directive usedBy should contain:', thenUsedByShouldContain);
+      }
+    );
+
+    RuleScenario(
+      'Extract both uses and usedBy from same directive',
+      ({ Given, When, Then, And }) => {
+        Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+        When('the file is parsed for directives', whenFileIsParsed);
+        Then('{int} directive should be found', thenDirectiveCountShouldBe);
+        And('the directive uses should contain:', thenUsesShouldContain);
+        And('the directive usedBy should contain:', thenUsedByShouldContain);
+      }
+    );
+
+    RuleScenario('NOT capture uses/usedBy values in description', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the directive description should start with {string}', thenDescriptionShouldStartWith);
+      And(
+        'the directive description should not start with any:',
+        thenDescriptionShouldNotStartWithAny
+      );
+      And('the directive uses should contain:', thenUsesShouldContain);
+      And('the directive usedBy should contain:', thenUsedByShouldContain);
+    });
+
+    RuleScenario(
+      'Not set uses/usedBy when no relationship tags exist',
+      ({ Given, When, Then, And }) => {
+        Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+        When('the file is parsed for directives', whenFileIsParsed);
+        Then('{int} directive should be found', thenDirectiveCountShouldBe);
+        And('the directive uses should be undefined', thenUsesShouldBeUndefined);
+        And('the directive usedBy should be undefined', thenUsedByShouldBeUndefined);
+      }
+    );
   });
 
-  Scenario('Not set uses/usedBy when no relationship tags exist', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive uses should be undefined', thenUsesShouldBeUndefined);
-    And('the directive usedBy should be undefined', thenUsedByShouldBeUndefined);
-  });
+  // ---------------------------------------------------------------------------
+  // Rule: Edge cases and malformed input are handled gracefully
+  // ---------------------------------------------------------------------------
 
-  // Edge Case Scenarios
-  Scenario('Skip comments without @libar-docs-* tags', ({ Given, When, Then }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directives should be found', thenDirectiveCountShouldBe);
-  });
+  Rule('Edge cases and malformed input are handled gracefully', ({ RuleScenario }) => {
+    RuleScenario('Skip comments without @libar-docs-* tags', ({ Given, When, Then }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directives should be found', thenDirectiveCountShouldBe);
+    });
 
-  Scenario('Skip invalid directive with incomplete tag', ({ Given, When, Then }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directives should be found', thenDirectiveCountShouldBe);
-  });
+    RuleScenario('Skip invalid directive with incomplete tag', ({ Given, When, Then }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directives should be found', thenDirectiveCountShouldBe);
+    });
 
-  Scenario('Handle malformed TypeScript gracefully', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with malformed content:', givenMalformedTypeScriptFile);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('parsing should fail with error', thenParsingShouldFail);
-    And('the parse error should contain the file path', thenParseErrorShouldContainFilePath);
-  });
+    RuleScenario('Handle malformed TypeScript gracefully', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with malformed content:', givenMalformedTypeScriptFile);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('parsing should fail with error', thenParsingShouldFail);
+      And('the parse error should contain the file path', thenParseErrorShouldContainFilePath);
+    });
 
-  Scenario('Handle empty file gracefully', ({ Given, When, Then }) => {
-    Given('an empty TypeScript file', givenEmptyTypeScriptFile);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directives should be found', thenDirectiveCountShouldBe);
-  });
+    RuleScenario('Handle empty file gracefully', ({ Given, When, Then }) => {
+      Given('an empty TypeScript file', givenEmptyTypeScriptFile);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directives should be found', thenDirectiveCountShouldBe);
+    });
 
-  Scenario('Handle whitespace-only file', ({ Given, When, Then }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directives should be found', thenDirectiveCountShouldBe);
-  });
+    RuleScenario('Handle whitespace-only file', ({ Given, When, Then }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directives should be found', thenDirectiveCountShouldBe);
+    });
 
-  Scenario('Handle file with only comments and no exports', ({ Given, When, Then }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directives should be found', thenDirectiveCountShouldBe);
-  });
+    RuleScenario('Handle file with only comments and no exports', ({ Given, When, Then }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directives should be found', thenDirectiveCountShouldBe);
+    });
 
-  Scenario('Skip inline comments (non-block)', ({ Given, When, Then }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directives should be found', thenDirectiveCountShouldBe);
-  });
+    RuleScenario('Skip inline comments (non-block)', ({ Given, When, Then }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directives should be found', thenDirectiveCountShouldBe);
+    });
 
-  Scenario('Handle unicode characters in descriptions', ({ Given, When, Then, And }) => {
-    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
-    When('the file is parsed for directives', whenFileIsParsed);
-    Then('{int} directive should be found', thenDirectiveCountShouldBe);
-    And('the directive description should contain all:', thenDescriptionShouldContainAll);
+    RuleScenario('Handle unicode characters in descriptions', ({ Given, When, Then, And }) => {
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the directive description should contain all:', thenDescriptionShouldContainAll);
+    });
   });
 });
 

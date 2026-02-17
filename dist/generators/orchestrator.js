@@ -208,17 +208,7 @@ export async function generateDocumentation(options) {
         workflow = workflowResult.value;
     }
     else {
-        // Load default workflow
-        try {
-            workflow = await loadDefaultWorkflow();
-        }
-        catch (error) {
-            // Default workflow load failure is not fatal - continue without workflow
-            warnings.push({
-                type: 'config',
-                message: `Could not load default workflow: ${error instanceof Error ? error.message : String(error)}`,
-            });
-        }
+        workflow = loadDefaultWorkflow();
     }
     // Step 8: Transform patterns into MasterDataset with pre-computed views
     // This is a single-pass transformation that computes all derived views:
@@ -235,9 +225,10 @@ export async function generateDocumentation(options) {
         workflow,
         contextInferenceRules: mergedContextRules,
     });
-    // Step 9: Build codec options for PR-scoped generators
-    // Only compute if PR Changes generator is requested
-    let codecOptions;
+    // Step 9: Build codec options
+    // Start with user-provided options, then overlay computed options
+    let codecOptions = options.codecOptions;
+    // Compute PR Changes options if that generator is requested
     if (options.generators.some((g) => g.trim() === 'pr-changes')) {
         // Use explicit changedFiles if provided, otherwise detect from git
         let changedFiles = options.changedFiles;
@@ -258,6 +249,7 @@ export async function generateDocumentation(options) {
             }
         }
         codecOptions = {
+            ...codecOptions,
             'pr-changes': {
                 changedFiles: changedFiles ?? [],
                 releaseFilter: options.releaseFilter ?? '',
@@ -288,7 +280,7 @@ export async function generateDocumentation(options) {
             outputDir: options.outputDir,
             registry,
             masterDataset,
-            ...(workflow && { workflow }),
+            workflow,
             ...(codecOptions && { codecOptions }),
         };
         // Generate files with merged patterns (TypeScript + Gherkin)
@@ -632,7 +624,10 @@ export async function generateFromConfig(config, options) {
     }
     // Register reference generators from config (explicit opt-in).
     // Done here (not at import time) because configs are user-provided.
-    if (config.project.referenceDocConfigs.length > 0 && !generatorRegistry.has('reference-docs')) {
+    // Check both meta-generators: configs are partitioned by productArea presence.
+    if (config.project.referenceDocConfigs.length > 0 &&
+        !generatorRegistry.has('reference-docs') &&
+        !generatorRegistry.has('product-area-docs')) {
         registerReferenceGenerators(generatorRegistry, config.project.referenceDocConfigs);
     }
     // Group generators by effective source config to minimize scans.
@@ -642,6 +637,10 @@ export async function generateFromConfig(config, options) {
     // Run each group through the existing pipeline
     const allResults = [];
     for (const group of groups) {
+        // Merge codec options: config-level → runtime options (runtime takes precedence)
+        const mergedCodecOptions = config.project.codecOptions !== undefined || options?.codecOptions !== undefined
+            ? { ...config.project.codecOptions, ...options?.codecOptions }
+            : undefined;
         const generateOptions = {
             input: [...group.sources.typescript],
             baseDir: process.cwd(),
@@ -655,6 +654,7 @@ export async function generateFromConfig(config, options) {
             ...(options?.gitDiffBase !== undefined && { gitDiffBase: options.gitDiffBase }),
             ...(options?.changedFiles !== undefined && { changedFiles: [...options.changedFiles] }),
             ...(options?.releaseFilter !== undefined && { releaseFilter: options.releaseFilter }),
+            ...(mergedCodecOptions !== undefined && { codecOptions: mergedCodecOptions }),
         };
         const result = await generateDocumentation(generateOptions);
         if (!result.ok) {

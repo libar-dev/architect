@@ -1,4 +1,8 @@
 @libar-docs
+@libar-docs-pattern:SourceMapperTesting
+@libar-docs-implements:SourceMapper
+@libar-docs-status:completed
+@libar-docs-product-area:Generation
 Feature: Source Mapper
 
   The Source Mapper aggregates content from multiple source files based on
@@ -14,8 +18,9 @@ Feature: Source Mapper
 
   Rule: Extraction methods dispatch to correct handlers
 
-    The source mapper dispatches to different extraction functions based on
-    the extraction method specified in the source mapping table.
+    **Invariant:** Each extraction method type (self-reference, TypeScript, Gherkin) must dispatch to the correct specialized handler based on the source file type or marker.
+    **Rationale:** Wrong dispatch would apply TypeScript extraction logic to Gherkin files (or vice versa), producing garbled or empty results.
+    **Verified by:** Dispatch to decision extraction for THIS DECISION, Dispatch to TypeScript extractor for .ts files, Dispatch to behavior spec extractor for .feature files
 
     @acceptance-criteria @unit
     Scenario: Dispatch to decision extraction for THIS DECISION
@@ -53,8 +58,9 @@ Feature: Source Mapper
 
   Rule: Self-references extract from current decision document
 
-    THIS DECISION markers extract content from the current decision document
-    rather than requiring a separate file path.
+    **Invariant:** THIS DECISION self-references must extract content from the current decision document using rule descriptions, DocStrings, or full document access.
+    **Rationale:** Self-references avoid circular file reads — the document content is already in memory, so extraction is a lookup operation rather than a file I/O operation.
+    **Verified by:** Extract from THIS DECISION using rule description, Extract DocStrings from THIS DECISION, Extract full document from THIS DECISION
 
     @acceptance-criteria @unit
     Scenario: Extract from THIS DECISION using rule description
@@ -83,8 +89,9 @@ Feature: Source Mapper
 
   Rule: Multiple sources are aggregated in mapping order
 
-    Multiple source mappings result in content extraction from each file.
-    The aggregated content preserves the order from the mapping table.
+    **Invariant:** When multiple source mappings target the same section, their extracted content must be aggregated in the order defined by the mapping table.
+    **Rationale:** Mapping order is intentional — authors structure their source tables to produce a logical reading flow, and reordering would break the narrative.
+    **Verified by:** Aggregate from multiple sources, Ordering is preserved from mapping table
 
     @acceptance-criteria @integration
     Scenario: Aggregate from multiple sources
@@ -119,8 +126,9 @@ Feature: Source Mapper
 
   Rule: Missing files produce warnings without failing
 
-    A referenced source file that does not exist produces a warning,
-    but generation continues with available sources.
+    **Invariant:** When a referenced source file does not exist, the mapper must produce a warning and continue processing remaining mappings rather than failing entirely.
+    **Rationale:** Partial extraction is more useful than total failure — a decision document with most sections populated and one warning is better than no document at all.
+    **Verified by:** Missing source file produces warning, Partial extraction when some files missing, Validation checks all files before extraction
 
     @acceptance-criteria @validation
     Scenario: Missing source file produces warning
@@ -152,8 +160,9 @@ Feature: Source Mapper
 
   Rule: Empty extraction results produce info warnings
 
-    Extraction that succeeds but produces no content (e.g., no shapes found)
-    results in an informational warning being logged.
+    **Invariant:** When extraction succeeds but produces empty results (no matching shapes, no matching rules), an informational warning must be generated.
+    **Rationale:** Empty results often indicate stale source mappings pointing to renamed or removed content — warnings surface these issues before they reach generated output.
+    **Verified by:** Empty shapes extraction produces info warning, No matching rules produces info warning
 
     @acceptance-criteria @validation
     Scenario: Empty shapes extraction produces info warning
@@ -174,8 +183,9 @@ Feature: Source Mapper
 
   Rule: Extraction methods are normalized for dispatch
 
-    The extraction method column can be written in various formats
-    and is normalized before dispatch.
+    **Invariant:** Extraction method strings must be normalized to canonical forms before dispatch, with unrecognized methods producing a warning.
+    **Rationale:** Users write extraction methods in natural language — normalization bridges the gap between human-readable table entries and programmatic dispatch keys.
+    **Verified by:** Normalize various extraction method formats, Unknown extraction method produces warning
 
     @acceptance-criteria @unit
     Scenario: Normalize various extraction method formats

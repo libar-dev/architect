@@ -1,7 +1,9 @@
+@libar-docs
+@libar-docs-pattern:RequirementsAdrCodecTesting
+@libar-docs-status:completed
+@libar-docs-product-area:Generation
 @libar-docs-implements:CodecBehaviorTesting
 @behavior @requirements-adr-codecs
-@libar-docs-pattern:RequirementsAdrCodecTesting
-@libar-docs-product-area:Codec
 Feature: Requirements and ADR Document Codecs
   The RequirementsDocumentCodec and AdrDocumentCodec transform MasterDataset
   into RenderableDocuments for PRD-style and architecture decision documentation.
@@ -22,6 +24,9 @@ Feature: Requirements and ADR Document Codecs
   # ═══════════════════════════════════════════════════════════════════════════
 
   Rule: RequirementsDocumentCodec generates PRD-style documentation from patterns
+
+    **Invariant:** RequirementsDocumentCodec transforms MasterDataset patterns into a PRD-style document with flexible grouping (product area, user role, or phase), optional detail file generation, and business value rendering.
+    **Verified by:** No patterns with PRD metadata produces empty message, Summary shows counts and groupings, By product area section groups patterns correctly, By user role section uses collapsible groups, Group by phase option changes primary grouping, Filter by status option limits patterns, All features table shows complete list, Business value rendering when enabled, Generate individual requirement detail files when enabled, Requirement detail file contains acceptance criteria from scenarios, Requirement detail file contains business rules section, Implementation links from relationshipIndex
 
     @happy-path @edge-case
     Scenario: No patterns with PRD metadata produces empty message
@@ -114,6 +119,9 @@ Feature: Requirements and ADR Document Codecs
 
   Rule: AdrDocumentCodec documents architecture decisions
 
+    **Invariant:** AdrDocumentCodec transforms MasterDataset ADR patterns into an architecture decision record document with status tracking, category/phase/date grouping, supersession relationships, and optional detail file generation.
+    **Verified by:** No ADR patterns produces empty message, Summary shows status counts and categories, ADRs grouped by category, ADRs grouped by phase option, ADRs grouped by date (quarter) option, ADR index table with all decisions, ADR entries use clean text without emojis, Context, Decision, Consequences sections from Rule keywords, ADR supersedes rendering, Generate individual ADR detail files when enabled, ADR detail file contains full content
+
     @happy-path @edge-case
     Scenario: No ADR patterns produces empty message
       Given a MasterDataset with no ADR patterns
@@ -165,15 +173,10 @@ Feature: Requirements and ADR Document Codecs
         | Status   |
         | Category |
 
-    Scenario: Status emoji mapping in ADR entries
+    Scenario: ADR entries use clean text without emojis
       Given a MasterDataset with ADR patterns
       When decoding with AdrDocumentCodec
-      Then ADR entries show correct status emojis:
-        | status     | emoji |
-        | accepted   | true  |
-        | proposed   | true  |
-        | superseded | true  |
-        | deprecated | true  |
+      Then ADR index entries contain no emojis
 
     Scenario: Context, Decision, Consequences sections from Rule keywords
       Given a MasterDataset with ADR patterns with semantic rules

@@ -232,6 +232,7 @@ export function extractPatternsFromGherkin(scannedFiles, config) {
         assignIfDefined(rawPattern, 'quarter', metadata.quarter);
         assignIfDefined(rawPattern, 'completed', metadata.completed);
         assignIfDefined(rawPattern, 'effort', metadata.effort);
+        assignIfDefined(rawPattern, 'effortActual', metadata.effortActual);
         assignIfDefined(rawPattern, 'team', metadata.team);
         assignIfDefined(rawPattern, 'workflow', metadata.workflow);
         assignIfDefined(rawPattern, 'risk', metadata.risk);
@@ -255,8 +256,12 @@ export function extractPatternsFromGherkin(scannedFiles, config) {
         assignIfDefined(rawPattern, 'adrCategory', metadata.adrCategory);
         assignIfDefined(rawPattern, 'adrSupersedes', metadata.adrSupersedes);
         assignIfDefined(rawPattern, 'adrSupersededBy', metadata.adrSupersededBy);
+        assignIfDefined(rawPattern, 'adrTheme', metadata.adrTheme);
+        assignIfDefined(rawPattern, 'adrLayer', metadata.adrLayer);
         // Convention tags for reference document generation
         assignIfNonEmpty(rawPattern, 'convention', metadata.convention);
+        // Cross-cutting document inclusion tags
+        assignIfNonEmpty(rawPattern, 'include', metadata.include);
         // NOTE: ADR content is now derived from Gherkin Rule: keywords
         // (Context, Decision, Consequences) instead of parsed markdown.
         // The rules array is populated below and rendered by the ADR codec.
@@ -507,6 +512,8 @@ export async function extractPatternsFromGherkinAsync(scannedFiles, config) {
         assignIfDefined(rawPattern, 'adrSupersedes', metadata.adrSupersedes);
         assignIfDefined(rawPattern, 'adrSupersededBy', metadata.adrSupersededBy);
         assignIfNonEmpty(rawPattern, 'convention', metadata.convention);
+        // Cross-cutting document inclusion tags
+        assignIfNonEmpty(rawPattern, 'include', metadata.include);
         // NOTE: ADR content derived from Gherkin Rule: keywords, not parsed markdown
         assignIfNonEmpty(rawPattern, 'whenToUse', whenToUse);
         if (scenarios.length > 0) {

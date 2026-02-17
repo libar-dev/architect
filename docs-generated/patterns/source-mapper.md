@@ -37,6 +37,12 @@ based on extraction method (shape extraction, rule blocks, JSDoc, etc.).
 - Depends on: ShapeExtractor
 - Depends on: GherkinASTParser
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`source-mapper.feature`](../../tests/features/doc-generation/source-mapper.feature) - The Source Mapper aggregates content from multiple source files based on
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

@@ -24,8 +24,22 @@ Session types: `planning` (minimal), `design` (full: stubs + deps + deliverables
 | `stubs --unresolved`    | Find design stubs missing implementations                                             |
 | `handoff --pattern`     | Capture session-end state for multi-session work                                      |
 
+#### Annotation Exploration
+
+Run these **before** making annotation changes — they prevent debugging cycles:
+
+| Command                    | When to Use                                                                   |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| `unannotated --path <dir>` | Find TS files missing `@libar-docs` — **run first** in any enrichment session |
+| `tags`                     | Tag usage inventory (counts per tag and value)                                |
+| `sources`                  | File inventory by type (TS, Gherkin, Stubs)                                   |
+| `query getPattern <name>`  | Full pattern JSON including `extractedShapes` and `productArea`               |
+
+**Lesson learned:** `unannotated --path src/types` would have immediately caught missing `@libar-docs` annotations on `result.ts` and `errors.ts` — saving ~30 minutes of debugging why shapes weren't appearing in generated docs.
+
 #### Tips
 
 - `pattern <name>` returns ~66KB for completed patterns — prefer `context --session` for interactive sessions.
+- `query getPattern <name>` shows raw JSON including `extractedShapes` — use for debugging shape extraction.
 - Output modifiers (`--names-only`, `--count`, `--fields`) compose with any list/query command.
 - `pnpm` outputs a banner to stdout. For clean JSON piping, use `npx tsx src/cli/process-api.ts` directly.

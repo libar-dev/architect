@@ -115,6 +115,9 @@ import {
   type HandoffSessionType,
 } from '../api/handoff-generator.js';
 import { execSync } from 'child_process';
+import { parseBusinessRuleAnnotations } from '../renderable/codecs/helpers.js';
+import type { BusinessRuleAnnotations } from '../renderable/codecs/helpers.js';
+import { deduplicateScenarioNames } from '../renderable/codecs/business-rules.js';
 
 // =============================================================================
 // CLI Config
@@ -318,6 +321,10 @@ Pattern Discovery (JSON output):
   stubs --unresolved        Only stubs with missing target files
   decisions <pattern>       AD-N design decisions from stub descriptions
   pdr <number>              Cross-reference patterns mentioning a PDR number
+  rules [filters]           Business rules and invariants from feature specs
+                              --product-area <name>  Filter by product area
+                              --pattern <name>       Filter by pattern name
+                              --only-invariants      Only rules with explicit invariants
 
 Architecture Queries (JSON output):
 
@@ -362,6 +369,8 @@ List Filters (for 'list' subcommand):
   --phase <number>          Filter by roadmap phase number
   --category <name>         Filter by category
   --source <ts|gherkin>     Filter by source type
+  --arch-context <name>     Filter by architecture context (@libar-docs-arch-context)
+  --product-area <name>     Filter by product area (@libar-docs-product-area)
   --limit <n>               Maximum results
   --offset <n>              Skip first n results
 
@@ -537,13 +546,7 @@ async function buildPipeline(config: ProcessAPICLIConfig): Promise<PipelineResul
     }
     workflow = workflowResult.value;
   } else {
-    try {
-      workflow = await loadDefaultWorkflow();
-    } catch (err) {
-      console.error(
-        `Warning: Could not load default workflow: ${err instanceof Error ? err.message : String(err)}`
-      );
-    }
+    workflow = loadDefaultWorkflow();
   }
 
   // Step 8: Transform to MasterDataset (with validation for graph health commands)
@@ -664,6 +667,8 @@ function parseListFilters(subArgs: string[]): ListFilters {
   let phase: number | null = null;
   let category: string | null = null;
   let source: 'typescript' | 'gherkin' | null = null;
+  let archContext: string | null = null;
+  let productArea: string | null = null;
   let limit: number | null = null;
   let offset: number | null = null;
 
@@ -724,12 +729,23 @@ function parseListFilters(subArgs: string[]): ListFilters {
         i++;
         break;
       }
+      case '--arch-context':
+        archContext = next ?? null;
+        i++;
+        break;
+      case '--product-area':
+        productArea = next ?? null;
+        i++;
+        break;
       default:
+        if (arg?.startsWith('-') === true) {
+          console.warn(`Warning: Unknown flag '${arg}' ignored`);
+        }
         break;
     }
   }
 
-  return { status, phase, category, source, limit, offset };
+  return { status, phase, category, source, archContext, productArea, limit, offset };
 }
 
 /**
@@ -1029,6 +1045,236 @@ function handlePdr(dataset: RuntimeMasterDataset, subArgs: string[]): unknown {
     pdr: `PDR-${normalizedNumber}`,
     referenceCount: references.length,
     references,
+  };
+}
+
+// =============================================================================
+// Business Rules Handler
+// =============================================================================
+
+interface RulesFilters {
+  productArea: string | null;
+  patternName: string | null;
+  onlyInvariants: boolean;
+}
+
+interface RuleOutput {
+  name: string;
+  invariant: string | undefined;
+  rationale: string | undefined;
+  verifiedBy: string[];
+  scenarioCount: number;
+}
+
+function parseRulesFilters(subArgs: string[]): RulesFilters {
+  let productArea: string | null = null;
+  let patternName: string | null = null;
+  let onlyInvariants = false;
+
+  for (let i = 0; i < subArgs.length; i++) {
+    const arg = subArgs[i];
+    if (arg === '--product-area') {
+      if (i + 1 >= subArgs.length || subArgs[i + 1]?.startsWith('-') === true) {
+        throw new QueryApiError('INVALID_ARGUMENT', '--product-area requires a value');
+      }
+      productArea = subArgs[++i] ?? null;
+    } else if (arg === '--pattern') {
+      if (i + 1 >= subArgs.length || subArgs[i + 1]?.startsWith('-') === true) {
+        throw new QueryApiError('INVALID_ARGUMENT', '--pattern requires a value');
+      }
+      patternName = subArgs[++i] ?? null;
+    } else if (arg === '--only-invariants') {
+      onlyInvariants = true;
+    } else if (typeof arg === 'string' && arg.startsWith('-')) {
+      console.warn(`Warning: Unknown flag '${arg}' ignored`);
+    }
+  }
+
+  return { productArea, patternName, onlyInvariants };
+}
+
+function handleRules(ctx: RouteContext): unknown {
+  const filters = parseRulesFilters(ctx.subArgs);
+
+  // Collect patterns with rules, applying filters
+  let patternsWithRules = ctx.dataset.patterns.filter(
+    (p) => p.rules !== undefined && p.rules.length > 0
+  );
+
+  if (filters.productArea !== null) {
+    const area = filters.productArea.toLowerCase();
+    patternsWithRules = patternsWithRules.filter((p) => p.productArea?.toLowerCase() === area);
+  }
+
+  if (filters.patternName !== null) {
+    const name = filters.patternName.toLowerCase();
+    patternsWithRules = patternsWithRules.filter((p) => p.name.toLowerCase() === name);
+  }
+
+  // Build structured output grouped by product area → phase → feature
+  const areaMap = new Map<
+    string,
+    {
+      features: Map<
+        string,
+        {
+          pattern: string;
+          source: string;
+          phase: string;
+          rules: RuleOutput[];
+        }
+      >;
+    }
+  >();
+
+  let totalRules = 0;
+  let totalInvariants = 0;
+  const allRuleNames: string[] = [];
+
+  for (const pattern of patternsWithRules) {
+    // Fix #6: Match codec's default product area ('Platform', not 'Uncategorized')
+    const area = pattern.productArea ?? 'Platform';
+    const phase =
+      pattern.phase !== undefined
+        ? `Phase ${String(pattern.phase)}`
+        : (pattern.release ?? 'Uncategorized');
+
+    if (!areaMap.has(area)) {
+      areaMap.set(area, { features: new Map() });
+    }
+    const areaGroup = areaMap.get(area);
+    if (areaGroup === undefined) {
+      throw new Error(`Invariant violation: areaMap missing key "${area}" after set`);
+    }
+
+    const featureKey = `${phase}::${pattern.name}`;
+    if (!areaGroup.features.has(featureKey)) {
+      areaGroup.features.set(featureKey, {
+        pattern: pattern.name,
+        source: pattern.source.file,
+        phase,
+        rules: [],
+      });
+    }
+    const feature = areaGroup.features.get(featureKey);
+    if (feature === undefined) {
+      throw new Error(`Invariant violation: features map missing key "${featureKey}" after set`);
+    }
+
+    // rules guaranteed non-empty by patternsWithRules filter above
+    if (pattern.rules === undefined) {
+      throw new Error(
+        `Invariant violation: pattern "${pattern.name}" passed rules filter but has no rules`
+      );
+    }
+    for (const rule of pattern.rules) {
+      // Fix #2: Wrap annotation parsing in try-catch for structured error
+      let annotations: BusinessRuleAnnotations;
+      try {
+        annotations = parseBusinessRuleAnnotations(rule.description);
+      } catch (err) {
+        throw new QueryApiError(
+          'INVALID_ARGUMENT',
+          `Failed to parse rule "${rule.name}" in "${pattern.name}": ${err instanceof Error ? err.message : String(err)}`
+        );
+      }
+
+      if (filters.onlyInvariants && annotations.invariant === undefined) {
+        continue;
+      }
+
+      // Fix #1: Merge scenarioNames (authoritative) with verifiedBy (manual annotation)
+      feature.rules.push({
+        name: rule.name,
+        invariant: annotations.invariant,
+        rationale: annotations.rationale,
+        verifiedBy: deduplicateScenarioNames(rule.scenarioNames, annotations.verifiedBy),
+        scenarioCount: rule.scenarioCount,
+      });
+
+      totalRules++;
+      if (annotations.invariant !== undefined) {
+        totalInvariants++;
+      }
+      allRuleNames.push(rule.name);
+    }
+  }
+
+  // Fix #5: Provide hint when filters match nothing (consistent with peer handlers)
+  if (totalRules === 0 && (filters.productArea !== null || filters.patternName !== null)) {
+    const availableAreas = [
+      ...new Set(
+        ctx.dataset.patterns
+          .filter((p) => p.rules !== undefined && p.rules.length > 0)
+          .map((p) => p.productArea ?? 'Platform')
+      ),
+    ];
+    const hint =
+      filters.productArea !== null
+        ? `No rules found for product area "${filters.productArea}". Areas with rules: ${availableAreas.join(', ')}`
+        : `No rules found for pattern "${String(filters.patternName)}".`;
+    if (ctx.modifiers.count) {
+      return { totalRules: 0, totalInvariants: 0, hint };
+    }
+    if (ctx.modifiers.namesOnly) {
+      return { names: [], hint };
+    }
+    return { productAreas: [], totalRules: 0, totalInvariants: 0, hint };
+  }
+
+  // Handle modifiers
+  if (ctx.modifiers.count) {
+    return { totalRules, totalInvariants };
+  }
+
+  if (ctx.modifiers.namesOnly) {
+    return allRuleNames;
+  }
+
+  // Build final grouped output
+  const productAreas = [...areaMap.entries()].map(([areaName, areaGroup]) => {
+    // Group features by phase
+    const phaseMap = new Map<
+      string,
+      Array<{ pattern: string; source: string; rules: RuleOutput[] }>
+    >();
+
+    let areaRuleCount = 0;
+    let areaInvariantCount = 0;
+
+    for (const feature of areaGroup.features.values()) {
+      if (feature.rules.length === 0) continue;
+
+      if (!phaseMap.has(feature.phase)) {
+        phaseMap.set(feature.phase, []);
+      }
+      phaseMap.get(feature.phase)?.push({
+        pattern: feature.pattern,
+        source: feature.source,
+        rules: feature.rules,
+      });
+
+      areaRuleCount += feature.rules.length;
+      areaInvariantCount += feature.rules.filter((r) => r.invariant !== undefined).length;
+    }
+
+    const phases = [...phaseMap.entries()].map(([phaseName, features]) => ({
+      phase: phaseName,
+      features,
+    }));
+
+    return {
+      productArea: areaName,
+      ruleCount: areaRuleCount,
+      invariantCount: areaInvariantCount,
+      phases,
+    };
+  });
+
+  return {
+    productAreas: productAreas.filter((a) => a.ruleCount > 0),
+    totalRules,
+    totalInvariants,
   };
 }
 
@@ -1341,6 +1587,9 @@ async function routeSubcommand(ctx: RouteContext): Promise<unknown> {
     case 'pdr':
       return handlePdr(ctx.dataset, ctx.subArgs);
 
+    case 'rules':
+      return handleRules(ctx);
+
     case 'tags':
       return aggregateTagUsage(ctx.dataset);
 
@@ -1373,7 +1622,7 @@ async function routeSubcommand(ctx: RouteContext): Promise<unknown> {
     default:
       throw new QueryApiError(
         'UNKNOWN_METHOD',
-        `Unknown subcommand: ${ctx.subcommand}\nAvailable: context, files, dep-tree, overview, scope-validate, handoff, status, query, pattern, list, search, arch, stubs, decisions, pdr, tags, sources, unannotated`
+        `Unknown subcommand: ${ctx.subcommand}\nAvailable: context, files, dep-tree, overview, scope-validate, handoff, status, query, pattern, list, search, arch, stubs, decisions, pdr, rules, tags, sources, unannotated`
       );
   }
 }

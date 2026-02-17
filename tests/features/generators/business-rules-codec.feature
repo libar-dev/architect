@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:BusinessRulesDocumentCodec
+@libar-docs-status:completed
+@libar-docs-product-area:Generation
 @libar-docs-implements:BusinessRulesGenerator
 Feature: Business Rules Document Codec
 
@@ -102,3 +106,109 @@ Feature: Business Rules Document Codec
       Given a pattern with scenarios in "reservation-pattern.feature" at line 42
       When decoding with BusinessRulesCodec in detailed mode with verification enabled
       Then the verification links include "reservation-pattern.feature"
+
+  # ===========================================================================
+  # Rule 6: Progressive disclosure splits by product area
+  # ===========================================================================
+
+  Rule: Progressive disclosure generates detail files per product area
+
+    Scenario: Detail files are generated per product area
+      Given patterns with rules in product areas:
+        | ProductArea | RuleName |
+        | Annotation | Tags validate on scan |
+        | Generation | Codecs transform data |
+        | Validation | FSM enforces transitions |
+      When decoding with BusinessRulesCodec with detail files enabled
+      Then the document has 3 additional files for product areas
+
+    Scenario: Main document has product area index table with links
+      Given patterns with rules in product areas:
+        | ProductArea | RuleName |
+        | Annotation | Tags validate on scan |
+        | Generation | Codecs transform data |
+      When decoding with BusinessRulesCodec with detail files enabled
+      Then the document has a table with column "Product Area"
+      And the table contains link text "Annotation"
+
+    Scenario: Detail files have back-link to main document
+      Given patterns with rules in product areas:
+        | ProductArea | RuleName |
+        | Annotation | Tags validate on scan |
+      When decoding with BusinessRulesCodec with detail files enabled
+      Then additional file "business-rules/annotation.md" contains back-link
+
+  # ===========================================================================
+  # Rule 7: Empty rules show placeholder instead of blank content
+  # ===========================================================================
+
+  Rule: Empty rules show placeholder instead of blank content
+
+    Scenario: Rule without invariant or description or scenarios shows placeholder
+      Given a pattern with a rule containing:
+        | Field | Value |
+        | name | Placeholder rule |
+      When decoding with BusinessRulesCodec in standard mode
+      Then the document contains rule "Placeholder rule"
+      And the document contains "No invariant or description specified"
+
+    Scenario: Rule without invariant but with scenarios shows verified-by instead
+      Given a pattern with a rule that has no invariant but 2 scenarios
+      When decoding with BusinessRulesCodec in standard mode
+      Then the document does not contain "No invariant or description specified"
+      And the document contains "Verified by"
+
+  # ===========================================================================
+  # Rule 8: Rules always render flat without collapsible blocks
+  # ===========================================================================
+
+  Rule: Rules always render flat for full visibility
+
+    Scenario: Features with many rules render flat without collapsible blocks
+      Given a pattern with 4 rules each having 2 scenarios
+      When decoding with BusinessRulesCodec in standard mode
+      Then the document does not contain collapsible blocks
+      And all rule headings are directly visible
+
+  # ===========================================================================
+  # Rule 9: Source shown as filename text not broken links
+  # ===========================================================================
+
+  Rule: Source file shown as filename text
+
+    Scenario: Source file rendered as plain text not link
+      Given a pattern with a rule in file "tests/features/my-feature.feature"
+      When decoding with BusinessRulesCodec in standard mode
+      Then the document contains "my-feature.feature"
+
+  # ===========================================================================
+  # Rule 10: Verified-by renders as compact italic line
+  # ===========================================================================
+
+  Rule: Verified-by renders as checkbox list at standard level
+
+    Scenario: Rules with scenarios show verified-by checklist
+      Given a pattern with a rule having scenarios "Create order" and "Cancel order"
+      When decoding with BusinessRulesCodec in standard mode
+      Then the document contains verified-by with scenario names
+
+    Scenario: Duplicate scenario names are deduplicated
+      Given a pattern with a rule having duplicate scenario names
+      When decoding with BusinessRulesCodec in standard mode
+      Then the verified-by list contains each scenario name only once
+
+  # ===========================================================================
+  # Rule 11: Feature names are humanized from camelCase
+  # ===========================================================================
+
+  Rule: Feature names are humanized from camelCase pattern names
+
+    Scenario: CamelCase pattern name becomes spaced heading
+      Given a pattern named "ConfigResolution" with a rule
+      When decoding with BusinessRulesCodec in standard mode
+      Then the document contains heading "Config Resolution"
+
+    Scenario: Testing suffix is stripped from feature names
+      Given a pattern named "ProcessGuardTesting" with a rule
+      When decoding with BusinessRulesCodec in standard mode
+      Then the document contains heading "Process Guard"

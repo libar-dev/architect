@@ -45,6 +45,7 @@ export declare const STATUS_NORMALIZATION_MAP: Readonly<Record<string, Normalize
  *
  * Per PDR-005: deferred items are treated as planned (not actively worked on)
  *
+ * @libar-docs-shape reference-sample
  * @param status - Raw status from pattern (case-insensitive)
  * @returns "completed" | "active" | "planned"
  *

@@ -86,6 +86,10 @@ export const MetadataTagDefinitionSchema = z
     default: z.string().max(200).optional(),
     /** Example usage of this tag */
     example: z.string().max(500).optional(),
+    /** Maps tag name to metadata object property name (defaults to kebab-to-camelCase) */
+    metadataKey: z.string().max(100).optional(),
+    /** Post-parse value transformer (runtime-only, not serializable) */
+    transform: z.function().optional(),
 })
     .strict();
 /**

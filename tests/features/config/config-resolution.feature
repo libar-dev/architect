@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:ConfigResolution
+@libar-docs-status:completed
+@libar-docs-product-area:Configuration
 @behavior @config
 Feature: Config Resolution - Defaults and Merging
   resolveProjectConfig transforms a raw DeliveryProcessProjectConfig into
@@ -18,6 +22,10 @@ Feature: Config Resolution - Defaults and Merging
 
   Rule: Default config provides sensible fallbacks
 
+    **Invariant:** A config created without user input must have isDefault=true and empty source collections.
+    **Rationale:** Downstream consumers need a safe starting point when no config file exists.
+    **Verified by:** Default config has empty sources and isDefault flag
+
     @happy-path
     Scenario: Default config has empty sources and isDefault flag
       When creating default resolved config
@@ -28,6 +36,10 @@ Feature: Config Resolution - Defaults and Merging
 
   Rule: Preset creates correct taxonomy instance
 
+    **Invariant:** Each preset must produce a taxonomy with the correct number of categories and tag prefix.
+    **Rationale:** Presets are the primary user-facing configuration — wrong category counts break downstream scanning.
+    **Verified by:** libar-generic preset creates 3 categories
+
     @happy-path
     Scenario: libar-generic preset creates 3 categories
       Given a raw config with preset "libar-generic"
@@ -37,6 +49,10 @@ Feature: Config Resolution - Defaults and Merging
 
   Rule: Stubs are merged into typescript sources
 
+    **Invariant:** Stub glob patterns must appear in resolved typescript sources alongside original globs.
+    **Rationale:** Stubs extend the scanner's source set without requiring users to manually list them.
+    **Verified by:** Stubs appended to typescript sources
+
     @happy-path
     Scenario: Stubs appended to typescript sources
       Given a raw config with typescript sources and stubs
@@ -44,6 +60,10 @@ Feature: Config Resolution - Defaults and Merging
       Then resolved typescript sources should contain both original and stub globs
 
   Rule: Output defaults are applied
+
+    **Invariant:** Missing output configuration must resolve to "docs/architecture" with overwrite=false.
+    **Rationale:** Consistent defaults prevent accidental overwrites and establish a predictable output location.
+    **Verified by:** Default output directory and overwrite, Explicit output overrides defaults
 
     @happy-path
     Scenario: Default output directory and overwrite
@@ -61,6 +81,10 @@ Feature: Config Resolution - Defaults and Merging
 
   Rule: Generator defaults are applied
 
+    **Invariant:** A config with no generators specified must default to the "patterns" generator.
+    **Rationale:** Patterns is the most commonly needed output — defaulting to it reduces boilerplate.
+    **Verified by:** Generators default to patterns
+
     @happy-path
     Scenario: Generators default to patterns
       Given a raw config with no generators specified
@@ -68,6 +92,10 @@ Feature: Config Resolution - Defaults and Merging
       Then generators should contain exactly "patterns"
 
   Rule: Context inference rules are prepended
+
+    **Invariant:** User-defined inference rules must appear before built-in defaults in the resolved array.
+    **Rationale:** Prepending gives user rules priority during context matching without losing defaults.
+    **Verified by:** User rules prepended to defaults
 
     @happy-path
     Scenario: User rules prepended to defaults
@@ -77,6 +105,10 @@ Feature: Config Resolution - Defaults and Merging
       And the default rules should follow after the user rule
 
   Rule: Config path is carried from options
+
+    **Invariant:** The configPath from resolution options must be preserved unchanged in resolved config.
+    **Rationale:** Downstream tools need the original config file location for error reporting and relative path resolution.
+    **Verified by:** configPath carried from resolution options
 
     @happy-path
     Scenario: configPath carried from resolution options

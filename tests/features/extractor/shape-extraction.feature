@@ -1,4 +1,8 @@
 @libar-docs
+@libar-docs-pattern:ShapeExtractionTesting
+@libar-docs-status:completed
+@libar-docs-implements:ReferenceDocShowcase
+@libar-docs-product-area:Annotation
 Feature: TypeScript Shape Extraction
 
   Validates the shape extraction system that extracts TypeScript type
@@ -439,7 +443,88 @@ Feature: TypeScript Shape Extraction
       Then the markdown should have 2 code fences
 
   # ============================================================================
-  # RULE 11: Input Validation
+  # RULE 11: Annotation Tag Stripping from JSDoc
+  # ============================================================================
+
+  Rule: Annotation tags are stripped from extracted JSDoc while preserving standard tags
+
+    **Invariant:** Extracted shapes never contain @libar-docs-* annotation lines in their jsDoc field.
+
+    **Rationale:** Shape JSDoc is rendered in documentation output. Annotation tags are metadata
+    for the extraction pipeline, not user-visible documentation content.
+
+    @acceptance-criteria @unit
+    Scenario: JSDoc with only annotation tags produces no jsDoc
+      Given TypeScript source code:
+        """
+        /**
+         * @libar-docs
+         * @libar-docs-pattern ShapeExtractor
+         * @libar-docs-status completed
+         */
+        export interface OnlyTags {
+          value: string;
+        }
+        """
+      When extracting shapes "OnlyTags"
+      Then the shape "OnlyTags" should have no jsDoc
+
+    @acceptance-criteria @unit
+    Scenario: Mixed JSDoc preserves standard tags and strips annotation tags
+      Given TypeScript source code:
+        """
+        /**
+         * @libar-docs
+         * @libar-docs-status active
+         *
+         * Configuration for the pipeline.
+         *
+         * @param timeout - Request timeout in ms
+         * @returns The configured instance
+         */
+        export interface MixedTags {
+          timeout: number;
+        }
+        """
+      When extracting shapes "MixedTags"
+      Then the shape "MixedTags" jsDoc should contain "Configuration for the pipeline"
+      And the shape "MixedTags" jsDoc should contain "@param timeout"
+      And the shape "MixedTags" jsDoc should contain "@returns"
+      And the shape "MixedTags" jsDoc should not contain "@libar-docs"
+
+    @acceptance-criteria @unit @edge-case
+    Scenario: Single-line annotation-only JSDoc produces no jsDoc
+      Given TypeScript source code:
+        """
+        /** @libar-docs-shape Foo */
+        export interface SingleLine {
+          id: string;
+        }
+        """
+      When extracting shapes "SingleLine"
+      Then the shape "SingleLine" should have no jsDoc
+
+    @acceptance-criteria @unit @edge-case
+    Scenario: Consecutive empty lines after tag removal are collapsed
+      Given TypeScript source code:
+        """
+        /**
+         * @libar-docs
+         * @libar-docs-status roadmap
+         *
+         *
+         * Useful description here.
+         */
+        export interface CollapsedLines {
+          name: string;
+        }
+        """
+      When extracting shapes "CollapsedLines"
+      Then the shape "CollapsedLines" jsDoc should contain "Useful description here"
+      And the shape "CollapsedLines" jsDoc should not contain consecutive empty JSDoc lines
+
+  # ============================================================================
+  # RULE 12: Input Validation
   # ============================================================================
 
   Rule: Large source files are rejected to prevent memory exhaustion

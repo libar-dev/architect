@@ -43,7 +43,7 @@ function initState(): StringUtilsTestState {
 
 const feature = await loadFeature('tests/features/utils/string-utils.feature');
 
-describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScenario }) => {
+describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
   AfterEachScenario(() => {
     state = null;
   });
@@ -58,36 +58,38 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
   // slugify
   // ===========================================================================
 
-  ScenarioOutline(
-    'slugify converts text to URL-safe format',
-    ({ When, Then }, variables: { input: string; expected: string }) => {
-      When('I slugify {string}', () => {
-        state!.slugResult = slugify(variables.input);
+  Rule('slugify generates URL-safe slugs', ({ RuleScenario, RuleScenarioOutline }) => {
+    RuleScenarioOutline(
+      'slugify converts text to URL-safe format',
+      ({ When, Then }, variables: { input: string; expected: string }) => {
+        When('I slugify {string}', () => {
+          state!.slugResult = slugify(variables.input);
+        });
+
+        Then('the slug should be {string}', () => {
+          expect(state!.slugResult).toBe(variables.expected);
+        });
+      }
+    );
+
+    RuleScenario('slugify handles empty-ish input', ({ When, Then }) => {
+      When('I slugify {string}', (_ctx: unknown, input: string) => {
+        state!.slugResult = slugify(input);
       });
 
-      Then('the slug should be {string}', () => {
-        expect(state!.slugResult).toBe(variables.expected);
+      Then('the slug should be {string}', (_ctx: unknown, expected: string) => {
+        expect(state!.slugResult).toBe(expected);
       });
-    }
-  );
-
-  Scenario('slugify handles empty-ish input', ({ When, Then }) => {
-    When('I slugify {string}', (_ctx: unknown, input: string) => {
-      state!.slugResult = slugify(input);
     });
 
-    Then('the slug should be {string}', (_ctx: unknown, expected: string) => {
-      expect(state!.slugResult).toBe(expected);
-    });
-  });
+    RuleScenario('slugify handles single word', ({ When, Then }) => {
+      When('I slugify {string}', (_ctx: unknown, input: string) => {
+        state!.slugResult = slugify(input);
+      });
 
-  Scenario('slugify handles single word', ({ When, Then }) => {
-    When('I slugify {string}', (_ctx: unknown, input: string) => {
-      state!.slugResult = slugify(input);
-    });
-
-    Then('the slug should be {string}', (_ctx: unknown, expected: string) => {
-      expect(state!.slugResult).toBe(expected);
+      Then('the slug should be {string}', (_ctx: unknown, expected: string) => {
+        expect(state!.slugResult).toBe(expected);
+      });
     });
   });
 
@@ -95,36 +97,41 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
   // camelCaseToTitleCase
   // ===========================================================================
 
-  ScenarioOutline(
-    'camelCaseToTitleCase converts to title case',
-    ({ When, Then }, variables: { input: string; expected: string }) => {
-      When('I convert {string} to title case', () => {
-        state!.titleResult = camelCaseToTitleCase(variables.input);
+  Rule(
+    'camelCaseToTitleCase generates readable titles',
+    ({ RuleScenario, RuleScenarioOutline }) => {
+      RuleScenarioOutline(
+        'camelCaseToTitleCase converts to title case',
+        ({ When, Then }, variables: { input: string; expected: string }) => {
+          When('I convert {string} to title case', () => {
+            state!.titleResult = camelCaseToTitleCase(variables.input);
+          });
+
+          Then('the title should be {string}', () => {
+            expect(state!.titleResult).toBe(variables.expected);
+          });
+        }
+      );
+
+      RuleScenario('camelCaseToTitleCase handles all-uppercase acronym', ({ When, Then }) => {
+        When('I convert {string} to title case', (_ctx: unknown, input: string) => {
+          state!.titleResult = camelCaseToTitleCase(input);
+        });
+
+        Then('the title should be {string}', (_ctx: unknown, expected: string) => {
+          expect(state!.titleResult).toBe(expected);
+        });
       });
 
-      Then('the title should be {string}', () => {
-        expect(state!.titleResult).toBe(variables.expected);
+      RuleScenario('camelCaseToTitleCase handles lowercase word', ({ When, Then }) => {
+        When('I convert {string} to title case', (_ctx: unknown, input: string) => {
+          state!.titleResult = camelCaseToTitleCase(input);
+        });
+
+        Then('the title should be {string}', (_ctx: unknown, expected: string) => {
+          expect(state!.titleResult).toBe(expected);
+        });
       });
     }
   );
-
-  Scenario('camelCaseToTitleCase handles all-uppercase acronym', ({ When, Then }) => {
-    When('I convert {string} to title case', (_ctx: unknown, input: string) => {
-      state!.titleResult = camelCaseToTitleCase(input);
-    });
-
-    Then('the title should be {string}', (_ctx: unknown, expected: string) => {
-      expect(state!.titleResult).toBe(expected);
-    });
-  });
-
-  Scenario('camelCaseToTitleCase handles lowercase word', ({ When, Then }) => {
-    When('I convert {string} to title case', (_ctx: unknown, input: string) => {
-      state!.titleResult = camelCaseToTitleCase(input);
-    });
-
-    Then('the title should be {string}', (_ctx: unknown, expected: string) => {
-      expect(state!.titleResult).toBe(expected);
-    });
-  });
 });

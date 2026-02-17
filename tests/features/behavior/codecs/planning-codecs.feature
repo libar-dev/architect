@@ -1,7 +1,9 @@
+@libar-docs
+@libar-docs-pattern:PlanningCodecTesting
+@libar-docs-status:completed
+@libar-docs-product-area:Generation
 @libar-docs-implements:CodecBehaviorTesting
 @behavior @planning-codecs
-@libar-docs-pattern:PlanningCodecTesting
-@libar-docs-product-area:Codec
 Feature: Planning Document Codecs
   The planning codecs (PlanningChecklistCodec, SessionPlanCodec, SessionFindingsCodec)
   transform MasterDataset into RenderableDocuments for planning and retrospective views.
@@ -24,6 +26,10 @@ Feature: Planning Document Codecs
   # =============================================================================
 
   Rule: PlanningChecklistCodec prepares for implementation sessions
+
+    **Invariant:** The checklist must include pre-planning questions, definition of done with deliverables, and dependency status for all actionable phases.
+    **Rationale:** Implementation sessions fail without upfront preparation — the checklist surfaces blockers before work begins.
+    **Verified by:** No actionable phases produces empty message, Summary shows phases to plan count, Pre-planning questions section, Definition of Done with deliverables, Acceptance criteria from scenarios, Risk assessment section, Dependency status shows met vs unmet, forActivePhases option, forNextActionable option
 
     @happy-path @edge-case
     Scenario: No actionable phases produces empty message
@@ -104,6 +110,10 @@ Feature: Planning Document Codecs
 
   Rule: SessionPlanCodec generates implementation plans
 
+    **Invariant:** The plan must include status summary, implementation approach from use cases, deliverables with status, and acceptance criteria from scenarios.
+    **Rationale:** A structured implementation plan ensures all deliverables and acceptance criteria are visible before coding starts.
+    **Verified by:** No phases to plan produces empty message, Summary shows status counts, Implementation approach from useCases, Deliverables rendering, Acceptance criteria with steps, Business rules section, statusFilter option for active only, statusFilter option for planned only
+
     @happy-path @edge-case
     Scenario: No phases to plan produces empty message
       Given a MasterDataset with only completed patterns
@@ -165,6 +175,10 @@ Feature: Planning Document Codecs
   # =============================================================================
 
   Rule: SessionFindingsCodec captures retrospective discoveries
+
+    **Invariant:** Findings must be categorized into gaps, improvements, risks, and learnings with per-type counts in the summary.
+    **Rationale:** Retrospective findings drive continuous improvement — categorization enables prioritized follow-up across sessions.
+    **Verified by:** No findings produces empty message, Summary shows finding type counts, Gaps section, Improvements section, Risks section includes risk field, Learnings section, groupBy category option, groupBy phase option, groupBy type option, showSourcePhase option enabled, showSourcePhase option disabled
 
     @happy-path @edge-case
     Scenario: No findings produces empty message

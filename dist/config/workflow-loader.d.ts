@@ -3,19 +3,21 @@
  * @libar-docs-config
  * @libar-docs-pattern WorkflowLoader
  * @libar-docs-status completed
+ * @libar-docs-arch-layer infrastructure
+ * @libar-docs-arch-context config
+ * @libar-docs-arch-role infrastructure
  * @libar-docs-uses WorkflowConfigSchema, CodecUtils
  * @libar-docs-used-by GeneratorOrchestrator, SectionHelpers
  *
  * ## WorkflowLoader - Workflow Configuration Loading
  *
- * Loads and validates workflow configuration from JSON files in the catalogue.
- * Supports loading by name from catalogue/workflows/ or by explicit path.
+ * Provides the default 6-phase workflow as an inline constant and loads
+ * custom workflow overrides from JSON files via `--workflow <path>`.
  *
  * ### When to Use
  *
- * - Use at pipeline startup to load workflow configuration
- * - Use when validating custom workflow configuration files
- * - Use when loading default 6-phase-standard workflow
+ * - Use `loadDefaultWorkflow()` at pipeline startup (synchronous, infallible)
+ * - Use `loadWorkflowFromPath()` for custom `--workflow <file>` overrides
  */
 import { Result } from '../types/result.js';
 import { type LoadedWorkflow, type WorkflowConfig } from '../validation-schemas/workflow-config.js';
@@ -36,27 +38,6 @@ export interface WorkflowLoadError {
     validationErrors?: string[];
 }
 /**
- * Load workflow configuration by name from catalogue
- *
- * Loads from catalogue/workflows/{name}.json. The name should not include
- * the .json extension.
- *
- * @param name - Workflow name (e.g., "6-phase-standard", "3-phase-minimal")
- * @returns Result with LoadedWorkflow or error details
- *
- * @example
- * ```typescript
- * const result = loadWorkflowConfig("6-phase-standard");
- * if (result.ok) {
- *   const workflow = result.value;
- *   const emoji = workflow.statusMap.get("completed")?.emoji;
- * } else {
- *   console.error(result.error.message);
- * }
- * ```
- */
-export declare function loadWorkflowConfig(name: string): Promise<Result<LoadedWorkflow, WorkflowLoadError>>;
-/**
  * Load workflow configuration from a specific file path
  *
  * @param configPath - Absolute or relative path to workflow JSON file
@@ -75,20 +56,20 @@ export declare function loadWorkflowFromPath(configPath: string, source?: string
 /**
  * Load the default workflow (6-phase-standard)
  *
- * Returns the standard USDP 6-phase workflow from the catalogue.
- * This function throws if the default workflow cannot be loaded,
- * as this indicates a package installation issue.
+ * Returns the standard USDP 6-phase workflow from an inline constant.
+ * Synchronous and infallible — no file I/O, no error handling needed.
+ *
+ * DD-4: Returns LoadedWorkflow synchronously (not Promise).
  *
  * @returns LoadedWorkflow for 6-phase-standard
- * @throws Error if default workflow cannot be loaded
  *
  * @example
  * ```typescript
- * const workflow = await loadDefaultWorkflow();
+ * const workflow = loadDefaultWorkflow();
  * const emoji = workflow.statusMap.get("completed")?.emoji; // "\u2705"
  * ```
  */
-export declare function loadDefaultWorkflow(): Promise<LoadedWorkflow>;
+export declare function loadDefaultWorkflow(): LoadedWorkflow;
 /**
  * Format workflow load error for console display
  *
@@ -97,7 +78,7 @@ export declare function loadDefaultWorkflow(): Promise<LoadedWorkflow>;
  *
  * @example
  * ```typescript
- * const result = await loadWorkflowConfig("non-existent");
+ * const result = await loadWorkflowFromPath("/path/to/custom.json");
  * if (!result.ok) {
  *   console.error(formatWorkflowLoadError(result.error));
  *   process.exit(1);

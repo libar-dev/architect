@@ -3,6 +3,9 @@
  * @libar-docs-core @libar-docs-config
  * @libar-docs-pattern ProjectConfigSchema
  * @libar-docs-status active
+ * @libar-docs-arch-layer infrastructure
+ * @libar-docs-arch-context config
+ * @libar-docs-arch-role infrastructure
  * @libar-docs-uses ProjectConfigTypes
  * @libar-docs-used-by ConfigLoader
  *
@@ -23,6 +26,7 @@
 import { z } from 'zod';
 import type { DeliveryProcessProjectConfig } from './project-config.js';
 import type { DeliveryProcessInstance } from './types.js';
+import { DIAGRAM_SOURCE_VALUES } from '../renderable/codecs/reference.js';
 
 /**
  * Glob pattern validation — replicates the security rules from
@@ -117,9 +121,15 @@ const DiagramScopeSchema = z
   .object({
     archContext: z.array(z.string().min(1)).readonly().optional(),
     patterns: z.array(z.string().min(1)).readonly().optional(),
-    archView: z.array(z.string().min(1)).readonly().optional(),
+    include: z.array(z.string().min(1)).readonly().optional(),
+    archLayer: z.array(z.string().min(1)).readonly().optional(),
     direction: z.enum(['TB', 'LR']).optional(),
     title: z.string().min(1).optional(),
+    diagramType: z
+      .enum(['graph', 'sequenceDiagram', 'stateDiagram-v2', 'C4Context', 'classDiagram'])
+      .optional(),
+    showEdgeLabels: z.boolean().optional(),
+    source: z.enum(DIAGRAM_SOURCE_VALUES).optional(),
   })
   .strict();
 
@@ -138,6 +148,26 @@ const ReferenceDocConfigSchema = z
     claudeMdSection: z.string().min(1),
     docsFilename: z.string().min(1),
     claudeMdFilename: z.string().min(1),
+    // DD-6: Fine-grained shape selectors (structural discriminated union)
+    shapeSelectors: z
+      .array(
+        z.union([
+          z.object({ group: z.string().min(1) }).strict(),
+          z
+            .object({
+              source: GlobPatternSchema,
+              names: z.array(z.string().min(1)).readonly(),
+            })
+            .strict(),
+          z.object({ source: GlobPatternSchema }).strict(),
+        ])
+      )
+      .readonly()
+      .optional(),
+    // DD-1 (CrossCuttingDocumentInclusion): Include-tag values for cross-cutting content routing
+    includeTags: z.array(z.string().min(1)).readonly().optional(),
+    // Product area filter (ADR-001): pre-filters all content sources by product area
+    productArea: z.string().min(1).optional(),
   })
   .strict();
 
@@ -178,6 +208,9 @@ export const DeliveryProcessProjectConfigSchema = z
     // Generators
     generators: z.array(z.string().min(1)).readonly().optional(),
     generatorOverrides: z.record(z.string(), GeneratorSourceOverrideSchema).optional(),
+
+    // Codec Options
+    codecOptions: z.record(z.string(), z.record(z.string(), z.unknown())).optional(),
 
     // Advanced
     contextInferenceRules: z.array(ContextInferenceRuleSchema).readonly().optional(),

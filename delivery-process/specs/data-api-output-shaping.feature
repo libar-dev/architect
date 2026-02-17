@@ -3,7 +3,7 @@
 @libar-docs-status:completed
 @libar-docs-unlock-reason:All-8-deliverables-implemented-and-verified
 @libar-docs-phase:25a
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:DataAPI
 @libar-docs-effort:4d
 @libar-docs-priority:high
 @libar-docs-business-value:compact-output-for-ai-agents

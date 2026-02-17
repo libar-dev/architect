@@ -119,6 +119,7 @@ export declare function extractPatternTags(tags: readonly string[]): {
     readonly quarter?: string;
     readonly completed?: string;
     readonly effort?: string;
+    readonly effortActual?: string;
     readonly team?: string;
     readonly workflow?: string;
     readonly risk?: string;
@@ -140,8 +141,19 @@ export declare function extractPatternTags(tags: readonly string[]): {
     readonly adrCategory?: string;
     readonly adrSupersedes?: string;
     readonly adrSupersededBy?: string;
+    readonly adrTheme?: string;
+    readonly adrLayer?: string;
     readonly target?: string;
     readonly since?: string;
     readonly convention?: readonly string[];
+    readonly executableSpecs?: readonly string[];
+    readonly roadmapSpec?: string;
+    readonly archRole?: string;
+    readonly archContext?: string;
+    readonly archLayer?: string;
+    readonly include?: readonly string[];
+    readonly extractShapes?: readonly string[];
+    readonly usecase?: string;
+    readonly [key: string]: unknown;
 };
 //# sourceMappingURL=gherkin-ast-parser.d.ts.map

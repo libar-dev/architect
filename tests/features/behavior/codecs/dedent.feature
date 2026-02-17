@@ -1,6 +1,8 @@
-@behavior @dedent
+@libar-docs
 @libar-docs-pattern:DedentHelper
-@libar-docs-product-area:Codec
+@libar-docs-status:completed
+@libar-docs-product-area:Generation
+@behavior @dedent
 Feature: Dedent Helper Function Edge Cases
 
   The dedent helper function normalizes indentation in code blocks extracted
@@ -20,11 +22,15 @@ Feature: Dedent Helper Function Edge Cases
   Background:
     Given a dedent test context
 
-  # =============================================================================
-  # Tab Handling
-  # =============================================================================
+  # ===========================================================================
+  # RULE 1: Tab Handling
+  # ===========================================================================
 
   Rule: Tabs are normalized to spaces before dedent
+
+    **Invariant:** Tab characters must be converted to spaces before calculating the minimum indentation level.
+    **Rationale:** Mixing tabs and spaces produces incorrect indentation calculations — normalizing first ensures consistent dedent depth.
+    **Verified by:** Tab-indented code is properly dedented, Mixed tabs and spaces are normalized
 
     @happy-path @tabs
     Scenario: Tab-indented code is properly dedented
@@ -50,11 +56,14 @@ Feature: Dedent Helper Function Edge Cases
       When dedenting the text
       Then the output has no leading whitespace on first non-empty line
 
-  # =============================================================================
-  # Empty Line Handling
-  # =============================================================================
+  # ===========================================================================
+  # RULE 2: Empty Line Handling
+  # ===========================================================================
 
   Rule: Empty lines are handled correctly
+
+    **Invariant:** Empty lines (including lines with only whitespace) must not affect the minimum indentation calculation and must be preserved in output.
+    **Verified by:** Empty lines with trailing spaces are preserved, All empty lines returns original text
 
     @edge-case @empty-lines
     Scenario: Empty lines with trailing spaces are preserved
@@ -75,11 +84,14 @@ Feature: Dedent Helper Function Edge Cases
       When dedenting the text
       Then the output equals the input
 
-  # =============================================================================
-  # Single Line and Minimal Input
-  # =============================================================================
+  # ===========================================================================
+  # RULE 3: Single Line and Minimal Input
+  # ===========================================================================
 
   Rule: Single line input is handled
+
+    **Invariant:** Single-line input must have its leading whitespace removed without errors or unexpected transformations.
+    **Verified by:** Single line with indentation is dedented, Single line without indentation is unchanged
 
     @edge-case @single-line
     Scenario: Single line with indentation is dedented
@@ -93,11 +105,14 @@ Feature: Dedent Helper Function Edge Cases
       When dedenting the text
       Then the output is "const x = 1;"
 
-  # =============================================================================
-  # Unicode and Special Characters
-  # =============================================================================
+  # ===========================================================================
+  # RULE 4: Unicode and Special Characters
+  # ===========================================================================
 
   Rule: Unicode whitespace is handled
+
+    **Invariant:** Non-breaking spaces and other Unicode whitespace characters must be treated as content, not as indentation to be removed.
+    **Verified by:** Non-breaking space is treated as content
 
     @edge-case @unicode
     Scenario: Non-breaking space is treated as content
@@ -105,11 +120,14 @@ Feature: Dedent Helper Function Edge Cases
       When dedenting the text
       Then the output preserves non-breaking spaces in content
 
-  # =============================================================================
-  # Relative Indentation Preservation
-  # =============================================================================
+  # ===========================================================================
+  # RULE 5: Relative Indentation Preservation
+  # ===========================================================================
 
   Rule: Relative indentation is preserved
+
+    **Invariant:** After removing the common leading whitespace, the relative indentation between lines must remain unchanged.
+    **Verified by:** Nested code blocks preserve relative indentation, Mixed indentation levels are preserved relatively
 
     @happy-path @relative-indent
     Scenario: Nested code blocks preserve relative indentation

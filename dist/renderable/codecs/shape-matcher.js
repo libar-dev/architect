@@ -6,6 +6,10 @@
  *
  * @see CodecDrivenReferenceGeneration AD-6: In-memory glob matching
  */
+/** Type guard: selector has source + names fields */
+function hasNames(selector) {
+    return 'names' in selector;
+}
 // ============================================================================
 // Glob Pattern Matching
 // ============================================================================
@@ -72,6 +76,65 @@ export function extractShapesFromDataset(dataset, shapeSources) {
             if (!seenNames.has(shape.name)) {
                 seenNames.add(shape.name);
                 shapes.push(shape);
+            }
+        }
+    }
+    return shapes;
+}
+// ============================================================================
+// Selector-Based Shape Filtering
+// ============================================================================
+/**
+ * Filter shapes from MasterDataset using fine-grained ShapeSelectors.
+ *
+ * Three selector modes (DD-6):
+ * - `{ group }` — all shapes where `shape.group` matches
+ * - `{ source, names }` — shapes from matching source file with listed names
+ * - `{ source }` — all shapes from matching source file
+ *
+ * Returns a deduplicated list in selector iteration order.
+ *
+ * @param dataset - MasterDataset with all extracted patterns
+ * @param selectors - Fine-grained shape selectors
+ * @returns Aggregated ExtractedShape array from matching selectors
+ */
+export function filterShapesBySelectors(dataset, selectors) {
+    if (selectors.length === 0)
+        return [];
+    const seenNames = new Set();
+    const shapes = [];
+    for (const selector of selectors) {
+        if ('group' in selector && !('source' in selector)) {
+            // Group selector: iterate all patterns' shapes, match by group
+            for (const pattern of dataset.patterns) {
+                if (pattern.extractedShapes === undefined || pattern.extractedShapes.length === 0)
+                    continue;
+                for (const shape of pattern.extractedShapes) {
+                    if (shape.group === selector.group && !seenNames.has(shape.name)) {
+                        seenNames.add(shape.name);
+                        shapes.push(shape);
+                    }
+                }
+            }
+        }
+        else if ('source' in selector) {
+            // Source-based selector: match by file path glob
+            const sourceGlob = String(selector.source);
+            const nameSet = hasNames(selector) ? new Set(selector.names) : undefined;
+            for (const pattern of dataset.patterns) {
+                if (pattern.extractedShapes === undefined || pattern.extractedShapes.length === 0)
+                    continue;
+                if (!matchesShapePattern(pattern.source.file, sourceGlob))
+                    continue;
+                for (const shape of pattern.extractedShapes) {
+                    if (seenNames.has(shape.name))
+                        continue;
+                    // If names specified, filter by name; otherwise include all
+                    if (nameSet !== undefined && !nameSet.has(shape.name))
+                        continue;
+                    seenNames.add(shape.name);
+                    shapes.push(shape);
+                }
             }
         }
     }

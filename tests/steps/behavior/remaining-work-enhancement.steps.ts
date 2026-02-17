@@ -181,7 +181,7 @@ function getDocumentText(doc: RenderableDocument): string {
 
 const feature = await loadFeature('tests/features/behavior/remaining-work-enhancement.feature');
 
-describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
+describeFeature(feature, ({ AfterEachScenario, Rule }) => {
   AfterEachScenario(() => {
     state = null;
   });
@@ -190,334 +190,9 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
   // Priority-Based Sorting
   // ===========================================================================
 
-  Scenario('Next Actionable sorted by priority', ({ Given, When, Then }) => {
-    Given('phases with the following priorities:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-      state = initState();
-      const patterns = dataTable.map((row, index) => {
-        const phase = parseInt(row.Phase || row.phase || '0', 10);
-        const priority = (row.Priority || row.priority || undefined) as
-          | 'critical'
-          | 'high'
-          | 'medium'
-          | 'low'
-          | undefined;
-
-        return createTestPattern({
-          id: generatePatternId(index + 1),
-          name: row.Name || row.name || `Pattern ${index + 1}`,
-          status: 'roadmap',
-          phase,
-          priority: priority && priority.trim() !== '' ? priority : undefined,
-        });
-      });
-
-      state.dataset = createTestMasterDataset({ patterns });
-    });
-
-    When('generating remaining work with sortBy: priority', () => {
-      const codec = createRemainingWorkCodec({ sortBy: 'priority' });
-      state!.document = codec.decode(state!.dataset!);
-    });
-
-    Then(
-      'the Next Actionable section shows phases in priority order:',
-      (_ctx: unknown, dataTable: DataTableRow[]) => {
-        const { list } = findNextActionableSection(state!.document!);
-        // The codec may or may not implement priority sorting
-        // Check that the section exists and has items
-        expect(list, 'Next Actionable list should exist').not.toBeNull();
-        // Priority order verification - check if items exist
-        const docText = getDocumentText(state!.document!);
-        for (const row of dataTable) {
-          const name = row.Name || row.name;
-          expect(docText).toContain(name);
-        }
-      }
-    );
-  });
-
-  Scenario('Undefined priority sorts last', ({ Given, When, Then }) => {
-    Given('phases with mixed priorities:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-      state = initState();
-      const patterns = dataTable.map((row, index) => {
-        const phase = parseInt(row.Phase || row.phase || '0', 10);
-        const priority = (row.Priority || row.priority || undefined) as
-          | 'critical'
-          | 'high'
-          | 'medium'
-          | 'low'
-          | undefined;
-
-        return createTestPattern({
-          id: generatePatternId(index + 1),
-          name: row.Name || row.name || `Pattern ${index + 1}`,
-          status: 'roadmap',
-          phase,
-          priority: priority && priority.trim() !== '' ? priority : undefined,
-        });
-      });
-
-      state.dataset = createTestMasterDataset({ patterns });
-    });
-
-    When('generating remaining work with sortBy: priority', () => {
-      const codec = createRemainingWorkCodec({ sortBy: 'priority' });
-      state!.document = codec.decode(state!.dataset!);
-    });
-
-    Then(
-      '{string} appears before {string} in Next Actionable',
-      (_ctx: unknown, first: string, second: string) => {
-        const docText = getDocumentText(state!.document!);
-        const firstIdx = docText.indexOf(first);
-        const secondIdx = docText.indexOf(second);
-        // Both should exist
-        expect(firstIdx).toBeGreaterThanOrEqual(0);
-        expect(secondIdx).toBeGreaterThanOrEqual(0);
-        // First should appear before second (or at same position if not sorted by priority)
-        // Since the codec may not implement priority sorting, we just verify both appear
-      }
-    );
-  });
-
-  Scenario('Priority icons displayed in table', ({ Given, When, Then }) => {
-    Given('a phase with critical priority:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-      state = initState();
-      const patterns = dataTable.map((row, index) => {
-        const phase = parseInt(row.Phase || row.phase || '0', 10);
-        const priority = (row.Priority || row.priority || 'critical') as
-          | 'critical'
-          | 'high'
-          | 'medium'
-          | 'low';
-
-        return createTestPattern({
-          id: generatePatternId(index + 1),
-          name: row.Name || row.name || `Pattern ${index + 1}`,
-          status: 'roadmap',
-          phase,
-          priority,
-        });
-      });
-
-      state.dataset = createTestMasterDataset({ patterns });
-    });
-
-    When('generating remaining work with sortBy: priority', () => {
-      const codec = createRemainingWorkCodec({ sortBy: 'priority' });
-      state!.document = codec.decode(state!.dataset!);
-    });
-
-    Then('the table includes priority icons', () => {
-      const docText = getDocumentText(state!.document!);
-      // Check for priority-related content (icons or text)
-      // The codec may use emojis like 🔥 for critical, ⚡ for high, etc.
-      // Or it may show priority in a column
-      const hasPriorityIndicator =
-        docText.includes('critical') ||
-        docText.includes('🔥') ||
-        docText.includes('Priority') ||
-        docText.includes('📋') ||
-        docText.includes('🚧');
-      expect(hasPriorityIndicator).toBe(true);
-    });
-  });
-
-  // ===========================================================================
-  // Effort-Based Sorting
-  // ===========================================================================
-
-  Scenario('Phases sorted by effort ascending', ({ Given, When, Then }) => {
-    Given('phases with the following efforts:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-      state = initState();
-      const patterns = dataTable.map((row, index) => {
-        const phase = parseInt(row.Phase || row.phase || '0', 10);
-        const effort = row.Effort || row.effort || undefined;
-
-        return createTestPattern({
-          id: generatePatternId(index + 1),
-          name: row.Name || row.name || `Pattern ${index + 1}`,
-          status: 'roadmap',
-          phase,
-          effort: effort && effort.trim() !== '' ? effort : undefined,
-        });
-      });
-
-      state.dataset = createTestMasterDataset({ patterns });
-    });
-
-    When('generating remaining work with sortBy: effort', () => {
-      const codec = createRemainingWorkCodec({ sortBy: 'effort' });
-      state!.document = codec.decode(state!.dataset!);
-    });
-
-    Then('phases appear in effort order: {string}', (_ctx: unknown, orderStr: string) => {
-      const expectedOrder = orderStr.split(',').map((s) => s.trim());
-      const docText = getDocumentText(state!.document!);
-      // All phases should appear
-      for (const name of expectedOrder) {
-        expect(docText).toContain(name);
-      }
-    });
-  });
-
-  Scenario('Effort parsing handles hours', ({ Given, When, Then }) => {
-    Given('a phase with effort {string}', (_ctx: unknown, effort: string) => {
-      state = initState();
-      state.effortString = effort;
-    });
-
-    When('parsing effort to hours', () => {
-      state!.effortHours = parseEffortToHours(state!.effortString!);
-    });
-
-    Then('the result is {int} hours', (_ctx: unknown, expected: number) => {
-      expect(state!.effortHours).toBe(expected);
-    });
-  });
-
-  Scenario('Effort parsing handles days', ({ Given, When, Then }) => {
-    Given('a phase with effort {string}', (_ctx: unknown, effort: string) => {
-      state = initState();
-      state.effortString = effort;
-    });
-
-    When('parsing effort to hours', () => {
-      state!.effortHours = parseEffortToHours(state!.effortString!);
-    });
-
-    Then('the result is {int} hours', (_ctx: unknown, expected: number) => {
-      expect(state!.effortHours).toBe(expected);
-    });
-  });
-
-  Scenario('Effort parsing handles weeks', ({ Given, When, Then }) => {
-    Given('a phase with effort {string}', (_ctx: unknown, effort: string) => {
-      state = initState();
-      state.effortString = effort;
-    });
-
-    When('parsing effort to hours', () => {
-      state!.effortHours = parseEffortToHours(state!.effortString!);
-    });
-
-    Then('the result is {int} hours', (_ctx: unknown, expected: number) => {
-      expect(state!.effortHours).toBe(expected);
-    });
-  });
-
-  Scenario('Effort parsing handles months', ({ Given, When, Then }) => {
-    Given('a phase with effort {string}', (_ctx: unknown, effort: string) => {
-      state = initState();
-      state.effortString = effort;
-    });
-
-    When('parsing effort to hours', () => {
-      state!.effortHours = parseEffortToHours(state!.effortString!);
-    });
-
-    Then('the result is {int} hours', (_ctx: unknown, expected: number) => {
-      expect(state!.effortHours).toBe(expected);
-    });
-  });
-
-  // ===========================================================================
-  // Quarter-Based Grouping
-  // ===========================================================================
-
-  Scenario('Planned phases grouped by quarter', ({ Given, And, When, Then }) => {
-    Given(
-      'roadmap phases spanning multiple quarters:',
-      (_ctx: unknown, dataTable: DataTableRow[]) => {
-        state = initState();
-        const patterns = dataTable.map((row, index) => {
-          const phase = parseInt(row.Phase || row.phase || '0', 10);
-          const quarter = row.Quarter || row.quarter || undefined;
-
-          return createTestPattern({
-            id: generatePatternId(index + 1),
-            name: row.Name || row.name || `Pattern ${index + 1}`,
-            status: 'roadmap',
-            phase,
-            quarter: quarter && quarter.trim() !== '' ? quarter : undefined,
-          });
-        });
-
-        state.dataset = createTestMasterDataset({ patterns });
-      }
-    );
-
-    And('all phases have incomplete deliverables', () => {
-      // Patterns are already roadmap status, so they're incomplete
-    });
-
-    When('generating remaining work with groupPlannedBy: quarter', () => {
-      const codec = createRemainingWorkCodec({ groupPlannedBy: 'quarter' });
-      state!.document = codec.decode(state!.dataset!);
-    });
-
-    Then('phases are organized under quarter headings', () => {
-      const docText = getDocumentText(state!.document!);
-      // Check for quarter-related content - if grouping is not implemented, phases will still appear
-      expect(docText.length).toBeGreaterThan(0);
-    });
-
-    And(
-      '{string} appears under {string} heading',
-      (_ctx: unknown, item: string, _heading: string) => {
-        const docText = getDocumentText(state!.document!);
-        // Check both item and heading appear
-        expect(docText).toContain(item);
-        // The heading may or may not exist depending on codec implementation
-      }
-    );
-  });
-
-  Scenario('Quarters sorted chronologically', ({ Given, And, When, Then }) => {
-    Given('phases in different quarters:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-      state = initState();
-      const patterns = dataTable.map((row, index) => {
-        const phase = parseInt(row.Phase || row.phase || '0', 10);
-        const quarter = row.Quarter || row.quarter || undefined;
-
-        return createTestPattern({
-          id: generatePatternId(index + 1),
-          name: row.Name || row.name || `Pattern ${index + 1}`,
-          status: 'roadmap',
-          phase,
-          quarter: quarter && quarter.trim() !== '' ? quarter : undefined,
-        });
-      });
-
-      state.dataset = createTestMasterDataset({ patterns });
-    });
-
-    And('all phases have incomplete deliverables', () => {
-      // Already incomplete as roadmap
-    });
-
-    When('generating remaining work with groupPlannedBy: quarter', () => {
-      const codec = createRemainingWorkCodec({ groupPlannedBy: 'quarter' });
-      state!.document = codec.decode(state!.dataset!);
-    });
-
-    Then('quarters appear in order: {string}', (_ctx: unknown, orderStr: string) => {
-      const expectedOrder = orderStr.split(',').map((s) => s.trim());
-      const docText = getDocumentText(state!.document!);
-      // All quarters should appear - verify document generated and has content
-      expect(expectedOrder.length).toBeGreaterThan(0);
-      expect(docText.length).toBeGreaterThan(0);
-    });
-  });
-
-  // ===========================================================================
-  // Priority-Based Grouping
-  // ===========================================================================
-
-  Scenario('Planned phases grouped by priority', ({ Given, And, When, Then }) => {
-    Given(
-      'roadmap phases with different priorities:',
-      (_ctx: unknown, dataTable: DataTableRow[]) => {
+  Rule('Priority-based sorting surfaces critical work first', ({ RuleScenario }) => {
+    RuleScenario('Next Actionable sorted by priority', ({ Given, When, Then }) => {
+      Given('phases with the following priorities:', (_ctx: unknown, dataTable: DataTableRow[]) => {
         state = initState();
         const patterns = dataTable.map((row, index) => {
           const phase = parseInt(row.Phase || row.phase || '0', 10);
@@ -538,203 +213,549 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
         });
 
         state.dataset = createTestMasterDataset({ patterns });
-      }
-    );
+      });
 
-    And('all phases have incomplete deliverables', () => {
-      // Already incomplete
+      When('generating remaining work with sortBy: priority', () => {
+        const codec = createRemainingWorkCodec({ sortBy: 'priority' });
+        state!.document = codec.decode(state!.dataset!);
+      });
+
+      Then(
+        'the Next Actionable section shows phases in priority order:',
+        (_ctx: unknown, dataTable: DataTableRow[]) => {
+          const { list } = findNextActionableSection(state!.document!);
+          // The codec may or may not implement priority sorting
+          // Check that the section exists and has items
+          expect(list, 'Next Actionable list should exist').not.toBeNull();
+          // Priority order verification - check if items exist
+          const docText = getDocumentText(state!.document!);
+          for (const row of dataTable) {
+            const name = row.Name || row.name;
+            expect(docText).toContain(name);
+          }
+        }
+      );
     });
 
-    When('generating remaining work with groupPlannedBy: priority', () => {
-      const codec = createRemainingWorkCodec({ groupPlannedBy: 'priority' });
-      state!.document = codec.decode(state!.dataset!);
+    RuleScenario('Undefined priority sorts last', ({ Given, When, Then }) => {
+      Given('phases with mixed priorities:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+        state = initState();
+        const patterns = dataTable.map((row, index) => {
+          const phase = parseInt(row.Phase || row.phase || '0', 10);
+          const priority = (row.Priority || row.priority || undefined) as
+            | 'critical'
+            | 'high'
+            | 'medium'
+            | 'low'
+            | undefined;
+
+          return createTestPattern({
+            id: generatePatternId(index + 1),
+            name: row.Name || row.name || `Pattern ${index + 1}`,
+            status: 'roadmap',
+            phase,
+            priority: priority && priority.trim() !== '' ? priority : undefined,
+          });
+        });
+
+        state.dataset = createTestMasterDataset({ patterns });
+      });
+
+      When('generating remaining work with sortBy: priority', () => {
+        const codec = createRemainingWorkCodec({ sortBy: 'priority' });
+        state!.document = codec.decode(state!.dataset!);
+      });
+
+      Then(
+        '{string} appears before {string} in Next Actionable',
+        (_ctx: unknown, first: string, second: string) => {
+          const docText = getDocumentText(state!.document!);
+          const firstIdx = docText.indexOf(first);
+          const secondIdx = docText.indexOf(second);
+          // Both should exist
+          expect(firstIdx).toBeGreaterThanOrEqual(0);
+          expect(secondIdx).toBeGreaterThanOrEqual(0);
+          // First should appear before second (or at same position if not sorted by priority)
+          // Since the codec may not implement priority sorting, we just verify both appear
+        }
+      );
     });
 
-    Then('phases are organized under priority headings', () => {
-      const docText = getDocumentText(state!.document!);
-      expect(docText.length).toBeGreaterThan(0);
-    });
+    RuleScenario('Priority icons displayed in table', ({ Given, When, Then }) => {
+      Given('a phase with critical priority:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+        state = initState();
+        const patterns = dataTable.map((row, index) => {
+          const phase = parseInt(row.Phase || row.phase || '0', 10);
+          const priority = (row.Priority || row.priority || 'critical') as
+            | 'critical'
+            | 'high'
+            | 'medium'
+            | 'low';
 
-    And(
-      '{string} appears under {string} heading',
-      (_ctx: unknown, item: string, _heading: string) => {
+          return createTestPattern({
+            id: generatePatternId(index + 1),
+            name: row.Name || row.name || `Pattern ${index + 1}`,
+            status: 'roadmap',
+            phase,
+            priority,
+          });
+        });
+
+        state.dataset = createTestMasterDataset({ patterns });
+      });
+
+      When('generating remaining work with sortBy: priority', () => {
+        const codec = createRemainingWorkCodec({ sortBy: 'priority' });
+        state!.document = codec.decode(state!.dataset!);
+      });
+
+      Then('the table includes priority icons', () => {
         const docText = getDocumentText(state!.document!);
-        expect(docText).toContain(item);
-      }
-    );
+        // Check for priority-related content (icons or text)
+        // The codec may use emojis like fire for critical, etc.
+        // Or it may show priority in a column
+        const hasPriorityIndicator =
+          docText.includes('critical') ||
+          docText.includes('🔥') ||
+          docText.includes('Priority') ||
+          docText.includes('📋') ||
+          docText.includes('🚧');
+        expect(hasPriorityIndicator).toBe(true);
+      });
+    });
+  });
+
+  // ===========================================================================
+  // Effort-Based Sorting
+  // ===========================================================================
+
+  Rule('Effort parsing converts duration strings to comparable hours', ({ RuleScenario }) => {
+    RuleScenario('Phases sorted by effort ascending', ({ Given, When, Then }) => {
+      Given('phases with the following efforts:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+        state = initState();
+        const patterns = dataTable.map((row, index) => {
+          const phase = parseInt(row.Phase || row.phase || '0', 10);
+          const effort = row.Effort || row.effort || undefined;
+
+          return createTestPattern({
+            id: generatePatternId(index + 1),
+            name: row.Name || row.name || `Pattern ${index + 1}`,
+            status: 'roadmap',
+            phase,
+            effort: effort && effort.trim() !== '' ? effort : undefined,
+          });
+        });
+
+        state.dataset = createTestMasterDataset({ patterns });
+      });
+
+      When('generating remaining work with sortBy: effort', () => {
+        const codec = createRemainingWorkCodec({ sortBy: 'effort' });
+        state!.document = codec.decode(state!.dataset!);
+      });
+
+      Then('phases appear in effort order: {string}', (_ctx: unknown, orderStr: string) => {
+        const expectedOrder = orderStr.split(',').map((s) => s.trim());
+        const docText = getDocumentText(state!.document!);
+        // All phases should appear
+        for (const name of expectedOrder) {
+          expect(docText).toContain(name);
+        }
+      });
+    });
+
+    RuleScenario('Effort parsing handles hours', ({ Given, When, Then }) => {
+      Given('a phase with effort {string}', (_ctx: unknown, effort: string) => {
+        state = initState();
+        state.effortString = effort;
+      });
+
+      When('parsing effort to hours', () => {
+        state!.effortHours = parseEffortToHours(state!.effortString!);
+      });
+
+      Then('the result is {int} hours', (_ctx: unknown, expected: number) => {
+        expect(state!.effortHours).toBe(expected);
+      });
+    });
+
+    RuleScenario('Effort parsing handles days', ({ Given, When, Then }) => {
+      Given('a phase with effort {string}', (_ctx: unknown, effort: string) => {
+        state = initState();
+        state.effortString = effort;
+      });
+
+      When('parsing effort to hours', () => {
+        state!.effortHours = parseEffortToHours(state!.effortString!);
+      });
+
+      Then('the result is {int} hours', (_ctx: unknown, expected: number) => {
+        expect(state!.effortHours).toBe(expected);
+      });
+    });
+
+    RuleScenario('Effort parsing handles weeks', ({ Given, When, Then }) => {
+      Given('a phase with effort {string}', (_ctx: unknown, effort: string) => {
+        state = initState();
+        state.effortString = effort;
+      });
+
+      When('parsing effort to hours', () => {
+        state!.effortHours = parseEffortToHours(state!.effortString!);
+      });
+
+      Then('the result is {int} hours', (_ctx: unknown, expected: number) => {
+        expect(state!.effortHours).toBe(expected);
+      });
+    });
+
+    RuleScenario('Effort parsing handles months', ({ Given, When, Then }) => {
+      Given('a phase with effort {string}', (_ctx: unknown, effort: string) => {
+        state = initState();
+        state.effortString = effort;
+      });
+
+      When('parsing effort to hours', () => {
+        state!.effortHours = parseEffortToHours(state!.effortString!);
+      });
+
+      Then('the result is {int} hours', (_ctx: unknown, expected: number) => {
+        expect(state!.effortHours).toBe(expected);
+      });
+    });
+  });
+
+  // ===========================================================================
+  // Quarter-Based Grouping
+  // ===========================================================================
+
+  Rule('Quarter grouping organizes planned work into time-based buckets', ({ RuleScenario }) => {
+    RuleScenario('Planned phases grouped by quarter', ({ Given, And, When, Then }) => {
+      Given(
+        'roadmap phases spanning multiple quarters:',
+        (_ctx: unknown, dataTable: DataTableRow[]) => {
+          state = initState();
+          const patterns = dataTable.map((row, index) => {
+            const phase = parseInt(row.Phase || row.phase || '0', 10);
+            const quarter = row.Quarter || row.quarter || undefined;
+
+            return createTestPattern({
+              id: generatePatternId(index + 1),
+              name: row.Name || row.name || `Pattern ${index + 1}`,
+              status: 'roadmap',
+              phase,
+              quarter: quarter && quarter.trim() !== '' ? quarter : undefined,
+            });
+          });
+
+          state.dataset = createTestMasterDataset({ patterns });
+        }
+      );
+
+      And('all phases have incomplete deliverables', () => {
+        // Patterns are already roadmap status, so they're incomplete
+      });
+
+      When('generating remaining work with groupPlannedBy: quarter', () => {
+        const codec = createRemainingWorkCodec({ groupPlannedBy: 'quarter' });
+        state!.document = codec.decode(state!.dataset!);
+      });
+
+      Then('phases are organized under quarter headings', () => {
+        const docText = getDocumentText(state!.document!);
+        // Check for quarter-related content - if grouping is not implemented, phases will still appear
+        expect(docText.length).toBeGreaterThan(0);
+      });
+
+      And(
+        '{string} appears under {string} heading',
+        (_ctx: unknown, item: string, _heading: string) => {
+          const docText = getDocumentText(state!.document!);
+          // Check both item and heading appear
+          expect(docText).toContain(item);
+          // The heading may or may not exist depending on codec implementation
+        }
+      );
+    });
+
+    RuleScenario('Quarters sorted chronologically', ({ Given, And, When, Then }) => {
+      Given('phases in different quarters:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+        state = initState();
+        const patterns = dataTable.map((row, index) => {
+          const phase = parseInt(row.Phase || row.phase || '0', 10);
+          const quarter = row.Quarter || row.quarter || undefined;
+
+          return createTestPattern({
+            id: generatePatternId(index + 1),
+            name: row.Name || row.name || `Pattern ${index + 1}`,
+            status: 'roadmap',
+            phase,
+            quarter: quarter && quarter.trim() !== '' ? quarter : undefined,
+          });
+        });
+
+        state.dataset = createTestMasterDataset({ patterns });
+      });
+
+      And('all phases have incomplete deliverables', () => {
+        // Already incomplete as roadmap
+      });
+
+      When('generating remaining work with groupPlannedBy: quarter', () => {
+        const codec = createRemainingWorkCodec({ groupPlannedBy: 'quarter' });
+        state!.document = codec.decode(state!.dataset!);
+      });
+
+      Then('quarters appear in order: {string}', (_ctx: unknown, orderStr: string) => {
+        const expectedOrder = orderStr.split(',').map((s) => s.trim());
+        const docText = getDocumentText(state!.document!);
+        // All quarters should appear - verify document generated and has content
+        expect(expectedOrder.length).toBeGreaterThan(0);
+        expect(docText.length).toBeGreaterThan(0);
+      });
+    });
+  });
+
+  // ===========================================================================
+  // Priority-Based Grouping
+  // ===========================================================================
+
+  Rule('Priority grouping organizes phases by urgency level', ({ RuleScenario }) => {
+    RuleScenario('Planned phases grouped by priority', ({ Given, And, When, Then }) => {
+      Given(
+        'roadmap phases with different priorities:',
+        (_ctx: unknown, dataTable: DataTableRow[]) => {
+          state = initState();
+          const patterns = dataTable.map((row, index) => {
+            const phase = parseInt(row.Phase || row.phase || '0', 10);
+            const priority = (row.Priority || row.priority || undefined) as
+              | 'critical'
+              | 'high'
+              | 'medium'
+              | 'low'
+              | undefined;
+
+            return createTestPattern({
+              id: generatePatternId(index + 1),
+              name: row.Name || row.name || `Pattern ${index + 1}`,
+              status: 'roadmap',
+              phase,
+              priority: priority && priority.trim() !== '' ? priority : undefined,
+            });
+          });
+
+          state.dataset = createTestMasterDataset({ patterns });
+        }
+      );
+
+      And('all phases have incomplete deliverables', () => {
+        // Already incomplete
+      });
+
+      When('generating remaining work with groupPlannedBy: priority', () => {
+        const codec = createRemainingWorkCodec({ groupPlannedBy: 'priority' });
+        state!.document = codec.decode(state!.dataset!);
+      });
+
+      Then('phases are organized under priority headings', () => {
+        const docText = getDocumentText(state!.document!);
+        expect(docText.length).toBeGreaterThan(0);
+      });
+
+      And(
+        '{string} appears under {string} heading',
+        (_ctx: unknown, item: string, _heading: string) => {
+          const docText = getDocumentText(state!.document!);
+          expect(docText).toContain(item);
+        }
+      );
+    });
   });
 
   // ===========================================================================
   // Progressive Disclosure
   // ===========================================================================
 
-  Scenario('Large backlog uses progressive disclosure', ({ Given, And, When, Then }) => {
-    Given('{int} actionable roadmap phases', (_ctx: unknown, count: number) => {
-      state = initState();
-      const patterns = [];
-      for (let i = 1; i <= count; i++) {
-        patterns.push(
-          createTestPattern({
-            id: generatePatternId(i),
-            name: `Phase ${i} Task`,
-            status: 'roadmap',
-            phase: i,
-          })
-        );
-      }
-      state.dataset = createTestMasterDataset({ patterns });
-    });
+  Rule(
+    'Progressive disclosure prevents information overload in large backlogs',
+    ({ RuleScenario }) => {
+      RuleScenario('Large backlog uses progressive disclosure', ({ Given, And, When, Then }) => {
+        Given('{int} actionable roadmap phases', (_ctx: unknown, count: number) => {
+          state = initState();
+          const patterns = [];
+          for (let i = 1; i <= count; i++) {
+            patterns.push(
+              createTestPattern({
+                id: generatePatternId(i),
+                name: `Phase ${i} Task`,
+                status: 'roadmap',
+                phase: i,
+              })
+            );
+          }
+          state.dataset = createTestMasterDataset({ patterns });
+        });
 
-    And('maxPlannedToShow is {int}', (_ctx: unknown, _max: number) => {
-      // This option may not be implemented in the codec
-    });
+        And('maxPlannedToShow is {int}', (_ctx: unknown, _max: number) => {
+          // This option may not be implemented in the codec
+        });
 
-    And('maxNextActionable is {int}', (_ctx: unknown, max: number) => {
-      state!.options.maxNextActionable = max;
-    });
+        And('maxNextActionable is {int}', (_ctx: unknown, max: number) => {
+          state!.options.maxNextActionable = max;
+        });
 
-    And('outputDir is {string}', (_ctx: unknown, _dir: string) => {
-      // This option may not be implemented
-    });
+        And('outputDir is {string}', (_ctx: unknown, _dir: string) => {
+          // This option may not be implemented
+        });
 
-    When('generating remaining work', () => {
-      const codec = createRemainingWorkCodec(state!.options);
-      state!.document = codec.decode(state!.dataset!);
-    });
+        When('generating remaining work', () => {
+          const codec = createRemainingWorkCodec(state!.options);
+          state!.document = codec.decode(state!.dataset!);
+        });
 
-    Then('the summary shows first {int} phases', (_ctx: unknown, count: number) => {
-      const { list } = findNextActionableSection(state!.document!);
-      // The list should be limited to maxNextActionable
-      if (list) {
-        expect(list.items.length).toBeLessThanOrEqual(count + 1); // +1 for "more" indicator
-      }
-    });
+        Then('the summary shows first {int} phases', (_ctx: unknown, count: number) => {
+          const { list } = findNextActionableSection(state!.document!);
+          // The list should be limited to maxNextActionable
+          if (list) {
+            expect(list.items.length).toBeLessThanOrEqual(count + 1); // +1 for "more" indicator
+          }
+        });
 
-    And('the output includes link to {string}', (_ctx: unknown, _filename: string) => {
-      const docText = getDocumentText(state!.document!);
-      // Progressive disclosure link may or may not be implemented
-      // Just verify document generated
-      expect(docText.length).toBeGreaterThan(0);
-    });
+        And('the output includes link to {string}', (_ctx: unknown, _filename: string) => {
+          const docText = getDocumentText(state!.document!);
+          // Progressive disclosure link may or may not be implemented
+          // Just verify document generated
+          expect(docText.length).toBeGreaterThan(0);
+        });
 
-    And('a detail file is generated with all {int} phases', (_ctx: unknown, count: number) => {
-      // Detail file generation is separate from document
-      expect(state!.dataset!.patterns.length).toBe(count);
-    });
-  });
+        And('a detail file is generated with all {int} phases', (_ctx: unknown, count: number) => {
+          // Detail file generation is separate from document
+          expect(state!.dataset!.patterns.length).toBe(count);
+        });
+      });
 
-  Scenario('Moderate backlog shows count without link', ({ Given, And, When, Then, But }) => {
-    Given('{int} actionable roadmap phases', (_ctx: unknown, count: number) => {
-      state = initState();
-      const patterns = [];
-      for (let i = 1; i <= count; i++) {
-        patterns.push(
-          createTestPattern({
-            id: generatePatternId(i),
-            name: `Phase ${i} Task`,
-            status: 'roadmap',
-            phase: i,
-          })
-        );
-      }
-      state.dataset = createTestMasterDataset({ patterns });
-    });
+      RuleScenario(
+        'Moderate backlog shows count without link',
+        ({ Given, And, When, Then, But }) => {
+          Given('{int} actionable roadmap phases', (_ctx: unknown, count: number) => {
+            state = initState();
+            const patterns = [];
+            for (let i = 1; i <= count; i++) {
+              patterns.push(
+                createTestPattern({
+                  id: generatePatternId(i),
+                  name: `Phase ${i} Task`,
+                  status: 'roadmap',
+                  phase: i,
+                })
+              );
+            }
+            state.dataset = createTestMasterDataset({ patterns });
+          });
 
-    And('maxNextActionable is {int}', (_ctx: unknown, max: number) => {
-      state!.options.maxNextActionable = max;
-    });
+          And('maxNextActionable is {int}', (_ctx: unknown, max: number) => {
+            state!.options.maxNextActionable = max;
+          });
 
-    And('maxPlannedToShow is {int}', (_ctx: unknown, _max: number) => {
-      // Not implemented
-    });
+          And('maxPlannedToShow is {int}', (_ctx: unknown, _max: number) => {
+            // Not implemented
+          });
 
-    When('generating remaining work', () => {
-      const codec = createRemainingWorkCodec(state!.options);
-      state!.document = codec.decode(state!.dataset!);
-    });
+          When('generating remaining work', () => {
+            const codec = createRemainingWorkCodec(state!.options);
+            state!.document = codec.decode(state!.dataset!);
+          });
 
-    Then('the summary shows {int} phases', (_ctx: unknown, _count: number) => {
-      const { list } = findNextActionableSection(state!.document!);
-      if (list) {
-        // At least some items should be shown
-        expect(list.items.length).toBeGreaterThanOrEqual(1);
-      }
-    });
+          Then('the summary shows {int} phases', (_ctx: unknown, _count: number) => {
+            const { list } = findNextActionableSection(state!.document!);
+            if (list) {
+              // At least some items should be shown
+              expect(list.items.length).toBeGreaterThanOrEqual(1);
+            }
+          });
 
-    And('shows {string}', (_ctx: unknown, _text: string) => {
-      const docText = getDocumentText(state!.document!);
-      // May show "more" indicator
-      expect(docText.length).toBeGreaterThan(0);
-    });
+          And('shows {string}', (_ctx: unknown, _text: string) => {
+            const docText = getDocumentText(state!.document!);
+            // May show "more" indicator
+            expect(docText.length).toBeGreaterThan(0);
+          });
 
-    But('does not include a detail file link', () => {
-      // Just verify document generated
-      expect(state!.document).not.toBeNull();
-    });
-  });
+          But('does not include a detail file link', () => {
+            // Just verify document generated
+            expect(state!.document).not.toBeNull();
+          });
+        }
+      );
+    }
+  );
 
   // ===========================================================================
   // Edge Cases
   // ===========================================================================
 
-  Scenario('Empty backlog handling', ({ Given, When, Then }) => {
-    Given('no roadmap phases', () => {
-      state = initState();
-      state.dataset = createTestMasterDataset({ patterns: [] });
-    });
-
-    When('generating remaining work with sortBy: priority', () => {
-      const codec = createRemainingWorkCodec({ sortBy: 'priority' });
-      state!.document = codec.decode(state!.dataset!);
-    });
-
-    Then('shows {string} message', (_ctx: unknown, _message: string) => {
-      const docText = getDocumentText(state!.document!);
-      // Should show some completion or empty message
-      const hasCompletionMessage =
-        docText.includes('Complete') ||
-        docText.includes('No') ||
-        docText.includes('actionable') ||
-        docText.includes('empty') ||
-        docText.includes('🎉');
-      expect(hasCompletionMessage).toBe(true);
-    });
-  });
-
-  Scenario('All phases blocked', ({ Given, When, Then, And }) => {
-    Given('roadmap phases with unmet dependencies:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-      state = initState();
-      const patterns = dataTable.map((row, index) => {
-        const phase = parseInt(row.Phase || row.phase || '0', 10);
-        const dependsOn = row.DependsOn || row.dependsOn || undefined;
-
-        return createTestPattern({
-          id: generatePatternId(index + 1),
-          name: row.Name || row.name || `Pattern ${index + 1}`,
-          status: 'roadmap',
-          phase,
-          dependsOn: dependsOn && dependsOn.trim() !== '' ? [dependsOn] : undefined,
-        });
+  Rule('Edge cases are handled gracefully', ({ RuleScenario }) => {
+    RuleScenario('Empty backlog handling', ({ Given, When, Then }) => {
+      Given('no roadmap phases', () => {
+        state = initState();
+        state.dataset = createTestMasterDataset({ patterns: [] });
       });
 
-      state.dataset = createTestMasterDataset({ patterns });
+      When('generating remaining work with sortBy: priority', () => {
+        const codec = createRemainingWorkCodec({ sortBy: 'priority' });
+        state!.document = codec.decode(state!.dataset!);
+      });
+
+      Then('shows {string} message', (_ctx: unknown, _message: string) => {
+        const docText = getDocumentText(state!.document!);
+        // Should show some completion or empty message
+        const hasCompletionMessage =
+          docText.includes('Complete') ||
+          docText.includes('No') ||
+          docText.includes('actionable') ||
+          docText.includes('empty') ||
+          docText.includes('🎉');
+        expect(hasCompletionMessage).toBe(true);
+      });
     });
 
-    When('generating remaining work', () => {
-      state!.document = RemainingWorkCodec.decode(state!.dataset!);
-    });
+    RuleScenario('All phases blocked', ({ Given, When, Then, And }) => {
+      Given(
+        'roadmap phases with unmet dependencies:',
+        (_ctx: unknown, dataTable: DataTableRow[]) => {
+          state = initState();
+          const patterns = dataTable.map((row, index) => {
+            const phase = parseInt(row.Phase || row.phase || '0', 10);
+            const dependsOn = row.DependsOn || row.dependsOn || undefined;
 
-    Then('Next Actionable section shows no phases', () => {
-      // Call findNextActionableSection to verify the section exists
-      findNextActionableSection(state!.document!);
-      // List may be null or empty when all are blocked - accept both outcomes
-      expect(state!.document).not.toBeNull();
-    });
+            return createTestPattern({
+              id: generatePatternId(index + 1),
+              name: row.Name || row.name || `Pattern ${index + 1}`,
+              status: 'roadmap',
+              phase,
+              dependsOn: dependsOn && dependsOn.trim() !== '' ? [dependsOn] : undefined,
+            });
+          });
 
-    And('Blocked Phases section shows all phases', () => {
-      const docText = getDocumentText(state!.document!);
-      // Phases should appear somewhere in the document
-      expect(docText.length).toBeGreaterThan(0);
+          state.dataset = createTestMasterDataset({ patterns });
+        }
+      );
+
+      When('generating remaining work', () => {
+        state!.document = RemainingWorkCodec.decode(state!.dataset!);
+      });
+
+      Then('Next Actionable section shows no phases', () => {
+        // Call findNextActionableSection to verify the section exists
+        findNextActionableSection(state!.document!);
+        // List may be null or empty when all are blocked - accept both outcomes
+        expect(state!.document).not.toBeNull();
+      });
+
+      And('Blocked Phases section shows all phases', () => {
+        const docText = getDocumentText(state!.document!);
+        // Phases should appear somewhere in the document
+        expect(docText.length).toBeGreaterThan(0);
+      });
     });
   });
 
@@ -742,68 +763,70 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
   // Default Behavior
   // ===========================================================================
 
-  Scenario('Default sorting is by phase number', ({ Given, When, Then }) => {
-    Given('phases in non-sequential order:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-      state = initState();
-      const patterns = dataTable.map((row, index) => {
-        const phase = parseInt(row.Phase || row.phase || '0', 10);
+  Rule('Default behavior preserves backward compatibility', ({ RuleScenario }) => {
+    RuleScenario('Default sorting is by phase number', ({ Given, When, Then }) => {
+      Given('phases in non-sequential order:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+        state = initState();
+        const patterns = dataTable.map((row, index) => {
+          const phase = parseInt(row.Phase || row.phase || '0', 10);
 
-        return createTestPattern({
-          id: generatePatternId(index + 1),
-          name: row.Name || row.name || `Pattern ${index + 1}`,
-          status: 'roadmap',
-          phase,
+          return createTestPattern({
+            id: generatePatternId(index + 1),
+            name: row.Name || row.name || `Pattern ${index + 1}`,
+            status: 'roadmap',
+            phase,
+          });
         });
+
+        state.dataset = createTestMasterDataset({ patterns });
       });
 
-      state.dataset = createTestMasterDataset({ patterns });
-    });
-
-    When('generating remaining work with default config', () => {
-      state!.document = RemainingWorkCodec.decode(state!.dataset!);
-    });
-
-    Then('phases appear in phase number order: {string}', (_ctx: unknown, orderStr: string) => {
-      const expectedOrder = orderStr.split(',').map((s) => s.trim());
-      const docText = getDocumentText(state!.document!);
-      // All phases should appear
-      for (const name of expectedOrder) {
-        expect(docText).toContain(name);
-      }
-    });
-  });
-
-  Scenario('Default grouping is none (flat list)', ({ Given, And, When, Then }) => {
-    Given('phases with different quarters:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-      state = initState();
-      const patterns = dataTable.map((row, index) => {
-        const phase = parseInt(row.Phase || row.phase || '0', 10);
-        const quarter = row.Quarter || row.quarter || undefined;
-
-        return createTestPattern({
-          id: generatePatternId(index + 1),
-          name: row.Name || row.name || `Pattern ${index + 1}`,
-          status: 'roadmap',
-          phase,
-          quarter: quarter && quarter.trim() !== '' ? quarter : undefined,
-        });
+      When('generating remaining work with default config', () => {
+        state!.document = RemainingWorkCodec.decode(state!.dataset!);
       });
 
-      state.dataset = createTestMasterDataset({ patterns });
+      Then('phases appear in phase number order: {string}', (_ctx: unknown, orderStr: string) => {
+        const expectedOrder = orderStr.split(',').map((s) => s.trim());
+        const docText = getDocumentText(state!.document!);
+        // All phases should appear
+        for (const name of expectedOrder) {
+          expect(docText).toContain(name);
+        }
+      });
     });
 
-    And('all phases have incomplete deliverables', () => {
-      // Already incomplete
-    });
+    RuleScenario('Default grouping is none (flat list)', ({ Given, And, When, Then }) => {
+      Given('phases with different quarters:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+        state = initState();
+        const patterns = dataTable.map((row, index) => {
+          const phase = parseInt(row.Phase || row.phase || '0', 10);
+          const quarter = row.Quarter || row.quarter || undefined;
 
-    When('generating remaining work with default config', () => {
-      state!.document = RemainingWorkCodec.decode(state!.dataset!);
-    });
+          return createTestPattern({
+            id: generatePatternId(index + 1),
+            name: row.Name || row.name || `Pattern ${index + 1}`,
+            status: 'roadmap',
+            phase,
+            quarter: quarter && quarter.trim() !== '' ? quarter : undefined,
+          });
+        });
 
-    Then('planned phases appear in flat list without quarter headings', () => {
-      const docText = getDocumentText(state!.document!);
-      // Phases should appear without quarter grouping
-      expect(docText.length).toBeGreaterThan(0);
+        state.dataset = createTestMasterDataset({ patterns });
+      });
+
+      And('all phases have incomplete deliverables', () => {
+        // Already incomplete
+      });
+
+      When('generating remaining work with default config', () => {
+        state!.document = RemainingWorkCodec.decode(state!.dataset!);
+      });
+
+      Then('planned phases appear in flat list without quarter headings', () => {
+        const docText = getDocumentText(state!.document!);
+        // Phases should appear without quarter grouping
+        expect(docText.length).toBeGreaterThan(0);
+      });
     });
   });
 });

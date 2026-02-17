@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [████████████░░░░░░░░] 104/173 (60%)
+**Patterns:** [██████████████░░░░░░] 207/302 (69%)
 
-**Phases:** 2/13 complete
+**Phases:** 4/19 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 173 |
-| Completed | 104 |
-| Active | 33 |
-| Planned | 36 |
+| Total Patterns | 302 |
+| Completed | 207 |
+| Active | 47 |
+| Planned | 48 |
 
 ---
 
@@ -27,12 +27,18 @@
 | 📋 [TraceabilityGenerator](phases/phase-18-traceability-generator.md) | 0/1 | 0% |
 | 📋 [ArchitectureDiagramGeneration](phases/phase-23-architecture-diagram-generation.md) | 0/1 | 0% |
 | 🚧 [ProcessStateAPIRelationshipQueries](phases/phase-24-process-state-api-relationship-queries.md) | 1/2 | 50% |
-| 📋 [DataAPIStubIntegration](phases/phase-25-data-api-stub-integration.md) | 5/9 | 56% |
+| 🚧 [DataAPIStubIntegration](phases/phase-25-data-api-stub-integration.md) | 5/10 | 50% |
 | ✅ [ShapeExtractor](phases/phase-26-shape-extractor.md) | 2/2 | 100% |
 | 🚧 [SourceMapper](phases/phase-27-source-mapper.md) | 4/5 | 80% |
 | ✅ [WarningCollector](phases/phase-28-warning-collector.md) | 5/5 | 100% |
-| 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/7 | 57% |
-| 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
+| 🚧 [ReferenceDocShowcase](phases/phase-30-reference-doc-showcase.md) | 0/1 | 0% |
+| ✅ [DeclarationLevelShapeTagging](phases/phase-31-declaration-level-shape-tagging.md) | 1/1 | 100% |
+| ✅ [CrossCuttingDocumentInclusion](phases/phase-32-cross-cutting-document-inclusion.md) | 1/1 | 100% |
+| 📋 [RichContentHelpersTesting](phases/phase-44-rich-content-helpers-testing.md) | 0/2 | 0% |
+| 🚧 [StepLintVitestCucumber](phases/phase-50-step-lint-vitest-cucumber.md) | 0/1 | 0% |
+| 📋 [StepLintExtendedRules](phases/phase-51-step-lint-extended-rules.md) | 0/1 | 0% |
+| 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 5/9 | 56% |
+| 📋 [ValidatorReadModelConsolidation](phases/phase-100-validator-read-model-consolidation.md) | 2/15 | 13% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
 | 📋 [CodecBehaviorTesting](phases/phase-102-codec-behavior-testing.md) | 0/1 | 0% |
 | 📋 [StepDefinitionCompletion](phases/phase-103-step-definition-completion.md) | 0/1 | 0% |
@@ -73,9 +79,9 @@
 
 ---
 
-### 📋 DataAPIStubIntegration
+### 🚧 DataAPIStubIntegration
 
-[████████░░░░░░░] 5/9 56% complete
+[████████░░░░░░░] 5/10 50% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
@@ -88,6 +94,7 @@
 | 📋 Data API Platform Integration | planned | The process-api CLI requires subprocess invocation for every query, adding shell overhead and preventing stateful... |
 | 📋 Data API Relationship Graph | planned | The current API provides flat relationship lookups (`getPatternDependencies`, `getPatternRelationships`) but no... |
 | ✅ Data API Stub Integration | completed | Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file... |
+| 🚧 Pattern Helpers Tests | active | - |
 
 ---
 
@@ -130,25 +137,88 @@
 
 ---
 
-### 📋 TypeScriptTaxonomyImplementation
+### 🚧 ReferenceDocShowcase
 
-[█████████░░░░░░] 4/7 57% complete
+[░░░░░░░░░░░░░░░] 0/1 0% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
+| 🚧 Reference Doc Showcase | active | The Reference Generation Sample document exercises a small fraction of the reference codec's capabilities: 2... |
+
+---
+
+### ✅ DeclarationLevelShapeTagging
+
+[███████████████] 1/1 100% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| ✅ Declaration Level Shape Tagging | completed | The current shape extraction system operates at file granularity. |
+
+---
+
+### ✅ CrossCuttingDocumentInclusion
+
+[███████████████] 1/1 100% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| ✅ Cross Cutting Document Inclusion | completed | The reference doc codec assembles content from four sources, each with its own selection mechanism: conventionTags... |
+
+---
+
+### 📋 RichContentHelpersTesting
+
+[░░░░░░░░░░░░░░░] 0/2 0% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| 📋 Kebab Case Slugs | planned | As a documentation generator I need to generate readable, URL-safe slugs from pattern names So that generated file... |
+| 📋 Rich Content Helpers Testing | planned | As a document codec author I need helpers to render Gherkin rich content So that DataTables, DocStrings, and... |
+
+---
+
+### 🚧 StepLintVitestCucumber
+
+[░░░░░░░░░░░░░░░] 0/1 0% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| 🚧 Step Lint Vitest Cucumber | active | Hours are lost debugging vitest-cucumber-specific issues that only surface at test runtime. |
+
+---
+
+### 📋 StepLintExtendedRules
+
+[░░░░░░░░░░░░░░░] 0/1 0% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| 📋 Step Lint Extended Rules | planned | The initial lint-steps CLI catches 8 vitest-cucumber traps, but 4 documented traps from... |
+
+---
+
+### 📋 TypeScriptTaxonomyImplementation
+
+[████████░░░░░░░] 5/9 56% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| ✅ Config Based Workflow Definition | completed | Every `pnpm process:query` and `pnpm docs:*` invocation prints: `Failed to load default workflow (6-phase-standard):... |
 | ✅ Mvp Workflow Implementation | completed | PDR-005 defines a 4-state workflow FSM (`roadmap, active, completed, deferred`) but the delivery-process package... |
 | ✅ Pattern Relationship Model | completed | Problem: The delivery process lacks a comprehensive relationship model between artifacts. |
 | 📋 Prd Implementation Section | planned | Problem: Implementation files with `@libar-docs-implements:PatternName` contain rich relationship metadata... |
 | ✅ Process Guard Linter | completed | During planning and implementation sessions, accidental modifications occur: - Specs outside the intended scope get... |
 | 📋 Status Aware Eslint Suppression | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
 | 📋 Streaming Git Diff | planned | The process guard (`lint-process --all`) fails with `ENOBUFS` error on large repositories. |
+| 📋 Test Content Blocks | planned | This feature demonstrates what content blocks are captured and rendered by the PRD generator. |
 | ✅ TypeScript Taxonomy Implementation | completed | As a delivery-process developer I want taxonomy defined in TypeScript with Zod integration So that I get compile-time... |
 
 ---
 
-### 📋 TraceabilityEnhancements
+### 📋 ValidatorReadModelConsolidation
 
-[██░░░░░░░░░░░░░] 2/13 15% complete
+[██░░░░░░░░░░░░░] 2/15 13% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
@@ -161,10 +231,12 @@
 | 📋 Living Roadmap CLI | planned | Roadmap is a static document that requires regeneration. |
 | 📋 Phase Numbering Conventions | planned | Phase numbers are assigned manually without validation, leading to potential conflicts (duplicate numbers), gaps that... |
 | ✅ Phase State Machine Validation | completed | Phase lifecycle state transitions are not enforced programmatically despite being documented in PROCESS_SETUP.md. |
+| 📋 Process API Layered Extraction | planned | `process-api.ts` is 1,700 lines containing three distinct responsibilities in one file: CLI shell (arg parsing, help,... |
 | 📋 Progressive Governance | planned | Enterprise governance patterns applied everywhere create overhead. |
 | 📋 Release Association Rules | planned | PDR-002 and PDR-003 define conventions for separating specs from release metadata, but there's no automated enforcement. |
 | 📋 Session File Cleanup | planned | Session files (docs-living/sessions/phase-*.md) are ephemeral working documents for active phases. |
 | 📋 Traceability Enhancements | planned | Current TRACEABILITY.md shows 15% coverage (timeline → behavior). |
+| 📋 Validator Read Model Consolidation | planned | `validate-patterns.ts` is the only feature consumer that bypasses the MasterDataset. |
 
 ---
 

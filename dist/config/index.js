@@ -38,7 +38,7 @@ export { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG, DEFAULT_REGEX_BUILDERS } f
 export { GENERIC_PRESET, LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PRESETS, } from './presets.js';
 // Config file discovery and loading
 export { loadConfig, loadProjectConfig, applyProjectSourceDefaults, findConfigFile, formatConfigError, } from './config-loader.js';
-export { loadWorkflowConfig, loadWorkflowFromPath, loadDefaultWorkflow, formatWorkflowLoadError, } from './workflow-loader.js';
+export { loadWorkflowFromPath, loadDefaultWorkflow, formatWorkflowLoadError, } from './workflow-loader.js';
 // Unified project configuration
 export { defineConfig } from './define-config.js';
 export { DeliveryProcessProjectConfigSchema, SourcesConfigSchema, OutputConfigSchema, GeneratorSourceOverrideSchema, isProjectConfig, isLegacyInstance, } from './project-config-schema.js';

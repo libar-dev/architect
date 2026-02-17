@@ -4,6 +4,7 @@
  * @libar-docs-pattern DeriveProcessState
  * @libar-docs-status active
  * @libar-docs-implements ProcessGuardLinter
+ * @libar-docs-uses GherkinScanner, FSMValidator
  * @libar-docs-depends-on:GherkinScanner,FSMValidator
  *
  * ## DeriveProcessState - Extract Process State from File Annotations

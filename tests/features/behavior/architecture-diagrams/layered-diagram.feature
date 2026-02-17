@@ -1,6 +1,8 @@
 @libar-docs
+@libar-docs-pattern:LayeredDiagramGeneration
+@libar-docs-status:completed
 @libar-docs-implements:ArchitectureDiagramGeneration
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Generation
 @architecture
 Feature: Layered Architecture Diagram Generation
 
@@ -16,6 +18,9 @@ Feature: Layered Architecture Diagram Generation
   # ============================================================================
 
   Rule: Layered diagrams group patterns by arch-layer
+
+    **Invariant:** Each distinct arch-layer value must produce exactly one Mermaid subgraph containing all patterns with that layer.
+    **Verified by:** Generate subgraphs for each layer
 
     Patterns with arch-layer are grouped into Mermaid subgraphs.
     Each layer becomes a visual container.
@@ -36,6 +41,10 @@ Feature: Layered Architecture Diagram Generation
 
   Rule: Layer order is domain to infrastructure (top to bottom)
 
+    **Invariant:** Layer subgraphs must be rendered in Clean Architecture order: domain first, then application, then infrastructure.
+    **Rationale:** The visual order reflects the dependency rule where outer layers depend on inner layers; reversing it would misrepresent the architecture.
+    **Verified by:** Layers render in correct order
+
     The layer subgraphs are rendered in Clean Architecture order:
     domain at top, then application, then infrastructure at bottom.
     This reflects the dependency rule: outer layers depend on inner layers.
@@ -53,6 +62,10 @@ Feature: Layered Architecture Diagram Generation
 
   Rule: Context labels included in layered diagram nodes
 
+    **Invariant:** Each node in a layered diagram must include its bounded context name as a label, since context is not conveyed by subgraph grouping.
+    **Rationale:** Layered diagrams group by layer, not context, so the context label is the only way to identify which bounded context a node belongs to.
+    **Verified by:** Nodes include context labels
+
     Unlike component diagrams which group by context, layered diagrams
     include the context as a label in each node name.
 
@@ -67,6 +80,10 @@ Feature: Layered Architecture Diagram Generation
       And the Mermaid output contains node "InvHandler" with context "inventory"
 
   Rule: Patterns without layer go to Other subgraph
+
+    **Invariant:** Patterns that have arch-role or arch-context but no arch-layer must be placed in an "Other" subgraph, never omitted from the diagram.
+    **Rationale:** Omitting unlayered patterns would silently hide architectural components; the "Other" group makes their missing classification visible.
+    **Verified by:** Unlayered patterns in Other subgraph
 
     Patterns that have arch-role or arch-context but no arch-layer
     are grouped into an "Other" subgraph.
@@ -86,6 +103,9 @@ Feature: Layered Architecture Diagram Generation
   # ============================================================================
 
   Rule: Layered diagram includes summary section
+
+    **Invariant:** The generated layered diagram document must include an Overview section with annotated source file count.
+    **Verified by:** Summary section for layered view
 
     The generated document starts with an overview section
     specific to layered architecture visualization.

@@ -4,7 +4,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:100
 @libar-docs-effort:2d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Generation
 @libar-docs-business-value:document-release-changes-automatically
 @libar-docs-priority:medium
 Feature: Architecture Delta Generation - ADRs as Release Notes
@@ -27,6 +27,10 @@ Feature: Architecture Delta Generation - ADRs as Release Notes
 
   Implements Convergence Opportunity 5: Architecture Change Control.
 
+  # ===========================================================================
+  # DELIVERABLES
+  # ===========================================================================
+
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
@@ -34,6 +38,10 @@ Feature: Architecture Delta Generation - ADRs as Release Notes
       | Pattern diff analyzer | pending | Yes | src/analyzers/ |
       | Architecture delta section renderer | pending | Yes | src/generators/sections/ |
       | arch-delta generator config | pending | No | src/generators/built-in/ |
+
+  # ===========================================================================
+  # ACCEPTANCE CRITERIA
+  # ===========================================================================
 
   @acceptance-criteria
   Scenario: Generate delta between releases

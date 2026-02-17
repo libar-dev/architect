@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:HandoffGeneratorTests
 @libar-docs-status:completed
+@libar-docs-product-area:DataAPI
 Feature: Handoff Generator - Session-End State Summary
 
   **Problem:**
@@ -13,6 +14,10 @@ Feature: Handoff Generator - Session-End State Summary
   issues, and next-session priorities.
 
   Rule: Handoff generates compact session state summary
+
+    **Invariant:** The handoff generator must produce a compact session state summary including pattern status, discovered items, inferred session type, modified files, and dependency blockers, throwing an error for unknown patterns.
+    **Rationale:** Handoff documents are the bridge between multi-session work — without compact state capture, the next session starts from scratch instead of resuming where the previous one left off.
+    **Verified by:** Generate handoff for in-progress pattern, Handoff captures discovered items, Session type is inferred from status, Completed pattern infers review session type, Deferred pattern infers design session type, Files modified section included when provided, Blockers section shows incomplete dependencies, Pattern not found throws error
 
     @acceptance-criteria @happy-path
     Scenario: Generate handoff for in-progress pattern
@@ -68,6 +73,10 @@ Feature: Handoff Generator - Session-End State Summary
       Then a PATTERN_NOT_FOUND error is thrown
 
   Rule: Formatter produces structured text output
+
+    **Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for machine-parseable session state.
+    **Rationale:** ADR-008 markers enable the context assembler to parse handoff output programmatically — unstructured text would require fragile regex parsing.
+    **Verified by:** Handoff formatter produces markers per ADR-008
 
     @acceptance-criteria @happy-path
     Scenario: Handoff formatter produces markers per ADR-008

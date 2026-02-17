@@ -35,6 +35,12 @@ Or use the default export for standard behavior:
 const doc = ValidationRulesCodec.decode(dataset);
 ```
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`validation-rules-codec.feature`](../../tests/features/doc-generation/validation-rules-codec.feature) - Validates the Validation Rules Codec that transforms MasterDataset into a
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

@@ -155,6 +155,7 @@ export type CollapsibleBlock = {
     content: SectionBlock[];
 };
 export type LinkOutBlock = z.infer<typeof LinkOutBlockSchema>;
+/** @libar-docs-shape reference-sample */
 export type SectionBlock = HeadingBlock | ParagraphBlock | SeparatorBlock | TableBlock | ListBlock | CodeBlock | MermaidBlock | CollapsibleBlock | LinkOutBlock;
 export type RenderableDocument = {
     title: string;

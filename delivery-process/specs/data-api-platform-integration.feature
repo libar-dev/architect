@@ -2,7 +2,7 @@
 @libar-docs-pattern:DataAPIPlatformIntegration
 @libar-docs-status:roadmap
 @libar-docs-phase:25d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:DataAPI
 @libar-docs-effort:3d
 @libar-docs-priority:medium
 @libar-docs-business-value:native-claude-code-integration-and-monorepo-support

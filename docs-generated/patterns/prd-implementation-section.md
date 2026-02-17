@@ -30,6 +30,12 @@
   | Usage guidance in docs | `usecase` annotations rendered as "When to Use" |
   | Zero manual sync | Code declares relationship, PRD reflects it |
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`prd-implementation-section.feature`](../../tests/features/generators/prd-implementation-section.feature) - Tests the Implementations section rendering in pattern documents.
+
 ## Acceptance Criteria
 
 **Implementations discovered from relationship index**

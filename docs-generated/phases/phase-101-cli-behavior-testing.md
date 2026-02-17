@@ -45,6 +45,10 @@
   | User Experience | Clear error messages for invalid usage |
   | CI/CD Integration | Predictable exit codes for automation |
 
+#### Dependencies
+
+- Depends on: ADR002GherkinOnlyTesting
+
 #### Acceptance Criteria
 
 **Generate specific document type**

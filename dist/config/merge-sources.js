@@ -3,6 +3,9 @@
  * @libar-docs-core @libar-docs-config
  * @libar-docs-pattern SourceMerger
  * @libar-docs-status active
+ * @libar-docs-arch-layer application
+ * @libar-docs-arch-context config
+ * @libar-docs-arch-role service
  * @libar-docs-uses ProjectConfigTypes
  * @libar-docs-used-by ConfigResolver
  *

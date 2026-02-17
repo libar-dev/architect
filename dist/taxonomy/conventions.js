@@ -20,5 +20,6 @@ export const CONVENTION_VALUES = [
     'pipeline-architecture',
     'publishing',
     'doc-generation',
+    'taxonomy-rules',
 ];
 //# sourceMappingURL=conventions.js.map

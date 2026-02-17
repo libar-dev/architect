@@ -30,6 +30,12 @@
 
   See: docs/ideation-convergence/01-delivery-process-opportunities.md
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`dod-validator.feature`](../../tests/features/validation/dod-validator.feature) - Validates that completed phases meet Definition of Done criteria:
+
 ## Acceptance Criteria
 
 **Validate DoD for completed phase**

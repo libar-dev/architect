@@ -3,7 +3,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:99
 @libar-docs-effort:2d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Validation
 @libar-docs-executable-specs:tests/features/behavior/status-aware-eslint
 Feature: Status-Aware ESLint Suppression - Annotation-Driven Lint Rule Relaxation
 

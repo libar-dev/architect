@@ -167,7 +167,20 @@ findFeatureFiles()    →  parseFeatureFile()  →  extractPatternTags()
 
 **Purpose:** Convert scanned files into normalized `ExtractedPattern` objects.
 
-**Key File:** `src/extractor/doc-extractor.ts:extractPatterns()`
+**Key Files:**
+
+- `src/extractor/doc-extractor.ts:extractPatterns()` - Pattern extraction
+- `src/extractor/shape-extractor.ts` - Shape extraction (3 modes)
+
+**Shape Extraction Modes:**
+
+| Mode                    | Trigger                                | Behavior                                       |
+| ----------------------- | -------------------------------------- | ---------------------------------------------- |
+| Explicit names          | `@libar-docs-extract-shapes Foo, Bar`  | Extracts named declarations only               |
+| Wildcard auto-discovery | `@libar-docs-extract-shapes *`         | Extracts all exported declarations from file   |
+| Declaration-level       | `@libar-docs-shape` on individual decl | Extracts tagged declarations (exported or not) |
+
+Shapes now include `params`, `returns`, and `throws` fields (parsed from `@param`/`@returns`/`@throws` JSDoc tags on function shapes), and an optional `group` field from the `@libar-docs-shape` tag value. `ExportInfo` includes an optional `signature` field for function/const/class declarations.
 
 ```typescript
 interface ExtractedPattern {
@@ -368,15 +381,17 @@ export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset 
 The delivery-process package uses a codec-based architecture for document generation:
 
 ```
-MasterDataset → Codec.decode() → RenderableDocument → Renderer → Markdown Files
+MasterDataset → Codec.decode() → RenderableDocument ─┬→ renderToMarkdown    → Markdown Files
+                                                      └→ renderToClaudeContext → Token-efficient text
 ```
 
-| Component              | Description                                                                       |
-| ---------------------- | --------------------------------------------------------------------------------- |
-| **MasterDataset**      | Aggregated view of all extracted patterns with indexes by category, phase, status |
-| **Codec**              | Zod 4 codec that transforms MasterDataset into RenderableDocument                 |
-| **RenderableDocument** | Universal intermediate format with typed section blocks                           |
-| **Renderer**           | Domain-agnostic markdown renderer (the "dumb printer")                            |
+| Component                 | Description                                                                         |
+| ------------------------- | ----------------------------------------------------------------------------------- |
+| **MasterDataset**         | Aggregated view of all extracted patterns with indexes by category, phase, status   |
+| **Codec**                 | Zod 4 codec that transforms MasterDataset into RenderableDocument                   |
+| **RenderableDocument**    | Universal intermediate format with typed section blocks                             |
+| **renderToMarkdown**      | Domain-agnostic markdown renderer for human documentation                           |
+| **renderToClaudeContext** | LLM-optimized renderer (~20-40% fewer tokens, omits Mermaid, flattens collapsibles) |
 
 ### Block Vocabulary (9 Types)
 
@@ -605,6 +620,71 @@ const doc = codec.decode(dataset);
 
 ---
 
+### Reference & Composition Codecs
+
+#### ReferenceCodec
+
+**Purpose:** Scoped reference documentation assembling four content layers into a single document.
+
+**Output Files:**
+
+- Configured per-instance (e.g., `docs/REFERENCE-SAMPLE.md`, `_claude-md/architecture/reference-sample.md`)
+
+**4-Layer Composition (in order):**
+
+1. **Convention content** — Extracted from `@libar-docs-convention`-tagged patterns (rules, invariants, tables)
+2. **Scoped diagrams** — Mermaid diagrams filtered by `archContext`, `archLayer`, `patterns`, or `archView`
+3. **TypeScript shapes** — API surfaces from `shapeSources` globs or `shapeSelectors` (declaration-level filtering)
+4. **Behavior content** — Gherkin-sourced patterns from `behaviorCategories`
+
+**Diagram Types (via `DiagramScope.diagramType`):**
+
+| Type              | Description                                                    |
+| ----------------- | -------------------------------------------------------------- |
+| `graph` (default) | Flowchart with subgraphs by `archContext`, custom node shapes  |
+| `sequenceDiagram` | Sequence diagram with typed messages between participants      |
+| `stateDiagram-v2` | State diagram with transitions from `dependsOn` relationships  |
+| `C4Context`       | C4 context diagram with boundaries, systems, and relationships |
+| `classDiagram`    | Class diagram with `<<archRole>>` stereotypes and typed arrows |
+
+**Key Options (ReferenceDocConfig):**
+
+| Option               | Type              | Description                                    |
+| -------------------- | ----------------- | ---------------------------------------------- |
+| `diagramScope`       | `DiagramScope`    | Single diagram configuration                   |
+| `diagramScopes`      | `DiagramScope[]`  | Multiple diagrams (takes precedence)           |
+| `shapeSources`       | `string[]`        | Glob patterns for shape extraction             |
+| `shapeSelectors`     | `ShapeSelector[]` | Fine-grained declaration-level shape filtering |
+| `behaviorCategories` | `string[]`        | Category tags for behavior pattern content     |
+| `conventionTags`     | `string[]`        | Convention tag values to include               |
+
+**ShapeSelector Variants:**
+
+| Variant             | Example                                         | Behavior                  |
+| ------------------- | ----------------------------------------------- | ------------------------- |
+| `{ group: string }` | `{ group: "api-types" }`                        | Match shapes by group tag |
+| `{ source, names }` | `{ source: "src/types.ts", names: ["Config"] }` | Named shapes from file    |
+| `{ source }`        | `{ source: "src/**/*.ts" }`                     | All shapes from glob      |
+
+#### CompositeCodec
+
+**Purpose:** Assembles documents from multiple child codecs into a single RenderableDocument.
+
+**Key Exports:**
+
+- `createCompositeCodec(codecs, options)` — Factory that decodes each child codec against the same MasterDataset and composes their outputs
+- `composeDocuments(documents, options)` — Pure document-level composition (concatenates sections, merges `additionalFiles` with last-wins semantics)
+
+**Options (CompositeCodecOptions):**
+
+| Option             | Type    | Default | Description                            |
+| ------------------ | ------- | ------- | -------------------------------------- |
+| `title`            | string  | —       | Document title                         |
+| `purpose`          | string  | —       | Document purpose for frontmatter       |
+| `separateSections` | boolean | `true`  | Insert separator blocks between codecs |
+
+---
+
 ## Progressive Disclosure
 
 Progressive disclosure splits large documents into a main index plus detail files. This improves readability and enables focused navigation.
@@ -674,12 +754,28 @@ The `detailLevel` option controls output verbosity:
  * @libar-docs-phase 14                     // Roadmap phase number
  * @libar-docs-uses OtherPattern, Another   // Dependencies (CSV)
  * @libar-docs-usecase "When doing X"       // Use cases (repeatable)
+ * @libar-docs-convention fsm-rules         // Convention tag (CSV, links to decisions)
+ * @libar-docs-extract-shapes *             // Auto-shape discovery (wildcard = all exports)
  *
  * ## Pattern Description                   // Markdown description
  *
  * Detailed description of the pattern...
  */
 ```
+
+**Declaration-Level Shape Tagging:**
+
+Individual declarations can be tagged with `@libar-docs-shape` in their JSDoc, without requiring a file-level `@libar-docs-extract-shapes` tag:
+
+```typescript
+/**
+ * @libar-docs-shape api-types
+ * Configuration for the delivery process pipeline.
+ */
+export interface PipelineConfig { ... }
+```
+
+The optional value (e.g., `api-types`) sets the shape's `group` field, enabling `ShapeSelector` filtering by group in reference codecs.
 
 **Tag Registry:** Defines categories, priorities, and metadata formats. Source: `src/taxonomy/` TypeScript modules.
 
@@ -712,6 +808,10 @@ Feature: My Pattern Implementation
     Then Y happens
 ```
 
+**Data-Driven Tag Extraction:**
+
+The Gherkin parser uses a data-driven approach — a `TAG_LOOKUP` map is built from `buildRegistry().metadataTags` at module load. For each tag, the registry definition provides: format (number/enum/csv/flag/value/quoted-value), optional transforms (`hyphenToSpace`, `padAdr`, `stripQuotes`), and the target `metadataKey`. Adding new Gherkin tags requires only a registry definition — no parser code changes.
+
 **Tag Mapping:**
 
 | Gherkin Tag                    | ExtractedPattern Field |
@@ -723,6 +823,7 @@ Feature: My Pattern Implementation
 | `@libar-docs-release:*`        | `release`              |
 | `@libar-docs-depends-on:*`     | `dependsOn`            |
 | `@libar-docs-product-area:*`   | `productArea`          |
+| `@libar-docs-convention:*`     | `convention`           |
 | `@libar-docs-discovered-gap:*` | `discoveredGaps`       |
 
 ### Status Normalization
@@ -1237,6 +1338,7 @@ generatorRegistry.register(new MyCustomGenerator());
 | `ChangelogCodec`            | `changelog`          | `-g changelog`          |
 | `TraceabilityCodec`         | `traceability`       | `-g traceability`       |
 | `OverviewCodec`             | `overview-rdm`       | `-g overview-rdm`       |
+| `ReferenceCodec`            | `reference-sample`   | `-g reference-sample`   |
 
 ### CLI Usage
 
@@ -1298,12 +1400,18 @@ filterQuarters: []; // All (default)
 
 ## Code References
 
-| Component                | File                                           | Purpose                     |
-| ------------------------ | ---------------------------------------------- | --------------------------- |
-| MasterDataset Schema     | `src/validation-schemas/master-dataset.ts`     | Central data structure      |
-| transformToMasterDataset | `src/generators/pipeline/transform-dataset.ts` | Single-pass transformation  |
-| Document Codecs          | `src/renderable/codecs/*.ts`                   | Zod 4 codec implementations |
-| Markdown Renderer        | `src/renderable/renderer.ts`                   | Block → Markdown            |
-| Orchestrator             | `src/generators/orchestrator.ts`               | Pipeline coordination       |
-| TypeScript Scanner       | `src/scanner/pattern-scanner.ts`               | TS AST parsing              |
-| Gherkin Scanner          | `src/scanner/gherkin-scanner.ts`               | Feature file parsing        |
+| Component                | File                                            | Purpose                       |
+| ------------------------ | ----------------------------------------------- | ----------------------------- |
+| MasterDataset Schema     | `src/validation-schemas/master-dataset.ts`      | Central data structure        |
+| transformToMasterDataset | `src/generators/pipeline/transform-dataset.ts`  | Single-pass transformation    |
+| Document Codecs          | `src/renderable/codecs/*.ts`                    | Zod 4 codec implementations   |
+| Reference Codec          | `src/renderable/codecs/reference.ts`            | Scoped reference documents    |
+| Composite Codec          | `src/renderable/codecs/composite.ts`            | Multi-codec assembly          |
+| Convention Extractor     | `src/renderable/codecs/convention-extractor.ts` | Convention content extraction |
+| Shape Matcher            | `src/renderable/codecs/shape-matcher.ts`        | Declaration-level filtering   |
+| Markdown Renderer        | `src/renderable/render.ts`                      | Block → Markdown              |
+| Claude Context Renderer  | `src/renderable/render.ts`                      | LLM-optimized rendering       |
+| Orchestrator             | `src/generators/orchestrator.ts`                | Pipeline coordination         |
+| TypeScript Scanner       | `src/scanner/pattern-scanner.ts`                | TS AST parsing                |
+| Gherkin Scanner          | `src/scanner/gherkin-scanner.ts`                | Feature file parsing          |
+| Shape Extractor          | `src/extractor/shape-extractor.ts`              | Shape extraction from TS      |

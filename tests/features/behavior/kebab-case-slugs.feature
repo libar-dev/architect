@@ -1,7 +1,10 @@
 @libar-docs
-@libar-docs-pattern KebabCaseSlugs
-@libar-docs-status roadmap
-@libar-docs-phase 44
+@libar-docs-pattern:KebabCaseSlugs
+@libar-docs-status:roadmap
+@libar-docs-phase:44
+@libar-docs-product-area:CoreTypes
+@libar-docs-include:core-types
+@libar-docs-depends-on:StringUtils
 
 Feature: Slug Generation for Progressive Disclosure
   As a documentation generator
@@ -16,6 +19,9 @@ Feature: Slug Generation for Progressive Disclosure
   - Proper phase prefixing for requirements
 
   Rule: CamelCase names convert to kebab-case
+
+    **Invariant:** CamelCase pattern names must be split at word boundaries and joined with hyphens in lowercase.
+    **Verified by:** Convert pattern names to readable slugs
 
     Scenario Outline: Convert pattern names to readable slugs
       Given pattern name "<input>"
@@ -37,6 +43,9 @@ Feature: Slug Generation for Progressive Disclosure
 
   Rule: Edge cases are handled correctly
 
+    **Invariant:** Slug generation must handle special characters, consecutive separators, and leading/trailing hyphens without producing invalid slugs.
+    **Verified by:** Handle edge cases in slug generation
+
     Scenario Outline: Handle edge cases in slug generation
       Given pattern name "<input>"
       When converting to kebab-case slug
@@ -51,6 +60,9 @@ Feature: Slug Generation for Progressive Disclosure
         | XMLHTTPRequest   | xmlhttp-request |
 
   Rule: Requirements include phase prefix
+
+    **Invariant:** Requirement slugs must be prefixed with "phase-NN-" where NN is the zero-padded phase number, defaulting to "00" when no phase is assigned.
+    **Verified by:** Requirement slugs include phase number, Requirement without phase uses phase 00
 
     Scenario Outline: Requirement slugs include phase number
       Given pattern "<pattern>" with phase "<phase>"
@@ -70,6 +82,9 @@ Feature: Slug Generation for Progressive Disclosure
       Then the slug is "phase-00-some-unassigned"
 
   Rule: Phase slugs use kebab-case for names
+
+    **Invariant:** Phase slugs must combine a zero-padded phase number with the kebab-case name in the format "phase-NN-name", defaulting to "unnamed" when no name is provided.
+    **Verified by:** Phase slugs combine number and kebab-case name, Phase without name uses "unnamed"
 
     Scenario Outline: Phase slugs combine number and kebab-case name
       Given phase number "<number>" with name "<name>"

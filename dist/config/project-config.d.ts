@@ -3,6 +3,8 @@
  * @libar-docs-core @libar-docs-config
  * @libar-docs-pattern ProjectConfigTypes
  * @libar-docs-status active
+ * @libar-docs-arch-layer domain
+ * @libar-docs-arch-context config
  * @libar-docs-uses ConfigurationTypes, ConfigurationPresets
  * @libar-docs-used-by DefineConfig, ConfigLoader
  * @libar-docs-extract-shapes DeliveryProcessProjectConfig, SourcesConfig, OutputConfig, GeneratorSourceOverride, ResolvedConfig, ResolvedProjectConfig, ResolvedSourcesConfig
@@ -35,6 +37,7 @@ import type { PresetName } from './presets.js';
 import type { DeliveryProcessConfig, DeliveryProcessInstance } from './types.js';
 import type { ContextInferenceRule } from '../generators/pipeline/transform-dataset.js';
 import type { ReferenceDocConfig } from '../renderable/codecs/reference.js';
+import type { CodecOptions } from '../renderable/generate.js';
 /**
  * Source glob configuration for the project.
  * Centralizes what previously lived in CLI --input/--features flags.
@@ -157,6 +160,12 @@ export interface DeliveryProcessProjectConfig {
     /** Path to custom workflow config JSON (relative to config file) */
     readonly workflowPath?: string;
     /**
+     * Per-codec options for fine-tuning document generation.
+     * Keys match codec names (e.g., 'business-rules', 'patterns').
+     * Passed through to codec factories at generation time.
+     */
+    readonly codecOptions?: CodecOptions;
+    /**
      * Reference document configurations for convention-based doc generation.
      * Each config defines one reference document's content composition via
      * convention tags, shape sources, behavior categories, and diagram scopes.
@@ -183,6 +192,8 @@ export interface ResolvedProjectConfig {
     readonly contextInferenceRules: readonly ContextInferenceRule[];
     /** Workflow config path (null if not specified) */
     readonly workflowPath: string | null;
+    /** Per-codec options for document generation (empty if none) */
+    readonly codecOptions?: CodecOptions;
     /** Reference document configurations (empty array if none) */
     readonly referenceDocConfigs: readonly ReferenceDocConfig[];
 }

@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:StubResolverTests
 @libar-docs-status:active
+@libar-docs-product-area:DataAPI
 Feature: Stub Resolver - Design Stub Discovery and Resolution
 
   **Problem:**
@@ -12,6 +13,10 @@ Feature: Stub Resolver - Design Stub Discovery and Resolution
   the MasterDataset with filesystem existence checks.
 
   Rule: Stubs are identified by path or target metadata
+
+    **Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath metadata field.
+    **Rationale:** Dual identification supports both convention-based (directory) and metadata-based (targetPath) stub detection — relying on only one would miss stubs organized differently.
+    **Verified by:** Patterns in stubs directory are identified as stubs, Patterns with targetPath are identified as stubs
 
     @acceptance-criteria @happy-path
     Scenario: Patterns in stubs directory are identified as stubs
@@ -26,6 +31,10 @@ Feature: Stub Resolver - Design Stub Discovery and Resolution
       Then patterns with targetPath are included in results
 
   Rule: Stubs are resolved against the filesystem
+
+    **Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the pattern they implement.
+    **Rationale:** Target existence status tells developers whether a stub has been implemented — grouping by pattern enables the "stubs --unresolved" command to show per-pattern implementation gaps.
+    **Verified by:** Resolved stubs show target existence status, Stubs are grouped by implementing pattern
 
     @acceptance-criteria @happy-path
     Scenario: Resolved stubs show target existence status
@@ -44,6 +53,10 @@ Feature: Stub Resolver - Design Stub Discovery and Resolution
       And each group has correct resolved and unresolved counts
 
   Rule: Decision items are extracted from descriptions
+
+    **Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions returning no items and malformed items being skipped.
+    **Rationale:** Decision items (AD-1, AD-2, etc.) link stubs to architectural decisions — extracting them enables traceability from code stubs back to the design rationale.
+    **Verified by:** AD-N items are extracted from description text, Empty description returns no decision items, Malformed AD items are skipped
 
     @acceptance-criteria @happy-path
     Scenario: AD-N items are extracted from description text
@@ -66,6 +79,10 @@ Feature: Stub Resolver - Design Stub Discovery and Resolution
       Then 0 decision items are returned
 
   Rule: PDR references are found across patterns
+
+    **Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results when no references exist.
+    **Rationale:** PDR cross-referencing enables impact analysis — knowing which patterns reference a decision helps assess the blast radius of changing that decision.
+    **Verified by:** Patterns referencing a PDR are found, No references returns empty result
 
     @acceptance-criteria @happy-path
     Scenario: Patterns referencing a PDR are found

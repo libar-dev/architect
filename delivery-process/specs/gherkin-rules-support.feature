@@ -5,7 +5,7 @@
 @libar-docs-phase:100
 @libar-docs-release:v1.0.0
 @libar-docs-effort:4h
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Annotation
 @libar-docs-business-value:enable-human-readable-documentation-from-feature-files
 @libar-docs-priority:high
 Feature: Gherkin Rules and Custom Content Support

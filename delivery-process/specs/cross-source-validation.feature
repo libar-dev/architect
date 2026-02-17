@@ -3,7 +3,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:100
 @libar-docs-effort:4h
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Annotation
 @libar-docs-business-value:detect-inconsistencies-between-typescript-and-gherkin-sources
 @libar-docs-priority:high
 Feature: Cross-Source Validation

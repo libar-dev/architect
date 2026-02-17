@@ -28,6 +28,12 @@ Uses explicit registration pattern for transparency and debuggability.
 - **Explicit Registration:** No auto-discovery, transparent registration
 - **Name Uniqueness:** Prevents duplicate generator names
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`registry.feature`](../../tests/features/generators/registry.feature) - Tests the GeneratorRegistry registration, lookup, and listing capabilities.
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

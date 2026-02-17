@@ -3,23 +3,23 @@
  * @libar-docs-config
  * @libar-docs-pattern WorkflowLoader
  * @libar-docs-status completed
+ * @libar-docs-arch-layer infrastructure
+ * @libar-docs-arch-context config
+ * @libar-docs-arch-role infrastructure
  * @libar-docs-uses WorkflowConfigSchema, CodecUtils
  * @libar-docs-used-by GeneratorOrchestrator, SectionHelpers
  *
  * ## WorkflowLoader - Workflow Configuration Loading
  *
- * Loads and validates workflow configuration from JSON files in the catalogue.
- * Supports loading by name from catalogue/workflows/ or by explicit path.
+ * Provides the default 6-phase workflow as an inline constant and loads
+ * custom workflow overrides from JSON files via `--workflow <path>`.
  *
  * ### When to Use
  *
- * - Use at pipeline startup to load workflow configuration
- * - Use when validating custom workflow configuration files
- * - Use when loading default 6-phase-standard workflow
+ * - Use `loadDefaultWorkflow()` at pipeline startup (synchronous, infallible)
+ * - Use `loadWorkflowFromPath()` for custom `--workflow <file>` overrides
  */
 import * as fs from 'fs/promises';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
 import { Result } from '../types/result.js';
 import { WorkflowConfigSchema, createLoadedWorkflow, } from '../validation-schemas/workflow-config.js';
 import { createJsonInputCodec } from '../validation-schemas/codec-utils.js';
@@ -27,44 +27,36 @@ import { createJsonInputCodec } from '../validation-schemas/codec-utils.js';
  * Codec for parsing and validating workflow configuration JSON
  */
 const WorkflowConfigCodec = createJsonInputCodec(WorkflowConfigSchema);
-/** Default workflow name */
-const DEFAULT_WORKFLOW_NAME = '6-phase-standard';
 /**
- * Get the path to the catalogue/workflows directory
+ * Default workflow configuration (6-phase USDP standard)
  *
- * Resolves relative to this module's location in the package.
+ * Inline constant using the 4 canonical statuses from ADR-001.
+ * Replaces the deleted catalogue/workflows/6-phase-standard.json.
+ *
+ * DD-1: Inline constant in workflow-loader.ts, not preset integration.
+ * DD-2: Satisfies existing WorkflowConfig type — no new types needed.
  */
-function getCatalogueWorkflowsPath() {
-    // Handle both ESM and CJS module resolution
-    const currentFile = fileURLToPath(import.meta.url);
-    const packageRoot = path.resolve(path.dirname(currentFile), '../..');
-    return path.join(packageRoot, 'catalogue', 'workflows');
-}
-/**
- * Load workflow configuration by name from catalogue
- *
- * Loads from catalogue/workflows/{name}.json. The name should not include
- * the .json extension.
- *
- * @param name - Workflow name (e.g., "6-phase-standard", "3-phase-minimal")
- * @returns Result with LoadedWorkflow or error details
- *
- * @example
- * ```typescript
- * const result = loadWorkflowConfig("6-phase-standard");
- * if (result.ok) {
- *   const workflow = result.value;
- *   const emoji = workflow.statusMap.get("completed")?.emoji;
- * } else {
- *   console.error(result.error.message);
- * }
- * ```
- */
-export async function loadWorkflowConfig(name) {
-    const cataloguePath = getCatalogueWorkflowsPath();
-    const configPath = path.join(cataloguePath, `${name}.json`);
-    return loadWorkflowFromPath(configPath, name);
-}
+const DEFAULT_WORKFLOW_CONFIG = Object.freeze({
+    name: '6-phase-standard',
+    version: '1.0.0',
+    statuses: [
+        { name: 'roadmap', emoji: '\u{1F4CB}' },
+        { name: 'active', emoji: '\u{1F6A7}' },
+        { name: 'completed', emoji: '\u2705' },
+        { name: 'deferred', emoji: '\u23F8\uFE0F' },
+    ],
+    phases: [
+        { name: 'Inception', order: 1 },
+        { name: 'Elaboration', order: 2 },
+        { name: 'Session', order: 3 },
+        { name: 'Construction', order: 4 },
+        { name: 'Validation', order: 5 },
+        { name: 'Retrospective', order: 6 },
+    ],
+    defaultStatus: 'roadmap',
+});
+/** Pre-computed LoadedWorkflow singleton — avoids rebuilding Maps on every call */
+const DEFAULT_LOADED_WORKFLOW = createLoadedWorkflow(DEFAULT_WORKFLOW_CONFIG);
 /**
  * Load workflow configuration from a specific file path
  *
@@ -133,25 +125,21 @@ export async function loadWorkflowFromPath(configPath, source) {
 /**
  * Load the default workflow (6-phase-standard)
  *
- * Returns the standard USDP 6-phase workflow from the catalogue.
- * This function throws if the default workflow cannot be loaded,
- * as this indicates a package installation issue.
+ * Returns the standard USDP 6-phase workflow from an inline constant.
+ * Synchronous and infallible — no file I/O, no error handling needed.
+ *
+ * DD-4: Returns LoadedWorkflow synchronously (not Promise).
  *
  * @returns LoadedWorkflow for 6-phase-standard
- * @throws Error if default workflow cannot be loaded
  *
  * @example
  * ```typescript
- * const workflow = await loadDefaultWorkflow();
+ * const workflow = loadDefaultWorkflow();
  * const emoji = workflow.statusMap.get("completed")?.emoji; // "\u2705"
  * ```
  */
-export async function loadDefaultWorkflow() {
-    const result = await loadWorkflowConfig(DEFAULT_WORKFLOW_NAME);
-    if (!result.ok) {
-        throw new Error(`Failed to load default workflow (${DEFAULT_WORKFLOW_NAME}): ${result.error.message}`);
-    }
-    return result.value;
+export function loadDefaultWorkflow() {
+    return DEFAULT_LOADED_WORKFLOW;
 }
 /**
  * Format workflow load error for console display
@@ -161,7 +149,7 @@ export async function loadDefaultWorkflow() {
  *
  * @example
  * ```typescript
- * const result = await loadWorkflowConfig("non-existent");
+ * const result = await loadWorkflowFromPath("/path/to/custom.json");
  * if (!result.ok) {
  *   console.error(formatWorkflowLoadError(result.error));
  *   process.exit(1);

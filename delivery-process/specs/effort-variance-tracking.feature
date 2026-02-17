@@ -4,7 +4,9 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:100
 @libar-docs-effort:2d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Process
+@libar-docs-include:process-workflow
+@libar-docs-depends-on:MvpWorkflowImplementation
 @libar-docs-business-value:track-planned-vs-actual-effort-variance
 @libar-docs-priority:medium
 Feature: Effort Variance Tracking - Improve Estimates Over Time

@@ -3,6 +3,9 @@
  * @libar-docs-core @libar-docs-config
  * @libar-docs-pattern RegexBuilders
  * @libar-docs-status completed
+ * @libar-docs-arch-layer infrastructure
+ * @libar-docs-arch-context config
+ * @libar-docs-arch-role infrastructure
  * @libar-docs-uses ConfigurationTypes
  * @libar-docs-used-by DeliveryProcessFactory
  * @libar-docs-extract-shapes createRegexBuilders

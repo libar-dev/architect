@@ -11,7 +11,7 @@
  * @libar-docs-arch-role read-model
  * @libar-docs-arch-context api
  * @libar-docs-arch-layer domain
- * @libar-docs-arch-view codec-transformation
+ * @libar-docs-include codec-transformation
  *
  * ## MasterDataset - Unified Pattern Views Schema
  *
@@ -186,7 +186,7 @@ export const ArchIndexSchema = z.object({
   /** Patterns grouped by arch-layer (domain, application, infrastructure) */
   byLayer: z.record(z.string(), z.array(ExtractedPatternSchema)),
 
-  /** Patterns grouped by arch-view (named architectural views for scoped diagrams) */
+  /** Patterns grouped by include tag (cross-cutting content routing and diagram scoping) */
   byView: z.record(z.string(), z.array(ExtractedPatternSchema)),
 
   /** Patterns with any architecture metadata (for diagram generation) */

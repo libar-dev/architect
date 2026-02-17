@@ -6,7 +6,7 @@
  * @libar-docs-arch-role projection
  * @libar-docs-arch-context renderer
  * @libar-docs-arch-layer application
- * @libar-docs-arch-view codec-transformation
+ * @libar-docs-include codec-transformation
  * @libar-docs-uses MasterDataset, ArchIndex
  *
  * ## Architecture Diagram Codec
@@ -141,8 +141,10 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            productArea: z.ZodOptional<z.ZodString>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
         code: z.ZodString;
         source: z.ZodObject<{
@@ -299,7 +301,7 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
@@ -316,9 +318,24 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
+            group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
+            }, z.core.$strip>>>>;
+            params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                type: z.ZodOptional<z.ZodString>;
+                description: z.ZodString;
+            }, z.core.$strip>>>>;
+            returns: z.ZodOptional<z.ZodObject<{
+                type: z.ZodOptional<z.ZodString>;
+                description: z.ZodString;
+            }, z.core.$strip>>;
+            throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                type: z.ZodOptional<z.ZodString>;
+                description: z.ZodString;
             }, z.core.$strip>>>>;
         }, z.core.$strip>>>>;
     }, z.core.$strict>>;
@@ -348,6 +365,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             values: z.ZodOptional<z.ZodArray<z.ZodString>>;
             default: z.ZodOptional<z.ZodString>;
             example: z.ZodOptional<z.ZodString>;
+            metadataKey: z.ZodOptional<z.ZodString>;
+            transform: z.ZodOptional<z.ZodFunction<z.core.$ZodFunctionArgs, z.core.$ZodFunctionOut>>;
         }, z.core.$strict>>;
         aggregationTags: z.ZodArray<z.ZodObject<{
             tag: z.ZodString;
@@ -403,8 +422,10 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
             source: z.ZodObject<{
@@ -561,7 +582,7 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -578,9 +599,24 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
+                params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>>>;
+                returns: z.ZodOptional<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>;
+                throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
                 }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
@@ -628,8 +664,10 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
             source: z.ZodObject<{
@@ -786,7 +824,7 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -803,9 +841,24 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
+                params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>>>;
+                returns: z.ZodOptional<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>;
+                throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
                 }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
@@ -853,8 +906,10 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
             source: z.ZodObject<{
@@ -1011,7 +1066,7 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -1028,9 +1083,24 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
+                params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>>>;
+                returns: z.ZodOptional<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>;
+                throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
                 }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
@@ -1082,8 +1152,10 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
             source: z.ZodObject<{
@@ -1240,7 +1312,7 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -1257,9 +1329,24 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
+                params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>>>;
+                returns: z.ZodOptional<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>;
+                throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
                 }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
@@ -1314,8 +1401,10 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            productArea: z.ZodOptional<z.ZodString>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
         code: z.ZodString;
         source: z.ZodObject<{
@@ -1472,7 +1561,7 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
@@ -1489,9 +1578,24 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
+            group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
+            }, z.core.$strip>>>>;
+            params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                type: z.ZodOptional<z.ZodString>;
+                description: z.ZodString;
+            }, z.core.$strip>>>>;
+            returns: z.ZodOptional<z.ZodObject<{
+                type: z.ZodOptional<z.ZodString>;
+                description: z.ZodString;
+            }, z.core.$strip>>;
+            throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                type: z.ZodOptional<z.ZodString>;
+                description: z.ZodString;
             }, z.core.$strip>>>>;
         }, z.core.$strip>>>>;
     }, z.core.$strict>>>;
@@ -1539,8 +1643,10 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            productArea: z.ZodOptional<z.ZodString>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
         code: z.ZodString;
         source: z.ZodObject<{
@@ -1697,7 +1803,7 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
@@ -1714,9 +1820,24 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
+            group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
+            }, z.core.$strip>>>>;
+            params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                type: z.ZodOptional<z.ZodString>;
+                description: z.ZodString;
+            }, z.core.$strip>>>>;
+            returns: z.ZodOptional<z.ZodObject<{
+                type: z.ZodOptional<z.ZodString>;
+                description: z.ZodString;
+            }, z.core.$strip>>;
+            throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                type: z.ZodOptional<z.ZodString>;
+                description: z.ZodString;
             }, z.core.$strip>>>>;
         }, z.core.$strip>>>>;
     }, z.core.$strict>>>;
@@ -1765,8 +1886,10 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
             source: z.ZodObject<{
@@ -1923,7 +2046,7 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -1940,9 +2063,24 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
+                params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>>>;
+                returns: z.ZodOptional<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>;
+                throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
                 }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
@@ -1990,8 +2128,10 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
             source: z.ZodObject<{
@@ -2148,7 +2288,7 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -2165,9 +2305,24 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
+                params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>>>;
+                returns: z.ZodOptional<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>;
+                throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
                 }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
@@ -2215,8 +2370,10 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
             source: z.ZodObject<{
@@ -2373,7 +2530,7 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -2390,9 +2547,24 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
+                params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>>>;
+                returns: z.ZodOptional<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>;
+                throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
                 }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
@@ -2440,8 +2612,10 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
             source: z.ZodObject<{
@@ -2598,7 +2772,7 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -2615,9 +2789,24 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
+                params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>>>;
+                returns: z.ZodOptional<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>;
+                throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
                 }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
@@ -2691,8 +2880,10 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
             source: z.ZodObject<{
@@ -2849,7 +3040,7 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -2866,9 +3057,24 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
+                params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>>>;
+                returns: z.ZodOptional<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>;
+                throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
                 }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>>;
@@ -2916,8 +3122,10 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
             source: z.ZodObject<{
@@ -3074,7 +3282,7 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -3091,9 +3299,24 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
+                params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>>>;
+                returns: z.ZodOptional<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>;
+                throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
                 }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>>;
@@ -3141,8 +3364,10 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
             source: z.ZodObject<{
@@ -3299,7 +3524,7 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -3316,9 +3541,24 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
+                params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>>>;
+                returns: z.ZodOptional<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>;
+                throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
                 }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>>;
@@ -3366,8 +3606,10 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
             source: z.ZodObject<{
@@ -3524,7 +3766,7 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -3541,9 +3783,24 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
+                params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>>>;
+                returns: z.ZodOptional<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>;
+                throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
                 }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>>;
@@ -3591,8 +3848,10 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
             source: z.ZodObject<{
@@ -3749,7 +4008,7 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -3766,9 +4025,24 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
+                params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>>>;
+                returns: z.ZodOptional<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
+                }, z.core.$strip>>;
+                throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    type: z.ZodOptional<z.ZodString>;
+                    description: z.ZodString;
                 }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;

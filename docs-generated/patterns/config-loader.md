@@ -38,6 +38,12 @@ import { createDeliveryProcess } from '@libar-dev/delivery-process';
 export default createDeliveryProcess({ preset: "libar-generic" });
 ```
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`config-loader.feature`](../../tests/features/config/config-loader.feature) - The config loader discovers and loads `delivery-process.config.ts` files
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

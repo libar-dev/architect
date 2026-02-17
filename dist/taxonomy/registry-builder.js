@@ -39,6 +39,7 @@ import { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG } from '../config/defaults.
  * - adr: Architecture decision records
  * - hierarchy: Epic/phase/task breakdown
  * - traceability: Two-tier spec architecture links
+ * - discovery: Session discovery findings (retrospective tags)
  * - architecture: Diagram generation tags
  * - extraction: Documentation extraction control
  * - stub: Design session stub metadata
@@ -77,13 +78,23 @@ export const METADATA_TAGS_BY_GROUP = {
         'adr-theme',
         'adr-layer',
     ],
-    hierarchy: ['level', 'parent'],
-    traceability: ['executable-specs', 'roadmap-spec'],
-    architecture: ['arch-role', 'arch-context', 'arch-layer', 'arch-view'],
-    extraction: ['extract-shapes'],
+    hierarchy: ['level', 'parent', 'title'],
+    traceability: ['executable-specs', 'roadmap-spec', 'behavior-file'],
+    discovery: [
+        'discovered-gap',
+        'discovered-improvement',
+        'discovered-risk',
+        'discovered-learning',
+    ],
+    architecture: ['arch-role', 'arch-context', 'arch-layer', 'include'],
+    extraction: ['extract-shapes', 'shape'],
     stub: ['target', 'since'],
     convention: ['convention'],
 };
+// Transform helpers for data-driven Gherkin tag extraction
+const hyphenToSpace = (v) => v.replace(/-/g, ' ');
+const padAdr = (v) => v.padStart(3, '0');
+const stripQuotes = (v) => v.replace(/^["']|["']$/g, '');
 /**
  * Build the complete tag registry from TypeScript constants
  *
@@ -170,12 +181,14 @@ export function buildRegistry() {
                 tag: 'implements',
                 format: 'csv',
                 purpose: 'Patterns this code file realizes (realization relationship)',
+                metadataKey: 'implementsPatterns',
                 example: '@libar-docs-implements EventStoreDurability, IdempotentAppend',
             },
             {
                 tag: 'extends',
                 format: 'value',
                 purpose: 'Base pattern this pattern extends (generalization relationship)',
+                metadataKey: 'extendsPattern',
                 example: '@libar-docs-extends ProjectionCategories',
             },
             {
@@ -245,6 +258,7 @@ export function buildRegistry() {
                 tag: 'business-value',
                 format: 'value',
                 purpose: 'Business value statement (hyphenated for tag format)',
+                transform: hyphenToSpace,
                 example: '@libar-docs-business-value eliminates-event-replay-complexity',
             },
             {
@@ -252,12 +266,15 @@ export function buildRegistry() {
                 format: 'value',
                 purpose: 'Technical constraint affecting feature implementation',
                 repeatable: true,
+                metadataKey: 'constraints',
+                transform: hyphenToSpace,
                 example: '@libar-docs-constraint requires-convex-backend',
             },
             {
                 tag: 'adr',
                 format: 'value',
                 purpose: 'ADR/PDR number for decision tracking',
+                transform: padAdr,
                 example: '@libar-docs-adr 015',
             },
             {
@@ -278,12 +295,14 @@ export function buildRegistry() {
                 tag: 'adr-supersedes',
                 format: 'value',
                 purpose: 'ADR/PDR number this decision supersedes',
+                transform: padAdr,
                 example: '@libar-docs-adr-supersedes 012',
             },
             {
                 tag: 'adr-superseded-by',
                 format: 'value',
                 purpose: 'ADR/PDR number that supersedes this decision',
+                transform: padAdr,
                 example: '@libar-docs-adr-superseded-by 020',
             },
             {
@@ -314,6 +333,13 @@ export function buildRegistry() {
                 purpose: 'Parent pattern name in hierarchy (links tasks to phases, phases to epics)',
                 example: '@libar-docs-parent AggregateArchitecture',
             },
+            {
+                tag: 'title',
+                format: 'quoted-value',
+                purpose: 'Human-readable display title (supports quoted values with spaces)',
+                transform: stripQuotes,
+                example: '@libar-docs-title:"Process Guard Linter"',
+            },
             // PDR-007: Two-Tier Spec Architecture traceability
             {
                 tag: 'executable-specs',
@@ -326,6 +352,49 @@ export function buildRegistry() {
                 format: 'value',
                 purpose: 'Links package spec back to roadmap pattern for traceability (PDR-007)',
                 example: '@libar-docs-roadmap-spec DeciderPattern',
+            },
+            {
+                tag: 'behavior-file',
+                format: 'value',
+                purpose: 'Path to behavior test feature file for traceability',
+                example: '@libar-docs-behavior-file behavior/my-pattern.feature',
+            },
+            // Session discovery findings (retrospective tags)
+            {
+                tag: 'discovered-gap',
+                format: 'value',
+                purpose: 'Gap identified during session retrospective',
+                repeatable: true,
+                metadataKey: 'discoveredGaps',
+                transform: hyphenToSpace,
+                example: '@libar-docs-discovered-gap missing-error-handling',
+            },
+            {
+                tag: 'discovered-improvement',
+                format: 'value',
+                purpose: 'Improvement identified during session retrospective',
+                repeatable: true,
+                metadataKey: 'discoveredImprovements',
+                transform: hyphenToSpace,
+                example: '@libar-docs-discovered-improvement cache-invalidation',
+            },
+            {
+                tag: 'discovered-risk',
+                format: 'value',
+                purpose: 'Risk identified during session retrospective',
+                repeatable: true,
+                metadataKey: 'discoveredRisks',
+                transform: hyphenToSpace,
+                example: '@libar-docs-discovered-risk data-loss-on-migration',
+            },
+            {
+                tag: 'discovered-learning',
+                format: 'value',
+                purpose: 'Learning captured during session retrospective',
+                repeatable: true,
+                metadataKey: 'discoveredLearnings',
+                transform: hyphenToSpace,
+                example: '@libar-docs-discovered-learning convex-mutation-limits',
             },
             // Cross-reference and API navigation tags (PatternRelationshipModel enhancement)
             {
@@ -346,6 +415,13 @@ export function buildRegistry() {
                 format: 'csv',
                 purpose: 'TypeScript type names to extract from this file for documentation',
                 example: '@libar-docs-extract-shapes DeciderInput, ValidationResult, ProcessViolation',
+            },
+            // DD-1: Declaration-level shape tagging
+            {
+                tag: 'shape',
+                format: 'value',
+                purpose: 'Marks declaration as documentable shape, optionally with group name',
+                example: '@libar-docs-shape api-types',
             },
             // Architecture diagram generation tags
             {
@@ -380,10 +456,10 @@ export function buildRegistry() {
                 example: '@libar-docs-arch-layer application',
             },
             {
-                tag: 'arch-view',
+                tag: 'include',
                 format: 'csv',
-                purpose: 'Named architectural views for scoped diagram generation',
-                example: '@libar-docs-arch-view codec-transformation,pipeline-overview',
+                purpose: 'Cross-cutting document inclusion for content routing and diagram scoping',
+                example: '@libar-docs-include reference-sample,codec-system',
             },
             // Design session stub metadata tags (DataAPIStubIntegration Phase B)
             {

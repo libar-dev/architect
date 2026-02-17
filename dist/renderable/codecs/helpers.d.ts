@@ -421,6 +421,20 @@ export declare function stripMarkdownTables(text: string): string;
  */
 export declare function renderBusinessRule(rule: BusinessRule): SectionBlock[];
 /**
+ * Render a rule description using structured annotation parsing.
+ *
+ * Extracts `**Invariant:**`, `**Rationale:**`, `**Verified by:**`, tables, and
+ * code examples for polished output with proper table formatting and separator rows.
+ *
+ * IMPORTANT: Table lines are stripped BEFORE annotation regexes so that bold markers
+ * inside table cells (e.g. `| **Context:** ... |`) don't act as false annotation
+ * boundaries that truncate the lazy `[\s\S]*?` capture.
+ *
+ * @param description - Raw rule description text from Gherkin Rule: block
+ * @returns Array of SectionBlocks with structured content
+ */
+export declare function renderRuleDescription(description: string): SectionBlock[];
+/**
  * Render a scenario's content including steps, DataTables, and DocStrings
  *
  * @param scenario - The scenario to render

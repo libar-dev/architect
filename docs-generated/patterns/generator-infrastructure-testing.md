@@ -34,6 +34,15 @@
   | Error Visibility | Failures produce clear error messages |
   | Extension Safety | New generators integrate correctly |
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`codec-based.feature`](../../tests/features/generators/codec-based.feature) - Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)
+- [`orchestrator.feature`](../../tests/features/generators/orchestrator.feature) - Tests the orchestrator's pattern merging, conflict detection, and generator
+- [`pr-changes-options.feature`](../../tests/features/generators/pr-changes-options.feature) - Tests the PrChangesCodec filtering capabilities for generating PR-scoped
+- [`registry.feature`](../../tests/features/generators/registry.feature) - Tests the GeneratorRegistry registration, lookup, and listing capabilities.
+
 ## Acceptance Criteria
 
 **Orchestrator merges TypeScript and Gherkin patterns**

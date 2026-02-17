@@ -61,4 +61,6 @@ export { ValidationRulesCodec, createValidationRulesCodec, DEFAULT_VALIDATION_RU
 export { extractConventions, } from './convention-extractor.js';
 // Reference Document Codec (parameterized factory)
 export { createReferenceCodec, } from './reference.js';
+// Composite (multi-codec assembly)
+export { createCompositeCodec, composeDocuments, } from './composite.js';
 //# sourceMappingURL=index.js.map

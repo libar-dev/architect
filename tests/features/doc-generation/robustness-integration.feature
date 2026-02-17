@@ -1,5 +1,7 @@
 @libar-docs
 @libar-docs-pattern:RobustnessIntegration
+@libar-docs-status:completed
+@libar-docs-product-area:Generation
 Feature: Robustness Integration
 
   **Context:** Document generation pipeline needs validation, deduplication, and

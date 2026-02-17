@@ -3,6 +3,9 @@
  * @libar-docs-core @libar-docs-config
  * @libar-docs-pattern ProjectConfigSchema
  * @libar-docs-status active
+ * @libar-docs-arch-layer infrastructure
+ * @libar-docs-arch-context config
+ * @libar-docs-arch-role infrastructure
  * @libar-docs-uses ProjectConfigTypes
  * @libar-docs-used-by ConfigLoader
  *
@@ -86,6 +89,7 @@ export declare const DeliveryProcessProjectConfigSchema: z.ZodObject<{
         replaceFeatures: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         outputDirectory: z.ZodOptional<z.ZodString>;
     }, z.core.$strict>>>;
+    codecOptions: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
     contextInferenceRules: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
         pattern: z.ZodString;
         context: z.ZodString;
@@ -99,26 +103,62 @@ export declare const DeliveryProcessProjectConfigSchema: z.ZodObject<{
         diagramScope: z.ZodOptional<z.ZodObject<{
             archContext: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             patterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            archLayer: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             direction: z.ZodOptional<z.ZodEnum<{
                 TB: "TB";
                 LR: "LR";
             }>>;
             title: z.ZodOptional<z.ZodString>;
+            diagramType: z.ZodOptional<z.ZodEnum<{
+                graph: "graph";
+                sequenceDiagram: "sequenceDiagram";
+                "stateDiagram-v2": "stateDiagram-v2";
+                C4Context: "C4Context";
+                classDiagram: "classDiagram";
+            }>>;
+            showEdgeLabels: z.ZodOptional<z.ZodBoolean>;
+            source: z.ZodOptional<z.ZodEnum<{
+                "fsm-lifecycle": "fsm-lifecycle";
+                "generation-pipeline": "generation-pipeline";
+            }>>;
         }, z.core.$strict>>;
         diagramScopes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             archContext: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             patterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            archLayer: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             direction: z.ZodOptional<z.ZodEnum<{
                 TB: "TB";
                 LR: "LR";
             }>>;
             title: z.ZodOptional<z.ZodString>;
+            diagramType: z.ZodOptional<z.ZodEnum<{
+                graph: "graph";
+                sequenceDiagram: "sequenceDiagram";
+                "stateDiagram-v2": "stateDiagram-v2";
+                C4Context: "C4Context";
+                classDiagram: "classDiagram";
+            }>>;
+            showEdgeLabels: z.ZodOptional<z.ZodBoolean>;
+            source: z.ZodOptional<z.ZodEnum<{
+                "fsm-lifecycle": "fsm-lifecycle";
+                "generation-pipeline": "generation-pipeline";
+            }>>;
         }, z.core.$strict>>>>;
         claudeMdSection: z.ZodString;
         docsFilename: z.ZodString;
         claudeMdFilename: z.ZodString;
+        shapeSelectors: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodUnion<readonly [z.ZodObject<{
+            group: z.ZodString;
+        }, z.core.$strict>, z.ZodObject<{
+            source: z.ZodString;
+            names: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+        }, z.core.$strict>, z.ZodObject<{
+            source: z.ZodString;
+        }, z.core.$strict>]>>>>;
+        includeTags: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        productArea: z.ZodOptional<z.ZodString>;
     }, z.core.$strict>>>>;
 }, z.core.$strict>;
 /**

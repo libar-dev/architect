@@ -1,5 +1,8 @@
 @libar-docs
+@libar-docs-pattern:LinterValidationTesting
+@libar-docs-status:completed
 @libar-docs-implements:PatternRelationshipModel
+@libar-docs-product-area:Validation
 Feature: Linter Rules for Relationship Validation
 
   Tests for lint rules that validate relationship integrity, detect conflicts,
@@ -10,6 +13,10 @@ Feature: Linter Rules for Relationship Validation
   # ===========================================================================
 
   Rule: Pattern cannot implement itself (circular reference)
+
+    **Invariant:** A pattern's implements tag must reference a different pattern than its own pattern tag.
+    **Rationale:** Self-implementing patterns create circular references that break the sub-pattern hierarchy.
+    **Verified by:** Pattern tag with implements tag causes error, Implements without pattern tag is valid
 
     A file cannot define a pattern that implements itself. This creates a
     circular reference. Different patterns are allowed (sub-pattern hierarchy).
@@ -48,6 +55,10 @@ Feature: Linter Rules for Relationship Validation
 
   Rule: Relationship targets should exist (strict mode)
 
+    **Invariant:** Every relationship target must reference a pattern that exists in the known pattern registry when strict mode is enabled.
+    **Rationale:** Dangling references to non-existent patterns produce broken dependency graphs and misleading documentation.
+    **Verified by:** Uses referencing non-existent pattern warns, Implements referencing non-existent pattern warns, Valid relationship target passes
+
     In strict mode, all relationship targets are validated against known patterns.
 
     @validation
@@ -79,6 +90,10 @@ Feature: Linter Rules for Relationship Validation
 
   Rule: Bidirectional traceability links should be consistent
 
+    **Invariant:** Every forward traceability link (executable-specs, roadmap-spec) must have a corresponding back-link in the target file.
+    **Rationale:** Asymmetric links mean one side of the traceability chain is invisible, defeating the purpose of bidirectional tracing.
+    **Verified by:** Missing back-link detected, Orphan executable spec detected
+
     @validation
     Scenario: Missing back-link detected
       Given a roadmap spec with executable-specs "path/to/tests"
@@ -99,6 +114,9 @@ Feature: Linter Rules for Relationship Validation
   # ===========================================================================
 
   Rule: Parent references must be valid
+
+    **Invariant:** A pattern's parent reference must point to an existing epic pattern in the registry.
+    **Verified by:** Invalid parent reference detected, Valid parent reference passes
 
     @validation
     Scenario: Invalid parent reference detected

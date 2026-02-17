@@ -3,7 +3,9 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:103
 @libar-docs-effort:2d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Process
+@libar-docs-include:process-workflow
+@libar-docs-depends-on:ADR002GherkinOnlyTesting
 @libar-docs-business-value:make-existing-behavior-specs-executable
 @libar-docs-priority:critical
 @libar-docs-executable-specs:tests/steps/behavior

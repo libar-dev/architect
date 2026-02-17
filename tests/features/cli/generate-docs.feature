@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:GenerateDocsCli
+@libar-docs-status:completed
+@libar-docs-product-area:DataAPI
 @libar-docs-implements:CliBehaviorTesting
 @cli @generate-docs
 Feature: generate-docs CLI
@@ -11,6 +15,10 @@ Feature: generate-docs CLI
   # ============================================================================
 
   Rule: CLI displays help and version information
+
+    **Invariant:** The --help and -v flags must produce usage/version output and exit successfully without requiring other arguments.
+    **Rationale:** Help and version are universal CLI conventions — they must work standalone so users can discover usage without reading external documentation.
+    **Verified by:** Display help with --help flag, Display version with -v flag
 
     @happy-path
     Scenario: Display help with --help flag
@@ -29,6 +37,10 @@ Feature: generate-docs CLI
 
   Rule: CLI requires input patterns
 
+    **Invariant:** The generate-docs CLI must fail with a clear error when the --input flag is not provided.
+    **Rationale:** Without input source paths, the generator has nothing to scan — failing early with a clear message prevents confusing "no patterns found" errors downstream.
+    **Verified by:** Fail without --input flag
+
     @validation
     Scenario: Fail without --input flag
       When running "generate-docs -o docs"
@@ -41,6 +53,10 @@ Feature: generate-docs CLI
 
   Rule: CLI lists available generators
 
+    **Invariant:** The --list-generators flag must display all registered generator names without performing any generation.
+    **Rationale:** Users need to discover available generators before specifying --generator — listing them avoids trial-and-error with invalid generator names.
+    **Verified by:** List generators with --list-generators
+
     @happy-path
     Scenario: List generators with --list-generators
       When running "generate-docs --list-generators"
@@ -52,6 +68,10 @@ Feature: generate-docs CLI
   # ============================================================================
 
   Rule: CLI generates documentation from source files
+
+    **Invariant:** Given valid input patterns and a generator name, the CLI must scan sources, extract patterns, and produce markdown output files.
+    **Rationale:** This is the core pipeline — the CLI is the primary entry point for transforming annotated source code into generated documentation.
+    **Verified by:** Generate patterns documentation, Use default generator (patterns) when not specified
 
     @happy-path
     Scenario: Generate patterns documentation
@@ -72,6 +92,10 @@ Feature: generate-docs CLI
   # ============================================================================
 
   Rule: CLI rejects unknown options
+
+    **Invariant:** Unrecognized CLI flags must cause an error with a descriptive message rather than being silently ignored.
+    **Rationale:** Silent flag ignoring hides typos and misconfigurations — users typing --ouput instead of --output would get unexpected default behavior without realizing their flag was ignored.
+    **Verified by:** Unknown option causes error
 
     @validation
     Scenario: Unknown option causes error

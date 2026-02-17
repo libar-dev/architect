@@ -2,7 +2,7 @@
 @libar-docs-pattern:DataAPIRelationshipGraph
 @libar-docs-status:roadmap
 @libar-docs-phase:25c
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:DataAPI
 @libar-docs-effort:2d
 @libar-docs-priority:medium
 @libar-docs-business-value:deep-dependency-analysis-and-health-checks

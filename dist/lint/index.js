@@ -19,4 +19,6 @@ export { defaultRules, filterRulesBySeverity, missingPatternName, invalidStatus,
 export { lintDirective, lintFiles, hasFailures, sortViolationsBySeverity, formatPretty, formatJson, } from './engine.js';
 // Process Guard (FSM validation, change detection, protection enforcement)
 export * from './process-guard/index.js';
+// Step Lint (vitest-cucumber feature/step compatibility checking)
+export { runStepLint, STEP_LINT_RULES } from './steps/index.js';
 //# sourceMappingURL=index.js.map

@@ -6,7 +6,7 @@
  * @libar-docs-arch-role service
  * @libar-docs-arch-context extractor
  * @libar-docs-arch-layer application
- * @libar-docs-arch-view pipeline-stages
+ * @libar-docs-include pipeline-stages
  * @libar-docs-uses Pattern Scanner, Tag Registry, Zod
  * @libar-docs-used-by Orchestrator, Generators
  * @libar-docs-usecase "When converting scanned files to ExtractedPattern objects"
@@ -34,7 +34,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import type { ScannedFile } from '../scanner/index.js';
-import { processExtractShapesTag } from './shape-extractor.js';
+import { processExtractShapesTag, discoverTaggedShapes } from './shape-extractor.js';
 import type {
   ExtractedPattern,
   DocDirective,
@@ -164,11 +164,68 @@ export function buildPattern(
   const name = inferPatternName(directive, exports, registry);
   const category = asCategoryName(inferCategory(directive.tags as readonly string[], registry));
 
-  // Extract shapes if @libar-docs-extract-shapes tag is present
-  // Read file lazily only when extraction is needed
+  // Shape extraction: both @libar-docs-extract-shapes (pattern-level) and
+  // @libar-docs-shape (declaration-level) contribute to extractedShapes.
+  // Read file once for both paths.
   let extractedShapes;
   const extractionWarnings: string[] = [];
-  if (directive.extractShapes && directive.extractShapes.length > 0) {
+
+  // Only TypeScript files can have shapes
+  if (filePath.endsWith('.ts') || filePath.endsWith('.tsx')) {
+    const jsx = filePath.endsWith('.tsx');
+    let sourceContent: string | undefined;
+    try {
+      sourceContent = fs.readFileSync(filePath, 'utf-8');
+    } catch (error) {
+      extractionWarnings.push(
+        `[shape-extraction] Failed to read file: ${filePath} - ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+
+    // Path 1: Existing @libar-docs-extract-shapes tag processing
+    if (
+      sourceContent !== undefined &&
+      directive.extractShapes !== undefined &&
+      directive.extractShapes.length > 0
+    ) {
+      const shapeResult = processExtractShapesTag(
+        sourceContent,
+        directive.extractShapes.join(', '),
+        { jsx }
+      );
+      extractedShapes = shapeResult.shapes;
+      extractionWarnings.push(...shapeResult.warnings);
+    }
+
+    // Path 2: Declaration-level @libar-docs-shape discovery
+    // Performance note: when both paths fire, sourceCode is parsed by typescript-estree
+    // twice (once in processExtractShapesTag, once in discoverTaggedShapes). Acceptable
+    // for v1 — future optimization could accept a pre-parsed AST.
+    if (sourceContent?.includes('libar-docs-shape') === true) {
+      const taggedResult = discoverTaggedShapes(sourceContent, { jsx });
+      if (taggedResult.ok && taggedResult.value.shapes.length > 0) {
+        const existingByName = new Map((extractedShapes ?? []).map((s) => [s.name, s]));
+        const newShapes = taggedResult.value.shapes.filter((s) => !existingByName.has(s.name));
+        // Merge group and includes from tagged shapes onto existing Path 1 shapes
+        for (const tagged of taggedResult.value.shapes) {
+          const existing = existingByName.get(tagged.name);
+          if (existing !== undefined) {
+            if (tagged.group !== undefined) {
+              existing.group = tagged.group;
+            }
+            if (tagged.includes !== undefined) {
+              existing.includes = tagged.includes;
+            }
+          }
+        }
+        extractedShapes = [...(extractedShapes ?? []), ...newShapes];
+        extractionWarnings.push(...taggedResult.value.warnings);
+      } else if (!taggedResult.ok) {
+        extractionWarnings.push(`[shape-discovery] ${taggedResult.error.message}`);
+      }
+    }
+  } else if (directive.extractShapes !== undefined && directive.extractShapes.length > 0) {
+    // Non-TS file with extract-shapes tag — legacy path
     try {
       const sourceContent = fs.readFileSync(filePath, 'utf-8');
       const shapeResult = processExtractShapesTag(
@@ -178,9 +235,8 @@ export function buildPattern(
       extractedShapes = shapeResult.shapes;
       extractionWarnings.push(...shapeResult.warnings);
     } catch (error) {
-      // File read error - collect warning but continue without shapes
       extractionWarnings.push(
-        `[shape-extraction] Failed to read file for shape extraction: ${filePath} - ${error instanceof Error ? error.message : String(error)}`
+        `[shape-extraction] Failed to read file: ${filePath} - ${error instanceof Error ? error.message : String(error)}`
       );
     }
   }
@@ -233,10 +289,15 @@ export function buildPattern(
     ...(directive.archRole !== undefined && { archRole: directive.archRole }),
     ...(directive.archContext !== undefined && { archContext: directive.archContext }),
     ...(directive.archLayer !== undefined && { archLayer: directive.archLayer }),
-    ...(directive.archView !== undefined &&
-      directive.archView.length > 0 && { archView: directive.archView }),
+    ...(directive.include !== undefined &&
+      directive.include.length > 0 && { include: directive.include }),
+    // PRD metadata fields
+    ...(directive.productArea !== undefined && { productArea: directive.productArea }),
     // Shape extraction fields (extracted from source file when @libar-docs-extract-shapes present)
     ...(extractedShapes && extractedShapes.length > 0 && { extractedShapes }),
+    // Convention tags for reference document generation
+    ...(directive.convention !== undefined &&
+      directive.convention.length > 0 && { convention: directive.convention }),
   };
 
   // Validate against schema (schema-first enforcement)

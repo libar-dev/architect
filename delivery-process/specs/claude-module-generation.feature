@@ -3,7 +3,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:25
 @libar-docs-effort:1.5d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Generation
 @libar-docs-depends-on:ArchitectureDiagramGeneration
 @libar-docs-business-value:automated-claude-md-modules-from-source
 @libar-docs-priority:high

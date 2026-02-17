@@ -63,7 +63,7 @@ function initState(): GherkinParserState {
 
 const feature = await loadFeature('tests/features/scanner/gherkin-parser.feature');
 
-describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
+describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
   // Cleanup
   // ---------------------------------------------------------------------------
@@ -214,52 +214,56 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   };
 
   // ---------------------------------------------------------------------------
-  // Success Scenarios
+  // Rule: Successful feature file parsing
   // ---------------------------------------------------------------------------
 
-  Scenario('Parse valid feature file with pattern metadata', ({ Given, When, Then, And }) => {
-    Given('a Gherkin feature file with content:', givenGherkinFileWithContent);
-    When('the feature file is parsed', whenFeatureFileIsParsed);
-    Then('parsing should succeed', thenParsingShouldSucceed);
-    And('the feature should have properties:', thenFeatureShouldHaveProperties);
-    And('the feature tags should be:', thenFeatureTagsShouldBe);
-    And('{int} scenario should be parsed', thenScenarioCountShouldBe);
-    And('scenario {int} should have properties:', thenScenarioShouldHaveProperties);
-    And('scenario {int} should have tags:', thenScenarioShouldHaveTags);
-    And('scenario {int} should have {int} steps', thenScenarioShouldHaveSteps);
-    And('scenario {int} step {int} should be:', thenScenarioStepShouldBe);
-  });
+  Rule('Successful feature file parsing extracts complete metadata', ({ RuleScenario }) => {
+    RuleScenario('Parse valid feature file with pattern metadata', ({ Given, When, Then, And }) => {
+      Given('a Gherkin feature file with content:', givenGherkinFileWithContent);
+      When('the feature file is parsed', whenFeatureFileIsParsed);
+      Then('parsing should succeed', thenParsingShouldSucceed);
+      And('the feature should have properties:', thenFeatureShouldHaveProperties);
+      And('the feature tags should be:', thenFeatureTagsShouldBe);
+      And('{int} scenario should be parsed', thenScenarioCountShouldBe);
+      And('scenario {int} should have properties:', thenScenarioShouldHaveProperties);
+      And('scenario {int} should have tags:', thenScenarioShouldHaveTags);
+      And('scenario {int} should have {int} steps', thenScenarioShouldHaveSteps);
+      And('scenario {int} step {int} should be:', thenScenarioStepShouldBe);
+    });
 
-  Scenario('Parse multiple scenarios', ({ Given, When, Then, And }) => {
-    Given('a Gherkin feature file with content:', givenGherkinFileWithContent);
-    When('the feature file is parsed', whenFeatureFileIsParsed);
-    Then('parsing should succeed', thenParsingShouldSucceed);
-    And('{int} scenarios should be parsed', thenScenarioCountShouldBe);
-    And('the scenarios should have names:', thenScenariosShouldHaveNames);
-  });
+    RuleScenario('Parse multiple scenarios', ({ Given, When, Then, And }) => {
+      Given('a Gherkin feature file with content:', givenGherkinFileWithContent);
+      When('the feature file is parsed', whenFeatureFileIsParsed);
+      Then('parsing should succeed', thenParsingShouldSucceed);
+      And('{int} scenarios should be parsed', thenScenarioCountShouldBe);
+      And('the scenarios should have names:', thenScenariosShouldHaveNames);
+    });
 
-  Scenario('Handle feature without tags', ({ Given, When, Then, And }) => {
-    Given('a Gherkin feature file with content:', givenGherkinFileWithContent);
-    When('the feature file is parsed', whenFeatureFileIsParsed);
-    Then('parsing should succeed', thenParsingShouldSucceed);
-    And('the feature should have no tags', thenFeatureShouldHaveNoTags);
+    RuleScenario('Handle feature without tags', ({ Given, When, Then, And }) => {
+      Given('a Gherkin feature file with content:', givenGherkinFileWithContent);
+      When('the feature file is parsed', whenFeatureFileIsParsed);
+      Then('parsing should succeed', thenParsingShouldSucceed);
+      And('the feature should have no tags', thenFeatureShouldHaveNoTags);
+    });
   });
 
   // ---------------------------------------------------------------------------
-  // Error Scenarios
+  // Rule: Invalid Gherkin produces structured errors
   // ---------------------------------------------------------------------------
 
-  Scenario('Return error for malformed Gherkin', ({ Given, When, Then, And }) => {
-    Given('a Gherkin feature file with content:', givenGherkinFileWithContent);
-    When('the feature file is parsed', whenFeatureFileIsParsed);
-    Then('parsing should fail', thenParsingShouldFail);
-    And('the error should reference file {string}', thenErrorShouldReferenceFile);
-  });
+  Rule('Invalid Gherkin produces structured errors', ({ RuleScenario }) => {
+    RuleScenario('Return error for malformed Gherkin', ({ Given, When, Then, And }) => {
+      Given('a Gherkin feature file with content:', givenGherkinFileWithContent);
+      When('the feature file is parsed', whenFeatureFileIsParsed);
+      Then('parsing should fail', thenParsingShouldFail);
+      And('the error should reference file {string}', thenErrorShouldReferenceFile);
+    });
 
-  Scenario('Return error for file without feature', ({ Given, When, Then, And }) => {
-    Given('a Gherkin feature file with content:', givenGherkinFileWithContent);
-    When('the feature file is parsed', whenFeatureFileIsParsed);
-    Then('parsing should fail', thenParsingShouldFail);
-    And('the error should reference file {string}', thenErrorShouldReferenceFile);
+    RuleScenario('Return error for file without feature', ({ Given, When, Then, And }) => {
+      Given('a Gherkin feature file with content:', givenGherkinFileWithContent);
+      When('the feature file is parsed', whenFeatureFileIsParsed);
+      Then('parsing should fail', thenParsingShouldFail);
+      And('the error should reference file {string}', thenErrorShouldReferenceFile);
+    });
   });
 });

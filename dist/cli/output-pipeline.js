@@ -34,6 +34,8 @@ export const DEFAULT_LIST_FILTERS = {
     phase: null,
     category: null,
     source: null,
+    archContext: null,
+    productArea: null,
     limit: null,
     offset: null,
 };
@@ -155,6 +157,16 @@ export function applyListFilters(dataset, filters) {
         candidates = candidates.filter((p) => {
             return deriveSource(p.source.file) === source;
         });
+    }
+    // Filter by architecture context
+    if (filters.archContext !== null) {
+        const ctx = filters.archContext.toLowerCase();
+        candidates = candidates.filter((p) => p.archContext?.toLowerCase() === ctx);
+    }
+    // Filter by product area
+    if (filters.productArea !== null) {
+        const area = filters.productArea.toLowerCase();
+        candidates = candidates.filter((p) => p.productArea?.toLowerCase() === area);
     }
     // Apply pagination
     if (filters.offset !== null) {

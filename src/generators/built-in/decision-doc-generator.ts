@@ -51,6 +51,7 @@ import {
 } from '../../renderable/codecs/decision-doc.js';
 import {
   parseDescriptionWithDocStrings,
+  renderRuleDescription,
   renderPropertyDocsTable,
 } from '../../renderable/codecs/helpers.js';
 import {
@@ -300,7 +301,7 @@ export function generateDetailedOutput(
     for (const rule of decisionContent.rules.context) {
       sections.push(heading(3, rule.name.replace(/^Context\s*[-:]\s*/i, '')));
       if (rule.description) {
-        sections.push(...parseDescriptionWithDocStrings(rule.description));
+        sections.push(...renderRuleDescription(rule.description));
       }
     }
   }
@@ -311,7 +312,7 @@ export function generateDetailedOutput(
     for (const rule of decisionContent.rules.decision) {
       sections.push(heading(3, rule.name.replace(/^Decision\s*[-:]\s*/i, '')));
       if (rule.description) {
-        sections.push(...parseDescriptionWithDocStrings(rule.description));
+        sections.push(...renderRuleDescription(rule.description));
       }
     }
   }
@@ -383,7 +384,7 @@ export function generateDetailedOutput(
     for (const rule of decisionContent.rules.consequences) {
       sections.push(heading(3, rule.name.replace(/^Consequence[s]?\s*[-:]\s*/i, '')));
       if (rule.description) {
-        sections.push(...parseDescriptionWithDocStrings(rule.description));
+        sections.push(...renderRuleDescription(rule.description));
       }
     }
   }
@@ -437,7 +438,7 @@ export function generateDetailedOutput(
       if (!isCovered) {
         sections.push(heading(2, rule.name));
         if (rule.description) {
-          sections.push(...parseDescriptionWithDocStrings(rule.description));
+          sections.push(...renderRuleDescription(rule.description));
         }
       }
     }

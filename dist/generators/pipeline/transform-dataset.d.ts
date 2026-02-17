@@ -7,7 +7,7 @@
  * @libar-docs-arch-role service
  * @libar-docs-arch-context generator
  * @libar-docs-arch-layer application
- * @libar-docs-arch-view pipeline-stages
+ * @libar-docs-include pipeline-stages
  * @libar-docs-uses MasterDataset, ExtractedPattern, TagRegistry, NormalizeStatus
  * @libar-docs-used-by Orchestrator
  * @libar-docs-usecase "When computing all pattern views in a single pass"

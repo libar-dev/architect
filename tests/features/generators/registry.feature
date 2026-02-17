@@ -1,4 +1,8 @@
-@libar-docs-implements:GeneratorInfrastructureTesting
+@libar-docs
+@libar-docs-pattern:GeneratorRegistryTesting
+@libar-docs-status:completed
+@libar-docs-product-area:Generation
+@libar-docs-implements:GeneratorRegistry,GeneratorInfrastructureTesting
 Feature: Generator Registry
 
   Tests the GeneratorRegistry registration, lookup, and listing capabilities.
@@ -12,6 +16,9 @@ Feature: Generator Registry
   # ===========================================================================
 
   Rule: Registry manages generator registration and retrieval
+
+    **Invariant:** Each generator name is unique within the registry; duplicate registration is rejected and lookup of unknown names returns undefined.
+    **Verified by:** Register generator with unique name, Duplicate registration throws error, Get registered generator, Get unknown generator returns undefined, Available returns sorted list
 
     @acceptance-criteria @happy-path
     Scenario: Register generator with unique name

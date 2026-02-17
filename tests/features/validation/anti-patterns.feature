@@ -1,6 +1,10 @@
+@libar-docs
 @behavior @anti-patterns
-@libar-docs-pattern:AntiPatternDetector
+@libar-docs-pattern:AntiPatternDetectorTesting
+@libar-docs-implements:AntiPatternDetector
+@libar-docs-status:completed
 @libar-docs-product-area:Validation
+@libar-docs-depends-on:DoDValidationTypes
 Feature: Anti-Pattern Detection
   Detects violations of the dual-source documentation architecture and
   process hygiene issues that lead to documentation drift.
@@ -22,6 +26,10 @@ Feature: Anti-Pattern Detection
   # ==========================================================================
 
   Rule: Process metadata should not appear in TypeScript code
+
+    **Invariant:** Process metadata tags (@libar-docs-status, @libar-docs-phase, etc.) must only appear in Gherkin feature files, never in TypeScript source code.
+    **Rationale:** TypeScript owns runtime behavior while Gherkin owns delivery process metadata — mixing them creates dual-source conflicts and validation ambiguity.
+    **Verified by:** Code without process tags passes, Feature-only process tags in code are flagged
 
     @happy-path
     Scenario: Code without process tags passes
@@ -56,6 +64,10 @@ Feature: Anti-Pattern Detection
   # ==========================================================================
 
   Rule: Generator hints should not appear in feature files
+
+    **Invariant:** Feature files must not contain generator magic comments beyond a configurable threshold.
+    **Rationale:** Generator hints are implementation details that belong in TypeScript — excessive magic comments in specs indicate leaking implementation concerns into business requirements.
+    **Verified by:** Feature without magic comments passes, Features with excessive magic comments are flagged, Magic comments within threshold pass
 
     @happy-path
     Scenario: Feature without magic comments passes
@@ -96,6 +108,10 @@ Feature: Anti-Pattern Detection
 
   Rule: Feature files should not have excessive scenarios
 
+    **Invariant:** A single feature file must not exceed the configured maximum scenario count.
+    **Rationale:** Oversized feature files indicate missing decomposition — they become hard to maintain and slow to execute.
+    **Verified by:** Feature with few scenarios passes, Feature exceeding scenario threshold is flagged
+
     @happy-path
     Scenario: Feature with few scenarios passes
       Given a feature with 5 scenarios
@@ -115,6 +131,10 @@ Feature: Anti-Pattern Detection
   # ==========================================================================
 
   Rule: Feature files should not exceed size thresholds
+
+    **Invariant:** A single feature file must not exceed the configured maximum line count.
+    **Rationale:** Excessively large files indicate a feature that should be split into focused, independently testable specifications.
+    **Verified by:** Normal-sized feature passes, Oversized feature is flagged
 
     @happy-path
     Scenario: Normal-sized feature passes
@@ -136,6 +156,10 @@ Feature: Anti-Pattern Detection
 
   Rule: All anti-patterns can be detected in one pass
 
+    **Invariant:** The anti-pattern detector must evaluate all registered rules in a single scan pass over the source files.
+    **Rationale:** Single-pass detection ensures consistent results and avoids O(n*m) performance degradation with multiple file traversals.
+    **Verified by:** Combined detection finds process-in-code issues
+
     @integration
     Scenario: Combined detection finds process-in-code issues
       Given a TypeScript file with directive tags:
@@ -154,6 +178,10 @@ Feature: Anti-Pattern Detection
   # ==========================================================================
 
   Rule: Violations can be formatted for console output
+
+    **Invariant:** Anti-pattern violations must be renderable as grouped, human-readable console output.
+    **Rationale:** Developers need actionable feedback at commit time — ungrouped or unformatted violations are hard to triage and fix.
+    **Verified by:** Empty violations produce clean report, Violations are grouped by severity
 
     Scenario: Empty violations produce clean report
       Given no violations

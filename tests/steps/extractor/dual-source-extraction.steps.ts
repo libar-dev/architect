@@ -22,6 +22,7 @@ import {
   combineSources,
   validateDualSource,
 } from '../../../src/extractor/dual-source-extractor.js';
+import { extractPatternsFromGherkin } from '../../../src/extractor/gherkin-extractor.js';
 
 const feature = await loadFeature('tests/features/extractor/dual-source-extraction.feature');
 
@@ -37,6 +38,7 @@ interface TestState {
   featureFiles: ScannedGherkinFile[];
   dualSourceResults: DualSourceResults | null;
   validationSummary: ValidationSummary | null;
+  extractedPatterns: ExtractedPattern[];
 }
 
 let state: TestState;
@@ -50,6 +52,7 @@ function resetState(): void {
     featureFiles: [],
     dualSourceResults: null,
     validationSummary: null,
+    extractedPatterns: [],
   };
 }
 
@@ -745,6 +748,80 @@ describeFeature(feature, ({ Rule }) => {
           w.toLowerCase().includes('no code stub')
         );
         expect(stubWarnings.length).toBe(count);
+      });
+    });
+  });
+
+  // ===========================================================================
+  // Rule: Include tags are extracted from Gherkin feature tags
+  // ===========================================================================
+
+  Rule('Include tags are extracted from Gherkin feature tags', ({ RuleScenario }) => {
+    RuleScenario('Single include tag is extracted', ({ Given, When, Then }) => {
+      Given('a feature with process tags:', (_ctx, dataTable: Array<{ tag: string }>) => {
+        resetState();
+        const tags = dataTable.map((row) => row.tag);
+        state.feature = createMockFeature(tags);
+      });
+
+      When('extracting Gherkin patterns', () => {
+        const result = extractPatternsFromGherkin([state.feature!], { baseDir: '/test' });
+        state.extractedPatterns = result.patterns;
+      });
+
+      Then('the extracted pattern has include {string}', (_ctx, expectedInclude: string) => {
+        expect(state.extractedPatterns.length).toBeGreaterThan(0);
+        const pattern = state.extractedPatterns[0];
+        expect(pattern).toBeDefined();
+        expect(pattern!.include).toBeDefined();
+        expect(pattern!.include).toContain(expectedInclude);
+      });
+    });
+
+    RuleScenario('CSV include tag produces multiple values', ({ Given, When, Then, And }) => {
+      Given('a feature with process tags:', (_ctx, dataTable: Array<{ tag: string }>) => {
+        resetState();
+        const tags = dataTable.map((row) => row.tag);
+        state.feature = createMockFeature(tags);
+      });
+
+      When('extracting Gherkin patterns', () => {
+        const result = extractPatternsFromGherkin([state.feature!], { baseDir: '/test' });
+        state.extractedPatterns = result.patterns;
+      });
+
+      Then('the extracted pattern has include {string}', (_ctx, expectedInclude: string) => {
+        expect(state.extractedPatterns.length).toBeGreaterThan(0);
+        const pattern = state.extractedPatterns[0];
+        expect(pattern).toBeDefined();
+        expect(pattern!.include).toBeDefined();
+        expect(pattern!.include).toContain(expectedInclude);
+      });
+
+      And('the extracted pattern has include {string}', (_ctx, expectedInclude: string) => {
+        const pattern = state.extractedPatterns[0];
+        expect(pattern).toBeDefined();
+        expect(pattern!.include).toContain(expectedInclude);
+      });
+    });
+
+    RuleScenario('Feature without include tag has no include field', ({ Given, When, Then }) => {
+      Given('a feature with process tags:', (_ctx, dataTable: Array<{ tag: string }>) => {
+        resetState();
+        const tags = dataTable.map((row) => row.tag);
+        state.feature = createMockFeature(tags);
+      });
+
+      When('extracting Gherkin patterns', () => {
+        const result = extractPatternsFromGherkin([state.feature!], { baseDir: '/test' });
+        state.extractedPatterns = result.patterns;
+      });
+
+      Then('the extracted pattern has no include field', () => {
+        expect(state.extractedPatterns.length).toBeGreaterThan(0);
+        const pattern = state.extractedPatterns[0];
+        expect(pattern).toBeDefined();
+        expect(pattern!.include).toBeUndefined();
       });
     });
   });

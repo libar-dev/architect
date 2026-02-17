@@ -4,7 +4,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:100
 @libar-docs-effort:3d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Validation
 @libar-docs-business-value:enable-machine-checkable-phase-completion
 @libar-docs-priority:high
 Feature: DoD Validation CLI - Machine-Checkable Definition of Done

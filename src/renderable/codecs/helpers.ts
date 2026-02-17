@@ -40,6 +40,7 @@ import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js
 import type { ExtractedShape, PropertyDoc } from '../../validation-schemas/extracted-shape.js';
 import { type SectionBlock, table, code, list, paragraph, heading } from '../schema.js';
 import { normalizeLineEndings } from '../../utils/string-utils.js';
+import { extractTablesFromDescription } from './convention-extractor.js';
 import type { WarningCollector } from '../../generators/warning-collector.js';
 
 // Re-export BusinessRule for convenience (consumers can import from codecs/index.ts)
@@ -727,7 +728,21 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
   textWithoutCode = textWithoutCode.replace(/"""(\w*)\n[\s\S]*?"""/g, '');
   textWithoutCode = textWithoutCode.replace(/```(\w*)\n[\s\S]*?```/g, '');
 
-  // Step 2.5: Protect backtick-quoted content from regex matching
+  // Step 2a: Remove table lines (| ... |) from text before parsing annotations.
+  // Tables are extracted separately by extractTablesFromDescription() upstream.
+  // Without this, annotation regexes over-capture table content and whitespace
+  // normalization collapses tables into single-line text inside invariant/rationale.
+  // Note: stripMarkdownTables() also strips these downstream in remainingContent;
+  // the early strip here prevents annotation regex over-capture before that point.
+  textWithoutCode = textWithoutCode
+    .split('\n')
+    .filter((line) => {
+      const trimmed = line.trim();
+      return !(trimmed.startsWith('|') && trimmed.endsWith('|'));
+    })
+    .join('\n');
+
+  // Step 2b: Protect backtick-quoted content from regex matching
   // This prevents `**Verified by:**` inside backticks from being treated as annotation boundary
   // e.g., "Scenario names in `**Verified by:**` are matched" should not truncate at `**V`
   const { processed: protectedText, restore } = protectBacktickContent(textWithoutCode);
@@ -882,6 +897,70 @@ export function renderBusinessRule(rule: BusinessRule): SectionBlock[] {
   }
 
   return sections;
+}
+
+/**
+ * Render a rule description using structured annotation parsing.
+ *
+ * Extracts `**Invariant:**`, `**Rationale:**`, `**Verified by:**`, tables, and
+ * code examples for polished output with proper table formatting and separator rows.
+ *
+ * IMPORTANT: Table lines are stripped BEFORE annotation regexes so that bold markers
+ * inside table cells (e.g. `| **Context:** ... |`) don't act as false annotation
+ * boundaries that truncate the lazy `[\s\S]*?` capture.
+ *
+ * @param description - Raw rule description text from Gherkin Rule: block
+ * @returns Array of SectionBlocks with structured content
+ */
+export function renderRuleDescription(description: string): SectionBlock[] {
+  const blocks: SectionBlock[] = [];
+  const annotations = parseBusinessRuleAnnotations(description);
+
+  // 1. Render structured annotations first (extracted cleanly)
+  if (annotations.invariant) {
+    blocks.push(paragraph(`**Invariant:** ${annotations.invariant}`));
+  }
+
+  if (annotations.rationale) {
+    blocks.push(paragraph(`**Rationale:** ${annotations.rationale}`));
+  }
+
+  // 2. Extract tables and render with proper markdown formatting (separator rows)
+  const tables = extractTablesFromDescription(description);
+  for (const tbl of tables) {
+    const rows = tbl.rows.map((row) => tbl.headers.map((h) => row[h] ?? ''));
+    blocks.push(table([...tbl.headers], rows));
+  }
+
+  // 3. Render remaining content with interleaved DocStrings preserved.
+  //    Strip table lines FIRST (before annotation regexes) so that bold markers
+  //    inside table cells (e.g. `| **Context:** ... |`) don't act as false
+  //    annotation boundaries that truncate the lazy `[\s\S]*?` capture.
+  //    Then strip known annotations and pass through parseDescriptionWithDocStrings
+  //    which preserves text → code → text → code ordering.
+  let stripped = description
+    .split('\n')
+    .filter((line) => {
+      const trimmed = line.trim();
+      return !(trimmed.startsWith('|') && trimmed.endsWith('|'));
+    })
+    .join('\n');
+  stripped = stripped.replace(/\*\*Invariant:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
+  stripped = stripped.replace(/\*\*Rationale:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
+  stripped = stripped.replace(/\*\*Verified by:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
+
+  const strippedTrimmed = stripped.trim();
+  if (strippedTrimmed.length > 0) {
+    blocks.push(...parseDescriptionWithDocStrings(strippedTrimmed));
+  }
+
+  // 4. Render verified-by list last
+  if (annotations.verifiedBy && annotations.verifiedBy.length > 0) {
+    blocks.push(paragraph('**Verified by:**'));
+    blocks.push(list([...annotations.verifiedBy]));
+  }
+
+  return blocks;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

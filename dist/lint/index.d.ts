@@ -21,4 +21,6 @@ export { defaultRules, filterRulesBySeverity, missingPatternName, invalidStatus,
 export type { LintResult, LintSummary, DirectiveWithLocation } from './engine.js';
 export { lintDirective, lintFiles, hasFailures, sortViolationsBySeverity, formatPretty, formatJson, } from './engine.js';
 export * from './process-guard/index.js';
+export { runStepLint, STEP_LINT_RULES } from './steps/index.js';
+export type { StepLintRule, FeatureStepPair, StepLintOptions } from './steps/index.js';
 //# sourceMappingURL=index.d.ts.map

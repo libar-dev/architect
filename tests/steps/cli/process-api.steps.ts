@@ -70,6 +70,73 @@ function createPatternFiles(): Array<{ path: string; content: string }> {
   ];
 }
 
+function createFeatureFilesWithRules(): Array<{ path: string; content: string }> {
+  return [
+    {
+      path: 'specs/validation-rules.feature',
+      content: [
+        '@libar-docs',
+        '@libar-docs-pattern:ValidationRulesTest',
+        '@libar-docs-status:completed',
+        '@libar-docs-product-area:Validation',
+        '@libar-docs-phase:10',
+        'Feature: Validation Rules Test',
+        '',
+        '  Rule: Completed files require unlock',
+        '',
+        '    **Invariant:** Completed files need unlock-reason.',
+        '',
+        '    **Rationale:** Prevents accidental regression.',
+        '',
+        '    **Verified by:** Unlock test',
+        '',
+        '    @acceptance-criteria',
+        '    Scenario: Unlock test',
+        '      Given a completed file',
+        '      Then it needs unlock',
+        '',
+        '  Rule: Status transitions follow FSM',
+        '',
+        '    **Invariant:** Only valid FSM transitions allowed.',
+        '',
+        '    @acceptance-criteria',
+        '    Scenario: Valid transition',
+        '      Given a roadmap pattern',
+        '      Then it can transition to active',
+      ].join('\n'),
+    },
+    {
+      path: 'specs/core-utils.feature',
+      content: [
+        '@libar-docs',
+        '@libar-docs-pattern:CoreUtilsTest',
+        '@libar-docs-status:completed',
+        '@libar-docs-product-area:CoreTypes',
+        '@libar-docs-phase:5',
+        'Feature: Core Utils Test',
+        '',
+        '  Rule: Slugify produces URL-safe slugs',
+        '',
+        '    **Invariant:** Output must be lowercase alphanumeric with hyphens.',
+        '',
+        '    @acceptance-criteria',
+        '    Scenario: Slug generation',
+        '      Given text input',
+        '      Then slug is URL-safe',
+        '',
+        '  Rule: Edge cases handled',
+        '',
+        '    No invariant here, just a plain rule.',
+        '',
+        '    @acceptance-criteria',
+        '    Scenario: Edge case',
+        '      Given empty input',
+        '      Then empty slug returned',
+      ].join('\n'),
+    },
+  ];
+}
+
 function createArchPatternFiles(): Array<{ path: string; content: string }> {
   return [
     {
@@ -193,6 +260,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   async function writePatternFiles(): Promise<void> {
     const dir = getTempDir();
     for (const file of createPatternFiles()) {
+      await writeTempFile(dir, file.path, file.content);
+    }
+  }
+
+  async function writeFeatureFilesWithRules(): Promise<void> {
+    const dir = getTempDir();
+    for (const file of createFeatureFilesWithRules()) {
       await writeTempFile(dir, file.path, file.content);
     }
   }
@@ -1132,5 +1206,284 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(Array.isArray(parsed.data)).toBe(true);
       });
     });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Rule: CLI rules subcommand queries business rules and invariants
+  // ---------------------------------------------------------------------------
+
+  Rule('CLI rules subcommand queries business rules and invariants', ({ RuleScenario }) => {
+    RuleScenario(
+      'Rules returns business rules from feature files',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript files with pattern annotations', async () => {
+          await writePatternFiles();
+        });
+
+        And('Gherkin feature files with business rules', async () => {
+          await writeFeatureFilesWithRules();
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult().exitCode).toBe(code);
+        });
+
+        And(
+          'stdout JSON data has fields:',
+          (_ctx: unknown, table: ReadonlyArray<{ readonly field: string }>) => {
+            const result = getResult();
+            const parsed = JSON.parse(result.stdout) as { data: Record<string, unknown> };
+            for (const row of table) {
+              expect(parsed.data).toHaveProperty(row.field);
+            }
+          }
+        );
+      }
+    );
+
+    RuleScenario('Rules filters by product area', ({ Given, When, Then, And }) => {
+      Given('TypeScript files with pattern annotations', async () => {
+        await writePatternFiles();
+      });
+
+      And('Gherkin feature files with business rules', async () => {
+        await writeFeatureFilesWithRules();
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And('stdout JSON data has field {string}', (_ctx: unknown, field: string) => {
+        const result = getResult();
+        const parsed = JSON.parse(result.stdout) as { data: Record<string, unknown> };
+        expect(parsed.data).toHaveProperty(field);
+      });
+    });
+
+    RuleScenario('Rules with count modifier returns totals', ({ Given, When, Then, And }) => {
+      Given('TypeScript files with pattern annotations', async () => {
+        await writePatternFiles();
+      });
+
+      And('Gherkin feature files with business rules', async () => {
+        await writeFeatureFilesWithRules();
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And(
+        'stdout JSON data has fields:',
+        (_ctx: unknown, table: ReadonlyArray<{ readonly field: string }>) => {
+          const result = getResult();
+          const parsed = JSON.parse(result.stdout) as { data: Record<string, unknown> };
+          for (const row of table) {
+            expect(parsed.data).toHaveProperty(row.field);
+          }
+        }
+      );
+    });
+
+    RuleScenario('Rules with names-only returns flat array', ({ Given, When, Then, And }) => {
+      Given('TypeScript files with pattern annotations', async () => {
+        await writePatternFiles();
+      });
+
+      And('Gherkin feature files with business rules', async () => {
+        await writeFeatureFilesWithRules();
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And('stdout JSON data is an array', () => {
+        const result = getResult();
+        const parsed = JSON.parse(result.stdout) as { data: unknown };
+        expect(Array.isArray(parsed.data)).toBe(true);
+      });
+    });
+
+    RuleScenario('Rules filters by pattern name', ({ Given, When, Then, And }) => {
+      Given('TypeScript files with pattern annotations', async () => {
+        await writePatternFiles();
+      });
+
+      And('Gherkin feature files with business rules', async () => {
+        await writeFeatureFilesWithRules();
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And(
+        'stdout JSON data has field values:',
+        (
+          _ctx: unknown,
+          table: ReadonlyArray<{ readonly field: string; readonly value: string }>
+        ) => {
+          const result = getResult();
+          const parsed = JSON.parse(result.stdout) as { data: Record<string, unknown> };
+          for (const row of table) {
+            expect(parsed.data[row.field]).toBe(parseInt(row.value, 10));
+          }
+        }
+      );
+    });
+
+    RuleScenario(
+      'Rules with only-invariants excludes rules without invariants',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript files with pattern annotations', async () => {
+          await writePatternFiles();
+        });
+
+        And('Gherkin feature files with business rules', async () => {
+          await writeFeatureFilesWithRules();
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult().exitCode).toBe(code);
+        });
+
+        And(
+          'stdout JSON data has field values:',
+          (
+            _ctx: unknown,
+            table: ReadonlyArray<{ readonly field: string; readonly value: string }>
+          ) => {
+            const result = getResult();
+            const parsed = JSON.parse(result.stdout) as { data: Record<string, unknown> };
+            for (const row of table) {
+              expect(parsed.data[row.field]).toBe(parseInt(row.value, 10));
+            }
+          }
+        );
+      }
+    );
+
+    RuleScenario(
+      'Rules product area filter excludes non-matching areas',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript files with pattern annotations', async () => {
+          await writePatternFiles();
+        });
+
+        And('Gherkin feature files with business rules', async () => {
+          await writeFeatureFilesWithRules();
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult().exitCode).toBe(code);
+        });
+
+        And(
+          'stdout JSON data has field values:',
+          (
+            _ctx: unknown,
+            table: ReadonlyArray<{ readonly field: string; readonly value: string }>
+          ) => {
+            const result = getResult();
+            const parsed = JSON.parse(result.stdout) as { data: Record<string, unknown> };
+            for (const row of table) {
+              expect(parsed.data[row.field]).toBe(parseInt(row.value, 10));
+            }
+          }
+        );
+      }
+    );
+
+    RuleScenario(
+      'Rules for non-existent product area returns hint',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript files with pattern annotations', async () => {
+          await writePatternFiles();
+        });
+
+        And('Gherkin feature files with business rules', async () => {
+          await writeFeatureFilesWithRules();
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult().exitCode).toBe(code);
+        });
+
+        And('stdout JSON data has field {string}', (_ctx: unknown, field: string) => {
+          const result = getResult();
+          const parsed = JSON.parse(result.stdout) as { data: Record<string, unknown> };
+          expect(parsed.data).toHaveProperty(field);
+        });
+      }
+    );
+
+    RuleScenario(
+      'Rules combines product area and only-invariants filters',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript files with pattern annotations', async () => {
+          await writePatternFiles();
+        });
+
+        And('Gherkin feature files with business rules', async () => {
+          await writeFeatureFilesWithRules();
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult().exitCode).toBe(code);
+        });
+
+        And(
+          'stdout JSON data has field values:',
+          (
+            _ctx: unknown,
+            table: ReadonlyArray<{ readonly field: string; readonly value: string }>
+          ) => {
+            const result = getResult();
+            const parsed = JSON.parse(result.stdout) as { data: Record<string, unknown> };
+            for (const row of table) {
+              expect(parsed.data[row.field]).toBe(parseInt(row.value, 10));
+            }
+          }
+        );
+      }
+    );
   });
 });

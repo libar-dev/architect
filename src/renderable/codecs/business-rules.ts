@@ -3,6 +3,7 @@
  * @libar-docs-core
  * @libar-docs-pattern BusinessRulesCodec
  * @libar-docs-status completed
+ * @libar-docs-unlock-reason:Progressive-disclosure-by-product-area
  *
  * ## Business Rules Document Codec
  *
@@ -58,9 +59,11 @@ import {
   paragraph,
   separator,
   table,
+  linkOut,
   document,
 } from '../schema.js';
 import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
+import { toKebabCase } from '../../utils/index.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Business Rules Codec Options (co-located with codec)
@@ -104,6 +107,9 @@ export interface BusinessRulesCodecOptions extends BaseCodecOptions {
 
   /** Maximum description length in characters for standard mode (default: 150, 0 = no limit) */
   maxDescriptionLength?: number;
+
+  /** Exclude patterns whose source.file starts with any of these prefixes (default: []) */
+  excludeSourcePaths?: string[];
 }
 
 /**
@@ -119,8 +125,9 @@ export const DEFAULT_BUSINESS_RULES_OPTIONS: Required<BusinessRulesCodecOptions>
   filterPhases: [],
   onlyWithInvariants: false,
   includeSource: true,
-  includeVerifiedBy: false, // Only in detailed mode
+  includeVerifiedBy: true,
   maxDescriptionLength: 150,
+  excludeSourcePaths: [],
 };
 import { RenderableDocumentOutputSchema } from './shared-schema.js';
 import {
@@ -245,7 +252,29 @@ function buildBusinessRulesDocument(
   // 2. Build summary (single line with stats)
   sections.push(...buildSummarySection(stats));
 
-  // 3. Build content sections (standard and detailed modes only)
+  // 3. Progressive disclosure: split by product area when detail files enabled
+  if (options.generateDetailFiles && options.detailLevel !== 'summary') {
+    sections.push(...buildProductAreaIndexSection(productAreaGroups));
+
+    const additionalFiles = buildBusinessRulesDetailFiles(productAreaGroups, options);
+
+    const docOpts: {
+      purpose: string;
+      detailLevel: string;
+      additionalFiles?: Record<string, RenderableDocument>;
+    } = {
+      purpose: 'Domain constraints and invariants extracted from feature files',
+      detailLevel: 'Overview with links to detailed business rules by product area',
+    };
+
+    if (Object.keys(additionalFiles).length > 0) {
+      docOpts.additionalFiles = additionalFiles;
+    }
+
+    return document('Business Rules', sections, docOpts);
+  }
+
+  // 4. Non-split mode: all content in single document
   if (options.detailLevel !== 'summary') {
     sections.push(...buildProductAreaSections(productAreaGroups, options));
   }
@@ -272,6 +301,14 @@ function collectRulesByProductArea(
   for (const pattern of dataset.patterns) {
     // Skip patterns without rules
     if (!pattern.rules || pattern.rules.length === 0) {
+      continue;
+    }
+
+    // Apply source path exclusion filter
+    if (
+      options.excludeSourcePaths.length > 0 &&
+      options.excludeSourcePaths.some((prefix) => pattern.source.file.startsWith(prefix))
+    ) {
       continue;
     }
 
@@ -492,18 +529,7 @@ function buildProductAreaSections(
   );
 
   for (const group of sortedGroups) {
-    // Sort phases: numeric phases first (ascending), then releases
-    const sortedPhases = [...group.phases.entries()].sort(([a], [b]) => {
-      const aNum = extractPhaseNumber(a);
-      const bNum = extractPhaseNumber(b);
-
-      if (aNum !== null && bNum !== null) {
-        return aNum - bNum;
-      }
-      if (aNum !== null) return -1;
-      if (bNum !== null) return 1;
-      return a.localeCompare(b);
-    });
+    const sortedPhases = sortPhaseEntries([...group.phases.entries()]);
 
     for (const [phaseKey, features] of sortedPhases) {
       // Product Area / Phase heading
@@ -525,6 +551,165 @@ function buildProductAreaSections(
   return sections;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// Progressive Disclosure: Product Area Index + Detail Files
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Per-area statistics
+ */
+interface AreaStats {
+  totalRules: number;
+  totalFeatures: number;
+  withInvariants: number;
+}
+
+/**
+ * Calculate statistics for a single product area group
+ */
+function calculateAreaStats(group: ProductAreaGroup): AreaStats {
+  let totalRules = 0;
+  let totalFeatures = 0;
+  let withInvariants = 0;
+
+  for (const features of group.phases.values()) {
+    totalFeatures += features.length;
+    for (const feature of features) {
+      totalRules += feature.rules.length;
+      for (const ruleCtx of feature.rules) {
+        if (ruleCtx.annotations.invariant) {
+          withInvariants++;
+        }
+      }
+    }
+  }
+
+  return { totalRules, totalFeatures, withInvariants };
+}
+
+/**
+ * Generate URL-safe slug from product area name
+ */
+function productAreaToSlug(productArea: string): string {
+  return toKebabCase(productArea);
+}
+
+/**
+ * Build the product area index section for the main document.
+ * Shows a summary table with links to each product area's detail file.
+ */
+function buildProductAreaIndexSection(groups: Map<string, ProductAreaGroup>): SectionBlock[] {
+  const sections: SectionBlock[] = [];
+  sections.push(heading(2, 'Product Areas'));
+
+  const sortedGroups = [...groups.values()].sort((a, b) =>
+    a.displayName.localeCompare(b.displayName)
+  );
+
+  const rows: string[][] = sortedGroups.map((group) => {
+    const areaStats = calculateAreaStats(group);
+    const slug = productAreaToSlug(group.productArea);
+    const link = `[${group.displayName}](business-rules/${slug}.md)`;
+    return [
+      link,
+      String(areaStats.totalFeatures),
+      String(areaStats.totalRules),
+      String(areaStats.withInvariants),
+    ];
+  });
+
+  sections.push(table(['Product Area', 'Features', 'Rules', 'With Invariants'], rows));
+  sections.push(separator());
+
+  return sections;
+}
+
+/**
+ * Build one detail file per product area
+ */
+function buildBusinessRulesDetailFiles(
+  groups: Map<string, ProductAreaGroup>,
+  options: Required<BusinessRulesCodecOptions>
+): Record<string, RenderableDocument> {
+  const files: Record<string, RenderableDocument> = {};
+
+  const sortedGroups = [...groups.values()].sort((a, b) =>
+    a.displayName.localeCompare(b.displayName)
+  );
+
+  for (const group of sortedGroups) {
+    const slug = productAreaToSlug(group.productArea);
+    files[`business-rules/${slug}.md`] = buildSingleProductAreaDocument(group, options);
+  }
+
+  return files;
+}
+
+/**
+ * Build a single product area detail document with rules organized by phase
+ */
+function buildSingleProductAreaDocument(
+  group: ProductAreaGroup,
+  options: Required<BusinessRulesCodecOptions>
+): RenderableDocument {
+  const sections: SectionBlock[] = [];
+  const areaStats = calculateAreaStats(group);
+
+  // Area stats
+  sections.push(
+    paragraph(
+      `**${areaStats.totalRules} rules** from ${areaStats.totalFeatures} features. ` +
+        `${areaStats.withInvariants} rules have explicit invariants.`
+    )
+  );
+  sections.push(separator());
+
+  // Sort phases
+  const sortedPhases = sortPhaseEntries([...group.phases.entries()]);
+
+  for (const [phaseKey, features] of sortedPhases) {
+    const sortedFeatures = [...features].sort((a, b) => a.featureName.localeCompare(b.featureName));
+
+    // Render features for this phase
+    const phaseContent: SectionBlock[] = [];
+    for (const feature of sortedFeatures) {
+      phaseContent.push(...renderFeatureWithRules(feature, options));
+    }
+
+    // Always render flat — file-level split by product area is sufficient disclosure
+    sections.push(heading(2, phaseKey));
+    sections.push(...phaseContent);
+
+    sections.push(separator());
+  }
+
+  // Back link
+  sections.push(linkOut('\u2190 Back to Business Rules', '../BUSINESS-RULES.md'));
+
+  return document(`${group.displayName} Business Rules`, sections, {
+    purpose: `Business rules for the ${group.displayName} product area`,
+  });
+}
+
+/**
+ * Sort phase entries: numeric phases first (ascending), then releases, then uncategorized
+ */
+function sortPhaseEntries(
+  entries: Array<[string, FeatureWithRules[]]>
+): Array<[string, FeatureWithRules[]]> {
+  return entries.sort(([a], [b]) => {
+    const aNum = extractPhaseNumber(a);
+    const bNum = extractPhaseNumber(b);
+
+    if (aNum !== null && bNum !== null) {
+      return aNum - bNum;
+    }
+    if (aNum !== null) return -1;
+    if (bNum !== null) return 1;
+    return a.localeCompare(b);
+  });
+}
+
 /**
  * Extract phase number from phase key (e.g., "Phase 21" → 21)
  */
@@ -542,7 +727,11 @@ function extractPhaseNumber(phaseKey: string): number | null {
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Render a feature with its rules inline
+ * Render a feature with its rules inline.
+ *
+ * All rules render flat — Rule title + Invariant + Rationale are essential
+ * business knowledge and must never be hidden behind collapsible blocks.
+ * Progressive disclosure happens at the file level (split by product area).
  */
 function renderFeatureWithRules(
   feature: FeatureWithRules,
@@ -551,30 +740,36 @@ function renderFeatureWithRules(
   const sections: SectionBlock[] = [];
   const isDetailed = options.detailLevel === 'detailed';
 
-  // Feature heading (H3)
-  sections.push(heading(3, feature.featureName));
+  // Feature heading (H3) — humanized from camelCase pattern name
+  sections.push(heading(3, humanizeFeatureName(feature.featureName)));
 
-  // Feature description (plain text, rule title bold provides structure)
+  // Feature description
   if (feature.featureDescription) {
     sections.push(paragraph(`*${feature.featureDescription}*`));
   }
 
-  // Render each rule inline
+  // Render each rule flat — no collapsible wrapping
   for (const ruleCtx of feature.rules) {
     sections.push(...renderRuleInline(ruleCtx, options, isDetailed));
   }
 
-  // Source link
+  // Source file path as italic text (informational, not a link — paths are
+  // relative to the feature repo root and don't resolve from docs-generated/)
   if (options.includeSource) {
     const sourceFile = feature.pattern.source.file;
-    sections.push(paragraph(`*[${extractSourceName(sourceFile)}](${sourceFile})*`));
+    sections.push(paragraph(`*${extractSourceName(sourceFile)}*`));
   }
 
   return sections;
 }
 
 /**
- * Render a single rule inline with its annotations
+ * Render a single rule inline with its annotations.
+ *
+ * Each rule is preceded by a separator. Invariant + Rationale are combined
+ * into a blockquote "constraint card" for visual emphasis. Verified-by is
+ * rendered as a checkbox list for scanability. Scenario names from the
+ * Rule block are deduplicated against explicit **Verified by:** annotations.
  */
 function renderRuleInline(
   ruleCtx: RuleWithContext,
@@ -584,27 +779,34 @@ function renderRuleInline(
   const sections: SectionBlock[] = [];
   const { rule, annotations } = ruleCtx;
 
-  // Rule name as H4 heading (for proper document structure and test assertions)
+  // Visual separator before each rule
+  sections.push(separator());
+
+  // Rule name as H4 heading
   sections.push(heading(4, rule.name));
 
-  // Invariant (or first line of description if no invariant)
+  // Constraint card: blockquote combining Invariant + Rationale
+  const cardLines: string[] = [];
+
   if (annotations.invariant) {
-    sections.push(paragraph(`- **Invariant:** ${annotations.invariant}`));
+    cardLines.push(`> **Invariant:** ${annotations.invariant}`);
+  }
+
+  if (options.includeRationale && annotations.rationale) {
+    cardLines.push(`> **Rationale:** ${annotations.rationale}`);
+  }
+
+  if (cardLines.length > 0) {
+    sections.push(paragraph(cardLines.join('\n>\n')));
   } else if (annotations.remainingContent) {
-    // Show first line as summary
+    // Fallback first-line stays as plain paragraph (not blockquoted)
     const firstLine = extractFirstSentence(annotations.remainingContent);
     if (firstLine) {
       sections.push(paragraph(firstLine));
     }
   }
 
-  // Rationale (if enabled and present)
-  if (options.includeRationale && annotations.rationale) {
-    sections.push(paragraph(`- **Rationale:** ${annotations.rationale}`));
-  }
-
-  // Tables from rule description (extract from original description since
-  // remainingContent has tables stripped to avoid duplicate rendering in text)
+  // Tables from rule description
   if (options.includeTables && rule.description) {
     const tableBlocks = extractTables(rule.description);
     for (const tableBlock of tableBlocks) {
@@ -619,13 +821,13 @@ function renderRuleInline(
     }
   }
 
-  // Verified by (detailed mode only, or if explicitly enabled)
-  if (
-    (isDetailed || options.includeVerifiedBy) &&
-    annotations.verifiedBy &&
-    annotations.verifiedBy.length > 0
-  ) {
-    sections.push(paragraph(`**Verified by:** ${annotations.verifiedBy.join(', ')}`));
+  // Verified-by as compact bullet list (label + items in one block, no blank line gap)
+  if (options.includeVerifiedBy) {
+    const names = deduplicateScenarioNames(rule.scenarioNames, annotations.verifiedBy);
+    if (names.length > 0) {
+      const bullets = names.map((name) => `- ${name}`).join('\n');
+      sections.push(paragraph(`**Verified by:**\n${bullets}`));
+    }
   }
 
   // API implementation references
@@ -634,8 +836,15 @@ function renderRuleInline(
     sections.push(paragraph(`**Implementation:** ${refList}`));
   }
 
-  // Add spacing between rules
-  sections.push(paragraph(''));
+  // Placeholder only when there is truly no content
+  if (
+    !annotations.invariant &&
+    !annotations.remainingContent &&
+    !annotations.rationale &&
+    rule.scenarioNames.length === 0
+  ) {
+    sections.push(paragraph('*No invariant or description specified.*'));
+  }
 
   return sections;
 }
@@ -722,6 +931,56 @@ function parseMarkdownTable(lines: string[]): SectionBlock | null {
 // ═══════════════════════════════════════════════════════════════════════════
 // Utilities
 // ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Humanize a camelCase/PascalCase feature name for display.
+ *
+ * Inserts spaces at camelCase boundaries and strips common suffixes
+ * like "Testing" that don't add value in business rules context.
+ *
+ * Examples:
+ * - ConfigResolution → Config Resolution
+ * - RichContentHelpersTesting → Rich Content Helpers
+ * - ProcessGuardTesting → Process Guard
+ * - ContextInference → Context Inference
+ */
+function humanizeFeatureName(name: string): string {
+  // Insert spaces before uppercase letters that follow lowercase
+  let humanized = name.replace(/([a-z])([A-Z])/g, '$1 $2');
+  // Insert spaces before sequences like "API" followed by lowercase
+  humanized = humanized.replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
+  // Strip common test suffixes
+  humanized = humanized.replace(/\s*Testing$/i, '');
+  return humanized.trim();
+}
+
+/**
+ * Deduplicate scenario names from Rule block and **Verified by:** annotation.
+ *
+ * Uses case-insensitive comparison to catch near-duplicates like
+ * "Standard level includes source link-out" vs "Standard level includes source link-out".
+ */
+export function deduplicateScenarioNames(
+  scenarioNames: readonly string[],
+  verifiedBy: readonly string[] | undefined
+): string[] {
+  const seen = new Map<string, string>(); // lowercase → original
+  for (const name of scenarioNames) {
+    const key = name.toLowerCase().trim();
+    if (!seen.has(key)) {
+      seen.set(key, name);
+    }
+  }
+  if (verifiedBy) {
+    for (const name of verifiedBy) {
+      const key = name.toLowerCase().trim();
+      if (!seen.has(key)) {
+        seen.set(key, name);
+      }
+    }
+  }
+  return [...seen.values()];
+}
 
 /**
  * Format product area name for display

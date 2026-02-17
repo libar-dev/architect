@@ -1,4 +1,17 @@
 /**
+ * @libar-docs
+ * @libar-docs-core
+ * @libar-docs-pattern ResultMonadTypes
+ * @libar-docs-status completed
+ * @libar-docs-implements ResultMonad
+ * @libar-docs-product-area CoreTypes
+ *
+ * ## Result Monad - Type Definitions
+ *
+ * Explicit error handling via discriminated union.
+ * Functions return `Result.ok(value)` or `Result.err(error)` instead of throwing.
+ */
+/**
  * Success result containing a value
  */
 export type Ok<T> = {
@@ -15,6 +28,8 @@ export type Err<E> = {
 /**
  * Result type representing either success (Ok) or failure (Err)
  *
+ * @libar-docs-shape
+ * @libar-docs-include core-types
  * @typeParam T - The success value type
  * @typeParam E - The error type (defaults to Error)
  */

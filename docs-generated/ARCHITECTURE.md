@@ -7,12 +7,12 @@
 
 ## Overview
 
-This diagram was auto-generated from 116 annotated source files across 10 bounded contexts.
+This diagram was auto-generated from 143 annotated source files across 11 bounded contexts.
 
 | Metric | Count |
 | --- | --- |
-| Total Components | 116 |
-| Bounded Contexts | 10 |
+| Total Components | 143 |
+| Bounded Contexts | 11 |
 | Component Roles | 5 |
 
 ---
@@ -51,16 +51,16 @@ graph TB
         CLIErrorHandler["CLIErrorHandler"]
     end
     subgraph config["Config BC"]
-        WorkflowLoader["WorkflowLoader"]
+        WorkflowLoader["WorkflowLoader[infrastructure]"]
         ConfigurationTypes["ConfigurationTypes"]
-        ConfigResolver["ConfigResolver"]
-        RegexBuilders["RegexBuilders"]
+        ConfigResolver["ConfigResolver[service]"]
+        RegexBuilders["RegexBuilders[infrastructure]"]
         ProjectConfigTypes["ProjectConfigTypes"]
-        ProjectConfigSchema["ProjectConfigSchema"]
+        ProjectConfigSchema["ProjectConfigSchema[infrastructure]"]
         ConfigurationPresets["ConfigurationPresets"]
-        SourceMerger["SourceMerger"]
+        SourceMerger["SourceMerger[service]"]
         DeliveryProcessFactory["DeliveryProcessFactory[service]"]
-        DefineConfig["DefineConfig"]
+        DefineConfig["DefineConfig[infrastructure]"]
         ConfigurationDefaults["ConfigurationDefaults"]
         ConfigLoader["ConfigLoader[infrastructure]"]
     end
@@ -101,6 +101,7 @@ graph TB
     subgraph renderer["Renderer BC"]
         RenderableUtils["RenderableUtils"]
         RenderableDocument["RenderableDocument[read-model]"]
+        SectionBlock["SectionBlock"]
         UniversalRenderer["UniversalRenderer[service]"]
         RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         DocumentGenerator["DocumentGenerator[service]"]
@@ -119,6 +120,7 @@ graph TB
         RichContentHelpers["RichContentHelpers"]
         Shared_Mermaid_Diagram_Utilities["Shared Mermaid Diagram Utilities"]
         DecisionDocCodec["DecisionDocCodec[projection]"]
+        CompositeCodec["CompositeCodec[projection]"]
         BusinessRulesCodec["BusinessRulesCodec"]
         ArchitectureCodec["ArchitectureCodec[projection]"]
         AdrDocumentCodec["AdrDocumentCodec"]
@@ -140,6 +142,11 @@ graph TB
         FormatTypes["FormatTypes"]
         DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
         CategoryDefinitions["CategoryDefinitions[read-model]"]
+        CategoryDefinition["CategoryDefinition"]
+    end
+    subgraph types["Types BC"]
+        ResultMonadTypes["ResultMonadTypes"]
+        ErrorFactoryTypes["ErrorFactoryTypes"]
     end
     subgraph validation["Validation BC"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
@@ -177,7 +184,11 @@ graph TB
         HierarchyLevels["HierarchyLevels"]
         FormatTypes["FormatTypes"]
         DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
+        CategoryDefinition["CategoryDefinition"]
+        ResultMonadTypes["ResultMonadTypes"]
+        ErrorFactoryTypes["ErrorFactoryTypes"]
         RenderableUtils["RenderableUtils"]
+        SectionBlock["SectionBlock"]
         RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         LintModule["LintModule"]
         WarningCollector["WarningCollector"]
@@ -193,16 +204,6 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
-        WorkflowLoader["WorkflowLoader"]
-        ConfigurationTypes["ConfigurationTypes"]
-        ConfigResolver["ConfigResolver"]
-        RegexBuilders["RegexBuilders"]
-        ProjectConfigTypes["ProjectConfigTypes"]
-        ProjectConfigSchema["ProjectConfigSchema"]
-        ConfigurationPresets["ConfigurationPresets"]
-        SourceMerger["SourceMerger"]
-        DefineConfig["DefineConfig"]
-        ConfigurationDefaults["ConfigurationDefaults"]
         ProcessStateTypes["ProcessStateTypes"]
         StubResolverImpl["StubResolverImpl"]
         APIModule["APIModule"]
@@ -229,17 +230,43 @@ graph TB
         BuiltInGenerators["BuiltInGenerators"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
         CodecBaseOptions["CodecBaseOptions"]
+        ADR006SingleReadModelArchitecture["ADR006SingleReadModelArchitecture"]
+        ADR005CodecBasedMarkdownRendering["ADR005CodecBasedMarkdownRendering"]
+        ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
+        ADR002GherkinOnlyTesting["ADR002GherkinOnlyTesting"]
+        ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
+        ValidatorReadModelConsolidation["ValidatorReadModelConsolidation"]
+        StepDefinitionCompletion["StepDefinitionCompletion"]
+        SessionFileCleanup["SessionFileCleanup"]
+        ProcessAPILayeredExtraction["ProcessAPILayeredExtraction"]
+        MvpWorkflowImplementation["MvpWorkflowImplementation"]
+        LivingRoadmapCLI["LivingRoadmapCLI"]
+        EffortVarianceTracking["EffortVarianceTracking"]
+        ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
+        CliBehaviorTesting["CliBehaviorTesting"]
+        ProcessGuardTesting["ProcessGuardTesting"]
+        ResultMonad["ResultMonad"]
+        ErrorFactories["ErrorFactories"]
+        StringUtils["StringUtils"]
+        SessionHandoffs["SessionHandoffs"]
+        SessionFileLifecycle["SessionFileLifecycle"]
+        KebabCaseSlugs["KebabCaseSlugs"]
+        ErrorHandlingUnification["ErrorHandlingUnification"]
     end
     ExtractedPatternSchema --> DocDirectiveSchema
+    DualSourceSchemas ..-> MvpWorkflowImplementation
+    DocDirectiveSchema ..-> MvpWorkflowImplementation
     DoDValidator --> DoDValidationTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
+    GherkinScanner --> GherkinASTParser
+    TypeScript_AST_Parser --> DocDirectiveSchema
+    ResultMonadTypes ..-> ResultMonad
+    ErrorFactoryTypes ..-> ErrorFactories
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
-    GherkinScanner --> GherkinASTParser
-    TypeScript_AST_Parser --> DocDirectiveSchema
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> ShapeExtractor
     SourceMapper -.-> GherkinASTParser
@@ -249,20 +276,6 @@ graph TB
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
     Document_Extractor --> Pattern_Scanner
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> DualSourceExtractor
-    ValidatePatternsCLI --> CodecUtils
-    ProcessAPICLIImpl --> ProcessStateAPI
-    ProcessAPICLIImpl --> MasterDataset
-    ProcessAPICLIImpl --> Pattern_Scanner
-    ProcessAPICLIImpl --> PatternSummarizerImpl
-    ProcessAPICLIImpl --> FuzzyMatcherImpl
-    ProcessAPICLIImpl --> OutputPipelineImpl
-    OutputPipelineImpl --> PatternSummarizerImpl
-    LintProcessCLI --> ProcessGuardModule
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    TagTaxonomyCLI --> ConfigLoader
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     ConfigResolver --> ProjectConfigTypes
@@ -280,6 +293,20 @@ graph TB
     DefineConfig --> ProjectConfigTypes
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> DualSourceExtractor
+    ValidatePatternsCLI --> CodecUtils
+    ProcessAPICLIImpl --> ProcessStateAPI
+    ProcessAPICLIImpl --> MasterDataset
+    ProcessAPICLIImpl --> Pattern_Scanner
+    ProcessAPICLIImpl --> PatternSummarizerImpl
+    ProcessAPICLIImpl --> FuzzyMatcherImpl
+    ProcessAPICLIImpl --> OutputPipelineImpl
+    OutputPipelineImpl --> PatternSummarizerImpl
+    LintProcessCLI --> ProcessGuardModule
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    TagTaxonomyCLI --> ConfigLoader
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
@@ -300,14 +327,35 @@ graph TB
     ContextAssemblerImpl --> StubResolverImpl
     ArchQueriesImpl --> ProcessStateAPI
     ArchQueriesImpl --> MasterDataset
+    FSMValidator --> FSMTransitions
+    FSMValidator --> FSMStates
     ArchitectureCodec --> MasterDataset
     DetectChanges --> DeriveProcessState
+    DeriveProcessState --> GherkinScanner
+    DeriveProcessState --> FSMValidator
+    ProcessGuardDecider --> FSMValidator
+    ProcessGuardDecider --> DeriveProcessState
+    ProcessGuardDecider --> DetectChanges
     TransformDataset --> MasterDataset
     PipelineModule --> TransformDataset
     BuiltInGenerators --> GeneratorRegistry
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
+    ADR006SingleReadModelArchitecture -.-> ADR005CodecBasedMarkdownRendering
+    ADR003SourceFirstPatternArchitecture -.-> ADR001TaxonomyCanonicalValues
+    ValidatorReadModelConsolidation -.-> ADR006SingleReadModelArchitecture
+    StepDefinitionCompletion -.-> ADR002GherkinOnlyTesting
+    SessionFileCleanup -.-> SessionFileLifecycle
+    ProcessAPILayeredExtraction -.-> ValidatorReadModelConsolidation
+    LivingRoadmapCLI -.-> MvpWorkflowImplementation
+    EffortVarianceTracking -.-> MvpWorkflowImplementation
+    ConfigBasedWorkflowDefinition -.-> MvpWorkflowImplementation
+    CliBehaviorTesting -.-> ADR002GherkinOnlyTesting
+    ProcessGuardTesting -.-> AntiPatternDetector
+    KebabCaseSlugs -.-> StringUtils
+    ErrorHandlingUnification -.-> ResultMonad
+    ErrorHandlingUnification -.-> ErrorFactories
 ```
 
 ---
@@ -342,8 +390,18 @@ All components with architecture annotations:
 | ✅ Scope Validator Impl | api | service | application | src/api/scope-validator.ts |
 | 🚧 Output Pipeline Impl | cli | service | application | src/cli/output-pipeline.ts |
 | 🚧 Process API CLI Impl | cli | service | application | src/cli/process-api.ts |
+| ✅ Configuration Defaults | config | - | domain | src/config/defaults.ts |
+| ✅ Configuration Presets | config | - | domain | src/config/presets.ts |
+| ✅ Configuration Types | config | - | domain | src/config/types.ts |
+| 🚧 Project Config Types | config | - | domain | src/config/project-config.ts |
 | ✅ Config Loader | config | infrastructure | infrastructure | src/config/config-loader.ts |
+| 🚧 Define Config | config | infrastructure | infrastructure | src/config/define-config.ts |
+| 🚧 Project Config Schema | config | infrastructure | infrastructure | src/config/project-config-schema.ts |
+| ✅ Regex Builders | config | infrastructure | infrastructure | src/config/regex-builders.ts |
+| ✅ Workflow Loader | config | infrastructure | infrastructure | src/config/workflow-loader.ts |
+| 🚧 Config Resolver | config | service | application | src/config/resolve-config.ts |
 | ✅ Delivery Process Factory | config | service | application | src/config/factory.ts |
+| 🚧 Source Merger | config | service | application | src/config/merge-sources.ts |
 | ✅ Document Extractor | extractor | service | application | src/extractor/doc-extractor.ts |
 | ✅ Dual Source Extractor | extractor | service | application | src/extractor/dual-source-extractor.ts |
 | ✅ Gherkin Extractor | extractor | service | application | src/extractor/gherkin-extractor.ts |
@@ -359,6 +417,7 @@ All components with architecture annotations:
 | ✅ Lint Rules | lint | service | application | src/lint/rules.ts |
 |  Shared Mermaid Diagram Utilities | renderer | - | - | src/renderable/codecs/diagram-utils.ts |
 | ✅ Architecture Codec | renderer | projection | application | src/renderable/codecs/architecture.ts |
+| 🚧 Composite Codec | renderer | projection | application | src/renderable/codecs/composite.ts |
 | ✅ Decision Doc Codec | renderer | projection | application | src/renderable/codecs/decision-doc.ts |
 | ✅ Patterns Codec | renderer | projection | application | src/renderable/codecs/patterns.ts |
 | ✅ Session Codec | renderer | projection | application | src/renderable/codecs/session.ts |
@@ -376,20 +435,23 @@ All components with architecture annotations:
 | 🚧 FSM Transitions | validation | read-model | domain | src/validation/fsm/transitions.ts |
 | ✅ Anti Pattern Detector | validation | service | application | src/validation/anti-patterns.ts |
 | ✅ DoD Validator | validation | service | application | src/validation/dod-validator.ts |
+| 📋 ADR 001 Taxonomy Canonical Values | - | - | - | delivery-process/decisions/adr-001-taxonomy-canonical-values.feature |
+| ✅ ADR 002 Gherkin Only Testing | - | - | - | delivery-process/decisions/adr-002-gherkin-only-testing.feature |
+| 📋 ADR 003 Source First Pattern Architecture | - | - | - | delivery-process/decisions/adr-003-source-first-pattern-architecture.feature |
+| ✅ ADR 005 Codec Based Markdown Rendering | - | - | - | delivery-process/decisions/adr-005-codec-based-markdown-rendering.feature |
+| ✅ ADR 006 Single Read Model Architecture | - | - | - | delivery-process/decisions/adr-006-single-read-model-architecture.feature |
 | ✅ Adr Document Codec | - | - | - | src/renderable/codecs/adr.ts |
 | 🚧 API Module | - | - | - | src/api/index.ts |
 | ✅ Built In Generators | - | - | - | src/generators/built-in/index.ts |
 | ✅ Business Rules Codec | - | - | - | src/renderable/codecs/business-rules.ts |
+|  CategoryDefinition | - | - | - | src/taxonomy/categories.ts |
+| 📋 Cli Behavior Testing | - | - | - | delivery-process/specs/cli-behavior-testing.feature |
 | ✅ CLI Error Handler | - | - | - | src/cli/error-handler.ts |
 | ✅ CLI Version Helper | - | - | - | src/cli/version.ts |
 | ✅ Codec Base Options | - | - | - | src/renderable/codecs/types/base.ts |
 | ✅ Codec Generator Registration | - | - | - | src/generators/built-in/codec-generators.ts |
 | ✅ Codec Utils | - | - | - | src/validation-schemas/codec-utils.ts |
-| 🚧 Config Resolver | - | - | - | src/config/resolve-config.ts |
-| ✅ Configuration Defaults | - | - | - | src/config/defaults.ts |
-| ✅ Configuration Presets | - | - | - | src/config/presets.ts |
-| ✅ Configuration Types | - | - | - | src/config/types.ts |
-| 🚧 Define Config | - | - | - | src/config/define-config.ts |
+| ✅ Config Based Workflow Definition | - | - | - | delivery-process/specs/config-based-workflow-definition.feature |
 | 🚧 Deliverable Status Taxonomy | - | - | - | src/taxonomy/deliverable-status.ts |
 | 🚧 Derive Process State | - | - | - | src/lint/process-guard/derive-state.ts |
 | 🚧 Detect Changes | - | - | - | src/lint/process-guard/detect-changes.ts |
@@ -398,6 +460,10 @@ All components with architecture annotations:
 | ✅ Document Codecs | - | - | - | src/renderable/codecs/index.ts |
 | ✅ DoD Validation Types | - | - | - | src/validation/types.ts |
 | ✅ Dual Source Schemas | - | - | - | src/validation-schemas/dual-source.ts |
+| 📋 Effort Variance Tracking | - | - | - | delivery-process/specs/effort-variance-tracking.feature |
+| ✅ Error Factories | - | - | - | tests/features/types/error-factories.feature |
+| ✅ Error Factory Types | - | - | - | src/types/errors.ts |
+| ✅ Error Handling Unification | - | - | - | tests/features/behavior/error-handling.feature |
 | ✅ Extracted Pattern Schema | - | - | - | src/validation-schemas/extracted-pattern.ts |
 | ✅ Extracted Shape Schema | - | - | - | src/validation-schemas/extracted-shape.ts |
 | ✅ Format Types | - | - | - | src/taxonomy/format-types.ts |
@@ -405,35 +471,44 @@ All components with architecture annotations:
 | ✅ Generator Registry | - | - | - | src/generators/registry.ts |
 | ✅ Generator Types | - | - | - | src/generators/types.ts |
 | ✅ Hierarchy Levels | - | - | - | src/taxonomy/hierarchy-levels.ts |
+| 📋 Kebab Case Slugs | - | - | - | tests/features/behavior/kebab-case-slugs.feature |
 | ✅ Layer Inference | - | - | - | src/extractor/layer-inference.ts |
 | ✅ Layer Types | - | - | - | src/taxonomy/layer-types.ts |
 | ✅ Lint Module | - | - | - | src/lint/index.ts |
 | ✅ Lint Patterns CLI | - | - | - | src/cli/lint-patterns.ts |
 | 🚧 Lint Process CLI | - | - | - | src/cli/lint-process.ts |
+| 📋 Living Roadmap CLI | - | - | - | delivery-process/specs/living-roadmap-cli.feature |
+| ✅ Mvp Workflow Implementation | - | - | - | delivery-process/specs/mvp-workflow-implementation.feature |
 | ✅ Normalized Status | - | - | - | src/taxonomy/normalized-status.ts |
 | ✅ Output Schemas | - | - | - | src/validation-schemas/output-schemas.ts |
 | ✅ Pipeline Module | - | - | - | src/generators/pipeline/index.ts |
 | ✅ Planning Codecs | - | - | - | src/renderable/codecs/planning.ts |
 | ✅ Pr Changes Codec | - | - | - | src/renderable/codecs/pr-changes.ts |
+| 📋 Process API Layered Extraction | - | - | - | delivery-process/specs/process-api-layered-extraction.feature |
 | 🚧 Process Guard Module | - | - | - | src/lint/process-guard/index.ts |
+| ✅ Process Guard Testing | - | - | - | tests/features/validation/process-guard.feature |
 | 🚧 Process Guard Types | - | - | - | src/lint/process-guard/types.ts |
 | 🚧 Process State Types | - | - | - | src/api/types.ts |
-| 🚧 Project Config Schema | - | - | - | src/config/project-config-schema.ts |
-| 🚧 Project Config Types | - | - | - | src/config/project-config.ts |
 | 🚧 Reference Document Codec | - | - | - | src/renderable/codecs/reference.ts |
 | 🚧 Reference Generator Registration | - | - | - | src/generators/built-in/reference-generators.ts |
-| ✅ Regex Builders | - | - | - | src/config/regex-builders.ts |
 | ✅ Renderable Document Model(RDM) | - | - | - | src/renderable/index.ts |
 | ✅ Renderable Utils | - | - | - | src/renderable/utils.ts |
 | ✅ Reporting Codecs | - | - | - | src/renderable/codecs/reporting.ts |
 | ✅ Requirements Codec | - | - | - | src/renderable/codecs/requirements.ts |
+| ✅ Result Monad | - | - | - | tests/features/types/result-monad.feature |
+| ✅ Result Monad Types | - | - | - | src/types/result.ts |
 | ✅ Rich Content Helpers | - | - | - | src/renderable/codecs/helpers.ts |
 | ✅ Risk Levels | - | - | - | src/taxonomy/risk-levels.ts |
+|  SectionBlock | - | - | - | src/renderable/schema.ts |
+| 📋 Session File Cleanup | - | - | - | delivery-process/specs/session-file-cleanup.feature |
+| ✅ Session File Lifecycle | - | - | - | tests/features/behavior/session-file-lifecycle.feature |
+| ✅ Session Handoffs | - | - | - | tests/features/behavior/session-handoffs.feature |
 | ✅ Shape Extractor | - | - | - | src/extractor/shape-extractor.ts |
 | ✅ Shared Codec Schema | - | - | - | src/renderable/codecs/shared-schema.ts |
 | ✅ Source Mapping Validator | - | - | - | src/generators/source-mapping-validator.ts |
-| 🚧 Source Merger | - | - | - | src/config/merge-sources.ts |
 | ✅ Status Values | - | - | - | src/taxonomy/status-values.ts |
+| 📋 Step Definition Completion | - | - | - | delivery-process/specs/step-definition-completion.feature |
+| ✅ String Utils | - | - | - | tests/features/utils/string-utils.feature |
 | 🚧 Stub Resolver Impl | - | - | - | src/api/stub-resolver.ts |
 | ✅ Tag Registry Configuration | - | - | - | src/validation-schemas/tag-registry.ts |
 | ⏸️ Tag Taxonomy CLI | - | - | - | src/cli/generate-tag-taxonomy.ts |
@@ -442,6 +517,6 @@ All components with architecture annotations:
 | ✅ Validate Patterns CLI | - | - | - | src/cli/validate-patterns.ts |
 | ✅ Validation Module | - | - | - | src/validation/index.ts |
 | ✅ Validation Rules Codec | - | - | - | src/renderable/codecs/validation-rules.ts |
+| 📋 Validator Read Model Consolidation | - | - | - | delivery-process/specs/validator-read-model-consolidation.feature |
 | ✅ Warning Collector | - | - | - | src/generators/warning-collector.ts |
 | ✅ Workflow Config Schema | - | - | - | src/validation-schemas/workflow-config.ts |
-| ✅ Workflow Loader | - | - | - | src/config/workflow-loader.ts |

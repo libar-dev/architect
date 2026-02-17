@@ -1,4 +1,8 @@
-@libar-docs-implements:GeneratorInfrastructureTesting
+@libar-docs
+@libar-docs-pattern:CodecBasedGeneratorTesting
+@libar-docs-status:completed
+@libar-docs-product-area:Generation
+@libar-docs-implements:CodecBasedGenerator,GeneratorInfrastructureTesting
 Feature: Codec-Based Generator
 
   Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)
@@ -13,6 +17,10 @@ Feature: Codec-Based Generator
   # ===========================================================================
 
   Rule: CodecBasedGenerator adapts codecs to generator interface
+
+    **Invariant:** CodecBasedGenerator delegates document generation to the underlying codec and surfaces codec errors through the generator interface.
+    **Rationale:** The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side.
+    **Verified by:** Generator delegates to codec, Missing MasterDataset returns error, Codec options are passed through
 
     @acceptance-criteria @happy-path
     Scenario: Generator delegates to codec

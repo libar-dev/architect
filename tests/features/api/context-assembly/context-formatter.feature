@@ -1,12 +1,17 @@
 @libar-docs
 @libar-docs-pattern:ContextFormatterTests
 @libar-docs-status:active
+@libar-docs-product-area:DataAPI
 Feature: Context Formatter - Plain Text Rendering
 
   Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),
   and formatOverview() plain text rendering functions.
 
   Rule: formatContextBundle renders section markers
+
+    **Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with design bundles rendering all sections and implement bundles focusing on deliverables and FSM.
+    **Rationale:** Section markers enable structured parsing of context output — without them, AI consumers cannot reliably extract specific sections from the formatted bundle.
+    **Verified by:** Design bundle renders all populated sections, Implement bundle renders deliverables and FSM
 
     @acceptance-criteria @happy-path
     Scenario: Design bundle renders all populated sections
@@ -31,6 +36,10 @@ Feature: Context Formatter - Plain Text Rendering
 
   Rule: formatDepTree renders indented tree
 
+    **Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to visually distinguish the target pattern from its dependencies.
+    **Rationale:** Visual hierarchy in the dependency tree makes dependency chains scannable at a glance — flat output would require mental parsing to understand depth and relationships.
+    **Verified by:** Tree renders with arrows and focal marker
+
     @acceptance-criteria @happy-path
     Scenario: Tree renders with arrows and focal marker
       Given a dep-tree with root, middle, and focal leaf
@@ -41,6 +50,10 @@ Feature: Context Formatter - Plain Text Rendering
         | <- YOU ARE HERE  |
 
   Rule: formatOverview renders progress summary
+
+    **Invariant:** The overview formatter must render a progress summary line showing completion metrics for the project.
+    **Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness without requiring detailed exploration.
+    **Verified by:** Overview renders progress line
 
     @acceptance-criteria @happy-path
     Scenario: Overview renders progress line
@@ -53,6 +66,10 @@ Feature: Context Formatter - Plain Text Rendering
         | === PROGRESS ===|
 
   Rule: formatFileReadingList renders categorized file paths
+
+    **Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing minimal output when the list is empty.
+    **Rationale:** Categorized file lists tell developers which files to read first (primary) versus reference (dependency) — uncategorized lists waste time on low-priority files.
+    **Verified by:** File list renders primary and dependency sections, Empty file reading list renders minimal output
 
     @acceptance-criteria @happy-path
     Scenario: File list renders primary and dependency sections

@@ -1,19 +1,28 @@
 /**
  * Convention Extractor
  *
- * Filters MasterDataset for decision records tagged with
- * `@libar-docs-convention` and extracts their Rule block content
- * as structured data for reference codec composition.
+ * Filters MasterDataset for patterns tagged with `@libar-docs-convention`
+ * and extracts convention content as structured data for reference codec
+ * composition. Supports two sources:
+ *
+ * - **Gherkin**: Extracts from `Rule:` blocks on the pattern's `rules` array
+ * - **TypeScript**: Decomposes JSDoc `directive.description` by `## Heading`
+ *   sections, parsing each section for structured annotations
+ *
+ * Both sources produce the same `ConventionRuleContent` output, enabling
+ * Gherkin and TypeScript convention content to merge in the same bundle.
  *
  * @see CodecDrivenReferenceGeneration spec
+ * @see ReferenceDocShowcase spec
  */
 import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { ExtractedPattern } from '../../validation-schemas/extracted-pattern.js';
 import type { SectionBlock } from '../schema.js';
 /**
  * Structured content extracted from a decision record Rule block.
  */
 export interface ConventionRuleContent {
-    /** Rule name from the Gherkin Rule: block */
+    /** Rule name (from Gherkin Rule: block or TypeScript ## heading) */
     readonly ruleName: string;
     /** Invariant statement if present */
     readonly invariant?: string;
@@ -47,11 +56,19 @@ export interface ConventionBundle {
     readonly rules: readonly ConventionRuleContent[];
 }
 /**
+ * Extract markdown tables from description text.
+ *
+ * Identifies lines starting and ending with `|` as table rows,
+ * groups consecutive table lines, and parses headers + data rows.
+ */
+export declare function extractTablesFromDescription(description: string): ConventionTable[];
+/**
  * Extracts convention content from MasterDataset.
  *
- * Filters patterns for decision records tagged with `@libar-docs-convention`
- * matching the requested tag values. Extracts Rule block content as
- * structured data.
+ * Filters patterns tagged with `@libar-docs-convention` matching the
+ * requested tag values. For Gherkin-sourced patterns, extracts from
+ * Rule: blocks. For TypeScript-sourced patterns (no rules array),
+ * decomposes the JSDoc description by ## headings.
  *
  * @param dataset - The MasterDataset containing all extracted patterns
  * @param conventionTags - Convention tag values to filter by
@@ -66,4 +83,16 @@ export interface ConventionBundle {
  * ```
  */
 export declare function extractConventions(dataset: MasterDataset, conventionTags: readonly string[]): ConventionBundle[];
+/**
+ * Extract convention bundles from pre-filtered patterns.
+ *
+ * DD-1 (CrossCuttingDocumentInclusion): Used by the include-tag pass to
+ * build convention content from patterns selected by include tag rather
+ * than by conventionTags filter. Groups output by each pattern's convention
+ * tag values.
+ *
+ * @param patterns - Pre-filtered patterns that have convention content
+ * @returns Array of ConventionBundles
+ */
+export declare function extractConventionsFromPatterns(patterns: readonly ExtractedPattern[]): ConventionBundle[];
 //# sourceMappingURL=convention-extractor.d.ts.map

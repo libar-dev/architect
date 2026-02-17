@@ -59,7 +59,8 @@
     "lint-process": "./dist/cli/lint-process.js",
     "generate-tag-taxonomy": "./dist/cli/generate-tag-taxonomy.js",
     "validate-patterns": "./dist/cli/validate-patterns.js",
-    "process-api": "./dist/cli/process-api.js"
+    "process-api": "./dist/cli/process-api.js",
+    "lint-steps": "./dist/cli/lint-steps.js"
   },
   "scripts": {
     "build": "tsc",
@@ -72,6 +73,7 @@
     "lint:fix": "eslint src tests --fix",
     "lint:process": "tsx src/cli/lint-process.ts --staged",
     "lint:process:all": "tsx src/cli/lint-process.ts --all",
+    "lint:steps": "tsx src/cli/lint-steps.ts",
     "lint-patterns": "tsx src/cli/lint-patterns.ts --input 'src/**/*.ts' --input 'delivery-process/stubs/**/*.ts'",
     "validate:patterns": "tsx src/cli/validate-patterns.ts",
     "validate:dod": "tsx src/cli/validate-patterns.ts --dod",
@@ -82,7 +84,7 @@
     "docs:remaining": "tsx src/cli/generate-docs.ts -g remaining",
     "docs:changelog": "tsx src/cli/generate-docs.ts -g changelog",
     "docs:architecture": "tsx src/cli/generate-docs.ts -g architecture",
-    "docs:decisions": "tsx src/cli/generate-docs.ts -g doc-from-decision",
+    "docs:decisions": "tsx src/cli/generate-docs.ts -g adrs",
     "docs:taxonomy": "tsx src/cli/generate-docs.ts -g taxonomy",
     "docs:validation": "tsx src/cli/generate-docs.ts -g validation-rules",
     "docs:requirements": "tsx src/cli/generate-docs.ts -g requirements",
@@ -90,7 +92,8 @@
     "docs:milestones": "tsx src/cli/generate-docs.ts -g milestones",
     "docs:business-rules": "tsx src/cli/generate-docs.ts -g business-rules",
     "docs:reference": "tsx src/cli/generate-docs.ts -g reference-docs",
-    "docs:all": "pnpm docs:patterns && pnpm docs:roadmap && pnpm docs:remaining && pnpm docs:changelog && pnpm docs:architecture && pnpm docs:decisions && pnpm docs:reference && pnpm docs:taxonomy && pnpm docs:validation && pnpm docs:requirements && pnpm docs:current && pnpm docs:milestones && pnpm docs:business-rules",
+    "docs:product-areas": "tsx src/cli/generate-docs.ts -g product-area-docs",
+    "docs:all": "pnpm docs:patterns && pnpm docs:roadmap && pnpm docs:remaining && pnpm docs:changelog && pnpm docs:architecture && pnpm docs:decisions && pnpm docs:reference && pnpm docs:product-areas && pnpm docs:taxonomy && pnpm docs:validation && pnpm docs:requirements && pnpm docs:current && pnpm docs:milestones && pnpm docs:business-rules",
     "process:query": "tsx src/cli/process-api.ts",
     "process:q": "tsx src/cli/process-api.ts",
     "docs:tag-taxonomy": "tsx src/cli/generate-tag-taxonomy.ts --output delivery-process/tag-taxonomy.md --overwrite",
@@ -104,6 +107,7 @@
     "release:minor": "npm version minor",
     "release:major": "npm version major",
     "prepare": "husky",
+    "session:stats": "bash scripts/session-stats.sh",
     "pr:comments": "node scripts/fetch-pr-comments.mjs",
     "pr:comments:default": "node scripts/fetch-pr-comments.mjs --type thread",
     "claude-md:build": "modular-claude-md build",
@@ -173,7 +177,6 @@
   "devDependencies": {
     "@amiceli/vitest-cucumber": "^5.2.1",
     "@types/node": "20.10.0",
-    "beautiful-mermaid": "^0.1.3",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",

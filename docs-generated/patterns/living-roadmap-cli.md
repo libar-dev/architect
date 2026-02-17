@@ -31,6 +31,10 @@
 
   Implements Convergence Opportunity 8: Living Roadmap That Compiles.
 
+## Dependencies
+
+- Depends on: MvpWorkflowImplementation
+
 ## Acceptance Criteria
 
 **Query next actionable phase**

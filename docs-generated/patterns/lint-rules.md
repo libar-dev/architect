@@ -23,6 +23,12 @@ missing-when-to-use, tautological-description, and missing-relationships.
 - Use `filterRulesBySeverity()` to customize which rules apply
 - Use individual rules for targeted validation
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`lint-rules.feature`](../../tests/features/lint/lint-rules.feature) - The lint system validates @libar-docs-* documentation annotations for quality.
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

@@ -31,6 +31,12 @@ calls with structured warning handling that integrates with the Result pattern.
 - **Aggregation**: Warnings collected across pipeline stages, maintaining insertion order
 - **Formatting**: Console, JSON, and markdown output formats
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`warning-collector.feature`](../../tests/features/doc-generation/warning-collector.feature) - The warning collector provides a unified system for capturing, categorizing,
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

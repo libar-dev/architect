@@ -2,7 +2,7 @@
 @libar-docs-pattern:DataAPICLIErgonomics
 @libar-docs-status:roadmap
 @libar-docs-phase:25d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:DataAPI
 @libar-docs-effort:2d
 @libar-docs-priority:medium
 @libar-docs-business-value:fast-interactive-cli-for-repeated-queries

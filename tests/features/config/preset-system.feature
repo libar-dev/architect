@@ -1,6 +1,8 @@
-@behavior @presets
+@libar-docs
 @libar-docs-pattern:PresetSystem
+@libar-docs-status:completed
 @libar-docs-product-area:Configuration
+@behavior @presets
 Feature: Preset System for Configuration
   Presets provide pre-configured taxonomies for different project types.
 
@@ -19,6 +21,10 @@ Feature: Preset System for Configuration
   # ==========================================================================
 
   Rule: Generic preset provides minimal taxonomy
+
+    **Invariant:** The generic preset must provide exactly 3 categories (core, api, infra) with @docs- prefix.
+    **Rationale:** Simple projects need minimal configuration without DDD-specific categories cluttering the taxonomy.
+    **Verified by:** Generic preset has correct prefix configuration, Generic preset has core categories only
 
     @happy-path
     Scenario: Generic preset has correct prefix configuration
@@ -44,6 +50,10 @@ Feature: Preset System for Configuration
 
   Rule: Libar generic preset provides minimal taxonomy with libar prefix
 
+    **Invariant:** The libar-generic preset must provide exactly 3 categories with @libar-docs- prefix.
+    **Rationale:** This package uses @libar-docs- prefix to avoid collisions with consumer projects' annotations.
+    **Verified by:** Libar generic preset has correct prefix configuration, Libar generic preset has core categories only
+
     @happy-path
     Scenario: Libar generic preset has correct prefix configuration
       Given the libar-generic preset
@@ -67,6 +77,10 @@ Feature: Preset System for Configuration
   # ==========================================================================
 
   Rule: DDD-ES-CQRS preset provides full taxonomy
+
+    **Invariant:** The DDD preset must provide all 21 categories spanning DDD, ES, CQRS, and infrastructure domains.
+    **Rationale:** DDD architectures require fine-grained categorization to distinguish bounded contexts, aggregates, and projections.
+    **Verified by:** Full preset has correct prefix configuration, Full preset has all DDD categories, Full preset has infrastructure categories, Full preset has all 21 categories
 
     @happy-path
     Scenario: Full preset has correct prefix configuration
@@ -106,6 +120,10 @@ Feature: Preset System for Configuration
   # ==========================================================================
 
   Rule: Presets can be accessed by name
+
+    **Invariant:** All preset instances must be accessible via the PRESETS map using their canonical string key.
+    **Rationale:** Programmatic access enables config files to reference presets by name instead of importing instances.
+    **Verified by:** Generic preset accessible via PRESETS map, DDD preset accessible via PRESETS map, Libar generic preset accessible via PRESETS map
 
     @happy-path
     Scenario: Generic preset accessible via PRESETS map

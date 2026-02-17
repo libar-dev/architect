@@ -63,8 +63,12 @@ export {
   type RuntimeMasterDataset,
 } from './pipeline/index.js';
 
-// Reference document config presets (for downstream repo configs)
-export { LIBAR_REFERENCE_CONFIGS } from './built-in/reference-generators.js';
+// Product area and reference document config helpers (for downstream repo configs)
+export {
+  createProductAreaConfigs,
+  PRODUCT_AREA_VALUES,
+  type ProductAreaConfigOptions,
+} from './built-in/reference-generators.js';
 
 /**
  * NOTE: Built-in generators are NOT auto-registered.

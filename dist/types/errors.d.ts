@@ -1,6 +1,22 @@
+/**
+ * @libar-docs
+ * @libar-docs-core
+ * @libar-docs-pattern ErrorFactoryTypes
+ * @libar-docs-status completed
+ * @libar-docs-implements ErrorFactories
+ * @libar-docs-product-area CoreTypes
+ *
+ * ## Error Factories - Type Definitions
+ *
+ * Structured, discriminated error types with factory functions.
+ * Each error type has a unique `type` discriminator for exhaustive pattern matching.
+ */
 import type { SourceFilePath } from './branded.js';
 /**
  * Base error interface for all documentation errors
+ *
+ * @libar-docs-shape
+ * @libar-docs-include core-types
  */
 export interface BaseDocError {
     /** Error type discriminator for pattern matching */
@@ -138,6 +154,9 @@ export interface GherkinPatternValidationError extends BaseDocError {
  * - Exhaustive pattern matching in switch statements
  * - Type narrowing based on `type` field
  * - Compile-time verification of error handling
+ *
+ * @libar-docs-shape
+ * @libar-docs-include core-types
  */
 export type DocError = FileSystemError | FileParseError | DirectiveValidationError | PatternValidationError | RegistryValidationError | MarkdownGenerationError | FileWriteError | FeatureParseError | ConfigError | ProcessMetadataValidationError | DeliverableValidationError | GherkinPatternValidationError;
 /**

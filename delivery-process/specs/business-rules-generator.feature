@@ -3,7 +3,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:100
 @libar-docs-effort:3d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Generation
 Feature: Business Rules Generator - Extract Invariants and Rationale from Feature Files
 
   **Business Value:** Enable stakeholders to understand domain constraints without reading

@@ -31,6 +31,12 @@ and composes unified pattern data for documentation generation.
 - **Cross-Validation**: Pattern name + phase must match across sources
 - **Deliverables**: Parsed from Gherkin Background tables in features
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`dual-source-extraction.feature`](../../tests/features/extractor/dual-source-extraction.feature) - Extracts and combines pattern metadata from both TypeScript code stubs
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)
