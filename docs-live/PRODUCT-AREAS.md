@@ -107,8 +107,6 @@ C4Context
         System(DefineConfig, "DefineConfig")
         System(ConfigLoader, "ConfigLoader")
     }
-    System(ADR003SourceFirstPatternArchitecture, "ADR003SourceFirstPatternArchitecture")
-    System(ADR001TaxonomyCanonicalValues, "ADR001TaxonomyCanonicalValues")
     System(ShapeExtraction, "ShapeExtraction")
     System(ScopedArchitecturalView, "ScopedArchitecturalView")
     System(DeclarationLevelShapeTagging, "DeclarationLevelShapeTagging")
@@ -118,6 +116,8 @@ C4Context
     System(CrossCuttingDocumentInclusion, "CrossCuttingDocumentInclusion")
     System(CodecDrivenReferenceGeneration, "CodecDrivenReferenceGeneration")
     System(ArchitectureDiagramGeneration, "ArchitectureDiagramGeneration")
+    System(ADR003SourceFirstPatternArchitecture, "ADR003SourceFirstPatternArchitecture")
+    System(ADR001TaxonomyCanonicalValues, "ADR001TaxonomyCanonicalValues")
     System(StringUtils, "StringUtils")
     System(ResultMonad, "ResultMonad")
     System(ErrorFactories, "ErrorFactories")
@@ -142,7 +142,6 @@ C4Context
     Rel(DefineConfig, ProjectConfigTypes, "uses")
     Rel(ConfigLoader, DeliveryProcessFactory, "uses")
     Rel(ConfigLoader, ConfigurationTypes, "uses")
-    Rel(ADR003SourceFirstPatternArchitecture, ADR001TaxonomyCanonicalValues, "depends on")
     Rel(ScopedArchitecturalView, ArchitectureDiagramGeneration, "depends on")
     Rel(ScopedArchitecturalView, ShapeExtraction, "depends on")
     Rel(DeclarationLevelShapeTagging, ShapeExtraction, "depends on")
@@ -155,6 +154,7 @@ C4Context
     Rel(CrossCuttingDocumentInclusion, ReferenceDocShowcase, "depends on")
     Rel(CodecDrivenReferenceGeneration, DocGenerationProofOfConcept, "depends on")
     Rel(CodecDrivenReferenceGeneration, ScopedArchitecturalView, "depends on")
+    Rel(ADR003SourceFirstPatternArchitecture, ADR001TaxonomyCanonicalValues, "depends on")
     Rel(ExtractionPipelineEnhancementsTesting, ReferenceDocShowcase, "implements")
     Rel(KebabCaseSlugs, StringUtils, "depends on")
     Rel(ErrorHandlingUnification, ResultMonad, "depends on")
@@ -184,8 +184,6 @@ graph LR
         DefineConfig[/"DefineConfig"/]
         ConfigLoader[/"ConfigLoader"/]
     end
-    ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
-    ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
     ShapeExtraction["ShapeExtraction"]
     ScopedArchitecturalView["ScopedArchitecturalView"]
     DeclarationLevelShapeTagging["DeclarationLevelShapeTagging"]
@@ -195,6 +193,8 @@ graph LR
     CrossCuttingDocumentInclusion["CrossCuttingDocumentInclusion"]
     CodecDrivenReferenceGeneration["CodecDrivenReferenceGeneration"]
     ArchitectureDiagramGeneration["ArchitectureDiagramGeneration"]
+    ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
+    ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
     StringUtils["StringUtils"]
     ResultMonad["ResultMonad"]
     ErrorFactories["ErrorFactories"]
@@ -221,7 +221,6 @@ graph LR
     DefineConfig -->|uses| ProjectConfigTypes
     ConfigLoader -->|uses| DeliveryProcessFactory
     ConfigLoader -->|uses| ConfigurationTypes
-    ADR003SourceFirstPatternArchitecture -.->|depends on| ADR001TaxonomyCanonicalValues
     ScopedArchitecturalView -.->|depends on| ArchitectureDiagramGeneration
     ScopedArchitecturalView -.->|depends on| ShapeExtraction
     DeclarationLevelShapeTagging -.->|depends on| ShapeExtraction
@@ -234,6 +233,7 @@ graph LR
     CrossCuttingDocumentInclusion -.->|depends on| ReferenceDocShowcase
     CodecDrivenReferenceGeneration -.->|depends on| DocGenerationProofOfConcept
     CodecDrivenReferenceGeneration -.->|depends on| ScopedArchitecturalView
+    ADR003SourceFirstPatternArchitecture -.->|depends on| ADR001TaxonomyCanonicalValues
     ExtractionPipelineEnhancementsTesting ..->|implements| ReferenceDocShowcase
     KebabCaseSlugs -.->|depends on| StringUtils
     ErrorHandlingUnification -.->|depends on| ResultMonad

@@ -29,18 +29,6 @@ Detail Level: Compact summary
 
 --- PipelineFactory ---
 
---- PDR001SessionWorkflowCommands ---
-
-| Rule                                                 | Description                                                                                                                        |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| DD-1 - Text output with section markers              | Both scope-validate and handoff return string from the router, using<br> === SECTION === markers. Follows the dual...              |
-| DD-2 - Git integration is opt-in via --git flag      | The handoff command accepts an optional --git flag. The CLI handler<br> calls git diff and passes file list to the...              |
-| DD-3 - Session type inferred from FSM status         | Handoff infers session type from pattern's current FSM status.<br> An explicit --session flag overrides inference....              |
-| DD-4 - Severity levels match Process Guard model     | Scope validation uses three severity levels:<br><br> \| Severity \| Meaning \|<br> \| PASS \| Check passed \|<br> \| BLOCKED \|... |
-| DD-5 - Current date only for handoff                 | Handoff always uses the current date. No --date flag.                                                                              |
-| DD-6 - Both positional and flag forms for scope type | scope-validate accepts scope type as both positional argument<br> and --type flag.                                                 |
-| DD-7 - Co-located formatter functions                | Each module (scope-validator.ts, handoff-generator.ts) exports<br> both the data builder and the text formatter....                |
-
 --- ProcessStateAPIRelationshipQueries ---
 
 | Rule                                             | Description                                                                                                               |
@@ -139,15 +127,17 @@ Detail Level: Compact summary
 | Coverage analysis reports annotation completeness with gaps    | **Invariant:** Coverage reports identify unannotated files that should have<br> the libar-docs opt-in marker based on... |
 | Tags and sources commands provide taxonomy and inventory views | **Invariant:** All tag values in use are discoverable without reading<br> configuration files. Source file inventory...  |
 
---- ProcessStateAPITesting ---
+--- PDR001SessionWorkflowCommands ---
 
-| Rule                                           | Description                                                                                                              |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Status queries return correct patterns         | **Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM...  |
-| Phase queries return correct phase data        | **Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and...      |
-| FSM queries expose transition validation       | **Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels...   |
-| Pattern queries find and retrieve pattern data | **Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with...   |
-| Timeline queries group patterns by time        | **Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date... |
+| Rule                                                 | Description                                                                                                                        |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| DD-1 - Text output with section markers              | Both scope-validate and handoff return string from the router, using<br> === SECTION === markers. Follows the dual...              |
+| DD-2 - Git integration is opt-in via --git flag      | The handoff command accepts an optional --git flag. The CLI handler<br> calls git diff and passes file list to the...              |
+| DD-3 - Session type inferred from FSM status         | Handoff infers session type from pattern's current FSM status.<br> An explicit --session flag overrides inference....              |
+| DD-4 - Severity levels match Process Guard model     | Scope validation uses three severity levels:<br><br> \| Severity \| Meaning \|<br> \| PASS \| Check passed \|<br> \| BLOCKED \|... |
+| DD-5 - Current date only for handoff                 | Handoff always uses the current date. No --date flag.                                                                              |
+| DD-6 - Both positional and flag forms for scope type | scope-validate accepts scope type as both positional argument<br> and --type flag.                                                 |
+| DD-7 - Co-located formatter functions                | Each module (scope-validator.ts, handoff-generator.ts) exports<br> both the data builder and the text formatter....                |
 
 --- ValidatePatternsCli ---
 
@@ -225,6 +215,16 @@ Detail Level: Compact summary
 | CLI generates documentation from source files | **Invariant:** Given valid input patterns and a generator name, the CLI must scan sources, extract patterns, and... |
 | CLI rejects unknown options                   | **Invariant:** Unrecognized CLI flags must cause an error with a descriptive message rather than being silently...  |
 
+--- ProcessStateAPITesting ---
+
+| Rule                                           | Description                                                                                                              |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Status queries return correct patterns         | **Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM...  |
+| Phase queries return correct phase data        | **Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and...      |
+| FSM queries expose transition validation       | **Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels...   |
+| Pattern queries find and retrieve pattern data | **Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with...   |
+| Timeline queries group patterns by time        | **Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date... |
+
 --- StubTaxonomyTagTests ---
 
 | Rule                                         | Description                                                                                                             |
@@ -255,6 +255,24 @@ Detail Level: Compact summary
 | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | Handoff generates compact session state summary | **Invariant:** The handoff generator must produce a compact session state summary including pattern status,... |
 | Formatter produces structured text output       | **Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for...   |
+
+--- ContextFormatterTests ---
+
+| Rule                                                 | Description                                                                                                              |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| formatContextBundle renders section markers          | **Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with... |
+| formatDepTree renders indented tree                  | **Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to...        |
+| formatOverview renders progress summary              | **Invariant:** The overview formatter must render a progress summary line showing completion metrics for the...          |
+| formatFileReadingList renders categorized file paths | **Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing...  |
+
+--- ContextAssemblerTests ---
+
+| Rule                                                      | Description                                                                                                              |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| assembleContext produces session-tailored context bundles | **Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its... |
+| buildDepTree walks dependency chains with cycle detection | **Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate... |
+| buildOverview provides executive project summary          | **Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and...        |
+| buildFileReadingList returns paths by relevance           | **Invariant:** Primary files (spec, implementation) must always be included; related files (dependency...                |
 
 --- PatternSummarizeTests ---
 
@@ -288,24 +306,6 @@ Detail Level: Compact summary
 | Fuzzy matching uses tiered scoring      | **Invariant:** Pattern matching must use a tiered scoring system: exact match (1.0) > prefix match (0.9) > substring... |
 | findBestMatch returns single suggestion | **Invariant:** findBestMatch must return the single highest-scoring match above the threshold, or undefined when no...  |
 | Levenshtein distance computation        | **Invariant:** The Levenshtein distance function must correctly compute edit distance between strings, returning 0...   |
-
---- ContextFormatterTests ---
-
-| Rule                                                 | Description                                                                                                              |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| formatContextBundle renders section markers          | **Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with... |
-| formatDepTree renders indented tree                  | **Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to...        |
-| formatOverview renders progress summary              | **Invariant:** The overview formatter must render a progress summary line showing completion metrics for the...          |
-| formatFileReadingList renders categorized file paths | **Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing...  |
-
---- ContextAssemblerTests ---
-
-| Rule                                                      | Description                                                                                                              |
-| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| assembleContext produces session-tailored context bundles | **Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its... |
-| buildDepTree walks dependency chains with cycle detection | **Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate... |
-| buildOverview provides executive project summary          | **Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and...        |
-| buildFileReadingList returns paths by relevance           | **Invariant:** Primary files (spec, implementation) must always be included; related files (dependency...                |
 
 --- ArchQueriesTest ---
 

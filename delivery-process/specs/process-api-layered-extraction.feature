@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:ProcessAPILayeredExtraction
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-phase:100
 @libar-docs-effort:2d
 @libar-docs-product-area:DataAPI
@@ -173,12 +173,12 @@ Feature: Process API Layered Extraction
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Create shared pipeline factory | pending | src/generators/pipeline/build-pipeline.ts |
-      | process-api.ts consumes pipeline factory | pending | src/cli/process-api.ts |
-      | validate-patterns.ts consumes pipeline factory (MasterDataset only) | pending | src/cli/validate-patterns.ts |
-      | Extract handleRules to rules-query.ts | pending | src/api/rules-query.ts |
-      | Update barrel exports | pending | src/api/index.ts, src/generators/pipeline/index.ts |
-      | End-to-end verification | pending | CLI output |
+      | Create shared pipeline factory | complete | src/generators/pipeline/build-pipeline.ts |
+      | process-api.ts consumes pipeline factory | complete | src/cli/process-api.ts |
+      | validate-patterns.ts consumes pipeline factory (MasterDataset only) | complete | src/cli/validate-patterns.ts |
+      | Extract handleRules to rules-query.ts | complete | src/api/rules-query.ts |
+      | Update barrel exports | complete | src/api/index.ts, src/generators/pipeline/index.ts |
+      | End-to-end verification | complete | CLI output |
 
   Rule: CLI file contains only routing, no domain logic
 

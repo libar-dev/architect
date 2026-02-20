@@ -378,109 +378,6 @@ Target: src/generators/pipeline/build-pipeline.ts
 See: ADR-006 (Single Read Model Architecture)
 See: DD-1, DD-2 (ProcessAPILayeredExtraction)
 
-### PDR001SessionWorkflowCommands
-
-[View PDR001SessionWorkflowCommands source](delivery-process/decisions/pdr-001-session-workflow-commands.feature)
-
-**Context:**
-DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session
-readiness check) and `handoff` (session-end state summary) CLI subcommands.
-Seven design decisions affect how these commands behave.
-
-**Decision:**
-Seven design decisions (DD-1 through DD-7) captured as Rules below.
-
-<details>
-<summary>DD-1 - Text output with section markers</summary>
-
-#### DD-1 - Text output with section markers
-
-Both scope-validate and handoff return string from the router, using
-=== SECTION === markers. Follows the dual output path where text
-commands bypass JSON.stringify.
-
-</details>
-
-<details>
-<summary>DD-2 - Git integration is opt-in via --git flag</summary>
-
-#### DD-2 - Git integration is opt-in via --git flag
-
-The handoff command accepts an optional --git flag. The CLI handler
-calls git diff and passes file list to the pure generator function.
-No shell dependency in domain logic.
-
-</details>
-
-<details>
-<summary>DD-3 - Session type inferred from FSM status</summary>
-
-#### DD-3 - Session type inferred from FSM status
-
-Handoff infers session type from pattern's current FSM status.
-An explicit --session flag overrides inference.
-
-| Status    | Inferred Session |
-| --------- | ---------------- |
-| roadmap   | design           |
-| active    | implement        |
-| completed | review           |
-| deferred  | design           |
-
-</details>
-
-<details>
-<summary>DD-4 - Severity levels match Process Guard model</summary>
-
-#### DD-4 - Severity levels match Process Guard model
-
-Scope validation uses three severity levels:
-
-    The --strict flag promotes WARN to BLOCKED.
-
-| Severity | Meaning                   |
-| -------- | ------------------------- |
-| PASS     | Check passed              |
-| BLOCKED  | Hard prerequisite missing |
-| WARN     | Recommendation not met    |
-
-</details>
-
-<details>
-<summary>DD-5 - Current date only for handoff</summary>
-
-#### DD-5 - Current date only for handoff
-
-Handoff always uses the current date. No --date flag.
-
-</details>
-
-<details>
-<summary>DD-6 - Both positional and flag forms for scope type</summary>
-
-#### DD-6 - Both positional and flag forms for scope type
-
-scope-validate accepts scope type as both positional argument
-and --type flag.
-
-</details>
-
-<details>
-<summary>DD-7 - Co-located formatter functions (2 scenarios)</summary>
-
-#### DD-7 - Co-located formatter functions
-
-Each module (scope-validator.ts, handoff-generator.ts) exports
-both the data builder and the text formatter. Simpler than the
-context-assembler/context-formatter split.
-
-**Verified by:**
-
-- scope-validate outputs structured text
-- Active pattern infers implement session
-
-</details>
-
 ### ProcessStateAPIRelationshipQueries
 
 [View ProcessStateAPIRelationshipQueries source](delivery-process/specs/process-state-api-relationship-queries.feature)
@@ -1974,113 +1871,106 @@ Extend the `arch` subcommand and add new discovery commands:
 
 </details>
 
-### ProcessStateAPITesting
+### PDR001SessionWorkflowCommands
 
-[View ProcessStateAPITesting source](tests/features/api/process-state-api.feature)
+[View PDR001SessionWorkflowCommands source](delivery-process/decisions/pdr-001-session-workflow-commands.feature)
 
-Programmatic interface for querying delivery process state.
-Designed for Claude Code integration and tool automation.
+**Context:**
+DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session
+readiness check) and `handoff` (session-end state summary) CLI subcommands.
+Seven design decisions affect how these commands behave.
 
-**Problem:**
-
-- Markdown generation is not ideal for programmatic access
-- Claude Code needs structured data to answer process questions
-- Multiple queries require redundant parsing of MasterDataset
-
-**Solution:**
-
-- ProcessStateAPI wraps MasterDataset with typed query methods
-- Returns structured data suitable for programmatic consumption
-- Integrates FSM validation for transition checks
+**Decision:**
+Seven design decisions (DD-1 through DD-7) captured as Rules below.
 
 <details>
-<summary>Status queries return correct patterns (6 scenarios)</summary>
+<summary>DD-1 - Text output with section markers</summary>
 
-#### Status queries return correct patterns
+#### DD-1 - Text output with section markers
 
-**Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
-
-**Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
-
-**Verified by:**
-
-- Get patterns by normalized status
-- Get patterns by FSM status
-- Get current work returns active patterns
-- Get roadmap items returns roadmap and deferred
-- Get status counts
-- Get completion percentage
+Both scope-validate and handoff return string from the router, using
+=== SECTION === markers. Follows the dual output path where text
+commands bypass JSON.stringify.
 
 </details>
 
 <details>
-<summary>Phase queries return correct phase data (4 scenarios)</summary>
+<summary>DD-2 - Git integration is opt-in via --git flag</summary>
 
-#### Phase queries return correct phase data
+#### DD-2 - Git integration is opt-in via --git flag
 
-**Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
-
-**Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
-
-**Verified by:**
-
-- Get patterns by phase
-- Get phase progress
-- Get nonexistent phase returns undefined
-- Get active phases
+The handoff command accepts an optional --git flag. The CLI handler
+calls git diff and passes file list to the pure generator function.
+No shell dependency in domain logic.
 
 </details>
 
 <details>
-<summary>FSM queries expose transition validation (4 scenarios)</summary>
+<summary>DD-3 - Session type inferred from FSM status</summary>
 
-#### FSM queries expose transition validation
+#### DD-3 - Session type inferred from FSM status
 
-**Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
+Handoff infers session type from pattern's current FSM status.
+An explicit --session flag overrides inference.
 
-**Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
-
-**Verified by:**
-
-- Check valid transition
-- Check invalid transition
-- Get valid transitions from status
-- Get protection info
-
-</details>
-
-<details>
-<summary>Pattern queries find and retrieve pattern data (4 scenarios)</summary>
-
-#### Pattern queries find and retrieve pattern data
-
-**Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
-
-**Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
-
-**Verified by:**
-
-- Find pattern by name (case insensitive)
-- Find nonexistent pattern returns undefined
-- Get patterns by category
-- Get all categories with counts
+| Status    | Inferred Session |
+| --------- | ---------------- |
+| roadmap   | design           |
+| active    | implement        |
+| completed | review           |
+| deferred  | design           |
 
 </details>
 
 <details>
-<summary>Timeline queries group patterns by time (3 scenarios)</summary>
+<summary>DD-4 - Severity levels match Process Guard model</summary>
 
-#### Timeline queries group patterns by time
+#### DD-4 - Severity levels match Process Guard model
 
-**Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
+Scope validation uses three severity levels:
 
-**Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
+    The --strict flag promotes WARN to BLOCKED.
+
+| Severity | Meaning                   |
+| -------- | ------------------------- |
+| PASS     | Check passed              |
+| BLOCKED  | Hard prerequisite missing |
+| WARN     | Recommendation not met    |
+
+</details>
+
+<details>
+<summary>DD-5 - Current date only for handoff</summary>
+
+#### DD-5 - Current date only for handoff
+
+Handoff always uses the current date. No --date flag.
+
+</details>
+
+<details>
+<summary>DD-6 - Both positional and flag forms for scope type</summary>
+
+#### DD-6 - Both positional and flag forms for scope type
+
+scope-validate accepts scope type as both positional argument
+and --type flag.
+
+</details>
+
+<details>
+<summary>DD-7 - Co-located formatter functions (2 scenarios)</summary>
+
+#### DD-7 - Co-located formatter functions
+
+Each module (scope-validator.ts, handoff-generator.ts) exports
+both the data builder and the text formatter. Simpler than the
+context-assembler/context-formatter split.
 
 **Verified by:**
 
-- Get patterns by quarter
-- Get all quarters
-- Get recently completed sorted by date
+- scope-validate outputs structured text
+- Active pattern infers implement session
 
 </details>
 
@@ -2813,6 +2703,116 @@ Command-line interface for generating documentation from annotated TypeScript.
 
 </details>
 
+### ProcessStateAPITesting
+
+[View ProcessStateAPITesting source](tests/features/api/process-state-api.feature)
+
+Programmatic interface for querying delivery process state.
+Designed for Claude Code integration and tool automation.
+
+**Problem:**
+
+- Markdown generation is not ideal for programmatic access
+- Claude Code needs structured data to answer process questions
+- Multiple queries require redundant parsing of MasterDataset
+
+**Solution:**
+
+- ProcessStateAPI wraps MasterDataset with typed query methods
+- Returns structured data suitable for programmatic consumption
+- Integrates FSM validation for transition checks
+
+<details>
+<summary>Status queries return correct patterns (6 scenarios)</summary>
+
+#### Status queries return correct patterns
+
+**Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
+
+**Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
+
+**Verified by:**
+
+- Get patterns by normalized status
+- Get patterns by FSM status
+- Get current work returns active patterns
+- Get roadmap items returns roadmap and deferred
+- Get status counts
+- Get completion percentage
+
+</details>
+
+<details>
+<summary>Phase queries return correct phase data (4 scenarios)</summary>
+
+#### Phase queries return correct phase data
+
+**Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
+
+**Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
+
+**Verified by:**
+
+- Get patterns by phase
+- Get phase progress
+- Get nonexistent phase returns undefined
+- Get active phases
+
+</details>
+
+<details>
+<summary>FSM queries expose transition validation (4 scenarios)</summary>
+
+#### FSM queries expose transition validation
+
+**Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
+
+**Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
+
+**Verified by:**
+
+- Check valid transition
+- Check invalid transition
+- Get valid transitions from status
+- Get protection info
+
+</details>
+
+<details>
+<summary>Pattern queries find and retrieve pattern data (4 scenarios)</summary>
+
+#### Pattern queries find and retrieve pattern data
+
+**Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
+
+**Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
+
+**Verified by:**
+
+- Find pattern by name (case insensitive)
+- Find nonexistent pattern returns undefined
+- Get patterns by category
+- Get all categories with counts
+
+</details>
+
+<details>
+<summary>Timeline queries group patterns by time (3 scenarios)</summary>
+
+#### Timeline queries group patterns by time
+
+**Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
+
+**Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
+
+**Verified by:**
+
+- Get patterns by quarter
+- Get all quarters
+- Get recently completed sorted by date
+
+</details>
+
 ### StubTaxonomyTagTests
 
 [View StubTaxonomyTagTests source](tests/features/api/stub-integration/taxonomy-tags.feature)
@@ -3027,6 +3027,160 @@ issues, and next-session priorities.
 **Verified by:**
 
 - Handoff formatter produces markers per ADR-008
+
+### ContextFormatterTests
+
+[View ContextFormatterTests source](tests/features/api/context-assembly/context-formatter.feature)
+
+Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),
+and formatOverview() plain text rendering functions.
+
+<details>
+<summary>formatContextBundle renders section markers (2 scenarios)</summary>
+
+#### formatContextBundle renders section markers
+
+**Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with design bundles rendering all sections and implement bundles focusing on deliverables and FSM.
+
+**Rationale:** Section markers enable structured parsing of context output — without them, AI consumers cannot reliably extract specific sections from the formatted bundle.
+
+**Verified by:**
+
+- Design bundle renders all populated sections
+- Implement bundle renders deliverables and FSM
+
+</details>
+
+<details>
+<summary>formatDepTree renders indented tree (1 scenarios)</summary>
+
+#### formatDepTree renders indented tree
+
+**Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to visually distinguish the target pattern from its dependencies.
+
+**Rationale:** Visual hierarchy in the dependency tree makes dependency chains scannable at a glance — flat output would require mental parsing to understand depth and relationships.
+
+**Verified by:**
+
+- Tree renders with arrows and focal marker
+
+</details>
+
+<details>
+<summary>formatOverview renders progress summary (1 scenarios)</summary>
+
+#### formatOverview renders progress summary
+
+**Invariant:** The overview formatter must render a progress summary line showing completion metrics for the project.
+
+**Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness without requiring detailed exploration.
+
+**Verified by:**
+
+- Overview renders progress line
+
+</details>
+
+<details>
+<summary>formatFileReadingList renders categorized file paths (2 scenarios)</summary>
+
+#### formatFileReadingList renders categorized file paths
+
+**Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing minimal output when the list is empty.
+
+**Rationale:** Categorized file lists tell developers which files to read first (primary) versus reference (dependency) — uncategorized lists waste time on low-priority files.
+
+**Verified by:**
+
+- File list renders primary and dependency sections
+- Empty file reading list renders minimal output
+
+</details>
+
+### ContextAssemblerTests
+
+[View ContextAssemblerTests source](tests/features/api/context-assembly/context-assembler.feature)
+
+Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and
+buildOverview() pure functions that operate on MasterDataset.
+
+<details>
+<summary>assembleContext produces session-tailored context bundles (7 scenarios)</summary>
+
+#### assembleContext produces session-tailored context bundles
+
+**Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its profile — no more, no less.
+
+**Rationale:** Over-fetching wastes AI context window tokens; under-fetching causes the agent to make uninformed decisions.
+
+**Verified by:**
+
+- Design session includes stubs, consumers, and architecture
+- Planning session includes only metadata and dependencies
+- Implement session includes deliverables and FSM
+- Multi-pattern context merges metadata from both patterns
+- Pattern not found returns error with suggestion
+- Description preserves Problem and Solution structure
+- Solution text with inline bold is not truncated
+- Design session includes stubs
+- consumers
+- and architecture
+
+</details>
+
+<details>
+<summary>buildDepTree walks dependency chains with cycle detection (4 scenarios)</summary>
+
+#### buildDepTree walks dependency chains with cycle detection
+
+**Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate safely on circular references.
+
+**Rationale:** Dependency chains reveal implementation prerequisites — cycles and infinite recursion would crash the CLI.
+
+**Verified by:**
+
+- Dependency tree shows chain with status markers
+- Depth limit truncates branches
+- Circular dependencies are handled safely
+- Standalone pattern returns single-node tree
+
+</details>
+
+<details>
+<summary>buildOverview provides executive project summary (2 scenarios)</summary>
+
+#### buildOverview provides executive project summary
+
+**Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and blocking dependencies.
+
+**Rationale:** The overview is the first command in every session start recipe — it must provide a complete project health snapshot.
+
+**Verified by:**
+
+- Overview shows progress, active phases, and blocking
+- Empty dataset returns zero-state overview
+- Overview shows progress
+- active phases
+- and blocking
+
+</details>
+
+<details>
+<summary>buildFileReadingList returns paths by relevance (3 scenarios)</summary>
+
+#### buildFileReadingList returns paths by relevance
+
+**Invariant:** Primary files (spec, implementation) must always be included; related files (dependency implementations) are included only when requested.
+
+**Rationale:** File reading lists power the "what to read" guidance — relevance sorting ensures the most important files are read first within token budgets.
+
+**Verified by:**
+
+- File list includes primary and related files
+- File list includes implementation files for completed dependencies
+- File list without related returns only primary
+
+</details>
 
 ### PatternSummarizeTests
 
@@ -3264,160 +3418,6 @@ Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein.
 
 - Identical strings have distance 0
 - Single character difference
-
-</details>
-
-### ContextFormatterTests
-
-[View ContextFormatterTests source](tests/features/api/context-assembly/context-formatter.feature)
-
-Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),
-and formatOverview() plain text rendering functions.
-
-<details>
-<summary>formatContextBundle renders section markers (2 scenarios)</summary>
-
-#### formatContextBundle renders section markers
-
-**Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with design bundles rendering all sections and implement bundles focusing on deliverables and FSM.
-
-**Rationale:** Section markers enable structured parsing of context output — without them, AI consumers cannot reliably extract specific sections from the formatted bundle.
-
-**Verified by:**
-
-- Design bundle renders all populated sections
-- Implement bundle renders deliverables and FSM
-
-</details>
-
-<details>
-<summary>formatDepTree renders indented tree (1 scenarios)</summary>
-
-#### formatDepTree renders indented tree
-
-**Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to visually distinguish the target pattern from its dependencies.
-
-**Rationale:** Visual hierarchy in the dependency tree makes dependency chains scannable at a glance — flat output would require mental parsing to understand depth and relationships.
-
-**Verified by:**
-
-- Tree renders with arrows and focal marker
-
-</details>
-
-<details>
-<summary>formatOverview renders progress summary (1 scenarios)</summary>
-
-#### formatOverview renders progress summary
-
-**Invariant:** The overview formatter must render a progress summary line showing completion metrics for the project.
-
-**Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness without requiring detailed exploration.
-
-**Verified by:**
-
-- Overview renders progress line
-
-</details>
-
-<details>
-<summary>formatFileReadingList renders categorized file paths (2 scenarios)</summary>
-
-#### formatFileReadingList renders categorized file paths
-
-**Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing minimal output when the list is empty.
-
-**Rationale:** Categorized file lists tell developers which files to read first (primary) versus reference (dependency) — uncategorized lists waste time on low-priority files.
-
-**Verified by:**
-
-- File list renders primary and dependency sections
-- Empty file reading list renders minimal output
-
-</details>
-
-### ContextAssemblerTests
-
-[View ContextAssemblerTests source](tests/features/api/context-assembly/context-assembler.feature)
-
-Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and
-buildOverview() pure functions that operate on MasterDataset.
-
-<details>
-<summary>assembleContext produces session-tailored context bundles (7 scenarios)</summary>
-
-#### assembleContext produces session-tailored context bundles
-
-**Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its profile — no more, no less.
-
-**Rationale:** Over-fetching wastes AI context window tokens; under-fetching causes the agent to make uninformed decisions.
-
-**Verified by:**
-
-- Design session includes stubs, consumers, and architecture
-- Planning session includes only metadata and dependencies
-- Implement session includes deliverables and FSM
-- Multi-pattern context merges metadata from both patterns
-- Pattern not found returns error with suggestion
-- Description preserves Problem and Solution structure
-- Solution text with inline bold is not truncated
-- Design session includes stubs
-- consumers
-- and architecture
-
-</details>
-
-<details>
-<summary>buildDepTree walks dependency chains with cycle detection (4 scenarios)</summary>
-
-#### buildDepTree walks dependency chains with cycle detection
-
-**Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate safely on circular references.
-
-**Rationale:** Dependency chains reveal implementation prerequisites — cycles and infinite recursion would crash the CLI.
-
-**Verified by:**
-
-- Dependency tree shows chain with status markers
-- Depth limit truncates branches
-- Circular dependencies are handled safely
-- Standalone pattern returns single-node tree
-
-</details>
-
-<details>
-<summary>buildOverview provides executive project summary (2 scenarios)</summary>
-
-#### buildOverview provides executive project summary
-
-**Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and blocking dependencies.
-
-**Rationale:** The overview is the first command in every session start recipe — it must provide a complete project health snapshot.
-
-**Verified by:**
-
-- Overview shows progress, active phases, and blocking
-- Empty dataset returns zero-state overview
-- Overview shows progress
-- active phases
-- and blocking
-
-</details>
-
-<details>
-<summary>buildFileReadingList returns paths by relevance (3 scenarios)</summary>
-
-#### buildFileReadingList returns paths by relevance
-
-**Invariant:** Primary files (spec, implementation) must always be included; related files (dependency implementations) are included only when requested.
-
-**Rationale:** File reading lists power the "what to read" guidance — relevance sorting ensures the most important files are read first within token budgets.
-
-**Verified by:**
-
-- File list includes primary and related files
-- File list includes implementation files for completed dependencies
-- File list without related returns only primary
 
 </details>
 

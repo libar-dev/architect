@@ -177,13 +177,8 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
-        ResultMonadTypes["ResultMonadTypes"]
-        ErrorFactoryTypes["ErrorFactoryTypes"]
         DoDValidationTypes["DoDValidationTypes"]
         ValidationModule["ValidationModule"]
-        RenderableUtils["RenderableUtils"]
-        SectionBlock["SectionBlock"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
@@ -192,9 +187,16 @@ graph TB
         FormatTypes["FormatTypes"]
         DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
         CategoryDefinition["CategoryDefinition"]
+        RenderableUtils["RenderableUtils"]
+        SectionBlock["SectionBlock"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
+        LintModule["LintModule"]
+        WarningCollector["WarningCollector"]
+        GeneratorTypes["GeneratorTypes"]
+        SourceMappingValidator["SourceMappingValidator"]
+        GeneratorRegistry["GeneratorRegistry"]
         ShapeExtractor["ShapeExtractor"]
         LayerInference["LayerInference"]
-        LintModule["LintModule"]
         CLIVersionHelper["CLIVersionHelper"]
         ValidatePatternsCLI["ValidatePatternsCLI"]
         LintProcessCLI["LintProcessCLI"]
@@ -202,10 +204,8 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
-        WarningCollector["WarningCollector"]
-        GeneratorTypes["GeneratorTypes"]
-        SourceMappingValidator["SourceMappingValidator"]
-        GeneratorRegistry["GeneratorRegistry"]
+        ResultMonadTypes["ResultMonadTypes"]
+        ErrorFactoryTypes["ErrorFactoryTypes"]
         ProcessStateTypes["ProcessStateTypes"]
         StubResolverImpl["StubResolverImpl"]
         RulesQueryModule["RulesQueryModule"]
@@ -248,10 +248,10 @@ graph TB
         EffortVarianceTracking["EffortVarianceTracking"]
         ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
         CliBehaviorTesting["CliBehaviorTesting"]
-        StringUtils["StringUtils"]
+        ProcessGuardTesting["ProcessGuardTesting"]
         ResultMonad["ResultMonad"]
         ErrorFactories["ErrorFactories"]
-        ProcessGuardTesting["ProcessGuardTesting"]
+        StringUtils["StringUtils"]
         SessionHandoffs["SessionHandoffs"]
         SessionFileLifecycle["SessionFileLifecycle"]
         KebabCaseSlugs["KebabCaseSlugs"]
@@ -260,21 +260,24 @@ graph TB
     ExtractedPatternSchema --> DocDirectiveSchema
     DualSourceSchemas ..-> MvpWorkflowImplementation
     DocDirectiveSchema ..-> MvpWorkflowImplementation
-    ResultMonadTypes ..-> ResultMonad
-    ErrorFactoryTypes ..-> ErrorFactories
-    GherkinScanner --> GherkinASTParser
-    TypeScript_AST_Parser --> DocDirectiveSchema
     DoDValidator --> DoDValidationTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
+    GherkinScanner --> GherkinASTParser
+    TypeScript_AST_Parser --> DocDirectiveSchema
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     ConfigResolver --> ProjectConfigTypes
@@ -307,11 +310,8 @@ graph TB
     LintPatternsCLI --> LintEngine
     LintPatternsCLI --> LintRules
     TagTaxonomyCLI --> ConfigLoader
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    ResultMonadTypes ..-> ResultMonad
+    ErrorFactoryTypes ..-> ErrorFactories
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
