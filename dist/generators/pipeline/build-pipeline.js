@@ -49,6 +49,7 @@ import { Result } from '../../types/result.js';
  */
 export async function buildMasterDataset(options) {
     const baseDir = path.resolve(options.baseDir);
+    const warnings = [];
     // Step 1: Load configuration
     const configResult = await loadConfig(baseDir);
     if (!configResult.ok) {
@@ -89,8 +90,9 @@ export async function buildMasterDataset(options) {
             });
             gherkinPatterns = gherkinResult.patterns;
         }
-        // Non-fatal: Gherkin scan failure is a warning — continue with empty
-        // gherkin patterns (matches process-api.ts original behavior)
+        else {
+            warnings.push('Gherkin scan failed - continuing with 0 Gherkin patterns');
+        }
     }
     // Step 5: Merge patterns (DD-2: conflict handling per strategy)
     const mergeResult = mergePatterns(extraction.patterns, gherkinPatterns);
@@ -134,6 +136,6 @@ export async function buildMasterDataset(options) {
         workflow,
         contextInferenceRules,
     });
-    return Result.ok({ dataset, validation });
+    return Result.ok({ dataset, validation, warnings });
 }
 //# sourceMappingURL=build-pipeline.js.map

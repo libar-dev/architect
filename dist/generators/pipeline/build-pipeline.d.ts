@@ -49,6 +49,7 @@ export interface PipelineError {
 export interface PipelineResult {
     readonly dataset: RuntimeMasterDataset;
     readonly validation: ValidationSummary;
+    readonly warnings: readonly string[];
 }
 /**
  * Build a MasterDataset by executing the 8-step extraction pipeline.

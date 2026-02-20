@@ -387,6 +387,9 @@ async function buildPipeline(config) {
         console.error(`Pipeline error [${result.error.step}]: ${result.error.message}`);
         process.exit(1);
     }
+    for (const w of result.value.warnings) {
+        console.warn(`⚠️  ${w}`);
+    }
     return result.value;
 }
 // =============================================================================

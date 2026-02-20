@@ -590,7 +590,12 @@ async function main() {
         if (!pipelineResult.ok) {
             throw new Error(`Pipeline error [${pipelineResult.error.step}]: ${pipelineResult.error.message}`);
         }
-        const { dataset } = pipelineResult.value;
+        const { dataset, warnings: pipelineWarnings } = pipelineResult.value;
+        if (config.format === 'pretty') {
+            for (const w of pipelineWarnings) {
+                console.warn(`⚠️  ${w}`);
+            }
+        }
         // Raw scans for stage-1 consumers (DoD validation, anti-pattern detection)
         // These correctly use scanned file data, not the MasterDataset — see DD-7
         const scannerConfig = ScannerConfigSchema.parse({

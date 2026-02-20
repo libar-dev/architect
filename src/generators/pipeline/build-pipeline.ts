@@ -76,6 +76,7 @@ export interface PipelineError {
 export interface PipelineResult {
   readonly dataset: RuntimeMasterDataset;
   readonly validation: ValidationSummary;
+  readonly warnings: readonly string[];
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -103,6 +104,7 @@ export async function buildMasterDataset(
   options: PipelineOptions
 ): Promise<Result<PipelineResult, PipelineError>> {
   const baseDir = path.resolve(options.baseDir);
+  const warnings: string[] = [];
 
   // Step 1: Load configuration
   const configResult = await loadConfig(baseDir);
@@ -149,9 +151,9 @@ export async function buildMasterDataset(
         scenariosAsUseCases: true,
       });
       gherkinPatterns = gherkinResult.patterns;
+    } else {
+      warnings.push('Gherkin scan failed - continuing with 0 Gherkin patterns');
     }
-    // Non-fatal: Gherkin scan failure is a warning — continue with empty
-    // gherkin patterns (matches process-api.ts original behavior)
   }
 
   // Step 5: Merge patterns (DD-2: conflict handling per strategy)
@@ -198,5 +200,5 @@ export async function buildMasterDataset(
     contextInferenceRules,
   });
 
-  return Result.ok({ dataset, validation });
+  return Result.ok({ dataset, validation, warnings });
 }
