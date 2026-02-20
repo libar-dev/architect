@@ -152,6 +152,10 @@ Session types: `planning` (minimal), `design` (full: stubs + deps + deliverables
 | `list --status roadmap` | Find available patterns to work on                                                    |
 | `arch blocking`         | Find patterns stuck on incomplete dependencies                                        |
 | `stubs --unresolved`    | Find design stubs missing implementations                                             |
+| `rules`                 | Business rules and invariants from Gherkin `Rule:` blocks                             |
+| `files <pattern>`       | File reading list with implementation paths — replaces manual path discovery          |
+| `decisions <pattern>`   | Design decisions (AD-N) from stub descriptions                                        |
+| `pdr <number>`          | Cross-reference patterns mentioning a PDR number                                      |
 | `handoff --pattern`     | Capture session-end state for multi-session work                                      |
 
 #### Annotation Exploration
@@ -166,6 +170,18 @@ Run these **before** making annotation changes — they prevent debugging cycles
 | `query getPattern <name>`  | Full pattern JSON including `extractedShapes` and `productArea`               |
 
 **Lesson learned:** `unannotated --path src/types` would have immediately caught missing `@libar-docs` annotations on `result.ts` and `errors.ts` — saving ~30 minutes of debugging why shapes weren't appearing in generated docs.
+
+#### Architecture Queries
+
+Query architectural structure directly — avoids explore agents for structural questions:
+
+| Command               | When to Use                                          |
+| --------------------- | ---------------------------------------------------- |
+| `arch coverage`       | Annotation completeness across the project           |
+| `arch context [name]` | Patterns in bounded context (list all if no name)    |
+| `arch layer [name]`   | Patterns in architecture layer (list all if no name) |
+| `arch dangling`       | Broken references — pattern names that don't resolve |
+| `arch orphans`        | Isolated patterns with no relationships              |
 
 #### Tips
 
@@ -196,21 +212,26 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 - **Schema-First**: Zod schemas in `src/validation-schemas/` define types with runtime validation
 - **Registry Pattern**: Tag registry (`src/taxonomy/`) defines categories, status values, and tag formats
 - **Codec-Based Rendering**: Generators in `src/generators/` use codecs to transform data to markdown
+- **Pipeline Factory**: Shared `buildMasterDataset()` in `src/generators/pipeline/build-pipeline.ts` — all consumers (orchestrator, process-api, validate-patterns) call this instead of wiring inline pipelines. Per-consumer behavior via `PipelineOptions`.
+- **Single Read Model** (ADR-006): MasterDataset is the sole read model. No consumer re-derives data from raw scanner/extractor output. Anti-patterns: Parallel Pipeline, Lossy Local Type, Re-derived Relationship.
 
 ### Module Structure
 
-| Module                    | Purpose                                                          |
-| ------------------------- | ---------------------------------------------------------------- |
-| `src/config/`             | Configuration factory, presets (generic, ddd-es-cqrs)            |
-| `src/taxonomy/`           | Tag definitions - categories, status values, format types        |
-| `src/scanner/`            | TypeScript and Gherkin file scanning                             |
-| `src/extractor/`          | Pattern extraction from AST/Gherkin                              |
-| `src/generators/`         | Document generators and orchestrator                             |
-| `src/renderable/`         | Markdown codec system                                            |
-| `src/validation/`         | FSM validation, DoD checks, anti-patterns                        |
-| `src/lint/`               | Pattern linting and process guard                                |
-| `src/api/`                | Query layer powering the Data API CLI                            |
-| `delivery-process/stubs/` | Design session code stubs (outside src/ for TS/ESLint isolation) |
+| Module                     | Purpose                                                              |
+| -------------------------- | -------------------------------------------------------------------- |
+| `src/config/`              | Configuration factory, presets (generic, ddd-es-cqrs)                |
+| `src/taxonomy/`            | Tag definitions - categories, status values, format types            |
+| `src/scanner/`             | TypeScript and Gherkin file scanning                                 |
+| `src/extractor/`           | Pattern extraction from AST/Gherkin                                  |
+| `src/generators/`          | Document generators, orchestrator, and pipeline factory              |
+| `src/generators/pipeline/` | `buildMasterDataset()` factory, `mergePatterns()`, dataset transform |
+| `src/renderable/`          | Markdown codec system                                                |
+| `src/validation/`          | FSM validation, DoD checks, anti-patterns                            |
+| `src/lint/`                | Pattern linting and process guard                                    |
+| `src/api/`                 | Query layer: Data API CLI, business rules query (`rules-query.ts`)   |
+| `delivery-process/stubs/`  | Design session code stubs (outside src/ for TS/ESLint isolation)     |
+
+**Live inventory:** `pnpm process:query -- arch context` and `pnpm process:query -- arch layer` reflect the actual annotated codebase structure.
 
 ### Three Presets
 
@@ -230,8 +251,11 @@ Tests use Vitest with BDD/Gherkin integration:
 - **Step definitions**: `tests/steps/**/*.steps.ts`
 - **Fixtures**: `tests/fixtures/` - test data and factory functions
 - **Support**: `tests/support/` - test helpers and setup utilities
+- **Shared state helpers**: `tests/support/helpers/` - reusable state management for split test suites
 
-Run a single test file: `pnpm test tests/steps/scanner.steps.ts`
+Large test files are split into focused domain files with shared state extracted to helpers (e.g., `ast-parser-state.ts`, `process-api-state.ts`).
+
+Run a single test file: `pnpm test tests/steps/scanner/file-discovery.steps.ts`
 
 ### Gherkin-Only Testing Policy
 
@@ -464,6 +488,8 @@ Deliverable status is enforced by `z.enum()` at schema level. The 6 canonical va
 
 **NEVER** use freeform status strings. The Zod schema rejects non-canonical values at parse time.
 
+**Terminal statuses:** `complete`, `n/a`, and `superseded` are terminal per `isDeliverableStatusTerminal()`. Used by DoD validation — `deferred` is NOT terminal.
+
 ### Efficient Debugging Strategy
 
 - **Don't** try to debug by running the full test suite repeatedly.
@@ -608,6 +634,8 @@ pnpm process:query -- stubs <SpecName>
 | `completed` | Hard-locked  | No                   | Yes          |
 | `deferred`  | None         | Yes                  | No           |
 
+**Live query:** `pnpm process:query -- query getProtectionInfo <status>` and `query getValidTransitionsFrom <status>` return current FSM rules from code.
+
 **Valid FSM Transitions:**
 
 ```
@@ -639,26 +667,14 @@ deferred ──→ roadmap
 
 ### Handoff Documentation
 
-For multi-session work, capture state at session boundaries:
+For multi-session work, generate handoff state from the API:
 
-```markdown
-## Session State
-
-- **Last completed:** Phase 1 - Core types
-- **In progress:** Phase 2 - Validation
-- **Blockers:** None
-
-### Files Modified
-
-- `src/types.ts` - Added core types
-- `src/validate.ts` - Started validation (incomplete)
-
-## Next Session
-
-1. **FIRST:** Complete validation in `src/validate.ts`
-2. Add integration tests
-3. Update deliverable statuses
+```bash
+pnpm process:query -- handoff --pattern <PatternName>
+# Options: --git (include recent commits), --session <id>
 ```
+
+Generates: deliverable statuses, blockers, modification date, and next steps — always reflects actual annotation state.
 
 ---
 
@@ -735,11 +751,21 @@ Enforces dual-source architecture ownership between TypeScript and Gherkin files
 | `@libar-docs-quarter`    | Feature files    | TypeScript     | Gherkin owns timeline metadata     |
 | `@libar-docs-team`       | Feature files    | TypeScript     | Gherkin owns ownership metadata    |
 
+#### Single Read Model Anti-Patterns (ADR-006)
+
+| Anti-Pattern            | Signal                                                                              |
+| ----------------------- | ----------------------------------------------------------------------------------- |
+| Parallel Pipeline       | Consumer imports from `scanner/` or `extractor/` instead of consuming MasterDataset |
+| Lossy Local Type        | Local interface with subset of `ExtractedPattern` fields                            |
+| Re-derived Relationship | Building `Map`/`Set` from raw `implements`/`uses` arrays in consumer code           |
+
+**Exception:** `lint-patterns.ts` is a stage-1 consumer (validates annotation syntax, no cross-source resolution).
+
 #### DoD Validation
 
 For patterns with `completed` status, validates:
 
-- All deliverables marked complete (checkmark, "Done", "Complete")
+- All deliverables have terminal status (`complete`, `n/a`, or `superseded`) per `isDeliverableStatusTerminal()` — `deferred` is NOT terminal
 - At least one `@acceptance-criteria` scenario exists in the spec
 
 #### Running Validation

@@ -35,3 +35,5 @@ When pattern exists in both TypeScript AND feature file:
 | Description       | TypeScript markdown description |
 
 **Warning:** If TypeScript file is missing `@libar-docs-status`, the pattern data is **ignored** and not merged with feature file.
+
+**Implementation:** `mergePatterns()` in `src/generators/pipeline/merge-patterns.ts`. Conflict strategy is per-consumer: `fatal` (orchestrator/process-api) or `concatenate` (validator).

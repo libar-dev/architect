@@ -7,6 +7,8 @@
 | `completed` | Hard-locked  | No                   | Yes          |
 | `deferred`  | None         | Yes                  | No           |
 
+**Live query:** `pnpm process:query -- query getProtectionInfo <status>` and `query getValidTransitionsFrom <status>` return current FSM rules from code.
+
 **Valid FSM Transitions:**
 
 ```
@@ -38,23 +40,11 @@ deferred ──→ roadmap
 
 ### Handoff Documentation
 
-For multi-session work, capture state at session boundaries:
+For multi-session work, generate handoff state from the API:
 
-```markdown
-## Session State
-
-- **Last completed:** Phase 1 - Core types
-- **In progress:** Phase 2 - Validation
-- **Blockers:** None
-
-### Files Modified
-
-- `src/types.ts` - Added core types
-- `src/validate.ts` - Started validation (incomplete)
-
-## Next Session
-
-1. **FIRST:** Complete validation in `src/validate.ts`
-2. Add integration tests
-3. Update deliverable statuses
+```bash
+pnpm process:query -- handoff --pattern <PatternName>
+# Options: --git (include recent commits), --session <id>
 ```
+
+Generates: deliverable statuses, blockers, modification date, and next steps — always reflects actual annotation state.
