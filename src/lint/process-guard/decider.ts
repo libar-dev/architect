@@ -217,6 +217,11 @@ function checkStatusTransitions(state: ProcessState, changes: ChangeDetection): 
   const violations: ProcessViolation[] = [];
 
   for (const [file, transition] of changes.statusTransitions) {
+    // New files with unlock-reason bypass FSM check (supports file splits/reorganization)
+    if (transition.isNewFile === true && transition.hasUnlockReason === true) {
+      continue;
+    }
+
     const validationResult = validateTransition(transition.from, transition.to);
 
     if (!validationResult.valid) {

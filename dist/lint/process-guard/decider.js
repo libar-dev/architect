@@ -7,6 +7,7 @@
  * @libar-docs-arch-context lint
  * @libar-docs-arch-layer application
  * @libar-docs-implements ProcessGuardLinter
+ * @libar-docs-uses FSMValidator, DeriveProcessState, DetectChanges
  * @libar-docs-depends-on:FSMValidator,DeriveProcessState,DetectChanges
  * @libar-docs-extract-shapes validateChanges
  *
@@ -172,6 +173,10 @@ function checkProtectionLevel(state, changes, registry) {
 function checkStatusTransitions(state, changes) {
     const violations = [];
     for (const [file, transition] of changes.statusTransitions) {
+        // New files with unlock-reason bypass FSM check (supports file splits/reorganization)
+        if (transition.isNewFile === true && transition.hasUnlockReason === true) {
+            continue;
+        }
         const validationResult = validateTransition(transition.from, transition.to);
         if (!validationResult.valid) {
             const validTransitions = getValidTransitionsFrom(transition.from);

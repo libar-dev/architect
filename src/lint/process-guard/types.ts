@@ -135,6 +135,8 @@ export interface StatusTransition {
   readonly to: ProcessStatusValue;
   /** True if this is a new file (no previous status, defaults from 'roadmap') */
   readonly isNewFile?: boolean;
+  /** True if the diff contains unlock-reason tag (supports file splits) */
+  readonly hasUnlockReason?: boolean;
   /** Location of the 'to' status tag */
   readonly toLocation?: StatusTagLocation;
   /** All status tags found in diff (for debugging false positives) */

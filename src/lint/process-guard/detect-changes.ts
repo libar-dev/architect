@@ -337,6 +337,8 @@ interface DiffFileParseState {
   validAddedTag: StatusTagLocation | null;
   /** The removed status tag (for modified files) */
   removedTag: StatusTagLocation | null;
+  /** Whether the diff contains an unlock-reason tag */
+  hasUnlockReason: boolean;
 }
 
 /**
@@ -385,6 +387,7 @@ function detectStatusTransitions(
           foundTags: [],
           validAddedTag: null,
           removedTag: null,
+          hasUnlockReason: false,
         });
       }
       continue;
@@ -414,6 +417,11 @@ function detectStatusTransitions(
     const lineContent = line.startsWith('+') || line.startsWith('-') ? line.substring(1) : line;
     if (/^\s*"""/.test(lineContent)) {
       state.insideDocstring = !state.insideDocstring;
+    }
+
+    // Detect unlock-reason tags in added lines
+    if (line.startsWith('+') && line.includes('unlock-reason')) {
+      state.hasUnlockReason = true;
     }
 
     // Look for removed status tags (old value for modified files)
@@ -488,6 +496,7 @@ function detectStatusTransitions(
       from: fromStatus,
       to: toStatus,
       isNewFile,
+      ...(state.hasUnlockReason ? { hasUnlockReason: true } : {}),
       toLocation: state.validAddedTag,
       // Include all detected tags if there were multiple (helps debug false positives)
       ...(state.foundTags.length > 1 ? { allDetectedTags: state.foundTags } : {}),

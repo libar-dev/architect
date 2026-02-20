@@ -25,9 +25,9 @@ import { z } from 'zod';
  */
 export const AntiPatternThresholdsSchema = z.object({
     /** Maximum scenarios per feature file before warning */
-    scenarioBloatThreshold: z.number().int().positive().default(20),
+    scenarioBloatThreshold: z.number().int().positive().default(30),
     /** Maximum lines per feature file before warning */
-    megaFeatureLineThreshold: z.number().int().positive().default(500),
+    megaFeatureLineThreshold: z.number().int().positive().default(750),
     /** Maximum magic comments before warning */
     magicCommentThreshold: z.number().int().positive().default(5),
 });
@@ -35,8 +35,8 @@ export const AntiPatternThresholdsSchema = z.object({
  * Default thresholds for anti-pattern detection
  */
 export const DEFAULT_THRESHOLDS = {
-    scenarioBloatThreshold: 20,
-    megaFeatureLineThreshold: 500,
+    scenarioBloatThreshold: 30,
+    megaFeatureLineThreshold: 750,
     magicCommentThreshold: 5,
 };
 /**

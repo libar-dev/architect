@@ -36,7 +36,7 @@ Feature: TypeScript Taxonomy Implementation
   # Status Values
   # ─────────────────────────────────────────────────────────────────────────────
 
-  @happy-path
+  @happy-path @acceptance-criteria
   Scenario: Define status values as TypeScript constant
     Given a file "src/taxonomy/status-values.ts"
     When I define the status values
