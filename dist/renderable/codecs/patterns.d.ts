@@ -211,8 +211,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
                 unknown: "unknown";
-                domain: "domain";
                 timeline: "timeline";
+                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -270,10 +270,10 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
+            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -311,9 +311,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
+                interface: "interface";
                 enum: "enum";
                 const: "const";
-                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -357,8 +357,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                enum: "enum";
                 value: "value";
+                enum: "enum";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -492,8 +492,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -551,10 +551,10 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -592,9 +592,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
+                    interface: "interface";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -734,8 +734,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -793,10 +793,10 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -834,9 +834,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
+                    interface: "interface";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -976,8 +976,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1035,10 +1035,10 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1076,9 +1076,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
+                    interface: "interface";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -1222,8 +1222,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1281,10 +1281,10 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1322,9 +1322,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
+                    interface: "interface";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -1471,8 +1471,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
                 unknown: "unknown";
-                domain: "domain";
                 timeline: "timeline";
+                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -1530,10 +1530,10 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
+            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1571,9 +1571,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
+                interface: "interface";
                 enum: "enum";
                 const: "const";
-                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1713,8 +1713,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
                 unknown: "unknown";
-                domain: "domain";
                 timeline: "timeline";
+                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -1772,10 +1772,10 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
+            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1813,9 +1813,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
+                interface: "interface";
                 enum: "enum";
                 const: "const";
-                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1956,8 +1956,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2015,10 +2015,10 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2056,9 +2056,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
+                    interface: "interface";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2198,8 +2198,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2257,10 +2257,10 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2298,9 +2298,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
+                    interface: "interface";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2440,8 +2440,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2499,10 +2499,10 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2540,9 +2540,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
+                    interface: "interface";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2682,8 +2682,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2741,10 +2741,10 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2782,9 +2782,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
+                    interface: "interface";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2950,8 +2950,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -3009,10 +3009,10 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3050,9 +3050,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
+                    interface: "interface";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3192,8 +3192,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -3251,10 +3251,10 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3292,9 +3292,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
+                    interface: "interface";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3434,8 +3434,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -3493,10 +3493,10 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3534,9 +3534,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
+                    interface: "interface";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3676,8 +3676,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -3735,10 +3735,10 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3776,9 +3776,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
+                    interface: "interface";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3918,8 +3918,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -3977,10 +3977,10 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -4018,9 +4018,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
+                    interface: "interface";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;

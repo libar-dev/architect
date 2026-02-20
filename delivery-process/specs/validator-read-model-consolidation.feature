@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:ValidatorReadModelConsolidation
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:100
 @libar-docs-effort:3d
 @libar-docs-product-area:Validation
@@ -116,12 +116,12 @@ Feature: Validator Read Model Consolidation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Remove phase tags from 5 utility patterns | pending | 5 TS files (see Files Modified) |
-      | Wire MasterDataset pipeline in main() | pending | src/cli/validate-patterns.ts |
-      | Rewrite validatePatterns() to consume RuntimeMasterDataset | pending | src/cli/validate-patterns.ts |
-      | Delete GherkinPatternInfo and extractGherkinPatternInfo | pending | src/cli/validate-patterns.ts |
-      | Remove unused scanner/extractor imports | pending | src/cli/validate-patterns.ts |
-      | Zero warnings on pnpm validate:patterns | pending | CLI output |
+      | Remove phase tags from 5 utility patterns | complete | 5 TS files (see Files Modified) |
+      | Wire MasterDataset pipeline in main() | complete | src/cli/validate-patterns.ts |
+      | Rewrite validatePatterns() to consume RuntimeMasterDataset | complete | src/cli/validate-patterns.ts |
+      | Delete GherkinPatternInfo and extractGherkinPatternInfo | complete | src/cli/validate-patterns.ts |
+      | Remove unused scanner/extractor imports | complete | src/cli/validate-patterns.ts |
+      | Zero warnings on pnpm validate:patterns | complete | CLI output |
 
   Rule: Validator queries the read model for cross-source matching
 
