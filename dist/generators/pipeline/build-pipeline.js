@@ -25,7 +25,7 @@ import { mergePatterns } from './merge-patterns.js';
 import { loadConfig, formatConfigError } from '../../config/config-loader.js';
 import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../../config/defaults.js';
 import { loadDefaultWorkflow, loadWorkflowFromPath } from '../../config/workflow-loader.js';
-import { transformToMasterDataset, transformToMasterDatasetWithValidation } from './transform-dataset.js';
+import { transformToMasterDataset, transformToMasterDatasetWithValidation, } from './transform-dataset.js';
 import { Result } from '../../types/result.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // Pipeline Factory
