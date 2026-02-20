@@ -121,6 +121,8 @@ export interface ValidateCLIConfig {
   magicCommentThreshold: number;
   /** Show version */
   version: boolean;
+  /** Show info-level messages in pretty output */
+  verbose: boolean;
 }
 
 /**
@@ -142,6 +144,7 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ValidateCLICo
     megaFeatureLineThreshold: DEFAULT_THRESHOLDS.megaFeatureLineThreshold,
     magicCommentThreshold: DEFAULT_THRESHOLDS.magicCommentThreshold,
     version: false,
+    verbose: false,
   };
 
   for (let i = 0; i < argv.length; i++) {
@@ -230,6 +233,8 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ValidateCLICo
       config.magicCommentThreshold = threshold;
     } else if (arg === '--version' || arg === '-v') {
       config.version = true;
+    } else if (arg === '--verbose') {
+      config.verbose = true;
     } else if (arg?.startsWith('-') === true) {
       console.warn(`Warning: Unknown flag '${arg}' ignored`);
     }
@@ -254,6 +259,7 @@ Options:
   -e, --exclude <pattern>     Glob pattern to exclude (repeatable)
   -b, --base-dir <dir>        Base directory for paths (default: cwd)
   --strict                    Treat warnings as errors (exit 2 on warnings)
+  --verbose                   Show info-level messages (hidden by default)
   -f, --format <type>         Output format: "pretty" (default) or "json"
   -h, --help                  Show this help message
   -v, --version               Show version number
@@ -576,7 +582,7 @@ export function validatePatterns(dataset: RuntimeMasterDataset): ValidationSumma
 /**
  * Format summary for pretty output
  */
-function formatPretty(summary: ValidationSummary): string {
+function formatPretty(summary: ValidationSummary, verbose = false): string {
   const lines: string[] = [];
 
   lines.push('Pattern Validation Summary');
@@ -616,7 +622,7 @@ function formatPretty(summary: ValidationSummary): string {
     lines.push('');
   }
 
-  if (infos.length > 0) {
+  if (infos.length > 0 && verbose) {
     lines.push(`Info (${infos.length}):`);
     for (const issue of infos) {
       lines.push(`  [INFO]  ${issue.message}`);
@@ -761,7 +767,7 @@ async function main(): Promise<void> {
 
     // Output cross-source results
     if (config.format === 'pretty') {
-      console.log(formatPretty(summary));
+      console.log(formatPretty(summary, config.verbose));
     }
 
     // Run DoD validation if enabled
