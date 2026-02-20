@@ -31,20 +31,12 @@ import { handleCliError } from './error-handler.js';
 import { getPatternName } from '../api/pattern-helpers.js';
 import { scanPatterns } from '../scanner/index.js';
 import { scanGherkinFiles } from '../scanner/gherkin-scanner.js';
-import { extractPatterns } from '../extractor/doc-extractor.js';
-import {
-  extractPatternsFromGherkin,
-  computeHierarchyChildren,
-} from '../extractor/gherkin-extractor.js';
-import { mergePatterns } from '../generators/orchestrator.js';
 import {
   loadConfig,
   applyProjectSourceDefaults,
   formatConfigError,
 } from '../config/config-loader.js';
-import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../config/defaults.js';
-import { loadDefaultWorkflow } from '../config/workflow-loader.js';
-import { transformToMasterDatasetWithValidation } from '../generators/pipeline/index.js';
+import { buildMasterDataset } from '../generators/pipeline/index.js';
 import {
   ScannerConfigSchema,
   createJsonOutputCodec,
@@ -717,22 +709,32 @@ async function main(): Promise<void> {
       console.log('');
     }
 
-    // Step 1: Scan TypeScript files
+    // Build MasterDataset via shared pipeline factory (DD-7)
+    const pipelineResult = await buildMasterDataset({
+      input: config.input,
+      features: config.features,
+      baseDir: config.baseDir,
+      mergeConflictStrategy: 'concatenate',
+      ...(config.exclude.length > 0 ? { exclude: config.exclude } : {}),
+    });
+    if (!pipelineResult.ok) {
+      throw new Error(
+        `Pipeline error [${pipelineResult.error.step}]: ${pipelineResult.error.message}`
+      );
+    }
+    const { dataset } = pipelineResult.value;
+
+    // Raw scans for stage-1 consumers (DoD validation, anti-pattern detection)
+    // These correctly use scanned file data, not the MasterDataset — see DD-7
     const scannerConfig = ScannerConfigSchema.parse({
       patterns: config.input,
       exclude: config.exclude.length > 0 ? config.exclude : undefined,
       baseDir: config.baseDir,
     });
-
     const scanResult = await scanPatterns(scannerConfig, registry);
     if (!scanResult.ok) {
       throw new Error('Unexpected scan failure');
     }
-
-    // Step 2: Extract TypeScript patterns
-    const extractionResult = extractPatterns(scanResult.value.files, config.baseDir, registry);
-
-    // Step 3: Scan Gherkin files
     const gherkinScanResult = await scanGherkinFiles({
       patterns: config.features,
       baseDir: config.baseDir,
@@ -740,35 +742,6 @@ async function main(): Promise<void> {
     if (!gherkinScanResult.ok) {
       throw new Error('Unexpected Gherkin scan failure');
     }
-
-    // Step 4: Extract Gherkin patterns (full extraction, not lossy)
-    const gherkinResult = extractPatternsFromGherkin(gherkinScanResult.value.files, {
-      baseDir: config.baseDir,
-      tagRegistry: registry,
-      scenariosAsUseCases: true,
-    });
-
-    // Step 5: Merge patterns
-    // mergePatterns() rejects same-name patterns across sources (designed for doc generation).
-    // The validator legitimately compares same-name cross-source patterns, so we fall back
-    // to concatenation when merge detects conflicts. The MasterDataset's bySource views
-    // still correctly separate TS vs Gherkin patterns regardless. (DD-1)
-    const mergeResult = mergePatterns(extractionResult.patterns, gherkinResult.patterns);
-    const mergedPatterns = mergeResult.ok
-      ? mergeResult.value
-      : [...extractionResult.patterns, ...gherkinResult.patterns];
-
-    // Step 6: Compute hierarchy children
-    const allPatterns = computeHierarchyChildren(mergedPatterns);
-
-    // Step 7: Load workflow and transform to MasterDataset
-    const workflow = loadDefaultWorkflow();
-    const { dataset } = transformToMasterDatasetWithValidation({
-      patterns: allPatterns,
-      tagRegistry: registry,
-      workflow,
-      contextInferenceRules: DEFAULT_CONTEXT_INFERENCE_RULES,
-    });
 
     // Warn if no patterns found (common misconfiguration)
     if (dataset.bySource.typescript.length === 0) {

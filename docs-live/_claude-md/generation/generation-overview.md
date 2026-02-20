@@ -29,6 +29,25 @@ Detail Level: Compact summary
 
 === BEHAVIOR SPECIFICATIONS ===
 
+--- ADR006SingleReadModelArchitecture ---
+
+| Rule                                                      | Description                                                                                                            |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| All feature consumers query the read model, not raw state | **Invariant:** Code that needs pattern relationships, status groupings,<br> cross-source resolution, or dependency...  |
+| No lossy local types                                      | **Invariant:** Consumers do not define local DTOs that duplicate and<br> discard fields from ExtractedPattern. If a... |
+| Relationship resolution is computed once                  | **Invariant:** Forward relationships (uses, dependsOn, implementsPatterns)<br> and reverse lookups (usedBy,...         |
+| Three named anti-patterns                                 | **Invariant:** These are recognized violations, serving as review criteria<br> for new code and refactoring targets... |
+
+--- ADR005CodecBasedMarkdownRendering ---
+
+| Rule                                                              | Description                                                                                                           |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Codecs implement a decode-only contract                           | **Invariant:** Every codec is a pure function that accepts a MasterDataset<br> and returns a RenderableDocument....   |
+| RenderableDocument is a typed intermediate representation         | **Invariant:** RenderableDocument contains a title, an ordered array of<br> SectionBlock elements, and an optional... |
+| CompositeCodec assembles documents from child codecs              | **Invariant:** CompositeCodec accepts an array of child codecs and<br> produces a single RenderableDocument by...     |
+| ADR content comes from both Feature description and Rule prefixes | **Invariant:** ADR structured content (Context, Decision, Consequences)<br> can appear in two locations within a...   |
+| The markdown renderer is codec-agnostic                           | **Invariant:** The renderer accepts any RenderableDocument regardless of<br> which codec produced it. Rendering...    |
+
 --- UniversalDocGeneratorRobustness ---
 
 | Rule                                                              | Description                                                                                                                |
@@ -162,25 +181,6 @@ Detail Level: Compact summary
 | Sequence diagrams render interaction flows                   | **Invariant:** Sequence diagrams must render interaction flows (command flow,<br> saga flow) showing step-by-step...     |
 
 --- ArchitectureDelta ---
-
---- ADR006SingleReadModelArchitecture ---
-
-| Rule                                                      | Description                                                                                                            |
-| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| All feature consumers query the read model, not raw state | **Invariant:** Code that needs pattern relationships, status groupings,<br> cross-source resolution, or dependency...  |
-| No lossy local types                                      | **Invariant:** Consumers do not define local DTOs that duplicate and<br> discard fields from ExtractedPattern. If a... |
-| Relationship resolution is computed once                  | **Invariant:** Forward relationships (uses, dependsOn, implementsPatterns)<br> and reverse lookups (usedBy,...         |
-| Three named anti-patterns                                 | **Invariant:** These are recognized violations, serving as review criteria<br> for new code and refactoring targets... |
-
---- ADR005CodecBasedMarkdownRendering ---
-
-| Rule                                                              | Description                                                                                                           |
-| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Codecs implement a decode-only contract                           | **Invariant:** Every codec is a pure function that accepts a MasterDataset<br> and returns a RenderableDocument....   |
-| RenderableDocument is a typed intermediate representation         | **Invariant:** RenderableDocument contains a title, an ordered array of<br> SectionBlock elements, and an optional... |
-| CompositeCodec assembles documents from child codecs              | **Invariant:** CompositeCodec accepts an array of child codecs and<br> produces a single RenderableDocument by...     |
-| ADR content comes from both Feature description and Rule prefixes | **Invariant:** ADR structured content (Context, Decision, Consequences)<br> can appear in two locations within a...   |
-| The markdown renderer is codec-agnostic                           | **Invariant:** The renderer accepts any RenderableDocument regardless of<br> which codec produced it. Rendering...    |
 
 --- TestContentBlocks ---
 

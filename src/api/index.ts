@@ -147,5 +147,9 @@ export {
 export type { CoverageReport } from './coverage-analyzer.js';
 export { analyzeCoverage, findUnannotatedFiles, findUnusedTaxonomy } from './coverage-analyzer.js';
 
+// Business Rules Query
+export type { RulesFilters, RuleOutput, RulesQueryResult } from './rules-query.js';
+export { queryBusinessRules } from './rules-query.js';
+
 // Pattern Summarization (extended)
 export { deriveSource } from './summarize.js';

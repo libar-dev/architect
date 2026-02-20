@@ -37,3 +37,14 @@ export {
   type DanglingReference,
   type TransformResult,
 } from './transform-dataset.js';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Pipeline Factory
+// ═══════════════════════════════════════════════════════════════════════════
+
+export {
+  buildMasterDataset,
+  type PipelineOptions,
+  type PipelineResult,
+  type PipelineError,
+} from './build-pipeline.js';

@@ -20,4 +20,5 @@
  * NOTE: Report codecs have been replaced by RDM codecs in src/renderable/codecs/
  */
 export { transformToMasterDataset, transformToMasterDatasetWithValidation, completionPercentage, isFullyCompleted, type RawDataset, type RuntimeMasterDataset, type ContextInferenceRule, type ValidationSummary, type MalformedPattern, type DanglingReference, type TransformResult, } from './transform-dataset.js';
+export { buildMasterDataset, type PipelineOptions, type PipelineResult, type PipelineError, } from './build-pipeline.js';
 //# sourceMappingURL=index.d.ts.map

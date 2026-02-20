@@ -35,15 +35,8 @@
  */
 import * as path from 'path';
 import * as fs from 'fs';
-import { loadConfig, applyProjectSourceDefaults, formatConfigError, } from '../config/config-loader.js';
-import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../config/defaults.js';
-import { scanPatterns } from '../scanner/index.js';
-import { extractPatterns } from '../extractor/doc-extractor.js';
-import { scanGherkinFiles } from '../scanner/gherkin-scanner.js';
-import { extractPatternsFromGherkin, computeHierarchyChildren, } from '../extractor/gherkin-extractor.js';
-import { mergePatterns } from '../generators/orchestrator.js';
-import { loadDefaultWorkflow, loadWorkflowFromPath } from '../config/workflow-loader.js';
-import { transformToMasterDatasetWithValidation } from '../generators/pipeline/index.js';
+import { applyProjectSourceDefaults } from '../config/config-loader.js';
+import { buildMasterDataset, } from '../generators/pipeline/index.js';
 import { createProcessStateAPI } from '../api/process-state.js';
 import { createSuccess, createError, QueryApiError } from '../api/types.js';
 import { handleCliError } from './error-handler.js';
@@ -59,8 +52,7 @@ import { analyzeCoverage, findUnannotatedFiles } from '../api/coverage-analyzer.
 import { validateScope, formatScopeValidation } from '../api/scope-validator.js';
 import { generateHandoff, formatHandoff, } from '../api/handoff-generator.js';
 import { execSync } from 'child_process';
-import { parseBusinessRuleAnnotations } from '../renderable/codecs/helpers.js';
-import { deduplicateScenarioNames } from '../renderable/codecs/business-rules.js';
+import { queryBusinessRules } from '../api/rules-query.js';
 // =============================================================================
 // Argument Parsing
 // =============================================================================
@@ -380,72 +372,22 @@ function applyConfigDefaultsFallback(config) {
         }
     }
 }
+// =============================================================================
+// Pipeline
+// =============================================================================
 async function buildPipeline(config) {
-    const baseDir = path.resolve(config.baseDir);
-    // Step 1: Load configuration
-    const configResult = await loadConfig(baseDir);
-    if (!configResult.ok) {
-        console.error(`Config error: ${formatConfigError(configResult.error)}`);
-        process.exit(1);
-    }
-    const registry = configResult.value.instance.registry;
-    // Step 2: Scan TypeScript source files
-    const scanResult = await scanPatterns({ patterns: config.input, baseDir }, registry);
-    if (!scanResult.ok) {
-        console.error(`Failed to scan source files: ${String(scanResult.error)}`);
-        process.exit(1);
-    }
-    const { files: scannedFiles } = scanResult.value;
-    // Step 3: Extract patterns from TypeScript
-    const extraction = extractPatterns(scannedFiles, baseDir, registry);
-    // Step 4: Scan and extract Gherkin patterns
-    let gherkinPatterns = [];
-    if (config.features.length > 0) {
-        const gherkinScanResult = await scanGherkinFiles({
-            patterns: config.features,
-            baseDir,
-        });
-        if (gherkinScanResult.ok) {
-            const gherkinResult = extractPatternsFromGherkin(gherkinScanResult.value.files, {
-                baseDir,
-                tagRegistry: registry,
-                scenariosAsUseCases: true,
-            });
-            gherkinPatterns = gherkinResult.patterns;
-        }
-        else {
-            console.error(`Warning: Failed to scan Gherkin files: ${String(gherkinScanResult.error)}`);
-        }
-    }
-    // Step 5: Merge patterns (conflict detection)
-    const mergeResult = mergePatterns(extraction.patterns, gherkinPatterns);
-    if (!mergeResult.ok) {
-        console.error(`Merge error: ${mergeResult.error}`);
-        process.exit(1);
-    }
-    // Step 6: Compute hierarchy children
-    const allPatterns = computeHierarchyChildren(mergeResult.value);
-    // Step 7: Load workflow configuration
-    let workflow;
-    if (config.workflowPath) {
-        const workflowResult = await loadWorkflowFromPath(config.workflowPath);
-        if (!workflowResult.ok) {
-            console.error(`Workflow error: ${workflowResult.error.message}`);
-            process.exit(1);
-        }
-        workflow = workflowResult.value;
-    }
-    else {
-        workflow = loadDefaultWorkflow();
-    }
-    // Step 8: Transform to MasterDataset (with validation for graph health commands)
-    const { dataset: masterDataset, validation } = transformToMasterDatasetWithValidation({
-        patterns: allPatterns,
-        tagRegistry: registry,
-        workflow,
-        contextInferenceRules: DEFAULT_CONTEXT_INFERENCE_RULES,
+    const result = await buildMasterDataset({
+        input: config.input,
+        features: config.features,
+        baseDir: config.baseDir,
+        mergeConflictStrategy: 'fatal',
+        ...(config.workflowPath !== null ? { workflowPath: config.workflowPath } : {}),
     });
-    return { dataset: masterDataset, validation };
+    if (!result.ok) {
+        console.error(`Pipeline error [${result.error.step}]: ${result.error.message}`);
+        process.exit(1);
+    }
+    return result.value;
 }
 // =============================================================================
 // Subcommand Handlers
@@ -827,6 +769,9 @@ function handlePdr(dataset, subArgs) {
         references,
     };
 }
+// =============================================================================
+// Business Rules Handler
+// =============================================================================
 function parseRulesFilters(subArgs) {
     let productArea = null;
     let patternName = null;
@@ -856,138 +801,28 @@ function parseRulesFilters(subArgs) {
 }
 function handleRules(ctx) {
     const filters = parseRulesFilters(ctx.subArgs);
-    // Collect patterns with rules, applying filters
-    let patternsWithRules = ctx.dataset.patterns.filter((p) => p.rules !== undefined && p.rules.length > 0);
-    if (filters.productArea !== null) {
-        const area = filters.productArea.toLowerCase();
-        patternsWithRules = patternsWithRules.filter((p) => p.productArea?.toLowerCase() === area);
-    }
-    if (filters.patternName !== null) {
-        const name = filters.patternName.toLowerCase();
-        patternsWithRules = patternsWithRules.filter((p) => p.name.toLowerCase() === name);
-    }
-    // Build structured output grouped by product area → phase → feature
-    const areaMap = new Map();
-    let totalRules = 0;
-    let totalInvariants = 0;
-    const allRuleNames = [];
-    for (const pattern of patternsWithRules) {
-        // Fix #6: Match codec's default product area ('Platform', not 'Uncategorized')
-        const area = pattern.productArea ?? 'Platform';
-        const phase = pattern.phase !== undefined
-            ? `Phase ${String(pattern.phase)}`
-            : (pattern.release ?? 'Uncategorized');
-        if (!areaMap.has(area)) {
-            areaMap.set(area, { features: new Map() });
-        }
-        const areaGroup = areaMap.get(area);
-        if (areaGroup === undefined) {
-            throw new Error(`Invariant violation: areaMap missing key "${area}" after set`);
-        }
-        const featureKey = `${phase}::${pattern.name}`;
-        if (!areaGroup.features.has(featureKey)) {
-            areaGroup.features.set(featureKey, {
-                pattern: pattern.name,
-                source: pattern.source.file,
-                phase,
-                rules: [],
-            });
-        }
-        const feature = areaGroup.features.get(featureKey);
-        if (feature === undefined) {
-            throw new Error(`Invariant violation: features map missing key "${featureKey}" after set`);
-        }
-        // rules guaranteed non-empty by patternsWithRules filter above
-        if (pattern.rules === undefined) {
-            throw new Error(`Invariant violation: pattern "${pattern.name}" passed rules filter but has no rules`);
-        }
-        for (const rule of pattern.rules) {
-            // Fix #2: Wrap annotation parsing in try-catch for structured error
-            let annotations;
-            try {
-                annotations = parseBusinessRuleAnnotations(rule.description);
-            }
-            catch (err) {
-                throw new QueryApiError('INVALID_ARGUMENT', `Failed to parse rule "${rule.name}" in "${pattern.name}": ${err instanceof Error ? err.message : String(err)}`);
-            }
-            if (filters.onlyInvariants && annotations.invariant === undefined) {
-                continue;
-            }
-            // Fix #1: Merge scenarioNames (authoritative) with verifiedBy (manual annotation)
-            feature.rules.push({
-                name: rule.name,
-                invariant: annotations.invariant,
-                rationale: annotations.rationale,
-                verifiedBy: deduplicateScenarioNames(rule.scenarioNames, annotations.verifiedBy),
-                scenarioCount: rule.scenarioCount,
-            });
-            totalRules++;
-            if (annotations.invariant !== undefined) {
-                totalInvariants++;
-            }
-            allRuleNames.push(rule.name);
-        }
-    }
-    // Fix #5: Provide hint when filters match nothing (consistent with peer handlers)
-    if (totalRules === 0 && (filters.productArea !== null || filters.patternName !== null)) {
-        const availableAreas = [
-            ...new Set(ctx.dataset.patterns
-                .filter((p) => p.rules !== undefined && p.rules.length > 0)
-                .map((p) => p.productArea ?? 'Platform')),
-        ];
-        const hint = filters.productArea !== null
-            ? `No rules found for product area "${filters.productArea}". Areas with rules: ${availableAreas.join(', ')}`
-            : `No rules found for pattern "${String(filters.patternName)}".`;
+    const result = queryBusinessRules(ctx.dataset, filters);
+    // Empty-result hint (delegated from query, applied per output modifier)
+    if (result.totalRules === 0 && (filters.productArea !== null || filters.patternName !== null)) {
         if (ctx.modifiers.count) {
-            return { totalRules: 0, totalInvariants: 0, hint };
+            return { totalRules: 0, totalInvariants: 0, hint: result.hint };
         }
         if (ctx.modifiers.namesOnly) {
-            return { names: [], hint };
+            return { names: [], hint: result.hint };
         }
-        return { productAreas: [], totalRules: 0, totalInvariants: 0, hint };
+        return { productAreas: [], totalRules: 0, totalInvariants: 0, hint: result.hint };
     }
-    // Handle modifiers
+    // Handle output modifiers
     if (ctx.modifiers.count) {
-        return { totalRules, totalInvariants };
+        return { totalRules: result.totalRules, totalInvariants: result.totalInvariants };
     }
     if (ctx.modifiers.namesOnly) {
-        return allRuleNames;
+        return result.allRuleNames;
     }
-    // Build final grouped output
-    const productAreas = [...areaMap.entries()].map(([areaName, areaGroup]) => {
-        // Group features by phase
-        const phaseMap = new Map();
-        let areaRuleCount = 0;
-        let areaInvariantCount = 0;
-        for (const feature of areaGroup.features.values()) {
-            if (feature.rules.length === 0)
-                continue;
-            if (!phaseMap.has(feature.phase)) {
-                phaseMap.set(feature.phase, []);
-            }
-            phaseMap.get(feature.phase)?.push({
-                pattern: feature.pattern,
-                source: feature.source,
-                rules: feature.rules,
-            });
-            areaRuleCount += feature.rules.length;
-            areaInvariantCount += feature.rules.filter((r) => r.invariant !== undefined).length;
-        }
-        const phases = [...phaseMap.entries()].map(([phaseName, features]) => ({
-            phase: phaseName,
-            features,
-        }));
-        return {
-            productArea: areaName,
-            ruleCount: areaRuleCount,
-            invariantCount: areaInvariantCount,
-            phases,
-        };
-    });
     return {
-        productAreas: productAreas.filter((a) => a.ruleCount > 0),
-        totalRules,
-        totalInvariants,
+        productAreas: result.productAreas,
+        totalRules: result.totalRules,
+        totalInvariants: result.totalInvariants,
     };
 }
 // =============================================================================

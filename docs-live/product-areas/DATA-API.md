@@ -353,6 +353,134 @@ ArchIndexSchema = z.object({
 
 ## Behavior Specifications
 
+### RulesQueryModule
+
+[View RulesQueryModule source](src/api/rules-query.ts)
+
+## RulesQueryModule - Business Rules Domain Query
+
+Pure query function for business rules extracted from Gherkin Rule: blocks.
+Groups rules by product area, phase, and feature pattern.
+
+Target: src/api/rules-query.ts
+See: DD-4 (ProcessAPILayeredExtraction)
+
+### PipelineFactory
+
+[View PipelineFactory source](src/generators/pipeline/build-pipeline.ts)
+
+## PipelineFactory - Shared Pipeline Orchestration
+
+Shared factory that executes the 8-step scan-extract-merge-transform pipeline.
+Replaces inline pipeline orchestration in CLI consumers.
+
+Target: src/generators/pipeline/build-pipeline.ts
+See: ADR-006 (Single Read Model Architecture)
+See: DD-1, DD-2 (ProcessAPILayeredExtraction)
+
+### PDR001SessionWorkflowCommands
+
+[View PDR001SessionWorkflowCommands source](delivery-process/decisions/pdr-001-session-workflow-commands.feature)
+
+**Context:**
+DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session
+readiness check) and `handoff` (session-end state summary) CLI subcommands.
+Seven design decisions affect how these commands behave.
+
+**Decision:**
+Seven design decisions (DD-1 through DD-7) captured as Rules below.
+
+<details>
+<summary>DD-1 - Text output with section markers</summary>
+
+#### DD-1 - Text output with section markers
+
+Both scope-validate and handoff return string from the router, using
+=== SECTION === markers. Follows the dual output path where text
+commands bypass JSON.stringify.
+
+</details>
+
+<details>
+<summary>DD-2 - Git integration is opt-in via --git flag</summary>
+
+#### DD-2 - Git integration is opt-in via --git flag
+
+The handoff command accepts an optional --git flag. The CLI handler
+calls git diff and passes file list to the pure generator function.
+No shell dependency in domain logic.
+
+</details>
+
+<details>
+<summary>DD-3 - Session type inferred from FSM status</summary>
+
+#### DD-3 - Session type inferred from FSM status
+
+Handoff infers session type from pattern's current FSM status.
+An explicit --session flag overrides inference.
+
+| Status    | Inferred Session |
+| --------- | ---------------- |
+| roadmap   | design           |
+| active    | implement        |
+| completed | review           |
+| deferred  | design           |
+
+</details>
+
+<details>
+<summary>DD-4 - Severity levels match Process Guard model</summary>
+
+#### DD-4 - Severity levels match Process Guard model
+
+Scope validation uses three severity levels:
+
+    The --strict flag promotes WARN to BLOCKED.
+
+| Severity | Meaning                   |
+| -------- | ------------------------- |
+| PASS     | Check passed              |
+| BLOCKED  | Hard prerequisite missing |
+| WARN     | Recommendation not met    |
+
+</details>
+
+<details>
+<summary>DD-5 - Current date only for handoff</summary>
+
+#### DD-5 - Current date only for handoff
+
+Handoff always uses the current date. No --date flag.
+
+</details>
+
+<details>
+<summary>DD-6 - Both positional and flag forms for scope type</summary>
+
+#### DD-6 - Both positional and flag forms for scope type
+
+scope-validate accepts scope type as both positional argument
+and --type flag.
+
+</details>
+
+<details>
+<summary>DD-7 - Co-located formatter functions (2 scenarios)</summary>
+
+#### DD-7 - Co-located formatter functions
+
+Each module (scope-validator.ts, handoff-generator.ts) exports
+both the data builder and the text formatter. Simpler than the
+context-assembler/context-formatter split.
+
+**Verified by:**
+
+- scope-validate outputs structured text
+- Active pattern infers implement session
+
+</details>
+
 ### ProcessStateAPIRelationshipQueries
 
 [View ProcessStateAPIRelationshipQueries source](delivery-process/specs/process-state-api-relationship-queries.feature)
@@ -630,80 +758,226 @@ Add a CLI command `pnpm process:query` that exposes key ProcessStateAPI methods:
 [View ProcessAPILayeredExtraction source](delivery-process/specs/process-api-layered-extraction.feature)
 
 **Problem:**
-`process-api.ts` is 1,700 lines containing three distinct responsibilities
-in one file: CLI shell (arg parsing, help, output formatting), pipeline
-orchestration (scan, extract, transform), and subcommand domain logic
-(rules grouping, stub resolution, scope validation).
+`process-api.ts` is 1,700 lines containing two remaining architectural
+violations of ADR-006:
 
-The subcommand handlers are feature consumers of the MasterDataset —
-per ADR-006 they belong in the API layer, not the CLI layer. Some already
-have API counterparts (`context-assembler.ts`, `arch-queries.ts`,
-`scope-validator.ts`), but others (`handleRules`, `handleStubs`,
-`handleDecisions`, `handlePdr`) do domain logic inline in the CLI file.
+1. **Parallel Pipeline**: `buildPipeline()` (lines 488-561) wires the
+   same 8-step scan-extract-transform sequence that `validate-patterns.ts`
+   and `orchestrator.ts` also wire independently. Three consumers, three
+   copies of identical pipeline orchestration code.
 
-This means:
+2. **Inline Domain Logic**: `handleRules()` (lines 1096-1279, 184 lines)
+   builds nested `Map` hierarchies (area -> phase -> feature -> rules),
+   parses business rule annotations via codec-layer imports
+   (`parseBusinessRuleAnnotations`, `deduplicateScenarioNames`), and
+   computes aggregate statistics. This is query logic that belongs in the
+   API layer, not the CLI file.
 
-- Domain logic is only accessible via CLI (not programmatically testable)
-- `handleRules()` alone is 183 lines building its own Map hierarchies
-- Adding a new query requires modifying the CLI file
-- Pipeline orchestration is duplicated between process-api.ts,
-  orchestrator.ts, and validate-patterns.ts (three consumers wiring
-  the same scan-extract-transform sequence)
+Most subcommand handlers already delegate correctly. Of the 16 handlers
+in process-api.ts, 13 are thin wrappers over `src/api/` modules:
+
+| Handler | Delegates To |
+| handleStatus | ProcessStateAPI methods |
+| handleQuery | Dynamic API method dispatch |
+| handlePattern | ProcessStateAPI methods |
+| handleList | output-pipeline.ts |
+| handleSearch | fuzzy-match.ts, pattern-helpers.ts |
+| handleStubs | stub-resolver.ts |
+| handleDecisions | stub-resolver.ts, pattern-helpers.ts |
+| handlePdr | stub-resolver.ts |
+| handleContext | context-assembler.ts, context-formatter.ts |
+| handleFiles | context-assembler.ts, context-formatter.ts |
+| handleDepTreeCmd | context-assembler.ts, context-formatter.ts |
+| handleOverviewCmd | context-assembler.ts, context-formatter.ts |
+| handleScopeValidate | scope-validator.ts |
+
+The remaining violations are:
+
+| Handler | Issue | Lines |
+| handleRules | Inline domain logic: nested Maps, codec imports | 184 |
+| handleArch | Partial: 6 sub-handlers delegate, 3 have trivial inline projections | 121 |
+| buildPipeline | Parallel Pipeline: duplicates 8-step sequence | 74 |
 
 **Solution:**
-Extract process-api.ts into three clean layers that mirror the project's
-own architecture (ADR-006 boundary: orchestration vs feature consumption):
+Extract the two remaining violations into their proper layers:
 
-| Layer | Responsibility | Location |
-| CLI Shell | Arg parsing, help text, output formatting, error envelope | src/cli/process-api.ts (slim) |
-| Pipeline Factory | Shared scan-extract-transform sequence | src/generators/pipeline/ (reusable) |
-| Query Handlers | Domain logic consuming MasterDataset | src/api/ modules |
+| Layer | Extraction | Location |
+| Pipeline Factory | Shared scan-extract-transform sequence from buildPipeline | src/generators/pipeline/build-pipeline.ts |
+| Query Handler | Business rules domain logic from handleRules | src/api/rules-query.ts |
 
-The CLI becomes a thin routing layer: parse args, call pipeline factory,
-route subcommand to API module, format output. No domain logic in the CLI.
+The CLI retains its routing responsibility: parse args, call pipeline
+factory, route subcommand to API module, format output.
 
-This also enables the ValidatorReadModelConsolidation spec — once the
-pipeline factory exists, validate-patterns.ts can consume it instead of
-wiring its own mini-pipeline.
+**Design Decisions:**
+
+DD-1: Pipeline factory location and return type.
+Location: `src/generators/pipeline/build-pipeline.ts`, re-exported from
+`src/generators/pipeline/index.ts`. The factory returns
+`Result<PipelineResult, PipelineError>` so each consumer can map errors
+to its own strategy (process-api calls `process.exit(1)`,
+validate-patterns throws, orchestrator returns `Result.err()`).
+`PipelineResult` contains `{ dataset: RuntimeMasterDataset, validation:
+  ValidationSummary }`. The `TagRegistry` is accessible via
+`dataset.tagRegistry` and does not need a separate field.
+
+DD-2: Merge conflict strategy as a pipeline option.
+The factory accepts `mergeConflictStrategy: 'fatal' | 'concatenate'`.
+`'fatal'` returns `Result.err()` on conflicts (process-api behavior).
+`'concatenate'` falls back to `[...ts, ...gherkin]` (validate-patterns
+behavior per DD-1 in ValidatorReadModelConsolidation). This is the most
+significant semantic difference between consumers.
+
+DD-3: Factory interface designed for future orchestrator migration.
+The `PipelineOptions` interface includes `exclude`, `contextInferenceRules`,
+and `includeValidation` fields that orchestrator.ts needs. However, the
+actual orchestrator migration is deferred to a follow-up spec. The
+orchestrator has 155 lines of pipeline with structured warning collection
+(scan errors, extraction errors, Gherkin parse errors as
+`GenerationWarning[]`). Integrating this into the factory adds risk to a
+first extraction. This spec migrates process-api.ts and
+validate-patterns.ts only.
+
+DD-4: handleRules domain logic extracts to `src/api/rules-query.ts`.
+The new module exports `queryBusinessRules(dataset: RuntimeMasterDataset,
+  filters: RulesFilters): RulesQueryResult`. The `RulesFilters` interface,
+`RuleOutput` interface, and all nested Map construction move to this module.
+The `parseBusinessRuleAnnotations` and `deduplicateScenarioNames` imports
+move from CLI to API layer, which is the correct placement per ADR-006.
+The CLI handler becomes: parse filters from args, call
+`queryBusinessRules`, apply output modifiers, return.
+
+DD-5: handleStubs, handleDecisions, handlePdr already delegate correctly.
+These handlers are thin CLI wrappers over `stub-resolver.ts` functions
+(`findStubPatterns`, `resolveStubs`, `groupStubsByPattern`,
+`extractDecisionItems`, `findPdrReferences`). The residual CLI code is
+argument parsing and error formatting, which is CLI-shell responsibility.
+No extraction needed. The original deliverables are marked n/a.
+
+DD-6: handleArch inline logic stays in CLI.
+The `roles`, `context`, and `layer` listing sub-handlers have 3-5 line
+`.map()` projections over `archIndex` pre-computed views. These are trivial
+view formatting, not domain logic. The `dangling`, `orphans`, `blocking`,
+`neighborhood`, `compare`, and `coverage` sub-handlers already delegate
+to `arch-queries.ts` and `context-assembler.ts`. Extracting 3-line `.map()`
+calls would add indirection with no architectural benefit.
+
+DD-7: validate-patterns.ts partially adopts the pipeline factory.
+The factory replaces the MasterDataset construction pipeline (steps 1-8).
+DoD validation and anti-pattern detection remain as direct stage-1
+consumers using raw scanned files (`scanResult.value.files`,
+`gherkinScanResult.value.files`). This is correct per ADR-006: the
+exception for `lint-patterns.ts` ("pure stage-1 consumer, no
+relationships, no cross-source resolution, direct scanner consumption is
+correct") applies equally to DoD validation (checking deliverable
+completeness on raw Gherkin) and anti-pattern detection (checking tag
+placement on raw scanned files).
+
+DD-8: Line count invariant replaced with qualitative criterion.
+The original 500-line target for process-api.ts is unrealistic. After
+extracting buildPipeline (74 lines) and handleRules (184 lines), the
+file is ~1,400 lines. The remaining code is legitimate CLI responsibility:
+parseArgs (134), showHelp (143), routeSubcommand (96), main (59), 13 thin
+delegation handlers (~350), config defaults (50), types (60), imports (120).
+Reaching 500 lines would require extracting arg parsing and help text to
+separate files, which is file hygiene, not architectural layering.
+The invariant becomes: no Map/Set construction in handler functions, each
+domain query delegates to an `src/api/` module.
+
+**Implementation Order:**
+
+| Step | What | Verification |
+| 1 | Create src/generators/pipeline/build-pipeline.ts with PipelineOptions and factory | pnpm typecheck |
+| 2 | Export from src/generators/pipeline/index.ts barrel | pnpm typecheck |
+| 3 | Migrate process-api.ts buildPipeline to factory call | pnpm typecheck, pnpm process:query -- overview |
+| 4 | Remove unused scanner/extractor imports from process-api.ts | pnpm lint |
+| 5 | Migrate validate-patterns.ts MasterDataset pipeline to factory call | pnpm validate:patterns (0 errors, 0 warnings) |
+| 6 | Create src/api/rules-query.ts with queryBusinessRules | pnpm typecheck |
+| 7 | Slim handleRules in process-api.ts to thin delegation | pnpm process:query -- rules |
+| 8 | Export from src/api/index.ts barrel | pnpm typecheck |
+| 9 | Full verification | pnpm build, pnpm test, pnpm lint, pnpm validate:patterns |
+
+**Files Modified:**
+
+| File | Change | Lines Affected |
+| src/generators/pipeline/build-pipeline.ts | NEW: shared pipeline factory | +~100 |
+| src/generators/pipeline/index.ts | Add re-export of build-pipeline | +2 |
+| src/api/rules-query.ts | NEW: business rules query from handleRules | +~200 |
+| src/api/index.ts | Add re-exports for rules-query | +5 |
+| src/cli/process-api.ts | Replace buildPipeline + handleRules with delegations | -~280 net |
+| src/cli/validate-patterns.ts | Replace MasterDataset pipeline with factory call | -~30 net |
+
+**What does NOT change:**
+
+- parseArgs(), showHelp(), routeSubcommand(), main() (CLI shell)
+- handleArch inline logic (trivial projections per DD-6)
+- handleStubs/handleDecisions/handlePdr (already delegate per DD-5)
+- generateEmptyHint (UX concern, correctly in CLI)
+- DoD validation and anti-pattern detection in validate-patterns.ts (stage-1 consumers per DD-7)
+- orchestrator.ts pipeline wiring (deferred per DD-3)
+- parseListFilters, parseRulesFilters (arg parsing, not domain logic)
+- ValidationIssue, ValidationSummary, ValidateCLIConfig (stable API in validate-patterns)
 
 <details>
-<summary>CLI file contains only routing, no domain logic (1 scenarios)</summary>
+<summary>CLI file contains only routing, no domain logic (2 scenarios)</summary>
 
 #### CLI file contains only routing, no domain logic
 
-**Invariant:** `process-api.ts` parses arguments, calls a pipeline factory for the MasterDataset, routes subcommands to API modules, and formats output. It does not build Maps, filter patterns, group data, or resolve relationships.
+**Invariant:** `process-api.ts` parses arguments, calls the pipeline factory for the MasterDataset, routes subcommands to API modules, and formats output. It does not build Maps, filter patterns, group data, or resolve relationships. Thin view projections (3-5 line `.map()` calls over pre-computed archIndex views) are acceptable as formatting.
+
+**Rationale:** Domain logic in the CLI file is only accessible via the command line. Extracting it to `src/api/` makes it programmatically testable, reusable by future consumers (MCP server, watch mode), and aligned with the feature-consumption layer defined in ADR-006.
 
 **Verified by:**
 
-- CLI routing shell
-- Domain logic in API modules
+- No domain data structures in handlers
+- All domain queries delegate
 
 </details>
 
 <details>
-<summary>Pipeline factory is shared across consumers (2 scenarios)</summary>
+<summary>Pipeline factory is shared across CLI consumers (2 scenarios)</summary>
 
-#### Pipeline factory is shared across consumers
+#### Pipeline factory is shared across CLI consumers
 
-**Invariant:** The scan-extract-transform sequence is defined once in a reusable factory. All consumers that need a MasterDataset — orchestrator, process-api, validate-patterns — call the same factory rather than wiring the pipeline independently.
+**Invariant:** The scan-extract-transform sequence is defined once in `src/generators/pipeline/build-pipeline.ts`. CLI consumers that need a MasterDataset call the factory rather than wiring the pipeline independently. The factory accepts `mergeConflictStrategy` to handle behavioral differences between consumers.
+
+**Rationale:** Three consumers (process-api, validate-patterns, orchestrator) independently wire the same 8-step sequence: loadConfig, scanPatterns, extractPatterns, scanGherkinFiles, extractPatternsFromGherkin, mergePatterns, computeHierarchyChildren, transformToMasterDataset. The only semantic difference is merge-conflict handling (fatal vs concatenate). This is a Parallel Pipeline anti-pattern per ADR-006.
 
 **Verified by:**
 
-- Pipeline factory is shared
-- No parallel pipelines
+- CLI consumers use factory
+- Orchestrator migration deferred
 
 </details>
 
 <details>
-<summary>Domain logic lives in API modules (1 scenarios)</summary>
+<summary>Domain logic lives in API modules (2 scenarios)</summary>
 
 #### Domain logic lives in API modules
 
-**Invariant:** Query logic that operates on MasterDataset lives in `src/api/` modules. This makes it programmatically testable, reusable by future consumers (e.g. MCP server, watch mode), and aligned with the feature-consumption layer defined in ADR-006.
+**Invariant:** Query logic that operates on MasterDataset lives in `src/api/` modules. The `rules-query.ts` module provides business rules querying with the same grouping logic that was inline in handleRules: filter by product area and pattern, group by area -> phase -> feature -> rules, parse annotations, compute totals.
+
+**Rationale:** `handleRules` is 184 lines with 5 Map/Set constructions, codec-layer imports (`parseBusinessRuleAnnotations`, `deduplicateScenarioNames`), and a complex 3-level grouping algorithm. This is the last significant inline domain logic in process-api.ts. Moving it to `src/api/` follows the same pattern as the 12 existing API modules (context-assembler, arch-queries, scope-validator, etc.).
 
 **Verified by:**
 
-- Domain logic in API modules
+- rules-query module exports
+- handleRules slim wrapper
+
+</details>
+
+<details>
+<summary>Pipeline factory returns Result for consumer-owned error handling (2 scenarios)</summary>
+
+#### Pipeline factory returns Result for consumer-owned error handling
+
+**Invariant:** The factory returns `Result<PipelineResult, PipelineError>` rather than throwing or calling `process.exit()`. Each consumer maps the error to its own strategy: process-api.ts calls `process.exit(1)`, validate-patterns.ts throws, and orchestrator.ts (future) returns `Result.err()`.
+
+**Rationale:** The current `buildPipeline()` in process-api.ts calls `process.exit(1)` on errors, making it non-reusable. The factory must work across consumers with different error handling models. The Result monad is the project's established pattern for this (see `src/types/result.ts`).
+
+**Verified by:**
+
+- Factory uses Result monad
+- Full verification passes
 
 </details>
 
@@ -1700,106 +1974,113 @@ Extend the `arch` subcommand and add new discovery commands:
 
 </details>
 
-### PDR001SessionWorkflowCommands
+### ProcessStateAPITesting
 
-[View PDR001SessionWorkflowCommands source](delivery-process/decisions/pdr-001-session-workflow-commands.feature)
+[View ProcessStateAPITesting source](tests/features/api/process-state-api.feature)
 
-**Context:**
-DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session
-readiness check) and `handoff` (session-end state summary) CLI subcommands.
-Seven design decisions affect how these commands behave.
+Programmatic interface for querying delivery process state.
+Designed for Claude Code integration and tool automation.
 
-**Decision:**
-Seven design decisions (DD-1 through DD-7) captured as Rules below.
+**Problem:**
 
-<details>
-<summary>DD-1 - Text output with section markers</summary>
+- Markdown generation is not ideal for programmatic access
+- Claude Code needs structured data to answer process questions
+- Multiple queries require redundant parsing of MasterDataset
 
-#### DD-1 - Text output with section markers
+**Solution:**
 
-Both scope-validate and handoff return string from the router, using
-=== SECTION === markers. Follows the dual output path where text
-commands bypass JSON.stringify.
-
-</details>
+- ProcessStateAPI wraps MasterDataset with typed query methods
+- Returns structured data suitable for programmatic consumption
+- Integrates FSM validation for transition checks
 
 <details>
-<summary>DD-2 - Git integration is opt-in via --git flag</summary>
+<summary>Status queries return correct patterns (6 scenarios)</summary>
 
-#### DD-2 - Git integration is opt-in via --git flag
+#### Status queries return correct patterns
 
-The handoff command accepts an optional --git flag. The CLI handler
-calls git diff and passes file list to the pure generator function.
-No shell dependency in domain logic.
+**Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
 
-</details>
-
-<details>
-<summary>DD-3 - Session type inferred from FSM status</summary>
-
-#### DD-3 - Session type inferred from FSM status
-
-Handoff infers session type from pattern's current FSM status.
-An explicit --session flag overrides inference.
-
-| Status    | Inferred Session |
-| --------- | ---------------- |
-| roadmap   | design           |
-| active    | implement        |
-| completed | review           |
-| deferred  | design           |
-
-</details>
-
-<details>
-<summary>DD-4 - Severity levels match Process Guard model</summary>
-
-#### DD-4 - Severity levels match Process Guard model
-
-Scope validation uses three severity levels:
-
-    The --strict flag promotes WARN to BLOCKED.
-
-| Severity | Meaning                   |
-| -------- | ------------------------- |
-| PASS     | Check passed              |
-| BLOCKED  | Hard prerequisite missing |
-| WARN     | Recommendation not met    |
-
-</details>
-
-<details>
-<summary>DD-5 - Current date only for handoff</summary>
-
-#### DD-5 - Current date only for handoff
-
-Handoff always uses the current date. No --date flag.
-
-</details>
-
-<details>
-<summary>DD-6 - Both positional and flag forms for scope type</summary>
-
-#### DD-6 - Both positional and flag forms for scope type
-
-scope-validate accepts scope type as both positional argument
-and --type flag.
-
-</details>
-
-<details>
-<summary>DD-7 - Co-located formatter functions (2 scenarios)</summary>
-
-#### DD-7 - Co-located formatter functions
-
-Each module (scope-validator.ts, handoff-generator.ts) exports
-both the data builder and the text formatter. Simpler than the
-context-assembler/context-formatter split.
+**Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
 
 **Verified by:**
 
-- scope-validate outputs structured text
-- Active pattern infers implement session
+- Get patterns by normalized status
+- Get patterns by FSM status
+- Get current work returns active patterns
+- Get roadmap items returns roadmap and deferred
+- Get status counts
+- Get completion percentage
+
+</details>
+
+<details>
+<summary>Phase queries return correct phase data (4 scenarios)</summary>
+
+#### Phase queries return correct phase data
+
+**Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
+
+**Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
+
+**Verified by:**
+
+- Get patterns by phase
+- Get phase progress
+- Get nonexistent phase returns undefined
+- Get active phases
+
+</details>
+
+<details>
+<summary>FSM queries expose transition validation (4 scenarios)</summary>
+
+#### FSM queries expose transition validation
+
+**Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
+
+**Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
+
+**Verified by:**
+
+- Check valid transition
+- Check invalid transition
+- Get valid transitions from status
+- Get protection info
+
+</details>
+
+<details>
+<summary>Pattern queries find and retrieve pattern data (4 scenarios)</summary>
+
+#### Pattern queries find and retrieve pattern data
+
+**Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
+
+**Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
+
+**Verified by:**
+
+- Find pattern by name (case insensitive)
+- Find nonexistent pattern returns undefined
+- Get patterns by category
+- Get all categories with counts
+
+</details>
+
+<details>
+<summary>Timeline queries group patterns by time (3 scenarios)</summary>
+
+#### Timeline queries group patterns by time
+
+**Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
+
+**Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
+
+**Verified by:**
+
+- Get patterns by quarter
+- Get all quarters
+- Get recently completed sorted by date
 
 </details>
 
@@ -2532,113 +2813,112 @@ Command-line interface for generating documentation from annotated TypeScript.
 
 </details>
 
-### ProcessStateAPITesting
+### StubTaxonomyTagTests
 
-[View ProcessStateAPITesting source](tests/features/api/process-state-api.feature)
-
-Programmatic interface for querying delivery process state.
-Designed for Claude Code integration and tool automation.
+[View StubTaxonomyTagTests source](tests/features/api/stub-integration/taxonomy-tags.feature)
 
 **Problem:**
-
-- Markdown generation is not ideal for programmatic access
-- Claude Code needs structured data to answer process questions
-- Multiple queries require redundant parsing of MasterDataset
+Stub metadata (target path, design session) was stored as plain text
+in JSDoc descriptions, invisible to structured queries.
 
 **Solution:**
+Register libar-docs-target and libar-docs-since as taxonomy tags
+so they flow through the extraction pipeline as structured fields.
 
-- ProcessStateAPI wraps MasterDataset with typed query methods
-- Returns structured data suitable for programmatic consumption
-- Integrates FSM validation for transition checks
+#### Taxonomy tags are registered in the registry
 
-<details>
-<summary>Status queries return correct patterns (6 scenarios)</summary>
+**Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy entries.
 
-#### Status queries return correct patterns
-
-**Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
-
-**Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
+**Rationale:** Unregistered tags would be flagged as unknown by the linter — registration ensures stub metadata tags pass validation alongside standard annotation tags.
 
 **Verified by:**
 
-- Get patterns by normalized status
-- Get patterns by FSM status
-- Get current work returns active patterns
-- Get roadmap items returns roadmap and deferred
-- Get status counts
-- Get completion percentage
+- Target and since tags exist in registry
+
+#### Tags are part of the stub metadata group
+
+**Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry.
+
+**Rationale:** Domain grouping enables the taxonomy codec to render stub metadata tags in their own section — ungrouped tags would be lost in the "Other" category.
+
+**Verified by:**
+
+- Built registry groups target and since as stub tags
+
+### StubResolverTests
+
+[View StubResolverTests source](tests/features/api/stub-integration/stub-resolver.feature)
+
+**Problem:**
+Design session stubs need structured discovery and resolution
+to determine which stubs have been implemented and which remain.
+
+**Solution:**
+StubResolver functions identify, resolve, and group stubs from
+the MasterDataset with filesystem existence checks.
+
+<details>
+<summary>Stubs are identified by path or target metadata (2 scenarios)</summary>
+
+#### Stubs are identified by path or target metadata
+
+**Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath metadata field.
+
+**Rationale:** Dual identification supports both convention-based (directory) and metadata-based (targetPath) stub detection — relying on only one would miss stubs organized differently.
+
+**Verified by:**
+
+- Patterns in stubs directory are identified as stubs
+- Patterns with targetPath are identified as stubs
 
 </details>
 
 <details>
-<summary>Phase queries return correct phase data (4 scenarios)</summary>
+<summary>Stubs are resolved against the filesystem (2 scenarios)</summary>
 
-#### Phase queries return correct phase data
+#### Stubs are resolved against the filesystem
 
-**Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
+**Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the pattern they implement.
 
-**Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
+**Rationale:** Target existence status tells developers whether a stub has been implemented — grouping by pattern enables the "stubs --unresolved" command to show per-pattern implementation gaps.
 
 **Verified by:**
 
-- Get patterns by phase
-- Get phase progress
-- Get nonexistent phase returns undefined
-- Get active phases
+- Resolved stubs show target existence status
+- Stubs are grouped by implementing pattern
 
 </details>
 
 <details>
-<summary>FSM queries expose transition validation (4 scenarios)</summary>
+<summary>Decision items are extracted from descriptions (3 scenarios)</summary>
 
-#### FSM queries expose transition validation
+#### Decision items are extracted from descriptions
 
-**Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
+**Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions returning no items and malformed items being skipped.
 
-**Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
+**Rationale:** Decision items (AD-1, AD-2, etc.) link stubs to architectural decisions — extracting them enables traceability from code stubs back to the design rationale.
 
 **Verified by:**
 
-- Check valid transition
-- Check invalid transition
-- Get valid transitions from status
-- Get protection info
+- AD-N items are extracted from description text
+- Empty description returns no decision items
+- Malformed AD items are skipped
 
 </details>
 
 <details>
-<summary>Pattern queries find and retrieve pattern data (4 scenarios)</summary>
+<summary>PDR references are found across patterns (2 scenarios)</summary>
 
-#### Pattern queries find and retrieve pattern data
+#### PDR references are found across patterns
 
-**Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
+**Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results when no references exist.
 
-**Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
-
-**Verified by:**
-
-- Find pattern by name (case insensitive)
-- Find nonexistent pattern returns undefined
-- Get patterns by category
-- Get all categories with counts
-
-</details>
-
-<details>
-<summary>Timeline queries group patterns by time (3 scenarios)</summary>
-
-#### Timeline queries group patterns by time
-
-**Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
-
-**Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
+**Rationale:** PDR cross-referencing enables impact analysis — knowing which patterns reference a decision helps assess the blast radius of changing that decision.
 
 **Verified by:**
 
-- Get patterns by quarter
-- Get all quarters
-- Get recently completed sorted by date
+- Patterns referencing a PDR are found
+- No references returns empty result
 
 </details>
 
@@ -2984,115 +3264,6 @@ Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein.
 
 - Identical strings have distance 0
 - Single character difference
-
-</details>
-
-### StubTaxonomyTagTests
-
-[View StubTaxonomyTagTests source](tests/features/api/stub-integration/taxonomy-tags.feature)
-
-**Problem:**
-Stub metadata (target path, design session) was stored as plain text
-in JSDoc descriptions, invisible to structured queries.
-
-**Solution:**
-Register libar-docs-target and libar-docs-since as taxonomy tags
-so they flow through the extraction pipeline as structured fields.
-
-#### Taxonomy tags are registered in the registry
-
-**Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy entries.
-
-**Rationale:** Unregistered tags would be flagged as unknown by the linter — registration ensures stub metadata tags pass validation alongside standard annotation tags.
-
-**Verified by:**
-
-- Target and since tags exist in registry
-
-#### Tags are part of the stub metadata group
-
-**Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry.
-
-**Rationale:** Domain grouping enables the taxonomy codec to render stub metadata tags in their own section — ungrouped tags would be lost in the "Other" category.
-
-**Verified by:**
-
-- Built registry groups target and since as stub tags
-
-### StubResolverTests
-
-[View StubResolverTests source](tests/features/api/stub-integration/stub-resolver.feature)
-
-**Problem:**
-Design session stubs need structured discovery and resolution
-to determine which stubs have been implemented and which remain.
-
-**Solution:**
-StubResolver functions identify, resolve, and group stubs from
-the MasterDataset with filesystem existence checks.
-
-<details>
-<summary>Stubs are identified by path or target metadata (2 scenarios)</summary>
-
-#### Stubs are identified by path or target metadata
-
-**Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath metadata field.
-
-**Rationale:** Dual identification supports both convention-based (directory) and metadata-based (targetPath) stub detection — relying on only one would miss stubs organized differently.
-
-**Verified by:**
-
-- Patterns in stubs directory are identified as stubs
-- Patterns with targetPath are identified as stubs
-
-</details>
-
-<details>
-<summary>Stubs are resolved against the filesystem (2 scenarios)</summary>
-
-#### Stubs are resolved against the filesystem
-
-**Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the pattern they implement.
-
-**Rationale:** Target existence status tells developers whether a stub has been implemented — grouping by pattern enables the "stubs --unresolved" command to show per-pattern implementation gaps.
-
-**Verified by:**
-
-- Resolved stubs show target existence status
-- Stubs are grouped by implementing pattern
-
-</details>
-
-<details>
-<summary>Decision items are extracted from descriptions (3 scenarios)</summary>
-
-#### Decision items are extracted from descriptions
-
-**Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions returning no items and malformed items being skipped.
-
-**Rationale:** Decision items (AD-1, AD-2, etc.) link stubs to architectural decisions — extracting them enables traceability from code stubs back to the design rationale.
-
-**Verified by:**
-
-- AD-N items are extracted from description text
-- Empty description returns no decision items
-- Malformed AD items are skipped
-
-</details>
-
-<details>
-<summary>PDR references are found across patterns (2 scenarios)</summary>
-
-#### PDR references are found across patterns
-
-**Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results when no references exist.
-
-**Rationale:** PDR cross-referencing enables impact analysis — knowing which patterns reference a decision helps assess the blast radius of changing that decision.
-
-**Verified by:**
-
-- Patterns referencing a PDR are found
-- No references returns empty result
 
 </details>
 

@@ -9,8 +9,8 @@
 
 | Metric | Value |
 | --- | --- |
-| Completed Patterns | 207 |
-| Completed Phases | 4 |
+| Completed Patterns | 209 |
+| Completed Phases | 5 |
 | Total Phases | 19 |
 
 ---
@@ -28,13 +28,21 @@
 </details>
 
 <details>
-<summary>✅ WarningCollector (5 patterns)</summary>
+<summary>✅ DecisionDocGenerator (3 patterns)</summary>
 
 | Pattern | Description |
 | --- | --- |
-| Warning Collector | Provides a unified system for capturing, categorizing, and reporting non-fatal issues during document generation. |
-| Source Mapping Validator | Performs pre-flight checks on source mapping tables before extraction begins. |
-| Content Deduplicator | Identifies and merges duplicate sections extracted from multiple sources. |
+| Decision Doc Generator | Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1. |
+| Doc Generation Proof Of Concept | Status: SUPERSEDED - This POC has been implemented. |
+| Codec Driven Reference Generation | Each reference document (Process Guard, Taxonomy, Validation, etc.) required a hand-coded recipe feature that... |
+
+</details>
+
+<details>
+<summary>✅ UniversalDocGeneratorRobustness (2 patterns)</summary>
+
+| Pattern | Description |
+| --- | --- |
 | Universal Doc Generator Robustness | This feature transforms the PoC document generator into a production-ready universal generator capable of operating... |
 | Scoped Architectural View | Full architecture diagrams show every annotated pattern in the project. |
 
@@ -62,17 +70,17 @@
 
 ## Recent Completions
 
+- ✅ Handoff Generator Tests
+- ✅ Scope Validator Tests
+- ✅ Arch Index Dataset
+- ✅ Arch Tag Extraction
+- ✅ Component Diagram Generation
+- ✅ Arch Generator Registration
+- ✅ Layered Diagram Generation
 - ✅ Composite Codec Testing
 - ✅ Convention Extractor Testing
 - ✅ Dedent Helper
-- ✅ Planning Codec Testing
-- ✅ Pr Changes Codec Testing
-- ✅ Reference Codec Testing
-- ✅ Reference Generator Testing
-- ✅ Reporting Codec Testing
-- ✅ Requirements Adr Codec Testing
-- ✅ Session Codec Testing
 
-Showing 10 of 207 completed patterns. See quarterly files for full history.
+Showing 10 of 209 completed patterns. See quarterly files for full history.
 
 ---

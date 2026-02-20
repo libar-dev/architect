@@ -10,7 +10,6 @@
 | --- | --- |
 | Status | completed |
 | Category | Core |
-| Phase | 27 |
 
 ## Description
 

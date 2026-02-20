@@ -41,7 +41,7 @@ The generation pipeline transforms annotated source code into markdown documents
 
 Validation is the enforcement boundary — it ensures that every change to annotated source files respects the delivery lifecycle rules defined by the FSM, protection levels, and scope constraints. The system operates in three layers: the FSM validator checks status transitions against a 4-state directed graph, the Process Guard orchestrates commit-time validation using a Decider pattern (state derived from annotations, not stored separately), and the lint engine provides pluggable rule execution with pretty and JSON output. Anti-pattern detection enforces dual-source ownership boundaries — `@libar-docs-uses` belongs on TypeScript, `@libar-docs-depends-on` belongs on Gherkin — preventing cross-domain tag confusion that causes documentation drift. Definition of Done validation ensures completed patterns have all deliverables marked done and at least one acceptance-criteria scenario.
 
-**21 patterns** — 12 completed, 1 active, 8 planned
+**21 patterns** — 13 completed, 1 active, 7 planned
 
 **Key patterns:** ProcessGuardLinter, PhaseStateMachineValidation, DoDValidation, StepLintVitestCucumber, ProgressiveGovernance
 
@@ -51,7 +51,7 @@ Validation is the enforcement boundary — it ensures that every change to annot
 
 The Data API provides direct terminal access to delivery process state. It replaces reading generated markdown or launching explore agents — targeted queries use 5-10x less context. The `context` command assembles curated bundles tailored to session type (planning, design, implement).
 
-**30 patterns** — 15 completed, 10 active, 5 planned
+**32 patterns** — 16 completed, 12 active, 4 planned
 
 **Key patterns:** DataAPIContextAssembly, ProcessStateAPICLI, DataAPIDesignSessionSupport, DataAPIRelationshipGraph, DataAPIOutputShaping
 
@@ -84,11 +84,11 @@ Process defines the USDP-inspired session workflow that governs how work moves t
 | [Annotation](product-areas/ANNOTATION.md)       | 23       | 20        | 2      | 1       |
 | [Configuration](product-areas/CONFIGURATION.md) | 9        | 8         | 0      | 1       |
 | [Generation](product-areas/GENERATION.md)       | 67       | 55        | 1      | 11      |
-| [Validation](product-areas/VALIDATION.md)       | 21       | 12        | 1      | 8       |
-| [DataAPI](product-areas/DATA-API.md)            | 30       | 15        | 10     | 5       |
+| [Validation](product-areas/VALIDATION.md)       | 21       | 13        | 1      | 7       |
+| [DataAPI](product-areas/DATA-API.md)            | 32       | 16        | 12     | 4       |
 | [CoreTypes](product-areas/CORE-TYPES.md)        | 7        | 6         | 0      | 1       |
 | [Process](product-areas/PROCESS.md)             | 11       | 4         | 0      | 7       |
-| **Total**                                       | **168**  | **120**   | **14** | **34**  |
+| **Total**                                       | **170**  | **122**   | **16** | **32**  |
 
 ---
 
@@ -107,6 +107,8 @@ C4Context
         System(DefineConfig, "DefineConfig")
         System(ConfigLoader, "ConfigLoader")
     }
+    System(ADR003SourceFirstPatternArchitecture, "ADR003SourceFirstPatternArchitecture")
+    System(ADR001TaxonomyCanonicalValues, "ADR001TaxonomyCanonicalValues")
     System(ShapeExtraction, "ShapeExtraction")
     System(ScopedArchitecturalView, "ScopedArchitecturalView")
     System(DeclarationLevelShapeTagging, "DeclarationLevelShapeTagging")
@@ -116,8 +118,6 @@ C4Context
     System(CrossCuttingDocumentInclusion, "CrossCuttingDocumentInclusion")
     System(CodecDrivenReferenceGeneration, "CodecDrivenReferenceGeneration")
     System(ArchitectureDiagramGeneration, "ArchitectureDiagramGeneration")
-    System(ADR003SourceFirstPatternArchitecture, "ADR003SourceFirstPatternArchitecture")
-    System(ADR001TaxonomyCanonicalValues, "ADR001TaxonomyCanonicalValues")
     System(StringUtils, "StringUtils")
     System(ResultMonad, "ResultMonad")
     System(ErrorFactories, "ErrorFactories")
@@ -142,6 +142,7 @@ C4Context
     Rel(DefineConfig, ProjectConfigTypes, "uses")
     Rel(ConfigLoader, DeliveryProcessFactory, "uses")
     Rel(ConfigLoader, ConfigurationTypes, "uses")
+    Rel(ADR003SourceFirstPatternArchitecture, ADR001TaxonomyCanonicalValues, "depends on")
     Rel(ScopedArchitecturalView, ArchitectureDiagramGeneration, "depends on")
     Rel(ScopedArchitecturalView, ShapeExtraction, "depends on")
     Rel(DeclarationLevelShapeTagging, ShapeExtraction, "depends on")
@@ -154,7 +155,6 @@ C4Context
     Rel(CrossCuttingDocumentInclusion, ReferenceDocShowcase, "depends on")
     Rel(CodecDrivenReferenceGeneration, DocGenerationProofOfConcept, "depends on")
     Rel(CodecDrivenReferenceGeneration, ScopedArchitecturalView, "depends on")
-    Rel(ADR003SourceFirstPatternArchitecture, ADR001TaxonomyCanonicalValues, "depends on")
     Rel(ExtractionPipelineEnhancementsTesting, ReferenceDocShowcase, "implements")
     Rel(KebabCaseSlugs, StringUtils, "depends on")
     Rel(ErrorHandlingUnification, ResultMonad, "depends on")
@@ -184,6 +184,8 @@ graph LR
         DefineConfig[/"DefineConfig"/]
         ConfigLoader[/"ConfigLoader"/]
     end
+    ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
+    ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
     ShapeExtraction["ShapeExtraction"]
     ScopedArchitecturalView["ScopedArchitecturalView"]
     DeclarationLevelShapeTagging["DeclarationLevelShapeTagging"]
@@ -193,8 +195,6 @@ graph LR
     CrossCuttingDocumentInclusion["CrossCuttingDocumentInclusion"]
     CodecDrivenReferenceGeneration["CodecDrivenReferenceGeneration"]
     ArchitectureDiagramGeneration["ArchitectureDiagramGeneration"]
-    ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
-    ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
     StringUtils["StringUtils"]
     ResultMonad["ResultMonad"]
     ErrorFactories["ErrorFactories"]
@@ -221,6 +221,7 @@ graph LR
     DefineConfig -->|uses| ProjectConfigTypes
     ConfigLoader -->|uses| DeliveryProcessFactory
     ConfigLoader -->|uses| ConfigurationTypes
+    ADR003SourceFirstPatternArchitecture -.->|depends on| ADR001TaxonomyCanonicalValues
     ScopedArchitecturalView -.->|depends on| ArchitectureDiagramGeneration
     ScopedArchitecturalView -.->|depends on| ShapeExtraction
     DeclarationLevelShapeTagging -.->|depends on| ShapeExtraction
@@ -233,7 +234,6 @@ graph LR
     CrossCuttingDocumentInclusion -.->|depends on| ReferenceDocShowcase
     CodecDrivenReferenceGeneration -.->|depends on| DocGenerationProofOfConcept
     CodecDrivenReferenceGeneration -.->|depends on| ScopedArchitecturalView
-    ADR003SourceFirstPatternArchitecture -.->|depends on| ADR001TaxonomyCanonicalValues
     ExtractionPipelineEnhancementsTesting ..->|implements| ReferenceDocShowcase
     KebabCaseSlugs -.->|depends on| StringUtils
     ErrorHandlingUnification -.->|depends on| ResultMonad

@@ -48,6 +48,7 @@ export { isValidSessionType, assembleContext, buildDepTree, buildFileReadingList
 export { formatContextBundle, formatDepTree, formatFileReadingList, formatOverview, } from './context-formatter.js';
 export { computeNeighborhood, compareContexts, aggregateTagUsage, buildSourceInventory, } from './arch-queries.js';
 export { analyzeCoverage, findUnannotatedFiles, findUnusedTaxonomy } from './coverage-analyzer.js';
+export { queryBusinessRules } from './rules-query.js';
 // Pattern Summarization (extended)
 export { deriveSource } from './summarize.js';
 //# sourceMappingURL=index.js.map

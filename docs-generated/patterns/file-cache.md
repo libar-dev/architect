@@ -10,7 +10,6 @@
 | --- | --- |
 | Status | active |
 | Category | Pattern |
-| Phase | 27 |
 
 ## Description
 

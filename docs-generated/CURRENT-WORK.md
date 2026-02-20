@@ -7,15 +7,15 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 207/302 (69%)
+**Overall Progress:** [██████████████░░░░░░] 209/304 (69%)
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 302 |
-| Completed | 207 |
-| Active | 47 |
-| Planned | 48 |
-| Active Phases | 5 |
+| Total Patterns | 304 |
+| Completed | 209 |
+| Active | 49 |
+| Planned | 46 |
+| Active Phases | 4 |
 
 ---
 
@@ -49,18 +49,6 @@
 | 🚧 Pattern Helpers Tests | - |
 
 [View DataAPIStubIntegration details →](current/phase-25-data-api-stub-integration.md)
-
----
-
-### 🚧 FileCache
-
-[████████████░░░] 4/5 80% complete (4 done, 1 active)
-
-| Pattern | Description |
-| --- | --- |
-| 🚧 File Cache | Simple Map-based cache for file contents during a single generation run. |
-
-[View FileCache details →](current/phase-27-file-cache.md)
 
 ---
 
@@ -133,7 +121,6 @@
 | --- | --- | --- | --- |
 | 🚧 Process State API Relationship Queries | Phase 24 | 3d | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 🚧 Pattern Helpers Tests | Phase 25 | - | - |
-| 🚧 File Cache | Phase 27 | - | Simple Map-based cache for file contents during a single generation run. |
 | 🚧 Reference Doc Showcase | Phase 30 | 13d | The Reference Generation Sample document exercises a small fraction of the reference codec's capabilities: 2... |
 | 🚧 Step Lint Vitest Cucumber | Phase 50 | 1d | Hours are lost debugging vitest-cucumber-specific issues that only surface at test runtime. |
 | 🚧 API Module | - | - | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
@@ -151,6 +138,7 @@
 | 🚧 Depends On Tag Testing | - | - | Tests extraction of @libar-docs-depends-on and @libar-docs-enables relationship tags from Gherkin files. |
 | 🚧 Derive Process State | - | - | :GherkinScanner,FSMValidator Derives process state from @libar-docs-* annotations in files. |
 | 🚧 Detect Changes | - | - | Detects changes from git diff including: - Modified, added, deleted files - Status transitions (@libar-docs-status... |
+| 🚧 File Cache | - | - | Simple Map-based cache for file contents during a single generation run. |
 | 🚧 FSM Module | - | - | :PDR005MvpWorkflow Central export for the 4-state FSM defined in PDR-005: ``` roadmap ──→ active ──→ completed │     ... |
 | 🚧 FSM States | - | - | :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -... |
 | 🚧 FSM Transitions | - | - | :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ... |
@@ -163,6 +151,7 @@
 | 🚧 Pattern Helpers | - | - | Common helper functions used by context-assembler, arch-queries, and other API modules that need pattern name... |
 | 🚧 Pattern Summarizer Impl | - | - | Projects the full ExtractedPattern (~3.5KB per pattern) down to a PatternSummary (~100 bytes) for list queries. |
 | 🚧 Pattern Summarize Tests | - | - | Validates that summarizePattern() projects ExtractedPattern (~3.5KB) to PatternSummary (~100 bytes) with the correct... |
+| 🚧 Pipeline Factory | - | - | Shared factory that executes the 8-step scan-extract-merge-transform pipeline. |
 | 🚧 Process API CLI Impl | - | - | Exposes ProcessStateAPI methods as CLI subcommands with JSON output. |
 | 🚧 Process Guard Decider | - | - | :FSMValidator,DeriveProcessState,DetectChanges Pure function that validates changes against process rules. |
 | 🚧 Process Guard Module | - | - | :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider Enforces delivery process rules by validating... |
@@ -173,6 +162,7 @@
 | 🚧 Project Config Types | - | - | Unified project configuration for the delivery-process package. |
 | 🚧 Reference Document Codec | - | - | A single codec factory that creates reference document codecs from configuration objects. |
 | 🚧 Reference Generator Registration | - | - | Registers all reference document generators. |
+| 🚧 Rules Query Module | - | - | Pure query function for business rules extracted from Gherkin Rule: blocks. |
 | 🚧 Source Merger | - | - | Computes effective sources for a specific generator by applying per-generator overrides to the base resolved sources. |
 | 🚧 Stub Resolver Impl | - | - | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 | 🚧 Stub Resolver Tests | - | - | Design session stubs need structured discovery and resolution to determine which stubs have been implemented and... |

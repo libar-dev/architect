@@ -7,14 +7,14 @@
 
 ## Summary
 
-**Overall:** [██████████████░░░░░░] 116/161 (72%)
+**Overall:** [██████████████░░░░░░] 118/163 (72%)
 
 | Metric         | Value |
 | -------------- | ----- |
-| Total Features | 161   |
-| Completed      | 116   |
-| Active         | 14    |
-| Planned        | 31    |
+| Total Features | 163   |
+| Completed      | 118   |
+| Active         | 16    |
+| Planned        | 29    |
 | Product Areas  | 7     |
 | User Roles     | 1     |
 
@@ -78,7 +78,7 @@
 
 ### DataAPI
 
-15/29 complete (52%)
+16/31 complete (52%)
 
 - [✅ Data API Architecture Queries - deep architecture exploration for design sessions](requirements/phase-25-data-api-architecture-queries.md)
 - [✅ Data API Context Assembly - replace explore agents with one command](requirements/phase-25-data-api-context-assembly.md)
@@ -91,6 +91,7 @@
 - [✅ Lint Patterns Cli](requirements/phase-00-lint-patterns-cli.md)
 - [✅ Lint Process Cli](requirements/phase-00-lint-process-cli.md)
 - [✅ Process Api Cli](requirements/phase-00-process-api-cli.md)
+- [✅ Process API Layered Extraction - separate cli shell from domain logic in process api](requirements/phase-100-process-api-layered-extraction.md)
 - [✅ Process State API CLI - direct api queries for planning](requirements/phase-24-process-state-apicli.md)
 - [✅ Process State API Testing](requirements/phase-00-process-state-api-testing.md)
 - [✅ Scope Validator Tests](requirements/phase-00-scope-validator-tests.md)
@@ -102,13 +103,14 @@
 - [🚧 Output Pipeline Tests](requirements/phase-00-output-pipeline-tests.md)
 - [🚧 Pattern Helpers Tests](requirements/phase-25-pattern-helpers-tests.md)
 - [🚧 Pattern Summarize Tests](requirements/phase-00-pattern-summarize-tests.md)
+- [🚧 Pipeline Factory](requirements/phase-00-pipeline-factory.md)
 - [🚧 Process State API Relationship Queries](requirements/phase-24-process-state-api-relationship-queries.md)
+- [🚧 Rules Query Module](requirements/phase-00-rules-query-module.md)
 - [🚧 Stub Resolver Tests](requirements/phase-00-stub-resolver-tests.md)
 - [🚧 Stub Taxonomy Tag Tests](requirements/phase-00-stub-taxonomy-tag-tests.md)
 - [📋 Data API CLI Ergonomics - fast interactive cli for repeated queries](requirements/phase-25-data-apicli-ergonomics.md)
 - [📋 Data API Platform Integration - native claude code integration and monorepo support](requirements/phase-25-data-api-platform-integration.md)
 - [📋 Data API Relationship Graph - deep dependency analysis and health checks](requirements/phase-25-data-api-relationship-graph.md)
-- [📋 Process API Layered Extraction - separate cli shell from domain logic in process api](requirements/phase-100-process-api-layered-extraction.md)
 
 ### Generation
 
@@ -194,7 +196,7 @@
 
 ### Validation
 
-12/21 complete (57%)
+13/21 complete (62%)
 
 - [✅ Anti Pattern Detector Testing](requirements/phase-00-anti-pattern-detector-testing.md)
 - [✅ Config Schema Validation](requirements/phase-00-config-schema-validation.md)
@@ -208,6 +210,7 @@
 - [✅ Process Guard Linter - prevent accidental scope creep and locked file modifications](requirements/phase-99-process-guard-linter.md)
 - [✅ Process Guard Testing](requirements/phase-00-process-guard-testing.md)
 - [✅ Status Transition Detection Testing](requirements/phase-00-status-transition-detection-testing.md)
+- [✅ Validator Read Model Consolidation - eliminate parallel pipeline and relationship blind spots in validator](requirements/phase-100-validator-read-model-consolidation.md)
 - [🚧 Step Lint Vitest Cucumber - prevent hours lost debugging vitest cucumber traps](requirements/phase-50-step-lint-vitest-cucumber.md)
 - [📋 DoD Validation - enable machine checkable phase completion](requirements/phase-100-do-d-validation.md)
 - [📋 Phase Numbering Conventions - prevent phase number conflicts and ensure consistent ordering](requirements/phase-100-phase-numbering-conventions.md)
@@ -216,7 +219,6 @@
 - [📋 Status Aware Eslint Suppression](requirements/phase-99-status-aware-eslint-suppression.md)
 - [📋 Step Lint Extended Rules - catch remaining vitest cucumber traps statically](requirements/phase-51-step-lint-extended-rules.md)
 - [📋 Streaming Git Diff - enable process guard on large repositories](requirements/phase-99-streaming-git-diff.md)
-- [📋 Validator Read Model Consolidation - eliminate parallel pipeline and relationship blind spots in validator](requirements/phase-100-validator-read-model-consolidation.md)
 
 ---
 
@@ -312,6 +314,7 @@
 | ✅ Prd Implementation Section Testing                         | Generation    | -         | completed |
 | ✅ Preset System                                              | Configuration | -         | completed |
 | ✅ Process Api Cli                                            | DataAPI       | -         | completed |
+| ✅ Process API Layered Extraction                             | DataAPI       | -         | completed |
 | ✅ Process Guard Linter                                       | Validation    | -         | completed |
 | ✅ Process Guard Testing                                      | Validation    | -         | completed |
 | ✅ Process State API CLI                                      | DataAPI       | -         | completed |
@@ -351,6 +354,7 @@
 | ✅ Universal Markdown Renderer                                | Generation    | -         | completed |
 | ✅ Validate Patterns Cli                                      | DataAPI       | -         | completed |
 | ✅ Validation Rules Codec Testing                             | Generation    | -         | completed |
+| ✅ Validator Read Model Consolidation                         | Validation    | -         | completed |
 | ✅ Warning Collector Testing                                  | Generation    | -         | completed |
 | ✅ Zod Codec Migration                                        | Generation    | -         | completed |
 | 🚧 Arch Queries Test                                          | DataAPI       | -         | active    |
@@ -361,8 +365,10 @@
 | 🚧 Output Pipeline Tests                                      | DataAPI       | -         | active    |
 | 🚧 Pattern Helpers Tests                                      | DataAPI       | -         | active    |
 | 🚧 Pattern Summarize Tests                                    | DataAPI       | -         | active    |
+| 🚧 Pipeline Factory                                           | DataAPI       | -         | active    |
 | 🚧 Process State API Relationship Queries                     | DataAPI       | -         | active    |
 | 🚧 Reference Doc Showcase                                     | Generation    | -         | active    |
+| 🚧 Rules Query Module                                         | DataAPI       | -         | active    |
 | 🚧 Step Lint Vitest Cucumber                                  | Validation    | -         | active    |
 | 🚧 Stub Resolver Tests                                        | DataAPI       | -         | active    |
 | 🚧 Stub Taxonomy Tag Tests                                    | DataAPI       | -         | active    |
@@ -385,7 +391,6 @@
 | 📋 Living Roadmap CLI                                         | Process       | -         | planned   |
 | 📋 Phase Numbering Conventions                                | Validation    | -         | planned   |
 | 📋 Prd Implementation Section                                 | Generation    | -         | planned   |
-| 📋 Process API Layered Extraction                             | DataAPI       | -         | planned   |
 | 📋 Progressive Governance                                     | Validation    | -         | planned   |
 | 📋 Release Association Rules                                  | Validation    | -         | planned   |
 | 📋 Rich Content Helpers Testing                               | Generation    | -         | planned   |
@@ -397,6 +402,5 @@
 | 📋 Test Content Blocks                                        | Generation    | -         | planned   |
 | 📋 Traceability Enhancements                                  | Generation    | -         | planned   |
 | 📋 Traceability Generator                                     | Generation    | -         | planned   |
-| 📋 Validator Read Model Consolidation                         | Validation    | -         | planned   |
 
 ---

@@ -209,10 +209,10 @@ classDiagram
     class Documentation_Generation_Orchestrator {
         <<service>>
     }
-    class DecisionDocGenerator {
+    class TransformDataset {
         <<service>>
     }
-    class TransformDataset {
+    class DecisionDocGenerator {
         <<service>>
     }
     class MasterDataset
@@ -225,10 +225,10 @@ classDiagram
     SourceMapper ..> ShapeExtractor : depends on
     SourceMapper ..> GherkinASTParser : depends on
     Documentation_Generation_Orchestrator ..> Pattern_Scanner : uses
-    DecisionDocGenerator ..> DecisionDocCodec : depends on
-    DecisionDocGenerator ..> SourceMapper : depends on
     TransformDataset ..> MasterDataset : uses
     TransformDataset ..|> PatternRelationshipModel : implements
+    DecisionDocGenerator ..> DecisionDocCodec : depends on
+    DecisionDocGenerator ..> SourceMapper : depends on
 ```
 
 ---
@@ -326,7 +326,6 @@ graph LR
         DataAPIOutputShaping["DataAPIOutputShaping"]:::neighbor
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
     end
-    TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
     ProjectConfigTypes -->|uses| ConfigurationTypes
     ProjectConfigTypes -->|uses| ConfigurationPresets
     ConfigurationPresets -->|uses| ConfigurationTypes
@@ -334,6 +333,7 @@ graph LR
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
+    TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
     FSMTransitions ..->|implements| PhaseStateMachineValidation
     FSMStates ..->|implements| PhaseStateMachineValidation
     ProcessStateAPI -->|uses| MasterDataset

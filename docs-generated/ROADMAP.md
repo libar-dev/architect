@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [██████████████░░░░░░] 207/302 (69%)
+**Patterns:** [██████████████░░░░░░] 209/304 (69%)
 
-**Phases:** 4/19 complete
+**Phases:** 5/19 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 302 |
-| Completed | 207 |
-| Active | 47 |
-| Planned | 48 |
+| Total Patterns | 304 |
+| Completed | 209 |
+| Active | 49 |
+| Planned | 46 |
 
 ---
 
@@ -29,8 +29,8 @@
 | 🚧 [ProcessStateAPIRelationshipQueries](phases/phase-24-process-state-api-relationship-queries.md) | 1/2 | 50% |
 | 🚧 [DataAPIStubIntegration](phases/phase-25-data-api-stub-integration.md) | 5/10 | 50% |
 | ✅ [ShapeExtractor](phases/phase-26-shape-extractor.md) | 2/2 | 100% |
-| 🚧 [SourceMapper](phases/phase-27-source-mapper.md) | 4/5 | 80% |
-| ✅ [WarningCollector](phases/phase-28-warning-collector.md) | 5/5 | 100% |
+| ✅ [DecisionDocGenerator](phases/phase-27-decision-doc-generator.md) | 3/3 | 100% |
+| ✅ [UniversalDocGeneratorRobustness](phases/phase-28-universal-doc-generator-robustness.md) | 2/2 | 100% |
 | 🚧 [ReferenceDocShowcase](phases/phase-30-reference-doc-showcase.md) | 0/1 | 0% |
 | ✅ [DeclarationLevelShapeTagging](phases/phase-31-declaration-level-shape-tagging.md) | 1/1 | 100% |
 | ✅ [CrossCuttingDocumentInclusion](phases/phase-32-cross-cutting-document-inclusion.md) | 1/1 | 100% |
@@ -38,7 +38,7 @@
 | 🚧 [StepLintVitestCucumber](phases/phase-50-step-lint-vitest-cucumber.md) | 0/1 | 0% |
 | 📋 [StepLintExtendedRules](phases/phase-51-step-lint-extended-rules.md) | 0/1 | 0% |
 | 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 5/9 | 56% |
-| 📋 [ValidatorReadModelConsolidation](phases/phase-100-validator-read-model-consolidation.md) | 2/15 | 13% |
+| 📋 [ValidatorReadModelConsolidation](phases/phase-100-validator-read-model-consolidation.md) | 4/15 | 27% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
 | 📋 [CodecBehaviorTesting](phases/phase-102-codec-behavior-testing.md) | 0/1 | 0% |
 | 📋 [StepDefinitionCompletion](phases/phase-103-step-definition-completion.md) | 0/1 | 0% |
@@ -109,31 +109,26 @@
 
 ---
 
-### 🚧 SourceMapper
+### ✅ DecisionDocGenerator
 
-[████████████░░░] 4/5 80% complete
+[███████████████] 3/3 100% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
 | ✅ Codec Driven Reference Generation | completed | Each reference document (Process Guard, Taxonomy, Validation, etc.) required a hand-coded recipe feature that... |
 | ✅ Decision Doc Generator | completed | Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1. |
 | ✅ Doc Generation Proof Of Concept | completed | Status: SUPERSEDED - This POC has been implemented. |
-| 🚧 File Cache | active | Simple Map-based cache for file contents during a single generation run. |
-| ✅ Source Mapper | completed | Aggregates content from multiple source files based on source mapping tables parsed from decision documents. |
 
 ---
 
-### ✅ WarningCollector
+### ✅ UniversalDocGeneratorRobustness
 
-[███████████████] 5/5 100% complete
+[███████████████] 2/2 100% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
-| ✅ Content Deduplicator | completed | Identifies and merges duplicate sections extracted from multiple sources. |
 | ✅ Scoped Architectural View | completed | Full architecture diagrams show every annotated pattern in the project. |
-| ✅ Source Mapping Validator | completed | Performs pre-flight checks on source mapping tables before extraction begins. |
 | ✅ Universal Doc Generator Robustness | completed | This feature transforms the PoC document generator into a production-ready universal generator capable of operating... |
-| ✅ Warning Collector | completed | Provides a unified system for capturing, categorizing, and reporting non-fatal issues during document generation. |
 
 ---
 
@@ -218,7 +213,7 @@
 
 ### 📋 ValidatorReadModelConsolidation
 
-[██░░░░░░░░░░░░░] 2/15 13% complete
+[████░░░░░░░░░░░] 4/15 27% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
@@ -231,12 +226,12 @@
 | 📋 Living Roadmap CLI | planned | Roadmap is a static document that requires regeneration. |
 | 📋 Phase Numbering Conventions | planned | Phase numbers are assigned manually without validation, leading to potential conflicts (duplicate numbers), gaps that... |
 | ✅ Phase State Machine Validation | completed | Phase lifecycle state transitions are not enforced programmatically despite being documented in PROCESS_SETUP.md. |
-| 📋 Process API Layered Extraction | planned | `process-api.ts` is 1,700 lines containing three distinct responsibilities in one file: CLI shell (arg parsing, help,... |
+| ✅ Process API Layered Extraction | completed | `process-api.ts` is 1,700 lines containing two remaining architectural violations of ADR-006: 1. |
 | 📋 Progressive Governance | planned | Enterprise governance patterns applied everywhere create overhead. |
 | 📋 Release Association Rules | planned | PDR-002 and PDR-003 define conventions for separating specs from release metadata, but there's no automated enforcement. |
 | 📋 Session File Cleanup | planned | Session files (docs-living/sessions/phase-*.md) are ephemeral working documents for active phases. |
 | 📋 Traceability Enhancements | planned | Current TRACEABILITY.md shows 15% coverage (timeline → behavior). |
-| 📋 Validator Read Model Consolidation | planned | `validate-patterns.ts` is the only feature consumer that bypasses the MasterDataset. |
+| ✅ Validator Read Model Consolidation | completed | `validate-patterns.ts` is the only feature consumer that bypasses the MasterDataset. |
 
 ---
 
