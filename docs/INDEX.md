@@ -21,13 +21,13 @@
 | ------------------------------ | -------------------------------------------- | ------ |
 | Get started quickly            | [README.md](../README.md)                    | 1-377  |
 | Configure presets and tags     | [CONFIGURATION.md](./CONFIGURATION.md)       | 1-357  |
-| Understand the "why"           | [METHODOLOGY.md](./METHODOLOGY.md)           | 1-210  |
-| Learn the architecture         | [ARCHITECTURE.md](./ARCHITECTURE.md)         | 1-1312 |
-| Run AI coding sessions         | [SESSION-GUIDES.md](./SESSION-GUIDES.md)     | 1-338  |
+| Understand the "why"           | [METHODOLOGY.md](./METHODOLOGY.md)           | 1-234  |
+| Learn the architecture         | [ARCHITECTURE.md](./ARCHITECTURE.md)         | 1-1515 |
+| Run AI coding sessions         | [SESSION-GUIDES.md](./SESSION-GUIDES.md)     | 1-351  |
 | Write Gherkin specs            | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | 1-343  |
 | Enforce delivery process rules | [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | 1-335  |
-| Validate annotation quality    | [VALIDATION.md](./VALIDATION.md)             | 1-199  |
-| Query process state via CLI    | [PROCESS-API.md](./PROCESS-API.md)           | 1-225  |
+| Validate annotation quality    | [VALIDATION.md](./VALIDATION.md)             | 1-206  |
+| Query process state via CLI    | [PROCESS-API.md](./PROCESS-API.md)           | 1-259  |
 | Look up tag definitions        | [INSTRUCTIONS.md](../INSTRUCTIONS.md)        | 1-344  |
 | Understand the taxonomy        | [TAXONOMY.md](./TAXONOMY.md)                 | 1-95   |
 | Publish to npm                 | [PUBLISHING.md](./PUBLISHING.md)             | 1-149  |
@@ -91,7 +91,7 @@
 
 ---
 
-### METHODOLOGY.md (Lines 1-210)
+### METHODOLOGY.md (Lines 1-234)
 
 | Section                     | Lines   | Key Topics                               |
 | --------------------------- | ------- | ---------------------------------------- |
@@ -105,48 +105,48 @@
 
 ---
 
-### ARCHITECTURE.md (Lines 1-1312)
+### ARCHITECTURE.md (Lines 1-1515)
 
-| Section                    | Lines     | Key Topics                                 |
-| -------------------------- | --------- | ------------------------------------------ |
-| Executive Summary          | 28-66     | What it does, key principles, overview     |
-| Configuration Architecture | 69-137    | Entry point, pipeline effects, resolution  |
-| Four-Stage Pipeline        | 140-245   | Scanner → Extractor → Transformer → Codec  |
-| Unified Transformation     | 248-362   | MasterDataset schema, single-pass          |
-| Codec Architecture         | 366-407   | Concepts, block vocabulary, factory        |
-| Available Codecs           | 410-607   | All 16 codecs with options tables          |
-| Progressive Disclosure     | 610-654   | Split logic, detail levels                 |
-| Source Systems             | 656-740   | TypeScript scanner, Gherkin scanner        |
-| Key Design Patterns        | 742-820   | Result monad, schema-first, tag registry   |
-| Data Flow Diagrams         | 823-980   | Pipeline flow, MasterDataset views, codecs |
-| Workflow Integration       | 983-1093  | Planning, implementing, release workflows  |
-| Programmatic Usage         | 1096-1149 | Direct codec usage, generateDocument       |
-| Extending the System       | 1152-1217 | Custom codec, custom generator             |
-| Quick Reference            | 1220-1289 | Codec-to-generator mapping, CLI, filters   |
+| Section                    | Lines     | Key Topics                                                       |
+| -------------------------- | --------- | ---------------------------------------------------------------- |
+| Executive Summary          | 28-69     | What it does, key principles (incl. Single Read Model), overview |
+| Configuration Architecture | 70-139    | Entry point, pipeline effects, resolution                        |
+| Four-Stage Pipeline        | 140-321   | Scanner → Extractor → Pipeline Factory → Transformer → Codec     |
+| Unified Transformation     | 322-448   | MasterDataset schema (10-field relationshipIndex), single-pass   |
+| Codec Architecture         | 449-494   | Concepts, block vocabulary, factory                              |
+| Available Codecs           | 495-759   | All 16 codecs with options tables                                |
+| Progressive Disclosure     | 760-805   | Split logic, detail levels                                       |
+| Source Systems             | 806-912   | TypeScript scanner, Gherkin scanner                              |
+| Key Design Patterns        | 913-993   | Result monad, schema-first, tag registry                         |
+| Data Flow Diagrams         | 994-1178  | Pipeline flow, factory entry point, MasterDataset views, codecs  |
+| Workflow Integration       | 1179-1289 | Planning, implementing, release workflows                        |
+| Programmatic Usage         | 1290-1346 | Direct codec usage, generateDocument                             |
+| Extending the System       | 1347-1415 | Custom codec, custom generator                                   |
+| Quick Reference            | 1416-1487 | Codec-to-generator mapping, CLI, filters                         |
 
 #### Available Codecs Reference
 
 | Codec                     | Lines   | Output Files                |
 | ------------------------- | ------- | --------------------------- |
-| PatternsDocumentCodec     | 417-437 | PATTERNS.md, patterns/\*.md |
-| RequirementsDocumentCodec | 440-457 | PRODUCT-REQUIREMENTS.md     |
-| RoadmapDocumentCodec      | 463-480 | ROADMAP.md, phases/\*.md    |
-| CompletedMilestonesCodec  | 483-489 | COMPLETED-MILESTONES.md     |
-| CurrentWorkCodec          | 492-498 | CURRENT-WORK.md             |
-| ChangelogCodec            | 500-515 | CHANGELOG.md                |
-| SessionContextCodec       | 520-528 | SESSION-CONTEXT.md          |
-| RemainingWorkCodec        | 530-547 | REMAINING-WORK.md           |
-| PlanningChecklistCodec    | 553-556 | PLANNING-CHECKLIST.md       |
-| SessionPlanCodec          | 558-561 | SESSION-PLAN.md             |
-| SessionFindingsCodec      | 563-576 | SESSION-FINDINGS.md         |
-| AdrDocumentCodec          | 582-590 | DECISIONS.md                |
-| PrChangesCodec            | 593-596 | working/PR-CHANGES.md       |
-| TraceabilityCodec         | 599-602 | TRACEABILITY.md             |
-| OverviewCodec             | 605-607 | OVERVIEW.md                 |
+| PatternsDocumentCodec     | 502-521 | PATTERNS.md, patterns/\*.md |
+| RequirementsDocumentCodec | 523-545 | PRODUCT-REQUIREMENTS.md     |
+| RoadmapDocumentCodec      | 547-564 | ROADMAP.md, phases/\*.md    |
+| CompletedMilestonesCodec  | 566-573 | COMPLETED-MILESTONES.md     |
+| CurrentWorkCodec          | 575-582 | CURRENT-WORK.md             |
+| ChangelogCodec            | 584-602 | CHANGELOG.md                |
+| SessionContextCodec       | 604-611 | SESSION-CONTEXT.md          |
+| RemainingWorkCodec        | 613-635 | REMAINING-WORK.md           |
+| PlanningChecklistCodec    | 637-641 | PLANNING-CHECKLIST.md       |
+| SessionPlanCodec          | 643-647 | SESSION-PLAN.md             |
+| SessionFindingsCodec      | 649-664 | SESSION-FINDINGS.md         |
+| AdrDocumentCodec          | 666-673 | DECISIONS.md                |
+| PrChangesCodec            | 675-679 | working/PR-CHANGES.md       |
+| TraceabilityCodec         | 681-685 | TRACEABILITY.md             |
+| OverviewCodec             | 687-693 | OVERVIEW.md                 |
 
 ---
 
-### SESSION-GUIDES.md (Lines 1-338)
+### SESSION-GUIDES.md (Lines 1-351)
 
 | Section                  | Lines   | Key Topics                               |
 | ------------------------ | ------- | ---------------------------------------- |
@@ -194,7 +194,7 @@
 
 ---
 
-### VALIDATION.md (Lines 1-199)
+### VALIDATION.md (Lines 1-206)
 
 | Section           | Lines   | Key Topics                            |
 | ----------------- | ------- | ------------------------------------- |

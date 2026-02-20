@@ -38,13 +38,14 @@ The tag prefix is configurable via presets or custom configuration (see [Configu
 
 ### Key Design Principles
 
-| Principle                      | Description                                                             |
-| ------------------------------ | ----------------------------------------------------------------------- |
-| **Single Source of Truth**     | Code + .feature files are authoritative; docs are generated projections |
-| **Single-Pass Transformation** | All derived views computed in O(n) time, not redundant O(n) per section |
-| **Codec-Based Rendering**      | Zod 4 codecs transform MasterDataset → RenderableDocument → Markdown    |
-| **Schema-First Validation**    | Zod schemas define types; runtime validation at all boundaries          |
-| **Result Monad**               | Explicit error handling via `Result<T, E>` instead of exceptions        |
+| Principle                      | Description                                                                                      |
+| ------------------------------ | ------------------------------------------------------------------------------------------------ |
+| **Single Source of Truth**     | Code + .feature files are authoritative; docs are generated projections                          |
+| **Single-Pass Transformation** | All derived views computed in O(n) time, not redundant O(n) per section                          |
+| **Codec-Based Rendering**      | Zod 4 codecs transform MasterDataset → RenderableDocument → Markdown                             |
+| **Schema-First Validation**    | Zod schemas define types; runtime validation at all boundaries                                   |
+| **Single Read Model**          | MasterDataset is the sole read model for all consumers — codecs, validators, query API (ADR-006) |
+| **Result Monad**               | Explicit error handling via `Result<T, E>` instead of exceptions                                 |
 
 ### Architecture Overview
 
@@ -138,7 +139,7 @@ defineConfig(userConfig)
 
 ## Four-Stage Pipeline
 
-The orchestrator (`src/generators/orchestrator.ts`) coordinates four stages:
+The pipeline has two entry points. The orchestrator (`src/generators/orchestrator.ts`) runs all 10 steps end-to-end for documentation generation. The shared pipeline factory `buildMasterDataset()` (`src/generators/pipeline/build-pipeline.ts`) runs steps 1-8 and returns a `Result<PipelineResult, PipelineError>` for CLI consumers like process-api and validate-patterns (see [Pipeline Factory](#pipeline-factory-adr-006)).
 
 ### Stage 1: Scanner
 
@@ -209,7 +210,71 @@ interface ExtractedPattern {
 
 **Dual-Source Merging:**
 
-After extraction, patterns from both sources are merged with conflict detection (`orchestrator.ts:534-560`). If the same pattern name exists in both TypeScript and Gherkin, an error is returned.
+After extraction, patterns from both sources are merged with conflict detection. Merge behavior varies by consumer: `'fatal'` mode (used by process-api and orchestrator) returns an error if the same pattern name exists in both TypeScript and Gherkin; `'concatenate'` mode (used by validate-patterns) falls back to concatenation on conflict, since the validator needs both sources for cross-source matching.
+
+### Pipeline Factory (ADR-006)
+
+ADR-006 established the **Single Read Model Architecture**: the MasterDataset is the sole read model for all consumers. The shared pipeline factory extracts the 8-step scan-extract-merge-transform pipeline into a reusable function.
+
+**Key File:** `src/generators/pipeline/build-pipeline.ts`
+
+**Signature:**
+
+```typescript
+function buildMasterDataset(
+  options: PipelineOptions
+): Promise<Result<PipelineResult, PipelineError>>;
+```
+
+**PipelineOptions:**
+
+| Field                   | Type                                         | Description                                          |
+| ----------------------- | -------------------------------------------- | ---------------------------------------------------- |
+| `input`                 | `readonly string[]`                          | TypeScript source glob patterns                      |
+| `features`              | `readonly string[]`                          | Gherkin feature glob patterns                        |
+| `baseDir`               | `string`                                     | Base directory for glob resolution                   |
+| `mergeConflictStrategy` | `'fatal' \| 'concatenate'`                   | How to handle duplicate pattern names across sources |
+| `exclude`               | `readonly string[]` (optional)               | Glob patterns to exclude from scanning               |
+| `workflowPath`          | `string` (optional)                          | Custom workflow config JSON path                     |
+| `contextInferenceRules` | `readonly ContextInferenceRule[]` (optional) | Custom context inference rules                       |
+
+**PipelineResult:**
+
+| Field        | Type                   | Description                                      |
+| ------------ | ---------------------- | ------------------------------------------------ |
+| `dataset`    | `RuntimeMasterDataset` | The fully-computed read model                    |
+| `validation` | `ValidationSummary`    | Schema validation results for all patterns       |
+| `warnings`   | `readonly string[]`    | Non-fatal warnings (e.g., Gherkin scan failures) |
+
+**PipelineError:**
+
+| Field     | Type     | Description                                             |
+| --------- | -------- | ------------------------------------------------------- |
+| `step`    | `string` | Pipeline step that failed (e.g., `'config'`, `'merge'`) |
+| `message` | `string` | Human-readable error description                        |
+
+**Consumer Table:**
+
+| Consumer            | `mergeConflictStrategy`          | Error Handling              |
+| ------------------- | -------------------------------- | --------------------------- |
+| `process-api`       | `'fatal'`                        | Maps to `process.exit(1)`   |
+| `validate-patterns` | `'concatenate'`                  | Falls back to concatenation |
+| `orchestrator`      | inline (equivalent to `'fatal'`) | Inline error reporting      |
+
+**Consumer Layers (ADR-006):**
+
+| Layer                  | May Import                            | Examples                                              |
+| ---------------------- | ------------------------------------- | ----------------------------------------------------- |
+| Pipeline Orchestration | `scanner/`, `extractor/`, `pipeline/` | `orchestrator.ts`, pipeline setup in CLI entry points |
+| Feature Consumption    | `MasterDataset`, `relationshipIndex`  | codecs, ProcessStateAPI, validators, query handlers   |
+
+**Named Anti-Patterns (ADR-006):**
+
+| Anti-Pattern            | Detection Signal                                                                                   |
+| ----------------------- | -------------------------------------------------------------------------------------------------- |
+| Parallel Pipeline       | Feature consumer imports from `scanner/` or `extractor/`                                           |
+| Lossy Local Type        | Local interface with subset of `ExtractedPattern` fields + dedicated extraction function           |
+| Re-derived Relationship | Building `Map` or `Set` from `pattern.implementsPatterns`, `uses`, or `dependsOn` in consumer code |
 
 ### Stage 3: Transformer
 
@@ -299,14 +364,23 @@ interface MasterDataset {
   phaseCount: number;
   categoryCount: number;
 
-  // ─── Relationship Index ─────────────────────────────────────────────────
+  // ─── Relationship Index (10 fields) ─────────────────────────────────────
   relationshipIndex: Record<
     string,
     {
-      uses: string[];
-      usedBy: string[];
-      dependsOn: string[];
-      enables: string[];
+      // Forward relationships (from annotations)
+      uses: string[]; // @libar-docs-uses
+      dependsOn: string[]; // @libar-docs-depends-on
+      implementsPatterns: string[]; // @libar-docs-implements
+      extendsPattern?: string; // @libar-docs-extends
+      seeAlso: string[]; // @libar-docs-see-also
+      apiRef: string[]; // @libar-docs-api-ref
+
+      // Reverse lookups (computed by transformer)
+      usedBy: string[]; // inverse of uses
+      enables: string[]; // inverse of dependsOn
+      implementedBy: ImplementationRef[]; // inverse of implementsPatterns (with file paths)
+      extendedBy: string[]; // inverse of extendsPattern
     }
   >;
 }
@@ -982,6 +1056,30 @@ Data-driven configuration for pattern categorization:
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
+### Pipeline Factory Entry Point (ADR-006)
+
+Steps 1-8 are also available via `buildMasterDataset()` from `src/generators/pipeline/build-pipeline.ts`. The orchestrator adds Steps 9-10 (codec execution and file writing).
+
+```
+buildMasterDataset(options)
+         │
+         ▼
+    Steps 1-8 (scan → extract → merge → transform)
+         │
+         ▼
+    Result<PipelineResult, PipelineError>
+         │
+         ├── process-api CLI        (mergeConflictStrategy: 'fatal')
+         │     └── query handlers consume dataset
+         │
+         ├── validate-patterns CLI  (mergeConflictStrategy: 'concatenate')
+         │     └── cross-source validation via relationshipIndex
+         │
+         └── orchestrator           (inline pipeline, adds Steps 9-10)
+               ├── Step 9:  Codec execution → RenderableDocument[]
+               └── Step 10: File writing → OutputFile[]
+```
+
 ### MasterDataset Views
 
 ```
@@ -1400,18 +1498,20 @@ filterQuarters: []; // All (default)
 
 ## Code References
 
-| Component                | File                                            | Purpose                       |
-| ------------------------ | ----------------------------------------------- | ----------------------------- |
-| MasterDataset Schema     | `src/validation-schemas/master-dataset.ts`      | Central data structure        |
-| transformToMasterDataset | `src/generators/pipeline/transform-dataset.ts`  | Single-pass transformation    |
-| Document Codecs          | `src/renderable/codecs/*.ts`                    | Zod 4 codec implementations   |
-| Reference Codec          | `src/renderable/codecs/reference.ts`            | Scoped reference documents    |
-| Composite Codec          | `src/renderable/codecs/composite.ts`            | Multi-codec assembly          |
-| Convention Extractor     | `src/renderable/codecs/convention-extractor.ts` | Convention content extraction |
-| Shape Matcher            | `src/renderable/codecs/shape-matcher.ts`        | Declaration-level filtering   |
-| Markdown Renderer        | `src/renderable/render.ts`                      | Block → Markdown              |
-| Claude Context Renderer  | `src/renderable/render.ts`                      | LLM-optimized rendering       |
-| Orchestrator             | `src/generators/orchestrator.ts`                | Pipeline coordination         |
-| TypeScript Scanner       | `src/scanner/pattern-scanner.ts`                | TS AST parsing                |
-| Gherkin Scanner          | `src/scanner/gherkin-scanner.ts`                | Feature file parsing          |
-| Shape Extractor          | `src/extractor/shape-extractor.ts`              | Shape extraction from TS      |
+| Component                | File                                            | Purpose                                        |
+| ------------------------ | ----------------------------------------------- | ---------------------------------------------- |
+| MasterDataset Schema     | `src/validation-schemas/master-dataset.ts`      | Central data structure                         |
+| transformToMasterDataset | `src/generators/pipeline/transform-dataset.ts`  | Single-pass transformation                     |
+| Document Codecs          | `src/renderable/codecs/*.ts`                    | Zod 4 codec implementations                    |
+| Reference Codec          | `src/renderable/codecs/reference.ts`            | Scoped reference documents                     |
+| Composite Codec          | `src/renderable/codecs/composite.ts`            | Multi-codec assembly                           |
+| Convention Extractor     | `src/renderable/codecs/convention-extractor.ts` | Convention content extraction                  |
+| Shape Matcher            | `src/renderable/codecs/shape-matcher.ts`        | Declaration-level filtering                    |
+| Markdown Renderer        | `src/renderable/render.ts`                      | Block → Markdown                               |
+| Claude Context Renderer  | `src/renderable/render.ts`                      | LLM-optimized rendering                        |
+| Orchestrator             | `src/generators/orchestrator.ts`                | Pipeline coordination                          |
+| TypeScript Scanner       | `src/scanner/pattern-scanner.ts`                | TS AST parsing                                 |
+| Gherkin Scanner          | `src/scanner/gherkin-scanner.ts`                | Feature file parsing                           |
+| Pipeline Factory         | `src/generators/pipeline/build-pipeline.ts`     | Shared 8-step pipeline for CLI consumers       |
+| Business Rules Query     | `src/api/rules-query.ts`                        | Rules domain query (from Gherkin Rule: blocks) |
+| Shape Extractor          | `src/extractor/shape-extractor.ts`              | Shape extraction from TS                       |

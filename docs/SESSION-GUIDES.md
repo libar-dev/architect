@@ -194,7 +194,7 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 
 6. **Regenerate docs:**
    ```bash
-   npx generate-docs -g patterns,roadmap -i "src/**/*.ts" --features "specs/**/*.feature" -o docs -f
+   pnpm docs:all
    ```
 
 ### Do NOT
