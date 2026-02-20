@@ -8,7 +8,7 @@
  * @libar-docs-arch-role service
  * @libar-docs-arch-context cli
  * @libar-docs-arch-layer application
- * @libar-docs-uses ProcessStateAPI, MasterDataset, Pattern Scanner, Doc Extractor, Gherkin Scanner, Gherkin Extractor, PatternSummarizerImpl, FuzzyMatcherImpl, OutputPipelineImpl
+ * @libar-docs-uses ProcessStateAPI, MasterDataset, PipelineFactory, RulesQueryModule, PatternSummarizerImpl, FuzzyMatcherImpl, OutputPipelineImpl
  * @libar-docs-used-by npm scripts, Claude Code sessions
  * @libar-docs-usecase "When querying delivery process state from CLI"
  * @libar-docs-usecase "When Claude Code needs real-time delivery state queries"

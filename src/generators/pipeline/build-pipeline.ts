@@ -30,6 +30,7 @@ import { mergePatterns } from './merge-patterns.js';
 import { loadConfig, formatConfigError } from '../../config/config-loader.js';
 import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../../config/defaults.js';
 import { loadDefaultWorkflow, loadWorkflowFromPath } from '../../config/workflow-loader.js';
+import type { LoadedWorkflow } from '../../config/workflow-loader.js';
 import {
   transformToMasterDataset,
   transformToMasterDatasetWithValidation,
@@ -271,6 +272,10 @@ export async function buildMasterDataset(
     allMerged = mergeResult.value;
   } else if (options.mergeConflictStrategy === 'concatenate') {
     // Validator behavior: fall back to concatenation on conflict (DD-2)
+    warnings.push({
+      type: 'scan',
+      message: `Pattern merge conflicts detected but concatenated per strategy: ${mergeResult.error}`,
+    });
     allMerged = [...extraction.patterns, ...gherkinPatterns];
   } else {
     // Fatal behavior: return error on conflict (DD-2)
@@ -284,7 +289,7 @@ export async function buildMasterDataset(
   const allPatterns = computeHierarchyChildren(allMerged);
 
   // Step 7: Load workflow configuration
-  let workflow;
+  let workflow: LoadedWorkflow;
   if (options.workflowPath !== undefined) {
     const workflowResult = await loadWorkflowFromPath(options.workflowPath);
     if (!workflowResult.ok) {
