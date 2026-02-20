@@ -161,6 +161,10 @@ export async function buildMasterDataset(options) {
     }
     else if (options.mergeConflictStrategy === 'concatenate') {
         // Validator behavior: fall back to concatenation on conflict (DD-2)
+        warnings.push({
+            type: 'scan',
+            message: `Pattern merge conflicts detected but concatenated per strategy: ${mergeResult.error}`,
+        });
         allMerged = [...extraction.patterns, ...gherkinPatterns];
     }
     else {

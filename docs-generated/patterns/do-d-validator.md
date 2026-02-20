@@ -14,7 +14,7 @@
 ## Description
 
 Validates that completed phases meet Definition of Done criteria:
-1. All deliverables must have "complete" status
+1. All deliverables must be in a terminal state (complete, n/a, or superseded)
 2. At least one @acceptance-criteria scenario must exist
 
 ### When to Use

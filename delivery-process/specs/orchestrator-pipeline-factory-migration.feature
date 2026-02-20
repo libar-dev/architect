@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:OrchestratorPipelineFactoryMigration
 @libar-docs-status:completed
+@libar-docs-unlock-reason:PR28-review-structural-fixes
 @libar-docs-phase:101
 @libar-docs-effort:2d
 @libar-docs-product-area:Generation
@@ -61,21 +62,10 @@ Feature: Orchestrator Pipeline Factory Migration
   The factory's `PipelineResult.warnings` changes from `readonly string[]`
   to `readonly PipelineWarning[]` where `PipelineWarning` is:
 
-      """typescript
-      interface PipelineWarning {
-        readonly type: 'scan' | 'extraction' | 'gherkin-parse';
-        readonly message: string;
-        readonly count?: number;
-        readonly details?: readonly PipelineWarningDetail[];
-      }
-
-      interface PipelineWarningDetail {
-        readonly file: string;
-        readonly line?: number;
-        readonly column?: number;
-        readonly message: string;
-      }
-      """
+  See PipelineWarning and PipelineWarningDetail interfaces in
+  src/generators/pipeline/build-pipeline.ts. PipelineWarning has a
+  discriminated type field ('scan' | 'extraction' | 'gherkin-parse'),
+  a message, optional count, and optional details array.
 
   This is structurally similar to `GenerationWarning` + `WarningDetail`
   from orchestrator.ts. The orchestrator maps `PipelineWarning` to
@@ -108,14 +98,9 @@ Feature: Orchestrator Pipeline Factory Migration
   had skipped directives, how many Gherkin files had parse errors. The
   factory adds an optional `scanMetadata` field:
 
-      """typescript
-      interface ScanMetadata {
-        readonly scannedFileCount: number;
-        readonly scanErrorCount: number;
-        readonly skippedDirectiveCount: number;
-        readonly gherkinErrorCount: number;
-      }
-      """
+  See ScanMetadata interface in src/generators/pipeline/build-pipeline.ts.
+  It carries scannedFileCount, scanErrorCount, skippedDirectiveCount,
+  and gherkinErrorCount.
 
   This avoids exposing raw `ScannedFile[]` (which would be a Parallel
   Pipeline enabler) while providing the counts the orchestrator needs
@@ -310,9 +295,19 @@ Feature: Orchestrator Pipeline Factory Migration
       And warnings include the scan error for the failing file
       And the pipeline does not return Result.err
 
-  @acceptance-criteria
-  Scenario: Full verification passes
-    Given the complete refactored codebase
-    When running pnpm build, pnpm test, pnpm lint, and pnpm validate:patterns
-    Then all pass with zero errors
-    And pnpm docs:all produces identical output to pre-refactor
+  Rule: End-to-end verification confirms behavioral equivalence
+
+    **Invariant:** After migration, all CLI commands and doc generation
+    produce identical output to pre-refactor behavior.
+
+    **Rationale:** The migration must not change observable behavior for any
+    consumer. Full verification confirms the factory migration is a pure refactor.
+
+    **Verified by:** Full verification passes
+
+    @acceptance-criteria
+    Scenario: Full verification passes
+      Given the complete refactored codebase
+      When running pnpm build, pnpm test, pnpm lint, and pnpm validate:patterns
+      Then all pass with zero errors
+      And pnpm docs:all produces identical output to pre-refactor

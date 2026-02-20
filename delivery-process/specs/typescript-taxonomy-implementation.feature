@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:TypeScriptTaxonomyImplementation
 @libar-docs-status:completed
-@libar-docs-unlock-reason:Normalize-deliverable-status-taxonomy
+@libar-docs-unlock-reason:PR28-acceptance-criteria-tagging
 @libar-docs-phase:99
 @libar-docs-release:v1.0.0
 @libar-docs-effort:4h
@@ -123,12 +123,14 @@ Feature: TypeScript Taxonomy Implementation
   # Zod Schema Updates
   # ─────────────────────────────────────────────────────────────────────────────
 
+  @acceptance-criteria
   Scenario: MetadataTagDefinitionSchema uses FORMAT_TYPES
     Given the updated validation schema
     When defining the format field
     Then it uses z.enum(FORMAT_TYPES) not hardcoded strings
     And changes to FORMAT_TYPES propagate automatically
 
+  @acceptance-criteria
   Scenario: Status field validation uses constant
     Given a pattern with status field
     When validated against schema
@@ -154,6 +156,7 @@ Feature: TypeScript Taxonomy Implementation
   # Registry Builder
   # ─────────────────────────────────────────────────────────────────────────────
 
+  @acceptance-criteria
   Scenario: buildRegistry returns expected structure
     Given the taxonomy module
     When buildRegistry() is called

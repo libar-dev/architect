@@ -63,12 +63,13 @@ Detail Level: Compact summary
 
 --- ProcessAPILayeredExtraction ---
 
-| Rule                                                              | Description                                                                                                        |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| CLI file contains only routing, no domain logic                   | **Invariant:** `process-api.ts` parses arguments, calls the pipeline<br> factory for the MasterDataset, routes...  |
-| Pipeline factory is shared across CLI consumers                   | **Invariant:** The scan-extract-transform sequence is defined once in...                                           |
-| Domain logic lives in API modules                                 | **Invariant:** Query logic that operates on MasterDataset lives in<br> `src/api/` modules. The `rules-query.ts`... |
-| Pipeline factory returns Result for consumer-owned error handling | **Invariant:** The factory returns `Result<PipelineResult, PipelineError>`<br> rather than throwing or calling...  |
+| Rule                                                              | Description                                                                                                          |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| CLI file contains only routing, no domain logic                   | **Invariant:** `process-api.ts` parses arguments, calls the pipeline<br> factory for the MasterDataset, routes...    |
+| Pipeline factory is shared across CLI consumers                   | **Invariant:** The scan-extract-transform sequence is defined once in...                                             |
+| Domain logic lives in API modules                                 | **Invariant:** Query logic that operates on MasterDataset lives in<br> `src/api/` modules. The `rules-query.ts`...   |
+| Pipeline factory returns Result for consumer-owned error handling | **Invariant:** The factory returns `Result<PipelineResult, PipelineError>`<br> rather than throwing or calling...    |
+| End-to-end verification confirms behavioral equivalence           | **Invariant:** After extraction, all CLI commands produce identical output<br> to pre-refactor behavior with zero... |
 
 --- DataAPIStubIntegration ---
 

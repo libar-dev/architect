@@ -317,7 +317,19 @@ validate-patterns.ts throws, and orchestrator.ts (future) returns
 
     **Verified by:** Factory uses Result monad
 
-_Verified by: Factory uses Result monad, Full verification passes_
+_Verified by: Factory uses Result monad_
+
+**End-to-end verification confirms behavioral equivalence**
+
+**Invariant:** After extraction, all CLI commands produce identical output
+to pre-refactor behavior with zero build, test, lint, and validation errors.
+
+    **Rationale:** The refactor must not change observable behavior. Full CLI
+    verification confirms the extraction is a pure refactor.
+
+    **Verified by:** Full verification passes
+
+_Verified by: Full verification passes_
 
 ## Deliverables
 

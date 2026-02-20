@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ProcessAPILayeredExtraction
 @libar-docs-status:completed
+@libar-docs-unlock-reason:PR28-review-structural-fixes
 @libar-docs-phase:100
 @libar-docs-effort:2d
 @libar-docs-product-area:DataAPI
@@ -303,11 +304,21 @@ Feature: Process API Layered Extraction
       And it does not call process.exit or throw
       And the PipelineError includes the step that failed and the error details
 
-  @acceptance-criteria
-  Scenario: Full verification passes
-    Given the complete refactored codebase
-    When running pnpm build, pnpm test, pnpm lint, and pnpm validate:patterns
-    Then all pass with zero errors
-    And pnpm process:query -- overview produces the same output as before
-    And pnpm process:query -- rules produces the same output as before
-    And pnpm process:query -- rules --product-area DataAPI produces the same output as before
+  Rule: End-to-end verification confirms behavioral equivalence
+
+    **Invariant:** After extraction, all CLI commands produce identical output
+    to pre-refactor behavior with zero build, test, lint, and validation errors.
+
+    **Rationale:** The refactor must not change observable behavior. Full CLI
+    verification confirms the extraction is a pure refactor.
+
+    **Verified by:** Full verification passes
+
+    @acceptance-criteria
+    Scenario: Full verification passes
+      Given the complete refactored codebase
+      When running pnpm build, pnpm test, pnpm lint, and pnpm validate:patterns
+      Then all pass with zero errors
+      And pnpm process:query -- overview produces the same output as before
+      And pnpm process:query -- rules produces the same output as before
+      And pnpm process:query -- rules --product-area DataAPI produces the same output as before

@@ -246,21 +246,10 @@ _Verified by: File not found error includes path, Parse error includes line numb
   The factory's `PipelineResult.warnings` changes from `readonly string[]`
   to `readonly PipelineWarning[]` where `PipelineWarning` is:
 
-      """typescript
-      interface PipelineWarning {
-        readonly type: 'scan' | 'extraction' | 'gherkin-parse';
-        readonly message: string;
-        readonly count?: number;
-        readonly details?: readonly PipelineWarningDetail[];
-      }
-
-      interface PipelineWarningDetail {
-        readonly file: string;
-        readonly line?: number;
-        readonly column?: number;
-        readonly message: string;
-      }
-      """
+  See PipelineWarning and PipelineWarningDetail interfaces in
+  src/generators/pipeline/build-pipeline.ts. PipelineWarning has a
+  discriminated type field ('scan' | 'extraction' | 'gherkin-parse'),
+  a message, optional count, and optional details array.
 
   This is structurally similar to `GenerationWarning` + `WarningDetail`
   from orchestrator.ts. The orchestrator maps `PipelineWarning` to
@@ -293,14 +282,9 @@ _Verified by: File not found error includes path, Parse error includes line numb
   had skipped directives, how many Gherkin files had parse errors. The
   factory adds an optional `scanMetadata` field:
 
-      """typescript
-      interface ScanMetadata {
-        readonly scannedFileCount: number;
-        readonly scanErrorCount: number;
-        readonly skippedDirectiveCount: number;
-        readonly gherkinErrorCount: number;
-      }
-      """
+  See ScanMetadata interface in src/generators/pipeline/build-pipeline.ts.
+  It carries scannedFileCount, scanErrorCount, skippedDirectiveCount,
+  and gherkinErrorCount.
 
   This avoids exposing raw `ScannedFile[]` (which would be a Parallel
   Pipeline enabler) while providing the counts the orchestrator needs
@@ -505,7 +489,19 @@ _Verified by: Orchestrator warnings preserved, Existing consumers unaffected_
 
     **Verified by:** Partial success mode works
 
-_Verified by: Partial success mode works, Full verification passes_
+_Verified by: Partial success mode works_
+
+**End-to-end verification confirms behavioral equivalence**
+
+**Invariant:** After migration, all CLI commands and doc generation
+    produce identical output to pre-refactor behavior.
+
+    **Rationale:** The migration must not change observable behavior for any
+    consumer. Full verification confirms the factory migration is a pure refactor.
+
+    **Verified by:** Full verification passes
+
+_Verified by: Full verification passes_
 
 ---
 

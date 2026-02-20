@@ -64,7 +64,7 @@
 
 | Pattern | Status | Description |
 | --- | --- | --- |
-| 📋 Architecture Diagram Advanced | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
+| 📋 Architecture Diagram Advanced | planned | Problem: Core diagram generation (see ArchitectureDiagramCore) produces component-level diagrams from `arch-*` tags. |
 | 📋 Architecture Diagram Core | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
 
 ---

@@ -41,7 +41,9 @@ graph TB
     subgraph related["Related"]
         Pattern_Scanner["Pattern Scanner"]:::neighbor
         StubResolverImpl["StubResolverImpl"]:::neighbor
+        RulesQueryModule["RulesQueryModule"]:::neighbor
         FSMValidator["FSMValidator"]:::neighbor
+        PipelineFactory["PipelineFactory"]:::neighbor
         ProcessStateAPICLI["ProcessStateAPICLI"]:::neighbor
         PhaseStateMachineValidation["PhaseStateMachineValidation"]:::neighbor
         DataAPIDesignSessionSupport["DataAPIDesignSessionSupport"]:::neighbor
@@ -51,7 +53,8 @@ graph TB
     end
     ProcessAPICLIImpl -->|uses| ProcessStateAPI
     ProcessAPICLIImpl -->|uses| MasterDataset
-    ProcessAPICLIImpl -->|uses| Pattern_Scanner
+    ProcessAPICLIImpl -->|uses| PipelineFactory
+    ProcessAPICLIImpl -->|uses| RulesQueryModule
     ProcessAPICLIImpl -->|uses| PatternSummarizerImpl
     ProcessAPICLIImpl -->|uses| FuzzyMatcherImpl
     ProcessAPICLIImpl -->|uses| OutputPipelineImpl
@@ -89,6 +92,7 @@ graph TB
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
     StubResolverImpl -->|uses| ProcessStateAPI
     FSMValidator ..->|implements| PhaseStateMachineValidation
+    PipelineFactory -->|uses| MasterDataset
     DataAPIDesignSessionSupport -.->|depends on| DataAPIContextAssembly
     DataAPIContextAssembly -.->|depends on| DataAPIOutputShaping
     DataAPIArchitectureQueries -.->|depends on| DataAPIOutputShaping
@@ -966,7 +970,7 @@ domain query delegates to an `src/api/` module.
 </details>
 
 <details>
-<summary>Pipeline factory returns Result for consumer-owned error handling (2 scenarios)</summary>
+<summary>Pipeline factory returns Result for consumer-owned error handling (1 scenarios)</summary>
 
 #### Pipeline factory returns Result for consumer-owned error handling
 
@@ -977,6 +981,20 @@ domain query delegates to an `src/api/` module.
 **Verified by:**
 
 - Factory uses Result monad
+
+</details>
+
+<details>
+<summary>End-to-end verification confirms behavioral equivalence (1 scenarios)</summary>
+
+#### End-to-end verification confirms behavioral equivalence
+
+**Invariant:** After extraction, all CLI commands produce identical output to pre-refactor behavior with zero build, test, lint, and validation errors.
+
+**Rationale:** The refactor must not change observable behavior. Full CLI verification confirms the extraction is a pure refactor.
+
+**Verified by:**
+
 - Full verification passes
 
 </details>

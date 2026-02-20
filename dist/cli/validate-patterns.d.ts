@@ -84,6 +84,8 @@ export interface ValidateCLIConfig {
     magicCommentThreshold: number;
     /** Show version */
     version: boolean;
+    /** Show info-level messages in pretty output */
+    verbose: boolean;
 }
 /**
  * Parse command line arguments

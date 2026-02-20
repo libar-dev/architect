@@ -26,23 +26,23 @@
 | Status | planned |
 | Effort | 1w |
 
-**Problem:** Architecture documentation requires manually maintaining mermaid diagrams
-  that duplicate information already encoded in source code. When code changes,
-  diagrams become stale. Manual sync is error-prone and time-consuming.
+**Problem:** Core diagram generation (see ArchitectureDiagramCore) produces
+  component-level diagrams from `arch-*` tags. However, large codebases need
+  additional visualization modes: layered views grouping patterns by architectural
+  layer, CLI-integrated generation via the generator registry, and sequence
+  diagrams showing runtime interaction flows between components.
 
-  **Solution:** Generate architecture diagrams automatically from source code annotations
-  using dedicated `arch-*` tags for precise control. Three tags classify components:
-  - `@libar-docs-arch-role` - Component type (preset-configurable: service, handler, repository, etc.)
-  - `@libar-docs-arch-context` - Bounded context for subgraph grouping
-  - `@libar-docs-arch-layer` - Architectural layer (domain, application, infrastructure)
+  **Solution:** Extend the architecture diagram system with advanced capabilities:
+  - Layered diagrams that group patterns by `@libar-docs-arch-layer` (domain, application, infrastructure)
+  - Generator registry integration for CLI-driven generation via `pnpm docs:architecture`
+  - Sequence diagram support for modeling runtime interactions between components
 
   **Why It Matters:**
   | Benefit | How |
-  | Always-current diagrams | Generated from source annotations |
-  | Bounded context isolation | arch-context groups into subgraphs |
-  | Multiple diagram types | Component diagrams + layered diagrams |
-  | UML-inspired semantics | Relationship arrows match uses/depends-on/implements/extends |
-  | CLI integration | `pnpm docs:architecture` via generator registry |
+  | Layer visibility | Layered diagrams reveal architectural boundaries |
+  | CLI integration | Generator registry enables `pnpm docs:architecture` |
+  | Runtime modeling | Sequence diagrams show interaction flows |
+  | Composable views | Multiple diagram types from the same annotations |
 
 #### Acceptance Criteria
 

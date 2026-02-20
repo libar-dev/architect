@@ -22,11 +22,11 @@ export interface RulesFilters {
     onlyInvariants: boolean;
 }
 export interface RuleOutput {
-    name: string;
-    invariant: string | undefined;
-    rationale: string | undefined;
-    verifiedBy: string[];
-    scenarioCount: number;
+    readonly name: string;
+    readonly invariant: string | undefined;
+    readonly rationale: string | undefined;
+    readonly verifiedBy: readonly string[];
+    readonly scenarioCount: number;
 }
 export interface RulesQueryResult {
     readonly productAreas: ReadonlyArray<{
