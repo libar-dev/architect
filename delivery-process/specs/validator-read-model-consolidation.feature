@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:ValidatorReadModelConsolidation
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-phase:100
 @libar-docs-effort:3d
 @libar-docs-product-area:Validation
