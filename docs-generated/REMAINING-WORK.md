@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 223/318 (70%)
+**Overall Progress:** [██████████████░░░░░░] 224/318 (70%)
 
 | Status | Count |
 | --- | --- |
-| 🚧 Active | 48 |
+| 🚧 Active | 47 |
 | 📋 Planned | 47 |
-| **Total Remaining** | 95 |
+| **Total Remaining** | 94 |
 
 ---
 
@@ -31,7 +31,7 @@
 | 📋 [StepLintExtendedRules](remaining/phase-51-step-lint-extended-rules.md) | 1 | 0 | 0% |
 | 📋 [TypeScriptTaxonomyImplementation](remaining/phase-99-type-script-taxonomy-implementation.md) | 4 | 0 | 56% |
 | 📋 [ValidatorReadModelConsolidation](remaining/phase-100-validator-read-model-consolidation.md) | 11 | 0 | 27% |
-| 🚧 [OrchestratorPipelineFactoryMigration](remaining/phase-101-orchestrator-pipeline-factory-migration.md) | 2 | 1 | 0% |
+| 📋 [OrchestratorPipelineFactoryMigration](remaining/phase-101-orchestrator-pipeline-factory-migration.md) | 1 | 0 | 50% |
 | 📋 [CodecBehaviorTesting](remaining/phase-102-codec-behavior-testing.md) | 1 | 0 | 0% |
 | 📋 [StepDefinitionCompletion](remaining/phase-103-step-definition-completion.md) | 1 | 0 | 0% |
 | 📋 [GeneratorInfrastructureTesting](remaining/phase-104-generator-infrastructure-testing.md) | 1 | 0 | 0% |
@@ -43,7 +43,7 @@
 
 | Priority | Count |
 | --- | --- |
-| 🚧 In Progress | 48 |
+| 🚧 In Progress | 47 |
 | ✅ Ready to Start | 45 |
 | ⚠️ Blocked | 2 |
 

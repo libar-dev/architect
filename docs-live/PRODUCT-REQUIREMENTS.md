@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall:** [███████████████░░░░░] 132/177 (75%)
+**Overall:** [███████████████░░░░░] 133/177 (75%)
 
 | Metric         | Value |
 | -------------- | ----- |
 | Total Features | 177   |
-| Completed      | 132   |
-| Active         | 15    |
+| Completed      | 133   |
+| Active         | 14    |
 | Planned        | 30    |
 | Product Areas  | 7     |
 | User Roles     | 1     |
@@ -119,7 +119,7 @@
 
 ### Generation
 
-58/72 complete (81%)
+59/72 complete (82%)
 
 - [✅ Arch Generator Registration](requirements/phase-00-arch-generator-registration.md)
 - [✅ Arch Index Dataset](requirements/phase-00-arch-index-dataset.md)
@@ -144,6 +144,7 @@
 - [✅ Layered Diagram Generation](requirements/phase-00-layered-diagram-generation.md)
 - [✅ Merge Patterns](requirements/phase-00-merge-patterns.md)
 - [✅ Mermaid Relationship Rendering](requirements/phase-00-mermaid-relationship-rendering.md)
+- [✅ Orchestrator Pipeline Factory Migration - eliminate last parallel pipeline and unify pipeline definition](requirements/phase-101-orchestrator-pipeline-factory-migration.md)
 - [✅ Patterns Codec Testing](requirements/phase-00-patterns-codec-testing.md)
 - [✅ Planning Codec Testing](requirements/phase-00-planning-codec-testing.md)
 - [✅ Poc Integration](requirements/phase-00-poc-integration.md)
@@ -179,7 +180,6 @@
 - [✅ Validation Rules Codec Testing](requirements/phase-00-validation-rules-codec-testing.md)
 - [✅ Warning Collector Testing](requirements/phase-00-warning-collector-testing.md)
 - [✅ Zod Codec Migration](requirements/phase-00-zod-codec-migration.md)
-- [🚧 Orchestrator Pipeline Factory Migration - eliminate last parallel pipeline and unify pipeline definition](requirements/phase-101-orchestrator-pipeline-factory-migration.md)
 - [🚧 Reference Doc Showcase - validates all content blocks via single integration document](requirements/phase-30-reference-doc-showcase.md)
 - [📋 Architecture Delta - document release changes automatically](requirements/phase-100-architecture-delta.md)
 - [📋 Architecture Diagram Advanced](requirements/phase-23-architecture-diagram-advanced.md)
@@ -320,6 +320,7 @@
 | ✅ Merge Patterns                                             | Generation    | -         | completed |
 | ✅ Mermaid Relationship Rendering                             | Generation    | -         | completed |
 | ✅ Mvp Workflow Implementation                                | Process       | -         | completed |
+| ✅ Orchestrator Pipeline Factory Migration                    | Generation    | -         | completed |
 | ✅ Pattern Relationship Model                                 | Annotation    | -         | completed |
 | ✅ Patterns Codec Testing                                     | Generation    | -         | completed |
 | ✅ Pattern Tag Extraction                                     | Annotation    | -         | completed |
@@ -390,7 +391,6 @@
 | 🚧 Context Formatter Tests                                    | DataAPI       | -         | active    |
 | 🚧 Depends On Tag Testing                                     | Annotation    | -         | active    |
 | 🚧 Fuzzy Match Tests                                          | DataAPI       | -         | active    |
-| 🚧 Orchestrator Pipeline Factory Migration                    | Generation    | -         | active    |
 | 🚧 Output Pipeline Tests                                      | DataAPI       | -         | active    |
 | 🚧 Pattern Helpers Tests                                      | DataAPI       | -         | active    |
 | 🚧 Pattern Summarize Tests                                    | DataAPI       | -         | active    |

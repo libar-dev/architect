@@ -1,4 +1,4 @@
-# 🚧 Orchestrator Pipeline Factory Migration
+# ✅ Orchestrator Pipeline Factory Migration
 
 **Purpose:** Detailed requirements for the Orchestrator Pipeline Factory Migration feature
 
@@ -8,7 +8,7 @@
 
 | Property       | Value                                                          |
 | -------------- | -------------------------------------------------------------- |
-| Status         | active                                                         |
+| Status         | completed                                                      |
 | Product Area   | Generation                                                     |
 | Business Value | eliminate last parallel pipeline and unify pipeline definition |
 | Phase          | 101                                                            |
@@ -326,13 +326,13 @@ _Verified by: Partial success mode works, Full verification passes_
 
 ## Deliverables
 
-- Move mergePatterns to pipeline/merge-patterns.ts (pending)
-- Add PipelineWarning structured types (pending)
-- Enrich factory with structured warnings and scan metadata (pending)
-- Add includeValidation and failOnScanErrors options (pending)
-- Migrate generateDocumentation to factory call (pending)
-- Remove unused scanner/extractor imports from orchestrator (pending)
-- Full end-to-end verification (pending)
+- Move mergePatterns to pipeline/merge-patterns.ts (complete)
+- Add PipelineWarning structured types (complete)
+- Enrich factory with structured warnings and scan metadata (complete)
+- Add includeValidation and failOnScanErrors options (complete)
+- Migrate generateDocumentation to factory call (complete)
+- Remove unused scanner/extractor imports from orchestrator (complete)
+- Full end-to-end verification (complete)
 
 ## Implementations
 

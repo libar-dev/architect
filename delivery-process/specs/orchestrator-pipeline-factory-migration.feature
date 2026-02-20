@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:OrchestratorPipelineFactoryMigration
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-phase:101
 @libar-docs-effort:2d
 @libar-docs-product-area:Generation
@@ -185,13 +185,13 @@ Feature: Orchestrator Pipeline Factory Migration
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Move mergePatterns to pipeline/merge-patterns.ts | pending | src/generators/pipeline/merge-patterns.ts |
-      | Add PipelineWarning structured types | pending | src/generators/pipeline/build-pipeline.ts |
-      | Enrich factory with structured warnings and scan metadata | pending | src/generators/pipeline/build-pipeline.ts |
-      | Add includeValidation and failOnScanErrors options | pending | src/generators/pipeline/build-pipeline.ts |
-      | Migrate generateDocumentation to factory call | pending | src/generators/orchestrator.ts |
-      | Remove unused scanner/extractor imports from orchestrator | pending | src/generators/orchestrator.ts |
-      | Full end-to-end verification | pending | CLI output |
+      | Move mergePatterns to pipeline/merge-patterns.ts | complete | src/generators/pipeline/merge-patterns.ts |
+      | Add PipelineWarning structured types | complete | src/generators/pipeline/build-pipeline.ts |
+      | Enrich factory with structured warnings and scan metadata | complete | src/generators/pipeline/build-pipeline.ts |
+      | Add includeValidation and failOnScanErrors options | complete | src/generators/pipeline/build-pipeline.ts |
+      | Migrate generateDocumentation to factory call | complete | src/generators/orchestrator.ts |
+      | Remove unused scanner/extractor imports from orchestrator | complete | src/generators/orchestrator.ts |
+      | Full end-to-end verification | complete | CLI output |
 
   Rule: Orchestrator delegates pipeline to factory
 

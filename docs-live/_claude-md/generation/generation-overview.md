@@ -526,6 +526,61 @@ Detail Level: Compact summary
 | Pattern names are sanitized for Mermaid node IDs  | **Invariant:** Pattern names must be transformed into valid Mermaid node IDs by replacing special characters (dots,... |
 | All relationship types appear in single graph     | **Invariant:** The generated Mermaid graph must combine all relationship types (uses, depends-on, implements,...       |
 
+--- LayeredDiagramGeneration ---
+
+| Rule                                                    | Description                                                                                                             |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Layered diagrams group patterns by arch-layer           | **Invariant:** Each distinct arch-layer value must produce exactly one Mermaid subgraph containing all patterns with... |
+| Layer order is domain to infrastructure (top to bottom) | **Invariant:** Layer subgraphs must be rendered in Clean Architecture order: domain first, then application, then...    |
+| Context labels included in layered diagram nodes        | **Invariant:** Each node in a layered diagram must include its bounded context name as a label, since context is not... |
+| Patterns without layer go to Other subgraph             | **Invariant:** Patterns that have arch-role or arch-context but no arch-layer must be placed in an "Other" subgraph,... |
+| Layered diagram includes summary section                | **Invariant:** The generated layered diagram document must include an Overview section with annotated source file...    |
+
+--- ArchGeneratorRegistration ---
+
+| Rule                                                         | Description                                                                                                              |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| Architecture generator is registered in the registry         | **Invariant:** The generator registry must contain an "architecture" generator entry available for CLI invocation....    |
+| Architecture generator produces component diagram by default | **Invariant:** Running the architecture generator without diagram type options must produce a component diagram with...  |
+| Architecture generator supports diagram type options         | **Invariant:** The architecture generator must accept a diagram type option that selects between component and...        |
+| Architecture generator supports context filtering            | **Invariant:** When context filtering is applied, the generated diagram must include only patterns from the specified... |
+
+--- ComponentDiagramGeneration ---
+
+| Rule                                                    | Description                                                                                                            |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Component diagrams group patterns by bounded context    | **Invariant:** Each distinct arch-context value must produce exactly one Mermaid subgraph containing all patterns...   |
+| Context-less patterns go to Shared Infrastructure       | **Invariant:** Patterns without an arch-context value must be placed in a "Shared Infrastructure" subgraph, never...   |
+| Relationship types render with distinct arrow styles    | **Invariant:** Each relationship type must render with its designated Mermaid arrow style: uses (-->), depends-on...   |
+| Arrows only connect annotated components                | **Invariant:** Relationship arrows must only be rendered when both source and target patterns exist in the...          |
+| Component diagram includes summary section              | **Invariant:** The generated component diagram document must include an Overview section with component count and...   |
+| Component diagram includes legend when enabled          | **Invariant:** When the legend is enabled, the document must include a Legend section explaining relationship arrow... |
+| Component diagram includes inventory table when enabled | **Invariant:** When the inventory is enabled, the document must include a Component Inventory table with Component,... |
+| Empty architecture data shows guidance message          | **Invariant:** When no patterns have architecture annotations, the document must display a guidance message...         |
+
+--- ArchTagExtraction ---
+
+| Rule                                                         | Description                                                                                                              |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| arch-role tag is defined in the registry                     | **Invariant:** The tag registry must contain an arch-role tag with enum format and all valid architectural role...       |
+| arch-context tag is defined in the registry                  | **Invariant:** The tag registry must contain an arch-context tag with value format for free-form bounded context...      |
+| arch-layer tag is defined in the registry                    | **Invariant:** The tag registry must contain an arch-layer tag with enum format and exactly three values: domain,...     |
+| AST parser extracts arch-role from TypeScript annotations    | **Invariant:** The AST parser must extract the arch-role value from JSDoc annotations and populate the directive's...    |
+| AST parser extracts arch-context from TypeScript annotations | **Invariant:** The AST parser must extract the arch-context value from JSDoc annotations and populate the directive's... |
+| AST parser extracts arch-layer from TypeScript annotations   | **Invariant:** The AST parser must extract the arch-layer value from JSDoc annotations and populate the directive's...   |
+| AST parser handles multiple arch tags together               | **Invariant:** When a JSDoc block contains arch-role, arch-context, and arch-layer tags, all three must be extracted...  |
+| Missing arch tags yield undefined values                     | **Invariant:** Arch tag fields absent from a JSDoc block must be undefined in the extracted directive, not null or...    |
+
+--- ArchIndexDataset ---
+
+| Rule                                                   | Description                                                                                                              |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| archIndex groups patterns by arch-role                 | **Invariant:** Every pattern with an arch-role tag must appear in the archIndex.byRole map under its role key....        |
+| archIndex groups patterns by arch-context              | **Invariant:** Every pattern with an arch-context tag must appear in the archIndex.byContext map under its context...    |
+| archIndex groups patterns by arch-layer                | **Invariant:** Every pattern with an arch-layer tag must appear in the archIndex.byLayer map under its layer key....     |
+| archIndex.all contains all patterns with any arch tag  | **Invariant:** archIndex.all must contain exactly the set of patterns that have at least one arch tag (role, context,... |
+| Patterns without arch tags are excluded from archIndex | **Invariant:** Patterns lacking all three arch tags (role, context, layer) must not appear in any archIndex view....     |
+
 --- TimelineCodecTesting ---
 
 | Rule                                                                      | Description                                                                                                             |
@@ -681,58 +736,3 @@ Detail Level: Compact summary
 | additionalFiles merge with last-wins semantics            | **Invariant:** additionalFiles from all children are merged into<br> a single record. When keys collide, the later...  |
 | composeDocuments works at document level without codecs   | **Invariant:** composeDocuments accepts RenderableDocument array and<br> produces a composed RenderableDocument...     |
 | Empty codec outputs are handled gracefully                | **Invariant:** Codecs producing empty sections arrays contribute<br> nothing to the output. No separator is emitted... |
-
---- LayeredDiagramGeneration ---
-
-| Rule                                                    | Description                                                                                                             |
-| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Layered diagrams group patterns by arch-layer           | **Invariant:** Each distinct arch-layer value must produce exactly one Mermaid subgraph containing all patterns with... |
-| Layer order is domain to infrastructure (top to bottom) | **Invariant:** Layer subgraphs must be rendered in Clean Architecture order: domain first, then application, then...    |
-| Context labels included in layered diagram nodes        | **Invariant:** Each node in a layered diagram must include its bounded context name as a label, since context is not... |
-| Patterns without layer go to Other subgraph             | **Invariant:** Patterns that have arch-role or arch-context but no arch-layer must be placed in an "Other" subgraph,... |
-| Layered diagram includes summary section                | **Invariant:** The generated layered diagram document must include an Overview section with annotated source file...    |
-
---- ArchGeneratorRegistration ---
-
-| Rule                                                         | Description                                                                                                              |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| Architecture generator is registered in the registry         | **Invariant:** The generator registry must contain an "architecture" generator entry available for CLI invocation....    |
-| Architecture generator produces component diagram by default | **Invariant:** Running the architecture generator without diagram type options must produce a component diagram with...  |
-| Architecture generator supports diagram type options         | **Invariant:** The architecture generator must accept a diagram type option that selects between component and...        |
-| Architecture generator supports context filtering            | **Invariant:** When context filtering is applied, the generated diagram must include only patterns from the specified... |
-
---- ComponentDiagramGeneration ---
-
-| Rule                                                    | Description                                                                                                            |
-| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Component diagrams group patterns by bounded context    | **Invariant:** Each distinct arch-context value must produce exactly one Mermaid subgraph containing all patterns...   |
-| Context-less patterns go to Shared Infrastructure       | **Invariant:** Patterns without an arch-context value must be placed in a "Shared Infrastructure" subgraph, never...   |
-| Relationship types render with distinct arrow styles    | **Invariant:** Each relationship type must render with its designated Mermaid arrow style: uses (-->), depends-on...   |
-| Arrows only connect annotated components                | **Invariant:** Relationship arrows must only be rendered when both source and target patterns exist in the...          |
-| Component diagram includes summary section              | **Invariant:** The generated component diagram document must include an Overview section with component count and...   |
-| Component diagram includes legend when enabled          | **Invariant:** When the legend is enabled, the document must include a Legend section explaining relationship arrow... |
-| Component diagram includes inventory table when enabled | **Invariant:** When the inventory is enabled, the document must include a Component Inventory table with Component,... |
-| Empty architecture data shows guidance message          | **Invariant:** When no patterns have architecture annotations, the document must display a guidance message...         |
-
---- ArchTagExtraction ---
-
-| Rule                                                         | Description                                                                                                              |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| arch-role tag is defined in the registry                     | **Invariant:** The tag registry must contain an arch-role tag with enum format and all valid architectural role...       |
-| arch-context tag is defined in the registry                  | **Invariant:** The tag registry must contain an arch-context tag with value format for free-form bounded context...      |
-| arch-layer tag is defined in the registry                    | **Invariant:** The tag registry must contain an arch-layer tag with enum format and exactly three values: domain,...     |
-| AST parser extracts arch-role from TypeScript annotations    | **Invariant:** The AST parser must extract the arch-role value from JSDoc annotations and populate the directive's...    |
-| AST parser extracts arch-context from TypeScript annotations | **Invariant:** The AST parser must extract the arch-context value from JSDoc annotations and populate the directive's... |
-| AST parser extracts arch-layer from TypeScript annotations   | **Invariant:** The AST parser must extract the arch-layer value from JSDoc annotations and populate the directive's...   |
-| AST parser handles multiple arch tags together               | **Invariant:** When a JSDoc block contains arch-role, arch-context, and arch-layer tags, all three must be extracted...  |
-| Missing arch tags yield undefined values                     | **Invariant:** Arch tag fields absent from a JSDoc block must be undefined in the extracted directive, not null or...    |
-
---- ArchIndexDataset ---
-
-| Rule                                                   | Description                                                                                                              |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| archIndex groups patterns by arch-role                 | **Invariant:** Every pattern with an arch-role tag must appear in the archIndex.byRole map under its role key....        |
-| archIndex groups patterns by arch-context              | **Invariant:** Every pattern with an arch-context tag must appear in the archIndex.byContext map under its context...    |
-| archIndex groups patterns by arch-layer                | **Invariant:** Every pattern with an arch-layer tag must appear in the archIndex.byLayer map under its layer key....     |
-| archIndex.all contains all patterns with any arch tag  | **Invariant:** archIndex.all must contain exactly the set of patterns that have at least one arch tag (role, context,... |
-| Patterns without arch tags are excluded from archIndex | **Invariant:** Patterns lacking all three arch tags (role, context, layer) must not appear in any archIndex view....     |

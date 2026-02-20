@@ -31,7 +31,7 @@ Configuration is the entry boundary — it transforms a user-authored `delivery-
 
 The generation pipeline transforms annotated source code into markdown documents. It follows a four-stage architecture: Scanner → Extractor → Transformer → Codec. Codecs are pure functions — given a MasterDataset, they produce a RenderableDocument without side effects. CompositeCodec composes multiple codecs into a single document.
 
-**75 patterns** — 61 completed, 2 active, 12 planned
+**75 patterns** — 62 completed, 1 active, 12 planned
 
 **Key patterns:** ADR005CodecBasedMarkdownRendering, CodecDrivenReferenceGeneration, CrossCuttingDocumentInclusion, ArchitectureDiagramGeneration, ScopedArchitecturalView
 
@@ -83,12 +83,12 @@ Process defines the USDP-inspired session workflow that governs how work moves t
 | ----------------------------------------------- | -------- | --------- | ------ | ------- |
 | [Annotation](product-areas/ANNOTATION.md)       | 26       | 23        | 2      | 1       |
 | [Configuration](product-areas/CONFIGURATION.md) | 9        | 8         | 0      | 1       |
-| [Generation](product-areas/GENERATION.md)       | 75       | 61        | 2      | 12      |
+| [Generation](product-areas/GENERATION.md)       | 75       | 62        | 1      | 12      |
 | [Validation](product-areas/VALIDATION.md)       | 22       | 14        | 1      | 7       |
 | [DataAPI](product-areas/DATA-API.md)            | 34       | 20        | 10     | 4       |
 | [CoreTypes](product-areas/CORE-TYPES.md)        | 7        | 6         | 0      | 1       |
 | [Process](product-areas/PROCESS.md)             | 11       | 4         | 0      | 7       |
-| **Total**                                       | **184**  | **136**   | **15** | **33**  |
+| **Total**                                       | **184**  | **137**   | **14** | **33**  |
 
 ---
 

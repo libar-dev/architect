@@ -37,19 +37,16 @@ and validates directive structure.
 - ```typescript
 
   ```
-
 - const result = test('hello');
 - console.log(result); // 'HELLO'
 - ```
 
   ```
-
 -
 - @example
 - ```typescript
 
   ```
-
 - const result = test('world');
 - ```
    */
@@ -252,7 +249,6 @@ and validates directive structure.
 - ```typescript
 
   ```
-
 - hasTag('@libar-docs-example'); // checking for a tag
 - hasTag('@libar-docs-saga'); // another example
 - ```

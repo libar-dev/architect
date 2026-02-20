@@ -7,15 +7,15 @@
 
 ## Overall Progress
 
-**Patterns:** [██████████████░░░░░░] 223/318 (70%)
+**Patterns:** [██████████████░░░░░░] 224/318 (70%)
 
 **Phases:** 5/19 complete
 
 | Metric | Value |
 | --- | --- |
 | Total Patterns | 318 |
-| Completed | 223 |
-| Active | 48 |
+| Completed | 224 |
+| Active | 47 |
 | Planned | 47 |
 
 ---
@@ -39,7 +39,7 @@
 | 📋 [StepLintExtendedRules](phases/phase-51-step-lint-extended-rules.md) | 0/1 | 0% |
 | 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 5/9 | 56% |
 | 📋 [ValidatorReadModelConsolidation](phases/phase-100-validator-read-model-consolidation.md) | 4/15 | 27% |
-| 🚧 [OrchestratorPipelineFactoryMigration](phases/phase-101-orchestrator-pipeline-factory-migration.md) | 0/2 | 0% |
+| 📋 [OrchestratorPipelineFactoryMigration](phases/phase-101-orchestrator-pipeline-factory-migration.md) | 1/2 | 50% |
 | 📋 [CodecBehaviorTesting](phases/phase-102-codec-behavior-testing.md) | 0/1 | 0% |
 | 📋 [StepDefinitionCompletion](phases/phase-103-step-definition-completion.md) | 0/1 | 0% |
 | 📋 [GeneratorInfrastructureTesting](phases/phase-104-generator-infrastructure-testing.md) | 0/1 | 0% |
@@ -236,14 +236,14 @@
 
 ---
 
-### 🚧 OrchestratorPipelineFactoryMigration
+### 📋 OrchestratorPipelineFactoryMigration
 
-[░░░░░░░░░░░░░░░] 0/2 0% complete
+[████████░░░░░░░] 1/2 50% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
 | 📋 Cli Behavior Testing | planned | All 5 CLI commands (generate-docs, lint-patterns, lint-process, validate-patterns, generate-tag-taxonomy) have zero... |
-| 🚧 Orchestrator Pipeline Factory Migration | active | `orchestrator.ts` is the last feature consumer that wires the 8-step scan-extract-merge-transform pipeline inline... |
+| ✅ Orchestrator Pipeline Factory Migration | completed | `orchestrator.ts` is the last feature consumer that wires the 8-step scan-extract-merge-transform pipeline inline... |
 
 ---
 

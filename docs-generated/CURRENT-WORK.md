@@ -7,15 +7,15 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 223/318 (70%)
+**Overall Progress:** [██████████████░░░░░░] 224/318 (70%)
 
 | Metric | Value |
 | --- | --- |
 | Total Patterns | 318 |
-| Completed | 223 |
-| Active | 48 |
+| Completed | 224 |
+| Active | 47 |
 | Planned | 47 |
-| Active Phases | 5 |
+| Active Phases | 4 |
 
 ---
 
@@ -115,28 +115,6 @@
 
 ---
 
-### 🚧 OrchestratorPipelineFactoryMigration
-
-[░░░░░░░░░░░░░░░] 0/2 0% complete (0 done, 1 active, 1 planned)
-
-| Pattern | Description |
-| --- | --- |
-| 🚧 Orchestrator Pipeline Factory Migration | `orchestrator.ts` is the last feature consumer that wires the 8-step scan-extract-merge-transform pipeline inline... |
-
-#### Deliverables
-
-- 📋 Move mergePatterns to pipeline/merge-patterns.ts
-- 📋 Add PipelineWarning structured types
-- 📋 Enrich factory with structured warnings and scan metadata
-- 📋 Add includeValidation and failOnScanErrors options
-- 📋 Migrate generateDocumentation to factory call
-- 📋 Remove unused scanner/extractor imports from orchestrator
-- 📋 Full end-to-end verification
-
-[View OrchestratorPipelineFactoryMigration details →](current/phase-101-orchestrator-pipeline-factory-migration.md)
-
----
-
 ## All Active Patterns
 
 | Pattern | Phase | Effort | Description |
@@ -145,7 +123,6 @@
 | 🚧 Pattern Helpers Tests | Phase 25 | - | - |
 | 🚧 Reference Doc Showcase | Phase 30 | 13d | The Reference Generation Sample document exercises a small fraction of the reference codec's capabilities: 2... |
 | 🚧 Step Lint Vitest Cucumber | Phase 50 | 1d | Hours are lost debugging vitest-cucumber-specific issues that only surface at test runtime. |
-| 🚧 Orchestrator Pipeline Factory Migration | Phase 101 | 2d | `orchestrator.ts` is the last feature consumer that wires the 8-step scan-extract-merge-transform pipeline inline... |
 | 🚧 API Module | - | - | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
 | 🚧 Arch Queries Impl | - | - | Pure functions over MasterDataset for deep architecture exploration. |
 | 🚧 Arch Queries Test | - | - | - |

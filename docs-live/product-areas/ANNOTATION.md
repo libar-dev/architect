@@ -358,7 +358,6 @@ Current pattern (duplication):
 - ```typescript
 
   ```
-
 - // DUPLICATED from actual interface below
 - interface DeciderInput {
 - state: ProcessState;

@@ -24,8 +24,8 @@ graph TB
     subgraph generator["Generator"]
         SourceMapper[/"SourceMapper"/]
         Documentation_Generation_Orchestrator("Documentation Generation Orchestrator")
-        DecisionDocGenerator("DecisionDocGenerator")
         TransformDataset("TransformDataset")
+        DecisionDocGenerator("DecisionDocGenerator")
     end
     subgraph renderer["Renderer"]
         PatternsCodec[("PatternsCodec")]
@@ -48,10 +48,10 @@ graph TB
     PatternsCodec ..->|implements| PatternRelationshipModel
     CompositeCodec ..->|implements| ReferenceDocShowcase
     ArchitectureCodec -->|uses| MasterDataset
-    DecisionDocGenerator -.->|depends on| DecisionDocCodec
-    DecisionDocGenerator -.->|depends on| SourceMapper
     TransformDataset -->|uses| MasterDataset
     TransformDataset ..->|implements| PatternRelationshipModel
+    DecisionDocGenerator -.->|depends on| DecisionDocCodec
+    DecisionDocGenerator -.->|depends on| SourceMapper
     classDef neighbor stroke-dasharray: 5 5
 ```
 
@@ -5754,6 +5754,618 @@ with distinct visual styles per relationship semantics.
 
 </details>
 
+### LayeredDiagramGeneration
+
+[View LayeredDiagramGeneration source](tests/features/behavior/architecture-diagrams/layered-diagram.feature)
+
+As a documentation generator
+I want to generate layered architecture diagrams from metadata
+So that system architecture is visualized by layer hierarchy
+
+<details>
+<summary>Layered diagrams group patterns by arch-layer (1 scenarios)</summary>
+
+#### Layered diagrams group patterns by arch-layer
+
+**Invariant:** Each distinct arch-layer value must produce exactly one Mermaid subgraph containing all patterns with that layer.
+
+**Verified by:**
+
+- Generate subgraphs for each layer
+- Generate subgraphs for each layer
+
+  Patterns with arch-layer are grouped into Mermaid subgraphs.
+  Each layer becomes a visual container.
+
+</details>
+
+<details>
+<summary>Layer order is domain to infrastructure (top to bottom) (1 scenarios)</summary>
+
+#### Layer order is domain to infrastructure (top to bottom)
+
+**Invariant:** Layer subgraphs must be rendered in Clean Architecture order: domain first, then application, then infrastructure.
+
+**Rationale:** The visual order reflects the dependency rule where outer layers depend on inner layers; reversing it would misrepresent the architecture.
+
+**Verified by:**
+
+- Layers render in correct order
+- Layers render in correct order
+
+  The layer subgraphs are rendered in Clean Architecture order:
+  domain at top
+
+- then application
+- then infrastructure at bottom.
+  This reflects the dependency rule: outer layers depend on inner layers.
+
+</details>
+
+<details>
+<summary>Context labels included in layered diagram nodes (1 scenarios)</summary>
+
+#### Context labels included in layered diagram nodes
+
+**Invariant:** Each node in a layered diagram must include its bounded context name as a label, since context is not conveyed by subgraph grouping.
+
+**Rationale:** Layered diagrams group by layer, not context, so the context label is the only way to identify which bounded context a node belongs to.
+
+**Verified by:**
+
+- Nodes include context labels
+- Nodes include context labels
+
+  Unlike component diagrams which group by context
+
+- layered diagrams
+  include the context as a label in each node name.
+
+</details>
+
+<details>
+<summary>Patterns without layer go to Other subgraph (1 scenarios)</summary>
+
+#### Patterns without layer go to Other subgraph
+
+**Invariant:** Patterns that have arch-role or arch-context but no arch-layer must be placed in an "Other" subgraph, never omitted from the diagram.
+
+**Rationale:** Omitting unlayered patterns would silently hide architectural components; the "Other" group makes their missing classification visible.
+
+**Verified by:**
+
+- Unlayered patterns in Other subgraph
+- Unlayered patterns in Other subgraph
+
+  Patterns that have arch-role or arch-context but no arch-layer
+  are grouped into an "Other" subgraph.
+
+</details>
+
+<details>
+<summary>Layered diagram includes summary section (1 scenarios)</summary>
+
+#### Layered diagram includes summary section
+
+**Invariant:** The generated layered diagram document must include an Overview section with annotated source file count.
+
+**Verified by:**
+
+- Summary section for layered view
+- Summary section for layered view
+
+  The generated document starts with an overview section
+  specific to layered architecture visualization.
+
+</details>
+
+### ArchGeneratorRegistration
+
+[View ArchGeneratorRegistration source](tests/features/behavior/architecture-diagrams/generator-registration.feature)
+
+As a CLI user
+I want an architecture generator registered in the generator registry
+So that I can run pnpm docs:architecture to generate diagrams
+
+<details>
+<summary>Architecture generator is registered in the registry (1 scenarios)</summary>
+
+#### Architecture generator is registered in the registry
+
+**Invariant:** The generator registry must contain an "architecture" generator entry available for CLI invocation.
+
+**Verified by:**
+
+- Generator is available in registry
+- Generator is available in registry
+
+  The architecture generator must be registered like other built-in
+  generators so it can be invoked via CLI.
+
+</details>
+
+<details>
+<summary>Architecture generator produces component diagram by default (1 scenarios)</summary>
+
+#### Architecture generator produces component diagram by default
+
+**Invariant:** Running the architecture generator without diagram type options must produce a component diagram with bounded context subgraphs.
+
+**Verified by:**
+
+- Default generation produces component diagram
+- Default generation produces component diagram
+
+  Running the architecture generator without options produces
+  a component diagram (bounded context view).
+
+</details>
+
+<details>
+<summary>Architecture generator supports diagram type options (1 scenarios)</summary>
+
+#### Architecture generator supports diagram type options
+
+**Invariant:** The architecture generator must accept a diagram type option that selects between component and layered diagram output.
+
+**Verified by:**
+
+- Generate layered diagram with options
+- Generate layered diagram with options
+
+  The generator accepts options to specify diagram type
+  (component or layered).
+
+</details>
+
+<details>
+<summary>Architecture generator supports context filtering (1 scenarios)</summary>
+
+#### Architecture generator supports context filtering
+
+**Invariant:** When context filtering is applied, the generated diagram must include only patterns from the specified bounded contexts and exclude all others.
+
+**Verified by:**
+
+- Filter to specific contexts
+- Filter to specific contexts
+
+  The generator can filter to specific bounded contexts
+  for focused diagram output.
+
+</details>
+
+### ComponentDiagramGeneration
+
+[View ComponentDiagramGeneration source](tests/features/behavior/architecture-diagrams/component-diagram.feature)
+
+As a documentation generator
+I want to generate component diagrams from architecture metadata
+So that system architecture is automatically visualized with bounded context subgraphs
+
+<details>
+<summary>Component diagrams group patterns by bounded context (1 scenarios)</summary>
+
+#### Component diagrams group patterns by bounded context
+
+**Invariant:** Each distinct arch-context value must produce exactly one Mermaid subgraph containing all patterns with that context.
+
+**Verified by:**
+
+- Generate subgraphs for bounded contexts
+- Generate subgraphs for bounded contexts
+
+  Patterns with arch-context are grouped into Mermaid subgraphs.
+  Each bounded context becomes a visual container.
+
+</details>
+
+<details>
+<summary>Context-less patterns go to Shared Infrastructure (1 scenarios)</summary>
+
+#### Context-less patterns go to Shared Infrastructure
+
+**Invariant:** Patterns without an arch-context value must be placed in a "Shared Infrastructure" subgraph, never omitted from the diagram.
+
+**Rationale:** Cross-cutting infrastructure components (event bus, logger) belong to no bounded context but must still appear in the diagram.
+
+**Verified by:**
+
+- Shared infrastructure subgraph for context-less patterns
+- Shared infrastructure subgraph for context-less patterns
+
+  Patterns without arch-context are grouped into a
+  "Shared Infrastructure" subgraph.
+
+</details>
+
+<details>
+<summary>Relationship types render with distinct arrow styles (1 scenarios)</summary>
+
+#### Relationship types render with distinct arrow styles
+
+**Invariant:** Each relationship type must render with its designated Mermaid arrow style: uses (-->), depends-on (-.->), implements (..->), extends (-->>).
+
+**Rationale:** Distinct arrow styles convey dependency semantics visually; conflating them loses architectural information.
+
+**Verified by:**
+
+- Arrow styles for relationship types
+- Arrow styles for relationship types
+
+  Arrow styles follow UML conventions:
+  - uses: solid arrow (-->)
+  - depends-on: dashed arrow (-.->)
+  - implements: dotted arrow (..->)
+  - extends: open arrow (-->>)
+
+</details>
+
+<details>
+<summary>Arrows only connect annotated components (1 scenarios)</summary>
+
+#### Arrows only connect annotated components
+
+**Invariant:** Relationship arrows must only be rendered when both source and target patterns exist in the architecture index.
+
+**Rationale:** Rendering an arrow to a non-existent node would produce invalid Mermaid syntax or dangling references.
+
+**Verified by:**
+
+- Skip arrows to non-annotated targets
+- Skip arrows to non-annotated targets
+
+  Relationships pointing to non-annotated patterns
+  are not rendered (target would not exist in diagram).
+
+</details>
+
+<details>
+<summary>Component diagram includes summary section (1 scenarios)</summary>
+
+#### Component diagram includes summary section
+
+**Invariant:** The generated component diagram document must include an Overview section with component count and bounded context count.
+
+**Verified by:**
+
+- Summary section with counts
+- Summary section with counts
+
+  The generated document starts with an overview section
+  showing component counts and bounded context statistics.
+
+</details>
+
+<details>
+<summary>Component diagram includes legend when enabled (1 scenarios)</summary>
+
+#### Component diagram includes legend when enabled
+
+**Invariant:** When the legend is enabled, the document must include a Legend section explaining relationship arrow styles.
+
+**Verified by:**
+
+- Legend section with arrow explanations
+- Legend section with arrow explanations
+
+  The legend explains arrow style meanings for readers.
+
+</details>
+
+<details>
+<summary>Component diagram includes inventory table when enabled (1 scenarios)</summary>
+
+#### Component diagram includes inventory table when enabled
+
+**Invariant:** When the inventory is enabled, the document must include a Component Inventory table with Component, Context, Role, and Layer columns.
+
+**Verified by:**
+
+- Inventory table with component details
+- Inventory table with component details
+
+  The inventory lists all components with their metadata.
+
+</details>
+
+<details>
+<summary>Empty architecture data shows guidance message (1 scenarios)</summary>
+
+#### Empty architecture data shows guidance message
+
+**Invariant:** When no patterns have architecture annotations, the document must display a guidance message explaining how to add arch tags.
+
+**Rationale:** An empty diagram with no explanation would be confusing; guidance helps users onboard to the annotation system.
+
+**Verified by:**
+
+- No architecture data message
+- No architecture data message
+
+  If no patterns have architecture annotations
+
+- the document explains how to add them.
+
+</details>
+
+### ArchTagExtraction
+
+[View ArchTagExtraction source](tests/features/behavior/architecture-diagrams/arch-tag-extraction.feature)
+
+As a documentation generator
+I want architecture tags extracted from source code
+So that I can generate accurate architecture diagrams
+
+<details>
+<summary>arch-role tag is defined in the registry (2 scenarios)</summary>
+
+#### arch-role tag is defined in the registry
+
+**Invariant:** The tag registry must contain an arch-role tag with enum format and all valid architectural role values.
+
+**Rationale:** Without a registry-defined arch-role tag, the extractor cannot validate role values and diagrams may render invalid roles.
+
+**Verified by:**
+
+- arch-role tag exists with enum format
+- arch-role has required enum values
+- arch-role has required enum values
+
+  Architecture roles classify components for diagram rendering.
+  Valid roles: command-handler
+
+- projection
+- saga
+- process-manager
+- infrastructure
+- repository
+- decider
+- read-model
+- bounded-context.
+
+</details>
+
+<details>
+<summary>arch-context tag is defined in the registry (1 scenarios)</summary>
+
+#### arch-context tag is defined in the registry
+
+**Invariant:** The tag registry must contain an arch-context tag with value format for free-form bounded context names.
+
+**Verified by:**
+
+- arch-context tag exists with value format
+- arch-context tag exists with value format
+
+  Context tags group components into bounded context subgraphs.
+  Format is "value" (free-form string like "orders"
+
+- "inventory").
+
+</details>
+
+<details>
+<summary>arch-layer tag is defined in the registry (2 scenarios)</summary>
+
+#### arch-layer tag is defined in the registry
+
+**Invariant:** The tag registry must contain an arch-layer tag with enum format and exactly three values: domain, application, infrastructure.
+
+**Verified by:**
+
+- arch-layer tag exists with enum format
+- arch-layer has exactly three values
+- arch-layer has exactly three values
+
+  Layer tags enable layered architecture diagrams.
+  Valid layers: domain
+
+- application
+- infrastructure.
+
+</details>
+
+<details>
+<summary>AST parser extracts arch-role from TypeScript annotations (2 scenarios)</summary>
+
+#### AST parser extracts arch-role from TypeScript annotations
+
+**Invariant:** The AST parser must extract the arch-role value from JSDoc annotations and populate the directive's archRole field.
+
+**Verified by:**
+
+- Extract arch-role projection
+- Extract arch-role command-handler
+- Extract arch-role command-handler
+
+  The AST parser must extract arch-role alongside other pattern metadata.
+
+</details>
+
+<details>
+<summary>AST parser extracts arch-context from TypeScript annotations (2 scenarios)</summary>
+
+#### AST parser extracts arch-context from TypeScript annotations
+
+**Invariant:** The AST parser must extract the arch-context value from JSDoc annotations and populate the directive's archContext field.
+
+**Verified by:**
+
+- Extract arch-context orders
+- Extract arch-context inventory
+- Extract arch-context inventory
+
+  Context values are free-form strings naming the bounded context.
+
+</details>
+
+<details>
+<summary>AST parser extracts arch-layer from TypeScript annotations (2 scenarios)</summary>
+
+#### AST parser extracts arch-layer from TypeScript annotations
+
+**Invariant:** The AST parser must extract the arch-layer value from JSDoc annotations and populate the directive's archLayer field.
+
+**Verified by:**
+
+- Extract arch-layer application
+- Extract arch-layer infrastructure
+- Extract arch-layer infrastructure
+
+  Layer tags classify components by architectural layer.
+
+</details>
+
+<details>
+<summary>AST parser handles multiple arch tags together (1 scenarios)</summary>
+
+#### AST parser handles multiple arch tags together
+
+**Invariant:** When a JSDoc block contains arch-role, arch-context, and arch-layer tags, all three must be extracted into the directive.
+
+**Verified by:**
+
+- Extract all three arch tags
+- Extract all three arch tags
+
+  Components often have role + context + layer together.
+
+</details>
+
+<details>
+<summary>Missing arch tags yield undefined values (1 scenarios)</summary>
+
+#### Missing arch tags yield undefined values
+
+**Invariant:** Arch tag fields absent from a JSDoc block must be undefined in the extracted directive, not null or empty string.
+
+**Rationale:** Downstream consumers distinguish between "not annotated" (undefined) and "annotated with empty value" to avoid rendering ghost nodes.
+
+**Verified by:**
+
+- Missing arch tags are undefined
+- Missing arch tags are undefined
+
+  Components without arch tags should have undefined (not null or empty).
+
+</details>
+
+### ArchIndexDataset
+
+[View ArchIndexDataset source](tests/features/behavior/architecture-diagrams/arch-index.feature)
+
+As a documentation generator
+I want an archIndex built during dataset transformation
+So that I can efficiently look up patterns by role, context, and layer
+
+<details>
+<summary>archIndex groups patterns by arch-role (1 scenarios)</summary>
+
+#### archIndex groups patterns by arch-role
+
+**Invariant:** Every pattern with an arch-role tag must appear in the archIndex.byRole map under its role key.
+
+**Rationale:** Diagram generators need O(1) lookup of patterns by role to render role-based groupings efficiently.
+
+**Verified by:**
+
+- Group patterns by role
+- Group patterns by role
+
+  The archIndex.byRole map groups patterns by their architectural role
+  (command-handler
+
+- projection
+- saga
+- etc.) for efficient lookup.
+
+</details>
+
+<details>
+<summary>archIndex groups patterns by arch-context (1 scenarios)</summary>
+
+#### archIndex groups patterns by arch-context
+
+**Invariant:** Every pattern with an arch-context tag must appear in the archIndex.byContext map under its context key.
+
+**Rationale:** Component diagrams render bounded context subgraphs and need patterns grouped by context.
+
+**Verified by:**
+
+- Group patterns by context
+- Group patterns by context
+
+  The archIndex.byContext map groups patterns by bounded context
+  for subgraph rendering in component diagrams.
+
+</details>
+
+<details>
+<summary>archIndex groups patterns by arch-layer (1 scenarios)</summary>
+
+#### archIndex groups patterns by arch-layer
+
+**Invariant:** Every pattern with an arch-layer tag must appear in the archIndex.byLayer map under its layer key.
+
+**Rationale:** Layered diagrams render layer subgraphs and need patterns grouped by architectural layer.
+
+**Verified by:**
+
+- Group patterns by layer
+- Group patterns by layer
+
+  The archIndex.byLayer map groups patterns by architectural layer
+  (domain
+
+- application
+- infrastructure) for layered diagram rendering.
+
+</details>
+
+<details>
+<summary>archIndex.all contains all patterns with any arch tag (1 scenarios)</summary>
+
+#### archIndex.all contains all patterns with any arch tag
+
+**Invariant:** archIndex.all must contain exactly the set of patterns that have at least one arch tag (role, context, or layer).
+
+**Verified by:**
+
+- archIndex.all includes all annotated patterns
+- archIndex.all includes all annotated patterns
+
+  The archIndex.all array contains all patterns that have at least
+  one arch tag (role
+
+- context
+- or layer). Patterns without any arch
+  tags are excluded.
+
+</details>
+
+<details>
+<summary>Patterns without arch tags are excluded from archIndex (1 scenarios)</summary>
+
+#### Patterns without arch tags are excluded from archIndex
+
+**Invariant:** Patterns lacking all three arch tags (role, context, layer) must not appear in any archIndex view.
+
+**Rationale:** Including non-architectural patterns would pollute diagrams with irrelevant components.
+
+**Verified by:**
+
+- Non-annotated patterns excluded
+- Non-annotated patterns excluded
+
+  Patterns that have no arch-role
+
+- arch-context
+- or arch-layer are
+  not included in the archIndex at all.
+
+</details>
+
 ### TimelineCodecTesting
 
 [View TimelineCodecTesting source](tests/features/behavior/codecs/timeline-codecs.feature)
@@ -7078,618 +7690,6 @@ documents composed from any combination of existing codecs.
 **Verified by:**
 
 - Empty codec skipped without separator
-
-</details>
-
-### LayeredDiagramGeneration
-
-[View LayeredDiagramGeneration source](tests/features/behavior/architecture-diagrams/layered-diagram.feature)
-
-As a documentation generator
-I want to generate layered architecture diagrams from metadata
-So that system architecture is visualized by layer hierarchy
-
-<details>
-<summary>Layered diagrams group patterns by arch-layer (1 scenarios)</summary>
-
-#### Layered diagrams group patterns by arch-layer
-
-**Invariant:** Each distinct arch-layer value must produce exactly one Mermaid subgraph containing all patterns with that layer.
-
-**Verified by:**
-
-- Generate subgraphs for each layer
-- Generate subgraphs for each layer
-
-  Patterns with arch-layer are grouped into Mermaid subgraphs.
-  Each layer becomes a visual container.
-
-</details>
-
-<details>
-<summary>Layer order is domain to infrastructure (top to bottom) (1 scenarios)</summary>
-
-#### Layer order is domain to infrastructure (top to bottom)
-
-**Invariant:** Layer subgraphs must be rendered in Clean Architecture order: domain first, then application, then infrastructure.
-
-**Rationale:** The visual order reflects the dependency rule where outer layers depend on inner layers; reversing it would misrepresent the architecture.
-
-**Verified by:**
-
-- Layers render in correct order
-- Layers render in correct order
-
-  The layer subgraphs are rendered in Clean Architecture order:
-  domain at top
-
-- then application
-- then infrastructure at bottom.
-  This reflects the dependency rule: outer layers depend on inner layers.
-
-</details>
-
-<details>
-<summary>Context labels included in layered diagram nodes (1 scenarios)</summary>
-
-#### Context labels included in layered diagram nodes
-
-**Invariant:** Each node in a layered diagram must include its bounded context name as a label, since context is not conveyed by subgraph grouping.
-
-**Rationale:** Layered diagrams group by layer, not context, so the context label is the only way to identify which bounded context a node belongs to.
-
-**Verified by:**
-
-- Nodes include context labels
-- Nodes include context labels
-
-  Unlike component diagrams which group by context
-
-- layered diagrams
-  include the context as a label in each node name.
-
-</details>
-
-<details>
-<summary>Patterns without layer go to Other subgraph (1 scenarios)</summary>
-
-#### Patterns without layer go to Other subgraph
-
-**Invariant:** Patterns that have arch-role or arch-context but no arch-layer must be placed in an "Other" subgraph, never omitted from the diagram.
-
-**Rationale:** Omitting unlayered patterns would silently hide architectural components; the "Other" group makes their missing classification visible.
-
-**Verified by:**
-
-- Unlayered patterns in Other subgraph
-- Unlayered patterns in Other subgraph
-
-  Patterns that have arch-role or arch-context but no arch-layer
-  are grouped into an "Other" subgraph.
-
-</details>
-
-<details>
-<summary>Layered diagram includes summary section (1 scenarios)</summary>
-
-#### Layered diagram includes summary section
-
-**Invariant:** The generated layered diagram document must include an Overview section with annotated source file count.
-
-**Verified by:**
-
-- Summary section for layered view
-- Summary section for layered view
-
-  The generated document starts with an overview section
-  specific to layered architecture visualization.
-
-</details>
-
-### ArchGeneratorRegistration
-
-[View ArchGeneratorRegistration source](tests/features/behavior/architecture-diagrams/generator-registration.feature)
-
-As a CLI user
-I want an architecture generator registered in the generator registry
-So that I can run pnpm docs:architecture to generate diagrams
-
-<details>
-<summary>Architecture generator is registered in the registry (1 scenarios)</summary>
-
-#### Architecture generator is registered in the registry
-
-**Invariant:** The generator registry must contain an "architecture" generator entry available for CLI invocation.
-
-**Verified by:**
-
-- Generator is available in registry
-- Generator is available in registry
-
-  The architecture generator must be registered like other built-in
-  generators so it can be invoked via CLI.
-
-</details>
-
-<details>
-<summary>Architecture generator produces component diagram by default (1 scenarios)</summary>
-
-#### Architecture generator produces component diagram by default
-
-**Invariant:** Running the architecture generator without diagram type options must produce a component diagram with bounded context subgraphs.
-
-**Verified by:**
-
-- Default generation produces component diagram
-- Default generation produces component diagram
-
-  Running the architecture generator without options produces
-  a component diagram (bounded context view).
-
-</details>
-
-<details>
-<summary>Architecture generator supports diagram type options (1 scenarios)</summary>
-
-#### Architecture generator supports diagram type options
-
-**Invariant:** The architecture generator must accept a diagram type option that selects between component and layered diagram output.
-
-**Verified by:**
-
-- Generate layered diagram with options
-- Generate layered diagram with options
-
-  The generator accepts options to specify diagram type
-  (component or layered).
-
-</details>
-
-<details>
-<summary>Architecture generator supports context filtering (1 scenarios)</summary>
-
-#### Architecture generator supports context filtering
-
-**Invariant:** When context filtering is applied, the generated diagram must include only patterns from the specified bounded contexts and exclude all others.
-
-**Verified by:**
-
-- Filter to specific contexts
-- Filter to specific contexts
-
-  The generator can filter to specific bounded contexts
-  for focused diagram output.
-
-</details>
-
-### ComponentDiagramGeneration
-
-[View ComponentDiagramGeneration source](tests/features/behavior/architecture-diagrams/component-diagram.feature)
-
-As a documentation generator
-I want to generate component diagrams from architecture metadata
-So that system architecture is automatically visualized with bounded context subgraphs
-
-<details>
-<summary>Component diagrams group patterns by bounded context (1 scenarios)</summary>
-
-#### Component diagrams group patterns by bounded context
-
-**Invariant:** Each distinct arch-context value must produce exactly one Mermaid subgraph containing all patterns with that context.
-
-**Verified by:**
-
-- Generate subgraphs for bounded contexts
-- Generate subgraphs for bounded contexts
-
-  Patterns with arch-context are grouped into Mermaid subgraphs.
-  Each bounded context becomes a visual container.
-
-</details>
-
-<details>
-<summary>Context-less patterns go to Shared Infrastructure (1 scenarios)</summary>
-
-#### Context-less patterns go to Shared Infrastructure
-
-**Invariant:** Patterns without an arch-context value must be placed in a "Shared Infrastructure" subgraph, never omitted from the diagram.
-
-**Rationale:** Cross-cutting infrastructure components (event bus, logger) belong to no bounded context but must still appear in the diagram.
-
-**Verified by:**
-
-- Shared infrastructure subgraph for context-less patterns
-- Shared infrastructure subgraph for context-less patterns
-
-  Patterns without arch-context are grouped into a
-  "Shared Infrastructure" subgraph.
-
-</details>
-
-<details>
-<summary>Relationship types render with distinct arrow styles (1 scenarios)</summary>
-
-#### Relationship types render with distinct arrow styles
-
-**Invariant:** Each relationship type must render with its designated Mermaid arrow style: uses (-->), depends-on (-.->), implements (..->), extends (-->>).
-
-**Rationale:** Distinct arrow styles convey dependency semantics visually; conflating them loses architectural information.
-
-**Verified by:**
-
-- Arrow styles for relationship types
-- Arrow styles for relationship types
-
-  Arrow styles follow UML conventions:
-  - uses: solid arrow (-->)
-  - depends-on: dashed arrow (-.->)
-  - implements: dotted arrow (..->)
-  - extends: open arrow (-->>)
-
-</details>
-
-<details>
-<summary>Arrows only connect annotated components (1 scenarios)</summary>
-
-#### Arrows only connect annotated components
-
-**Invariant:** Relationship arrows must only be rendered when both source and target patterns exist in the architecture index.
-
-**Rationale:** Rendering an arrow to a non-existent node would produce invalid Mermaid syntax or dangling references.
-
-**Verified by:**
-
-- Skip arrows to non-annotated targets
-- Skip arrows to non-annotated targets
-
-  Relationships pointing to non-annotated patterns
-  are not rendered (target would not exist in diagram).
-
-</details>
-
-<details>
-<summary>Component diagram includes summary section (1 scenarios)</summary>
-
-#### Component diagram includes summary section
-
-**Invariant:** The generated component diagram document must include an Overview section with component count and bounded context count.
-
-**Verified by:**
-
-- Summary section with counts
-- Summary section with counts
-
-  The generated document starts with an overview section
-  showing component counts and bounded context statistics.
-
-</details>
-
-<details>
-<summary>Component diagram includes legend when enabled (1 scenarios)</summary>
-
-#### Component diagram includes legend when enabled
-
-**Invariant:** When the legend is enabled, the document must include a Legend section explaining relationship arrow styles.
-
-**Verified by:**
-
-- Legend section with arrow explanations
-- Legend section with arrow explanations
-
-  The legend explains arrow style meanings for readers.
-
-</details>
-
-<details>
-<summary>Component diagram includes inventory table when enabled (1 scenarios)</summary>
-
-#### Component diagram includes inventory table when enabled
-
-**Invariant:** When the inventory is enabled, the document must include a Component Inventory table with Component, Context, Role, and Layer columns.
-
-**Verified by:**
-
-- Inventory table with component details
-- Inventory table with component details
-
-  The inventory lists all components with their metadata.
-
-</details>
-
-<details>
-<summary>Empty architecture data shows guidance message (1 scenarios)</summary>
-
-#### Empty architecture data shows guidance message
-
-**Invariant:** When no patterns have architecture annotations, the document must display a guidance message explaining how to add arch tags.
-
-**Rationale:** An empty diagram with no explanation would be confusing; guidance helps users onboard to the annotation system.
-
-**Verified by:**
-
-- No architecture data message
-- No architecture data message
-
-  If no patterns have architecture annotations
-
-- the document explains how to add them.
-
-</details>
-
-### ArchTagExtraction
-
-[View ArchTagExtraction source](tests/features/behavior/architecture-diagrams/arch-tag-extraction.feature)
-
-As a documentation generator
-I want architecture tags extracted from source code
-So that I can generate accurate architecture diagrams
-
-<details>
-<summary>arch-role tag is defined in the registry (2 scenarios)</summary>
-
-#### arch-role tag is defined in the registry
-
-**Invariant:** The tag registry must contain an arch-role tag with enum format and all valid architectural role values.
-
-**Rationale:** Without a registry-defined arch-role tag, the extractor cannot validate role values and diagrams may render invalid roles.
-
-**Verified by:**
-
-- arch-role tag exists with enum format
-- arch-role has required enum values
-- arch-role has required enum values
-
-  Architecture roles classify components for diagram rendering.
-  Valid roles: command-handler
-
-- projection
-- saga
-- process-manager
-- infrastructure
-- repository
-- decider
-- read-model
-- bounded-context.
-
-</details>
-
-<details>
-<summary>arch-context tag is defined in the registry (1 scenarios)</summary>
-
-#### arch-context tag is defined in the registry
-
-**Invariant:** The tag registry must contain an arch-context tag with value format for free-form bounded context names.
-
-**Verified by:**
-
-- arch-context tag exists with value format
-- arch-context tag exists with value format
-
-  Context tags group components into bounded context subgraphs.
-  Format is "value" (free-form string like "orders"
-
-- "inventory").
-
-</details>
-
-<details>
-<summary>arch-layer tag is defined in the registry (2 scenarios)</summary>
-
-#### arch-layer tag is defined in the registry
-
-**Invariant:** The tag registry must contain an arch-layer tag with enum format and exactly three values: domain, application, infrastructure.
-
-**Verified by:**
-
-- arch-layer tag exists with enum format
-- arch-layer has exactly three values
-- arch-layer has exactly three values
-
-  Layer tags enable layered architecture diagrams.
-  Valid layers: domain
-
-- application
-- infrastructure.
-
-</details>
-
-<details>
-<summary>AST parser extracts arch-role from TypeScript annotations (2 scenarios)</summary>
-
-#### AST parser extracts arch-role from TypeScript annotations
-
-**Invariant:** The AST parser must extract the arch-role value from JSDoc annotations and populate the directive's archRole field.
-
-**Verified by:**
-
-- Extract arch-role projection
-- Extract arch-role command-handler
-- Extract arch-role command-handler
-
-  The AST parser must extract arch-role alongside other pattern metadata.
-
-</details>
-
-<details>
-<summary>AST parser extracts arch-context from TypeScript annotations (2 scenarios)</summary>
-
-#### AST parser extracts arch-context from TypeScript annotations
-
-**Invariant:** The AST parser must extract the arch-context value from JSDoc annotations and populate the directive's archContext field.
-
-**Verified by:**
-
-- Extract arch-context orders
-- Extract arch-context inventory
-- Extract arch-context inventory
-
-  Context values are free-form strings naming the bounded context.
-
-</details>
-
-<details>
-<summary>AST parser extracts arch-layer from TypeScript annotations (2 scenarios)</summary>
-
-#### AST parser extracts arch-layer from TypeScript annotations
-
-**Invariant:** The AST parser must extract the arch-layer value from JSDoc annotations and populate the directive's archLayer field.
-
-**Verified by:**
-
-- Extract arch-layer application
-- Extract arch-layer infrastructure
-- Extract arch-layer infrastructure
-
-  Layer tags classify components by architectural layer.
-
-</details>
-
-<details>
-<summary>AST parser handles multiple arch tags together (1 scenarios)</summary>
-
-#### AST parser handles multiple arch tags together
-
-**Invariant:** When a JSDoc block contains arch-role, arch-context, and arch-layer tags, all three must be extracted into the directive.
-
-**Verified by:**
-
-- Extract all three arch tags
-- Extract all three arch tags
-
-  Components often have role + context + layer together.
-
-</details>
-
-<details>
-<summary>Missing arch tags yield undefined values (1 scenarios)</summary>
-
-#### Missing arch tags yield undefined values
-
-**Invariant:** Arch tag fields absent from a JSDoc block must be undefined in the extracted directive, not null or empty string.
-
-**Rationale:** Downstream consumers distinguish between "not annotated" (undefined) and "annotated with empty value" to avoid rendering ghost nodes.
-
-**Verified by:**
-
-- Missing arch tags are undefined
-- Missing arch tags are undefined
-
-  Components without arch tags should have undefined (not null or empty).
-
-</details>
-
-### ArchIndexDataset
-
-[View ArchIndexDataset source](tests/features/behavior/architecture-diagrams/arch-index.feature)
-
-As a documentation generator
-I want an archIndex built during dataset transformation
-So that I can efficiently look up patterns by role, context, and layer
-
-<details>
-<summary>archIndex groups patterns by arch-role (1 scenarios)</summary>
-
-#### archIndex groups patterns by arch-role
-
-**Invariant:** Every pattern with an arch-role tag must appear in the archIndex.byRole map under its role key.
-
-**Rationale:** Diagram generators need O(1) lookup of patterns by role to render role-based groupings efficiently.
-
-**Verified by:**
-
-- Group patterns by role
-- Group patterns by role
-
-  The archIndex.byRole map groups patterns by their architectural role
-  (command-handler
-
-- projection
-- saga
-- etc.) for efficient lookup.
-
-</details>
-
-<details>
-<summary>archIndex groups patterns by arch-context (1 scenarios)</summary>
-
-#### archIndex groups patterns by arch-context
-
-**Invariant:** Every pattern with an arch-context tag must appear in the archIndex.byContext map under its context key.
-
-**Rationale:** Component diagrams render bounded context subgraphs and need patterns grouped by context.
-
-**Verified by:**
-
-- Group patterns by context
-- Group patterns by context
-
-  The archIndex.byContext map groups patterns by bounded context
-  for subgraph rendering in component diagrams.
-
-</details>
-
-<details>
-<summary>archIndex groups patterns by arch-layer (1 scenarios)</summary>
-
-#### archIndex groups patterns by arch-layer
-
-**Invariant:** Every pattern with an arch-layer tag must appear in the archIndex.byLayer map under its layer key.
-
-**Rationale:** Layered diagrams render layer subgraphs and need patterns grouped by architectural layer.
-
-**Verified by:**
-
-- Group patterns by layer
-- Group patterns by layer
-
-  The archIndex.byLayer map groups patterns by architectural layer
-  (domain
-
-- application
-- infrastructure) for layered diagram rendering.
-
-</details>
-
-<details>
-<summary>archIndex.all contains all patterns with any arch tag (1 scenarios)</summary>
-
-#### archIndex.all contains all patterns with any arch tag
-
-**Invariant:** archIndex.all must contain exactly the set of patterns that have at least one arch tag (role, context, or layer).
-
-**Verified by:**
-
-- archIndex.all includes all annotated patterns
-- archIndex.all includes all annotated patterns
-
-  The archIndex.all array contains all patterns that have at least
-  one arch tag (role
-
-- context
-- or layer). Patterns without any arch
-  tags are excluded.
-
-</details>
-
-<details>
-<summary>Patterns without arch tags are excluded from archIndex (1 scenarios)</summary>
-
-#### Patterns without arch tags are excluded from archIndex
-
-**Invariant:** Patterns lacking all three arch tags (role, context, layer) must not appear in any archIndex view.
-
-**Rationale:** Including non-architectural patterns would pollute diagrams with irrelevant components.
-
-**Verified by:**
-
-- Non-annotated patterns excluded
-- Non-annotated patterns excluded
-
-  Patterns that have no arch-role
-
-- arch-context
-- or arch-layer are
-  not included in the archIndex at all.
 
 </details>
 
