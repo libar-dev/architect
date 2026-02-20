@@ -2,7 +2,7 @@
  * @libar-docs
  * @libar-docs-core
  * @libar-docs-pattern RulesQueryModule
- * @libar-docs-status active
+ * @libar-docs-status completed
  * @libar-docs-implements ProcessAPILayeredExtraction
  * @libar-docs-product-area DataAPI
  * @libar-docs-uses BusinessRulesCodec, CodecHelpers

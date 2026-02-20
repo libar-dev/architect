@@ -2,7 +2,7 @@
  * @libar-docs
  * @libar-docs-generator @libar-docs-infra
  * @libar-docs-pattern PipelineFactory
- * @libar-docs-status active
+ * @libar-docs-status completed
  * @libar-docs-implements ProcessAPILayeredExtraction
  * @libar-docs-product-area DataAPI
  * @libar-docs-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, MasterDataset
@@ -59,7 +59,11 @@ export async function buildMasterDataset(options) {
     }
     const registry = configResult.value.instance.registry;
     // Step 2: Scan TypeScript source files
-    const scanResult = await scanPatterns({ patterns: options.input, baseDir }, registry);
+    const scanResult = await scanPatterns({
+        patterns: options.input,
+        baseDir,
+        ...(options.exclude !== undefined ? { exclude: options.exclude } : {}),
+    }, registry);
     if (!scanResult.ok) {
         return Result.err({
             step: 'scan-typescript',
@@ -75,6 +79,7 @@ export async function buildMasterDataset(options) {
         const gherkinScanResult = await scanGherkinFiles({
             patterns: options.features,
             baseDir,
+            ...(options.exclude !== undefined ? { exclude: options.exclude } : {}),
         });
         if (gherkinScanResult.ok) {
             const gherkinResult = extractPatternsFromGherkin(gherkinScanResult.value.files, {

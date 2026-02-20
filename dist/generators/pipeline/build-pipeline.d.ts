@@ -2,7 +2,7 @@
  * @libar-docs
  * @libar-docs-generator @libar-docs-infra
  * @libar-docs-pattern PipelineFactory
- * @libar-docs-status active
+ * @libar-docs-status completed
  * @libar-docs-implements ProcessAPILayeredExtraction
  * @libar-docs-product-area DataAPI
  * @libar-docs-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, MasterDataset
@@ -23,8 +23,8 @@ import type { RuntimeMasterDataset, ValidationSummary, ContextInferenceRule } fr
  *
  * DD-1: Factory lives at src/generators/pipeline/build-pipeline.ts.
  * DD-2: mergeConflictStrategy controls per-consumer conflict handling.
- * DD-3: exclude, contextInferenceRules, includeValidation support future
- *        orchestrator migration without breaking changes.
+ * DD-3: exclude, contextInferenceRules support future orchestrator
+ *        migration without breaking changes.
  */
 export interface PipelineOptions {
     readonly input: readonly string[];
@@ -34,7 +34,6 @@ export interface PipelineOptions {
     readonly exclude?: readonly string[];
     readonly workflowPath?: string;
     readonly contextInferenceRules?: readonly ContextInferenceRule[];
-    readonly includeValidation?: boolean;
 }
 /**
  * Structured error from the pipeline factory.
