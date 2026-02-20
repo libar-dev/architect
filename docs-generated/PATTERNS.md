@@ -954,6 +954,8 @@ graph TD
     Documentation_Generation_Orchestrator --> Gherkin_Extractor
     Documentation_Generation_Orchestrator --> Generator_Registry
     Documentation_Generation_Orchestrator --> JSON_Output_Codec
+    ResultMonadTypes ..-> ResultMonad
+    ErrorFactoryTypes ..-> ErrorFactories
     ShapeExtractor --> typescript_estree
     ShapeExtractor ..-> ShapeExtraction
     GherkinExtractor --> GherkinTypes
@@ -965,8 +967,6 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
-    ResultMonadTypes ..-> ResultMonad
-    ErrorFactoryTypes ..-> ErrorFactories
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     ConfigResolver --> ProjectConfigTypes
@@ -1119,6 +1119,9 @@ graph TD
     CodecDrivenReferenceGeneration -.-> ScopedArchitecturalView
     CliBehaviorTesting -.-> ADR002GherkinOnlyTesting
     ClaudeModuleGeneration -.-> ArchitectureDiagramGeneration
+    AstParserRelationshipsEdges ..-> AstParser
+    AstParserMetadata ..-> AstParser
+    AstParserExports ..-> AstParser
     StatusTransitionDetectionTesting ..-> DetectChanges
     ProcessGuardTesting -.-> PhaseStateMachineValidation
     ProcessGuardTesting -.-> AntiPatternDetector
@@ -1131,13 +1134,15 @@ graph TD
     DetectChangesTesting ..-> DetectChanges
     AntiPatternDetectorTesting -.-> DoDValidationTypes
     AntiPatternDetectorTesting ..-> AntiPatternDetector
-    AstParserRelationshipsEdges ..-> AstParser
-    AstParserMetadata ..-> AstParser
-    AstParserExports ..-> AstParser
     LintRuleIndividualTesting ..-> LintRules
     LintRuleAdvancedTesting ..-> LintRules
     LintEngineTesting -.-> LintRules
     LintEngineTesting ..-> LintEngine
+    ShapeExtractionTypesTesting ..-> ReferenceDocShowcase
+    ShapeExtractionRenderingTesting ..-> ReferenceDocShowcase
+    ExtractionPipelineEnhancementsTesting ..-> ReferenceDocShowcase
+    DualSourceExtractorTesting ..-> DualSourceExtractor
+    DeclarationLevelShapeTaggingTesting ..-> DeclarationLevelShapeTagging
     GeneratorRegistryTesting ..-> GeneratorRegistry
     GeneratorRegistryTesting ..-> GeneratorInfrastructureTesting
     PrdImplementationSectionTesting ..-> PrdImplementationSection
@@ -1155,11 +1160,6 @@ graph TD
     DecisionDocCodecTesting ..-> DecisionDocCodec
     DefineConfigTesting ..-> DefineConfig
     ConfigLoaderTesting ..-> ConfigLoader
-    ShapeExtractionTypesTesting ..-> ReferenceDocShowcase
-    ShapeExtractionRenderingTesting ..-> ReferenceDocShowcase
-    ExtractionPipelineEnhancementsTesting ..-> ReferenceDocShowcase
-    DualSourceExtractorTesting ..-> DualSourceExtractor
-    DeclarationLevelShapeTaggingTesting ..-> DeclarationLevelShapeTagging
     ValidatePatternsCli ..-> CliBehaviorTesting
     ProcessApiCliSubcommands ..-> ProcessApiCli
     ProcessApiCliModifiersAndRules ..-> ProcessApiCli
@@ -1168,6 +1168,7 @@ graph TD
     LintPatternsCli ..-> CliBehaviorTesting
     GenerateTagTaxonomyCli ..-> CliBehaviorTesting
     GenerateDocsCli ..-> CliBehaviorTesting
+    ProcessStateAPITesting ..-> ProcessStateAPICLI
     TransformDatasetTesting ..-> TransformDataset
     RichContentHelpersTesting ..-> RichContentHelpers
     RendererOutputFormats ..-> UniversalMarkdownRenderer
@@ -1177,12 +1178,6 @@ graph TD
     KebabCaseSlugs -.-> StringUtils
     ErrorHandlingUnification -.-> ResultMonad
     ErrorHandlingUnification -.-> ErrorFactories
-    ProcessStateAPITesting ..-> ProcessStateAPICLI
-    LayeredDiagramGeneration ..-> ArchitectureDiagramGeneration
-    ArchGeneratorRegistration ..-> ArchitectureDiagramGeneration
-    ComponentDiagramGeneration ..-> ArchitectureDiagramGeneration
-    ArchTagExtraction ..-> ArchitectureDiagramGeneration
-    ArchIndexDataset ..-> ArchitectureDiagramGeneration
     UsesTagTesting ..-> PatternRelationshipModel
     MermaidRelationshipRendering ..-> PatternRelationshipModel
     LinterValidationTesting ..-> PatternRelationshipModel
@@ -1207,6 +1202,11 @@ graph TD
     PlanningCodecTesting ..-> CodecBehaviorTesting
     ConventionExtractorTesting ..-> ReferenceDocShowcase
     CompositeCodecTesting ..-> ReferenceDocShowcase
+    LayeredDiagramGeneration ..-> ArchitectureDiagramGeneration
+    ArchGeneratorRegistration ..-> ArchitectureDiagramGeneration
+    ComponentDiagramGeneration ..-> ArchitectureDiagramGeneration
+    ArchTagExtraction ..-> ArchitectureDiagramGeneration
+    ArchIndexDataset ..-> ArchitectureDiagramGeneration
 ```
 
 ---

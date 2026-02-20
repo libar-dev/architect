@@ -34,9 +34,9 @@ graph TB
         ArchitectureCodec[("ArchitectureCodec")]
     end
     subgraph related["Related"]
+        MasterDataset["MasterDataset"]:::neighbor
         Pattern_Scanner["Pattern Scanner"]:::neighbor
         GherkinASTParser["GherkinASTParser"]:::neighbor
-        MasterDataset["MasterDataset"]:::neighbor
         ShapeExtractor["ShapeExtractor"]:::neighbor
         ReferenceDocShowcase["ReferenceDocShowcase"]:::neighbor
         PatternRelationshipModel["PatternRelationshipModel"]:::neighbor

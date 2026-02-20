@@ -140,6 +140,16 @@ Detail Level: Compact summary
 | Coverage analysis reports annotation completeness with gaps    | **Invariant:** Coverage reports identify unannotated files that should have<br> the libar-docs opt-in marker based on... |
 | Tags and sources commands provide taxonomy and inventory views | **Invariant:** All tag values in use are discoverable without reading<br> configuration files. Source file inventory...  |
 
+--- ProcessStateAPITesting ---
+
+| Rule                                           | Description                                                                                                              |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Status queries return correct patterns         | **Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM...  |
+| Phase queries return correct phase data        | **Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and...      |
+| FSM queries expose transition validation       | **Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels...   |
+| Pattern queries find and retrieve pattern data | **Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with...   |
+| Timeline queries group patterns by time        | **Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date... |
+
 --- ValidatePatternsCli ---
 
 | Rule                                                         | Description                                                                                                              |
@@ -225,16 +235,6 @@ Detail Level: Compact summary
 | CLI lists available generators                | **Invariant:** The --list-generators flag must display all registered generator names without performing any...     |
 | CLI generates documentation from source files | **Invariant:** Given valid input patterns and a generator name, the CLI must scan sources, extract patterns, and... |
 | CLI rejects unknown options                   | **Invariant:** Unrecognized CLI flags must cause an error with a descriptive message rather than being silently...  |
-
---- ProcessStateAPITesting ---
-
-| Rule                                           | Description                                                                                                              |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Status queries return correct patterns         | **Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM...  |
-| Phase queries return correct phase data        | **Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and...      |
-| FSM queries expose transition validation       | **Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels...   |
-| Pattern queries find and retrieve pattern data | **Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with...   |
-| Timeline queries group patterns by time        | **Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date... |
 
 --- StubTaxonomyTagTests ---
 

@@ -51,16 +51,6 @@ graph TB
         DataAPIContextAssembly["DataAPIContextAssembly"]:::neighbor
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
     end
-    ProcessAPICLIImpl -->|uses| ProcessStateAPI
-    ProcessAPICLIImpl -->|uses| MasterDataset
-    ProcessAPICLIImpl -->|uses| PipelineFactory
-    ProcessAPICLIImpl -->|uses| RulesQueryModule
-    ProcessAPICLIImpl -->|uses| PatternSummarizerImpl
-    ProcessAPICLIImpl -->|uses| FuzzyMatcherImpl
-    ProcessAPICLIImpl -->|uses| OutputPipelineImpl
-    ProcessAPICLIImpl ..->|implements| ProcessStateAPICLI
-    OutputPipelineImpl -->|uses| PatternSummarizerImpl
-    OutputPipelineImpl ..->|implements| DataAPIOutputShaping
     PatternSummarizerImpl -->|uses| ProcessStateAPI
     PatternSummarizerImpl ..->|implements| DataAPIOutputShaping
     ScopeValidatorImpl -->|uses| ProcessStateAPI
@@ -90,6 +80,16 @@ graph TB
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
+    ProcessAPICLIImpl -->|uses| ProcessStateAPI
+    ProcessAPICLIImpl -->|uses| MasterDataset
+    ProcessAPICLIImpl -->|uses| PipelineFactory
+    ProcessAPICLIImpl -->|uses| RulesQueryModule
+    ProcessAPICLIImpl -->|uses| PatternSummarizerImpl
+    ProcessAPICLIImpl -->|uses| FuzzyMatcherImpl
+    ProcessAPICLIImpl -->|uses| OutputPipelineImpl
+    ProcessAPICLIImpl ..->|implements| ProcessStateAPICLI
+    OutputPipelineImpl -->|uses| PatternSummarizerImpl
+    OutputPipelineImpl ..->|implements| DataAPIOutputShaping
     StubResolverImpl -->|uses| ProcessStateAPI
     FSMValidator ..->|implements| PhaseStateMachineValidation
     PipelineFactory -->|uses| MasterDataset
@@ -1992,6 +1992,116 @@ Extend the `arch` subcommand and add new discovery commands:
 
 </details>
 
+### ProcessStateAPITesting
+
+[View ProcessStateAPITesting source](tests/features/api/process-state-api.feature)
+
+Programmatic interface for querying delivery process state.
+Designed for Claude Code integration and tool automation.
+
+**Problem:**
+
+- Markdown generation is not ideal for programmatic access
+- Claude Code needs structured data to answer process questions
+- Multiple queries require redundant parsing of MasterDataset
+
+**Solution:**
+
+- ProcessStateAPI wraps MasterDataset with typed query methods
+- Returns structured data suitable for programmatic consumption
+- Integrates FSM validation for transition checks
+
+<details>
+<summary>Status queries return correct patterns (6 scenarios)</summary>
+
+#### Status queries return correct patterns
+
+**Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
+
+**Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
+
+**Verified by:**
+
+- Get patterns by normalized status
+- Get patterns by FSM status
+- Get current work returns active patterns
+- Get roadmap items returns roadmap and deferred
+- Get status counts
+- Get completion percentage
+
+</details>
+
+<details>
+<summary>Phase queries return correct phase data (4 scenarios)</summary>
+
+#### Phase queries return correct phase data
+
+**Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
+
+**Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
+
+**Verified by:**
+
+- Get patterns by phase
+- Get phase progress
+- Get nonexistent phase returns undefined
+- Get active phases
+
+</details>
+
+<details>
+<summary>FSM queries expose transition validation (4 scenarios)</summary>
+
+#### FSM queries expose transition validation
+
+**Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
+
+**Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
+
+**Verified by:**
+
+- Check valid transition
+- Check invalid transition
+- Get valid transitions from status
+- Get protection info
+
+</details>
+
+<details>
+<summary>Pattern queries find and retrieve pattern data (4 scenarios)</summary>
+
+#### Pattern queries find and retrieve pattern data
+
+**Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
+
+**Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
+
+**Verified by:**
+
+- Find pattern by name (case insensitive)
+- Find nonexistent pattern returns undefined
+- Get patterns by category
+- Get all categories with counts
+
+</details>
+
+<details>
+<summary>Timeline queries group patterns by time (3 scenarios)</summary>
+
+#### Timeline queries group patterns by time
+
+**Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
+
+**Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
+
+**Verified by:**
+
+- Get patterns by quarter
+- Get all quarters
+- Get recently completed sorted by date
+
+</details>
+
 ### ValidatePatternsCli
 
 [View ValidatePatternsCli source](tests/features/cli/validate-patterns.feature)
@@ -2730,116 +2840,6 @@ Command-line interface for generating documentation from annotated TypeScript.
 **Verified by:**
 
 - Unknown option causes error
-
-</details>
-
-### ProcessStateAPITesting
-
-[View ProcessStateAPITesting source](tests/features/api/process-state-api.feature)
-
-Programmatic interface for querying delivery process state.
-Designed for Claude Code integration and tool automation.
-
-**Problem:**
-
-- Markdown generation is not ideal for programmatic access
-- Claude Code needs structured data to answer process questions
-- Multiple queries require redundant parsing of MasterDataset
-
-**Solution:**
-
-- ProcessStateAPI wraps MasterDataset with typed query methods
-- Returns structured data suitable for programmatic consumption
-- Integrates FSM validation for transition checks
-
-<details>
-<summary>Status queries return correct patterns (6 scenarios)</summary>
-
-#### Status queries return correct patterns
-
-**Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
-
-**Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
-
-**Verified by:**
-
-- Get patterns by normalized status
-- Get patterns by FSM status
-- Get current work returns active patterns
-- Get roadmap items returns roadmap and deferred
-- Get status counts
-- Get completion percentage
-
-</details>
-
-<details>
-<summary>Phase queries return correct phase data (4 scenarios)</summary>
-
-#### Phase queries return correct phase data
-
-**Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
-
-**Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
-
-**Verified by:**
-
-- Get patterns by phase
-- Get phase progress
-- Get nonexistent phase returns undefined
-- Get active phases
-
-</details>
-
-<details>
-<summary>FSM queries expose transition validation (4 scenarios)</summary>
-
-#### FSM queries expose transition validation
-
-**Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
-
-**Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
-
-**Verified by:**
-
-- Check valid transition
-- Check invalid transition
-- Get valid transitions from status
-- Get protection info
-
-</details>
-
-<details>
-<summary>Pattern queries find and retrieve pattern data (4 scenarios)</summary>
-
-#### Pattern queries find and retrieve pattern data
-
-**Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
-
-**Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
-
-**Verified by:**
-
-- Find pattern by name (case insensitive)
-- Find nonexistent pattern returns undefined
-- Get patterns by category
-- Get all categories with counts
-
-</details>
-
-<details>
-<summary>Timeline queries group patterns by time (3 scenarios)</summary>
-
-#### Timeline queries group patterns by time
-
-**Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
-
-**Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
-
-**Verified by:**
-
-- Get patterns by quarter
-- Get all quarters
-- Get recently completed sorted by date
 
 </details>
 
