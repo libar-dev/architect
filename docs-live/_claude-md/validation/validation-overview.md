@@ -201,15 +201,20 @@ Detail Level: Compact summary
 | All anti-patterns can be detected in one pass         | **Invariant:** The anti-pattern detector must evaluate all registered rules in a single scan pass over the source... |
 | Violations can be formatted for console output        | **Invariant:** Anti-pattern violations must be renderable as grouped, human-readable console output....              |
 
---- LintRulesTesting ---
+--- LintRuleIndividualTesting ---
+
+| Rule                                          | Description                                                                                                      |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Files must declare an explicit pattern name   | **Invariant:** Every annotated file must have a non-empty patternName to be identifiable in the registry....     |
+| Files should declare a lifecycle status       | **Invariant:** Every annotated file should have a status tag to track its position in the delivery lifecycle.... |
+| Files should document when to use the pattern | **Invariant:** Annotated files should include whenToUse guidance so consumers know when to apply the pattern.... |
+| Files should declare relationship tags        | **Invariant:** Annotated files should declare uses or usedBy relationships to enable dependency tracking and...  |
+
+--- LintRuleAdvancedTesting ---
 
 | Rule                                                  | Description                                                                                                           |
 | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Files must declare an explicit pattern name           | **Invariant:** Every annotated file must have a non-empty patternName to be identifiable in the registry....          |
-| Files should declare a lifecycle status               | **Invariant:** Every annotated file should have a status tag to track its position in the delivery lifecycle....      |
-| Files should document when to use the pattern         | **Invariant:** Annotated files should include whenToUse guidance so consumers know when to apply the pattern....      |
 | Descriptions must not repeat the pattern name         | **Invariant:** A description that merely echoes the pattern name adds no value and must be rejected....               |
-| Files should declare relationship tags                | **Invariant:** Annotated files should declare uses or usedBy relationships to enable dependency tracking and...       |
 | Default rules collection is complete and well-ordered | **Invariant:** The default rules collection must contain all defined rules with unique IDs, ordered by severity...    |
 | Rules can be filtered by minimum severity             | **Invariant:** Filtering by severity must return only rules at or above the specified level.<br> **Rationale:** CI... |
 

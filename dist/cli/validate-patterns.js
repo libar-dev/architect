@@ -593,7 +593,7 @@ async function main() {
         const { dataset, warnings: pipelineWarnings } = pipelineResult.value;
         if (config.format === 'pretty') {
             for (const w of pipelineWarnings) {
-                console.warn(`⚠️  ${w}`);
+                console.warn(`⚠️  ${w.message}`);
             }
         }
         // Raw scans for stage-1 consumers (DoD validation, anti-pattern detection)

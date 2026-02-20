@@ -172,39 +172,382 @@ Scoped architecture diagram showing component relationships:
 
 ```mermaid
 graph LR
+    ADR006SingleReadModelArchitecture["ADR006SingleReadModelArchitecture"]
+    ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
+    ADR002GherkinOnlyTesting["ADR002GherkinOnlyTesting"]
+    ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
     ValidatorReadModelConsolidation["ValidatorReadModelConsolidation"]
     StepDefinitionCompletion["StepDefinitionCompletion"]
     SessionFileCleanup["SessionFileCleanup"]
     ProcessAPILayeredExtraction["ProcessAPILayeredExtraction"]
+    OrchestratorPipelineFactoryMigration["OrchestratorPipelineFactoryMigration"]
     MvpWorkflowImplementation["MvpWorkflowImplementation"]
     LivingRoadmapCLI["LivingRoadmapCLI"]
     EffortVarianceTracking["EffortVarianceTracking"]
     ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
     CliBehaviorTesting["CliBehaviorTesting"]
-    ADR006SingleReadModelArchitecture["ADR006SingleReadModelArchitecture"]
-    ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
-    ADR002GherkinOnlyTesting["ADR002GherkinOnlyTesting"]
-    ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
     SessionFileLifecycle["SessionFileLifecycle"]
     subgraph related["Related"]
         ADR005CodecBasedMarkdownRendering["ADR005CodecBasedMarkdownRendering"]:::neighbor
     end
+    ADR006SingleReadModelArchitecture -.->|depends on| ADR005CodecBasedMarkdownRendering
+    ADR003SourceFirstPatternArchitecture -.->|depends on| ADR001TaxonomyCanonicalValues
     ValidatorReadModelConsolidation -.->|depends on| ADR006SingleReadModelArchitecture
     StepDefinitionCompletion -.->|depends on| ADR002GherkinOnlyTesting
     SessionFileCleanup -.->|depends on| SessionFileLifecycle
     ProcessAPILayeredExtraction -.->|depends on| ValidatorReadModelConsolidation
+    OrchestratorPipelineFactoryMigration -.->|depends on| ProcessAPILayeredExtraction
     LivingRoadmapCLI -.->|depends on| MvpWorkflowImplementation
     EffortVarianceTracking -.->|depends on| MvpWorkflowImplementation
     ConfigBasedWorkflowDefinition -.->|depends on| MvpWorkflowImplementation
     CliBehaviorTesting -.->|depends on| ADR002GherkinOnlyTesting
-    ADR006SingleReadModelArchitecture -.->|depends on| ADR005CodecBasedMarkdownRendering
-    ADR003SourceFirstPatternArchitecture -.->|depends on| ADR001TaxonomyCanonicalValues
     classDef neighbor stroke-dasharray: 5 5
 ```
 
 ---
 
 ## Behavior Specifications
+
+### ADR003SourceFirstPatternArchitecture
+
+[View ADR003SourceFirstPatternArchitecture source](delivery-process/decisions/adr-003-source-first-pattern-architecture.feature)
+
+**Context:**
+The original annotation architecture assumed pattern definitions live
+in tier 1 feature specs, with TypeScript code limited to `@libar-docs-implements`.
+At scale this creates three problems: tier 1 specs become stale after implementation
+(only 39% of 44 specs have traceability to executable specs), retroactive annotation
+of existing code triggers merge conflicts, and duplicated Rules/Scenarios in tier 1
+specs average 200-400 lines that exist in better form in executable specs.
+
+**Decision:**
+Invert the ownership model: TypeScript source code is the canonical pattern
+definition. Tier 1 specs become ephemeral planning documents. The three durable
+artifacts are annotated source code, executable specs, and decision specs.
+
+**Consequences:**
+| Type | Impact |
+| Positive | Pattern identity travels with code from stub through production |
+| Positive | Eliminates stale tier 1 spec maintenance burden |
+| Positive | Executable specs become the living specification (richer, verified) |
+| Positive | Retroactive annotation works without merge conflicts |
+| Negative | Migration effort for existing tier 1 specs |
+| Negative | Requires updating CLAUDE.md annotation ownership guidance |
+
+<details>
+<summary>TypeScript source owns pattern identity</summary>
+
+#### TypeScript source owns pattern identity
+
+**Invariant:** A pattern is defined by `@libar-docs-pattern` in a TypeScript file — either a stub (pre-implementation) or source code (post-implementation).
+
+**Pattern Definition Lifecycle:**
+
+    Exception: Patterns with no TypeScript implementation (pure process or
+    workflow concerns) may be defined in decision specs. The constraint is:
+    one definition per pattern, regardless of source type.
+
+| Phase          | Location                               | Status    |
+| -------------- | -------------------------------------- | --------- |
+| Design         | `delivery-process/stubs/pattern-name/` | roadmap   |
+| Implementation | `src/path/to/module.ts`                | active    |
+| Completed      | `src/path/to/module.ts`                | completed |
+
+</details>
+
+<details>
+<summary>Tier 1 specs are ephemeral working documents</summary>
+
+#### Tier 1 specs are ephemeral working documents
+
+**Invariant:** Tier 1 roadmap specs serve planning and delivery tracking. They are not the source of truth for pattern identity, invariants, or acceptance criteria. After completion, they may be archived.
+
+**Value by lifecycle phase:**
+
+| Phase     | Planning Value                | Documentation Value                |
+| --------- | ----------------------------- | ---------------------------------- |
+| roadmap   | High                          | None (not yet built)               |
+| active    | Medium (deliverable tracking) | Low (stale snapshot)               |
+| completed | None                          | None (executable specs are better) |
+
+</details>
+
+<details>
+<summary>Three durable artifact types</summary>
+
+#### Three durable artifact types
+
+**Invariant:** The delivery process produces three artifact types with long-term value. All other artifacts are projections or ephemeral.
+
+| Artifact                 | Purpose                              | Owns                                  |
+| ------------------------ | ------------------------------------ | ------------------------------------- |
+| Annotated TypeScript     | Pattern identity, architecture graph | Name, status, uses, categories        |
+| Executable specs         | Behavior verification, invariants    | Rules, rationale, acceptance criteria |
+| Decision specs (ADR/PDR) | Architectural choices, rationale     | Why decisions were made               |
+
+</details>
+
+<details>
+<summary>Implements is UML Realization (many-to-one)</summary>
+
+#### Implements is UML Realization (many-to-one)
+
+**Invariant:** `@libar-docs-implements` declares a realization relationship. Multiple files can implement the same pattern. One file can implement multiple patterns (CSV format).
+
+| Relationship | Tag                      | Cardinality             |
+| ------------ | ------------------------ | ----------------------- |
+| Definition   | `@libar-docs-pattern`    | Exactly one per pattern |
+| Realization  | `@libar-docs-implements` | Many-to-one             |
+
+</details>
+
+<details>
+<summary>Single-definition constraint</summary>
+
+#### Single-definition constraint
+
+**Invariant:** `@libar-docs-pattern:X` may appear in exactly one file across the entire codebase. The `mergePatterns()` conflict check in `orchestrator.ts` correctly enforces this.
+
+**Migration path for existing conflicts:**
+
+| Current State                   | Resolution                                      |
+| ------------------------------- | ----------------------------------------------- |
+| Pattern in both TS and feature  | Keep TS definition, feature uses `@implements`  |
+| Pattern only in tier 1 spec     | Move definition to TS stub, archive tier 1 spec |
+| Pattern only in TS              | Already correct                                 |
+| Pattern only in executable spec | Valid if no TS implementation exists            |
+
+</details>
+
+<details>
+<summary>Reverse links preferred over forward links (1 scenarios)</summary>
+
+#### Reverse links preferred over forward links
+
+**Invariant:** `@libar-docs-implements` (reverse: "I verify this pattern") is the primary traceability mechanism. `@libar-docs-executable-specs` (forward: "my tests live here") is retained but not required.
+
+| Mechanism                     | Usage             | Reliability                      |
+| ----------------------------- | ----------------- | -------------------------------- |
+| `@implements` (reverse)       | 14 patterns (32%) | Self-maintaining, lives in test  |
+| `@executable-specs` (forward) | 9 patterns (20%)  | Requires tier 1 spec maintenance |
+
+**Verified by:**
+
+- TypeScript source is canonical pattern definition
+
+</details>
+
+### ADR002GherkinOnlyTesting
+
+[View ADR002GherkinOnlyTesting source](delivery-process/decisions/adr-002-gherkin-only-testing.feature)
+
+**Context:**
+A package that generates documentation from `.feature` files had dual
+test approaches: 97 legacy `.test.ts` files alongside Gherkin features.
+This undermined the core thesis that Gherkin IS sufficient for all testing.
+
+**Decision:**
+Enforce strict Gherkin-only testing for the delivery-process package:
+
+- All tests must be `.feature` files with step definitions
+- No new `.test.ts` files
+- Edge cases use Scenario Outline with Examples tables
+
+**Consequences:**
+| Type | Impact |
+| Positive | Single source of truth for tests AND documentation |
+| Positive | Demonstrates Gherkin sufficiency -- the package practices what it preaches |
+| Positive | Living documentation always matches test coverage |
+| Positive | Forces better scenario design with Examples tables |
+| Negative | Scenario Outline syntax more verbose than parameterized tests |
+
+#### Source-driven process benefit
+
+**Invariant:** Feature files serve as both executable specs and documentation source. This dual purpose is the primary benefit of Gherkin-only testing for this package.
+
+| Artifact            | Without Gherkin-Only        | With Gherkin-Only                  |
+| ------------------- | --------------------------- | ---------------------------------- |
+| Tests               | .test.ts (hidden from docs) | .feature (visible in docs)         |
+| Business rules      | Manually maintained         | Extracted from Rule blocks         |
+| Acceptance criteria | Implicit in test code       | Explicit @acceptance-criteria tags |
+| Traceability        | Manual cross-referencing    | @libar-docs-implements links       |
+
+**Verified by:**
+
+- Gherkin-only policy enforced
+
+### ADR001TaxonomyCanonicalValues
+
+[View ADR001TaxonomyCanonicalValues source](delivery-process/decisions/adr-001-taxonomy-canonical-values.feature)
+
+**Context:**
+The annotation system requires well-defined canonical values for taxonomy
+tags, FSM status lifecycle, and source ownership rules. Without canonical
+values, organic growth produces drift (Generator vs Generators, Process
+vs DeliveryProcess) and inconsistent grouping in generated documentation.
+
+**Decision:**
+Define canonical values for all taxonomy enums, FSM states with protection
+levels, valid transitions, tag format types, and source ownership rules.
+These are the durable constants of the delivery process.
+
+**Consequences:**
+| Type | Impact |
+| Positive | Generated docs group into coherent sections |
+| Positive | FSM enforcement has clear, auditable state definitions |
+| Positive | Source ownership prevents cross-domain tag confusion |
+| Negative | Migration effort for existing specs with non-canonical values |
+
+<details>
+<summary>Product area canonical values</summary>
+
+#### Product area canonical values
+
+**Invariant:** The product-area tag uses one of 7 canonical values. Each value represents a reader-facing documentation section, not a source module.
+
+| Value         | Reader Question                     | Covers                                          |
+| ------------- | ----------------------------------- | ----------------------------------------------- |
+| Annotation    | How do I annotate code?             | Scanning, extraction, tag parsing, dual-source  |
+| Configuration | How do I configure the tool?        | Config loading, presets, resolution             |
+| Generation    | How does code become docs?          | Codecs, generators, rendering, diagrams         |
+| Validation    | How is the workflow enforced?       | FSM, DoD, anti-patterns, process guard, lint    |
+| DataAPI       | How do I query process state?       | Process state API, stubs, context assembly, CLI |
+| CoreTypes     | What foundational types exist?      | Result monad, error factories, string utils     |
+| Process       | How does the session workflow work? | Session lifecycle, handoffs, conventions        |
+
+</details>
+
+<details>
+<summary>ADR category canonical values</summary>
+
+#### ADR category canonical values
+
+**Invariant:** The adr-category tag uses one of 4 values.
+
+| Value         | Purpose                                       |
+| ------------- | --------------------------------------------- |
+| architecture  | System structure, component design, data flow |
+| process       | Workflow, conventions, annotation rules       |
+| testing       | Test strategy, verification approach          |
+| documentation | Documentation generation, content structure   |
+
+</details>
+
+<details>
+<summary>FSM status values and protection levels</summary>
+
+#### FSM status values and protection levels
+
+**Invariant:** Pattern status uses exactly 4 values with defined protection levels. These are enforced by Process Guard at commit time.
+
+| Status    | Protection   | Can Add Deliverables | Allowed Actions                 |
+| --------- | ------------ | -------------------- | ------------------------------- |
+| roadmap   | None         | Yes                  | Full editing                    |
+| active    | Scope-locked | No                   | Edit existing deliverables only |
+| completed | Hard-locked  | No                   | Requires unlock-reason tag      |
+| deferred  | None         | Yes                  | Full editing                    |
+
+</details>
+
+<details>
+<summary>Valid FSM transitions</summary>
+
+#### Valid FSM transitions
+
+**Invariant:** Only these transitions are valid. All others are rejected by Process Guard. Completed is a terminal state. Modifications require `@libar-docs-unlock-reason` escape hatch.
+
+| From     | To        | Trigger               |
+| -------- | --------- | --------------------- |
+| roadmap  | active    | Start work            |
+| roadmap  | deferred  | Postpone              |
+| active   | completed | All deliverables done |
+| active   | roadmap   | Blocked/regressed     |
+| deferred | roadmap   | Resume planning       |
+
+</details>
+
+<details>
+<summary>Tag format types</summary>
+
+#### Tag format types
+
+**Invariant:** Every tag has one of 6 format types that determines how its value is parsed.
+
+| Format       | Parsing                        | Example                        |
+| ------------ | ------------------------------ | ------------------------------ |
+| flag         | Boolean presence, no value     | @libar-docs-core               |
+| value        | Simple string                  | @libar-docs-pattern MyPattern  |
+| enum         | Constrained to predefined list | @libar-docs-status completed   |
+| csv          | Comma-separated values         | @libar-docs-uses A, B, C       |
+| number       | Numeric value                  | @libar-docs-phase 15           |
+| quoted-value | Preserves spaces               | @libar-docs-brief:'Multi word' |
+
+</details>
+
+<details>
+<summary>Source ownership</summary>
+
+#### Source ownership
+
+**Invariant:** Relationship tags have defined ownership by source type. Anti-pattern detection enforces these boundaries.
+
+| Tag        | Correct Source | Wrong Source  | Rationale                          |
+| ---------- | -------------- | ------------- | ---------------------------------- |
+| uses       | TypeScript     | Feature files | TS owns runtime dependencies       |
+| depends-on | Feature files  | TypeScript    | Gherkin owns planning dependencies |
+| quarter    | Feature files  | TypeScript    | Gherkin owns timeline metadata     |
+| team       | Feature files  | TypeScript    | Gherkin owns ownership metadata    |
+
+</details>
+
+<details>
+<summary>Quarter format convention</summary>
+
+#### Quarter format convention
+
+**Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`). ISO-year-first sorting works lexicographically.
+
+</details>
+
+<details>
+<summary>Canonical phase definitions (6-phase USDP standard)</summary>
+
+#### Canonical phase definitions (6-phase USDP standard)
+
+**Invariant:** The default workflow defines exactly 6 phases in fixed order. These are the canonical phase names and ordinals used by all generated documentation.
+
+| Order | Phase         | Purpose                                        |
+| ----- | ------------- | ---------------------------------------------- |
+| 1     | Inception     | Problem framing, scope definition              |
+| 2     | Elaboration   | Design decisions, architecture exploration     |
+| 3     | Session       | Planning and design session work               |
+| 4     | Construction  | Implementation, testing, integration           |
+| 5     | Validation    | Verification, acceptance criteria confirmation |
+| 6     | Retrospective | Review, lessons learned, documentation         |
+
+</details>
+
+<details>
+<summary>Deliverable status canonical values (1 scenarios)</summary>
+
+#### Deliverable status canonical values
+
+**Invariant:** Deliverable status (distinct from pattern FSM status) uses exactly 6 values, enforced by Zod schema at parse time.
+
+| Value       | Meaning              |
+| ----------- | -------------------- |
+| complete    | Work is done         |
+| in-progress | Work is ongoing      |
+| pending     | Work has not started |
+| deferred    | Work postponed       |
+| superseded  | Replaced by another  |
+| n/a         | Not applicable       |
+
+**Verified by:**
+
+- Canonical values are enforced
+
+</details>
 
 ### StepDefinitionCompletion
 
@@ -569,347 +912,6 @@ Create behavior specs for each CLI command covering:
 - Parse error includes line number
 - Error formatting
 - Unknown error handling
-
-</details>
-
-### ADR003SourceFirstPatternArchitecture
-
-[View ADR003SourceFirstPatternArchitecture source](delivery-process/decisions/adr-003-source-first-pattern-architecture.feature)
-
-**Context:**
-The original annotation architecture assumed pattern definitions live
-in tier 1 feature specs, with TypeScript code limited to `@libar-docs-implements`.
-At scale this creates three problems: tier 1 specs become stale after implementation
-(only 39% of 44 specs have traceability to executable specs), retroactive annotation
-of existing code triggers merge conflicts, and duplicated Rules/Scenarios in tier 1
-specs average 200-400 lines that exist in better form in executable specs.
-
-**Decision:**
-Invert the ownership model: TypeScript source code is the canonical pattern
-definition. Tier 1 specs become ephemeral planning documents. The three durable
-artifacts are annotated source code, executable specs, and decision specs.
-
-**Consequences:**
-| Type | Impact |
-| Positive | Pattern identity travels with code from stub through production |
-| Positive | Eliminates stale tier 1 spec maintenance burden |
-| Positive | Executable specs become the living specification (richer, verified) |
-| Positive | Retroactive annotation works without merge conflicts |
-| Negative | Migration effort for existing tier 1 specs |
-| Negative | Requires updating CLAUDE.md annotation ownership guidance |
-
-<details>
-<summary>TypeScript source owns pattern identity</summary>
-
-#### TypeScript source owns pattern identity
-
-**Invariant:** A pattern is defined by `@libar-docs-pattern` in a TypeScript file — either a stub (pre-implementation) or source code (post-implementation).
-
-**Pattern Definition Lifecycle:**
-
-    Exception: Patterns with no TypeScript implementation (pure process or
-    workflow concerns) may be defined in decision specs. The constraint is:
-    one definition per pattern, regardless of source type.
-
-| Phase          | Location                               | Status    |
-| -------------- | -------------------------------------- | --------- |
-| Design         | `delivery-process/stubs/pattern-name/` | roadmap   |
-| Implementation | `src/path/to/module.ts`                | active    |
-| Completed      | `src/path/to/module.ts`                | completed |
-
-</details>
-
-<details>
-<summary>Tier 1 specs are ephemeral working documents</summary>
-
-#### Tier 1 specs are ephemeral working documents
-
-**Invariant:** Tier 1 roadmap specs serve planning and delivery tracking. They are not the source of truth for pattern identity, invariants, or acceptance criteria. After completion, they may be archived.
-
-**Value by lifecycle phase:**
-
-| Phase     | Planning Value                | Documentation Value                |
-| --------- | ----------------------------- | ---------------------------------- |
-| roadmap   | High                          | None (not yet built)               |
-| active    | Medium (deliverable tracking) | Low (stale snapshot)               |
-| completed | None                          | None (executable specs are better) |
-
-</details>
-
-<details>
-<summary>Three durable artifact types</summary>
-
-#### Three durable artifact types
-
-**Invariant:** The delivery process produces three artifact types with long-term value. All other artifacts are projections or ephemeral.
-
-| Artifact                 | Purpose                              | Owns                                  |
-| ------------------------ | ------------------------------------ | ------------------------------------- |
-| Annotated TypeScript     | Pattern identity, architecture graph | Name, status, uses, categories        |
-| Executable specs         | Behavior verification, invariants    | Rules, rationale, acceptance criteria |
-| Decision specs (ADR/PDR) | Architectural choices, rationale     | Why decisions were made               |
-
-</details>
-
-<details>
-<summary>Implements is UML Realization (many-to-one)</summary>
-
-#### Implements is UML Realization (many-to-one)
-
-**Invariant:** `@libar-docs-implements` declares a realization relationship. Multiple files can implement the same pattern. One file can implement multiple patterns (CSV format).
-
-| Relationship | Tag                      | Cardinality             |
-| ------------ | ------------------------ | ----------------------- |
-| Definition   | `@libar-docs-pattern`    | Exactly one per pattern |
-| Realization  | `@libar-docs-implements` | Many-to-one             |
-
-</details>
-
-<details>
-<summary>Single-definition constraint</summary>
-
-#### Single-definition constraint
-
-**Invariant:** `@libar-docs-pattern:X` may appear in exactly one file across the entire codebase. The `mergePatterns()` conflict check in `orchestrator.ts` correctly enforces this.
-
-**Migration path for existing conflicts:**
-
-| Current State                   | Resolution                                      |
-| ------------------------------- | ----------------------------------------------- |
-| Pattern in both TS and feature  | Keep TS definition, feature uses `@implements`  |
-| Pattern only in tier 1 spec     | Move definition to TS stub, archive tier 1 spec |
-| Pattern only in TS              | Already correct                                 |
-| Pattern only in executable spec | Valid if no TS implementation exists            |
-
-</details>
-
-<details>
-<summary>Reverse links preferred over forward links (1 scenarios)</summary>
-
-#### Reverse links preferred over forward links
-
-**Invariant:** `@libar-docs-implements` (reverse: "I verify this pattern") is the primary traceability mechanism. `@libar-docs-executable-specs` (forward: "my tests live here") is retained but not required.
-
-| Mechanism                     | Usage             | Reliability                      |
-| ----------------------------- | ----------------- | -------------------------------- |
-| `@implements` (reverse)       | 14 patterns (32%) | Self-maintaining, lives in test  |
-| `@executable-specs` (forward) | 9 patterns (20%)  | Requires tier 1 spec maintenance |
-
-**Verified by:**
-
-- TypeScript source is canonical pattern definition
-
-</details>
-
-### ADR002GherkinOnlyTesting
-
-[View ADR002GherkinOnlyTesting source](delivery-process/decisions/adr-002-gherkin-only-testing.feature)
-
-**Context:**
-A package that generates documentation from `.feature` files had dual
-test approaches: 97 legacy `.test.ts` files alongside Gherkin features.
-This undermined the core thesis that Gherkin IS sufficient for all testing.
-
-**Decision:**
-Enforce strict Gherkin-only testing for the delivery-process package:
-
-- All tests must be `.feature` files with step definitions
-- No new `.test.ts` files
-- Edge cases use Scenario Outline with Examples tables
-
-**Consequences:**
-| Type | Impact |
-| Positive | Single source of truth for tests AND documentation |
-| Positive | Demonstrates Gherkin sufficiency -- the package practices what it preaches |
-| Positive | Living documentation always matches test coverage |
-| Positive | Forces better scenario design with Examples tables |
-| Negative | Scenario Outline syntax more verbose than parameterized tests |
-
-#### Source-driven process benefit
-
-**Invariant:** Feature files serve as both executable specs and documentation source. This dual purpose is the primary benefit of Gherkin-only testing for this package.
-
-| Artifact            | Without Gherkin-Only        | With Gherkin-Only                  |
-| ------------------- | --------------------------- | ---------------------------------- |
-| Tests               | .test.ts (hidden from docs) | .feature (visible in docs)         |
-| Business rules      | Manually maintained         | Extracted from Rule blocks         |
-| Acceptance criteria | Implicit in test code       | Explicit @acceptance-criteria tags |
-| Traceability        | Manual cross-referencing    | @libar-docs-implements links       |
-
-**Verified by:**
-
-- Gherkin-only policy enforced
-
-### ADR001TaxonomyCanonicalValues
-
-[View ADR001TaxonomyCanonicalValues source](delivery-process/decisions/adr-001-taxonomy-canonical-values.feature)
-
-**Context:**
-The annotation system requires well-defined canonical values for taxonomy
-tags, FSM status lifecycle, and source ownership rules. Without canonical
-values, organic growth produces drift (Generator vs Generators, Process
-vs DeliveryProcess) and inconsistent grouping in generated documentation.
-
-**Decision:**
-Define canonical values for all taxonomy enums, FSM states with protection
-levels, valid transitions, tag format types, and source ownership rules.
-These are the durable constants of the delivery process.
-
-**Consequences:**
-| Type | Impact |
-| Positive | Generated docs group into coherent sections |
-| Positive | FSM enforcement has clear, auditable state definitions |
-| Positive | Source ownership prevents cross-domain tag confusion |
-| Negative | Migration effort for existing specs with non-canonical values |
-
-<details>
-<summary>Product area canonical values</summary>
-
-#### Product area canonical values
-
-**Invariant:** The product-area tag uses one of 7 canonical values. Each value represents a reader-facing documentation section, not a source module.
-
-| Value         | Reader Question                     | Covers                                          |
-| ------------- | ----------------------------------- | ----------------------------------------------- |
-| Annotation    | How do I annotate code?             | Scanning, extraction, tag parsing, dual-source  |
-| Configuration | How do I configure the tool?        | Config loading, presets, resolution             |
-| Generation    | How does code become docs?          | Codecs, generators, rendering, diagrams         |
-| Validation    | How is the workflow enforced?       | FSM, DoD, anti-patterns, process guard, lint    |
-| DataAPI       | How do I query process state?       | Process state API, stubs, context assembly, CLI |
-| CoreTypes     | What foundational types exist?      | Result monad, error factories, string utils     |
-| Process       | How does the session workflow work? | Session lifecycle, handoffs, conventions        |
-
-</details>
-
-<details>
-<summary>ADR category canonical values</summary>
-
-#### ADR category canonical values
-
-**Invariant:** The adr-category tag uses one of 4 values.
-
-| Value         | Purpose                                       |
-| ------------- | --------------------------------------------- |
-| architecture  | System structure, component design, data flow |
-| process       | Workflow, conventions, annotation rules       |
-| testing       | Test strategy, verification approach          |
-| documentation | Documentation generation, content structure   |
-
-</details>
-
-<details>
-<summary>FSM status values and protection levels</summary>
-
-#### FSM status values and protection levels
-
-**Invariant:** Pattern status uses exactly 4 values with defined protection levels. These are enforced by Process Guard at commit time.
-
-| Status    | Protection   | Can Add Deliverables | Allowed Actions                 |
-| --------- | ------------ | -------------------- | ------------------------------- |
-| roadmap   | None         | Yes                  | Full editing                    |
-| active    | Scope-locked | No                   | Edit existing deliverables only |
-| completed | Hard-locked  | No                   | Requires unlock-reason tag      |
-| deferred  | None         | Yes                  | Full editing                    |
-
-</details>
-
-<details>
-<summary>Valid FSM transitions</summary>
-
-#### Valid FSM transitions
-
-**Invariant:** Only these transitions are valid. All others are rejected by Process Guard. Completed is a terminal state. Modifications require `@libar-docs-unlock-reason` escape hatch.
-
-| From     | To        | Trigger               |
-| -------- | --------- | --------------------- |
-| roadmap  | active    | Start work            |
-| roadmap  | deferred  | Postpone              |
-| active   | completed | All deliverables done |
-| active   | roadmap   | Blocked/regressed     |
-| deferred | roadmap   | Resume planning       |
-
-</details>
-
-<details>
-<summary>Tag format types</summary>
-
-#### Tag format types
-
-**Invariant:** Every tag has one of 6 format types that determines how its value is parsed.
-
-| Format       | Parsing                        | Example                        |
-| ------------ | ------------------------------ | ------------------------------ |
-| flag         | Boolean presence, no value     | @libar-docs-core               |
-| value        | Simple string                  | @libar-docs-pattern MyPattern  |
-| enum         | Constrained to predefined list | @libar-docs-status completed   |
-| csv          | Comma-separated values         | @libar-docs-uses A, B, C       |
-| number       | Numeric value                  | @libar-docs-phase 15           |
-| quoted-value | Preserves spaces               | @libar-docs-brief:'Multi word' |
-
-</details>
-
-<details>
-<summary>Source ownership</summary>
-
-#### Source ownership
-
-**Invariant:** Relationship tags have defined ownership by source type. Anti-pattern detection enforces these boundaries.
-
-| Tag        | Correct Source | Wrong Source  | Rationale                          |
-| ---------- | -------------- | ------------- | ---------------------------------- |
-| uses       | TypeScript     | Feature files | TS owns runtime dependencies       |
-| depends-on | Feature files  | TypeScript    | Gherkin owns planning dependencies |
-| quarter    | Feature files  | TypeScript    | Gherkin owns timeline metadata     |
-| team       | Feature files  | TypeScript    | Gherkin owns ownership metadata    |
-
-</details>
-
-<details>
-<summary>Quarter format convention</summary>
-
-#### Quarter format convention
-
-**Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`). ISO-year-first sorting works lexicographically.
-
-</details>
-
-<details>
-<summary>Canonical phase definitions (6-phase USDP standard)</summary>
-
-#### Canonical phase definitions (6-phase USDP standard)
-
-**Invariant:** The default workflow defines exactly 6 phases in fixed order. These are the canonical phase names and ordinals used by all generated documentation.
-
-| Order | Phase         | Purpose                                        |
-| ----- | ------------- | ---------------------------------------------- |
-| 1     | Inception     | Problem framing, scope definition              |
-| 2     | Elaboration   | Design decisions, architecture exploration     |
-| 3     | Session       | Planning and design session work               |
-| 4     | Construction  | Implementation, testing, integration           |
-| 5     | Validation    | Verification, acceptance criteria confirmation |
-| 6     | Retrospective | Review, lessons learned, documentation         |
-
-</details>
-
-<details>
-<summary>Deliverable status canonical values (1 scenarios)</summary>
-
-#### Deliverable status canonical values
-
-**Invariant:** Deliverable status (distinct from pattern FSM status) uses exactly 6 values, enforced by Zod schema at parse time.
-
-| Value       | Meaning              |
-| ----------- | -------------------- |
-| complete    | Work is done         |
-| in-progress | Work is ongoing      |
-| pending     | Work has not started |
-| deferred    | Work postponed       |
-| superseded  | Replaced by another  |
-| n/a         | Not applicable       |
-
-**Verified by:**
-
-- Canonical values are enforced
 
 </details>
 

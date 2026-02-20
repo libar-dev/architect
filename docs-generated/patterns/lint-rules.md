@@ -27,7 +27,8 @@ missing-when-to-use, tautological-description, and missing-relationships.
 
 Files that implement this pattern:
 
-- [`lint-rules.feature`](../../tests/features/lint/lint-rules.feature) - The lint system validates @libar-docs-* documentation annotations for quality.
+- [`lint-rules-advanced.feature`](../../tests/features/lint/lint-rules-advanced.feature) - Complex lint rule logic and collection-level behavior.
+- [`lint-rules-individual.feature`](../../tests/features/lint/lint-rules-individual.feature) - Individual lint rules that check parsed directives for completeness.
 
 ---
 

@@ -35,9 +35,9 @@ export { GeneratorRegistry, generatorRegistry } from './registry.js';
 // Codec-based generators (RDM architecture)
 export { CodecBasedGenerator, createCodecGenerator, DOCUMENT_TYPES, } from './codec-based.js';
 // Orchestrator - programmatic API for documentation generation
-export { generateDocumentation, mergePatterns, } from './orchestrator.js';
+export { generateDocumentation, } from './orchestrator.js';
 // Pipeline - MasterDataset transformation for ProcessStateAPI usage
-export { transformToMasterDataset, } from './pipeline/index.js';
+export { mergePatterns, transformToMasterDataset, } from './pipeline/index.js';
 // Product area and reference document config helpers (for downstream repo configs)
 export { createProductAreaConfigs, PRODUCT_AREA_VALUES, } from './built-in/reference-generators.js';
 /**

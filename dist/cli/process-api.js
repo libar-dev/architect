@@ -388,7 +388,7 @@ async function buildPipeline(config) {
         process.exit(1);
     }
     for (const w of result.value.warnings) {
-        console.warn(`⚠️  ${w}`);
+        console.warn(`⚠️  ${w.message}`);
     }
     return result.value;
 }

@@ -106,36 +106,51 @@ Detail Level: Compact summary
 | MediaType is used when rendering code blocks           | **Invariant:** The rendered code block language must match the DocString mediaType; when mediaType is absent, the... |
 | renderDocString handles both string and object formats | **Invariant:** renderDocString accepts both plain string and object DocString formats; when an object has a...       |
 
---- AstParser ---
+--- AstParserRelationshipsEdges ---
+
+| Rule                                                   | Description                                                                                                           |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| Relationship tags extract uses and usedBy dependencies | **Invariant:** The uses and usedBy relationship arrays are populated from directive tags, not from description...     |
+| Edge cases and malformed input are handled gracefully  | **Invariant:** The parser never crashes on invalid input. Files without directives return empty results. Malformed... |
+
+--- AstParserMetadata ---
 
 | Rule                                                                                 | Description                                                                                                              |
 | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| Export types are correctly identified from TypeScript declarations                   | **Invariant:** Every exported TypeScript declaration type (function, type, interface, const, class, enum, abstract...    |
 | Metadata is correctly extracted from JSDoc comments                                  | **Invariant:** Examples, multi-line descriptions, line numbers, function signatures, and standard JSDoc tags are all...  |
 | Tags are extracted only from the directive section, not from description or examples | **Invariant:** Only tags appearing in the directive section (before the description) are extracted. Tags mentioned in... |
 | When to Use sections are extracted in all supported formats                          | **Invariant:** When to Use content is extracted from heading format with bullet points, inline bold format, and...       |
-| Relationship tags extract uses and usedBy dependencies                               | **Invariant:** The uses and usedBy relationship arrays are populated from directive tags, not from description...        |
-| Edge cases and malformed input are handled gracefully                                | **Invariant:** The parser never crashes on invalid input. Files without directives return empty results. Malformed...    |
 
---- ShapeExtractionTesting ---
+--- AstParserExports ---
 
-| Rule                                                                             | Description                                                                                                            |
-| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| extract-shapes tag exists in registry with CSV format                            |                                                                                                                        |
-| Interfaces are extracted from TypeScript AST                                     |                                                                                                                        |
-| Property-level JSDoc is extracted for interface properties                       | The extractor uses strict adjacency (gap = 1 line) to prevent<br> interface-level JSDoc from being misattributed to... |
-| Type aliases are extracted from TypeScript AST                                   |                                                                                                                        |
-| Enums are extracted from TypeScript AST                                          |                                                                                                                        |
-| Function signatures are extracted with body omitted                              |                                                                                                                        |
-| Multiple shapes are extracted in specified order                                 |                                                                                                                        |
-| Extracted shapes render as fenced code blocks                                    |                                                                                                                        |
-| Imported and re-exported shapes are tracked separately                           |                                                                                                                        |
-| Const declarations are extracted from TypeScript AST                             |                                                                                                                        |
-| Invalid TypeScript produces error result                                         |                                                                                                                        |
-| Non-exported shapes are extractable                                              |                                                                                                                        |
-| Shape rendering supports grouping options                                        |                                                                                                                        |
-| Annotation tags are stripped from extracted JSDoc while preserving standard tags | **Invariant:** Extracted shapes never contain @libar-docs-\* annotation lines in their jsDoc field....                 |
-| Large source files are rejected to prevent memory exhaustion                     |                                                                                                                        |
+| Rule                                                               | Description                                                                                                           |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| Export types are correctly identified from TypeScript declarations | **Invariant:** Every exported TypeScript declaration type (function, type, interface, const, class, enum, abstract... |
+
+--- ShapeExtractionTypesTesting ---
+
+| Rule                                                       | Description                                                                                                            |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| extract-shapes tag exists in registry with CSV format      |                                                                                                                        |
+| Interfaces are extracted from TypeScript AST               |                                                                                                                        |
+| Property-level JSDoc is extracted for interface properties | The extractor uses strict adjacency (gap = 1 line) to prevent<br> interface-level JSDoc from being misattributed to... |
+| Type aliases are extracted from TypeScript AST             |                                                                                                                        |
+| Enums are extracted from TypeScript AST                    |                                                                                                                        |
+| Function signatures are extracted with body omitted        |                                                                                                                        |
+| Const declarations are extracted from TypeScript AST       |                                                                                                                        |
+| Non-exported shapes are extractable                        |                                                                                                                        |
+
+--- ShapeExtractionRenderingTesting ---
+
+| Rule                                                                             | Description                                                                                            |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Multiple shapes are extracted in specified order                                 |                                                                                                        |
+| Extracted shapes render as fenced code blocks                                    |                                                                                                        |
+| Imported and re-exported shapes are tracked separately                           |                                                                                                        |
+| Invalid TypeScript produces error result                                         |                                                                                                        |
+| Shape rendering supports grouping options                                        |                                                                                                        |
+| Annotation tags are stripped from extracted JSDoc while preserving standard tags | **Invariant:** Extracted shapes never contain @libar-docs-\* annotation lines in their jsDoc field.... |
+| Large source files are rejected to prevent memory exhaustion                     |                                                                                                        |
 
 --- ExtractionPipelineEnhancementsTesting ---
 

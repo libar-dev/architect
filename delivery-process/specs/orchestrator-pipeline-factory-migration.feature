@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:OrchestratorPipelineFactoryMigration
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:101
 @libar-docs-effort:2d
 @libar-docs-product-area:Generation
@@ -77,11 +77,14 @@ Feature: Orchestrator Pipeline Factory Migration
       }
       """
 
-  This is isomorphic to `GenerationWarning` + `WarningDetail` from
-  orchestrator.ts. The orchestrator maps `PipelineWarning` to
-  `GenerationWarning` in a thin adapter (type narrowing, not data loss).
-  Existing consumers (process-api, validate-patterns) that ignore warnings
-  or use flat strings are unaffected — they can read `.message` only.
+  This is structurally similar to `GenerationWarning` + `WarningDetail`
+  from orchestrator.ts. The orchestrator maps `PipelineWarning` to
+  `GenerationWarning` in a thin adapter — `'gherkin-parse'` maps to
+  `'scan'`, and generator-level warning types (`'overwrite-skipped'`,
+  `'config'`, `'cleanup'`) are produced by the orchestrator itself, not
+  the pipeline. Existing consumers (process-api, validate-patterns) that
+  ignore warnings or use flat strings are unaffected — they can read
+  `.message` only.
 
   DD-2: mergePatterns moves to src/generators/pipeline/merge-patterns.ts.
   Currently defined in orchestrator.ts (line 701), imported by
@@ -99,11 +102,11 @@ Feature: Orchestrator Pipeline Factory Migration
   opt out, since doc generation doesn't need validation summaries.
   This was foreshadowed in ProcessAPILayeredExtraction DD-3.
 
-  DD-4: Scan result details flow through PipelineResult.
-  The orchestrator needs raw scan result metadata: `scannedFiles` (for
-  the `allPatterns` array passed to generators as legacy API),
-  `scanErrors` count, and `skippedDirectives` count. The factory adds
-  an optional `scanMetadata` field:
+  DD-4: Scan result counts flow through PipelineResult.
+  The orchestrator needs scan result counts for constructing its warning
+  messages: how many files were scanned, how many had errors, how many
+  had skipped directives, how many Gherkin files had parse errors. The
+  factory adds an optional `scanMetadata` field:
 
       """typescript
       interface ScanMetadata {
@@ -116,22 +119,31 @@ Feature: Orchestrator Pipeline Factory Migration
 
   This avoids exposing raw `ScannedFile[]` (which would be a Parallel
   Pipeline enabler) while providing the counts the orchestrator needs
-  for its warning messages.
+  for its warning messages. The merged patterns array for
+  `GenerateResult.patterns` and generator context comes from
+  `PipelineResult.dataset.patterns`, not from scan metadata.
 
-  DD-5: The factory captures per-step errors internally.
-  Today the factory returns `Result.err` on the first failure. The
-  orchestrator needs partial success: scan errors are warnings, not
-  fatals. The factory gains a `failOnScanErrors?: boolean` option
-  (default true for process-api, false for orchestrator). When false,
-  scan errors are captured in `PipelineResult.warnings` and the
-  pipeline continues with successfully scanned files.
+  DD-5: The factory supports partial success for scan errors.
+  Today the factory returns `Result.err` on total scanner failure
+  (e.g., invalid glob), which remains unchanged — total infrastructure
+  failures are always fatal. For partial failures (individual files
+  with parse errors within an otherwise successful scan), the new
+  `failOnScanErrors?: boolean` option controls behavior. When true
+  (default for process-api), partial scan errors produce `Result.err`.
+  When false (orchestrator), partial errors are captured in
+  `PipelineResult.warnings` as structured `PipelineWarning` objects
+  and the pipeline continues with successfully scanned files.
 
   DD-6: generateDocumentation signature is unchanged.
   The public `GenerateOptions` and `GenerateResult` interfaces don't
   change. The orchestrator's `generateDocumentation()` becomes a thinner
   function: build PipelineOptions from GenerateOptions, call factory,
   map PipelineWarnings to GenerationWarnings, then proceed with generator
-  dispatch. The programmatic API is stable.
+  dispatch. The programmatic API is stable. The orchestrator's config
+  loading (`loadConfig`) is replaced by the factory's internal config
+  step — `tagRegistry` is accessed via `dataset.tagRegistry`. The merged
+  patterns array for `GenerateResult.patterns` and generator context is
+  `dataset.patterns` from the MasterDataset.
 
   DD-7: validate-patterns.ts and process-api.ts are unaffected.
   They already consume the factory. The only change they see is
@@ -143,7 +155,7 @@ Feature: Orchestrator Pipeline Factory Migration
 
   | Step | What | Verification |
   | 1 | Move mergePatterns to src/generators/pipeline/merge-patterns.ts | pnpm typecheck |
-  | 2 | Update imports in build-pipeline.ts, orchestrator.ts, generators/index.ts | pnpm typecheck, pnpm lint |
+  | 2 | Update imports in build-pipeline.ts, orchestrator.ts, generators/index.ts, orchestrator.steps.ts | pnpm typecheck, pnpm lint |
   | 3 | Add PipelineWarning types to build-pipeline.ts | pnpm typecheck |
   | 4 | Enrich factory to collect structured warnings and scan metadata | pnpm typecheck |
   | 5 | Add includeValidation and failOnScanErrors options to factory | pnpm typecheck |
@@ -159,6 +171,7 @@ Feature: Orchestrator Pipeline Factory Migration
   | src/generators/pipeline/index.ts | Re-export merge-patterns | +2 |
   | src/generators/orchestrator.ts | Replace pipeline with factory call, remove mergePatterns | -~170 net |
   | src/generators/index.ts | Update mergePatterns re-export source | ~2 |
+  | tests/steps/generators/orchestrator.steps.ts | Update mergePatterns import to pipeline/merge-patterns | ~1 |
 
   **What does NOT change:**
 
@@ -254,7 +267,7 @@ Feature: Orchestrator Pipeline Factory Migration
     directives, extraction errors, and Gherkin parse errors as structured
     `GenerationWarning` objects. The factory must provide equivalent
     structure to eliminate the orchestrator's need to run the pipeline
-    directly. The `PipelineWarning` type is isomorphic to
+    directly. The `PipelineWarning` type is structurally similar to
     `GenerationWarning` to minimize mapping complexity.
 
     **Verified by:** Orchestrator warnings preserved, Existing consumers unaffected

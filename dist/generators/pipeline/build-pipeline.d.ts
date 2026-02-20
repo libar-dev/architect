@@ -34,6 +34,10 @@ export interface PipelineOptions {
     readonly exclude?: readonly string[];
     readonly workflowPath?: string;
     readonly contextInferenceRules?: readonly ContextInferenceRule[];
+    /** DD-3: When false, skip validation pass (default true). */
+    readonly includeValidation?: boolean;
+    /** DD-5: When true, return error on individual scan failures (default false). */
+    readonly failOnScanErrors?: boolean;
 }
 /**
  * Structured error from the pipeline factory.
@@ -44,12 +48,42 @@ export interface PipelineError {
     readonly message: string;
 }
 /**
+ * DD-1: Detail for a pipeline warning (file-level diagnostic).
+ */
+export interface PipelineWarningDetail {
+    readonly file: string;
+    readonly line?: number;
+    readonly column?: number;
+    readonly message: string;
+}
+/**
+ * DD-1: Structured pipeline warning replacing flat strings.
+ * Consumers can read `.message` for human-readable text.
+ */
+export interface PipelineWarning {
+    readonly type: 'scan' | 'extraction' | 'gherkin-parse';
+    readonly message: string;
+    readonly count?: number;
+    readonly details?: readonly PipelineWarningDetail[];
+}
+/**
+ * DD-4: Aggregate scan counts for reporting.
+ * Avoids exposing raw ScannedFile[] arrays.
+ */
+export interface ScanMetadata {
+    readonly scannedFileCount: number;
+    readonly scanErrorCount: number;
+    readonly skippedDirectiveCount: number;
+    readonly gherkinErrorCount: number;
+}
+/**
  * Successful pipeline result containing the dataset and validation summary.
  */
 export interface PipelineResult {
     readonly dataset: RuntimeMasterDataset;
     readonly validation: ValidationSummary;
-    readonly warnings: readonly string[];
+    readonly warnings: readonly PipelineWarning[];
+    readonly scanMetadata: ScanMetadata;
 }
 /**
  * Build a MasterDataset by executing the 8-step extraction pipeline.

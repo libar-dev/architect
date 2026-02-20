@@ -7,12 +7,12 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 209/304 (69%)
+**Overall Progress:** [██████████████░░░░░░] 223/318 (70%)
 
 | Status | Count |
 | --- | --- |
-| 🚧 Active | 49 |
-| 📋 Planned | 46 |
+| 🚧 Active | 48 |
+| 📋 Planned | 47 |
 | **Total Remaining** | 95 |
 
 ---
@@ -22,7 +22,7 @@
 | Phase | Remaining | Active | Complete |
 | --- | --- | --- | --- |
 | 📋 [TraceabilityGenerator](remaining/phase-18-traceability-generator.md) | 1 | 0 | 0% |
-| 📋 [ArchitectureDiagramGeneration](remaining/phase-23-architecture-diagram-generation.md) | 1 | 0 | 0% |
+| 📋 [ArchitectureDiagramCore](remaining/phase-23-architecture-diagram-core.md) | 2 | 0 | 0% |
 | 🚧 [ProcessStateAPIRelationshipQueries](remaining/phase-24-process-state-api-relationship-queries.md) | 1 | 1 | 50% |
 | 🚧 [DataAPIStubIntegration](remaining/phase-25-data-api-stub-integration.md) | 5 | 1 | 50% |
 | 🚧 [ReferenceDocShowcase](remaining/phase-30-reference-doc-showcase.md) | 1 | 1 | 0% |
@@ -31,11 +31,11 @@
 | 📋 [StepLintExtendedRules](remaining/phase-51-step-lint-extended-rules.md) | 1 | 0 | 0% |
 | 📋 [TypeScriptTaxonomyImplementation](remaining/phase-99-type-script-taxonomy-implementation.md) | 4 | 0 | 56% |
 | 📋 [ValidatorReadModelConsolidation](remaining/phase-100-validator-read-model-consolidation.md) | 11 | 0 | 27% |
-| 📋 [CliBehaviorTesting](remaining/phase-101-cli-behavior-testing.md) | 1 | 0 | 0% |
+| 🚧 [OrchestratorPipelineFactoryMigration](remaining/phase-101-orchestrator-pipeline-factory-migration.md) | 2 | 1 | 0% |
 | 📋 [CodecBehaviorTesting](remaining/phase-102-codec-behavior-testing.md) | 1 | 0 | 0% |
 | 📋 [StepDefinitionCompletion](remaining/phase-103-step-definition-completion.md) | 1 | 0 | 0% |
 | 📋 [GeneratorInfrastructureTesting](remaining/phase-104-generator-infrastructure-testing.md) | 1 | 0 | 0% |
-| 🚧 Backlog (No Phase) | 63 | 45 | 0% |
+| 🚧 Backlog (No Phase) | 61 | 43 | 0% |
 
 ---
 
@@ -43,22 +43,22 @@
 
 | Priority | Count |
 | --- | --- |
-| 🚧 In Progress | 49 |
-| ✅ Ready to Start | 43 |
-| ⚠️ Blocked | 3 |
+| 🚧 In Progress | 48 |
+| ✅ Ready to Start | 45 |
+| ⚠️ Blocked | 2 |
 
 ### Top Ready to Start
 
 - Traceability Generator (Phase 18)
-- Architecture Diagram Generation (Phase 23)
+- Architecture Diagram Advanced (Phase 23)
+- Architecture Diagram Core (Phase 23)
+- Claude Module Generation (Phase 25)
 - Data API CLI Ergonomics (Phase 25)
 - Data API Platform Integration (Phase 25)
 - Data API Relationship Graph (Phase 25)
 - Kebab Case Slugs (Phase 44)
 - Rich Content Helpers Testing (Phase 44)
 - Prd Implementation Section (Phase 99)
-- Status Aware Eslint Suppression (Phase 99)
-- Streaming Git Diff (Phase 99)
 
 See phase detail files for full list.
 
@@ -69,11 +69,11 @@ See phase detail files for full list.
 Items ready to start (no blocking dependencies):
 
 - 📋 Traceability Generator (Phase 18) - 2d
-- 📋 Architecture Diagram Generation (Phase 23) - 1w
+- 📋 Architecture Diagram Advanced (Phase 23) - 1w
+- 📋 Architecture Diagram Core (Phase 23) - 1w
+- 📋 Claude Module Generation (Phase 25) - 1.5d
 - 📋 Data API CLI Ergonomics (Phase 25) - 2d
-- 📋 Data API Platform Integration (Phase 25) - 3d
-- 📋 Data API Relationship Graph (Phase 25) - 2d
 
-Showing 5 of 43 actionable items.
+Showing 5 of 45 actionable items.
 
 ---

@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [██████████████░░░░░░] 209/304 (69%)
+**Patterns:** [██████████████░░░░░░] 223/318 (70%)
 
 **Phases:** 5/19 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 304 |
-| Completed | 209 |
-| Active | 49 |
-| Planned | 46 |
+| Total Patterns | 318 |
+| Completed | 223 |
+| Active | 48 |
+| Planned | 47 |
 
 ---
 
@@ -25,7 +25,7 @@
 | Phase | Progress | Complete |
 | --- | --- | --- |
 | 📋 [TraceabilityGenerator](phases/phase-18-traceability-generator.md) | 0/1 | 0% |
-| 📋 [ArchitectureDiagramGeneration](phases/phase-23-architecture-diagram-generation.md) | 0/1 | 0% |
+| 📋 [ArchitectureDiagramCore](phases/phase-23-architecture-diagram-core.md) | 0/2 | 0% |
 | 🚧 [ProcessStateAPIRelationshipQueries](phases/phase-24-process-state-api-relationship-queries.md) | 1/2 | 50% |
 | 🚧 [DataAPIStubIntegration](phases/phase-25-data-api-stub-integration.md) | 5/10 | 50% |
 | ✅ [ShapeExtractor](phases/phase-26-shape-extractor.md) | 2/2 | 100% |
@@ -39,7 +39,7 @@
 | 📋 [StepLintExtendedRules](phases/phase-51-step-lint-extended-rules.md) | 0/1 | 0% |
 | 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 5/9 | 56% |
 | 📋 [ValidatorReadModelConsolidation](phases/phase-100-validator-read-model-consolidation.md) | 4/15 | 27% |
-| 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
+| 🚧 [OrchestratorPipelineFactoryMigration](phases/phase-101-orchestrator-pipeline-factory-migration.md) | 0/2 | 0% |
 | 📋 [CodecBehaviorTesting](phases/phase-102-codec-behavior-testing.md) | 0/1 | 0% |
 | 📋 [StepDefinitionCompletion](phases/phase-103-step-definition-completion.md) | 0/1 | 0% |
 | 📋 [GeneratorInfrastructureTesting](phases/phase-104-generator-infrastructure-testing.md) | 0/1 | 0% |
@@ -58,13 +58,14 @@
 
 ---
 
-### 📋 ArchitectureDiagramGeneration
+### 📋 ArchitectureDiagramCore
 
-[░░░░░░░░░░░░░░░] 0/1 0% complete
+[░░░░░░░░░░░░░░░] 0/2 0% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
-| 📋 Architecture Diagram Generation | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
+| 📋 Architecture Diagram Advanced | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
+| 📋 Architecture Diagram Core | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
 
 ---
 
@@ -235,13 +236,14 @@
 
 ---
 
-### 📋 CliBehaviorTesting
+### 🚧 OrchestratorPipelineFactoryMigration
 
-[░░░░░░░░░░░░░░░] 0/1 0% complete
+[░░░░░░░░░░░░░░░] 0/2 0% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
 | 📋 Cli Behavior Testing | planned | All 5 CLI commands (generate-docs, lint-patterns, lint-process, validate-patterns, generate-tag-taxonomy) have zero... |
+| 🚧 Orchestrator Pipeline Factory Migration | active | `orchestrator.ts` is the last feature consumer that wires the 8-step scan-extract-merge-transform pipeline inline... |
 
 ---
 

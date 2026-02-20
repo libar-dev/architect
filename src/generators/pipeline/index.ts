@@ -39,6 +39,12 @@ export {
 } from './transform-dataset.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Merge Patterns
+// ═══════════════════════════════════════════════════════════════════════════
+
+export { mergePatterns } from './merge-patterns.js';
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Pipeline Factory
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -47,4 +53,7 @@ export {
   type PipelineOptions,
   type PipelineResult,
   type PipelineError,
+  type PipelineWarning,
+  type PipelineWarningDetail,
+  type ScanMetadata,
 } from './build-pipeline.js';

@@ -419,12 +419,16 @@ Files that implement this pattern:
 - [`composite.ts`](../../src/renderable/codecs/composite.ts) - ## Composite Document Codec
 - [`composite-codec.feature`](../../tests/features/behavior/codecs/composite-codec.feature) - Assembles reference documents from multiple codec outputs by
 - [`convention-extractor.feature`](../../tests/features/behavior/codecs/convention-extractor.feature) - Extracts convention content from MasterDataset decision records
-- [`reference-codec.feature`](../../tests/features/behavior/codecs/reference-codec.feature) - Parameterized codec factory that creates reference document codecs
+- [`reference-codec-core.feature`](../../tests/features/behavior/codecs/reference-codec-core.feature) - Parameterized codec factory that creates reference document codecs
+- [`reference-codec-detail-rendering.feature`](../../tests/features/behavior/codecs/reference-codec-detail-rendering.feature) - Standard detail level behavior, deep behavior rendering with structured
+- [`reference-codec-diagram-types.feature`](../../tests/features/behavior/codecs/reference-codec-diagram-types.feature) - Diagram type controls Mermaid output format including flowchart,
+- [`reference-codec-diagrams.feature`](../../tests/features/behavior/codecs/reference-codec-diagrams.feature) - Scoped diagram generation from diagramScope and diagramScopes config,
 - [`reference-generators.feature`](../../tests/features/behavior/codecs/reference-generators.feature) - Registers reference document generators from project config. Configs with
 - [`shape-matcher.feature`](../../tests/features/behavior/codecs/shape-matcher.feature) - Matches file paths against glob patterns for TypeScript shape extraction.
 - [`shape-selector.feature`](../../tests/features/behavior/codecs/shape-selector.feature) - Tests the filterShapesBySelectors function that provides fine-grained
 - [`extraction-pipeline-enhancements.feature`](../../tests/features/extractor/extraction-pipeline-enhancements.feature) - Validates extraction pipeline capabilities for ReferenceDocShowcase:
-- [`shape-extraction.feature`](../../tests/features/extractor/shape-extraction.feature) - Validates the shape extraction system that extracts TypeScript type
+- [`shape-extraction-rendering.feature`](../../tests/features/extractor/shape-extraction-rendering.feature) - Validates the shape extraction system that extracts TypeScript type
+- [`shape-extraction-types.feature`](../../tests/features/extractor/shape-extraction-types.feature) - Validates the shape extraction system that extracts TypeScript type
 
 ---
 

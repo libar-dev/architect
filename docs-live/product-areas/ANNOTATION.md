@@ -358,6 +358,7 @@ Current pattern (duplication):
 - ```typescript
 
   ```
+
 - // DUPLICATED from actual interface below
 - interface DeciderInput {
 - state: ProcessState;
@@ -1224,40 +1225,50 @@ from being incorrectly escaped when the language hint is lost.
 
 </details>
 
-### AstParser
+### AstParserRelationshipsEdges
 
-[View AstParser source](tests/features/scanner/ast-parser.feature)
+[View AstParserRelationshipsEdges source](tests/features/scanner/ast-parser-relationships-edges.feature)
 
 The AST Parser extracts @libar-docs-\* directives from TypeScript source files
 using the TypeScript compiler API. It identifies exports, extracts metadata,
 and validates directive structure.
 
-<details>
-<summary>Export types are correctly identified from TypeScript declarations (15 scenarios)</summary>
+#### Relationship tags extract uses and usedBy dependencies
 
-#### Export types are correctly identified from TypeScript declarations
-
-**Invariant:** Every exported TypeScript declaration type (function, type, interface, const, class, enum, abstract class, arrow function, async function, generic function, default export, re-export) is correctly classified.
+**Invariant:** The uses and usedBy relationship arrays are populated from directive tags, not from description content. When no relationship tags exist, the fields are undefined.
 
 **Verified by:**
 
-- Parse function export with directive
-- Parse type export with directive
-- Parse interface export with directive
-- Parse const export with directive
-- Parse class export with directive
-- Parse enum export with directive
-- Parse const enum export with directive
-- Parse abstract class export with directive
-- Parse arrow function export with directive
-- Parse async function export with directive
-- Parse generic function export with directive
-- Parse default export with directive
-- Parse re-exports with directive
-- Parse multiple exports in single statement
-- Parse multiple directives in same file
+- Extract @libar-docs-uses with single value
+- Extract @libar-docs-uses with comma-separated values
+- Extract @libar-docs-used-by with single value
+- Extract @libar-docs-used-by with comma-separated values
+- Extract both uses and usedBy from same directive
+- NOT capture uses/usedBy values in description
+- Not set uses/usedBy when no relationship tags exist
 
-</details>
+#### Edge cases and malformed input are handled gracefully
+
+**Invariant:** The parser never crashes on invalid input. Files without directives return empty results. Malformed TypeScript returns a structured error with the file path.
+
+**Verified by:**
+
+- Skip comments without @libar-docs-\* tags
+- Skip invalid directive with incomplete tag
+- Handle malformed TypeScript gracefully
+- Handle empty file gracefully
+- Handle whitespace-only file
+- Handle file with only comments and no exports
+- Skip inline comments (non-block)
+- Handle unicode characters in descriptions
+
+### AstParserMetadata
+
+[View AstParserMetadata source](tests/features/scanner/ast-parser-metadata.feature)
+
+The AST Parser extracts @libar-docs-\* directives from TypeScript source files
+using the TypeScript compiler API. It identifies exports, extracts metadata,
+and validates directive structure.
 
 <details>
 <summary>Metadata is correctly extracted from JSDoc comments (5 scenarios)</summary>
@@ -1308,48 +1319,39 @@ and validates directive structure.
 
 </details>
 
-<details>
-<summary>Relationship tags extract uses and usedBy dependencies (7 scenarios)</summary>
+### AstParserExports
 
-#### Relationship tags extract uses and usedBy dependencies
+[View AstParserExports source](tests/features/scanner/ast-parser-exports.feature)
 
-**Invariant:** The uses and usedBy relationship arrays are populated from directive tags, not from description content. When no relationship tags exist, the fields are undefined.
+The AST Parser extracts @libar-docs-\* directives from TypeScript source files
+using the TypeScript compiler API. It identifies exports, extracts metadata,
+and validates directive structure.
 
-**Verified by:**
+#### Export types are correctly identified from TypeScript declarations
 
-- Extract @libar-docs-uses with single value
-- Extract @libar-docs-uses with comma-separated values
-- Extract @libar-docs-used-by with single value
-- Extract @libar-docs-used-by with comma-separated values
-- Extract both uses and usedBy from same directive
-- NOT capture uses/usedBy values in description
-- Not set uses/usedBy when no relationship tags exist
-
-</details>
-
-<details>
-<summary>Edge cases and malformed input are handled gracefully (8 scenarios)</summary>
-
-#### Edge cases and malformed input are handled gracefully
-
-**Invariant:** The parser never crashes on invalid input. Files without directives return empty results. Malformed TypeScript returns a structured error with the file path.
+**Invariant:** Every exported TypeScript declaration type (function, type, interface, const, class, enum, abstract class, arrow function, async function, generic function, default export, re-export) is correctly classified.
 
 **Verified by:**
 
-- Skip comments without @libar-docs-\* tags
-- Skip invalid directive with incomplete tag
-- Handle malformed TypeScript gracefully
-- Handle empty file gracefully
-- Handle whitespace-only file
-- Handle file with only comments and no exports
-- Skip inline comments (non-block)
-- Handle unicode characters in descriptions
+- Parse function export with directive
+- Parse type export with directive
+- Parse interface export with directive
+- Parse const export with directive
+- Parse class export with directive
+- Parse enum export with directive
+- Parse const enum export with directive
+- Parse abstract class export with directive
+- Parse arrow function export with directive
+- Parse async function export with directive
+- Parse generic function export with directive
+- Parse default export with directive
+- Parse re-exports with directive
+- Parse multiple exports in single statement
+- Parse multiple directives in same file
 
-</details>
+### ShapeExtractionTypesTesting
 
-### ShapeExtractionTesting
-
-[View ShapeExtractionTesting source](tests/features/extractor/shape-extraction.feature)
+[View ShapeExtractionTypesTesting source](tests/features/extractor/shape-extraction-types.feature)
 
 Validates the shape extraction system that extracts TypeScript type
 definitions (interfaces, type aliases, enums, function signatures)
@@ -1435,6 +1437,38 @@ interface-level JSDoc from being misattributed to the first property.
 </details>
 
 <details>
+<summary>Const declarations are extracted from TypeScript AST (2 scenarios)</summary>
+
+#### Const declarations are extracted from TypeScript AST
+
+**Verified by:**
+
+- Extract const with type annotation
+- Extract const without type annotation
+
+</details>
+
+<details>
+<summary>Non-exported shapes are extractable (2 scenarios)</summary>
+
+#### Non-exported shapes are extractable
+
+**Verified by:**
+
+- Extract non-exported interface
+- Re-export marks internal shape as exported
+
+</details>
+
+### ShapeExtractionRenderingTesting
+
+[View ShapeExtractionRenderingTesting source](tests/features/extractor/shape-extraction-rendering.feature)
+
+Validates the shape extraction system that extracts TypeScript type
+definitions (interfaces, type aliases, enums, function signatures)
+from source files for documentation generation.
+
+<details>
 <summary>Multiple shapes are extracted in specified order (2 scenarios)</summary>
 
 #### Multiple shapes are extracted in specified order
@@ -1470,18 +1504,6 @@ interface-level JSDoc from being misattributed to the first property.
 </details>
 
 <details>
-<summary>Const declarations are extracted from TypeScript AST (2 scenarios)</summary>
-
-#### Const declarations are extracted from TypeScript AST
-
-**Verified by:**
-
-- Extract const with type annotation
-- Extract const without type annotation
-
-</details>
-
-<details>
 <summary>Invalid TypeScript produces error result (1 scenarios)</summary>
 
 #### Invalid TypeScript produces error result
@@ -1489,18 +1511,6 @@ interface-level JSDoc from being misattributed to the first property.
 **Verified by:**
 
 - Malformed TypeScript returns error
-
-</details>
-
-<details>
-<summary>Non-exported shapes are extractable (2 scenarios)</summary>
-
-#### Non-exported shapes are extractable
-
-**Verified by:**
-
-- Extract non-exported interface
-- Re-export marks internal shape as exported
 
 </details>
 

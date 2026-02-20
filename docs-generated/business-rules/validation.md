@@ -4,7 +4,7 @@
 
 ---
 
-**54 rules** from 10 features. 54 rules have explicit invariants.
+**54 rules** from 11 features. 54 rules have explicit invariants.
 
 ---
 
@@ -510,9 +510,61 @@
 
 *linter-validation.feature*
 
-### Lint Rules
+### Lint Rule Advanced
 
-*The lint system validates @libar-docs-* documentation annotations for quality.*
+*Complex lint rule logic and collection-level behavior.*
+
+---
+
+#### Descriptions must not repeat the pattern name
+
+> **Invariant:** A description that merely echoes the pattern name adds no value and must be rejected.
+>
+> **Rationale:** Tautological descriptions waste reader attention and indicate missing documentation effort.
+
+**Verified by:**
+- Detect description that equals pattern name
+- Detect description that is pattern name with punctuation
+- Detect short description starting with pattern name
+- Accept description with substantial content after name
+- Accept meaningfully different description
+- Ignore empty descriptions
+- Ignore missing pattern name
+- Skip headings when finding first line
+- Skip "When to use" sections when finding first line
+
+---
+
+#### Default rules collection is complete and well-ordered
+
+> **Invariant:** The default rules collection must contain all defined rules with unique IDs, ordered by severity (errors first).
+>
+> **Rationale:** A complete, ordered collection ensures no rule is silently dropped and severity-based filtering works correctly.
+
+**Verified by:**
+- Default rules contains all 8 rules
+- Default rules have unique IDs
+- Default rules are ordered by severity
+- Default rules include all named rules
+
+---
+
+#### Rules can be filtered by minimum severity
+
+> **Invariant:** Filtering by severity must return only rules at or above the specified level.
+>
+> **Rationale:** CI pipelines need to control which violations block merges vs. which are advisory.
+
+**Verified by:**
+- Filter returns all rules for info severity
+- Filter excludes info rules for warning severity
+- Filter returns only errors for error severity
+
+*lint-rules-advanced.feature*
+
+### Lint Rule Individual
+
+*Individual lint rules that check parsed directives for completeness.*
 
 ---
 
@@ -559,25 +611,6 @@
 
 ---
 
-#### Descriptions must not repeat the pattern name
-
-> **Invariant:** A description that merely echoes the pattern name adds no value and must be rejected.
->
-> **Rationale:** Tautological descriptions waste reader attention and indicate missing documentation effort.
-
-**Verified by:**
-- Detect description that equals pattern name
-- Detect description that is pattern name with punctuation
-- Detect short description starting with pattern name
-- Accept description with substantial content after name
-- Accept meaningfully different description
-- Ignore empty descriptions
-- Ignore missing pattern name
-- Skip headings when finding first line
-- Skip "When to use" sections when finding first line
-
----
-
 #### Files should declare relationship tags
 
 > **Invariant:** Annotated files should declare uses or usedBy relationships to enable dependency tracking and architecture diagrams.
@@ -591,34 +624,7 @@
 - Accept usedBy with content
 - Accept both uses and usedBy
 
----
-
-#### Default rules collection is complete and well-ordered
-
-> **Invariant:** The default rules collection must contain all defined rules with unique IDs, ordered by severity (errors first).
->
-> **Rationale:** A complete, ordered collection ensures no rule is silently dropped and severity-based filtering works correctly.
-
-**Verified by:**
-- Default rules contains all 8 rules
-- Default rules have unique IDs
-- Default rules are ordered by severity
-- Default rules include all named rules
-
----
-
-#### Rules can be filtered by minimum severity
-
-> **Invariant:** Filtering by severity must return only rules at or above the specified level.
->
-> **Rationale:** CI pipelines need to control which violations block merges vs. which are advisory.
-
-**Verified by:**
-- Filter returns all rules for info severity
-- Filter excludes info rules for warning severity
-- Filter returns only errors for error severity
-
-*lint-rules.feature*
+*lint-rules-individual.feature*
 
 ### Process Guard
 

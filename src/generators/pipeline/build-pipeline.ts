@@ -26,11 +26,14 @@ import {
   extractPatternsFromGherkin,
   computeHierarchyChildren,
 } from '../../extractor/gherkin-extractor.js';
-import { mergePatterns } from '../orchestrator.js';
+import { mergePatterns } from './merge-patterns.js';
 import { loadConfig, formatConfigError } from '../../config/config-loader.js';
 import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../../config/defaults.js';
 import { loadDefaultWorkflow, loadWorkflowFromPath } from '../../config/workflow-loader.js';
-import { transformToMasterDatasetWithValidation } from './transform-dataset.js';
+import {
+  transformToMasterDataset,
+  transformToMasterDatasetWithValidation,
+} from './transform-dataset.js';
 import { Result } from '../../types/result.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import type {
@@ -59,6 +62,10 @@ export interface PipelineOptions {
   readonly exclude?: readonly string[];
   readonly workflowPath?: string;
   readonly contextInferenceRules?: readonly ContextInferenceRule[];
+  /** DD-3: When false, skip validation pass (default true). */
+  readonly includeValidation?: boolean;
+  /** DD-5: When true, return error on individual scan failures (default false). */
+  readonly failOnScanErrors?: boolean;
 }
 
 /**
@@ -71,12 +78,45 @@ export interface PipelineError {
 }
 
 /**
+ * DD-1: Detail for a pipeline warning (file-level diagnostic).
+ */
+export interface PipelineWarningDetail {
+  readonly file: string;
+  readonly line?: number;
+  readonly column?: number;
+  readonly message: string;
+}
+
+/**
+ * DD-1: Structured pipeline warning replacing flat strings.
+ * Consumers can read `.message` for human-readable text.
+ */
+export interface PipelineWarning {
+  readonly type: 'scan' | 'extraction' | 'gherkin-parse';
+  readonly message: string;
+  readonly count?: number;
+  readonly details?: readonly PipelineWarningDetail[];
+}
+
+/**
+ * DD-4: Aggregate scan counts for reporting.
+ * Avoids exposing raw ScannedFile[] arrays.
+ */
+export interface ScanMetadata {
+  readonly scannedFileCount: number;
+  readonly scanErrorCount: number;
+  readonly skippedDirectiveCount: number;
+  readonly gherkinErrorCount: number;
+}
+
+/**
  * Successful pipeline result containing the dataset and validation summary.
  */
 export interface PipelineResult {
   readonly dataset: RuntimeMasterDataset;
   readonly validation: ValidationSummary;
-  readonly warnings: readonly string[];
+  readonly warnings: readonly PipelineWarning[];
+  readonly scanMetadata: ScanMetadata;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -104,7 +144,7 @@ export async function buildMasterDataset(
   options: PipelineOptions
 ): Promise<Result<PipelineResult, PipelineError>> {
   const baseDir = path.resolve(options.baseDir);
-  const warnings: string[] = [];
+  const warnings: PipelineWarning[] = [];
 
   // Step 1: Load configuration
   const configResult = await loadConfig(baseDir);
@@ -131,13 +171,46 @@ export async function buildMasterDataset(
       message: String(scanResult.error),
     });
   }
-  const { files: scannedFiles } = scanResult.value;
+  const { files: scannedFiles, errors: scanErrors, skippedDirectives } = scanResult.value;
+
+  // DD-5: failOnScanErrors — return error on individual file parse failures
+  if (options.failOnScanErrors === true && scanErrors.length > 0) {
+    return Result.err({
+      step: 'scan-typescript',
+      message: `${scanErrors.length} file${scanErrors.length === 1 ? '' : 's'} failed to scan`,
+    });
+  }
+
+  // DD-1: Collect structured scan warnings
+  if (scanErrors.length > 0) {
+    warnings.push({
+      type: 'scan',
+      message: `Failed to scan ${scanErrors.length} files (syntax errors)`,
+      count: scanErrors.length,
+    });
+  }
+  if (skippedDirectives.length > 0) {
+    warnings.push({
+      type: 'scan',
+      message: `Skipped ${skippedDirectives.length} invalid directives`,
+      count: skippedDirectives.length,
+    });
+  }
 
   // Step 3: Extract patterns from TypeScript
   const extraction = extractPatterns(scannedFiles, baseDir, registry);
 
+  if (extraction.errors.length > 0) {
+    warnings.push({
+      type: 'extraction',
+      message: `${extraction.errors.length} TypeScript patterns had errors`,
+      count: extraction.errors.length,
+    });
+  }
+
   // Step 4: Scan and extract Gherkin patterns
   let gherkinPatterns: readonly ExtractedPattern[] = [];
+  let gherkinErrorCount = 0;
   if (options.features.length > 0) {
     const gherkinScanResult = await scanGherkinFiles({
       patterns: options.features,
@@ -145,15 +218,49 @@ export async function buildMasterDataset(
       ...(options.exclude !== undefined ? { exclude: options.exclude } : {}),
     });
     if (gherkinScanResult.ok) {
-      const gherkinResult = extractPatternsFromGherkin(gherkinScanResult.value.files, {
+      const { files: gherkinFiles, errors: gherkinErrors } = gherkinScanResult.value;
+      gherkinErrorCount = gherkinErrors.length;
+
+      // DD-1: Gherkin parse errors with file/line/column detail
+      if (gherkinErrors.length > 0) {
+        warnings.push({
+          type: 'gherkin-parse',
+          message: `Failed to parse ${gherkinErrors.length} feature file${gherkinErrors.length === 1 ? '' : 's'}`,
+          count: gherkinErrors.length,
+          details: gherkinErrors.map((e) => ({
+            file: e.file,
+            // Use spread pattern for optional properties (exactOptionalPropertyTypes)
+            ...(e.error.line !== undefined && { line: e.error.line }),
+            ...(e.error.column !== undefined && { column: e.error.column }),
+            message: e.error.message,
+          })),
+        });
+      }
+
+      // Extract patterns from Gherkin
+      const gherkinResult = extractPatternsFromGherkin(gherkinFiles, {
         baseDir,
         tagRegistry: registry,
         scenariosAsUseCases: true,
       });
       gherkinPatterns = gherkinResult.patterns;
-    } else {
-      warnings.push('Gherkin scan failed - continuing with 0 Gherkin patterns');
+
+      // DD-1: Gherkin extraction errors per pattern
+      if (gherkinResult.errors.length > 0) {
+        for (const error of gherkinResult.errors) {
+          const details =
+            error.validationErrors !== undefined && error.validationErrors.length > 0
+              ? ` [${error.validationErrors.join('; ')}]`
+              : '';
+          warnings.push({
+            type: 'extraction',
+            message: `${error.file}: ${error.patternName} - ${error.reason}${details}`,
+          });
+        }
+      }
     }
+    // Note: scanGherkinFiles returns Result<T, never> so it always succeeds
+    // Individual file errors are collected in gherkinScanResult.value.errors
   }
 
   // Step 5: Merge patterns (DD-2: conflict handling per strategy)
@@ -191,14 +298,40 @@ export async function buildMasterDataset(
     workflow = loadDefaultWorkflow();
   }
 
+  // DD-4: Build scan metadata for reporting
+  const scanMetadata: ScanMetadata = {
+    scannedFileCount: scannedFiles.length,
+    scanErrorCount: scanErrors.length,
+    skippedDirectiveCount: skippedDirectives.length,
+    gherkinErrorCount,
+  };
+
   // Step 8: Transform to MasterDataset
+  // DD-3: includeValidation controls which transform path to use
   const contextInferenceRules = options.contextInferenceRules ?? DEFAULT_CONTEXT_INFERENCE_RULES;
-  const { dataset, validation } = transformToMasterDatasetWithValidation({
+  const rawDataset = {
     patterns: allPatterns,
     tagRegistry: registry,
     workflow,
     contextInferenceRules,
-  });
+  };
 
-  return Result.ok({ dataset, validation, warnings });
+  if (options.includeValidation === false) {
+    const dataset = transformToMasterDataset(rawDataset);
+    return Result.ok({
+      dataset,
+      validation: {
+        totalPatterns: allPatterns.length,
+        malformedPatterns: [],
+        danglingReferences: [],
+        unknownStatuses: [],
+        warningCount: 0,
+      },
+      warnings,
+      scanMetadata,
+    });
+  }
+
+  const { dataset, validation } = transformToMasterDatasetWithValidation(rawDataset);
+  return Result.ok({ dataset, validation, warnings, scanMetadata });
 }

@@ -725,7 +725,7 @@ async function main(): Promise<void> {
     const { dataset, warnings: pipelineWarnings } = pipelineResult.value;
     if (config.format === 'pretty') {
       for (const w of pipelineWarnings) {
-        console.warn(`⚠️  ${w}`);
+        console.warn(`⚠️  ${w.message}`);
       }
     }
 

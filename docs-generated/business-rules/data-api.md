@@ -4,7 +4,7 @@
 
 ---
 
-**86 rules** from 18 features. 72 rules have explicit invariants.
+**86 rules** from 20 features. 72 rules have explicit invariants.
 
 ---
 
@@ -705,9 +705,9 @@
 
 *summarize.feature*
 
-### Process Api Cli
+### Process Api Cli Core
 
-*Command-line interface for querying delivery process state via ProcessStateAPI.*
+*Core CLI infrastructure: help, version, input validation, status, query, pattern, arch basics, missing args, edge cases.*
 
 ---
 
@@ -776,6 +776,63 @@
 - Integer arguments are coerced for phase queries
 - Double-dash separator is handled gracefully
 
+*process-api-core.feature*
+
+### Process Api Cli Modifiers And Rules
+
+*Output modifiers, arch health, and rules subcommand.*
+
+---
+
+#### Output modifiers work when placed after the subcommand
+
+> **Invariant:** Output modifiers (--count, --names-only, --fields) produce identical results regardless of position relative to the subcommand and its filters.
+>
+> **Rationale:** Users should not need to memorize argument ordering rules; the CLI should be forgiving.
+
+**Verified by:**
+- Count modifier after list subcommand returns count
+- Names-only modifier after list subcommand returns names
+- Count modifier combined with list filter
+
+---
+
+#### CLI arch health subcommands detect graph quality issues
+
+> **Invariant:** Health subcommands (dangling, orphans, blocking) operate on the relationship index, not the architecture index, and return results without requiring arch annotations.
+>
+> **Rationale:** Graph quality issues (broken references, isolated patterns, blocked dependencies) are relationship-level concerns that should be queryable even when no architecture metadata exists.
+
+**Verified by:**
+- Arch dangling returns broken references
+- Arch orphans returns isolated patterns
+- Arch blocking returns blocked patterns
+
+---
+
+#### CLI rules subcommand queries business rules and invariants
+
+> **Invariant:** The rules subcommand returns structured business rules extracted from Gherkin Rule: blocks, grouped by product area and phase, with parsed invariant and rationale annotations.
+>
+> **Rationale:** Live business rule queries replace static generated markdown, enabling on-demand filtering by product area, pattern, and invariant presence.
+
+**Verified by:**
+- Rules returns business rules from feature files
+- Rules filters by product area
+- Rules with count modifier returns totals
+- Rules with names-only returns flat array
+- Rules filters by pattern name
+- Rules with only-invariants excludes rules without invariants
+- Rules product area filter excludes non-matching areas
+- Rules for non-existent product area returns hint
+- Rules combines product area and only-invariants filters
+
+*process-api-modifiers-rules.feature*
+
+### Process Api Cli Subcommands
+
+*Discovery subcommands: list, search, context assembly, tags/sources, extended arch, unannotated.*
+
 ---
 
 #### CLI list subcommand filters patterns
@@ -826,52 +883,7 @@
 **Verified by:**
 - Unannotated finds files missing libar-docs marker
 
----
-
-#### Output modifiers work when placed after the subcommand
-
-> **Invariant:** Output modifiers (--count, --names-only, --fields) produce identical results regardless of position relative to the subcommand and its filters.
->
-> **Rationale:** Users should not need to memorize argument ordering rules; the CLI should be forgiving.
-
-**Verified by:**
-- Count modifier after list subcommand returns count
-- Names-only modifier after list subcommand returns names
-- Count modifier combined with list filter
-
----
-
-#### CLI arch health subcommands detect graph quality issues
-
-> **Invariant:** Health subcommands (dangling, orphans, blocking) operate on the relationship index, not the architecture index, and return results without requiring arch annotations.
->
-> **Rationale:** Graph quality issues (broken references, isolated patterns, blocked dependencies) are relationship-level concerns that should be queryable even when no architecture metadata exists.
-
-**Verified by:**
-- Arch dangling returns broken references
-- Arch orphans returns isolated patterns
-- Arch blocking returns blocked patterns
-
----
-
-#### CLI rules subcommand queries business rules and invariants
-
-> **Invariant:** The rules subcommand returns structured business rules extracted from Gherkin Rule: blocks, grouped by product area and phase, with parsed invariant and rationale annotations.
->
-> **Rationale:** Live business rule queries replace static generated markdown, enabling on-demand filtering by product area, pattern, and invariant presence.
-
-**Verified by:**
-- Rules returns business rules from feature files
-- Rules filters by product area
-- Rules with count modifier returns totals
-- Rules with names-only returns flat array
-- Rules filters by pattern name
-- Rules with only-invariants excludes rules without invariants
-- Rules product area filter excludes non-matching areas
-- Rules for non-existent product area returns hint
-- Rules combines product area and only-invariants filters
-
-*process-api.feature*
+*process-api-subcommands.feature*
 
 ### Process State API
 

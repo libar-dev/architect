@@ -45,7 +45,6 @@ Files that implement this pattern:
 
 - [`process-api.ts`](../../src/cli/process-api.ts) - ## process-api - CLI Query Interface to ProcessStateAPI
 - [`process-state-api.feature`](../../tests/features/api/process-state-api.feature) - Programmatic interface for querying delivery process state.
-- [`process-api.feature`](../../tests/features/cli/process-api.feature) - Command-line interface for querying delivery process state via ProcessStateAPI.
 
 ## Acceptance Criteria
 

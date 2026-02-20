@@ -7,14 +7,14 @@
 
 ## Summary
 
-**Overall:** [██████████████░░░░░░] 118/163 (72%)
+**Overall:** [███████████████░░░░░] 132/177 (75%)
 
 | Metric         | Value |
 | -------------- | ----- |
-| Total Features | 163   |
-| Completed      | 118   |
-| Active         | 16    |
-| Planned        | 29    |
+| Total Features | 177   |
+| Completed      | 132   |
+| Active         | 15    |
+| Planned        | 30    |
 | Product Areas  | 7     |
 | User Roles     | 1     |
 
@@ -24,9 +24,11 @@
 
 ### Annotation
 
-20/23 complete (87%)
+23/26 complete (88%)
 
-- [✅ Ast Parser](requirements/phase-00-ast-parser.md)
+- [✅ Ast Parser Exports](requirements/phase-00-ast-parser-exports.md)
+- [✅ Ast Parser Metadata](requirements/phase-00-ast-parser-metadata.md)
+- [✅ Ast Parser Relationships Edges](requirements/phase-00-ast-parser-relationships-edges.md)
 - [✅ Context Inference](requirements/phase-00-context-inference.md)
 - [✅ Declaration Level Shape Tagging - enables focused shape extraction without whole file dumping](requirements/phase-31-declaration-level-shape-tagging.md)
 - [✅ Declaration Level Shape Tagging Testing](requirements/phase-00-declaration-level-shape-tagging-testing.md)
@@ -44,7 +46,8 @@
 - [✅ Pattern Tag Extraction](requirements/phase-00-pattern-tag-extraction.md)
 - [✅ Scanner Core](requirements/phase-00-scanner-core.md)
 - [✅ Shape Extraction - eliminates type duplication in documentation](requirements/phase-26-shape-extraction.md)
-- [✅ Shape Extraction Testing](requirements/phase-00-shape-extraction-testing.md)
+- [✅ Shape Extraction Rendering Testing](requirements/phase-00-shape-extraction-rendering-testing.md)
+- [✅ Shape Extraction Types Testing](requirements/phase-00-shape-extraction-types-testing.md)
 - [✅ TypeScript Taxonomy Implementation - compile time taxonomy protection](requirements/phase-99-type-script-taxonomy-implementation.md)
 - [🚧 Depends On Tag Testing](requirements/phase-00-depends-on-tag-testing.md)
 - [🚧 Uses Tag Testing](requirements/phase-00-uses-tag-testing.md)
@@ -78,7 +81,7 @@
 
 ### DataAPI
 
-16/31 complete (52%)
+20/33 complete (61%)
 
 - [✅ Data API Architecture Queries - deep architecture exploration for design sessions](requirements/phase-25-data-api-architecture-queries.md)
 - [✅ Data API Context Assembly - replace explore agents with one command](requirements/phase-25-data-api-context-assembly.md)
@@ -90,10 +93,14 @@
 - [✅ Handoff Generator Tests](requirements/phase-00-handoff-generator-tests.md)
 - [✅ Lint Patterns Cli](requirements/phase-00-lint-patterns-cli.md)
 - [✅ Lint Process Cli](requirements/phase-00-lint-process-cli.md)
-- [✅ Process Api Cli](requirements/phase-00-process-api-cli.md)
+- [✅ Pipeline Factory](requirements/phase-00-pipeline-factory.md)
+- [✅ Process Api Cli Core](requirements/phase-00-process-api-cli-core.md)
+- [✅ Process Api Cli Modifiers And Rules](requirements/phase-00-process-api-cli-modifiers-and-rules.md)
+- [✅ Process Api Cli Subcommands](requirements/phase-00-process-api-cli-subcommands.md)
 - [✅ Process API Layered Extraction - separate cli shell from domain logic in process api](requirements/phase-100-process-api-layered-extraction.md)
 - [✅ Process State API CLI - direct api queries for planning](requirements/phase-24-process-state-apicli.md)
 - [✅ Process State API Testing](requirements/phase-00-process-state-api-testing.md)
+- [✅ Rules Query Module](requirements/phase-00-rules-query-module.md)
 - [✅ Scope Validator Tests](requirements/phase-00-scope-validator-tests.md)
 - [✅ Validate Patterns Cli](requirements/phase-00-validate-patterns-cli.md)
 - [🚧 Arch Queries Test](requirements/phase-00-arch-queries-test.md)
@@ -103,9 +110,7 @@
 - [🚧 Output Pipeline Tests](requirements/phase-00-output-pipeline-tests.md)
 - [🚧 Pattern Helpers Tests](requirements/phase-25-pattern-helpers-tests.md)
 - [🚧 Pattern Summarize Tests](requirements/phase-00-pattern-summarize-tests.md)
-- [🚧 Pipeline Factory](requirements/phase-00-pipeline-factory.md)
 - [🚧 Process State API Relationship Queries](requirements/phase-24-process-state-api-relationship-queries.md)
-- [🚧 Rules Query Module](requirements/phase-00-rules-query-module.md)
 - [🚧 Stub Resolver Tests](requirements/phase-00-stub-resolver-tests.md)
 - [🚧 Stub Taxonomy Tag Tests](requirements/phase-00-stub-taxonomy-tag-tests.md)
 - [📋 Data API CLI Ergonomics - fast interactive cli for repeated queries](requirements/phase-25-data-apicli-ergonomics.md)
@@ -114,7 +119,7 @@
 
 ### Generation
 
-52/64 complete (81%)
+58/72 complete (81%)
 
 - [✅ Arch Generator Registration](requirements/phase-00-arch-generator-registration.md)
 - [✅ Arch Index Dataset](requirements/phase-00-arch-index-dataset.md)
@@ -137,18 +142,25 @@
 - [✅ Generator Registry Testing](requirements/phase-00-generator-registry-testing.md)
 - [✅ Implementation Link Path Normalization](requirements/phase-00-implementation-link-path-normalization.md)
 - [✅ Layered Diagram Generation](requirements/phase-00-layered-diagram-generation.md)
+- [✅ Merge Patterns](requirements/phase-00-merge-patterns.md)
 - [✅ Mermaid Relationship Rendering](requirements/phase-00-mermaid-relationship-rendering.md)
 - [✅ Patterns Codec Testing](requirements/phase-00-patterns-codec-testing.md)
 - [✅ Planning Codec Testing](requirements/phase-00-planning-codec-testing.md)
 - [✅ Poc Integration](requirements/phase-00-poc-integration.md)
-- [✅ Pr Changes Codec Testing](requirements/phase-00-pr-changes-codec-testing.md)
+- [✅ Pr Changes Codec Options Testing](requirements/phase-00-pr-changes-codec-options-testing.md)
+- [✅ Pr Changes Codec Rendering Testing](requirements/phase-00-pr-changes-codec-rendering-testing.md)
 - [✅ Pr Changes Generation](requirements/phase-00-pr-changes-generation.md)
 - [✅ Pr Changes Options](requirements/phase-00-pr-changes-options.md)
 - [✅ Prd Implementation Section Testing](requirements/phase-00-prd-implementation-section-testing.md)
-- [✅ Reference Codec Testing](requirements/phase-00-reference-codec-testing.md)
+- [✅ Reference Codec Core Testing](requirements/phase-00-reference-codec-core-testing.md)
+- [✅ Reference Codec Detail Rendering](requirements/phase-00-reference-codec-detail-rendering.md)
+- [✅ Reference Codec Diagram Testing](requirements/phase-00-reference-codec-diagram-testing.md)
+- [✅ Reference Codec Diagram Type Testing](requirements/phase-00-reference-codec-diagram-type-testing.md)
 - [✅ Reference Generator Testing](requirements/phase-00-reference-generator-testing.md)
 - [✅ Remaining Work Enhancement](requirements/phase-00-remaining-work-enhancement.md)
 - [✅ Remaining Work Summary Accuracy](requirements/phase-00-remaining-work-summary-accuracy.md)
+- [✅ Renderer Block Types](requirements/phase-00-renderer-block-types.md)
+- [✅ Renderer Output Formats](requirements/phase-00-renderer-output-formats.md)
 - [✅ Reporting Codec Testing](requirements/phase-00-reporting-codec-testing.md)
 - [✅ Requirements Adr Codec Testing](requirements/phase-00-requirements-adr-codec-testing.md)
 - [✅ Robustness Integration](requirements/phase-00-robustness-integration.md)
@@ -164,13 +176,14 @@
 - [✅ Timeline Codec Testing](requirements/phase-00-timeline-codec-testing.md)
 - [✅ Transform Dataset Testing](requirements/phase-00-transform-dataset-testing.md)
 - [✅ Universal Doc Generator Robustness - enables monorepo scale doc generation](requirements/phase-28-universal-doc-generator-robustness.md)
-- [✅ Universal Markdown Renderer](requirements/phase-00-universal-markdown-renderer.md)
 - [✅ Validation Rules Codec Testing](requirements/phase-00-validation-rules-codec-testing.md)
 - [✅ Warning Collector Testing](requirements/phase-00-warning-collector-testing.md)
 - [✅ Zod Codec Migration](requirements/phase-00-zod-codec-migration.md)
+- [🚧 Orchestrator Pipeline Factory Migration - eliminate last parallel pipeline and unify pipeline definition](requirements/phase-101-orchestrator-pipeline-factory-migration.md)
 - [🚧 Reference Doc Showcase - validates all content blocks via single integration document](requirements/phase-30-reference-doc-showcase.md)
 - [📋 Architecture Delta - document release changes automatically](requirements/phase-100-architecture-delta.md)
-- [📋 Architecture Diagram Generation](requirements/phase-23-architecture-diagram-generation.md)
+- [📋 Architecture Diagram Advanced](requirements/phase-23-architecture-diagram-advanced.md)
+- [📋 Architecture Diagram Core](requirements/phase-23-architecture-diagram-core.md)
 - [📋 Business Rules Generator](requirements/phase-100-business-rules-generator.md)
 - [📋 Claude Module Generation - automated claude md modules from source](requirements/phase-25-claude-module-generation.md)
 - [📋 Codec Behavior Testing - ensure all document codecs produce correct output](requirements/phase-102-codec-behavior-testing.md)
@@ -196,7 +209,7 @@
 
 ### Validation
 
-13/21 complete (62%)
+14/22 complete (64%)
 
 - [✅ Anti Pattern Detector Testing](requirements/phase-00-anti-pattern-detector-testing.md)
 - [✅ Config Schema Validation](requirements/phase-00-config-schema-validation.md)
@@ -205,7 +218,8 @@
 - [✅ FSM Validator Testing](requirements/phase-00-fsm-validator-testing.md)
 - [✅ Lint Engine Testing](requirements/phase-00-lint-engine-testing.md)
 - [✅ Linter Validation Testing](requirements/phase-00-linter-validation-testing.md)
-- [✅ Lint Rules Testing](requirements/phase-00-lint-rules-testing.md)
+- [✅ Lint Rule Advanced Testing](requirements/phase-00-lint-rule-advanced-testing.md)
+- [✅ Lint Rule Individual Testing](requirements/phase-00-lint-rule-individual-testing.md)
 - [✅ Phase State Machine Validation - ensure state machine rules are enforced programmatically](requirements/phase-100-phase-state-machine-validation.md)
 - [✅ Process Guard Linter - prevent accidental scope creep and locked file modifications](requirements/phase-99-process-guard-linter.md)
 - [✅ Process Guard Testing](requirements/phase-00-process-guard-testing.md)
@@ -243,7 +257,9 @@
 | ✅ Arch Generator Registration                                | Generation    | -         | completed |
 | ✅ Arch Index Dataset                                         | Generation    | -         | completed |
 | ✅ Arch Tag Extraction                                        | Generation    | -         | completed |
-| ✅ Ast Parser                                                 | Annotation    | -         | completed |
+| ✅ Ast Parser Exports                                         | Annotation    | -         | completed |
+| ✅ Ast Parser Metadata                                        | Annotation    | -         | completed |
+| ✅ Ast Parser Relationships Edges                             | Annotation    | -         | completed |
 | ✅ Business Rules Document Codec                              | Generation    | -         | completed |
 | ✅ Codec Based Generator Testing                              | Generation    | -         | completed |
 | ✅ Codec Driven Reference Generation                          | Generation    | -         | completed |
@@ -299,37 +315,49 @@
 | ✅ Linter Validation Testing                                  | Validation    | -         | completed |
 | ✅ Lint Patterns Cli                                          | DataAPI       | -         | completed |
 | ✅ Lint Process Cli                                           | DataAPI       | -         | completed |
-| ✅ Lint Rules Testing                                         | Validation    | -         | completed |
+| ✅ Lint Rule Advanced Testing                                 | Validation    | -         | completed |
+| ✅ Lint Rule Individual Testing                               | Validation    | -         | completed |
+| ✅ Merge Patterns                                             | Generation    | -         | completed |
 | ✅ Mermaid Relationship Rendering                             | Generation    | -         | completed |
 | ✅ Mvp Workflow Implementation                                | Process       | -         | completed |
 | ✅ Pattern Relationship Model                                 | Annotation    | -         | completed |
 | ✅ Patterns Codec Testing                                     | Generation    | -         | completed |
 | ✅ Pattern Tag Extraction                                     | Annotation    | -         | completed |
 | ✅ Phase State Machine Validation                             | Validation    | -         | completed |
+| ✅ Pipeline Factory                                           | DataAPI       | -         | completed |
 | ✅ Planning Codec Testing                                     | Generation    | -         | completed |
 | ✅ Poc Integration                                            | Generation    | -         | completed |
-| ✅ Pr Changes Codec Testing                                   | Generation    | -         | completed |
+| ✅ Pr Changes Codec Options Testing                           | Generation    | -         | completed |
+| ✅ Pr Changes Codec Rendering Testing                         | Generation    | -         | completed |
 | ✅ Pr Changes Generation                                      | Generation    | -         | completed |
 | ✅ Pr Changes Options                                         | Generation    | -         | completed |
 | ✅ Prd Implementation Section Testing                         | Generation    | -         | completed |
 | ✅ Preset System                                              | Configuration | -         | completed |
-| ✅ Process Api Cli                                            | DataAPI       | -         | completed |
+| ✅ Process Api Cli Core                                       | DataAPI       | -         | completed |
+| ✅ Process Api Cli Modifiers And Rules                        | DataAPI       | -         | completed |
+| ✅ Process Api Cli Subcommands                                | DataAPI       | -         | completed |
 | ✅ Process API Layered Extraction                             | DataAPI       | -         | completed |
 | ✅ Process Guard Linter                                       | Validation    | -         | completed |
 | ✅ Process Guard Testing                                      | Validation    | -         | completed |
 | ✅ Process State API CLI                                      | DataAPI       | -         | completed |
 | ✅ Process State API Testing                                  | DataAPI       | -         | completed |
 | ✅ Project Config Loader                                      | Configuration | -         | completed |
-| ✅ Reference Codec Testing                                    | Generation    | -         | completed |
+| ✅ Reference Codec Core Testing                               | Generation    | -         | completed |
+| ✅ Reference Codec Detail Rendering                           | Generation    | -         | completed |
+| ✅ Reference Codec Diagram Testing                            | Generation    | -         | completed |
+| ✅ Reference Codec Diagram Type Testing                       | Generation    | -         | completed |
 | ✅ Reference Generator Testing                                | Generation    | -         | completed |
 | ✅ Remaining Work Enhancement                                 | Generation    | -         | completed |
 | ✅ Remaining Work Summary Accuracy                            | Generation    | -         | completed |
+| ✅ Renderer Block Types                                       | Generation    | -         | completed |
+| ✅ Renderer Output Formats                                    | Generation    | -         | completed |
 | ✅ Reporting Codec Testing                                    | Generation    | -         | completed |
 | ✅ Requirements Adr Codec Testing                             | Generation    | -         | completed |
 | ✅ Result Monad                                               | CoreTypes     | -         | completed |
 | ✅ Result Monad Types                                         | CoreTypes     | -         | completed |
 | ✅ Robustness Integration                                     | Generation    | -         | completed |
 | ✅ Rule Keyword Po C                                          | Generation    | -         | completed |
+| ✅ Rules Query Module                                         | DataAPI       | -         | completed |
 | ✅ Scanner Core                                               | Annotation    | -         | completed |
 | ✅ Scoped Architectural View                                  | Generation    | -         | completed |
 | ✅ Scope Validator Tests                                      | DataAPI       | -         | completed |
@@ -337,7 +365,8 @@
 | ✅ Session File Lifecycle                                     | Process       | -         | completed |
 | ✅ Session Handoffs                                           | Process       | -         | completed |
 | ✅ Shape Extraction                                           | Annotation    | -         | completed |
-| ✅ Shape Extraction Testing                                   | Annotation    | -         | completed |
+| ✅ Shape Extraction Rendering Testing                         | Annotation    | -         | completed |
+| ✅ Shape Extraction Types Testing                             | Annotation    | -         | completed |
 | ✅ Shape Matcher Testing                                      | Generation    | -         | completed |
 | ✅ Shape Selector Testing                                     | Generation    | -         | completed |
 | ✅ Source Mapper Testing                                      | Generation    | -         | completed |
@@ -351,7 +380,6 @@
 | ✅ Transform Dataset Testing                                  | Generation    | -         | completed |
 | ✅ TypeScript Taxonomy Implementation                         | Annotation    | Developer | completed |
 | ✅ Universal Doc Generator Robustness                         | Generation    | -         | completed |
-| ✅ Universal Markdown Renderer                                | Generation    | -         | completed |
 | ✅ Validate Patterns Cli                                      | DataAPI       | -         | completed |
 | ✅ Validation Rules Codec Testing                             | Generation    | -         | completed |
 | ✅ Validator Read Model Consolidation                         | Validation    | -         | completed |
@@ -362,19 +390,19 @@
 | 🚧 Context Formatter Tests                                    | DataAPI       | -         | active    |
 | 🚧 Depends On Tag Testing                                     | Annotation    | -         | active    |
 | 🚧 Fuzzy Match Tests                                          | DataAPI       | -         | active    |
+| 🚧 Orchestrator Pipeline Factory Migration                    | Generation    | -         | active    |
 | 🚧 Output Pipeline Tests                                      | DataAPI       | -         | active    |
 | 🚧 Pattern Helpers Tests                                      | DataAPI       | -         | active    |
 | 🚧 Pattern Summarize Tests                                    | DataAPI       | -         | active    |
-| 🚧 Pipeline Factory                                           | DataAPI       | -         | active    |
 | 🚧 Process State API Relationship Queries                     | DataAPI       | -         | active    |
 | 🚧 Reference Doc Showcase                                     | Generation    | -         | active    |
-| 🚧 Rules Query Module                                         | DataAPI       | -         | active    |
 | 🚧 Step Lint Vitest Cucumber                                  | Validation    | -         | active    |
 | 🚧 Stub Resolver Tests                                        | DataAPI       | -         | active    |
 | 🚧 Stub Taxonomy Tag Tests                                    | DataAPI       | -         | active    |
 | 🚧 Uses Tag Testing                                           | Annotation    | -         | active    |
 | 📋 Architecture Delta                                         | Generation    | -         | planned   |
-| 📋 Architecture Diagram Generation                            | Generation    | -         | planned   |
+| 📋 Architecture Diagram Advanced                              | Generation    | -         | planned   |
+| 📋 Architecture Diagram Core                                  | Generation    | -         | planned   |
 | 📋 Business Rules Generator                                   | Generation    | -         | planned   |
 | 📋 Claude Module Generation                                   | Generation    | -         | planned   |
 | 📋 Cli Behavior Testing                                       | Process       | -         | planned   |

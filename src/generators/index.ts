@@ -48,7 +48,6 @@ export {
 // Orchestrator - programmatic API for documentation generation
 export {
   generateDocumentation,
-  mergePatterns,
   type GenerateOptions,
   type GenerateResult,
   type GeneratedFile,
@@ -58,6 +57,7 @@ export {
 
 // Pipeline - MasterDataset transformation for ProcessStateAPI usage
 export {
+  mergePatterns,
   transformToMasterDataset,
   type RawDataset,
   type RuntimeMasterDataset,

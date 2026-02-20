@@ -29,6 +29,18 @@ Detail Level: Compact summary
 
 --- PipelineFactory ---
 
+--- PDR001SessionWorkflowCommands ---
+
+| Rule                                                 | Description                                                                                                                        |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| DD-1 - Text output with section markers              | Both scope-validate and handoff return string from the router, using<br> === SECTION === markers. Follows the dual...              |
+| DD-2 - Git integration is opt-in via --git flag      | The handoff command accepts an optional --git flag. The CLI handler<br> calls git diff and passes file list to the...              |
+| DD-3 - Session type inferred from FSM status         | Handoff infers session type from pattern's current FSM status.<br> An explicit --session flag overrides inference....              |
+| DD-4 - Severity levels match Process Guard model     | Scope validation uses three severity levels:<br><br> \| Severity \| Meaning \|<br> \| PASS \| Check passed \|<br> \| BLOCKED \|... |
+| DD-5 - Current date only for handoff                 | Handoff always uses the current date. No --date flag.                                                                              |
+| DD-6 - Both positional and flag forms for scope type | scope-validate accepts scope type as both positional argument<br> and --type flag.                                                 |
+| DD-7 - Co-located formatter functions                | Each module (scope-validator.ts, handoff-generator.ts) exports<br> both the data builder and the text formatter....                |
+
 --- ProcessStateAPIRelationshipQueries ---
 
 | Rule                                             | Description                                                                                                               |
@@ -127,18 +139,6 @@ Detail Level: Compact summary
 | Coverage analysis reports annotation completeness with gaps    | **Invariant:** Coverage reports identify unannotated files that should have<br> the libar-docs opt-in marker based on... |
 | Tags and sources commands provide taxonomy and inventory views | **Invariant:** All tag values in use are discoverable without reading<br> configuration files. Source file inventory...  |
 
---- PDR001SessionWorkflowCommands ---
-
-| Rule                                                 | Description                                                                                                                        |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| DD-1 - Text output with section markers              | Both scope-validate and handoff return string from the router, using<br> === SECTION === markers. Follows the dual...              |
-| DD-2 - Git integration is opt-in via --git flag      | The handoff command accepts an optional --git flag. The CLI handler<br> calls git diff and passes file list to the...              |
-| DD-3 - Session type inferred from FSM status         | Handoff infers session type from pattern's current FSM status.<br> An explicit --session flag overrides inference....              |
-| DD-4 - Severity levels match Process Guard model     | Scope validation uses three severity levels:<br><br> \| Severity \| Meaning \|<br> \| PASS \| Check passed \|<br> \| BLOCKED \|... |
-| DD-5 - Current date only for handoff                 | Handoff always uses the current date. No --date flag.                                                                              |
-| DD-6 - Both positional and flag forms for scope type | scope-validate accepts scope type as both positional argument<br> and --type flag.                                                 |
-| DD-7 - Co-located formatter functions                | Each module (scope-validator.ts, handoff-generator.ts) exports<br> both the data builder and the text formatter....                |
-
 --- ValidatePatternsCli ---
 
 | Rule                                                         | Description                                                                                                              |
@@ -150,27 +150,37 @@ Detail Level: Compact summary
 | Strict mode treats warnings as errors                        | **Invariant:** When --strict is enabled, warnings must be promoted to errors causing a non-zero exit code (exit 2);...   |
 | CLI warns about unknown flags                                | **Invariant:** Unrecognized CLI flags must produce a warning message but allow execution to continue....                 |
 
---- ProcessApiCli ---
+--- ProcessApiCliSubcommands ---
 
-| Rule                                                           | Description                                                                                                              |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| CLI displays help and version information                      |                                                                                                                          |
-| CLI requires input flag for subcommands                        |                                                                                                                          |
-| CLI status subcommand shows delivery state                     |                                                                                                                          |
-| CLI query subcommand executes API methods                      |                                                                                                                          |
-| CLI pattern subcommand shows pattern detail                    |                                                                                                                          |
-| CLI arch subcommand queries architecture                       |                                                                                                                          |
-| CLI shows errors for missing subcommand arguments              |                                                                                                                          |
-| CLI handles argument edge cases                                |                                                                                                                          |
-| CLI list subcommand filters patterns                           |                                                                                                                          |
-| CLI search subcommand finds patterns by fuzzy match            |                                                                                                                          |
-| CLI context assembly subcommands return text output            |                                                                                                                          |
-| CLI tags and sources subcommands return JSON                   |                                                                                                                          |
-| CLI extended arch subcommands query architecture relationships |                                                                                                                          |
-| CLI unannotated subcommand finds files without annotations     |                                                                                                                          |
-| Output modifiers work when placed after the subcommand         | **Invariant:** Output modifiers (--count, --names-only, --fields) produce identical results regardless of position...    |
-| CLI arch health subcommands detect graph quality issues        | **Invariant:** Health subcommands (dangling, orphans, blocking) operate on the relationship index, not the...            |
-| CLI rules subcommand queries business rules and invariants     | **Invariant:** The rules subcommand returns structured business rules extracted from Gherkin Rule: blocks, grouped by... |
+| Rule                                                           | Description |
+| -------------------------------------------------------------- | ----------- |
+| CLI list subcommand filters patterns                           |             |
+| CLI search subcommand finds patterns by fuzzy match            |             |
+| CLI context assembly subcommands return text output            |             |
+| CLI tags and sources subcommands return JSON                   |             |
+| CLI extended arch subcommands query architecture relationships |             |
+| CLI unannotated subcommand finds files without annotations     |             |
+
+--- ProcessApiCliModifiersAndRules ---
+
+| Rule                                                       | Description                                                                                                              |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Output modifiers work when placed after the subcommand     | **Invariant:** Output modifiers (--count, --names-only, --fields) produce identical results regardless of position...    |
+| CLI arch health subcommands detect graph quality issues    | **Invariant:** Health subcommands (dangling, orphans, blocking) operate on the relationship index, not the...            |
+| CLI rules subcommand queries business rules and invariants | **Invariant:** The rules subcommand returns structured business rules extracted from Gherkin Rule: blocks, grouped by... |
+
+--- ProcessApiCliCore ---
+
+| Rule                                              | Description |
+| ------------------------------------------------- | ----------- |
+| CLI displays help and version information         |             |
+| CLI requires input flag for subcommands           |             |
+| CLI status subcommand shows delivery state        |             |
+| CLI query subcommand executes API methods         |             |
+| CLI pattern subcommand shows pattern detail       |             |
+| CLI arch subcommand queries architecture          |             |
+| CLI shows errors for missing subcommand arguments |             |
+| CLI handles argument edge cases                   |             |
 
 --- LintProcessCli ---
 
@@ -256,24 +266,6 @@ Detail Level: Compact summary
 | Handoff generates compact session state summary | **Invariant:** The handoff generator must produce a compact session state summary including pattern status,... |
 | Formatter produces structured text output       | **Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for...   |
 
---- ContextFormatterTests ---
-
-| Rule                                                 | Description                                                                                                              |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| formatContextBundle renders section markers          | **Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with... |
-| formatDepTree renders indented tree                  | **Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to...        |
-| formatOverview renders progress summary              | **Invariant:** The overview formatter must render a progress summary line showing completion metrics for the...          |
-| formatFileReadingList renders categorized file paths | **Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing...  |
-
---- ContextAssemblerTests ---
-
-| Rule                                                      | Description                                                                                                              |
-| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| assembleContext produces session-tailored context bundles | **Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its... |
-| buildDepTree walks dependency chains with cycle detection | **Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate... |
-| buildOverview provides executive project summary          | **Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and...        |
-| buildFileReadingList returns paths by relevance           | **Invariant:** Primary files (spec, implementation) must always be included; related files (dependency...                |
-
 --- PatternSummarizeTests ---
 
 | Rule                                         | Description                                                                                                             |
@@ -306,6 +298,24 @@ Detail Level: Compact summary
 | Fuzzy matching uses tiered scoring      | **Invariant:** Pattern matching must use a tiered scoring system: exact match (1.0) > prefix match (0.9) > substring... |
 | findBestMatch returns single suggestion | **Invariant:** findBestMatch must return the single highest-scoring match above the threshold, or undefined when no...  |
 | Levenshtein distance computation        | **Invariant:** The Levenshtein distance function must correctly compute edit distance between strings, returning 0...   |
+
+--- ContextFormatterTests ---
+
+| Rule                                                 | Description                                                                                                              |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| formatContextBundle renders section markers          | **Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with... |
+| formatDepTree renders indented tree                  | **Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to...        |
+| formatOverview renders progress summary              | **Invariant:** The overview formatter must render a progress summary line showing completion metrics for the...          |
+| formatFileReadingList renders categorized file paths | **Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing...  |
+
+--- ContextAssemblerTests ---
+
+| Rule                                                      | Description                                                                                                              |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| assembleContext produces session-tailored context bundles | **Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its... |
+| buildDepTree walks dependency chains with cycle detection | **Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate... |
+| buildOverview provides executive project summary          | **Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and...        |
+| buildFileReadingList returns paths by relevance           | **Invariant:** Primary files (spec, implementation) must always be included; related files (dependency...                |
 
 --- ArchQueriesTest ---
 

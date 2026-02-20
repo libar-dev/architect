@@ -24,8 +24,8 @@ graph TB
     subgraph generator["Generator"]
         SourceMapper[/"SourceMapper"/]
         Documentation_Generation_Orchestrator("Documentation Generation Orchestrator")
-        TransformDataset("TransformDataset")
         DecisionDocGenerator("DecisionDocGenerator")
+        TransformDataset("TransformDataset")
     end
     subgraph renderer["Renderer"]
         PatternsCodec[("PatternsCodec")]
@@ -48,10 +48,10 @@ graph TB
     PatternsCodec ..->|implements| PatternRelationshipModel
     CompositeCodec ..->|implements| ReferenceDocShowcase
     ArchitectureCodec -->|uses| MasterDataset
-    TransformDataset -->|uses| MasterDataset
-    TransformDataset ..->|implements| PatternRelationshipModel
     DecisionDocGenerator -.->|depends on| DecisionDocCodec
     DecisionDocGenerator -.->|depends on| SourceMapper
+    TransformDataset -->|uses| MasterDataset
+    TransformDataset ..->|implements| PatternRelationshipModel
     classDef neighbor stroke-dasharray: 5 5
 ```
 
@@ -230,6 +230,282 @@ function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 ---
 
 ## Behavior Specifications
+
+### MergePatterns
+
+[View MergePatterns source](src/generators/pipeline/merge-patterns.ts)
+
+## MergePatterns - Dual-Source Pattern Merging
+
+Merges patterns from TypeScript and Gherkin sources with conflict detection.
+Each pattern name must be unique across both sources.
+
+Target: src/generators/pipeline/merge-patterns.ts
+See: DD-2 (OrchestratorPipelineFactoryMigration)
+
+### ADR006SingleReadModelArchitecture
+
+[View ADR006SingleReadModelArchitecture source](delivery-process/decisions/adr-006-single-read-model-architecture.feature)
+
+**Context:**
+The delivery-process package applies event sourcing to itself: git is
+the event store, annotated source files are authoritative state, generated
+documentation is a projection. The MasterDataset is the read model —
+produced by a single-pass O(n) transformer with pre-computed views
+and a relationship index.
+
+ADR-005 established that codecs consume MasterDataset as their sole input.
+The ProcessStateAPI consumes it. But the validation layer bypasses it,
+wiring its own mini-pipeline from raw scanner/extractor output. It creates
+a lossy local type that discards relationship data, then discovers it
+lacks the information needed — requiring ad-hoc re-derivation of what
+the MasterDataset already computes.
+
+This is the same class of problem the MasterDataset was created to solve.
+Before the single-pass transformer, each generator called `.filter()`
+independently. The MasterDataset eliminated that duplication for codecs.
+This ADR extends the same principle to all consumers.
+
+**Decision:**
+The MasterDataset is the single read model for all consumers. No consumer
+re-derives pattern data from raw scanner/extractor output when that data
+is available in the MasterDataset. Validators, codecs, and query APIs
+consume the same pre-computed read model.
+
+**Consequences:**
+| Type | Impact |
+| Positive | Relationship resolution happens once — no consumer re-derives implements, uses, or dependsOn |
+| Positive | Eliminates lossy local types that discard fields from canonical ExtractedPattern |
+| Positive | Validation rules automatically benefit from new MasterDataset views and indices |
+| Positive | Aligns with the monorepo's own ADR-006: projections for all reads, never query aggregate state |
+| Negative | Validators that today only need stage 1-2 data will import the transformer |
+| Negative | MasterDataset schema changes affect more consumers |
+
+<details>
+<summary>All feature consumers query the read model, not raw state</summary>
+
+#### All feature consumers query the read model, not raw state
+
+**Invariant:** Code that needs pattern relationships, status groupings, cross-source resolution, or dependency information consumes the MasterDataset. Direct scanner/extractor imports are permitted only in pipeline orchestration code that builds the MasterDataset. Exception: `lint-patterns.ts` is a pure stage-1 consumer. It validates annotation syntax on scanned files. No relationships, no cross-source resolution. Direct scanner consumption is correct for that use case.
+
+| Layer                  | May Import                       | Examples                                            |
+| ---------------------- | -------------------------------- | --------------------------------------------------- |
+| Pipeline Orchestration | scanner/, extractor/, pipeline/  | orchestrator.ts, process-api.ts pipeline setup      |
+| Feature Consumption    | MasterDataset, relationshipIndex | codecs, ProcessStateAPI, validators, query handlers |
+
+</details>
+
+<details>
+<summary>No lossy local types</summary>
+
+#### No lossy local types
+
+**Invariant:** Consumers do not define local DTOs that duplicate and discard fields from ExtractedPattern. If a consumer needs a subset, the type system provides the projection — not a hand-written extraction function that becomes a barrier between the consumer and canonical data.
+
+</details>
+
+<details>
+<summary>Relationship resolution is computed once</summary>
+
+#### Relationship resolution is computed once
+
+**Invariant:** Forward relationships (uses, dependsOn, implementsPatterns) and reverse lookups (usedBy, implementedBy, extendedBy) are computed in `transformToMasterDataset()`. No consumer re-derives these from raw pattern arrays or scanned file tags.
+
+</details>
+
+<details>
+<summary>Three named anti-patterns</summary>
+
+#### Three named anti-patterns
+
+**Invariant:** These are recognized violations, serving as review criteria for new code and refactoring targets for existing code: Naming them makes them visible in code review — including AI-assisted sessions where the default proposal is often "add a helper function."
+
+**Good vs Bad**
+
+**References**
+
+- Monorepo ADR-006: Projections for All Reads (same principle, application domain)
+- ADR-005: Codec-Based Markdown Rendering (established MasterDataset as codec input)
+- Order-management ARCHITECTURE.md: CommandOrchestrator + Read Model separation
+
+| Anti-Pattern            | Detection Signal                                                                         |
+| ----------------------- | ---------------------------------------------------------------------------------------- |
+| Parallel Pipeline       | Feature consumer imports from scanner/ or extractor/                                     |
+| Lossy Local Type        | Local interface with subset of ExtractedPattern fields + dedicated extraction function   |
+| Re-derived Relationship | Building Map or Set from pattern.implementsPatterns, uses, or dependsOn in consumer code |
+
+```typescript
+// Good: consume the read model
+  function validateCrossSource(dataset: RuntimeMasterDataset): ValidationSummary {
+    const rel = dataset.relationshipIndex[patternName];
+    const isImplemented = rel.implementedBy.length > 0;
+  }
+
+  // Bad: re-derive from raw state (Parallel Pipeline + Re-derived Relationship)
+  function buildImplementsLookup(
+    gherkinFiles: readonly ScannedGherkinFile[],
+    tsPatterns: readonly ExtractedPattern[]
+  ): ReadonlySet<string> { ... }
+```
+
+</details>
+
+### ADR005CodecBasedMarkdownRendering
+
+[View ADR005CodecBasedMarkdownRendering source](delivery-process/decisions/adr-005-codec-based-markdown-rendering.feature)
+
+**Context:**
+The documentation generator needs to transform structured pattern data
+(MasterDataset) into markdown files. The initial approach used direct
+string concatenation in generator functions, mixing data selection,
+formatting logic, and output assembly in a single pass. This made
+generators hard to test, difficult to compose, and impossible to
+render the same data in different formats (e.g., full docs vs compact
+AI context).
+
+**Decision:**
+Adopt a codec architecture inspired by serialization codecs (encode/decode).
+Each document type has a codec that decodes a MasterDataset into a
+RenderableDocument — an intermediate representation of sections, headings,
+tables, paragraphs, and code blocks. A separate renderer transforms the
+RenderableDocument into markdown. This separates data selection (what to
+include) from formatting (how it looks) from serialization (markdown syntax).
+
+**Consequences:**
+| Type | Impact |
+| Positive | Codecs are pure functions: dataset in, document out -- trivially testable |
+| Positive | RenderableDocument is an inspectable IR -- tests assert on structure, not strings |
+| Positive | Composable via CompositeCodec -- reference docs assemble from child codecs |
+| Positive | Same dataset can produce different outputs (full doc, compact doc, AI context) |
+| Negative | Extra abstraction layer between data and output |
+| Negative | RenderableDocument vocabulary must cover all needed output patterns |
+
+**Benefits:**
+| Benefit | Before (String Concat) | After (Codec) |
+| Testability | Assert on markdown strings | Assert on typed section blocks |
+| Composability | Copy-paste between generators | CompositeCodec assembles children |
+| Format variants | Duplicate generator logic | Same codec, different renderer |
+| Progressive disclosure | Manual heading management | Heading depth auto-calculated |
+
+<details>
+<summary>Codecs implement a decode-only contract (2 scenarios)</summary>
+
+#### Codecs implement a decode-only contract
+
+**Invariant:** Every codec is a pure function that accepts a MasterDataset and returns a RenderableDocument. Codecs do not perform side effects, do not write files, and do not access the filesystem. The codec contract is decode-only because the transformation is one-directional: structured data becomes a document, never the reverse.
+
+**Rationale:** Pure functions are deterministic and trivially testable. For the same MasterDataset, a codec always produces the same RenderableDocument. This makes snapshot testing reliable and enables codec output comparison across versions.
+
+**Codec call signature:**
+
+```typescript
+interface DocumentCodec {
+  decode(dataset: MasterDataset): RenderableDocument;
+}
+```
+
+**Verified by:**
+
+- Codec produces deterministic output
+- Codec has no side effects
+
+</details>
+
+<details>
+<summary>RenderableDocument is a typed intermediate representation (2 scenarios)</summary>
+
+#### RenderableDocument is a typed intermediate representation
+
+**Invariant:** RenderableDocument contains a title, an ordered array of SectionBlock elements, and an optional record of additional files. Each SectionBlock is a discriminated union: heading, paragraph, table, code, list, separator, or metaRow. The renderer consumes this IR without needing to know which codec produced it.
+
+**Rationale:** A typed IR decouples codecs from rendering. Codecs express intent ("this is a table with these rows") and the renderer handles syntax ("pipe-delimited markdown with separator row"). This means switching output format (e.g., HTML instead of markdown) requires only a new renderer, not changes to every codec.
+
+**Section block types:**
+
+| Block Type | Purpose                       | Markdown Output             |
+| ---------- | ----------------------------- | --------------------------- |
+| heading    | Section title with depth      | ## Title (depth-adjusted)   |
+| paragraph  | Prose text                    | Plain text with blank lines |
+| table      | Structured data               | Pipe-delimited table        |
+| code       | Code sample with language     | Fenced code block           |
+| list       | Ordered or unordered items    | - item or 1. item           |
+| separator  | Visual break between sections | ---                         |
+| metaRow    | Key-value metadata            | **Key:** Value              |
+
+**Verified by:**
+
+- All block types render to markdown
+- Unknown block type is rejected
+
+</details>
+
+<details>
+<summary>CompositeCodec assembles documents from child codecs (2 scenarios)</summary>
+
+#### CompositeCodec assembles documents from child codecs
+
+**Invariant:** CompositeCodec accepts an array of child codecs and produces a single RenderableDocument by concatenating their sections. Child codec order determines section order in the output. Separators are inserted between children by default.
+
+**Rationale:** Reference documents combine content from multiple domains (patterns, conventions, shapes, diagrams). Rather than building a monolithic codec that knows about all content types, CompositeCodec lets each domain own its codec and composes them declaratively.
+
+**Composition example:**
+
+```typescript
+const referenceDoc = CompositeCodec.create({
+  title: 'Architecture Reference',
+  codecs: [
+    behaviorCodec, // patterns with rules
+    conventionCodec, // decision records
+    shapeCodec, // type definitions
+    diagramCodec, // mermaid diagrams
+  ],
+});
+```
+
+**Verified by:**
+
+- Child sections appear in codec array order
+- Empty children are skipped without separators
+
+</details>
+
+<details>
+<summary>ADR content comes from both Feature description and Rule prefixes (3 scenarios)</summary>
+
+#### ADR content comes from both Feature description and Rule prefixes
+
+**Invariant:** ADR structured content (Context, Decision, Consequences) can appear in two locations within a feature file. Both sources must be rendered. Silently dropping either source causes content loss.
+
+**Rationale:** Early ADRs used name prefixes like "Context - ..." and "Decision - ..." on Rule blocks to structure content. Later ADRs placed Context, Decision, and Consequences as bold-annotated prose in the Feature description, reserving Rule: blocks for invariants and design rules. Both conventions are valid. The ADR codec must handle both because the codebase contains ADRs authored in each style. The Feature description lives in pattern.directive.description. If the codec only renders Rules (via partitionRulesByPrefix), then Feature description content is silently dropped -- no error, no warning. This caused confusion across two repos where ADR content appeared in the feature file but was missing from generated docs. The fix renders pattern.directive.description in buildSingleAdrDocument between the Overview metadata table and the partitioned Rules section, using renderFeatureDescription() which walks content linearly and handles prose, tables, and DocStrings with correct interleaving.
+
+| Source              | Location                            | Example                   | Rendered Via               |
+| ------------------- | ----------------------------------- | ------------------------- | -------------------------- |
+| Rule prefix         | Rule: Context - ...                 | ADR-001 (taxonomy)        | partitionRulesByPrefix()   |
+| Feature description | **Context:** prose in Feature block | ADR-005 (codec rendering) | renderFeatureDescription() |
+
+**Verified by:**
+
+- Feature description content is rendered
+- Rule prefix content is rendered
+- Both sources combine in single ADR
+
+</details>
+
+<details>
+<summary>The markdown renderer is codec-agnostic (2 scenarios)</summary>
+
+#### The markdown renderer is codec-agnostic
+
+**Invariant:** The renderer accepts any RenderableDocument regardless of which codec produced it. Rendering depends only on block types, not on document origin. This enables testing codecs and renderers independently.
+
+**Rationale:** If the renderer knew about specific codecs, adding a new codec would require renderer changes. By operating purely on the SectionBlock discriminated union, the renderer is closed for modification but open for extension via new block types.
+
+**Verified by:**
+
+- Same renderer handles different codec outputs
+- Renderer and codec are tested independently
+
+</details>
 
 ### UniversalDocGeneratorRobustness
 
@@ -852,6 +1128,247 @@ relationship model from PatternRelationshipModel without requiring specs to list
 
 - Section omitted when no implementations exist
 - Section omitted when empty
+
+</details>
+
+### OrchestratorPipelineFactoryMigration
+
+[View OrchestratorPipelineFactoryMigration source](delivery-process/specs/orchestrator-pipeline-factory-migration.feature)
+
+**Problem:**
+`orchestrator.ts` is the last feature consumer that wires the 8-step
+scan-extract-merge-transform pipeline inline (lines 282-427). This is
+the Parallel Pipeline anti-pattern identified in ADR-006. The shared
+pipeline factory in `build-pipeline.ts` already serves `process-api.ts`
+and `validate-patterns.ts`, but the orchestrator — the original pipeline
+host — was deferred (ProcessAPILayeredExtraction DD-3) because it
+collects structured warnings (scan errors with file details, extraction
+error counts, Gherkin parse errors with line/column) that the factory's
+flat `readonly string[]` warnings cannot represent.
+
+**Current violations in orchestrator.ts:**
+
+| Anti-Pattern | Location | Evidence |
+| Parallel Pipeline | Lines 282-427 | 8-step pipeline: loadConfig, scanPatterns, extractPatterns, scanGherkinFiles, extractPatternsFromGherkin, mergePatterns, computeHierarchyChildren, transformToMasterDataset |
+
+Additionally, `mergePatterns()` is defined in orchestrator.ts (line 701)
+but imported by `build-pipeline.ts` from `../orchestrator.js`. This
+creates a misplaced-dependency: the factory depends on the consumer it
+is meant to replace. When the orchestrator migrates to the factory, the
+import direction inverts correctly.
+
+**What the orchestrator does beyond the pipeline:**
+
+| Responsibility | Lines | Stays in orchestrator |
+| Pipeline (steps 1-8) | 282-427 | No — delegates to factory |
+| PR Changes git detection | 429-469 | Yes — generator-specific option |
+| Generator dispatch + file writing | 471-645 | Yes — core orchestrator job |
+| Session file cleanup | 647-679 | Yes — post-generation lifecycle |
+| mergePatterns utility | 701-727 | No — moves to pipeline/ |
+| cleanupOrphanedSessionFiles | 761-809 | Yes — lifecycle utility |
+| generateFromConfig | 922-998 | Yes — config-based entry point |
+| groupGenerators, mergeGenerateResults | 850-898 | Yes — batching utilities |
+
+**Solution:**
+Enrich the pipeline factory's `PipelineResult` with structured warnings
+that capture the granularity the orchestrator needs, then migrate
+`generateDocumentation()` to call `buildMasterDataset()`. Move
+`mergePatterns()` to `src/generators/pipeline/merge-patterns.ts` as a
+standalone pipeline step.
+
+The orchestrator retains: generator dispatch, file writing, PR-changes
+detection, codec option assembly, session cleanup, and the
+`generateFromConfig` entry point.
+
+**Design Decisions:**
+
+DD-1: Structured warnings replace flat strings in PipelineResult.
+The factory's `PipelineResult.warnings` changes from `readonly string[]`
+to `readonly PipelineWarning[]` where `PipelineWarning` is:
+
+      """typescript
+      interface PipelineWarning {
+        readonly type: 'scan' | 'extraction' | 'gherkin-parse';
+        readonly message: string;
+        readonly count?: number;
+        readonly details?: readonly PipelineWarningDetail[];
+      }
+
+      interface PipelineWarningDetail {
+        readonly file: string;
+        readonly line?: number;
+        readonly column?: number;
+        readonly message: string;
+      }
+      """
+
+This is structurally similar to `GenerationWarning` + `WarningDetail`
+from orchestrator.ts. The orchestrator maps `PipelineWarning` to
+`GenerationWarning` in a thin adapter — `'gherkin-parse'` maps to
+`'scan'`, and generator-level warning types (`'overwrite-skipped'`,
+`'config'`, `'cleanup'`) are produced by the orchestrator itself, not
+the pipeline. Existing consumers (process-api, validate-patterns) that
+ignore warnings or use flat strings are unaffected — they can read
+`.message` only.
+
+DD-2: mergePatterns moves to src/generators/pipeline/merge-patterns.ts.
+Currently defined in orchestrator.ts (line 701), imported by
+build-pipeline.ts. After the move:
+
+- `build-pipeline.ts` imports from `./merge-patterns.js` (sibling)
+- `orchestrator.ts` no longer exports `mergePatterns`
+- `generators/index.ts` re-exports from `pipeline/merge-patterns.js`
+- The public API (`mergePatterns`) stays available, just moves home
+
+DD-3: Pipeline factory gains an includeValidation option.
+The orchestrator calls `transformToMasterDataset` (no validation),
+while process-api calls `transformToMasterDatasetWithValidation`.
+The factory already calls the validation variant. Adding
+`includeValidation?: boolean` (default true) lets the orchestrator
+opt out, since doc generation doesn't need validation summaries.
+This was foreshadowed in ProcessAPILayeredExtraction DD-3.
+
+DD-4: Scan result counts flow through PipelineResult.
+The orchestrator needs scan result counts for constructing its warning
+messages: how many files were scanned, how many had errors, how many
+had skipped directives, how many Gherkin files had parse errors. The
+factory adds an optional `scanMetadata` field:
+
+      """typescript
+      interface ScanMetadata {
+        readonly scannedFileCount: number;
+        readonly scanErrorCount: number;
+        readonly skippedDirectiveCount: number;
+        readonly gherkinErrorCount: number;
+      }
+      """
+
+This avoids exposing raw `ScannedFile[]` (which would be a Parallel
+Pipeline enabler) while providing the counts the orchestrator needs
+for its warning messages. The merged patterns array for
+`GenerateResult.patterns` and generator context comes from
+`PipelineResult.dataset.patterns`, not from scan metadata.
+
+DD-5: The factory supports partial success for scan errors.
+Today the factory returns `Result.err` on total scanner failure
+(e.g., invalid glob), which remains unchanged — total infrastructure
+failures are always fatal. For partial failures (individual files
+with parse errors within an otherwise successful scan), the new
+`failOnScanErrors?: boolean` option controls behavior. When true
+(default for process-api), partial scan errors produce `Result.err`.
+When false (orchestrator), partial errors are captured in
+`PipelineResult.warnings` as structured `PipelineWarning` objects
+and the pipeline continues with successfully scanned files.
+
+DD-6: generateDocumentation signature is unchanged.
+The public `GenerateOptions` and `GenerateResult` interfaces don't
+change. The orchestrator's `generateDocumentation()` becomes a thinner
+function: build PipelineOptions from GenerateOptions, call factory,
+map PipelineWarnings to GenerationWarnings, then proceed with generator
+dispatch. The programmatic API is stable. The orchestrator's config
+loading (`loadConfig`) is replaced by the factory's internal config
+step — `tagRegistry` is accessed via `dataset.tagRegistry`. The merged
+patterns array for `GenerateResult.patterns` and generator context is
+`dataset.patterns` from the MasterDataset.
+
+DD-7: validate-patterns.ts and process-api.ts are unaffected.
+They already consume the factory. The only change they see is
+`PipelineResult.warnings` widening from `readonly string[]` to
+`readonly PipelineWarning[]`, which is backward-compatible (they
+currently ignore or stringify warnings).
+
+**Implementation Order:**
+
+| Step | What | Verification |
+| 1 | Move mergePatterns to src/generators/pipeline/merge-patterns.ts | pnpm typecheck |
+| 2 | Update imports in build-pipeline.ts, orchestrator.ts, generators/index.ts, orchestrator.steps.ts | pnpm typecheck, pnpm lint |
+| 3 | Add PipelineWarning types to build-pipeline.ts | pnpm typecheck |
+| 4 | Enrich factory to collect structured warnings and scan metadata | pnpm typecheck |
+| 5 | Add includeValidation and failOnScanErrors options to factory | pnpm typecheck |
+| 6 | Migrate generateDocumentation pipeline to factory call | pnpm build, pnpm test |
+| 7 | Remove unused scanner/extractor imports from orchestrator.ts | pnpm lint |
+| 8 | Full verification | pnpm build, pnpm test, pnpm lint, pnpm validate:patterns, pnpm docs:all |
+
+**Files Modified:**
+
+| File | Change | Lines Affected |
+| src/generators/pipeline/merge-patterns.ts | NEW: mergePatterns moved from orchestrator | +~30 |
+| src/generators/pipeline/build-pipeline.ts | Enrich PipelineResult, add options, collect warnings | +~60 |
+| src/generators/pipeline/index.ts | Re-export merge-patterns | +2 |
+| src/generators/orchestrator.ts | Replace pipeline with factory call, remove mergePatterns | -~170 net |
+| src/generators/index.ts | Update mergePatterns re-export source | ~2 |
+| tests/steps/generators/orchestrator.steps.ts | Update mergePatterns import to pipeline/merge-patterns | ~1 |
+
+**What does NOT change:**
+
+- GenerateOptions, GenerateResult, GeneratedFile interfaces (stable public API)
+- Generator dispatch, file writing, PR-changes detection (orchestrator core)
+- Session cleanup, generateFromConfig, groupGenerators (orchestrator utilities)
+- generate-docs CLI (calls generateDocumentation unchanged)
+- process-api.ts, validate-patterns.ts (already migrated)
+- Existing test scenarios for orchestrator (same observable behavior)
+
+<details>
+<summary>Orchestrator delegates pipeline to factory (2 scenarios)</summary>
+
+#### Orchestrator delegates pipeline to factory
+
+**Invariant:** `generateDocumentation()` calls `buildMasterDataset()` for the scan-extract-merge-transform sequence. It does not import from `scanner/` or `extractor/` for pipeline orchestration. Direct imports are permitted only for types used in GenerateResult (e.g., `ExtractedPattern`).
+
+**Rationale:** The orchestrator is the original host of the inline pipeline. After this migration, the pipeline factory is the sole definition of the 8-step sequence. Any future changes to pipeline steps (adding caching, parallel scanning, incremental extraction) happen in one place and all consumers benefit.
+
+**Verified by:**
+
+- No pipeline imports in orchestrator
+- Factory is sole pipeline definition
+
+</details>
+
+<details>
+<summary>mergePatterns lives in pipeline module (2 scenarios)</summary>
+
+#### mergePatterns lives in pipeline module
+
+**Invariant:** The `mergePatterns()` function lives in `src/generators/pipeline/merge-patterns.ts` as a pipeline step. It is not defined in consumer code (orchestrator or CLI files).
+
+**Rationale:** `mergePatterns` is step 5 of the 8-step pipeline. It was defined in orchestrator.ts for historical reasons (the orchestrator was the first pipeline host). Now that the pipeline factory exists, the function belongs alongside other pipeline steps (scan, extract, transform). The public API re-export in `generators/index.ts` preserves backward compatibility.
+
+**Verified by:**
+
+- mergePatterns location
+- Public API preserved
+
+</details>
+
+<details>
+<summary>Factory provides structured warnings for all consumers (2 scenarios)</summary>
+
+#### Factory provides structured warnings for all consumers
+
+**Invariant:** `PipelineResult.warnings` contains typed warning objects with `type`, `message`, optional `count`, and optional `details` (file, line, column, message). Consumers that need granular diagnostics (orchestrator) use the full structure. Consumers that need simple messages (process-api) read `.message` only.
+
+**Rationale:** The orchestrator collects scan errors, skipped directives, extraction errors, and Gherkin parse errors as structured `GenerationWarning` objects. The factory must provide equivalent structure to eliminate the orchestrator's need to run the pipeline directly. The `PipelineWarning` type is structurally similar to `GenerationWarning` to minimize mapping complexity.
+
+**Verified by:**
+
+- Orchestrator warnings preserved
+- Existing consumers unaffected
+
+</details>
+
+<details>
+<summary>Pipeline factory supports partial success mode (2 scenarios)</summary>
+
+#### Pipeline factory supports partial success mode
+
+**Invariant:** When `failOnScanErrors` is false, the factory captures scan errors and extraction errors as warnings and continues with successfully processed files. When true (default), the factory returns `Result.err` on the first scan failure.
+
+**Rationale:** The orchestrator treats scan errors as non-fatal warnings — documentation generation should succeed for all scannable files even if some files have syntax errors. The process-api treats scan errors as fatal because the query layer requires a complete dataset. The factory must support both strategies via configuration.
+
+**Verified by:**
+
+- Partial success mode works
+- Full verification passes
 
 </details>
 
@@ -2097,9 +2614,9 @@ implementation details or full feature files.
 
 </details>
 
-### ArchitectureDiagramGeneration
+### ArchitectureDiagramCore
 
-[View ArchitectureDiagramGeneration source](delivery-process/specs/architecture-diagram-generation.feature)
+[View ArchitectureDiagramCore source](delivery-process/specs/architecture-diagram-core.feature)
 
 **Problem:** Architecture documentation requires manually maintaining mermaid diagrams
 that duplicate information already encoded in source code. When code changes,
@@ -2211,6 +2728,29 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 
 </details>
 
+### ArchitectureDiagramAdvanced
+
+[View ArchitectureDiagramAdvanced source](delivery-process/specs/architecture-diagram-advanced.feature)
+
+**Problem:** Architecture documentation requires manually maintaining mermaid diagrams
+that duplicate information already encoded in source code. When code changes,
+diagrams become stale. Manual sync is error-prone and time-consuming.
+
+**Solution:** Generate architecture diagrams automatically from source code annotations
+using dedicated `arch-*` tags for precise control. Three tags classify components:
+
+- `@libar-docs-arch-role` - Component type (preset-configurable: service, handler, repository, etc.)
+- `@libar-docs-arch-context` - Bounded context for subgraph grouping
+- `@libar-docs-arch-layer` - Architectural layer (domain, application, infrastructure)
+
+**Why It Matters:**
+| Benefit | How |
+| Always-current diagrams | Generated from source annotations |
+| Bounded context isolation | arch-context groups into subgraphs |
+| Multiple diagram types | Component diagrams + layered diagrams |
+| UML-inspired semantics | Relationship arrows match uses/depends-on/implements/extends |
+| CLI integration | `pnpm docs:architecture` via generator registry |
+
 <details>
 <summary>Layered diagrams group patterns by architectural layer (4 scenarios)</summary>
 
@@ -2293,270 +2833,6 @@ Uses git tags to determine release boundaries.
 Uses @libar-docs-decision, @libar-docs-replaces annotations.
 
 Implements Convergence Opportunity 5: Architecture Change Control.
-
-### ADR006SingleReadModelArchitecture
-
-[View ADR006SingleReadModelArchitecture source](delivery-process/decisions/adr-006-single-read-model-architecture.feature)
-
-**Context:**
-The delivery-process package applies event sourcing to itself: git is
-the event store, annotated source files are authoritative state, generated
-documentation is a projection. The MasterDataset is the read model —
-produced by a single-pass O(n) transformer with pre-computed views
-and a relationship index.
-
-ADR-005 established that codecs consume MasterDataset as their sole input.
-The ProcessStateAPI consumes it. But the validation layer bypasses it,
-wiring its own mini-pipeline from raw scanner/extractor output. It creates
-a lossy local type that discards relationship data, then discovers it
-lacks the information needed — requiring ad-hoc re-derivation of what
-the MasterDataset already computes.
-
-This is the same class of problem the MasterDataset was created to solve.
-Before the single-pass transformer, each generator called `.filter()`
-independently. The MasterDataset eliminated that duplication for codecs.
-This ADR extends the same principle to all consumers.
-
-**Decision:**
-The MasterDataset is the single read model for all consumers. No consumer
-re-derives pattern data from raw scanner/extractor output when that data
-is available in the MasterDataset. Validators, codecs, and query APIs
-consume the same pre-computed read model.
-
-**Consequences:**
-| Type | Impact |
-| Positive | Relationship resolution happens once — no consumer re-derives implements, uses, or dependsOn |
-| Positive | Eliminates lossy local types that discard fields from canonical ExtractedPattern |
-| Positive | Validation rules automatically benefit from new MasterDataset views and indices |
-| Positive | Aligns with the monorepo's own ADR-006: projections for all reads, never query aggregate state |
-| Negative | Validators that today only need stage 1-2 data will import the transformer |
-| Negative | MasterDataset schema changes affect more consumers |
-
-<details>
-<summary>All feature consumers query the read model, not raw state</summary>
-
-#### All feature consumers query the read model, not raw state
-
-**Invariant:** Code that needs pattern relationships, status groupings, cross-source resolution, or dependency information consumes the MasterDataset. Direct scanner/extractor imports are permitted only in pipeline orchestration code that builds the MasterDataset. Exception: `lint-patterns.ts` is a pure stage-1 consumer. It validates annotation syntax on scanned files. No relationships, no cross-source resolution. Direct scanner consumption is correct for that use case.
-
-| Layer                  | May Import                       | Examples                                            |
-| ---------------------- | -------------------------------- | --------------------------------------------------- |
-| Pipeline Orchestration | scanner/, extractor/, pipeline/  | orchestrator.ts, process-api.ts pipeline setup      |
-| Feature Consumption    | MasterDataset, relationshipIndex | codecs, ProcessStateAPI, validators, query handlers |
-
-</details>
-
-<details>
-<summary>No lossy local types</summary>
-
-#### No lossy local types
-
-**Invariant:** Consumers do not define local DTOs that duplicate and discard fields from ExtractedPattern. If a consumer needs a subset, the type system provides the projection — not a hand-written extraction function that becomes a barrier between the consumer and canonical data.
-
-</details>
-
-<details>
-<summary>Relationship resolution is computed once</summary>
-
-#### Relationship resolution is computed once
-
-**Invariant:** Forward relationships (uses, dependsOn, implementsPatterns) and reverse lookups (usedBy, implementedBy, extendedBy) are computed in `transformToMasterDataset()`. No consumer re-derives these from raw pattern arrays or scanned file tags.
-
-</details>
-
-<details>
-<summary>Three named anti-patterns</summary>
-
-#### Three named anti-patterns
-
-**Invariant:** These are recognized violations, serving as review criteria for new code and refactoring targets for existing code: Naming them makes them visible in code review — including AI-assisted sessions where the default proposal is often "add a helper function."
-
-**Good vs Bad**
-
-**References**
-
-- Monorepo ADR-006: Projections for All Reads (same principle, application domain)
-- ADR-005: Codec-Based Markdown Rendering (established MasterDataset as codec input)
-- Order-management ARCHITECTURE.md: CommandOrchestrator + Read Model separation
-
-| Anti-Pattern            | Detection Signal                                                                         |
-| ----------------------- | ---------------------------------------------------------------------------------------- |
-| Parallel Pipeline       | Feature consumer imports from scanner/ or extractor/                                     |
-| Lossy Local Type        | Local interface with subset of ExtractedPattern fields + dedicated extraction function   |
-| Re-derived Relationship | Building Map or Set from pattern.implementsPatterns, uses, or dependsOn in consumer code |
-
-```typescript
-// Good: consume the read model
-  function validateCrossSource(dataset: RuntimeMasterDataset): ValidationSummary {
-    const rel = dataset.relationshipIndex[patternName];
-    const isImplemented = rel.implementedBy.length > 0;
-  }
-
-  // Bad: re-derive from raw state (Parallel Pipeline + Re-derived Relationship)
-  function buildImplementsLookup(
-    gherkinFiles: readonly ScannedGherkinFile[],
-    tsPatterns: readonly ExtractedPattern[]
-  ): ReadonlySet<string> { ... }
-```
-
-</details>
-
-### ADR005CodecBasedMarkdownRendering
-
-[View ADR005CodecBasedMarkdownRendering source](delivery-process/decisions/adr-005-codec-based-markdown-rendering.feature)
-
-**Context:**
-The documentation generator needs to transform structured pattern data
-(MasterDataset) into markdown files. The initial approach used direct
-string concatenation in generator functions, mixing data selection,
-formatting logic, and output assembly in a single pass. This made
-generators hard to test, difficult to compose, and impossible to
-render the same data in different formats (e.g., full docs vs compact
-AI context).
-
-**Decision:**
-Adopt a codec architecture inspired by serialization codecs (encode/decode).
-Each document type has a codec that decodes a MasterDataset into a
-RenderableDocument — an intermediate representation of sections, headings,
-tables, paragraphs, and code blocks. A separate renderer transforms the
-RenderableDocument into markdown. This separates data selection (what to
-include) from formatting (how it looks) from serialization (markdown syntax).
-
-**Consequences:**
-| Type | Impact |
-| Positive | Codecs are pure functions: dataset in, document out -- trivially testable |
-| Positive | RenderableDocument is an inspectable IR -- tests assert on structure, not strings |
-| Positive | Composable via CompositeCodec -- reference docs assemble from child codecs |
-| Positive | Same dataset can produce different outputs (full doc, compact doc, AI context) |
-| Negative | Extra abstraction layer between data and output |
-| Negative | RenderableDocument vocabulary must cover all needed output patterns |
-
-**Benefits:**
-| Benefit | Before (String Concat) | After (Codec) |
-| Testability | Assert on markdown strings | Assert on typed section blocks |
-| Composability | Copy-paste between generators | CompositeCodec assembles children |
-| Format variants | Duplicate generator logic | Same codec, different renderer |
-| Progressive disclosure | Manual heading management | Heading depth auto-calculated |
-
-<details>
-<summary>Codecs implement a decode-only contract (2 scenarios)</summary>
-
-#### Codecs implement a decode-only contract
-
-**Invariant:** Every codec is a pure function that accepts a MasterDataset and returns a RenderableDocument. Codecs do not perform side effects, do not write files, and do not access the filesystem. The codec contract is decode-only because the transformation is one-directional: structured data becomes a document, never the reverse.
-
-**Rationale:** Pure functions are deterministic and trivially testable. For the same MasterDataset, a codec always produces the same RenderableDocument. This makes snapshot testing reliable and enables codec output comparison across versions.
-
-**Codec call signature:**
-
-```typescript
-interface DocumentCodec {
-  decode(dataset: MasterDataset): RenderableDocument;
-}
-```
-
-**Verified by:**
-
-- Codec produces deterministic output
-- Codec has no side effects
-
-</details>
-
-<details>
-<summary>RenderableDocument is a typed intermediate representation (2 scenarios)</summary>
-
-#### RenderableDocument is a typed intermediate representation
-
-**Invariant:** RenderableDocument contains a title, an ordered array of SectionBlock elements, and an optional record of additional files. Each SectionBlock is a discriminated union: heading, paragraph, table, code, list, separator, or metaRow. The renderer consumes this IR without needing to know which codec produced it.
-
-**Rationale:** A typed IR decouples codecs from rendering. Codecs express intent ("this is a table with these rows") and the renderer handles syntax ("pipe-delimited markdown with separator row"). This means switching output format (e.g., HTML instead of markdown) requires only a new renderer, not changes to every codec.
-
-**Section block types:**
-
-| Block Type | Purpose                       | Markdown Output             |
-| ---------- | ----------------------------- | --------------------------- |
-| heading    | Section title with depth      | ## Title (depth-adjusted)   |
-| paragraph  | Prose text                    | Plain text with blank lines |
-| table      | Structured data               | Pipe-delimited table        |
-| code       | Code sample with language     | Fenced code block           |
-| list       | Ordered or unordered items    | - item or 1. item           |
-| separator  | Visual break between sections | ---                         |
-| metaRow    | Key-value metadata            | **Key:** Value              |
-
-**Verified by:**
-
-- All block types render to markdown
-- Unknown block type is rejected
-
-</details>
-
-<details>
-<summary>CompositeCodec assembles documents from child codecs (2 scenarios)</summary>
-
-#### CompositeCodec assembles documents from child codecs
-
-**Invariant:** CompositeCodec accepts an array of child codecs and produces a single RenderableDocument by concatenating their sections. Child codec order determines section order in the output. Separators are inserted between children by default.
-
-**Rationale:** Reference documents combine content from multiple domains (patterns, conventions, shapes, diagrams). Rather than building a monolithic codec that knows about all content types, CompositeCodec lets each domain own its codec and composes them declaratively.
-
-**Composition example:**
-
-```typescript
-const referenceDoc = CompositeCodec.create({
-  title: 'Architecture Reference',
-  codecs: [
-    behaviorCodec, // patterns with rules
-    conventionCodec, // decision records
-    shapeCodec, // type definitions
-    diagramCodec, // mermaid diagrams
-  ],
-});
-```
-
-**Verified by:**
-
-- Child sections appear in codec array order
-- Empty children are skipped without separators
-
-</details>
-
-<details>
-<summary>ADR content comes from both Feature description and Rule prefixes (3 scenarios)</summary>
-
-#### ADR content comes from both Feature description and Rule prefixes
-
-**Invariant:** ADR structured content (Context, Decision, Consequences) can appear in two locations within a feature file. Both sources must be rendered. Silently dropping either source causes content loss.
-
-**Rationale:** Early ADRs used name prefixes like "Context - ..." and "Decision - ..." on Rule blocks to structure content. Later ADRs placed Context, Decision, and Consequences as bold-annotated prose in the Feature description, reserving Rule: blocks for invariants and design rules. Both conventions are valid. The ADR codec must handle both because the codebase contains ADRs authored in each style. The Feature description lives in pattern.directive.description. If the codec only renders Rules (via partitionRulesByPrefix), then Feature description content is silently dropped -- no error, no warning. This caused confusion across two repos where ADR content appeared in the feature file but was missing from generated docs. The fix renders pattern.directive.description in buildSingleAdrDocument between the Overview metadata table and the partitioned Rules section, using renderFeatureDescription() which walks content linearly and handles prose, tables, and DocStrings with correct interleaving.
-
-| Source              | Location                            | Example                   | Rendered Via               |
-| ------------------- | ----------------------------------- | ------------------------- | -------------------------- |
-| Rule prefix         | Rule: Context - ...                 | ADR-001 (taxonomy)        | partitionRulesByPrefix()   |
-| Feature description | **Context:** prose in Feature block | ADR-005 (codec rendering) | renderFeatureDescription() |
-
-**Verified by:**
-
-- Feature description content is rendered
-- Rule prefix content is rendered
-- Both sources combine in single ADR
-
-</details>
-
-<details>
-<summary>The markdown renderer is codec-agnostic (2 scenarios)</summary>
-
-#### The markdown renderer is codec-agnostic
-
-**Invariant:** The renderer accepts any RenderableDocument regardless of which codec produced it. Rendering depends only on block types, not on document origin. This enables testing codecs and renderers independently.
-
-**Rationale:** If the renderer knew about specific codecs, adding a new codec would require renderer changes. By operating purely on the SectionBlock discriminated union, the renderer is closed for modification but open for extension via new block types.
-
-**Verified by:**
-
-- Same renderer handles different codec outputs
-- Renderer and codec are tested independently
-
-</details>
 
 ### TestContentBlocks
 
@@ -4344,92 +4620,12 @@ The helpers handle edge cases like:
 
 </details>
 
-### UniversalMarkdownRenderer
+### RendererOutputFormats
 
-[View UniversalMarkdownRenderer source](tests/features/behavior/render.feature)
+[View RendererOutputFormats source](tests/features/behavior/render-output.feature)
 
 The universal renderer converts RenderableDocument to markdown.
 It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
-
-<details>
-<summary>Document metadata renders as frontmatter before sections (4 scenarios)</summary>
-
-#### Document metadata renders as frontmatter before sections
-
-**Invariant:** Title always renders as H1, purpose and detail level render as bold key-value pairs separated by horizontal rule.
-
-**Verified by:**
-
-- Render minimal document with title only
-- Render document with purpose
-- Render document with detail level
-- Render document with purpose and detail level
-
-</details>
-
-<details>
-<summary>Headings render at correct markdown levels with clamping (3 scenarios)</summary>
-
-#### Headings render at correct markdown levels with clamping
-
-**Invariant:** Heading levels are clamped to the valid range 1-6 regardless of input value.
-
-**Verified by:**
-
-- Render headings at different levels
-- Clamp heading level 0 to 1
-- Clamp heading level 7 to 6
-
-</details>
-
-<details>
-<summary>Paragraphs and separators render as plain text and horizontal rules (3 scenarios)</summary>
-
-#### Paragraphs and separators render as plain text and horizontal rules
-
-**Invariant:** Paragraph content passes through unmodified, including special markdown characters. Separators render as horizontal rules.
-
-**Verified by:**
-
-- Render paragraph
-- Render paragraph with special characters
-- Render separator
-
-</details>
-
-<details>
-<summary>Tables render with headers, alignment, and cell escaping (6 scenarios)</summary>
-
-#### Tables render with headers, alignment, and cell escaping
-
-**Invariant:** Tables must escape pipe characters, convert newlines to line breaks, and pad short rows to match column count.
-
-**Verified by:**
-
-- Render basic table
-- Render table with alignment
-- Render empty table (no columns)
-- Render table with pipe character in cell
-- Render table with newline in cell
-- Render table with short row (fewer cells than columns)
-
-</details>
-
-<details>
-<summary>Lists render in unordered, ordered, checkbox, and nested formats (4 scenarios)</summary>
-
-#### Lists render in unordered, ordered, checkbox, and nested formats
-
-**Invariant:** List type determines prefix: dash for unordered, numbered for ordered, checkbox syntax for checked items. Nesting adds two-space indentation per level.
-
-**Verified by:**
-
-- Render unordered list
-- Render ordered list
-- Render checkbox list with checked items
-- Render nested list
-
-</details>
 
 <details>
 <summary>Code blocks and mermaid diagrams render with fenced syntax (3 scenarios)</summary>
@@ -4518,6 +4714,93 @@ It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
 - Claude context renders link-out as plain text
 - Claude context omits separator tokens
 - Claude context produces fewer characters than markdown
+
+</details>
+
+### RendererBlockTypes
+
+[View RendererBlockTypes source](tests/features/behavior/render-blocks.feature)
+
+The universal renderer converts RenderableDocument to markdown.
+It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
+
+<details>
+<summary>Document metadata renders as frontmatter before sections (4 scenarios)</summary>
+
+#### Document metadata renders as frontmatter before sections
+
+**Invariant:** Title always renders as H1, purpose and detail level render as bold key-value pairs separated by horizontal rule.
+
+**Verified by:**
+
+- Render minimal document with title only
+- Render document with purpose
+- Render document with detail level
+- Render document with purpose and detail level
+
+</details>
+
+<details>
+<summary>Headings render at correct markdown levels with clamping (3 scenarios)</summary>
+
+#### Headings render at correct markdown levels with clamping
+
+**Invariant:** Heading levels are clamped to the valid range 1-6 regardless of input value.
+
+**Verified by:**
+
+- Render headings at different levels
+- Clamp heading level 0 to 1
+- Clamp heading level 7 to 6
+
+</details>
+
+<details>
+<summary>Paragraphs and separators render as plain text and horizontal rules (3 scenarios)</summary>
+
+#### Paragraphs and separators render as plain text and horizontal rules
+
+**Invariant:** Paragraph content passes through unmodified, including special markdown characters. Separators render as horizontal rules.
+
+**Verified by:**
+
+- Render paragraph
+- Render paragraph with special characters
+- Render separator
+
+</details>
+
+<details>
+<summary>Tables render with headers, alignment, and cell escaping (6 scenarios)</summary>
+
+#### Tables render with headers, alignment, and cell escaping
+
+**Invariant:** Tables must escape pipe characters, convert newlines to line breaks, and pad short rows to match column count.
+
+**Verified by:**
+
+- Render basic table
+- Render table with alignment
+- Render empty table (no columns)
+- Render table with pipe character in cell
+- Render table with newline in cell
+- Render table with short row (fewer cells than columns)
+
+</details>
+
+<details>
+<summary>Lists render in unordered, ordered, checkbox, and nested formats (4 scenarios)</summary>
+
+#### Lists render in unordered, ordered, checkbox, and nested formats
+
+**Invariant:** List type determines prefix: dash for unordered, numbered for ordered, checkbox syntax for checked items. Nesting adds two-space indentation per level.
+
+**Verified by:**
+
+- Render unordered list
+- Render ordered list
+- Render checkbox list with checked items
+- Render nested list
 
 </details>
 
@@ -5911,13 +6194,202 @@ produces TWO individual generators (detailed + summary).
 
 </details>
 
-### ReferenceCodecTesting
+### ReferenceCodecDiagramTesting
 
-[View ReferenceCodecTesting source](tests/features/behavior/codecs/reference-codec.feature)
+[View ReferenceCodecDiagramTesting source](tests/features/behavior/codecs/reference-codec-diagrams.feature)
+
+Scoped diagram generation from diagramScope and diagramScopes config,
+including archContext, include, archLayer, patterns filters, and
+multiple diagram scope composition.
+
+#### Scoped diagrams are generated from diagramScope config
+
+**Verified by:**
+
+- Config with diagramScope produces mermaid block at detailed level
+- Neighbor patterns appear in diagram with distinct style
+- include filter selects patterns by include tag membership
+- Self-contained scope produces no Related subgraph
+- Multiple filter dimensions OR together
+- Explicit pattern names filter selects named patterns
+- Config without diagramScope produces no diagram section
+- archLayer filter selects patterns by architectural layer
+- archLayer and archContext compose via OR
+- Summary level omits scoped diagram
+
+#### Multiple diagram scopes produce multiple mermaid blocks
+
+**Verified by:**
+
+- Config with diagramScopes array produces multiple diagrams
+- Diagram direction is reflected in mermaid output
+- Legacy diagramScope still works when diagramScopes is absent
+
+### ReferenceCodecDiagramTypeTesting
+
+[View ReferenceCodecDiagramTypeTesting source](tests/features/behavior/codecs/reference-codec-diagram-types.feature)
+
+Diagram type controls Mermaid output format including flowchart,
+sequenceDiagram, stateDiagram-v2, C4Context, and classDiagram.
+Edge labels and custom node shapes enrich diagram readability.
+
+#### Diagram type controls Mermaid output format
+
+**Invariant:** The diagramType field on DiagramScope selects the Mermaid output format. Supported types are graph (flowchart, default), sequenceDiagram, and stateDiagram-v2. Each type produces syntactically valid Mermaid output with type-appropriate node and edge rendering.
+
+**Rationale:** Flowcharts cannot naturally express event flows (sequence), FSM visualization (state), or temporal ordering. Multiple diagram types unlock richer architectural documentation from the same relationship data.
+
+**Verified by:**
+
+- Default diagramType produces flowchart
+- Sequence diagram renders participant-message format
+- State diagram renders state transitions
+- Sequence diagram includes neighbor patterns as participants
+- State diagram adds start and end pseudo-states
+- C4 diagram renders system boundary format
+- C4 diagram renders neighbor patterns as external systems
+- Class diagram renders class members and relationships
+- Class diagram renders archRole as stereotype
+
+#### Edge labels and custom node shapes enrich diagram readability
+
+**Invariant:** Relationship edges display labels describing the relationship type (uses, depends on, implements, extends). Edge labels are enabled by default and can be disabled via showEdgeLabels false. Node shapes in flowchart diagrams vary by archRole value using Mermaid shape syntax.
+
+**Rationale:** Unlabeled edges are ambiguous without consulting a legend. Custom node shapes make archRole visually distinguishable without color reliance, improving accessibility and scanability.
+
+**Verified by:**
+
+- Relationship edges display type labels by default
+- Edge labels can be disabled for compact diagrams
+- archRole controls Mermaid node shape
+- Pattern without archRole uses default rectangle shape
+- Edge labels appear by default
+- Edge labels can be disabled
+- archRole controls node shape
+- Unknown archRole falls back to rectangle
+
+### ReferenceCodecDetailRendering
+
+[View ReferenceCodecDetailRendering source](tests/features/behavior/codecs/reference-codec-detail-rendering.feature)
+
+Standard detail level behavior, deep behavior rendering with structured
+annotations, shape JSDoc prose, param/returns/throws documentation,
+collapsible blocks, link-out blocks, and include tags.
+
+<details>
+<summary>Standard detail level includes narrative but omits rationale (1 scenarios)</summary>
+
+#### Standard detail level includes narrative but omits rationale
+
+**Verified by:**
+
+- Standard level includes narrative but omits rationale
+
+</details>
+
+<details>
+<summary>Deep behavior rendering with structured annotations (4 scenarios)</summary>
+
+#### Deep behavior rendering with structured annotations
+
+**Verified by:**
+
+- Detailed level renders structured behavior rules
+- Standard level renders behavior rules without rationale
+- Summary level shows behavior rules as truncated table
+- Scenario names and verifiedBy merge as deduplicated list
+
+</details>
+
+<details>
+<summary>Shape JSDoc prose renders at standard and detailed levels (3 scenarios)</summary>
+
+#### Shape JSDoc prose renders at standard and detailed levels
+
+**Verified by:**
+
+- Standard level includes JSDoc in code blocks
+- Detailed level includes JSDoc in code block and property table
+- Shapes without JSDoc render code blocks only
+
+</details>
+
+<details>
+<summary>Shape sections render param returns and throws documentation (4 scenarios)</summary>
+
+#### Shape sections render param returns and throws documentation
+
+**Verified by:**
+
+- Detailed level renders param table for function shapes
+- Detailed level renders returns and throws documentation
+- Standard level renders param table without throws
+- Shapes without param docs skip param table
+
+</details>
+
+<details>
+<summary>Collapsible blocks wrap behavior rules for progressive disclosure (3 scenarios)</summary>
+
+#### Collapsible blocks wrap behavior rules for progressive disclosure
+
+**Invariant:** When a behavior pattern has 3 or more rules and detail level is not summary, each rule's content is wrapped in a collapsible block with the rule name and scenario count in the summary. Patterns with fewer than 3 rules render rules flat. Summary level never produces collapsible blocks.
+
+**Rationale:** Behavior sections with many rules produce substantial content at detailed level. Collapsible blocks enable progressive disclosure so readers can expand only the rules they need.
+
+**Verified by:**
+
+- Behavior pattern with many rules uses collapsible blocks at detailed level
+- Behavior pattern with few rules does not use collapsible blocks
+- Summary level never produces collapsible blocks
+- Many rules use collapsible at detailed level
+- Few rules render flat
+- Summary level suppresses collapsible
+
+</details>
+
+<details>
+<summary>Link-out blocks provide source file cross-references (3 scenarios)</summary>
+
+#### Link-out blocks provide source file cross-references
+
+**Invariant:** At standard and detailed levels, each behavior pattern includes a link-out block referencing its source file path. At summary level, link-out blocks are omitted for compact output.
+
+**Rationale:** Cross-reference links enable readers to navigate from generated documentation to the annotated source files, closing the loop between generated docs and the single source of truth.
+
+**Verified by:**
+
+- Behavior pattern includes source file link-out at detailed level
+- Standard level includes source file link-out
+- Summary level omits link-out blocks
+- Detailed level includes source link-out
+- Standard level includes source link-out
+- Summary level omits link-out
+
+</details>
+
+<details>
+<summary>Include tags route cross-cutting content into reference documents (3 scenarios)</summary>
+
+#### Include tags route cross-cutting content into reference documents
+
+**Invariant:** Patterns with matching include tags appear alongside category-selected patterns in the behavior section. The merging is additive (OR semantics).
+
+**Verified by:**
+
+- Include-tagged pattern appears in behavior section
+- Include-tagged pattern is additive with category-selected patterns
+- Pattern without matching include tag is excluded
+
+</details>
+
+### ReferenceCodecCoreTesting
+
+[View ReferenceCodecCoreTesting source](tests/features/behavior/codecs/reference-codec-core.feature)
 
 Parameterized codec factory that creates reference document codecs
-from configuration objects. Each config replaces one recipe .feature file
-and produces a RenderableDocument at configurable detail levels.
+from configuration objects. Core behavior including empty datasets,
+conventions, detail levels, shapes, composition, and mermaid blocks.
 
 <details>
 <summary>Empty datasets produce fallback content (1 scenarios)</summary>
@@ -6012,194 +6484,9 @@ and produces a RenderableDocument at configurable detail levels.
 
 </details>
 
-<details>
-<summary>Scoped diagrams are generated from diagramScope config (10 scenarios)</summary>
+### PrChangesCodecRenderingTesting
 
-#### Scoped diagrams are generated from diagramScope config
-
-**Verified by:**
-
-- Config with diagramScope produces mermaid block at detailed level
-- Neighbor patterns appear in diagram with distinct style
-- include filter selects patterns by include tag membership
-- Self-contained scope produces no Related subgraph
-- Multiple filter dimensions OR together
-- Explicit pattern names filter selects named patterns
-- Config without diagramScope produces no diagram section
-- archLayer filter selects patterns by architectural layer
-- archLayer and archContext compose via OR
-- Summary level omits scoped diagram
-
-</details>
-
-<details>
-<summary>Multiple diagram scopes produce multiple mermaid blocks (3 scenarios)</summary>
-
-#### Multiple diagram scopes produce multiple mermaid blocks
-
-**Verified by:**
-
-- Config with diagramScopes array produces multiple diagrams
-- Diagram direction is reflected in mermaid output
-- Legacy diagramScope still works when diagramScopes is absent
-
-</details>
-
-<details>
-<summary>Standard detail level includes narrative but omits rationale (1 scenarios)</summary>
-
-#### Standard detail level includes narrative but omits rationale
-
-**Verified by:**
-
-- Standard level includes narrative but omits rationale
-
-</details>
-
-<details>
-<summary>Deep behavior rendering with structured annotations (4 scenarios)</summary>
-
-#### Deep behavior rendering with structured annotations
-
-**Verified by:**
-
-- Detailed level renders structured behavior rules
-- Standard level renders behavior rules without rationale
-- Summary level shows behavior rules as truncated table
-- Scenario names and verifiedBy merge as deduplicated list
-
-</details>
-
-<details>
-<summary>Shape JSDoc prose renders at standard and detailed levels (3 scenarios)</summary>
-
-#### Shape JSDoc prose renders at standard and detailed levels
-
-**Verified by:**
-
-- Standard level includes JSDoc in code blocks
-- Detailed level includes JSDoc in code block and property table
-- Shapes without JSDoc render code blocks only
-
-</details>
-
-<details>
-<summary>Shape sections render param returns and throws documentation (4 scenarios)</summary>
-
-#### Shape sections render param returns and throws documentation
-
-**Verified by:**
-
-- Detailed level renders param table for function shapes
-- Detailed level renders returns and throws documentation
-- Standard level renders param table without throws
-- Shapes without param docs skip param table
-
-</details>
-
-<details>
-<summary>Diagram type controls Mermaid output format (9 scenarios)</summary>
-
-#### Diagram type controls Mermaid output format
-
-**Invariant:** The diagramType field on DiagramScope selects the Mermaid output format. Supported types are graph (flowchart, default), sequenceDiagram, and stateDiagram-v2. Each type produces syntactically valid Mermaid output with type-appropriate node and edge rendering.
-
-**Rationale:** Flowcharts cannot naturally express event flows (sequence), FSM visualization (state), or temporal ordering. Multiple diagram types unlock richer architectural documentation from the same relationship data.
-
-**Verified by:**
-
-- Default diagramType produces flowchart
-- Sequence diagram renders participant-message format
-- State diagram renders state transitions
-- Sequence diagram includes neighbor patterns as participants
-- State diagram adds start and end pseudo-states
-- C4 diagram renders system boundary format
-- C4 diagram renders neighbor patterns as external systems
-- Class diagram renders class members and relationships
-- Class diagram renders archRole as stereotype
-
-</details>
-
-<details>
-<summary>Edge labels and custom node shapes enrich diagram readability (4 scenarios)</summary>
-
-#### Edge labels and custom node shapes enrich diagram readability
-
-**Invariant:** Relationship edges display labels describing the relationship type (uses, depends on, implements, extends). Edge labels are enabled by default and can be disabled via showEdgeLabels false. Node shapes in flowchart diagrams vary by archRole value using Mermaid shape syntax.
-
-**Rationale:** Unlabeled edges are ambiguous without consulting a legend. Custom node shapes make archRole visually distinguishable without color reliance, improving accessibility and scanability.
-
-**Verified by:**
-
-- Relationship edges display type labels by default
-- Edge labels can be disabled for compact diagrams
-- archRole controls Mermaid node shape
-- Pattern without archRole uses default rectangle shape
-- Edge labels appear by default
-- Edge labels can be disabled
-- archRole controls node shape
-- Unknown archRole falls back to rectangle
-
-</details>
-
-<details>
-<summary>Collapsible blocks wrap behavior rules for progressive disclosure (3 scenarios)</summary>
-
-#### Collapsible blocks wrap behavior rules for progressive disclosure
-
-**Invariant:** When a behavior pattern has 3 or more rules and detail level is not summary, each rule's content is wrapped in a collapsible block with the rule name and scenario count in the summary. Patterns with fewer than 3 rules render rules flat. Summary level never produces collapsible blocks.
-
-**Rationale:** Behavior sections with many rules produce substantial content at detailed level. Collapsible blocks enable progressive disclosure so readers can expand only the rules they need.
-
-**Verified by:**
-
-- Behavior pattern with many rules uses collapsible blocks at detailed level
-- Behavior pattern with few rules does not use collapsible blocks
-- Summary level never produces collapsible blocks
-- Many rules use collapsible at detailed level
-- Few rules render flat
-- Summary level suppresses collapsible
-
-</details>
-
-<details>
-<summary>Link-out blocks provide source file cross-references (3 scenarios)</summary>
-
-#### Link-out blocks provide source file cross-references
-
-**Invariant:** At standard and detailed levels, each behavior pattern includes a link-out block referencing its source file path. At summary level, link-out blocks are omitted for compact output.
-
-**Rationale:** Cross-reference links enable readers to navigate from generated documentation to the annotated source files, closing the loop between generated docs and the single source of truth.
-
-**Verified by:**
-
-- Behavior pattern includes source file link-out at detailed level
-- Standard level includes source file link-out
-- Summary level omits link-out blocks
-- Detailed level includes source link-out
-- Standard level includes source link-out
-- Summary level omits link-out
-
-</details>
-
-<details>
-<summary>Include tags route cross-cutting content into reference documents (3 scenarios)</summary>
-
-#### Include tags route cross-cutting content into reference documents
-
-**Invariant:** Patterns with matching include tags appear alongside category-selected patterns in the behavior section. The merging is additive (OR semantics).
-
-**Verified by:**
-
-- Include-tagged pattern appears in behavior section
-- Include-tagged pattern is additive with category-selected patterns
-- Pattern without matching include tag is excluded
-
-</details>
-
-### PrChangesCodecTesting
-
-[View PrChangesCodecTesting source](tests/features/behavior/codecs/pr-changes-codec.feature)
+[View PrChangesCodecRenderingTesting source](tests/features/behavior/codecs/pr-changes-codec-rendering.feature)
 
 The PrChangesCodec transforms MasterDataset into RenderableDocument for
 PR-scoped documentation. It filters patterns by changed files and/or
@@ -6350,6 +6637,27 @@ review-focused output.
 - Business rules show rule names and verification info
 
 </details>
+
+### PrChangesCodecOptionsTesting
+
+[View PrChangesCodecOptionsTesting source](tests/features/behavior/codecs/pr-changes-codec-options.feature)
+
+The PrChangesCodec transforms MasterDataset into RenderableDocument for
+PR-scoped documentation. It filters patterns by changed files and/or
+release version tags, groups by phase or priority, and generates
+review-focused output.
+
+**Problem:**
+
+- Need to generate PR-specific documentation from patterns
+- Filters by changed files and release version tags
+- Different grouping options (phase, priority, workflow)
+
+**Solution:**
+
+- PrChangesCodec with configurable filtering and grouping
+- Generates review checklists and dependency sections
+- OR logic for combined filters
 
 <details>
 <summary>PrChangesCodec generates review checklist when includeReviewChecklist is enabled (6 scenarios)</summary>

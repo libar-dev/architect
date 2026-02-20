@@ -40,7 +40,6 @@
 Files that implement this pattern:
 
 - [`planning-codecs.feature`](../../tests/features/behavior/codecs/planning-codecs.feature) - The planning codecs (PlanningChecklistCodec, SessionPlanCodec, SessionFindingsCodec)
-- [`pr-changes-codec.feature`](../../tests/features/behavior/codecs/pr-changes-codec.feature) - The PrChangesCodec transforms MasterDataset into RenderableDocument for
 - [`reporting-codecs.feature`](../../tests/features/behavior/codecs/reporting-codecs.feature) - The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
 - [`requirements-adr-codecs.feature`](../../tests/features/behavior/codecs/requirements-adr-codecs.feature) - The RequirementsDocumentCodec and AdrDocumentCodec transform MasterDataset
 - [`session-codecs.feature`](../../tests/features/behavior/codecs/session-codecs.feature) - The session codecs (SessionContextCodec, RemainingWorkCodec)

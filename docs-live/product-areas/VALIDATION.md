@@ -224,12 +224,14 @@ type ProtectionLevel = 'none' | 'scope' | 'hard';
 
 ```typescript
 /**
- * Check if a deliverable status indicates completion
+ * Check if a deliverable has "complete" status.
  *
- * Uses canonical deliverable status taxonomy. Status must be 'complete'.
+ * This checks for the literal 'complete' status value only.
+ * For DoD validation (which also accepts 'n/a' and 'superseded'),
+ * see isDeliverableStatusTerminal().
  *
  * @param deliverable - The deliverable to check
- * @returns True if the deliverable is complete
+ * @returns True if the deliverable status is 'complete'
  */
 ```
 
@@ -241,7 +243,7 @@ function isDeliverableComplete(deliverable: Deliverable): boolean;
 | ----------- | ---- | ------------------------ |
 | deliverable |      | The deliverable to check |
 
-**Returns:** True if the deliverable is complete
+**Returns:** True if the deliverable status is 'complete'
 
 ### hasAcceptanceCriteria (function)
 
@@ -295,7 +297,7 @@ function extractAcceptanceCriteriaScenarios(feature: ScannedGherkinFile): readon
  * Validate DoD for a single phase/pattern
  *
  * Checks:
- * 1. All deliverables have "complete" status
+ * 1. All deliverables must be in a terminal state (complete, n/a, superseded)
  * 2. At least one @acceptance-criteria scenario exists
  *
  * @param patternName - Name of the pattern being validated
@@ -2653,20 +2655,12 @@ process hygiene issues that lead to documentation drift.
 
 </details>
 
-### LintRulesTesting
+### LintRuleIndividualTesting
 
-[View LintRulesTesting source](tests/features/lint/lint-rules.feature)
+[View LintRuleIndividualTesting source](tests/features/lint/lint-rules-individual.feature)
 
-The lint system validates @libar-docs-\* documentation annotations for quality.
-
-Rules check parsed directives for completeness and quality, enabling
-CI enforcement of documentation standards.
-
-Each rule has a severity level:
-
-- error: Must fix before merge
-- warning: Should fix for quality
-- info: Suggestions for improvement
+Individual lint rules that check parsed directives for completeness.
+Tests presence/absence checks: pattern name, status, whenToUse, and relationships.
 
 <details>
 <summary>Files must declare an explicit pattern name (5 scenarios)</summary>
@@ -2724,6 +2718,32 @@ Each rule has a severity level:
 </details>
 
 <details>
+<summary>Files should declare relationship tags (5 scenarios)</summary>
+
+#### Files should declare relationship tags
+
+**Invariant:** Annotated files should declare uses or usedBy relationships to enable dependency tracking and architecture diagrams.
+
+**Rationale:** Isolated patterns without relationships produce diagrams with no edges and prevent dependency analysis.
+
+**Verified by:**
+
+- Detect missing relationship tags
+- Detect empty uses array
+- Accept uses with content
+- Accept usedBy with content
+- Accept both uses and usedBy
+
+</details>
+
+### LintRuleAdvancedTesting
+
+[View LintRuleAdvancedTesting source](tests/features/lint/lint-rules-advanced.feature)
+
+Complex lint rule logic and collection-level behavior.
+Tests tautological description detection, default collection, and severity filtering.
+
+<details>
 <summary>Descriptions must not repeat the pattern name (9 scenarios)</summary>
 
 #### Descriptions must not repeat the pattern name
@@ -2743,25 +2763,6 @@ Each rule has a severity level:
 - Ignore missing pattern name
 - Skip headings when finding first line
 - Skip "When to use" sections when finding first line
-
-</details>
-
-<details>
-<summary>Files should declare relationship tags (5 scenarios)</summary>
-
-#### Files should declare relationship tags
-
-**Invariant:** Annotated files should declare uses or usedBy relationships to enable dependency tracking and architecture diagrams.
-
-**Rationale:** Isolated patterns without relationships produce diagrams with no edges and prevent dependency analysis.
-
-**Verified by:**
-
-- Detect missing relationship tags
-- Detect empty uses array
-- Accept uses with content
-- Accept usedBy with content
-- Accept both uses and usedBy
 
 </details>
 

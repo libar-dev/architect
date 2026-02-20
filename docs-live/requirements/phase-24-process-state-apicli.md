@@ -6,39 +6,41 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
-| Product Area | DataAPI |
+| Property       | Value                           |
+| -------------- | ------------------------------- |
+| Status         | completed                       |
+| Product Area   | DataAPI                         |
 | Business Value | direct api queries for planning |
-| Phase | 24 |
+| Phase          | 24                              |
 
 ## Description
 
 **Problem:**
-  The ProcessStateAPI provides 27 typed query methods for efficient state queries, but
-  Claude Code sessions cannot use it directly:
-  - Import paths require built packages with correct ESM resolution
-  - No CLI command exposes the API for shell invocation
-  - Current workaround requires regenerating markdown docs and reading them
-  - Documentation claims API is "directly usable" but practical usage is blocked
+The ProcessStateAPI provides 27 typed query methods for efficient state queries, but
+Claude Code sessions cannot use it directly:
 
-  **Solution:**
-  Add a CLI command `pnpm process:query` that exposes key ProcessStateAPI methods:
-  - `--status active|roadmap|completed` - Filter patterns by status
-  - `--phase N` - Get patterns in specific phase
-  - `--progress` - Show completion percentage and counts
-  - `--current-work` - Show active patterns (shorthand for --status active)
-  - `--roadmap-items` - Show available items (roadmap + deferred)
-  - `--format text|json` - Output format (default: text, json for AI parsing)
+- Import paths require built packages with correct ESM resolution
+- No CLI command exposes the API for shell invocation
+- Current workaround requires regenerating markdown docs and reading them
+- Documentation claims API is "directly usable" but practical usage is blocked
 
-  **Business Value:**
-  | Benefit | Impact |
-  | AI-native planning | Claude Code can query state in one command vs reading markdown |
-  | Reduced context usage | JSON output is 5-10x smaller than generated docs |
-  | Real-time accuracy | Queries source directly, no stale documentation |
-  | Session efficiency | "What's next?" answered in 100ms vs 10s regeneration |
-  | Completes API promise | Makes CLAUDE.md documentation accurate |
+**Solution:**
+Add a CLI command `pnpm process:query` that exposes key ProcessStateAPI methods:
+
+- `--status active|roadmap|completed` - Filter patterns by status
+- `--phase N` - Get patterns in specific phase
+- `--progress` - Show completion percentage and counts
+- `--current-work` - Show active patterns (shorthand for --status active)
+- `--roadmap-items` - Show available items (roadmap + deferred)
+- `--format text|json` - Output format (default: text, json for AI parsing)
+
+**Business Value:**
+| Benefit | Impact |
+| AI-native planning | Claude Code can query state in one command vs reading markdown |
+| Reduced context usage | JSON output is 5-10x smaller than generated docs |
+| Real-time accuracy | Queries source directly, no stale documentation |
+| Session efficiency | "What's next?" answered in 100ms vs 10s regeneration |
+| Completes API promise | Makes CLAUDE.md documentation accurate |
 
 ## Acceptance Criteria
 
@@ -94,9 +96,9 @@
 Overall Progress: 62/91 (68%)
 
 Status Counts:
-  Completed: 62
-  Active: 3
-  Planned: 26
+Completed: 62
+Active: 3
+Planned: 26
 ```
 
 **Status distribution with percentages**
@@ -162,11 +164,11 @@ Status Counts:
 
 ```markdown
 Examples:
-  pnpm process:query --current-work              # What's active?
-  pnpm process:query --roadmap-items             # What can I start?
-  pnpm process:query --phase 18 --progress       # Phase 18 status
-  pnpm process:query --pattern DCB --deliverables # Pattern details
-  pnpm process:query --progress --format json    # For AI parsing
+pnpm process:query --current-work # What's active?
+pnpm process:query --roadmap-items # What can I start?
+pnpm process:query --phase 18 --progress # Phase 18 status
+pnpm process:query --pattern DCB --deliverables # Pattern details
+pnpm process:query --progress --format json # For AI parsing
 ```
 
 ## Business Rules
@@ -285,7 +287,7 @@ _Verified by: Help output shows all flags, Help shows examples_
 - process:query CLI command (complete)
 - CLI argument parser (complete)
 - JSON output formatter (complete)
-- Text output formatter (deferred)
+- Text output formatter (n/a)
 - Root package.json script (complete)
 - CLAUDE.md documentation update (complete)
 
@@ -295,7 +297,6 @@ Files that implement this pattern:
 
 - [`process-api.ts`](../../src/cli/process-api.ts) - ## process-api - CLI Query Interface to ProcessStateAPI
 - [`process-state-api.feature`](../../tests/features/api/process-state-api.feature) - Programmatic interface for querying delivery process state.
-- [`process-api.feature`](../../tests/features/cli/process-api.feature) - Command-line interface for querying delivery process state via ProcessStateAPI.
 
 ---
 

@@ -9,7 +9,7 @@
 
 | Metric | Value |
 | --- | --- |
-| Completed Patterns | 209 |
+| Completed Patterns | 223 |
 | Completed Phases | 5 |
 | Total Phases | 19 |
 
@@ -70,17 +70,17 @@
 
 ## Recent Completions
 
+- ✅ Handoff Generator Tests
+- ✅ Scope Validator Tests
 - ✅ Composite Codec Testing
 - ✅ Convention Extractor Testing
 - ✅ Dedent Helper
 - ✅ Planning Codec Testing
-- ✅ Pr Changes Codec Testing
-- ✅ Reference Codec Testing
-- ✅ Reference Generator Testing
-- ✅ Reporting Codec Testing
-- ✅ Requirements Adr Codec Testing
-- ✅ Session Codec Testing
+- ✅ Pr Changes Codec Options Testing
+- ✅ Pr Changes Codec Rendering Testing
+- ✅ Reference Codec Core Testing
+- ✅ Reference Codec Detail Rendering
 
-Showing 10 of 209 completed patterns. See quarterly files for full history.
+Showing 10 of 223 completed patterns. See quarterly files for full history.
 
 ---

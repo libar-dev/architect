@@ -26,19 +26,10 @@ These patterns can be started immediately:
 
 | Pattern | Effort | Business Value |
 | --- | --- | --- |
+| 📋 Claude Module Generation | 1.5d | automated claude md modules from source |
 | 📋 Data API CLI Ergonomics | 2d | fast interactive cli for repeated queries |
 | 📋 Data API Platform Integration | 3d | native claude code integration and monorepo support |
 | 📋 Data API Relationship Graph | 2d | deep dependency analysis and health checks |
-
----
-
-## ⚠️ Blocked
-
-These patterns are waiting on dependencies:
-
-| Pattern | Blocked By | Effort |
-| --- | --- | --- |
-| Claude Module Generation | ArchitectureDiagramGeneration | 1.5d |
 
 ---
 

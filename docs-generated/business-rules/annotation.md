@@ -4,13 +4,13 @@
 
 ---
 
-**88 rules** from 17 features. 74 rules have explicit invariants.
+**88 rules** from 20 features. 74 rules have explicit invariants.
 
 ---
 
 ## Uncategorized
 
-### Ast Parser
+### Ast Parser Exports
 
 *The AST Parser extracts @libar-docs-* directives from TypeScript source files*
 
@@ -36,6 +36,12 @@
 - Parse re-exports with directive
 - Parse multiple exports in single statement
 - Parse multiple directives in same file
+
+*ast-parser-exports.feature*
+
+### Ast Parser Metadata
+
+*The AST Parser extracts @libar-docs-* directives from TypeScript source files*
 
 ---
 
@@ -74,6 +80,12 @@
 - Extract asterisk bullets in When to Use section
 - Not set whenToUse when section is missing
 
+*ast-parser-metadata.feature*
+
+### Ast Parser Relationships Edges
+
+*The AST Parser extracts @libar-docs-* directives from TypeScript source files*
+
 ---
 
 #### Relationship tags extract uses and usedBy dependencies
@@ -105,7 +117,7 @@
 - Skip inline comments (non-block)
 - Handle unicode characters in descriptions
 
-*ast-parser.feature*
+*ast-parser-relationships-edges.feature*
 
 ### Context Inference
 
@@ -961,7 +973,72 @@
 
 *scanner-core.feature*
 
-### Shape Extraction
+### Shape Extraction Rendering
+
+*Validates the shape extraction system that extracts TypeScript type*
+
+---
+
+#### Multiple shapes are extracted in specified order
+
+**Verified by:**
+- Shapes appear in tag order not source order
+- Mixed shape types in specified order
+
+---
+
+#### Extracted shapes render as fenced code blocks
+
+**Verified by:**
+- Render shapes as markdown
+
+---
+
+#### Imported and re-exported shapes are tracked separately
+
+**Verified by:**
+- Imported shape produces warning
+- Re-exported shape produces re-export entry
+
+---
+
+#### Invalid TypeScript produces error result
+
+**Verified by:**
+- Malformed TypeScript returns error
+
+---
+
+#### Shape rendering supports grouping options
+
+**Verified by:**
+- Grouped rendering in single code block
+- Separate rendering with multiple code blocks
+
+---
+
+#### Annotation tags are stripped from extracted JSDoc while preserving standard tags
+
+> **Invariant:** Extracted shapes never contain @libar-docs-* annotation lines in their jsDoc field.
+>
+> **Rationale:** Shape JSDoc is rendered in documentation output. Annotation tags are metadata for the extraction pipeline, not user-visible documentation content.
+
+**Verified by:**
+- JSDoc with only annotation tags produces no jsDoc
+- Mixed JSDoc preserves standard tags and strips annotation tags
+- Single-line annotation-only JSDoc produces no jsDoc
+- Consecutive empty lines after tag removal are collapsed
+
+---
+
+#### Large source files are rejected to prevent memory exhaustion
+
+**Verified by:**
+- Source code exceeding 5MB limit returns error
+
+*shape-extraction-rendering.feature*
+
+### Shape Extraction Types
 
 *Validates the shape extraction system that extracts TypeScript type*
 
@@ -1022,41 +1099,11 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 
 ---
 
-#### Multiple shapes are extracted in specified order
-
-**Verified by:**
-- Shapes appear in tag order not source order
-- Mixed shape types in specified order
-
----
-
-#### Extracted shapes render as fenced code blocks
-
-**Verified by:**
-- Render shapes as markdown
-
----
-
-#### Imported and re-exported shapes are tracked separately
-
-**Verified by:**
-- Imported shape produces warning
-- Re-exported shape produces re-export entry
-
----
-
 #### Const declarations are extracted from TypeScript AST
 
 **Verified by:**
 - Extract const with type annotation
 - Extract const without type annotation
-
----
-
-#### Invalid TypeScript produces error result
-
-**Verified by:**
-- Malformed TypeScript returns error
 
 ---
 
@@ -1066,36 +1113,7 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 - Extract non-exported interface
 - Re-export marks internal shape as exported
 
----
-
-#### Shape rendering supports grouping options
-
-**Verified by:**
-- Grouped rendering in single code block
-- Separate rendering with multiple code blocks
-
----
-
-#### Annotation tags are stripped from extracted JSDoc while preserving standard tags
-
-> **Invariant:** Extracted shapes never contain @libar-docs-* annotation lines in their jsDoc field.
->
-> **Rationale:** Shape JSDoc is rendered in documentation output. Annotation tags are metadata for the extraction pipeline, not user-visible documentation content.
-
-**Verified by:**
-- JSDoc with only annotation tags produces no jsDoc
-- Mixed JSDoc preserves standard tags and strips annotation tags
-- Single-line annotation-only JSDoc produces no jsDoc
-- Consecutive empty lines after tag removal are collapsed
-
----
-
-#### Large source files are rejected to prevent memory exhaustion
-
-**Verified by:**
-- Source code exceeding 5MB limit returns error
-
-*shape-extraction.feature*
+*shape-extraction-types.feature*
 
 ### Uses Tag
 

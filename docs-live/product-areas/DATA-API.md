@@ -378,6 +378,109 @@ Target: src/generators/pipeline/build-pipeline.ts
 See: ADR-006 (Single Read Model Architecture)
 See: DD-1, DD-2 (ProcessAPILayeredExtraction)
 
+### PDR001SessionWorkflowCommands
+
+[View PDR001SessionWorkflowCommands source](delivery-process/decisions/pdr-001-session-workflow-commands.feature)
+
+**Context:**
+DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session
+readiness check) and `handoff` (session-end state summary) CLI subcommands.
+Seven design decisions affect how these commands behave.
+
+**Decision:**
+Seven design decisions (DD-1 through DD-7) captured as Rules below.
+
+<details>
+<summary>DD-1 - Text output with section markers</summary>
+
+#### DD-1 - Text output with section markers
+
+Both scope-validate and handoff return string from the router, using
+=== SECTION === markers. Follows the dual output path where text
+commands bypass JSON.stringify.
+
+</details>
+
+<details>
+<summary>DD-2 - Git integration is opt-in via --git flag</summary>
+
+#### DD-2 - Git integration is opt-in via --git flag
+
+The handoff command accepts an optional --git flag. The CLI handler
+calls git diff and passes file list to the pure generator function.
+No shell dependency in domain logic.
+
+</details>
+
+<details>
+<summary>DD-3 - Session type inferred from FSM status</summary>
+
+#### DD-3 - Session type inferred from FSM status
+
+Handoff infers session type from pattern's current FSM status.
+An explicit --session flag overrides inference.
+
+| Status    | Inferred Session |
+| --------- | ---------------- |
+| roadmap   | design           |
+| active    | implement        |
+| completed | review           |
+| deferred  | design           |
+
+</details>
+
+<details>
+<summary>DD-4 - Severity levels match Process Guard model</summary>
+
+#### DD-4 - Severity levels match Process Guard model
+
+Scope validation uses three severity levels:
+
+    The --strict flag promotes WARN to BLOCKED.
+
+| Severity | Meaning                   |
+| -------- | ------------------------- |
+| PASS     | Check passed              |
+| BLOCKED  | Hard prerequisite missing |
+| WARN     | Recommendation not met    |
+
+</details>
+
+<details>
+<summary>DD-5 - Current date only for handoff</summary>
+
+#### DD-5 - Current date only for handoff
+
+Handoff always uses the current date. No --date flag.
+
+</details>
+
+<details>
+<summary>DD-6 - Both positional and flag forms for scope type</summary>
+
+#### DD-6 - Both positional and flag forms for scope type
+
+scope-validate accepts scope type as both positional argument
+and --type flag.
+
+</details>
+
+<details>
+<summary>DD-7 - Co-located formatter functions (2 scenarios)</summary>
+
+#### DD-7 - Co-located formatter functions
+
+Each module (scope-validator.ts, handoff-generator.ts) exports
+both the data builder and the text formatter. Simpler than the
+context-assembler/context-formatter split.
+
+**Verified by:**
+
+- scope-validate outputs structured text
+- Active pattern infers implement session
+
+</details>
+
 ### ProcessStateAPIRelationshipQueries
 
 [View ProcessStateAPIRelationshipQueries source](delivery-process/specs/process-state-api-relationship-queries.feature)
@@ -1871,109 +1974,6 @@ Extend the `arch` subcommand and add new discovery commands:
 
 </details>
 
-### PDR001SessionWorkflowCommands
-
-[View PDR001SessionWorkflowCommands source](delivery-process/decisions/pdr-001-session-workflow-commands.feature)
-
-**Context:**
-DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session
-readiness check) and `handoff` (session-end state summary) CLI subcommands.
-Seven design decisions affect how these commands behave.
-
-**Decision:**
-Seven design decisions (DD-1 through DD-7) captured as Rules below.
-
-<details>
-<summary>DD-1 - Text output with section markers</summary>
-
-#### DD-1 - Text output with section markers
-
-Both scope-validate and handoff return string from the router, using
-=== SECTION === markers. Follows the dual output path where text
-commands bypass JSON.stringify.
-
-</details>
-
-<details>
-<summary>DD-2 - Git integration is opt-in via --git flag</summary>
-
-#### DD-2 - Git integration is opt-in via --git flag
-
-The handoff command accepts an optional --git flag. The CLI handler
-calls git diff and passes file list to the pure generator function.
-No shell dependency in domain logic.
-
-</details>
-
-<details>
-<summary>DD-3 - Session type inferred from FSM status</summary>
-
-#### DD-3 - Session type inferred from FSM status
-
-Handoff infers session type from pattern's current FSM status.
-An explicit --session flag overrides inference.
-
-| Status    | Inferred Session |
-| --------- | ---------------- |
-| roadmap   | design           |
-| active    | implement        |
-| completed | review           |
-| deferred  | design           |
-
-</details>
-
-<details>
-<summary>DD-4 - Severity levels match Process Guard model</summary>
-
-#### DD-4 - Severity levels match Process Guard model
-
-Scope validation uses three severity levels:
-
-    The --strict flag promotes WARN to BLOCKED.
-
-| Severity | Meaning                   |
-| -------- | ------------------------- |
-| PASS     | Check passed              |
-| BLOCKED  | Hard prerequisite missing |
-| WARN     | Recommendation not met    |
-
-</details>
-
-<details>
-<summary>DD-5 - Current date only for handoff</summary>
-
-#### DD-5 - Current date only for handoff
-
-Handoff always uses the current date. No --date flag.
-
-</details>
-
-<details>
-<summary>DD-6 - Both positional and flag forms for scope type</summary>
-
-#### DD-6 - Both positional and flag forms for scope type
-
-scope-validate accepts scope type as both positional argument
-and --type flag.
-
-</details>
-
-<details>
-<summary>DD-7 - Co-located formatter functions (2 scenarios)</summary>
-
-#### DD-7 - Co-located formatter functions
-
-Each module (scope-validator.ts, handoff-generator.ts) exports
-both the data builder and the text formatter. Simpler than the
-context-assembler/context-formatter split.
-
-**Verified by:**
-
-- scope-validate outputs structured text
-- Active pattern infers implement session
-
-</details>
-
 ### ValidatePatternsCli
 
 [View ValidatePatternsCli source](tests/features/cli/validate-patterns.feature)
@@ -2078,11 +2078,154 @@ Command-line interface for cross-validating TypeScript patterns vs Gherkin featu
 
 </details>
 
-### ProcessApiCli
+### ProcessApiCliSubcommands
 
-[View ProcessApiCli source](tests/features/cli/process-api.feature)
+[View ProcessApiCliSubcommands source](tests/features/cli/process-api-subcommands.feature)
 
-Command-line interface for querying delivery process state via ProcessStateAPI.
+Discovery subcommands: list, search, context assembly, tags/sources, extended arch, unannotated.
+
+<details>
+<summary>CLI list subcommand filters patterns (2 scenarios)</summary>
+
+#### CLI list subcommand filters patterns
+
+**Verified by:**
+
+- List all patterns returns JSON array
+- List with invalid phase shows error
+
+</details>
+
+<details>
+<summary>CLI search subcommand finds patterns by fuzzy match (2 scenarios)</summary>
+
+#### CLI search subcommand finds patterns by fuzzy match
+
+**Verified by:**
+
+- Search returns matching patterns
+- Search without query shows error
+
+</details>
+
+<details>
+<summary>CLI context assembly subcommands return text output (4 scenarios)</summary>
+
+#### CLI context assembly subcommands return text output
+
+**Verified by:**
+
+- Context returns curated text bundle
+- Context without pattern name shows error
+- Overview returns executive summary text
+- Dep-tree returns dependency tree text
+
+</details>
+
+<details>
+<summary>CLI tags and sources subcommands return JSON (2 scenarios)</summary>
+
+#### CLI tags and sources subcommands return JSON
+
+**Verified by:**
+
+- Tags returns tag usage counts
+- Sources returns file inventory
+
+</details>
+
+<details>
+<summary>CLI extended arch subcommands query architecture relationships (3 scenarios)</summary>
+
+#### CLI extended arch subcommands query architecture relationships
+
+**Verified by:**
+
+- Arch neighborhood returns pattern relationships
+- Arch compare returns context comparison
+- Arch coverage returns annotation coverage
+
+</details>
+
+<details>
+<summary>CLI unannotated subcommand finds files without annotations (1 scenarios)</summary>
+
+#### CLI unannotated subcommand finds files without annotations
+
+**Verified by:**
+
+- Unannotated finds files missing libar-docs marker
+
+</details>
+
+### ProcessApiCliModifiersAndRules
+
+[View ProcessApiCliModifiersAndRules source](tests/features/cli/process-api-modifiers-rules.feature)
+
+Output modifiers, arch health, and rules subcommand.
+
+<details>
+<summary>Output modifiers work when placed after the subcommand (3 scenarios)</summary>
+
+#### Output modifiers work when placed after the subcommand
+
+**Invariant:** Output modifiers (--count, --names-only, --fields) produce identical results regardless of position relative to the subcommand and its filters.
+
+**Rationale:** Users should not need to memorize argument ordering rules; the CLI should be forgiving.
+
+**Verified by:**
+
+- Count modifier after list subcommand returns count
+- Names-only modifier after list subcommand returns names
+- Count modifier combined with list filter
+
+</details>
+
+<details>
+<summary>CLI arch health subcommands detect graph quality issues (3 scenarios)</summary>
+
+#### CLI arch health subcommands detect graph quality issues
+
+**Invariant:** Health subcommands (dangling, orphans, blocking) operate on the relationship index, not the architecture index, and return results without requiring arch annotations.
+
+**Rationale:** Graph quality issues (broken references, isolated patterns, blocked dependencies) are relationship-level concerns that should be queryable even when no architecture metadata exists.
+
+**Verified by:**
+
+- Arch dangling returns broken references
+- Arch orphans returns isolated patterns
+- Arch blocking returns blocked patterns
+
+</details>
+
+<details>
+<summary>CLI rules subcommand queries business rules and invariants (9 scenarios)</summary>
+
+#### CLI rules subcommand queries business rules and invariants
+
+**Invariant:** The rules subcommand returns structured business rules extracted from Gherkin Rule: blocks, grouped by product area and phase, with parsed invariant and rationale annotations.
+
+**Rationale:** Live business rule queries replace static generated markdown, enabling on-demand filtering by product area, pattern, and invariant presence.
+
+**Verified by:**
+
+- Rules returns business rules from feature files
+- Rules filters by product area
+- Rules with count modifier returns totals
+- Rules with names-only returns flat array
+- Rules filters by pattern name
+- Rules with only-invariants excludes rules without invariants
+- Rules product area filter excludes non-matching areas
+- Rules for non-existent product area returns hint
+- Rules combines product area and only-invariants filters
+
+</details>
+
+### ProcessApiCliCore
+
+[View ProcessApiCliCore source](tests/features/cli/process-api-core.feature)
+
+Core CLI infrastructure: help, version, input validation, status, query, pattern, arch basics, missing args, edge cases.
 
 <details>
 <summary>CLI displays help and version information (3 scenarios)</summary>
@@ -2180,137 +2323,6 @@ Command-line interface for querying delivery process state via ProcessStateAPI.
 
 - Integer arguments are coerced for phase queries
 - Double-dash separator is handled gracefully
-
-</details>
-
-<details>
-<summary>CLI list subcommand filters patterns (2 scenarios)</summary>
-
-#### CLI list subcommand filters patterns
-
-**Verified by:**
-
-- List all patterns returns JSON array
-- List with invalid phase shows error
-
-</details>
-
-<details>
-<summary>CLI search subcommand finds patterns by fuzzy match (2 scenarios)</summary>
-
-#### CLI search subcommand finds patterns by fuzzy match
-
-**Verified by:**
-
-- Search returns matching patterns
-- Search without query shows error
-
-</details>
-
-<details>
-<summary>CLI context assembly subcommands return text output (4 scenarios)</summary>
-
-#### CLI context assembly subcommands return text output
-
-**Verified by:**
-
-- Context returns curated text bundle
-- Context without pattern name shows error
-- Overview returns executive summary text
-- Dep-tree returns dependency tree text
-
-</details>
-
-<details>
-<summary>CLI tags and sources subcommands return JSON (2 scenarios)</summary>
-
-#### CLI tags and sources subcommands return JSON
-
-**Verified by:**
-
-- Tags returns tag usage counts
-- Sources returns file inventory
-
-</details>
-
-<details>
-<summary>CLI extended arch subcommands query architecture relationships (3 scenarios)</summary>
-
-#### CLI extended arch subcommands query architecture relationships
-
-**Verified by:**
-
-- Arch neighborhood returns pattern relationships
-- Arch compare returns context comparison
-- Arch coverage returns annotation coverage
-
-</details>
-
-<details>
-<summary>CLI unannotated subcommand finds files without annotations (1 scenarios)</summary>
-
-#### CLI unannotated subcommand finds files without annotations
-
-**Verified by:**
-
-- Unannotated finds files missing libar-docs marker
-
-</details>
-
-<details>
-<summary>Output modifiers work when placed after the subcommand (3 scenarios)</summary>
-
-#### Output modifiers work when placed after the subcommand
-
-**Invariant:** Output modifiers (--count, --names-only, --fields) produce identical results regardless of position relative to the subcommand and its filters.
-
-**Rationale:** Users should not need to memorize argument ordering rules; the CLI should be forgiving.
-
-**Verified by:**
-
-- Count modifier after list subcommand returns count
-- Names-only modifier after list subcommand returns names
-- Count modifier combined with list filter
-
-</details>
-
-<details>
-<summary>CLI arch health subcommands detect graph quality issues (3 scenarios)</summary>
-
-#### CLI arch health subcommands detect graph quality issues
-
-**Invariant:** Health subcommands (dangling, orphans, blocking) operate on the relationship index, not the architecture index, and return results without requiring arch annotations.
-
-**Rationale:** Graph quality issues (broken references, isolated patterns, blocked dependencies) are relationship-level concerns that should be queryable even when no architecture metadata exists.
-
-**Verified by:**
-
-- Arch dangling returns broken references
-- Arch orphans returns isolated patterns
-- Arch blocking returns blocked patterns
-
-</details>
-
-<details>
-<summary>CLI rules subcommand queries business rules and invariants (9 scenarios)</summary>
-
-#### CLI rules subcommand queries business rules and invariants
-
-**Invariant:** The rules subcommand returns structured business rules extracted from Gherkin Rule: blocks, grouped by product area and phase, with parsed invariant and rationale annotations.
-
-**Rationale:** Live business rule queries replace static generated markdown, enabling on-demand filtering by product area, pattern, and invariant presence.
-
-**Verified by:**
-
-- Rules returns business rules from feature files
-- Rules filters by product area
-- Rules with count modifier returns totals
-- Rules with names-only returns flat array
-- Rules filters by pattern name
-- Rules with only-invariants excludes rules without invariants
-- Rules product area filter excludes non-matching areas
-- Rules for non-existent product area returns hint
-- Rules combines product area and only-invariants filters
 
 </details>
 
@@ -3028,160 +3040,6 @@ issues, and next-session priorities.
 
 - Handoff formatter produces markers per ADR-008
 
-### ContextFormatterTests
-
-[View ContextFormatterTests source](tests/features/api/context-assembly/context-formatter.feature)
-
-Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),
-and formatOverview() plain text rendering functions.
-
-<details>
-<summary>formatContextBundle renders section markers (2 scenarios)</summary>
-
-#### formatContextBundle renders section markers
-
-**Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with design bundles rendering all sections and implement bundles focusing on deliverables and FSM.
-
-**Rationale:** Section markers enable structured parsing of context output — without them, AI consumers cannot reliably extract specific sections from the formatted bundle.
-
-**Verified by:**
-
-- Design bundle renders all populated sections
-- Implement bundle renders deliverables and FSM
-
-</details>
-
-<details>
-<summary>formatDepTree renders indented tree (1 scenarios)</summary>
-
-#### formatDepTree renders indented tree
-
-**Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to visually distinguish the target pattern from its dependencies.
-
-**Rationale:** Visual hierarchy in the dependency tree makes dependency chains scannable at a glance — flat output would require mental parsing to understand depth and relationships.
-
-**Verified by:**
-
-- Tree renders with arrows and focal marker
-
-</details>
-
-<details>
-<summary>formatOverview renders progress summary (1 scenarios)</summary>
-
-#### formatOverview renders progress summary
-
-**Invariant:** The overview formatter must render a progress summary line showing completion metrics for the project.
-
-**Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness without requiring detailed exploration.
-
-**Verified by:**
-
-- Overview renders progress line
-
-</details>
-
-<details>
-<summary>formatFileReadingList renders categorized file paths (2 scenarios)</summary>
-
-#### formatFileReadingList renders categorized file paths
-
-**Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing minimal output when the list is empty.
-
-**Rationale:** Categorized file lists tell developers which files to read first (primary) versus reference (dependency) — uncategorized lists waste time on low-priority files.
-
-**Verified by:**
-
-- File list renders primary and dependency sections
-- Empty file reading list renders minimal output
-
-</details>
-
-### ContextAssemblerTests
-
-[View ContextAssemblerTests source](tests/features/api/context-assembly/context-assembler.feature)
-
-Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and
-buildOverview() pure functions that operate on MasterDataset.
-
-<details>
-<summary>assembleContext produces session-tailored context bundles (7 scenarios)</summary>
-
-#### assembleContext produces session-tailored context bundles
-
-**Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its profile — no more, no less.
-
-**Rationale:** Over-fetching wastes AI context window tokens; under-fetching causes the agent to make uninformed decisions.
-
-**Verified by:**
-
-- Design session includes stubs, consumers, and architecture
-- Planning session includes only metadata and dependencies
-- Implement session includes deliverables and FSM
-- Multi-pattern context merges metadata from both patterns
-- Pattern not found returns error with suggestion
-- Description preserves Problem and Solution structure
-- Solution text with inline bold is not truncated
-- Design session includes stubs
-- consumers
-- and architecture
-
-</details>
-
-<details>
-<summary>buildDepTree walks dependency chains with cycle detection (4 scenarios)</summary>
-
-#### buildDepTree walks dependency chains with cycle detection
-
-**Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate safely on circular references.
-
-**Rationale:** Dependency chains reveal implementation prerequisites — cycles and infinite recursion would crash the CLI.
-
-**Verified by:**
-
-- Dependency tree shows chain with status markers
-- Depth limit truncates branches
-- Circular dependencies are handled safely
-- Standalone pattern returns single-node tree
-
-</details>
-
-<details>
-<summary>buildOverview provides executive project summary (2 scenarios)</summary>
-
-#### buildOverview provides executive project summary
-
-**Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and blocking dependencies.
-
-**Rationale:** The overview is the first command in every session start recipe — it must provide a complete project health snapshot.
-
-**Verified by:**
-
-- Overview shows progress, active phases, and blocking
-- Empty dataset returns zero-state overview
-- Overview shows progress
-- active phases
-- and blocking
-
-</details>
-
-<details>
-<summary>buildFileReadingList returns paths by relevance (3 scenarios)</summary>
-
-#### buildFileReadingList returns paths by relevance
-
-**Invariant:** Primary files (spec, implementation) must always be included; related files (dependency implementations) are included only when requested.
-
-**Rationale:** File reading lists power the "what to read" guidance — relevance sorting ensures the most important files are read first within token budgets.
-
-**Verified by:**
-
-- File list includes primary and related files
-- File list includes implementation files for completed dependencies
-- File list without related returns only primary
-
-</details>
-
 ### PatternSummarizeTests
 
 [View PatternSummarizeTests source](tests/features/api/output-shaping/summarize.feature)
@@ -3418,6 +3276,160 @@ Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein.
 
 - Identical strings have distance 0
 - Single character difference
+
+</details>
+
+### ContextFormatterTests
+
+[View ContextFormatterTests source](tests/features/api/context-assembly/context-formatter.feature)
+
+Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),
+and formatOverview() plain text rendering functions.
+
+<details>
+<summary>formatContextBundle renders section markers (2 scenarios)</summary>
+
+#### formatContextBundle renders section markers
+
+**Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with design bundles rendering all sections and implement bundles focusing on deliverables and FSM.
+
+**Rationale:** Section markers enable structured parsing of context output — without them, AI consumers cannot reliably extract specific sections from the formatted bundle.
+
+**Verified by:**
+
+- Design bundle renders all populated sections
+- Implement bundle renders deliverables and FSM
+
+</details>
+
+<details>
+<summary>formatDepTree renders indented tree (1 scenarios)</summary>
+
+#### formatDepTree renders indented tree
+
+**Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to visually distinguish the target pattern from its dependencies.
+
+**Rationale:** Visual hierarchy in the dependency tree makes dependency chains scannable at a glance — flat output would require mental parsing to understand depth and relationships.
+
+**Verified by:**
+
+- Tree renders with arrows and focal marker
+
+</details>
+
+<details>
+<summary>formatOverview renders progress summary (1 scenarios)</summary>
+
+#### formatOverview renders progress summary
+
+**Invariant:** The overview formatter must render a progress summary line showing completion metrics for the project.
+
+**Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness without requiring detailed exploration.
+
+**Verified by:**
+
+- Overview renders progress line
+
+</details>
+
+<details>
+<summary>formatFileReadingList renders categorized file paths (2 scenarios)</summary>
+
+#### formatFileReadingList renders categorized file paths
+
+**Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing minimal output when the list is empty.
+
+**Rationale:** Categorized file lists tell developers which files to read first (primary) versus reference (dependency) — uncategorized lists waste time on low-priority files.
+
+**Verified by:**
+
+- File list renders primary and dependency sections
+- Empty file reading list renders minimal output
+
+</details>
+
+### ContextAssemblerTests
+
+[View ContextAssemblerTests source](tests/features/api/context-assembly/context-assembler.feature)
+
+Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and
+buildOverview() pure functions that operate on MasterDataset.
+
+<details>
+<summary>assembleContext produces session-tailored context bundles (7 scenarios)</summary>
+
+#### assembleContext produces session-tailored context bundles
+
+**Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its profile — no more, no less.
+
+**Rationale:** Over-fetching wastes AI context window tokens; under-fetching causes the agent to make uninformed decisions.
+
+**Verified by:**
+
+- Design session includes stubs, consumers, and architecture
+- Planning session includes only metadata and dependencies
+- Implement session includes deliverables and FSM
+- Multi-pattern context merges metadata from both patterns
+- Pattern not found returns error with suggestion
+- Description preserves Problem and Solution structure
+- Solution text with inline bold is not truncated
+- Design session includes stubs
+- consumers
+- and architecture
+
+</details>
+
+<details>
+<summary>buildDepTree walks dependency chains with cycle detection (4 scenarios)</summary>
+
+#### buildDepTree walks dependency chains with cycle detection
+
+**Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate safely on circular references.
+
+**Rationale:** Dependency chains reveal implementation prerequisites — cycles and infinite recursion would crash the CLI.
+
+**Verified by:**
+
+- Dependency tree shows chain with status markers
+- Depth limit truncates branches
+- Circular dependencies are handled safely
+- Standalone pattern returns single-node tree
+
+</details>
+
+<details>
+<summary>buildOverview provides executive project summary (2 scenarios)</summary>
+
+#### buildOverview provides executive project summary
+
+**Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and blocking dependencies.
+
+**Rationale:** The overview is the first command in every session start recipe — it must provide a complete project health snapshot.
+
+**Verified by:**
+
+- Overview shows progress, active phases, and blocking
+- Empty dataset returns zero-state overview
+- Overview shows progress
+- active phases
+- and blocking
+
+</details>
+
+<details>
+<summary>buildFileReadingList returns paths by relevance (3 scenarios)</summary>
+
+#### buildFileReadingList returns paths by relevance
+
+**Invariant:** Primary files (spec, implementation) must always be included; related files (dependency implementations) are included only when requested.
+
+**Rationale:** File reading lists power the "what to read" guidance — relevance sorting ensures the most important files are read first within token budgets.
+
+**Verified by:**
+
+- File list includes primary and related files
+- File list includes implementation files for completed dependencies
+- File list without related returns only primary
 
 </details>
 

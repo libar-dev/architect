@@ -41,6 +41,13 @@ PR Changes codec filters patterns by:
 
 If both are specified, patterns must match at least one criterion.
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`pr-changes-codec-options.feature`](../../tests/features/behavior/codecs/pr-changes-codec-options.feature) - The PrChangesCodec transforms MasterDataset into RenderableDocument for
+- [`pr-changes-codec-rendering.feature`](../../tests/features/behavior/codecs/pr-changes-codec-rendering.feature) - The PrChangesCodec transforms MasterDataset into RenderableDocument for
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

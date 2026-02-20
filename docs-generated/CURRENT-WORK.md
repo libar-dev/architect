@@ -7,15 +7,15 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 209/304 (69%)
+**Overall Progress:** [██████████████░░░░░░] 223/318 (70%)
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 304 |
-| Completed | 209 |
-| Active | 49 |
-| Planned | 46 |
-| Active Phases | 4 |
+| Total Patterns | 318 |
+| Completed | 223 |
+| Active | 48 |
+| Planned | 47 |
+| Active Phases | 5 |
 
 ---
 
@@ -115,6 +115,28 @@
 
 ---
 
+### 🚧 OrchestratorPipelineFactoryMigration
+
+[░░░░░░░░░░░░░░░] 0/2 0% complete (0 done, 1 active, 1 planned)
+
+| Pattern | Description |
+| --- | --- |
+| 🚧 Orchestrator Pipeline Factory Migration | `orchestrator.ts` is the last feature consumer that wires the 8-step scan-extract-merge-transform pipeline inline... |
+
+#### Deliverables
+
+- 📋 Move mergePatterns to pipeline/merge-patterns.ts
+- 📋 Add PipelineWarning structured types
+- 📋 Enrich factory with structured warnings and scan metadata
+- 📋 Add includeValidation and failOnScanErrors options
+- 📋 Migrate generateDocumentation to factory call
+- 📋 Remove unused scanner/extractor imports from orchestrator
+- 📋 Full end-to-end verification
+
+[View OrchestratorPipelineFactoryMigration details →](current/phase-101-orchestrator-pipeline-factory-migration.md)
+
+---
+
 ## All Active Patterns
 
 | Pattern | Phase | Effort | Description |
@@ -123,6 +145,7 @@
 | 🚧 Pattern Helpers Tests | Phase 25 | - | - |
 | 🚧 Reference Doc Showcase | Phase 30 | 13d | The Reference Generation Sample document exercises a small fraction of the reference codec's capabilities: 2... |
 | 🚧 Step Lint Vitest Cucumber | Phase 50 | 1d | Hours are lost debugging vitest-cucumber-specific issues that only surface at test runtime. |
+| 🚧 Orchestrator Pipeline Factory Migration | Phase 101 | 2d | `orchestrator.ts` is the last feature consumer that wires the 8-step scan-extract-merge-transform pipeline inline... |
 | 🚧 API Module | - | - | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
 | 🚧 Arch Queries Impl | - | - | Pure functions over MasterDataset for deep architecture exploration. |
 | 🚧 Arch Queries Test | - | - | - |
@@ -151,7 +174,6 @@
 | 🚧 Pattern Helpers | - | - | Common helper functions used by context-assembler, arch-queries, and other API modules that need pattern name... |
 | 🚧 Pattern Summarizer Impl | - | - | Projects the full ExtractedPattern (~3.5KB per pattern) down to a PatternSummary (~100 bytes) for list queries. |
 | 🚧 Pattern Summarize Tests | - | - | Validates that summarizePattern() projects ExtractedPattern (~3.5KB) to PatternSummary (~100 bytes) with the correct... |
-| 🚧 Pipeline Factory | - | - | Shared factory that executes the 8-step scan-extract-merge-transform pipeline. |
 | 🚧 Process API CLI Impl | - | - | Exposes ProcessStateAPI methods as CLI subcommands with JSON output. |
 | 🚧 Process Guard Decider | - | - | :FSMValidator,DeriveProcessState,DetectChanges Pure function that validates changes against process rules. |
 | 🚧 Process Guard Module | - | - | :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider Enforces delivery process rules by validating... |
@@ -162,7 +184,6 @@
 | 🚧 Project Config Types | - | - | Unified project configuration for the delivery-process package. |
 | 🚧 Reference Document Codec | - | - | A single codec factory that creates reference document codecs from configuration objects. |
 | 🚧 Reference Generator Registration | - | - | Registers all reference document generators. |
-| 🚧 Rules Query Module | - | - | Pure query function for business rules extracted from Gherkin Rule: blocks. |
 | 🚧 Source Merger | - | - | Computes effective sources for a specific generator by applying per-generator overrides to the base resolved sources. |
 | 🚧 Stub Resolver Impl | - | - | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 | 🚧 Stub Resolver Tests | - | - | Design session stubs need structured discovery and resolution to determine which stubs have been implemented and... |
