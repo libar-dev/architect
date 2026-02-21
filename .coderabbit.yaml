@@ -160,7 +160,6 @@ knowledge_base:
     enabled: true
     filePatterns:
       - '**/CLAUDE.md'
-      - '**/INSTRUCTIONS.md'
 
   learnings:
     scope: local # Keep learnings repository-specific

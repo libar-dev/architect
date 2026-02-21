@@ -293,15 +293,67 @@ This validates FSM transitions and blocks invalid status changes.
 
 ## CLI Commands
 
-| Command                 | Purpose                                                |
-| ----------------------- | ------------------------------------------------------ |
-| `generate-docs`         | Generate documentation from annotated sources          |
-| `lint-patterns`         | Validate annotation quality (missing tags, etc.)       |
-| `lint-process`          | Validate delivery workflow FSM transitions             |
-| `validate-patterns`     | Cross-source validation with Definition of Done checks |
-| `generate-tag-taxonomy` | Generate tag reference from TypeScript taxonomy        |
+| Command                 | Purpose                                                | Docs                                      |
+| ----------------------- | ------------------------------------------------------ | ----------------------------------------- |
+| `generate-docs`         | Generate documentation from annotated sources          | See flags below                           |
+| `lint-patterns`         | Validate annotation quality (missing tags, etc.)       | [VALIDATION.md](docs/VALIDATION.md)       |
+| `lint-process`          | Validate delivery workflow FSM transitions             | [PROCESS-GUARD.md](docs/PROCESS-GUARD.md) |
+| `validate-patterns`     | Cross-source validation with Definition of Done checks | [VALIDATION.md](docs/VALIDATION.md)       |
+| `generate-tag-taxonomy` | Generate tag reference from TypeScript taxonomy        | See flags below                           |
 
-See [INSTRUCTIONS.md](INSTRUCTIONS.md) for full CLI reference.
+### generate-docs
+
+Generate documentation from annotated sources.
+
+```bash
+generate-docs [options]
+```
+
+| Flag                         | Short | Description                                    | Default             |
+| ---------------------------- | ----- | ---------------------------------------------- | ------------------- |
+| `--input <pattern>`          | `-i`  | Glob pattern for TypeScript files (repeatable) | required            |
+| `--generators <names>`       | `-g`  | Generator names (comma-separated)              | required            |
+| `--features <pattern>`       |       | Glob pattern for Gherkin files                 | -                   |
+| `--exclude <pattern>`        | `-e`  | Exclude pattern (repeatable)                   | -                   |
+| `--output <dir>`             | `-o`  | Output directory                               | `docs/architecture` |
+| `--base-dir <path>`          | `-b`  | Base directory                                 | cwd                 |
+| `--overwrite`                | `-f`  | Overwrite existing files                       | false               |
+| `--workflow <file>`          | `-w`  | Workflow config JSON file                      | -                   |
+| `--list-generators`          |       | List available generators                      | -                   |
+| `--git-diff-base <branch>`   |       | PR Changes: base branch for diff               | -                   |
+| `--changed-files <file>`     |       | PR Changes: explicit file list                 | -                   |
+| `--release-filter <version>` |       | PR Changes: filter by release                  | -                   |
+
+```bash
+# Generate pattern docs
+generate-docs -g patterns -i "src/**/*.ts" -o docs -f
+
+# List all available generators
+generate-docs --list-generators
+
+# Generate with Gherkin specs
+generate-docs -g patterns -i "src/**/*.ts" --features "specs/**/*.feature" -o docs -f
+```
+
+### generate-tag-taxonomy
+
+Generate a complete tag reference document from the TypeScript taxonomy source. The output is always current — it reflects exactly what tags the system supports.
+
+```bash
+generate-tag-taxonomy [options]
+```
+
+| Flag               | Short | Description             | Default                             |
+| ------------------ | ----- | ----------------------- | ----------------------------------- |
+| `--output <path>`  | `-o`  | Output file path        | `docs/architecture/TAG_TAXONOMY.md` |
+| `--overwrite`      | `-f`  | Overwrite existing file | false                               |
+| `--base-dir <dir>` | `-b`  | Base directory          | cwd                                 |
+
+```bash
+npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f
+```
+
+For tag concepts and taxonomy architecture, see [docs/TAXONOMY.md](docs/TAXONOMY.md).
 
 ---
 
@@ -586,7 +638,7 @@ See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for custom presets.
 | [GHERKIN-PATTERNS](docs/GHERKIN-PATTERNS.md) | Writers    | Writing effective specs   |
 | [PROCESS-GUARD](docs/PROCESS-GUARD.md)       | Team Leads | FSM enforcement rules     |
 | [VALIDATION](docs/VALIDATION.md)             | CI/CD      | Automated quality checks  |
-| [INSTRUCTIONS](INSTRUCTIONS.md)              | Reference  | Tag and CLI reference     |
+| [TAXONOMY](docs/TAXONOMY.md)                 | Reference  | Tag taxonomy and API      |
 
 ---
 

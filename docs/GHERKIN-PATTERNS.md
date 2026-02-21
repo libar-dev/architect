@@ -2,7 +2,7 @@
 
 Practical patterns for writing Gherkin specs that work with `delivery-process` generators.
 
-> **Tag Reference:** For the complete tag list, see [INSTRUCTIONS.md](../INSTRUCTIONS.md#category-tags).
+> **Tag Reference:** Run `npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f` for the complete tag list. See [TAXONOMY.md](./TAXONOMY.md) for concepts.
 
 ---
 
@@ -339,5 +339,5 @@ For values with spaces, use the `quoted-value` format where supported:
 
 | Document                                    | Purpose                             |
 | ------------------------------------------- | ----------------------------------- |
-| [INSTRUCTIONS.md](../INSTRUCTIONS.md)       | Complete tag reference and CLI      |
+| [TAXONOMY.md](./TAXONOMY.md)                | Tag taxonomy concepts and API       |
 | [docs/CONFIGURATION.md](./CONFIGURATION.md) | Preset and tag prefix configuration |

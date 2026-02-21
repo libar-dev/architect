@@ -28,8 +28,7 @@
 | Enforce delivery process rules | [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | 1-335  |
 | Validate annotation quality    | [VALIDATION.md](./VALIDATION.md)             | 1-206  |
 | Query process state via CLI    | [PROCESS-API.md](./PROCESS-API.md)           | 1-259  |
-| Look up tag definitions        | [INSTRUCTIONS.md](../INSTRUCTIONS.md)        | 1-344  |
-| Understand the taxonomy        | [TAXONOMY.md](./TAXONOMY.md)                 | 1-95   |
+| Understand the taxonomy        | [TAXONOMY.md](./TAXONOMY.md)                 | 1-110  |
 | Publish to npm                 | [PUBLISHING.md](./PUBLISHING.md)             | 1-149  |
 
 ---
@@ -48,7 +47,6 @@
 5. **[PROCESS-API.md](./PROCESS-API.md)** — Data API CLI query interface
 6. **[SESSION-GUIDES.md](./SESSION-GUIDES.md)** — Planning/Design/Implementation workflows
 7. **[GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md)** — Writing effective Gherkin specs
-8. **[INSTRUCTIONS.md](../INSTRUCTIONS.md)** — Complete tag and CLI reference
 
 ### For Team Leads / CI
 
@@ -209,24 +207,7 @@
 
 ---
 
-### INSTRUCTIONS.md (Lines 1-344)
-
-| Section                    | Lines   | Key Topics                            |
-| -------------------------- | ------- | ------------------------------------- |
-| File-Level Opt-In          | 23-43   | Preset markers, basic usage           |
-| Category Tags              | 46-81   | All 21 DDD-ES-CQRS categories table   |
-| Metadata Tags              | 84-159  | Core, relationship, process, PRD, ADR |
-| Aggregation Tags           | 162-171 | overview, decision, intro routing     |
-| CLI: generate-docs         | 176-204 | All flags, basic usage                |
-| CLI: lint-patterns         | 207-226 | Flags, exit codes                     |
-| CLI: lint-process          | 229-250 | Flags, exit codes                     |
-| CLI: validate-patterns     | 253-277 | Flags, exit codes                     |
-| CLI: generate-tag-taxonomy | 280-292 | Flags for taxonomy generation         |
-| Gherkin Integration        | 295-331 | @pattern:\* tags, process metadata    |
-
----
-
-### TAXONOMY.md (Lines 1-95)
+### TAXONOMY.md (Lines 1-110)
 
 | Section              | Lines | Key Topics                             |
 | -------------------- | ----- | -------------------------------------- |
@@ -297,6 +278,5 @@ pnpm process:query -- pattern TransformDataset
 | GHERKIN-PATTERNS.md | Writers     | Specs — writing effective Gherkin |
 | PROCESS-GUARD.md    | Team Leads  | Governance — enforcement rules    |
 | VALIDATION.md       | CI/CD       | Quality — automated checks        |
-| INSTRUCTIONS.md     | Reference   | Lookup — tag and CLI reference    |
-| TAXONOMY.md         | Reference   | Lookup — tag format definitions   |
+| TAXONOMY.md         | Reference   | Lookup — tag taxonomy and API     |
 | PUBLISHING.md       | Maintainers | Release — npm publishing          |

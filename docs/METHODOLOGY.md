@@ -2,7 +2,7 @@
 
 > **Git is the event store. Documentation artifacts are projections. Annotated code is the single source of truth.**
 
-This document explains the _why_ behind `@libar-dev/delivery-process`. For _how_, see [INSTRUCTIONS.md](../INSTRUCTIONS.md).
+This document explains the _why_ behind `@libar-dev/delivery-process`. For _how_, see [README.md](../README.md) and [TAXONOMY.md](./TAXONOMY.md).
 
 ---
 
@@ -231,4 +231,4 @@ This avoids `.skip()` (forbidden by test safety policy) while preserving plannin
 | [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | FSM validation rules, protection levels, CLI |
 | [CONFIGURATION.md](./CONFIGURATION.md)       | Tag prefixes, presets, customization         |
 | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | Writing effective specs                      |
-| [INSTRUCTIONS.md](../INSTRUCTIONS.md)        | Complete tag reference                       |
+| [TAXONOMY.md](./TAXONOMY.md)                 | Tag taxonomy concepts and API                |

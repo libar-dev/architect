@@ -36,7 +36,7 @@ heading, paragraph, separator, table, list, code, mermaid, collapsible, linkOut,
 // ═══════════════════════════════════════════════════════════════════════════
 // Renderer Exports
 // ═══════════════════════════════════════════════════════════════════════════
-export { renderToMarkdown, renderToClaudeMdModule, renderDocumentWithFiles } from './render.js';
+export { renderToMarkdown, renderToClaudeMdModule, renderDocumentWithFiles, } from './render.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // Codec Exports
 // ═══════════════════════════════════════════════════════════════════════════

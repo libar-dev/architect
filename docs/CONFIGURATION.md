@@ -3,7 +3,7 @@
 Configure tag prefixes, presets, sources, output, and custom taxonomies for `@libar-dev/delivery-process`.
 
 > **Prerequisites:** See [README.md](../README.md) for installation and basic usage.
-> **Tag Reference:** See [INSTRUCTIONS.md](../INSTRUCTIONS.md) for complete tag lists.
+> **Tag Reference:** Run `npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f` for a complete tag list. See [TAXONOMY.md](./TAXONOMY.md) for concepts.
 
 ---
 
@@ -147,7 +147,7 @@ Full taxonomy for domain-driven architectures with 21 categories.
 export function transformToMasterDataset(input: TransformInput): MasterDataset { ... }
 ```
 
-> **Category Reference:** See [INSTRUCTIONS.md](../INSTRUCTIONS.md#category-tags) for the complete list.
+> **Category Reference:** Run `npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f` for the complete list. See [TAXONOMY.md](./TAXONOMY.md) for concepts.
 
 ---
 
@@ -348,9 +348,9 @@ New projects should use `defineConfig()` for the unified configuration experienc
 
 ## Related Documentation
 
-| Document                              | Purpose                         |
-| ------------------------------------- | ------------------------------- |
-| [README.md](../README.md)             | Installation and quick start    |
-| [INSTRUCTIONS.md](../INSTRUCTIONS.md) | Complete tag and CLI reference  |
-| [ARCHITECTURE.md](./ARCHITECTURE.md)  | Pipeline and codec architecture |
-| [METHODOLOGY.md](./METHODOLOGY.md)    | Dual-source ownership strategy  |
+| Document                             | Purpose                         |
+| ------------------------------------ | ------------------------------- |
+| [README.md](../README.md)            | Installation and quick start    |
+| [TAXONOMY.md](./TAXONOMY.md)         | Tag taxonomy concepts and API   |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | Pipeline and codec architecture |
+| [METHODOLOGY.md](./METHODOLOGY.md)   | Dual-source ownership strategy  |

@@ -327,8 +327,8 @@ State is derived from file annotations — there is no separate state file to ma
 
 ## Related Documentation
 
-| Document                              | Content                         |
-| ------------------------------------- | ------------------------------- |
-| [METHODOLOGY.md](./METHODOLOGY.md)    | FSM concepts, state definitions |
-| [README.md](../README.md)             | Package overview, quick start   |
-| [INSTRUCTIONS.md](../INSTRUCTIONS.md) | Complete tag reference          |
+| Document                           | Content                         |
+| ---------------------------------- | ------------------------------- |
+| [METHODOLOGY.md](./METHODOLOGY.md) | FSM concepts, state definitions |
+| [README.md](../README.md)          | Package overview, quick start   |
+| [TAXONOMY.md](./TAXONOMY.md)       | Tag taxonomy concepts and API   |

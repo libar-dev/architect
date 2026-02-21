@@ -828,7 +828,7 @@ Rule: Quick Start Paths
 | Task | Start Here | Then Read |
 | --- | --- | --- |
 | Set up pre-commit hooks | PROCESS-GUARD.md | CONFIGURATION.md |
-| Add annotations to TypeScript | INSTRUCTIONS.md | GHERKIN-PATTERNS.md |
+| Add annotations to TypeScript | TAXONOMY.md | GHERKIN-PATTERNS.md |
 | Run AI-assisted implementation | SESSION-GUIDES.md | PROCESS-GUARD.md |
 ```
 

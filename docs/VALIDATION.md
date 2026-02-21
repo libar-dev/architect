@@ -42,6 +42,18 @@ npx lint-patterns -i "src/**/*.ts"
 npx lint-patterns -i "src/**/*.ts" --strict
 ```
 
+### CLI Flags
+
+| Flag                     | Short | Description                         | Default  |
+| ------------------------ | ----- | ----------------------------------- | -------- |
+| `--input <pattern>`      | `-i`  | Glob pattern (required, repeatable) | required |
+| `--exclude <pattern>`    | `-e`  | Exclude pattern (repeatable)        | -        |
+| `--base-dir <dir>`       | `-b`  | Base directory                      | cwd      |
+| `--strict`               |       | Treat warnings as errors            | false    |
+| `--format <type>`        | `-f`  | Output: `pretty` or `json`          | `pretty` |
+| `--quiet`                | `-q`  | Only show errors                    | false    |
+| `--min-severity <level>` |       | `error`, `warning`, `info`          | -        |
+
 ### Rules
 
 | Rule                       | Severity | What It Checks                      |
@@ -52,8 +64,6 @@ npx lint-patterns -i "src/**/*.ts" --strict
 | `missing-status`           | warning  | Should have status tag              |
 | `missing-when-to-use`      | warning  | Should have "When to Use" section   |
 | `missing-relationships`    | info     | Consider adding uses/used-by        |
-
-**Full CLI reference:** See [INSTRUCTIONS.md](../INSTRUCTIONS.md#lint-patterns)
 
 ---
 
@@ -78,8 +88,6 @@ npx lint-process --all --strict
 
 **Detailed rules and escape hatches:** See [PROCESS-GUARD.md](./PROCESS-GUARD.md)
 
-**Full CLI reference:** See [INSTRUCTIONS.md](../INSTRUCTIONS.md#lint-process)
-
 ---
 
 ## validate-patterns
@@ -94,6 +102,23 @@ npx validate-patterns \
   --dod \
   --anti-patterns
 ```
+
+### CLI Flags
+
+| Flag                        | Short | Description                                      | Default  |
+| --------------------------- | ----- | ------------------------------------------------ | -------- |
+| `--input`                   | `-i`  | Glob for TypeScript files (required, repeatable) | required |
+| `--features`                | `-F`  | Glob for Gherkin files (required, repeatable)    | required |
+| `--exclude`                 | `-e`  | Exclude pattern (repeatable)                     | -        |
+| `--base-dir`                | `-b`  | Base directory                                   | cwd      |
+| `--strict`                  |       | Treat warnings as errors                         | false    |
+| `--format`                  | `-f`  | Output: `pretty` or `json`                       | `pretty` |
+| `--dod`                     |       | Enable Definition of Done validation             | false    |
+| `--phase`                   |       | Validate specific phase (repeatable)             | -        |
+| `--anti-patterns`           |       | Enable anti-pattern detection                    | false    |
+| `--scenario-threshold`      |       | Max scenarios per feature                        | 20       |
+| `--mega-feature-threshold`  |       | Max lines per feature                            | 500      |
+| `--magic-comment-threshold` |       | Max magic comments                               | 5        |
 
 ### Checks Available
 
@@ -126,8 +151,6 @@ For patterns with `completed` status, checks:
 
 - All deliverables marked complete (checkmark, "Done", "Complete")
 - At least one `@acceptance-criteria` scenario exists
-
-**Full CLI reference:** See [INSTRUCTIONS.md](../INSTRUCTIONS.md#validate-patterns)
 
 ---
 
@@ -202,5 +225,5 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed API documentation.
 | Document                               | Content                         |
 | -------------------------------------- | ------------------------------- |
 | [PROCESS-GUARD.md](./PROCESS-GUARD.md) | FSM rules, error fixes, escapes |
-| [INSTRUCTIONS.md](../INSTRUCTIONS.md)  | Full CLI reference              |
+| [TAXONOMY.md](./TAXONOMY.md)           | Tag taxonomy concepts and API   |
 | [ARCHITECTURE.md](./ARCHITECTURE.md)   | Programmatic API details        |

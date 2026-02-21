@@ -86,10 +86,25 @@ This creates a markdown file documenting all tags with their formats, valid valu
 
 ---
 
+## Generated Tag Reference
+
+For a complete, always-current tag reference generated from the TypeScript taxonomy source:
+
+```bash
+# Flat single-file reference
+npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f
+
+# Progressive disclosure with detail files (via docs generator)
+npx generate-docs -g taxonomy -i "src/**/*.ts" -o docs -f
+```
+
+The generated output reflects every tag the system supports — including all 21 categories available with the `ddd-es-cqrs` preset.
+
+---
+
 ## Related Documentation
 
 | Topic                 | Document                                                    |
 | --------------------- | ----------------------------------------------------------- |
-| **Complete tag list** | [INSTRUCTIONS.md](../INSTRUCTIONS.md)                       |
 | **Presets & config**  | [CONFIGURATION.md](./CONFIGURATION.md)                      |
 | **Custom categories** | [CONFIGURATION.md](./CONFIGURATION.md#custom-configuration) |

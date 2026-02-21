@@ -196,7 +196,6 @@
     "docs-generated",
     "docs-live",
     "README.md",
-    "INSTRUCTIONS.md",
     "LICENSE"
   ],
   "private": false,

@@ -343,9 +343,10 @@ Valid transitions: See [METHODOLOGY.md#fsm-enforced-workflow](./METHODOLOGY.md#f
 
 ## Related Documentation
 
-| Document                                     | Content                                        |
-| -------------------------------------------- | ---------------------------------------------- |
-| [METHODOLOGY.md](./METHODOLOGY.md)           | Core thesis, FSM states, two-tier architecture |
-| [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | DataTables, DocStrings, Rule blocks            |
-| [CONFIGURATION.md](./CONFIGURATION.md)       | Tag prefixes, presets                          |
-| [../INSTRUCTIONS.md](../INSTRUCTIONS.md)     | CLI commands, full tag reference               |
+| Document                                     | Content                                           |
+| -------------------------------------------- | ------------------------------------------------- |
+| [METHODOLOGY.md](./METHODOLOGY.md)           | Core thesis, FSM states, two-tier architecture    |
+| [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | DataTables, DocStrings, Rule blocks               |
+| [CONFIGURATION.md](./CONFIGURATION.md)       | Tag prefixes, presets                             |
+| [TAXONOMY.md](./TAXONOMY.md)                 | Tag taxonomy concepts and API                     |
+| [VALIDATION.md](./VALIDATION.md)             | CLI flags for lint-patterns and validate-patterns |

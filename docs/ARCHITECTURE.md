@@ -1491,7 +1491,7 @@ filterQuarters: []; // All (default)
 
 - [README.md](../README.md) - Package quick start and API overview
 - [CONFIGURATION.md](./CONFIGURATION.md) - Configuration guide, presets, customization
-- [INSTRUCTIONS.md](../INSTRUCTIONS.md) - Tag reference and CLI details
+- [TAXONOMY.md](./TAXONOMY.md) - Tag taxonomy concepts and API
 - [src/taxonomy/](../src/taxonomy/) - TypeScript taxonomy source (categories, status values, priorities)
 
 ---
