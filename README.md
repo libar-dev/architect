@@ -1,29 +1,26 @@
 # @libar-dev/delivery-process
 
-**A source-first delivery process where everything is code.**
+**Context engineering for AI-assisted codebases.**
 
-Turn TypeScript annotations and Gherkin feature files into **living documentation**, **architecture diagrams**, **dependency graphs**, and **enforced delivery workflows**.
+Turn TypeScript annotations and Gherkin specs into a **structured, queryable delivery state** — living documentation, architecture graphs, and FSM-enforced workflows that AI agents consume without hallucinating.
 
 [![npm version](https://img.shields.io/npm/v/@libar-dev/delivery-process.svg)](https://www.npmjs.com/package/@libar-dev/delivery-process)
 [![Build Status](https://github.com/libar-dev/delivery-process/workflows/CI/badge.svg)](https://github.com/libar-dev/delivery-process/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/node/v/@libar-dev/delivery-process.svg)](https://nodejs.org/)
+[![npm provenance](https://img.shields.io/badge/provenance-verified-brightgreen)](https://docs.npmjs.com/generating-provenance-statements)
 
 > **v1.0.0-pre.0** — Pre-release for validation. We welcome feedback and contributions.
 
 ---
 
-## The Problem
+## Why This Exists
 
-Documentation drifts from reality. Roadmaps get stale. Requirements live in Jira, code in GitHub, and status tracking in spreadsheets. When AI coding assistants need context, they parse Markdown files that may already be outdated.
+AI coding agents (Claude Code, Cursor, Copilot Workspace) need architectural context to generate correct code. Today they scrape README files, parse stale Markdown, and guess at relationships — leading to hallucinated imports, violated patterns, and wasted context windows.
 
-Teams spend time **updating docs** instead of **updating code that generates docs**.
+This package makes **code the single source of truth** for both humans and machines:
 
-## The Solution
-
-Make **code the single source of truth**:
-
-| Aspect             | Traditional Docs             | Source-First (This Package)         |
+| Aspect             | Traditional Docs             | Context Engineering (This Package)  |
 | ------------------ | ---------------------------- | ----------------------------------- |
 | **Source**         | Separate Markdown/Confluence | Annotations in code + Gherkin specs |
 | **Freshness**      | Manual updates → drift       | Generated → always current          |
@@ -48,187 +45,7 @@ pnpm process:query -- query isValidTransition roadmap active
 pnpm process:query -- dep-tree DualSourceExtractor
 ```
 
-**Claude Code, Cursor, GitHub Copilot Workspace** — any AI that can run shell commands gets typed JSON access to your delivery state. No Markdown parsing. No context drift.
-
----
-
-## Proven: Structured Specs Beat Human Prompts
-
-This methodology was validated across **422 executable specifications** and a **8.8M line monorepo**. The results challenged assumptions about AI context management.
-
-### The Discovery
-
-| Metric                             | Traditional Prompts | Structured Specs                     |
-| ---------------------------------- | ------------------- | ------------------------------------ |
-| Context usage during heavy editing | ~100% (fills up)    | **50-65%** (stays low)               |
-| After context compaction           | Breaks continuity   | **No impact** — results stay perfect |
-| Work completed per session         | 1X baseline         | **5X increase**                      |
-| Planning/decision overhead         | High                | **Near zero**                        |
-
-### Why Structured Specs Work Better
-
-Traditional AI prompts are verbose and imprecise:
-
-```
-"We need to implement a validation system that checks if status transitions
-are valid according to the FSM rules defined in our methodology document.
-It should handle the four states (roadmap, active, completed, deferred) and
-validate that transitions follow the allowed paths..."
-```
-
-Structured specs are concise and typed:
-
-```gherkin
-Rule: Status transitions must follow FSM
-
-  Scenario Outline: Valid transitions pass
-    Given a file with status "<from>"
-    When status changes to "<to>"
-    Then validation passes
-
-    Examples:
-      | from    | to        |
-      | roadmap | active    |
-      | active  | completed |
-```
-
-**The AI understands structure better than prose.** Gherkin files compress into context more efficiently than explanatory paragraphs.
-
-### Real Results: 3-Session MVP
-
-The Process Guard validation system was implemented in 3 sessions using only structured specs as context:
-
-| Session | Context Used      | Observation                                        |
-| ------- | ----------------- | -------------------------------------------------- |
-| 1       | 100% → compressed | Speed **increased** after compression              |
-| 2       | **65%**           | First time context stayed low during heavy editing |
-| 3       | **55%**           | Context actually **decreased** during work         |
-
-### Implementation Sessions Become Mechanical
-
-With structured specs:
-
-- **No complicated planning** in implementation sessions
-- **No decision-making overhead** — decisions live in specs
-- **No prose explanations** — structured patterns are self-documenting
-- **Context compaction doesn't break anything** — specs survive compression
-
-> "Providing the specs and the implementation workflow doc is all that is needed."
-
-This transforms implementation sessions from creative problem-solving to **mechanical spec-to-test transformation** — dramatically more reliable and 5X more productive.
-
-### Before: Fighting AI-Generated Code with ESLint
-
-Before structured specs, AI assistants generated patterns that violated architectural constraints. The "solution" was **106 custom ESLint rules**:
-
-```
-eslint-rules/
-├── prevent-unsafe-patterns.ts      # 800+ lines catching AI mistakes
-├── enforce-parallel-queries.ts     # AI forgot async patterns
-├── no-action-wrapper-queries.ts    # AI mixed action/query contexts
-├── require-query-bounds.ts         # AI forgot pagination
-├── workflow-determinism/           # 13 rules for workflow safety
-│   ├── no-date-now.ts
-│   ├── no-math-random.ts
-│   ├── no-process-env.ts
-│   └── ... (10 more)
-└── ... (90+ more rules)
-```
-
-Each rule required tests, maintenance, exception lists, and `@architectural-directive` comments scattered through code. **Constant whack-a-mole.**
-
-### After: AI Understands Structured Patterns
-
-With structured specs, the AI generates correct patterns _from the start_:
-
-```gherkin
-Rule: Workflow functions must be deterministic
-
-  Scenario Outline: Non-deterministic calls are forbidden
-    Given a workflow function
-    When it calls "<forbidden>"
-    Then compilation fails
-
-    Examples:
-      | forbidden       |
-      | Date.now()      |
-      | Math.random()   |
-      | process.env     |
-```
-
-**Result:** 106 ESLint rules → 0. The AI reads the spec and generates deterministic code. No enforcement needed.
-
-### Scale Validation
-
-The methodology was proven on a complex monorepo:
-
-```
-Monorepo totals:
-├── 8.8M lines of code
-├── 43,949 files
-├── 378 Gherkin feature files
-├── 12,770 TypeScript files
-└── Built in 3-4 weeks with this approach
-
-delivery-process package:
-├── 1.6M lines
-├── 120 feature files
-└── 422 executable specifications
-```
-
----
-
-## How It Works
-
-This package documents itself using its own annotation system. Here's a real example from the codebase:
-
-**TypeScript annotations** define pattern metadata and relationships:
-
-```typescript
-/**
- * @libar-docs
- * @libar-docs-pattern TransformDataset
- * @libar-docs-status completed
- * @libar-docs-uses MasterDataset, ExtractedPattern, TagRegistry
- * @libar-docs-used-by Orchestrator
- *
- * ## TransformDataset - Single-Pass Pattern Transformation
- *
- * Transforms raw extracted patterns into a MasterDataset with all
- * pre-computed views in a single O(n) pass.
- */
-export function transformToMasterDataset(input: TransformInput): MasterDataset {
-  // ...
-}
-```
-
-**Gherkin feature files** own planning metadata:
-
-```gherkin
-@libar-docs
-@libar-docs-pattern:TransformDataset
-@libar-docs-status:completed
-@libar-docs-phase:12
-Feature: Transform Dataset
-
-  Background: Deliverables
-    | Deliverable              | Status    |
-    | Single-pass transformer  | completed |
-    | Pre-computed views       | completed |
-
-  Scenario: Transform patterns to MasterDataset
-    Given extracted patterns from TypeScript and Gherkin
-    When I call transformToMasterDataset
-    Then I get a MasterDataset with status, phase, and category groups
-```
-
-**Run the generator:**
-
-```bash
-npx generate-docs -g patterns -i "src/**/*.ts" --features "specs/**/*.feature" -o docs -f
-```
-
-**Get living documentation** — pattern registries, dependency graphs, roadmaps — all generated from your annotated source.
+**Claude Code, Cursor, GitHub Copilot Workspace** — any AI that can run shell commands gets typed JSON access to your delivery state. No Markdown parsing. No context drift. No hallucinated relationships.
 
 ---
 
@@ -288,6 +105,81 @@ npx lint-process --staged
 ```
 
 This validates FSM transitions and blocks invalid status changes.
+
+---
+
+## How It Works
+
+This package documents itself using its own annotation system. Here's a real example from the codebase:
+
+**TypeScript annotations** define pattern metadata and relationships:
+
+```typescript
+/**
+ * @libar-docs
+ * @libar-docs-pattern TransformDataset
+ * @libar-docs-status completed
+ * @libar-docs-uses MasterDataset, ExtractedPattern, TagRegistry
+ * @libar-docs-used-by Orchestrator
+ *
+ * ## TransformDataset - Single-Pass Pattern Transformation
+ *
+ * Transforms raw extracted patterns into a MasterDataset with all
+ * pre-computed views in a single O(n) pass.
+ */
+export function transformToMasterDataset(input: TransformInput): MasterDataset {
+  // ...
+}
+```
+
+**Gherkin feature files** own planning metadata:
+
+```gherkin
+@libar-docs
+@libar-docs-pattern:TransformDataset
+@libar-docs-status:completed
+@libar-docs-phase:12
+Feature: Transform Dataset
+
+  Background: Deliverables
+    | Deliverable              | Status    |
+    | Single-pass transformer  | completed |
+    | Pre-computed views       | completed |
+
+  Scenario: Transform patterns to MasterDataset
+    Given extracted patterns from TypeScript and Gherkin
+    When I call transformToMasterDataset
+    Then I get a MasterDataset with status, phase, and category groups
+```
+
+**Run the generator:**
+
+```bash
+npx generate-docs -g patterns -i "src/**/*.ts" --features "specs/**/*.feature" -o docs -f
+```
+
+**Get living documentation** — pattern registries, dependency graphs, roadmaps — all generated from your annotated source.
+
+**Pipeline:** `Config → Scanner → Extractor → Transformer → Codec` — files become patterns, patterns become a MasterDataset, the MasterDataset renders to Markdown and JSON.
+
+---
+
+## What Gets Generated
+
+The codec pipeline produces rich, multi-format documents from a single config declaration. Every content block below is **derived from annotations** — not hand-authored:
+
+| Content Block                     | Source                                         | Example                                                   |
+| --------------------------------- | ---------------------------------------------- | --------------------------------------------------------- |
+| **Convention tables**             | Gherkin `Rule:` Invariant/Rationale            | FSM protection levels, tag format types, source ownership |
+| **Live Mermaid diagrams**         | `@docs-uses`, `@docs-depends-on` relationships | C4Context, sequence, class, state, flowchart (6 types)    |
+| **API Types**                     | `@docs-shape` on TypeScript declarations       | Functions, interfaces, constants, type aliases with JSDoc |
+| **Behavior specifications**       | Feature descriptions + `Rule:` blocks          | Collapsible rules with verified-by scenario lists         |
+| **Architecture decision records** | Decision feature files                         | Context/Decision/Consequences with structured tables      |
+| **Roadmap & status tracking**     | `@docs-status`, `@docs-phase` tags             | Phase progress, deliverable tables, completion metrics    |
+
+**Config-driven generation:** A single `ReferenceDocConfig` object produces a complete reference document — convention tables, scoped diagrams, extracted types, and behavior specs composed automatically. 13 configs produce 27 generators (detailed + AI-compact pairs).
+
+**See it live:** [docs-live/product-areas/](docs-live/product-areas/) contains 7 generated product area documents with live Mermaid diagrams and extracted API types — all from annotations in this codebase.
 
 ---
 
@@ -361,60 +253,52 @@ For tag concepts and taxonomy architecture, see [docs/TAXONOMY.md](docs/TAXONOMY
 
 ---
 
-## Design-First Development
+## Proven at Scale
 
-The package enforces a clear separation between **design artifacts** and **production code**.
+This methodology was validated across **422 executable specifications** and an **8.8M line monorepo** (43,949 files). The results challenged assumptions about AI context management.
 
-### The Problem with Design Stubs in src/
+### The Discovery
 
-Many projects mix design artifacts with production code:
+| Metric                             | Traditional Prompts | Structured Specs                     |
+| ---------------------------------- | ------------------- | ------------------------------------ |
+| Context usage during heavy editing | ~100% (fills up)    | **50-65%** (stays low)               |
+| After context compaction           | Breaks continuity   | **No impact** — results stay perfect |
+| Work completed per session         | 1X baseline         | **5X increase**                      |
+| Planning/decision overhead         | High                | **Near zero**                        |
 
-```javascript
-// eslint.config.js — Don't do this
-{
-  files: ["**/src/durability/intentCompletion.ts"],
-  rules: { "@typescript-eslint/no-unused-vars": "off" }  // ESLint exceptions for "not-yet-real" code
-}
+### Why It Works
+
+Traditional AI prompts are verbose and imprecise. Structured specs are concise and typed:
+
+```gherkin
+Rule: Status transitions must follow FSM
+
+  Scenario Outline: Valid transitions pass
+    Given a file with status "<from>"
+    When status changes to "<to>"
+    Then validation passes
+
+    Examples:
+      | from    | to        |
+      | roadmap | active    |
+      | active  | completed |
 ```
 
-This causes confusion, accidental imports of unimplemented code, and maintenance burden.
+**The AI understands structure better than prose.** Gherkin files compress into context more efficiently than explanatory paragraphs.
 
-### The Solution: Design Artifacts Outside src/
+### Real Results: 3-Session MVP
 
-| Location                                     | Content                                       | ESLint     | When Moved             |
-| -------------------------------------------- | --------------------------------------------- | ---------- | ---------------------- |
-| `delivery-process/stubs/{pattern-name}/*.ts` | API shapes, interfaces, throw-not-implemented | Excluded   | Implementation session |
-| `src/**/*.ts`                                | **Production code only**                      | Full rules | Already there          |
+The Process Guard validation system was implemented in 3 sessions using only structured specs as context:
 
-**Design stub pattern:**
+| Session | Context Used      | Observation                                        |
+| ------- | ----------------- | -------------------------------------------------- |
+| 1       | 100% → compressed | Speed **increased** after compression              |
+| 2       | **65%**           | First time context stayed low during heavy editing |
+| 3       | **55%**           | Context actually **decreased** during work         |
 
-```typescript
-// delivery-process/stubs/my-feature/my-feature.ts
-/**
- * @libar-docs
- * @libar-docs-status roadmap
- * @libar-docs-implements MyFeature
- *
- * ## My Feature - Design Stub
- *
- * API design for the upcoming feature.
- * Target: src/path/to/final/location.ts
- */
-export interface MyConfig {
-  timeout: number;
-}
+### Before/After: ESLint Rules
 
-export function myFeature(config: MyConfig): Result {
-  throw new Error('MyFeature not yet implemented - roadmap pattern');
-}
-```
-
-**Benefits:**
-
-- No ESLint exceptions needed — stubs are excluded from linting
-- Clear separation: `delivery-process/stubs/` = design, `src/` = production
-- Safe iteration on API shapes without breaking anything
-- Moving to `src/` signals implementation started
+Before structured specs, AI assistants generated patterns that violated architectural constraints. The workaround was **106 custom ESLint rules** — each requiring tests, maintenance, and exception lists. With structured specs, the AI reads the spec and generates correct patterns from the start. **106 ESLint rules → 0.**
 
 ---
 
@@ -507,68 +391,37 @@ graph TD
 
 ## How It Compares
 
-| Tool                 | Living Docs | FSM Enforcement | AI API | Code-First | Context Efficient |
-| -------------------- | ----------- | --------------- | ------ | ---------- | ----------------- |
-| **This package**     | ✓           | ✓               | ✓      | ✓          | ✓ (50-65%)        |
-| Backstage            | ✓           | ✗               | ✗      | ✗ (YAML)   | ✗                 |
-| Notion/Confluence    | ✗           | ✗               | ✗      | ✗          | ✗                 |
-| Docusaurus/VitePress | ✗           | ✗               | ✗      | Partial    | ✗                 |
-| Gherkin Living Doc   | ✓           | ✗               | ✗      | ✓          | Partial           |
-| Human prompts to AI  | ✗           | ✗               | ✗      | ✗          | ✗ (100%)          |
+| Tool                       | Living Docs | FSM Enforcement | AI API | Code-First | AI Context Optimized |
+| -------------------------- | ----------- | --------------- | ------ | ---------- | -------------------- |
+| **This package**           | Yes         | Yes             | Yes    | Yes        | Yes (50-65%)         |
+| Backstage                  | Yes         | No              | No     | No (YAML)  | No                   |
+| Mintlify / GitBook         | Partial     | No              | No     | No         | No                   |
+| Notion / Confluence        | No          | No              | No     | No         | No                   |
+| Docusaurus / VitePress     | No          | No              | No     | Partial    | No                   |
+| Gherkin Living Doc         | Yes         | No              | No     | Yes        | Partial              |
+| CLAUDE.md / manual prompts | No          | No              | No     | No         | No (100%)            |
 
 **Key differentiators:**
 
-- **FSM enforcement** — Not just docs; validated state machine transitions
-- **Dual-source** — TypeScript relationships + Gherkin planning = complete picture
+- **FSM enforcement** — Not just docs; validated state machine transitions at commit time
+- **Dual-source** — TypeScript owns runtime relationships, Gherkin owns planning constraints = complete picture
 - **AI-native** — CLI provides typed JSON queries, not string parsing
 - **Context efficient** — Structured specs use 50-65% context vs 100% for prose prompts
 - **Compaction resilient** — Specs survive context compression; prose doesn't
 
-**Note on AI models:** This methodology was validated primarily with Claude Opus 4.5. The structured spec approach appears to leverage advanced pattern-recognition capabilities particularly well.
+**Note on AI models:** This methodology was validated primarily with Claude (Anthropic). The structured spec approach benefits any LLM-based coding assistant, leveraging pattern-recognition capabilities particularly well.
+
+---
+
+## Design-First Development
+
+The package enforces a clear separation between **design artifacts** (stubs in `delivery-process/stubs/`) and **production code** (in `src/`). Design stubs use `throw new Error('not yet implemented')` and are excluded from ESLint, avoiding the need for lint exceptions on unfinished code. See [docs/METHODOLOGY.md](docs/METHODOLOGY.md) for the full stub workflow.
 
 ---
 
 ## Document Durability Model
 
-Not all specs are equal. The package recognizes different durability levels:
-
-| Document Type               | Durability | After Implementation           | Content Ownership           |
-| --------------------------- | ---------- | ------------------------------ | --------------------------- |
-| **Decision docs (ADR/PDR)** | Permanent  | Remains valid until superseded | Intro, context, rationale   |
-| **Behavior specs**          | Permanent  | Must pass tests                | Rules, examples, edge cases |
-| **Tier 1 roadmap specs**    | Temporary  | Becomes clutter                | Deliverables (until done)   |
-| **Generated docs**          | Derived    | Regenerated from sources       | —                           |
-
-### Why This Matters
-
-**Decisions own "why"** — they're durable by design:
-
-```gherkin
-Rule: Context - Why we need FSM validation
-  # This content remains valid for years
-
-Rule: Decision - How FSM validation works
-  # Implementation details that rarely change
-```
-
-**Behavior specs own "what"** — they're tested:
-
-```gherkin
-Scenario: Invalid transition fails
-  Given status "roadmap"
-  When changing to "completed"
-  Then validation fails  # If this breaks, tests fail
-```
-
-**Tier 1 specs own "when"** — they're temporary:
-
-```gherkin
-Background: Deliverables
-  | Deliverable | Status |
-  | FSM types   | Done   |  # Tracking until completion
-```
-
-This hierarchy enables **documentation generation from durable sources** — decisions and behavior specs stay current; tier 1 specs can be archived.
+Not all specs are equal. Decision docs and behavior specs are **permanent** (tested, durable). Tier 1 roadmap specs are **temporary** (tracking until completion). Generated docs are **derived** (regenerated from source). This hierarchy enables documentation generation from durable sources — details in [docs/METHODOLOGY.md](docs/METHODOLOGY.md).
 
 ---
 

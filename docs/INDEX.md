@@ -4,14 +4,14 @@
 
 ## Package Metadata
 
-| Field            | Value                                                              |
-| ---------------- | ------------------------------------------------------------------ |
-| **Package**      | @libar-dev/delivery-process                                        |
-| **Version**      | 1.0.0-pre.0                                                        |
-| **Purpose**      | Source-first delivery process — code is the single source of truth |
-| **Key Features** | Living docs, FSM enforcement, AI-native Data API CLI               |
-| **Node.js**      | >= 18.0.0                                                          |
-| **License**      | MIT                                                                |
+| Field            | Value                                                |
+| ---------------- | ---------------------------------------------------- |
+| **Package**      | @libar-dev/delivery-process                          |
+| **Version**      | 1.0.0-pre.0                                          |
+| **Purpose**      | Context engineering for AI-assisted codebases        |
+| **Key Features** | Living docs, FSM enforcement, AI-native Data API CLI |
+| **Node.js**      | >= 18.0.0                                            |
+| **License**      | MIT                                                  |
 
 ---
 
@@ -19,7 +19,7 @@
 
 | If you want to...              | Read this                                    | Lines  |
 | ------------------------------ | -------------------------------------------- | ------ |
-| Get started quickly            | [README.md](../README.md)                    | 1-651  |
+| Get started quickly            | [README.md](../README.md)                    | 1-504  |
 | Configure presets and tags     | [CONFIGURATION.md](./CONFIGURATION.md)       | 1-357  |
 | Understand the "why"           | [METHODOLOGY.md](./METHODOLOGY.md)           | 1-238  |
 | Learn the architecture         | [ARCHITECTURE.md](./ARCHITECTURE.md)         | 1-1638 |
@@ -61,26 +61,27 @@
 
 ## Detailed Table of Contents
 
-### README.md (Lines 1-651)
+### README.md (Lines 1-504)
 
-| Section                    | Lines   | Key Topics                                        |
-| -------------------------- | ------- | ------------------------------------------------- |
-| The Problem / The Solution | 16-33   | Documentation drift, code as source of truth      |
-| Built for AI-Assisted Dev  | 36-53   | Data API CLI typed queries                        |
-| Proven: Structured Specs   | 55-178  | Discovery, real results, scale validation         |
-| How It Works               | 181-232 | Annotation examples, dual-source                  |
-| Quick Start                | 235-292 | Install, annotate, generate, lint                 |
-| CLI Commands               | 294-362 | generate-docs, process-api, generate-tag-taxonomy |
-| Design-First Development   | 364-417 | Stub pattern, src/ isolation, design artifacts    |
-| FSM-Enforced Workflow      | 421-451 | State diagram, protection levels                  |
-| Data API CLI               | 455-479 | CLI example, context cost comparison              |
-| Rich Relationship Model    | 483-504 | Dependency tags, Mermaid graph                    |
-| How It Compares            | 508-527 | Comparison with Backstage, Confluence, etc.       |
-| Document Durability Model  | 531-571 | Durability via generation, regeneration from code |
-| Use Cases                  | 575-584 | Multi-phase roadmaps, AI sessions, validation     |
-| Configuration              | 588-620 | Presets table, custom config                      |
-| Documentation              | 624-646 | Doc links table                                   |
-| License                    | 649-651 | MIT license                                       |
+| Section                   | Lines   | Key Topics                                        |
+| ------------------------- | ------- | ------------------------------------------------- |
+| Why This Exists           | 17-31   | AI context failure, code as source of truth       |
+| Built for AI-Assisted Dev | 33-50   | Data API CLI typed queries                        |
+| Quick Start               | 52-109  | Install, annotate, generate, lint                 |
+| How It Works              | 111-165 | Annotation examples, pipeline one-liner           |
+| What Gets Generated       | 167-184 | Content block types, config-driven generation     |
+| CLI Commands              | 186-254 | generate-docs, process-api, generate-tag-taxonomy |
+| Proven at Scale           | 256-303 | Discovery, real results, 3-session MVP            |
+| FSM-Enforced Workflow     | 305-337 | State diagram, protection levels                  |
+| Data API CLI              | 339-365 | CLI example, context cost comparison              |
+| Rich Relationship Model   | 367-390 | Dependency tags, Mermaid graph                    |
+| How It Compares           | 392-414 | Comparison with Backstage, Mintlify, etc.         |
+| Design-First Development  | 416-420 | Stub pattern summary + link                       |
+| Document Durability Model | 422-426 | Durability hierarchy summary + link               |
+| Use Cases                 | 428-439 | Multi-phase roadmaps, AI sessions, validation     |
+| Configuration             | 441-475 | Presets table, custom config                      |
+| Documentation             | 477-500 | Doc links table                                   |
+| License                   | 502-504 | MIT license                                       |
 
 ---
 

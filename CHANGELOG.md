@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
 ## [1.0.0-pre.0] - 2026-02-21
 
 First npm-published pre-release for monorepo validation.
@@ -24,3 +26,6 @@ First npm-published pre-release for monorepo validation.
 - `dist/` removed from git tracking -- built fresh during publish
 - `@libar-dev/modular-claude-md` moved from dependencies to devDependencies
 - Package size trimmed (removed self-referential docs from tarball)
+
+[Unreleased]: https://github.com/libar-dev/delivery-process/compare/v1.0.0-pre.0...HEAD
+[1.0.0-pre.0]: https://github.com/libar-dev/delivery-process/releases/tag/v1.0.0-pre.0
