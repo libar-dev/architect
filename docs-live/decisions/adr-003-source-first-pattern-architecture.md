@@ -41,6 +41,8 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 **Invariant:** A pattern is defined by `@libar-docs-pattern` in a TypeScript file — either a stub (pre-implementation) or source code (post-implementation).
 
+**Rationale:** If pattern identity lives in tier 1 specs, it becomes stale after implementation and diverges from the code that actually realizes the pattern.
+
 | Phase          | Location                               | Status    |
 | -------------- | -------------------------------------- | --------- |
 | Design         | `delivery-process/stubs/pattern-name/` | roadmap   |
@@ -57,6 +59,8 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 **Invariant:** Tier 1 roadmap specs serve planning and delivery tracking. They are not the source of truth for pattern identity, invariants, or acceptance criteria. After completion, they may be archived.
 
+**Rationale:** Treating tier 1 specs as durable creates a maintenance burden — at scale only 39% maintain traceability, and duplicated Rules/Scenarios average 200-400 stale lines.
+
 | Phase     | Planning Value                | Documentation Value                |
 | --------- | ----------------------------- | ---------------------------------- |
 | roadmap   | High                          | None (not yet built)               |
@@ -69,6 +73,8 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 **Invariant:** The delivery process produces three artifact types with long-term value. All other artifacts are projections or ephemeral.
 
+**Rationale:** Without a clear boundary between durable and ephemeral artifacts, teams maintain redundant documents that inevitably drift from the source of truth.
+
 | Artifact                 | Purpose                              | Owns                                  |
 | ------------------------ | ------------------------------------ | ------------------------------------- |
 | Annotated TypeScript     | Pattern identity, architecture graph | Name, status, uses, categories        |
@@ -79,6 +85,8 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 **Invariant:** `@libar-docs-implements` declares a realization relationship. Multiple files can implement the same pattern. One file can implement multiple patterns (CSV format).
 
+**Rationale:** Without many-to-one realization, cross-cutting patterns that span multiple files cannot be traced back to a single canonical definition.
+
 | Relationship | Tag                      | Cardinality             |
 | ------------ | ------------------------ | ----------------------- |
 | Definition   | `@libar-docs-pattern`    | Exactly one per pattern |
@@ -87,6 +95,8 @@ artifacts are annotated source code, executable specs, and decision specs.
 ### Single-definition constraint
 
 **Invariant:** `@libar-docs-pattern:X` may appear in exactly one file across the entire codebase. The `mergePatterns()` conflict check in `orchestrator.ts` correctly enforces this.
+
+**Rationale:** Duplicate pattern definitions cause merge conflicts in the MasterDataset and produce ambiguous ownership in generated documentation.
 
 | Current State                   | Resolution                                      |
 | ------------------------------- | ----------------------------------------------- |
@@ -100,6 +110,8 @@ artifacts are annotated source code, executable specs, and decision specs.
 ### Reverse links preferred over forward links
 
 **Invariant:** `@libar-docs-implements` (reverse: "I verify this pattern") is the primary traceability mechanism. `@libar-docs-executable-specs` (forward: "my tests live here") is retained but not required.
+
+**Rationale:** Forward links in tier 1 specs go stale when specs are archived, while reverse links in test files are self-maintaining because the test cannot run without the implementation.
 
 | Mechanism                     | Usage             | Reliability                      |
 | ----------------------------- | ----------------- | -------------------------------- |

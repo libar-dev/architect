@@ -47,6 +47,9 @@ Feature: Gherkin Rules and Custom Content Support
 
   Rule: Rules flow through the entire pipeline without data loss
 
+    **Invariant:** Rule data (name, description, tags, scenarios) must be preserved through every pipeline stage from parser to ExtractedPattern.
+    **Rationale:** Any data loss at an intermediate stage makes rule content invisible to all downstream generators, silently producing incomplete documentation.
+
     The @cucumber/gherkin parser extracts Rules natively. Our pipeline must
     preserve this data through scanner, extractor, and into ExtractedPattern
     so generators can access rule names, descriptions, and nested scenarios.
@@ -74,6 +77,9 @@ Feature: Gherkin Rules and Custom Content Support
 
   Rule: Generators can render rules as business documentation
 
+    **Invariant:** Rules must render as human-readable Business Rules sections, not as raw Given/When/Then syntax.
+    **Rationale:** Business stakeholders cannot interpret Gherkin step definitions; without rendering transformation, feature files remain developer-only artifacts.
+
     Business stakeholders see rule names and descriptions as "Business Rules"
     sections, not Given/When/Then syntax. This enables human-readable PRDs
     from the same files used for test execution.
@@ -88,6 +94,9 @@ Feature: Gherkin Rules and Custom Content Support
       And verification scenarios are listed
 
   Rule: Custom content blocks render in acceptance criteria
+
+    **Invariant:** DataTables and DocStrings attached to steps must appear in generated documentation as Markdown tables and fenced code blocks respectively.
+    **Rationale:** Without rendering custom content blocks, acceptance criteria lose the structured data and code examples that make them self-contained and verifiable.
 
     DataTables and DocStrings in steps should appear in generated documentation,
     providing structured data and code examples alongside step descriptions.
@@ -105,6 +114,9 @@ Feature: Gherkin Rules and Custom Content Support
       Then output contains fenced code block with content
 
   Rule: vitest-cucumber executes scenarios inside Rules
+
+    **Invariant:** Scenarios nested inside Rule blocks must be executable by vitest-cucumber using the Rule() and RuleScenario() API.
+    **Rationale:** If Rule-scoped scenarios cannot execute, adding Rule blocks to feature files would break the test suite, forcing a choice between documentation structure and test coverage.
 
     Test execution must work for scenarios inside Rule blocks.
     Use Rule() function with RuleScenario() instead of Scenario().

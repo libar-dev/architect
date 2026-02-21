@@ -89,6 +89,8 @@ Feature: Step Lint - vitest-cucumber Static Compatibility Checker
     scenario cause vitest-cucumber step matching failures. The fix is
     to consolidate into a single step with a DataTable.
 
+    **Rationale:** Duplicate step text silently overwrites step registrations, causing the second And to match the first handler and produce wrong or undefined behavior at runtime.
+
     **Verified by:** Duplicate And step text is flagged,
     Same And text in different scenarios is allowed
 
@@ -109,6 +111,8 @@ Feature: Step Lint - vitest-cucumber Static Compatibility Checker
     **Invariant:** The $ character in step text causes matching issues
     in vitest-cucumber's expression parser.
 
+    **Rationale:** The dollar sign is interpreted as a special character in expression parsing, causing steps to silently fail to match and producing confusing StepAbleUnknowStepError messages.
+
     **Verified by:** Dollar in step text produces warning
 
     @acceptance-criteria @happy-path
@@ -126,6 +130,8 @@ Feature: Step Lint - vitest-cucumber Static Compatibility Checker
     **Invariant:** vitest-cucumber only supports string patterns with
     {string} and {int}. Regex patterns throw StepAbleStepExpressionError.
 
+    **Rationale:** Regex patterns are a common Cucumber.js habit that compiles without error but throws at runtime in vitest-cucumber, wasting debugging time.
+
     **Verified by:** Regex pattern in Given is flagged
 
     @acceptance-criteria @happy-path
@@ -138,6 +144,8 @@ Feature: Step Lint - vitest-cucumber Static Compatibility Checker
 
     **Invariant:** vitest-cucumber does not support {phrase}. Use {string}
     with quoted values in the feature file.
+
+    **Rationale:** The {phrase} type is valid in standard Cucumber but unsupported in vitest-cucumber, causing silent parameter capture failures that are difficult to trace.
 
     **Verified by:** Phrase type in step string is flagged
 
@@ -156,6 +164,8 @@ Feature: Step Lint - vitest-cucumber Static Compatibility Checker
     **Invariant:** ScenarioOutline step callbacks must use the variables
     object, not function params. Using (_ctx, value: string) means
     value will be undefined at runtime.
+
+    **Rationale:** This is the most common vitest-cucumber trap. Function params compile and even type-check, but the values are always undefined at runtime because ScenarioOutline injects data through the variables object, not positional arguments.
 
     **Verified by:** Function params in ScenarioOutline are flagged,
     Function params in regular Scenario are not flagged
@@ -179,6 +189,8 @@ Feature: Step Lint - vitest-cucumber Static Compatibility Checker
     **Invariant:** If a feature file has And steps, the step definition
     must destructure And from the scenario callback.
 
+    **Rationale:** Without destructuring And, vitest-cucumber cannot bind And steps and throws StepAbleUnknowStepError at runtime with no indication that a missing destructure is the cause.
+
     **Verified by:** Missing And destructuring is flagged,
     Present And destructuring passes
 
@@ -200,6 +212,8 @@ Feature: Step Lint - vitest-cucumber Static Compatibility Checker
 
     **Invariant:** If a feature file has Rule: blocks, the step definition
     must destructure Rule from describeFeature.
+
+    **Rationale:** Without the Rule() wrapper, scenarios inside Rule: blocks are invisible to vitest-cucumber and silently never execute, giving a false green test suite.
 
     **Verified by:** Missing Rule wrapper is flagged,
     Present Rule wrapper passes
@@ -226,6 +240,8 @@ Feature: Step Lint - vitest-cucumber Static Compatibility Checker
 
     **Invariant:** Step files use two loadFeature patterns: simple string
     paths and resolve(__dirname, relative) paths. Both must be paired.
+
+    **Rationale:** Unpaired feature files cannot be cross-checked for compatibility issues, leaving ScenarioOutline param misuse and missing destructures undetected.
 
     **Verified by:** Simple loadFeature path is paired,
     Resolve-based loadFeature path is paired

@@ -156,6 +156,7 @@ Feature: Scanner Core Integration
   Rule: Pattern matching and exclusion filtering
 
     **Invariant:** Glob patterns control file discovery and exclusion patterns remove matched files before scanning.
+    **Rationale:** Without exclusion filtering, internal directories and generated files would pollute the pattern registry with false positives and slow down scanning.
 
     **Verified by:** Return empty results when no patterns match, Respect exclusion patterns, Handle multiple files with multiple directives each
 

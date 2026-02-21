@@ -16,6 +16,9 @@ Feature: Reference Codec - Core Behavior
 
   Rule: Empty datasets produce fallback content
 
+    **Invariant:** A codec must always produce a valid document, even when no matching content exists in the dataset.
+    **Rationale:** Consumers rely on a consistent document structure; a missing or null document would cause rendering failures downstream.
+
     @happy-path @edge-case
     Scenario: Codec with no matching content produces fallback message
       Given a reference config with convention tags "nonexistent" and behavior tags "nonexistent"
@@ -25,6 +28,9 @@ Feature: Reference Codec - Core Behavior
       And the document contains a no-content fallback paragraph
 
   Rule: Convention content is rendered as sections
+
+    **Invariant:** Convention-tagged patterns must render as distinct headed sections with their rule names, invariants, and tables preserved.
+    **Rationale:** Conventions define project-wide constraints; losing their structure in generated docs would make them unenforceable and undiscoverable.
 
     @happy-path
     Scenario: Convention rules appear as H2 headings with content
@@ -45,6 +51,9 @@ Feature: Reference Codec - Core Behavior
 
   Rule: Detail level controls output density
 
+    **Invariant:** Each detail level (summary, standard, detailed) must produce a deterministic subset of content, with summary being the most restrictive.
+    **Rationale:** AI session contexts have strict token budgets; uncontrolled output density wastes context window and degrades session quality.
+
     @happy-path
     Scenario: Summary level omits narrative and rationale
       Given a reference config with convention tags "fsm-rules" and behavior tags ""
@@ -62,6 +71,9 @@ Feature: Reference Codec - Core Behavior
 
   Rule: Behavior sections are rendered from category-matching patterns
 
+    **Invariant:** Only patterns whose category matches the configured behavior tags may appear in the Behavior Specifications section.
+    **Rationale:** Mixing unrelated categories into a single behavior section would produce misleading documentation that conflates distinct concerns.
+
     @happy-path
     Scenario: Behavior-tagged patterns appear in a Behavior Specifications section
       Given a reference config with convention tags "" and behavior tags "process-guard"
@@ -70,6 +82,9 @@ Feature: Reference Codec - Core Behavior
       Then the document has a heading "Behavior Specifications"
 
   Rule: Shape sources are extracted from matching patterns
+
+    **Invariant:** Only shapes from patterns whose file path matches the configured shapeSources glob may appear in the API Types section.
+    **Rationale:** Including shapes from unrelated source paths would pollute the API Types section with irrelevant type definitions, breaking the scoped documentation contract.
 
     @happy-path
     Scenario: Shapes appear when source file matches shapeSources glob
@@ -96,6 +111,9 @@ Feature: Reference Codec - Core Behavior
 
   Rule: Convention and behavior content compose in a single document
 
+    **Invariant:** Convention and behavior content must coexist in the same RenderableDocument when both are present in the dataset.
+    **Rationale:** Splitting conventions and behaviors into separate documents would force consumers to cross-reference multiple files, losing the unified view of a product area.
+
     @happy-path
     Scenario: Both convention and behavior sections appear when data exists
       Given a reference config with convention tags "fsm-rules" and behavior tags "process-guard"
@@ -106,6 +124,9 @@ Feature: Reference Codec - Core Behavior
 
   Rule: Composition order follows AD-5: conventions then shapes then behaviors
 
+    **Invariant:** Document sections must follow the canonical order: conventions, then API types (shapes), then behavior specifications.
+    **Rationale:** AD-5 establishes a consistent reading flow (rules, then types, then specs); violating this order would confuse readers who expect a stable document structure.
+
     @happy-path
     Scenario: Convention headings appear before shapes before behaviors
       Given a reference config with all three content sources
@@ -115,6 +136,9 @@ Feature: Reference Codec - Core Behavior
       And the heading "API Types" appears before "Behavior Specifications"
 
   Rule: Convention code examples render as mermaid blocks
+
+    **Invariant:** Mermaid diagram content in conventions must render as fenced mermaid blocks, and must be excluded at summary detail level.
+    **Rationale:** Mermaid diagrams are visual aids that require rendering support; emitting them as plain text would produce unreadable output, and including them in summaries wastes token budget.
 
     @happy-path
     Scenario: Convention with mermaid content produces mermaid block in output

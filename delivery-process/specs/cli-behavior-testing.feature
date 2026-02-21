@@ -47,6 +47,7 @@ Feature: CLI Behavior Testing
 
     **Invariant:** Invalid arguments produce clear error messages with usage hints.
     Valid arguments produce expected output files.
+    **Rationale:** CLI commands are the primary user-facing interface; unclear errors cause developers to bypass the tool and maintain docs manually, defeating the code-first approach.
 
     **API:** See `src/cli/generate-docs.ts`
 
@@ -89,6 +90,7 @@ Feature: CLI Behavior Testing
 
     **Invariant:** Lint violations are reported with file, line, and severity.
     Exit codes reflect violation presence based on strictness setting.
+    **Rationale:** Without structured violation output, CI pipelines cannot distinguish lint failures from crashes, and developers cannot locate the offending annotation to fix it.
 
     **API:** See `src/cli/lint-patterns.ts`
 
@@ -129,6 +131,7 @@ Feature: CLI Behavior Testing
 
     **Invariant:** DoD and anti-pattern violations are reported per phase.
     Exit codes reflect validation state.
+    **Rationale:** Phase-level reporting is required because cross-source validation spans multiple files; a single pass/fail gives no actionable information about which phase needs attention.
 
     **API:** See `src/cli/validate-patterns.ts`
 
@@ -162,6 +165,7 @@ Feature: CLI Behavior Testing
 
     **Invariant:** Errors include type, file, line (when applicable), and reason.
     Unknown errors are caught and formatted safely.
+    **Rationale:** Inconsistent error formats force consumers to write per-CLI parsing logic; a uniform DocError shape enables a single error handler across all CLI commands and CI integrations.
 
     **Verified by:** Error formatting, Unknown error handling
 

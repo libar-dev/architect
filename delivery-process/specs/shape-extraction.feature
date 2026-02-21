@@ -94,6 +94,7 @@ Feature: TypeScript Shape Extraction for Documentation
 
     **Invariant:** The `extract-shapes` tag must exist with CSV format to list
     multiple type names for extraction.
+    **Rationale:** Without a CSV-format tag, there is no mechanism to specify which type names to extract, and the extractor cannot discover shapes from source files.
 
     @acceptance-criteria @happy-path
     Scenario: Tag registry contains extract-shapes
@@ -112,6 +113,7 @@ Feature: TypeScript Shape Extraction for Documentation
     **Invariant:** When `@libar-docs-extract-shapes` lists an interface name,
     the extractor must find and extract the complete interface definition
     including JSDoc comments, generics, and extends clauses.
+    **Rationale:** Partial extraction (missing generics, JSDoc, or extends clauses) produces incomplete API documentation that misleads consumers about a type's actual contract.
 
     @acceptance-criteria @happy-path
     Scenario: Extract simple interface
@@ -210,6 +212,7 @@ Feature: TypeScript Shape Extraction for Documentation
 
     **Invariant:** Type aliases (including union types, intersection types,
     and mapped types) are extracted when listed in extract-shapes.
+    **Rationale:** Type aliases define domain vocabulary (status enums, branded types, utility types) that consumers need to understand API signatures; omitting them leaves gaps in generated documentation.
 
     @acceptance-criteria @happy-path
     Scenario: Extract union type alias
@@ -265,6 +268,7 @@ Feature: TypeScript Shape Extraction for Documentation
 
     **Invariant:** Both string and numeric enums are extracted with their
     complete member definitions.
+    **Rationale:** Enum members define the closed set of valid values for a type; extracting only the enum name without its members provides no useful information to documentation consumers.
 
     @acceptance-criteria @happy-path
     Scenario: Extract string enum
@@ -313,6 +317,7 @@ Feature: TypeScript Shape Extraction for Documentation
     **Invariant:** When a function name is listed in extract-shapes, only the
     signature (parameters, return type, generics) is extracted. The function
     body is replaced with ellipsis for documentation purposes.
+    **Rationale:** Including implementation bodies in generated documentation exposes internal logic, bloats output size, and creates a maintenance burden when internals change without API changes.
 
     @acceptance-criteria @happy-path
     Scenario: Extract function signature
@@ -376,6 +381,7 @@ Feature: TypeScript Shape Extraction for Documentation
 
     **Invariant:** When multiple shapes are listed, they appear in the
     documentation in the order specified in the tag, not source order.
+    **Rationale:** Authors intentionally order shapes for progressive disclosure (e.g., output before input); using source order would break the author's intended documentation narrative.
 
     @acceptance-criteria @happy-path
     Scenario: Shapes appear in tag order
@@ -417,6 +423,7 @@ Feature: TypeScript Shape Extraction for Documentation
 
     **Invariant:** Codecs render extracted shapes as TypeScript fenced code
     blocks, grouped under an "API Types" or similar section.
+    **Rationale:** Rendering shapes as plain text or without language hints prevents syntax highlighting and makes API types unreadable in generated markdown documentation.
 
     @acceptance-criteria @happy-path
     Scenario: Shapes render in claude module
@@ -454,6 +461,7 @@ Feature: TypeScript Shape Extraction for Documentation
     **Invariant:** Extracted shapes may reference types from imports. The
     extractor does NOT resolve imports - it extracts the shape as-is.
     Consumers understand that referenced types are defined elsewhere.
+    **Rationale:** Resolving imports would require full dependency graph traversal across the codebase, dramatically increasing complexity and coupling the extractor to the project's module structure.
 
     @acceptance-criteria @happy-path
     Scenario: Shape with imported type reference
@@ -507,6 +515,7 @@ Feature: TypeScript Shape Extraction for Documentation
 
     **Invariant:** When a function has multiple overload signatures, all
     signatures are extracted together as they represent the complete API.
+    **Rationale:** Extracting only one overload signature hides valid call patterns from consumers, leading to incorrect usage assumptions about the function's capabilities.
 
     @acceptance-criteria @happy-path
     Scenario: Extract overloaded function signatures
@@ -556,6 +565,7 @@ Feature: TypeScript Shape Extraction for Documentation
 
     **Invariant:** Codecs can render shapes grouped in a single code block
     or as separate code blocks, depending on detail level.
+    **Rationale:** Compact claude-md modules need grouped blocks to minimize token usage, while detailed human docs benefit from separate blocks with individual JSDoc annotations.
 
     @acceptance-criteria @happy-path
     Scenario: Grouped rendering for compact output

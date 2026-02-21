@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ConfigBasedWorkflowDefinition
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Add-missing-Invariant-Rationale-annotations
 @libar-docs-phase:99
 @libar-docs-effort:2h
 @libar-docs-product-area:Configuration
@@ -150,6 +151,9 @@ Feature: Config-Based Workflow Definition
   # ============================================================================
 
   Rule: Workflow as a configurable preset field is deferred
+
+    **Invariant:** The inline default workflow constant is the only workflow source until preset integration is implemented. No preset or project config field exposes workflow customization.
+    **Rationale:** Coupling workflow into the preset/config system before the inline fix ships would widen the blast radius and risk type regressions across all config consumers.
 
     Adding `workflow` as a field on `DeliveryProcessConfig` (presets) and
     `DeliveryProcessProjectConfig` (project config) is a natural next step

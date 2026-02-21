@@ -4,7 +4,7 @@
 
 ---
 
-**88 rules** from 20 features. 74 rules have explicit invariants.
+**88 rules** from 20 features. 88 rules have explicit invariants.
 
 ---
 
@@ -19,6 +19,8 @@
 #### Export types are correctly identified from TypeScript declarations
 
 > **Invariant:** Every exported TypeScript declaration type (function, type, interface, const, class, enum, abstract class, arrow function, async function, generic function, default export, re-export) is correctly classified.
+>
+> **Rationale:** Export type classification drives how codecs render API documentation — misclassifying a function as a const (or vice versa) produces incorrect signatures and misleading docs.
 
 **Verified by:**
 - Parse function export with directive
@@ -48,6 +50,8 @@
 #### Metadata is correctly extracted from JSDoc comments
 
 > **Invariant:** Examples, multi-line descriptions, line numbers, function signatures, and standard JSDoc tags are all correctly parsed and separated.
+>
+> **Rationale:** Downstream codecs render each metadata field independently — incorrect parsing causes examples to leak into descriptions or signatures to be lost in generated documentation.
 
 **Verified by:**
 - Extract examples from directive
@@ -61,6 +65,8 @@
 #### Tags are extracted only from the directive section, not from description or examples
 
 > **Invariant:** Only tags appearing in the directive section (before the description) are extracted. Tags mentioned in description prose or example code blocks are ignored.
+>
+> **Rationale:** Tags control taxonomy classification and pattern routing — extracting them from prose or examples would create phantom patterns and corrupt the registry.
 
 **Verified by:**
 - Extract multiple tags from directive section
@@ -73,6 +79,8 @@
 #### When to Use sections are extracted in all supported formats
 
 > **Invariant:** When to Use content is extracted from heading format with bullet points, inline bold format, and asterisk bullet format. When no When to Use section exists, the field is undefined.
+>
+> **Rationale:** Generated pattern documentation includes a When to Use section — failing to recognize any supported format means valid guidance silently disappears from output.
 
 **Verified by:**
 - Extract When to Use heading format with bullet points
@@ -91,6 +99,8 @@
 #### Relationship tags extract uses and usedBy dependencies
 
 > **Invariant:** The uses and usedBy relationship arrays are populated from directive tags, not from description content. When no relationship tags exist, the fields are undefined.
+>
+> **Rationale:** Relationship data drives dependency diagrams and impact analysis — extracting from prose would produce false edges from incidental mentions.
 
 **Verified by:**
 - Extract @libar-docs-uses with single value
@@ -106,6 +116,8 @@
 #### Edge cases and malformed input are handled gracefully
 
 > **Invariant:** The parser never crashes on invalid input. Files without directives return empty results. Malformed TypeScript returns a structured error with the file path.
+>
+> **Rationale:** The scanner processes hundreds of files in bulk — a single malformed file must not abort the entire pipeline or produce an undiagnosable crash.
 
 **Verified by:**
 - Skip comments without @libar-docs-* tags
@@ -150,6 +162,8 @@
 #### matchPattern supports prefix matching
 
 > **Invariant:** A trailing slash pattern matches any file whose path starts with that directory prefix.
+>
+> **Rationale:** Without prefix matching, users would need separate wildcard patterns for each nesting depth, making rule configuration verbose and error-prone.
 
 **Verified by:**
 - Prefix matching behavior
@@ -194,6 +208,8 @@
 #### Inference works independently of archLayer
 
 > **Invariant:** Context inference operates on file path alone; the presence or absence of archLayer does not affect context assignment.
+>
+> **Rationale:** Coupling context inference to archLayer would prevent context-based queries from finding patterns that lack explicit layer annotations.
 
 **Verified by:**
 - Pattern without archLayer is still added to byContext if context is inferred
@@ -220,6 +236,8 @@
 #### Declarations opt in via libar-docs-shape tag
 
 > **Invariant:** Only declarations with the libar-docs-shape tag in their immediately preceding JSDoc are collected as tagged shapes.
+>
+> **Rationale:** Extracting shapes without an explicit opt-in tag would surface internal implementation details in generated API documentation, violating information hiding.
 
 **Verified by:**
 - Tagged declaration is extracted as shape
@@ -238,6 +256,8 @@
 #### Discovery uses existing estree parser with JSDoc comment scanning
 
 > **Invariant:** The discoverTaggedShapes function uses the existing typescript-estree parse() and extractPrecedingJsDoc() approach.
+>
+> **Rationale:** Introducing a second parser would create divergent AST behavior — reusing the established parser ensures consistent JSDoc handling and avoids subtle extraction differences.
 
 **Verified by:**
 - All five declaration kinds are discoverable
@@ -261,6 +281,8 @@
 #### Depends-on tag is defined in taxonomy registry
 
 > **Invariant:** The depends-on and enables tags must exist in the taxonomy registry with CSV format.
+>
+> **Rationale:** Without registry definitions, the data-driven AST parser cannot discover or extract these planning dependency tags from source files.
 
 **Verified by:**
 - Depends-on tag exists in registry
@@ -271,6 +293,8 @@
 #### Depends-on tag is extracted from Gherkin files
 
 > **Invariant:** The Gherkin parser must extract depends-on values from feature file tags, including CSV multi-value lists.
+>
+> **Rationale:** Missing dependency extraction causes the dependency tree and blocking-pattern queries to return incomplete results.
 
 **Verified by:**
 - Depends-on extracted from feature file
@@ -298,6 +322,8 @@
 #### Enables tag is extracted from Gherkin files
 
 > **Invariant:** The Gherkin parser must extract enables values from feature file tags, including CSV multi-value lists.
+>
+> **Rationale:** Missing enables extraction breaks forward-looking dependency queries, hiding which patterns are unblocked when a prerequisite completes.
 
 **Verified by:**
 - Enables extracted from feature file
@@ -308,6 +334,8 @@
 #### Planning dependencies are stored in relationship index
 
 > **Invariant:** The relationship index must store dependsOn and enables relationships extracted from pattern metadata.
+>
+> **Rationale:** Omitting planning dependencies from the index causes blocking-pattern and critical-path queries to return incomplete results.
 
 **Verified by:**
 - DependsOn relationships stored in relationship index
@@ -386,6 +414,8 @@
 #### MediaType is used when rendering code blocks
 
 > **Invariant:** The rendered code block language must match the DocString mediaType; when mediaType is absent, the renderer falls back to a caller-specified default language.
+>
+> **Rationale:** Using the wrong language hint causes syntax highlighters to misrender code blocks, and losing mediaType entirely can trigger incorrect escaping (e.g., asterisks in JSDoc).
 
 **Verified by:**
 - TypeScript mediaType renders as typescript code block
@@ -472,6 +502,8 @@
 #### Include tags are extracted from Gherkin feature tags
 
 > **Invariant:** Include tags are parsed as comma-separated values; absence of the tag means the pattern has no includes.
+>
+> **Rationale:** Include tags control which patterns appear in scoped diagrams — incorrect parsing drops patterns from diagrams or includes unrelated ones.
 
 **Verified by:**
 - Single include tag is extracted
@@ -489,6 +521,8 @@
 #### Extends tag is defined in taxonomy registry
 
 > **Invariant:** The extends tag must exist in the taxonomy registry with single-value format.
+>
+> **Rationale:** Without a registry definition, the data-driven AST parser cannot discover or extract the extends tag from source files.
 
 **Verified by:**
 - Extends tag exists in registry
@@ -514,6 +548,8 @@
 #### Transform builds extendedBy reverse lookup
 
 > **Invariant:** The transform must compute an extendedBy reverse index so base patterns know which patterns extend them.
+>
+> **Rationale:** Without the reverse index, base patterns cannot discover their extensions, breaking generalization hierarchy navigation in generated docs.
 
 **Verified by:**
 - Extended pattern knows its extensions
@@ -541,6 +577,8 @@
 #### Function signatures surface full parameter types in ExportInfo
 
 > **Invariant:** ExportInfo.signature shows full parameter types and return type instead of the placeholder value.
+>
+> **Rationale:** Reference documentation renders signatures verbatim — placeholder values instead of real types make the API docs unusable for consumers.
 
 **Verified by:**
 - Simple function signature is extracted with full types
@@ -557,6 +595,8 @@
 #### Property-level JSDoc preserves full multi-line content
 
 > **Invariant:** Property-level JSDoc preserves full multi-line content without first-line truncation.
+>
+> **Rationale:** Truncated property descriptions lose important behavioral details (defaults, units, constraints) that consumers rely on when integrating with the API.
 
 **Verified by:**
 - Multi-line property JSDoc is fully preserved
@@ -569,6 +609,8 @@
 #### Param returns and throws tags are extracted from function JSDoc
 
 > **Invariant:** JSDoc param, returns, and throws tags are extracted and stored on ExtractedShape for function-kind shapes.
+>
+> **Rationale:** Function reference docs require parameter, return, and exception documentation — missing extraction means consumers must read source code instead of generated docs.
 
 **Verified by:**
 - Param tags are extracted from function JSDoc
@@ -585,6 +627,8 @@
 #### Auto-shape discovery extracts all exported types via wildcard
 
 > **Invariant:** When extract-shapes tag value is the wildcard character, all exported declarations are extracted without listing names.
+>
+> **Rationale:** Requiring explicit names for every export creates maintenance burden and stale annotations — wildcard discovery keeps shape docs in sync as exports are added or removed.
 
 **Verified by:**
 - Wildcard extracts all exported declarations
@@ -632,6 +676,8 @@
 #### Custom configuration extends discovery behavior
 
 > **Invariant:** User-provided exclude patterns must be applied in addition to (not replacing) the default exclusions.
+>
+> **Rationale:** Replacing defaults with custom patterns would silently re-include node_modules and dist, causing false positives in the pattern registry.
 
 **Verified by:**
 - Respect custom exclude patterns
@@ -680,6 +726,8 @@
 #### Implements tag is defined in taxonomy registry
 
 > **Invariant:** The implements tag must exist in the taxonomy registry with CSV format.
+>
+> **Rationale:** Without a registry definition, the data-driven AST parser cannot discover or extract the implements tag from source files.
 
 **Verified by:**
 - Implements tag exists in registry
@@ -694,6 +742,8 @@
 #### Files can implement a single pattern
 
 > **Invariant:** The AST parser must extract a single implements value and preserve it through the extraction pipeline.
+>
+> **Rationale:** Lost implements values sever the link between implementation files and their roadmap specs, breaking traceability.
 
 **Verified by:**
 - Parse implements with single pattern
@@ -704,6 +754,8 @@
 #### Files can implement multiple patterns using CSV format
 
 > **Invariant:** The AST parser must split CSV implements values into individual pattern references with whitespace trimming.
+>
+> **Rationale:** Unsplit or untrimmed CSV values produce invalid pattern references that fail relationship index lookups.
 
 **Verified by:**
 - Parse implements with multiple patterns
@@ -714,6 +766,8 @@
 #### Transform builds implementedBy reverse lookup
 
 > **Invariant:** The transform must compute an implementedBy reverse index so spec patterns know which files implement them.
+>
+> **Rationale:** Without the reverse index, roadmap specs cannot discover their implementation files, breaking traceability and DoD validation.
 
 **Verified by:**
 - Single implementation creates reverse lookup
@@ -724,6 +778,8 @@
 #### Schemas validate implements field correctly
 
 > **Invariant:** The Zod schemas must accept implements and implementedBy fields with correct array-of-string types.
+>
+> **Rationale:** Schema rejection of valid implements/implementedBy values causes runtime parse failures that silently drop traceability links.
 
 **Verified by:**
 - DocDirective schema accepts implements
@@ -740,6 +796,8 @@
 #### Timeline layer is detected from /timeline/ directory segments
 
 > **Invariant:** Any feature file path containing a /timeline/ directory segment is classified as timeline layer.
+>
+> **Rationale:** Timeline features track phased delivery progress and must be grouped separately for roadmap generation and phase filtering.
 
 **Verified by:**
 - Detect timeline features from /timeline/ path
@@ -751,6 +809,8 @@
 #### Domain layer is detected from business context directory segments
 
 > **Invariant:** Feature files in /deciders/, /orders/, or /inventory/ directories are classified as domain layer.
+>
+> **Rationale:** Domain features define core business rules and must be distinguished from infrastructure tests for accurate coverage reporting.
 
 **Verified by:**
 - Detect decider features as domain
@@ -762,6 +822,8 @@
 #### Integration layer is detected and takes priority over domain directories
 
 > **Invariant:** Paths containing /integration-features/ or /integration/ are classified as integration, even when they also contain domain directory names.
+>
+> **Rationale:** Integration tests nested under domain directories (e.g., /integration/orders/) would be misclassified as domain without explicit priority, skewing layer coverage metrics.
 
 **Verified by:**
 - Detect integration-features directory as integration
@@ -774,6 +836,8 @@
 #### E2E layer is detected from /e2e/ directory segments
 
 > **Invariant:** Any feature file path containing an /e2e/ directory segment is classified as e2e layer.
+>
+> **Rationale:** E2E tests require separate execution infrastructure and longer timeouts; misclassification would mix them into faster test suites.
 
 **Verified by:**
 - Detect e2e features from /e2e/ path
@@ -785,6 +849,8 @@
 #### Component layer is detected from tool-specific directory segments
 
 > **Invariant:** Feature files in /scanner/ or /lint/ directories are classified as component layer.
+>
+> **Rationale:** Tool-specific features test internal pipeline stages and must be isolated from business domain and integration layers in documentation grouping.
 
 **Verified by:**
 - Detect scanner features as component
@@ -795,6 +861,8 @@
 #### Unknown layer is the fallback for unclassified paths
 
 > **Invariant:** Any feature file path that does not match a known layer pattern is classified as unknown.
+>
+> **Rationale:** Silently dropping unclassified features would create invisible gaps in test coverage; the unknown fallback ensures every feature is accounted for.
 
 **Verified by:**
 - Return unknown for unclassified paths
@@ -806,6 +874,8 @@
 #### Path normalization handles cross-platform and case differences
 
 > **Invariant:** Layer inference produces correct results regardless of path separators, case, or absolute vs relative paths.
+>
+> **Rationale:** The consumer monorepo runs on multiple platforms; platform-dependent classification would produce inconsistent documentation across developer machines and CI.
 
 **Verified by:**
 - Handle Windows-style paths with backslashes
@@ -821,6 +891,8 @@
 #### FEATURE_LAYERS constant provides validated layer enumeration
 
 > **Invariant:** FEATURE_LAYERS is a readonly array containing exactly all 6 valid layer values.
+>
+> **Rationale:** Consumers iterate over FEATURE_LAYERS for exhaustive layer handling; a mutable or incomplete array would cause missed layers at runtime.
 
 **Verified by:**
 - FEATURE_LAYERS contains all valid layer values
@@ -838,6 +910,8 @@
 #### Single value tags produce scalar metadata fields
 
 > **Invariant:** Each single-value tag (pattern, phase, status, brief) maps to exactly one metadata field with the correct type.
+>
+> **Rationale:** Incorrect type coercion (e.g., phase as string instead of number) causes downstream pipeline failures in filtering and sorting.
 
 **Verified by:**
 - Extract pattern name tag
@@ -853,6 +927,8 @@
 #### Array value tags accumulate into list metadata fields
 
 > **Invariant:** Tags for depends-on and enables split comma-separated values and accumulate across multiple tag occurrences.
+>
+> **Rationale:** Missing a dependency value silently breaks the dependency graph, causing incorrect build ordering and orphaned pattern references.
 
 **Verified by:**
 - Extract single dependency
@@ -864,6 +940,8 @@
 #### Category tags are colon-free tags filtered against known non-categories
 
 > **Invariant:** Tags without colons become categories, except known non-category tags (acceptance-criteria, happy-path) and the libar-docs opt-in marker.
+>
+> **Rationale:** Including test-control tags (acceptance-criteria, happy-path) as categories pollutes the pattern taxonomy with non-semantic values.
 
 **Verified by:**
 - Extract category tags (no colon)
@@ -874,6 +952,8 @@
 #### Complex tag lists produce fully populated metadata
 
 > **Invariant:** All tag types (scalar, array, category) are correctly extracted from a single mixed tag list.
+>
+> **Rationale:** Real feature files combine many tag types; extraction must handle all types simultaneously without interference between parsers.
 
 **Verified by:**
 - Extract all metadata from complex tag list
@@ -883,6 +963,8 @@
 #### Edge cases produce safe defaults
 
 > **Invariant:** Empty or invalid inputs produce empty metadata or omit invalid fields rather than throwing errors.
+>
+> **Rationale:** Throwing on malformed tags would abort extraction for the entire file, losing valid metadata from well-formed tags.
 
 **Verified by:**
 - Empty tag list returns empty metadata
@@ -893,6 +975,8 @@
 #### Convention tags support CSV values with whitespace trimming
 
 > **Invariant:** Convention tags split comma-separated values and trim whitespace from each value.
+>
+> **Rationale:** Untrimmed whitespace creates distinct values for the same convention, causing false negatives in convention-based filtering and validation.
 
 **Verified by:**
 - Extract single convention tag
@@ -904,6 +988,8 @@
 #### Registry-driven extraction handles enums, transforms, and value constraints
 
 > **Invariant:** Tags defined in the registry use data-driven extraction with enum validation, CSV accumulation, value transforms, and constraint checking.
+>
+> **Rationale:** Hard-coded if/else branches for each tag type cannot scale; registry-driven extraction ensures new tags are supported by configuration, not code changes.
 
 **Verified by:**
 - Registry-driven enum tag without prior if/else branch
@@ -951,6 +1037,8 @@
 #### Pattern matching and exclusion filtering
 
 > **Invariant:** Glob patterns control file discovery and exclusion patterns remove matched files before scanning.
+>
+> **Rationale:** Without exclusion filtering, internal directories and generated files would pollute the pattern registry with false positives and slow down scanning.
 
 **Verified by:**
 - Return empty results when no patterns match
@@ -981,6 +1069,10 @@
 
 #### Multiple shapes are extracted in specified order
 
+> **Invariant:** Extracted shapes appear in the order specified by the tag list, not in source file declaration order.
+>
+> **Rationale:** Documentation consumers rely on tag-specified ordering for consistent, predictable layout regardless of how source files are organized.
+
 **Verified by:**
 - Shapes appear in tag order not source order
 - Mixed shape types in specified order
@@ -989,12 +1081,20 @@
 
 #### Extracted shapes render as fenced code blocks
 
+> **Invariant:** Every extracted shape renders as a fenced TypeScript code block in the markdown output.
+>
+> **Rationale:** Fenced code blocks provide syntax highlighting and preserve type definition formatting, which is essential for readable API documentation.
+
 **Verified by:**
 - Render shapes as markdown
 
 ---
 
 #### Imported and re-exported shapes are tracked separately
+
+> **Invariant:** Shapes resolved via import or re-export statements are classified distinctly from locally declared shapes.
+>
+> **Rationale:** Silently extracting imported types as if they were local declarations would produce duplicate or misleading documentation, since the canonical definition lives in another file.
 
 **Verified by:**
 - Imported shape produces warning
@@ -1004,12 +1104,20 @@
 
 #### Invalid TypeScript produces error result
 
+> **Invariant:** Malformed TypeScript source returns an error Result instead of throwing or producing partial shapes.
+>
+> **Rationale:** Unhandled parse exceptions would crash the pipeline mid-run, preventing all subsequent files from being processed.
+
 **Verified by:**
 - Malformed TypeScript returns error
 
 ---
 
 #### Shape rendering supports grouping options
+
+> **Invariant:** The `groupInSingleBlock` option controls whether shapes render in one combined code fence or in separate per-shape code fences.
+>
+> **Rationale:** Different documentation layouts require different grouping strategies; a single block provides compact overviews while separate blocks allow per-type commentary.
 
 **Verified by:**
 - Grouped rendering in single code block
@@ -1033,6 +1141,10 @@
 
 #### Large source files are rejected to prevent memory exhaustion
 
+> **Invariant:** Source files exceeding 5MB are rejected before parsing begins.
+>
+> **Rationale:** Feeding unbounded input to the TypeScript parser risks out-of-memory crashes that would halt the entire extraction pipeline.
+
 **Verified by:**
 - Source code exceeding 5MB limit returns error
 
@@ -1046,12 +1158,20 @@
 
 #### extract-shapes tag exists in registry with CSV format
 
+> **Invariant:** The `extract-shapes` tag must be registered with CSV format so multiple shape names can be specified in a single annotation.
+>
+> **Rationale:** Without CSV format registration, the tag parser cannot split comma-separated shape lists, causing only the first shape to be extracted.
+
 **Verified by:**
 - Tag registry contains extract-shapes with correct format
 
 ---
 
 #### Interfaces are extracted from TypeScript AST
+
+> **Invariant:** Every named interface declaration in a TypeScript source file must be extractable as a shape with kind `interface`, including generics, extends clauses, and JSDoc.
+>
+> **Rationale:** Interfaces are the primary API surface for TypeScript libraries; failing to extract them leaves the most important type contracts undocumented.
 
 **Verified by:**
 - Extract simple interface
@@ -1064,8 +1184,9 @@
 
 #### Property-level JSDoc is extracted for interface properties
 
-The extractor uses strict adjacency (gap = 1 line) to prevent
-    interface-level JSDoc from being misattributed to the first property.
+> **Invariant:** Property-level JSDoc must be attributed only to the immediately adjacent property, never inherited from the parent interface declaration.
+>
+> **Rationale:** Misattributing interface-level JSDoc to the first property produces incorrect per-field documentation and misleads consumers about individual property semantics. The extractor uses strict adjacency (gap = 1 line) to prevent interface-level JSDoc from being misattributed to the first property.
 
 **Verified by:**
 - Extract properties with adjacent JSDoc
@@ -1076,6 +1197,10 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 
 #### Type aliases are extracted from TypeScript AST
 
+> **Invariant:** Union types, mapped types, and conditional types must all be extractable as shapes with kind `type`, preserving their full type expression.
+>
+> **Rationale:** Type aliases encode domain constraints (e.g., discriminated unions, mapped utilities) that are essential for API documentation; omitting them hides the type-level design.
+
 **Verified by:**
 - Extract union type alias
 - Extract mapped type
@@ -1085,6 +1210,10 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 
 #### Enums are extracted from TypeScript AST
 
+> **Invariant:** Both regular and const enums must be extractable as shapes with kind `enum`, including their member values.
+>
+> **Rationale:** Enums define finite value sets used in validation and serialization; missing them from documentation forces consumers to read source code to discover valid values.
+
 **Verified by:**
 - Extract string enum
 - Extract const enum
@@ -1092,6 +1221,10 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 ---
 
 #### Function signatures are extracted with body omitted
+
+> **Invariant:** Extracted function shapes must include the full signature (name, parameters, return type, async modifier) but never the implementation body.
+>
+> **Rationale:** Including function bodies in documentation exposes implementation details, inflates output size, and creates a maintenance burden when internals change without signature changes.
 
 **Verified by:**
 - Extract function signature
@@ -1101,6 +1234,10 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 
 #### Const declarations are extracted from TypeScript AST
 
+> **Invariant:** Const declarations must be extractable as shapes with kind `const`, whether or not they carry an explicit type annotation.
+>
+> **Rationale:** Constants define configuration defaults, version strings, and sentinel values that consumers depend on; excluding them creates documentation gaps for public API surface.
+
 **Verified by:**
 - Extract const with type annotation
 - Extract const without type annotation
@@ -1108,6 +1245,10 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 ---
 
 #### Non-exported shapes are extractable
+
+> **Invariant:** Shape extraction must succeed for declarations regardless of export status, with the `exported` flag accurately reflecting visibility.
+>
+> **Rationale:** Internal types often define the core domain model; restricting extraction to exports only would omit types that are essential for understanding module internals.
 
 **Verified by:**
 - Extract non-exported interface
@@ -1124,6 +1265,8 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 #### Uses tag is defined in taxonomy registry
 
 > **Invariant:** The uses and used-by tags must be registered in the taxonomy with CSV format and dependency-related purpose descriptions.
+>
+> **Rationale:** Without registry definitions, the data-driven AST parser cannot discover or extract these tags from source files.
 
 **Verified by:**
 - Uses tag exists in registry
@@ -1134,6 +1277,8 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 #### Uses tag is extracted from TypeScript files
 
 > **Invariant:** The AST parser must extract single and comma-separated uses values from TypeScript JSDoc annotations.
+>
+> **Rationale:** Missing or malformed uses extraction breaks runtime dependency tracking and produces incomplete relationship diagrams.
 
 **Verified by:**
 - Single uses value extracted
@@ -1144,6 +1289,8 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 #### Used-by tag is extracted from TypeScript files
 
 > **Invariant:** The AST parser must extract single and comma-separated used-by values from TypeScript JSDoc annotations.
+>
+> **Rationale:** Missing used-by extraction prevents reverse dependency lookups, leaving consumers unable to discover which patterns depend on them.
 
 **Verified by:**
 - Single used-by value extracted
@@ -1154,6 +1301,8 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 #### Uses relationships are stored in relationship index
 
 > **Invariant:** All declared uses and usedBy relationships must be stored in the relationship index as explicitly declared entries.
+>
+> **Rationale:** Omitting relationships from the index causes dependency diagrams and impact-analysis queries to silently miss connections.
 
 **Verified by:**
 - Uses relationships stored in relationship index
@@ -1169,6 +1318,8 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 #### Schemas validate uses field correctly
 
 > **Invariant:** DocDirective and RelationshipEntry schemas must accept uses and usedBy fields as valid CSV string values.
+>
+> **Rationale:** Schema rejection of valid uses/usedBy values causes runtime parse failures that silently drop relationship data.
 
 **Verified by:**
 - DocDirective schema accepts uses

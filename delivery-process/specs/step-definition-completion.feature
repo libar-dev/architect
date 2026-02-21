@@ -57,6 +57,7 @@ Feature: Step Definition Completion
   Rule: Generator-related specs need step definitions for output validation
 
     **Invariant:** Step definitions test actual codec output against expected structure.
+    **Rationale:** Testing rendered markdown strings instead of structured codec output makes tests brittle to formatting changes that do not affect correctness.
     Factory functions from tests/fixtures/ should be used for test data.
 
     **Existing Specs:**
@@ -101,6 +102,7 @@ Feature: Step Definition Completion
   Rule: Renderable helper specs need step definitions for utility functions
 
     **Invariant:** Helper functions are pure and easy to unit test.
+    **Rationale:** Renderable helpers are reused across multiple codecs; untested edge cases silently corrupt generated documentation in every consumer.
     Step definitions should test edge cases identified in specs.
 
     **Existing Specs:**
@@ -135,6 +137,9 @@ Feature: Step Definition Completion
 
   Rule: Remaining specs in other directories need step definitions
 
+    **Invariant:** Every feature file in tests/features/ must have a corresponding step definition file.
+    **Rationale:** Feature files without step definitions are inert documentation that silently fall out of sync with the code they describe.
+
     **Existing Specs:**
     - `tests/features/generators/table-extraction.feature`
     - `tests/features/scanner/docstring-mediatype.feature`
@@ -158,6 +163,9 @@ Feature: Step Definition Completion
   # ============================================================================
 
   Rule: Step definition implementation follows project patterns
+
+    **Invariant:** All step definition files must follow the established state-management and import patterns from existing .steps.ts files.
+    **Rationale:** Inconsistent step definition structure makes tests harder to review, debug, and maintain across the 10+ feature files in this deliverable.
 
     **Pattern:** All step definitions should follow the established patterns in
     existing .steps.ts files for consistency.

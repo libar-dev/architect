@@ -21,6 +21,7 @@ Feature: Lint Engine
   Rule: Single directive linting validates annotations against rules
 
       **Invariant:** Every directive is checked against all provided rules and violations include source location.
+      **Rationale:** Skipping rules or omitting source locations makes violations unactionable, as developers cannot locate or understand the issue.
       **Verified by:** Return empty array when all rules pass, Return violations for failing rules, Run all provided rules, Include correct file and line in violations
 
     @function:lintDirective @happy-path
@@ -70,6 +71,7 @@ Feature: Lint Engine
   Rule: Multi-file batch linting aggregates results across files
 
       **Invariant:** All files and directives are scanned, violations are collected per file, and severity counts are accurate.
+      **Rationale:** Missing files or inaccurate severity counts cause silent rule violations in CI and undermine trust in the linting pipeline.
       **Verified by:** Return empty results for clean files, Collect violations by file, Count violations by severity, Handle multiple directives per file
 
     @function:lintFiles @happy-path
@@ -128,6 +130,7 @@ Feature: Lint Engine
   Rule: Failure detection respects strict mode for severity escalation
 
       **Invariant:** Errors always indicate failure. Warnings only indicate failure in strict mode. Info never indicates failure.
+      **Rationale:** Without correct severity-to-exit-code mapping, CI pipelines either miss real errors or block on informational messages, eroding developer trust in the linter.
       **Verified by:** Return true when there are errors, Return false for warnings only in non-strict mode, Return true for warnings in strict mode, Return false for info only, Return false when no violations
 
     @function:hasFailures
@@ -171,6 +174,7 @@ Feature: Lint Engine
   Rule: Violation sorting orders by severity then by line number
 
       **Invariant:** Sorted output places errors first, then warnings, then info, with stable line-number ordering within each severity. Sorting does not mutate the original array.
+      **Rationale:** Unsorted output forces developers to manually scan for critical errors among lower-severity noise, and mutating the original array would break callers that hold a reference to it.
       **Verified by:** Sort errors first then warnings then info, Sort by line number within same severity, Not mutate original array
 
     @function:sortViolationsBySeverity
@@ -218,6 +222,7 @@ Feature: Lint Engine
   Rule: Pretty formatting produces human-readable output with severity counts
 
       **Invariant:** Pretty output includes file paths, line numbers, severity labels, rule IDs, and summary counts. Quiet mode suppresses non-error violations.
+      **Rationale:** Incomplete formatting (missing file paths or line numbers) prevents developers from navigating directly to violations, and noisy output in quiet mode defeats its purpose.
       **Verified by:** Show success message when no violations, Format violations with file line severity and message, Show summary line with counts, Filter out warnings and info in quiet mode
 
     @function:formatPretty @happy-path
@@ -274,6 +279,7 @@ Feature: Lint Engine
   Rule: JSON formatting produces machine-readable output with full details
 
       **Invariant:** JSON output is valid, includes all summary fields, and preserves violation details including file, line, severity, rule, and message.
+      **Rationale:** Machine consumers (CI pipelines, IDE integrations) depend on valid JSON with complete fields; missing or malformed output breaks automated tooling downstream.
       **Verified by:** Return valid JSON, Include all summary fields, Include violation details
 
     @function:formatJson

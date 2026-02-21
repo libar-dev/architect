@@ -15,6 +15,7 @@ Feature: Shape Source Pattern Matching
   Rule: Exact paths match without wildcards
 
     **Invariant:** A pattern without glob characters must match only the exact file path, character for character.
+    **Rationale:** Loose matching on non-glob patterns would silently include unintended files, causing incorrect shapes to appear in generated documentation.
     **Verified by:** Exact path matches identical path, Exact path does not match different path
 
     @happy-path
@@ -30,6 +31,7 @@ Feature: Shape Source Pattern Matching
   Rule: Single-level globs match one directory level
 
     **Invariant:** A single `*` glob must match files only within the specified directory, never crossing directory boundaries.
+    **Rationale:** Crossing directory boundaries would violate standard glob semantics and pull in shapes from nested modules that belong to different product areas.
     **Verified by:** Single glob matches file in target directory, Single glob does not match nested subdirectory, Single glob does not match wrong extension
 
     @happy-path
@@ -50,6 +52,7 @@ Feature: Shape Source Pattern Matching
   Rule: Recursive globs match any depth
 
     **Invariant:** A `**` glob must match files at any nesting depth below the specified prefix, while still respecting extension and prefix constraints.
+    **Rationale:** Recursive globs enable broad subtree selection for shape extraction; failing to respect prefix and extension constraints would leak unrelated shapes into the output.
     **Verified by:** Recursive glob matches file at target depth, Recursive glob matches file at deeper depth, Recursive glob matches file at top level, Recursive glob does not match wrong prefix
 
     @happy-path

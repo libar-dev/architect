@@ -129,6 +129,8 @@ Feature: Configuration Schema Validation
 
     **Invariant:** isScannerConfig returns true only for objects that have a non-empty patterns array and a string baseDir.
 
+    **Rationale:** Without a reliable type guard, callers cannot safely narrow unknown config objects and risk accessing properties on incompatible types at runtime.
+
     **Verified by:** isScannerConfig returns true for valid config, isScannerConfig returns false for invalid config, isScannerConfig returns false for null, isScannerConfig returns false for non-object
 
     @function:isScannerConfig @happy-path
@@ -158,6 +160,8 @@ Feature: Configuration Schema Validation
   Rule: isGeneratorConfig type guard narrows unknown values
 
     **Invariant:** isGeneratorConfig returns true only for objects that have a string outputDir and a .json registryPath.
+
+    **Rationale:** Without a reliable type guard, callers cannot safely narrow unknown config objects and risk passing malformed generator configs that bypass schema validation.
 
     **Verified by:** isGeneratorConfig returns true for valid config, isGeneratorConfig returns false for invalid config, isGeneratorConfig returns false for non-json registry
 

@@ -14,6 +14,8 @@ Feature: Universal Markdown Renderer - Output Formats
   Rule: Code blocks and mermaid diagrams render with fenced syntax
 
       **Invariant:** Code blocks use triple backtick fencing with optional language hint. Mermaid blocks use mermaid as the language hint.
+      **Rationale:** Inconsistent fencing breaks syntax highlighting in GitHub/IDE markdown previews and prevents Mermaid renderers from detecting diagram blocks.
+
       **Verified by:** Render code block with language, Render code block without language, Render mermaid diagram
 
     Scenario: Render code block with language
@@ -55,6 +57,8 @@ Feature: Universal Markdown Renderer - Output Formats
   Rule: Collapsible blocks render as HTML details elements
 
       **Invariant:** Summary text is HTML-escaped to prevent injection. Collapsible content renders between details tags.
+      **Rationale:** Unescaped HTML in summary text enables XSS when generated markdown is rendered in browsers; malformed details tags break progressive disclosure in documentation.
+
       **Verified by:** Render collapsible block, Render collapsible with HTML entities in summary, Render nested collapsible content
 
     @happy-path
@@ -83,6 +87,8 @@ Feature: Universal Markdown Renderer - Output Formats
   Rule: Link-out blocks render as markdown links with URL encoding
 
       **Invariant:** Link paths with spaces are percent-encoded for valid URLs.
+      **Rationale:** Unencoded spaces produce broken links in markdown renderers, making cross-document navigation fail silently for files with spaces in their paths.
+
       **Verified by:** Render link-out block, Render link-out with spaces in path
 
     Scenario: Render link-out block
@@ -98,6 +104,8 @@ Feature: Universal Markdown Renderer - Output Formats
   Rule: Multi-file documents produce correct output file collections
 
       **Invariant:** Output file count equals 1 (main) plus additional file count. The first output file always uses the provided base path.
+      **Rationale:** A mismatch between expected and actual file count causes the orchestrator to write orphaned files or miss outputs, corrupting the generated documentation directory.
+
       **Verified by:** Render document with additional files, Render document without additional files
 
     @happy-path
@@ -115,6 +123,8 @@ Feature: Universal Markdown Renderer - Output Formats
   Rule: Complex documents render all block types in sequence
 
       **Invariant:** Multiple block types in a single document render in order without interference.
+      **Rationale:** Block ordering reflects the codec's semantic structure; out-of-order or swallowed blocks would produce misleading documentation that diverges from the source of truth.
+
       **Verified by:** Render complex document with multiple block types
 
     Scenario: Render complex document with multiple block types
@@ -140,6 +150,8 @@ Feature: Universal Markdown Renderer - Output Formats
   Rule: Claude context renderer produces compact AI-optimized output
 
       **Invariant:** Claude context replaces markdown syntax with section markers, omits visual-only blocks (mermaid, separators), flattens collapsible content, and produces shorter output than markdown.
+      **Rationale:** LLM context windows are token-limited; visual-only blocks waste tokens without adding semantic value, and verbose markdown syntax inflates context size unnecessarily.
+
       **Verified by:** Claude context renders title and headings as section markers, Claude context renders sub-headings with different markers, Claude context omits mermaid blocks, Claude context flattens collapsible blocks, Claude context renders link-out as plain text, Claude context omits separator tokens, Claude context produces fewer characters than markdown
 
     @happy-path

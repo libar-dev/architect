@@ -34,6 +34,7 @@ import { sanitizeNodeId, EDGE_STYLES, EDGE_LABELS, SEQUENCE_ARROWS, formatNodeDe
 import { getPatternName } from '../../api/pattern-helpers.js';
 import { VALID_TRANSITIONS } from '../../validation/fsm/transitions.js';
 import { PROTECTION_LEVELS } from '../../validation/fsm/states.js';
+import { camelCaseToTitleCase } from '../../utils/string-utils.js';
 // ============================================================================
 // Shared Constants
 // ============================================================================
@@ -560,14 +561,15 @@ function decodeProductArea(dataset, config, opts) {
             sections.push(...buildShapeSections(limited, opts.detailLevel));
         }
     }
-    // 5. Behavior specifications from area patterns with rules or descriptions
-    // Optionally exclude source paths (e.g., Tier 1 specs) via config
-    const behaviorPatterns = areaPatterns.filter((p) => (config.excludeSourcePaths === undefined ||
+    // 5. Compact business rules index (replaces verbose Behavior Specifications)
+    // Shows only rule name, invariant, and rationale per rule in tables
+    const rulesPatterns = areaPatterns.filter((p) => (config.excludeSourcePaths === undefined ||
         config.excludeSourcePaths.length === 0 ||
         !config.excludeSourcePaths.some((prefix) => p.source.file.startsWith(prefix))) &&
-        (p.directive.description.length > 0 || (p.rules !== undefined && p.rules.length > 0)));
-    if (behaviorPatterns.length > 0) {
-        sections.push(...buildBehaviorSectionsFromPatterns(behaviorPatterns, opts.detailLevel));
+        p.rules !== undefined &&
+        p.rules.length > 0);
+    if (rulesPatterns.length > 0) {
+        sections.push(...buildBusinessRulesCompactSection(rulesPatterns, opts.detailLevel));
     }
     if (sections.length === 0) {
         sections.push(paragraph(`No content found for product area "${area}". ` +
@@ -702,6 +704,72 @@ function buildBehaviorSectionsFromPatterns(patterns, detailLevel) {
                 }
             }
         }
+    }
+    sections.push(separator());
+    return sections;
+}
+/**
+ * Build a compact business rules index section.
+ *
+ * Replaces the verbose Behavior Specifications in product area docs.
+ * Groups rules by pattern, showing only rule name, invariant, and rationale.
+ * Always renders open H3 headings with tables for immediate scannability.
+ *
+ * Detail level controls:
+ * - summary: Section omitted entirely
+ * - standard: Rules with invariants only; truncated to 150/120 chars
+ * - detailed: All rules; full text, no truncation
+ */
+function buildBusinessRulesCompactSection(patterns, detailLevel) {
+    if (detailLevel === 'summary')
+        return [];
+    const sections = [];
+    // Count totals for header
+    let totalRules = 0;
+    let totalInvariants = 0;
+    const annotationsCache = new Map();
+    for (const p of patterns) {
+        if (p.rules === undefined)
+            continue;
+        for (const r of p.rules) {
+            totalRules++;
+            const ann = parseBusinessRuleAnnotations(r.description);
+            annotationsCache.set(`${p.name}::${r.name}`, ann);
+            if (ann.invariant !== undefined)
+                totalInvariants++;
+        }
+    }
+    if (totalRules === 0)
+        return sections;
+    sections.push(heading(2, 'Business Rules'));
+    sections.push(paragraph(`${String(patterns.length)} patterns, ` +
+        `${String(totalInvariants)} rules with invariants ` +
+        `(${String(totalRules)} total)`));
+    const isDetailed = detailLevel === 'detailed';
+    const maxInvariant = isDetailed ? 0 : 150;
+    const maxRationale = isDetailed ? 0 : 120;
+    const sorted = [...patterns].sort((a, b) => a.name.localeCompare(b.name));
+    for (const pattern of sorted) {
+        if (pattern.rules === undefined)
+            continue;
+        const rows = [];
+        for (const rule of pattern.rules) {
+            const ann = annotationsCache.get(`${pattern.name}::${rule.name}`) ?? {};
+            // At standard level, skip rules without invariant
+            if (!isDetailed && ann.invariant === undefined)
+                continue;
+            const invariantText = ann.invariant ?? '';
+            const rationaleText = ann.rationale ?? '';
+            rows.push([
+                rule.name,
+                maxInvariant > 0 ? truncateText(invariantText, maxInvariant) : invariantText,
+                maxRationale > 0 ? truncateText(rationaleText, maxRationale) : rationaleText,
+            ]);
+        }
+        if (rows.length === 0)
+            continue;
+        sections.push(heading(3, camelCaseToTitleCase(pattern.name)));
+        sections.push(table(['Rule', 'Invariant', 'Rationale'], rows));
     }
     sections.push(separator());
     return sections;

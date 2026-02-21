@@ -4,7 +4,7 @@
 
 ---
 
-**264 rules** from 55 features. 230 rules have explicit invariants.
+**264 rules** from 55 features. 264 rules have explicit invariants.
 
 ---
 
@@ -19,6 +19,8 @@
 #### DocString parsing handles edge cases
 
 > **Invariant:** DocString parsing must gracefully handle empty input, missing language hints, unclosed delimiters, and non-LF line endings without throwing errors.
+>
+> **Rationale:** Codecs receive uncontrolled user content from feature file descriptions; unhandled edge cases would crash document generation for the entire pipeline.
 
 **Verified by:**
 - Empty description returns empty array
@@ -33,6 +35,8 @@
 #### DataTable rendering produces valid markdown
 
 > **Invariant:** DataTable rendering must produce a well-formed table block for any number of rows, substituting empty strings for missing cell values.
+>
+> **Rationale:** Malformed tables break markdown rendering and downstream tooling; missing cells would produce undefined values that corrupt table alignment.
 
 **Verified by:**
 - Single row DataTable renders correctly
@@ -44,6 +48,8 @@
 #### Scenario content rendering respects options
 
 > **Invariant:** Scenario rendering must honor the includeSteps option, producing step lists only when enabled, and must include embedded DataTables when present.
+>
+> **Rationale:** Ignoring the includeSteps option would bloat summary views with unwanted detail, and dropping embedded DataTables would lose structured test data.
 
 **Verified by:**
 - Render scenario with steps
@@ -55,6 +61,8 @@
 #### Business rule rendering handles descriptions
 
 > **Invariant:** Business rule rendering must always include the rule name as a bold paragraph, and must parse descriptions for embedded DocStrings when present.
+>
+> **Rationale:** Omitting the rule name makes rendered output unnavigable, and skipping DocString parsing would output raw delimiter syntax instead of formatted code blocks.
 
 **Verified by:**
 - Rule with simple description
@@ -66,6 +74,8 @@
 #### DocString content is dedented when parsed
 
 > **Invariant:** DocString code blocks must be dedented to remove common leading whitespace while preserving internal relative indentation, empty lines, and trimming trailing whitespace from each line.
+>
+> **Rationale:** Without dedentation, code blocks inherit the Gherkin indentation level, rendering as deeply indented and unreadable in generated markdown.
 
 **Verified by:**
 - Code block preserves internal relative indentation
@@ -87,7 +97,9 @@
 
 #### Business rules appear as a separate section
 
-Rule descriptions provide context for why this business rule exists.
+> **Invariant:** Every Rule block must produce a distinct Business Rule entry containing its description and associated scenarios.
+>
+> **Rationale:** Without guaranteed capture, rule descriptions and rich content (DocStrings, DataTables) would be silently dropped from generated documentation. Rule descriptions provide context for why this business rule exists. You can include multiple paragraphs here. This is a second paragraph explaining edge cases or exceptions.
 
 **Verified by:**
 - Scenario with DocString for rich content
@@ -97,7 +109,9 @@ Rule descriptions provide context for why this business rule exists.
 
 #### Multiple rules create multiple Business Rule entries
 
-Each Rule keyword creates a separate entry in the Business Rules section.
+> **Invariant:** Each Rule keyword in a feature file must produce its own independent Business Rule entry in generated output.
+>
+> **Rationale:** Merging rules into a single entry would collapse distinct business domains, making it impossible to trace scenarios back to their governing constraint. Each Rule keyword creates a separate entry in the Business Rules section. This helps organize complex features into logical business domains.
 
 **Verified by:**
 - Simple scenario under second rule
@@ -118,6 +132,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Architecture generator is registered in the registry
 
 > **Invariant:** The generator registry must contain an "architecture" generator entry available for CLI invocation.
+>
+> **Rationale:** Without a registered entry, the CLI cannot discover or invoke architecture diagram generation.
 
 **Verified by:**
 - Generator is available in registry
@@ -131,6 +147,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Architecture generator produces component diagram by default
 
 > **Invariant:** Running the architecture generator without diagram type options must produce a component diagram with bounded context subgraphs.
+>
+> **Rationale:** A sensible default prevents users from needing to specify options for the most common use case.
 
 **Verified by:**
 - Default generation produces component diagram
@@ -144,6 +162,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Architecture generator supports diagram type options
 
 > **Invariant:** The architecture generator must accept a diagram type option that selects between component and layered diagram output.
+>
+> **Rationale:** Different architectural perspectives (bounded context vs. layer hierarchy) require different diagram types, and the user must be able to select which to generate.
 
 **Verified by:**
 - Generate layered diagram with options
@@ -157,6 +177,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Architecture generator supports context filtering
 
 > **Invariant:** When context filtering is applied, the generated diagram must include only patterns from the specified bounded contexts and exclude all others.
+>
+> **Rationale:** Without filtering, large monorepos would produce unreadable diagrams with dozens of bounded contexts; filtering enables focused per-context views.
 
 **Verified by:**
 - Filter to specific contexts
@@ -226,6 +248,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### archIndex.all contains all patterns with any arch tag
 
 > **Invariant:** archIndex.all must contain exactly the set of patterns that have at least one arch tag (role, context, or layer).
+>
+> **Rationale:** Consumers iterating over all architectural patterns need a single canonical list; omitting partially-tagged patterns would silently drop them from diagrams.
 
 **Verified by:**
 - archIndex.all includes all annotated patterns
@@ -289,6 +313,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### arch-context tag is defined in the registry
 
 > **Invariant:** The tag registry must contain an arch-context tag with value format for free-form bounded context names.
+>
+> **Rationale:** Without a registry-defined arch-context tag, bounded context groupings cannot be validated and diagrams may contain arbitrary context names.
 
 **Verified by:**
 - arch-context tag exists with value format
@@ -303,6 +329,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### arch-layer tag is defined in the registry
 
 > **Invariant:** The tag registry must contain an arch-layer tag with enum format and exactly three values: domain, application, infrastructure.
+>
+> **Rationale:** Allowing arbitrary layer values would break the fixed Clean Architecture ordering that layered diagrams depend on.
 
 **Verified by:**
 - arch-layer tag exists with enum format
@@ -319,6 +347,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### AST parser extracts arch-role from TypeScript annotations
 
 > **Invariant:** The AST parser must extract the arch-role value from JSDoc annotations and populate the directive's archRole field.
+>
+> **Rationale:** If arch-role is not extracted, patterns cannot be classified by architectural role and diagram node styling is lost.
 
 **Verified by:**
 - Extract arch-role projection
@@ -332,6 +362,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### AST parser extracts arch-context from TypeScript annotations
 
 > **Invariant:** The AST parser must extract the arch-context value from JSDoc annotations and populate the directive's archContext field.
+>
+> **Rationale:** If arch-context is not extracted, component diagrams cannot group patterns into bounded context subgraphs.
 
 **Verified by:**
 - Extract arch-context orders
@@ -345,6 +377,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### AST parser extracts arch-layer from TypeScript annotations
 
 > **Invariant:** The AST parser must extract the arch-layer value from JSDoc annotations and populate the directive's archLayer field.
+>
+> **Rationale:** If arch-layer is not extracted, layered diagrams cannot group patterns into domain/application/infrastructure subgraphs.
 
 **Verified by:**
 - Extract arch-layer application
@@ -358,6 +392,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### AST parser handles multiple arch tags together
 
 > **Invariant:** When a JSDoc block contains arch-role, arch-context, and arch-layer tags, all three must be extracted into the directive.
+>
+> **Rationale:** Partial extraction would cause components to be missing from role, context, or layer groupings depending on which tag was dropped.
 
 **Verified by:**
 - Extract all three arch tags
@@ -389,6 +425,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Extracts Rule blocks with Invariant and Rationale
 
+> **Invariant:** Annotated Rule blocks must have their Invariant, Rationale, and Verified-by fields faithfully extracted and rendered.
+>
+> **Rationale:** These structured annotations are the primary content of business rules documentation; losing them silently produces incomplete output.
+
 **Verified by:**
 - Extracts annotated Rule with Invariant and Rationale
 - Extracts unannotated Rule without showing not specified
@@ -396,6 +436,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 ---
 
 #### Organizes rules by product area and phase
+
+> **Invariant:** Rules must be grouped by product area and ordered by phase number within each group.
+>
+> **Rationale:** Ungrouped or misordered rules make it impossible to find domain-specific constraints or understand their delivery sequence.
 
 **Verified by:**
 - Groups rules by product area and phase
@@ -405,6 +449,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Summary mode generates compact output
 
+> **Invariant:** Summary mode must produce only a statistics line and omit all detailed rule headings and content.
+>
+> **Rationale:** AI context windows have strict token limits; including full detail in summary mode wastes context budget and degrades session quality.
+
 **Verified by:**
 - Summary mode includes statistics line
 - Summary mode excludes detailed sections
@@ -412,6 +460,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 ---
 
 #### Preserves code examples and tables in detailed mode
+
+> **Invariant:** Code examples must appear only in detailed mode and must be excluded from standard mode output.
+>
+> **Rationale:** Code blocks in standard mode clutter the overview and push important rule summaries out of view; detailed mode is the opt-in path for full content.
 
 **Verified by:**
 - Code examples included in detailed mode
@@ -421,12 +473,20 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Generates scenario traceability links
 
+> **Invariant:** Verification links must include the source file path so readers can locate the verifying scenario.
+>
+> **Rationale:** Links without file paths are unresolvable, breaking the traceability chain between business rules and their executable specifications.
+
 **Verified by:**
 - Verification links include file path
 
 ---
 
 #### Progressive disclosure generates detail files per product area
+
+> **Invariant:** Each product area with rules must produce a separate detail file, and the main document must link to all detail files via an index table.
+>
+> **Rationale:** A single monolithic document becomes unnavigable at scale; progressive disclosure lets readers drill into only the product area they need.
 
 **Verified by:**
 - Detail files are generated per product area
@@ -437,6 +497,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Empty rules show placeholder instead of blank content
 
+> **Invariant:** Rules with no invariant, description, or scenarios must render a placeholder message; rules with scenarios but no invariant must show the verified-by list instead.
+>
+> **Rationale:** Blank rule sections are indistinguishable from rendering bugs; explicit placeholders signal intentional incompleteness versus broken extraction.
+
 **Verified by:**
 - Rule without invariant or description or scenarios shows placeholder
 - Rule without invariant but with scenarios shows verified-by instead
@@ -445,12 +509,20 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Rules always render flat for full visibility
 
+> **Invariant:** Rule output must never use collapsible blocks regardless of rule count; all rule headings must be directly visible.
+>
+> **Rationale:** Business rules are compliance-critical content; hiding them behind collapsible sections risks rules being overlooked during review.
+
 **Verified by:**
 - Features with many rules render flat without collapsible blocks
 
 ---
 
 #### Source file shown as filename text
+
+> **Invariant:** Source file references must render as plain filename text, not as markdown links.
+>
+> **Rationale:** Markdown links to local file paths break in every viewer except the local filesystem, producing dead links that erode trust in the documentation.
 
 **Verified by:**
 - Source file rendered as plain text not link
@@ -459,6 +531,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Verified-by renders as checkbox list at standard level
 
+> **Invariant:** Verified-by must render as a checkbox list of scenario names, with duplicate names deduplicated.
+>
+> **Rationale:** Duplicate entries inflate the checklist and mislead reviewers into thinking more verification exists than actually does.
+
 **Verified by:**
 - Rules with scenarios show verified-by checklist
 - Duplicate scenario names are deduplicated
@@ -466,6 +542,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 ---
 
 #### Feature names are humanized from camelCase pattern names
+
+> **Invariant:** CamelCase pattern names must be converted to space-separated headings with trailing "Testing" suffixes stripped.
+>
+> **Rationale:** Raw camelCase names are unreadable in documentation headings, and "Testing" suffixes leak implementation concerns into user-facing output.
 
 **Verified by:**
 - CamelCase pattern name becomes spaced heading
@@ -501,6 +581,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Component diagrams group patterns by bounded context
 
 > **Invariant:** Each distinct arch-context value must produce exactly one Mermaid subgraph containing all patterns with that context.
+>
+> **Rationale:** Without subgraph grouping, the visual relationship between components and their bounded context is lost, making the diagram structurally meaningless.
 
 **Verified by:**
 - Generate subgraphs for bounded contexts
@@ -562,6 +644,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Component diagram includes summary section
 
 > **Invariant:** The generated component diagram document must include an Overview section with component count and bounded context count.
+>
+> **Rationale:** Without summary counts, readers cannot quickly assess diagram scope or detect missing components.
 
 **Verified by:**
 - Summary section with counts
@@ -575,6 +659,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Component diagram includes legend when enabled
 
 > **Invariant:** When the legend is enabled, the document must include a Legend section explaining relationship arrow styles.
+>
+> **Rationale:** Without a legend, readers cannot distinguish uses, depends-on, implements, and extends arrows, making relationship semantics ambiguous.
 
 **Verified by:**
 - Legend section with arrow explanations
@@ -587,6 +673,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Component diagram includes inventory table when enabled
 
 > **Invariant:** When the inventory is enabled, the document must include a Component Inventory table with Component, Context, Role, and Layer columns.
+>
+> **Rationale:** The inventory provides a searchable, text-based alternative to the visual diagram for tooling and accessibility.
 
 **Verified by:**
 - Inventory table with component details
@@ -620,6 +708,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### CompositeCodec concatenates sections in codec array order
 
 > **Invariant:** Sections from child codecs appear in the composite output in the same order as the codecs array.
+>
+> **Rationale:** Non-deterministic section ordering would make generated documents unstable across runs, breaking diff-based review workflows.
 
 **Verified by:**
 - Sections from two codecs appear in order
@@ -630,6 +720,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Separators between codec outputs are configurable
 
 > **Invariant:** By default, a separator block is inserted between each child codec's sections. When separateSections is false, no separators are added.
+>
+> **Rationale:** Without configurable separators, consumers cannot control visual grouping — some documents need clear boundaries between codec outputs while others need seamless flow.
 
 **Verified by:**
 - Default separator between sections
@@ -640,6 +732,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### additionalFiles merge with last-wins semantics
 
 > **Invariant:** additionalFiles from all children are merged into a single record. When keys collide, the later codec's value wins.
+>
+> **Rationale:** Silently dropping colliding keys would lose content without warning, while throwing on collision would prevent composing codecs that intentionally override shared file paths.
 
 **Verified by:**
 - Non-overlapping files merged
@@ -650,6 +744,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### composeDocuments works at document level without codecs
 
 > **Invariant:** composeDocuments accepts RenderableDocument array and produces a composed RenderableDocument without requiring codecs.
+>
+> **Rationale:** Requiring a full codec instance for simple document merging would force unnecessary schema definitions when callers already hold pre-rendered documents.
 
 **Verified by:**
 - Direct document composition
@@ -659,6 +755,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Empty codec outputs are handled gracefully
 
 > **Invariant:** Codecs producing empty sections arrays contribute nothing to the output. No separator is emitted for empty outputs.
+>
+> **Rationale:** Emitting separators around empty sections would produce orphaned dividers in the generated markdown, creating visual noise with no content between them.
 
 **Verified by:**
 - Empty codec skipped without separator
@@ -746,6 +844,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Empty and missing inputs produce empty results
 
+> **Invariant:** Extraction with no tags or no matching patterns always produces an empty result.
+>
+> **Rationale:** Callers must be able to distinguish "no conventions found" from errors without special-casing nulls or exceptions.
+
 **Verified by:**
 - Empty convention tags returns empty array
 - No matching patterns returns empty array
@@ -753,6 +855,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 ---
 
 #### Convention bundles are extracted from matching patterns
+
+> **Invariant:** Each unique convention tag produces exactly one bundle, and patterns sharing a tag are merged into that bundle.
+>
+> **Rationale:** Without tag-based grouping and merging, convention content would be fragmented across duplicates, making downstream rendering unreliable.
 
 **Verified by:**
 - Single pattern with one convention tag produces one bundle
@@ -763,6 +869,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Structured content is extracted from rule descriptions
 
+> **Invariant:** Invariant, rationale, and table content embedded in rule descriptions must be extracted as structured metadata, not raw text.
+>
+> **Rationale:** Downstream renderers depend on structured fields to produce consistent documentation; unstructured text would require re-parsing at every consumption point.
+
 **Verified by:**
 - Invariant and rationale are extracted from rule description
 - Tables in rule descriptions are extracted as structured data
@@ -771,6 +881,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Code examples in rule descriptions are preserved
 
+> **Invariant:** Fenced code blocks (including Mermaid diagrams) in rule descriptions must be extracted as typed code examples and never discarded.
+>
+> **Rationale:** Losing code examples during extraction would silently degrade generated documentation, removing diagrams and samples authors intended to publish.
+
 **Verified by:**
 - Mermaid diagram in rule description is extracted as code example
 - Rule description without code examples has no code examples field
@@ -778,6 +892,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 ---
 
 #### TypeScript JSDoc conventions are extracted alongside Gherkin
+
+> **Invariant:** TypeScript JSDoc and Gherkin convention sources sharing the same tag must merge into a single bundle with all rules preserved from both sources.
+>
+> **Rationale:** Conventions are defined across both TypeScript and Gherkin; failing to merge them would split a single logical convention into incomplete fragments.
 
 **Verified by:**
 - TypeScript pattern with heading sections produces multiple rules
@@ -987,6 +1105,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Empty lines are handled correctly
 
 > **Invariant:** Empty lines (including lines with only whitespace) must not affect the minimum indentation calculation and must be preserved in output.
+>
+> **Rationale:** Counting whitespace-only lines as indented content would inflate the minimum indentation, causing non-empty lines to retain unwanted leading spaces.
 
 **Verified by:**
 - Empty lines with trailing spaces are preserved
@@ -997,6 +1117,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Single line input is handled
 
 > **Invariant:** Single-line input must have its leading whitespace removed without errors or unexpected transformations.
+>
+> **Rationale:** Failing or returning empty output on single-line input would break callers that extract individual lines from multi-line DocStrings.
 
 **Verified by:**
 - Single line with indentation is dedented
@@ -1007,6 +1129,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Unicode whitespace is handled
 
 > **Invariant:** Non-breaking spaces and other Unicode whitespace characters must be treated as content, not as indentation to be removed.
+>
+> **Rationale:** Stripping Unicode whitespace as indentation would corrupt intentional formatting in source code and documentation content.
 
 **Verified by:**
 - Non-breaking space is treated as content
@@ -1016,6 +1140,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Relative indentation is preserved
 
 > **Invariant:** After removing the common leading whitespace, the relative indentation between lines must remain unchanged.
+>
+> **Rationale:** Altering relative indentation would break the syntactic structure of extracted code blocks, making them unparseable or semantically incorrect.
 
 **Verified by:**
 - Nested code blocks preserve relative indentation
@@ -1045,6 +1171,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Edge cases are handled correctly
 
 > **Invariant:** Header stripping handles degenerate inputs (header-only, whitespace-only, mid-description headers) without data loss or rendering errors.
+>
+> **Rationale:** Patterns with unusual descriptions (header-only stubs, whitespace padding) are common in early roadmap stages; crashing on these would block documentation generation for the entire dataset.
 
 **Verified by:**
 - Empty description after stripping headers
@@ -1056,6 +1184,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### stripLeadingHeaders removes only leading headers
 
 > **Invariant:** The helper function strips only headers that appear before any non-header content; headers occurring after body text are preserved.
+>
+> **Rationale:** Mid-description headers are intentional structural elements authored by the user; stripping them would silently destroy document structure.
 
 **Verified by:**
 - Strips h1 header
@@ -1076,6 +1206,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Behavior files are verified during pattern extraction
 
 > **Invariant:** Every timeline pattern must report whether its corresponding behavior file exists.
+>
+> **Rationale:** Without verification at extraction time, traceability reports would silently include broken references to non-existent behavior files.
 
 **Verified by:**
 - Behavior file existence verified during extraction
@@ -1088,6 +1220,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Traceability coverage reports verified and unverified behavior files
 
 > **Invariant:** Coverage reports must distinguish between patterns with verified behavior files and those without.
+>
+> **Rationale:** Conflating verified and unverified coverage would overstate test confidence, hiding gaps that should be addressed before release.
 
 **Verified by:**
 - Traceability shows covered phases with verified behavior files
@@ -1097,6 +1231,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Pattern names are transformed to human-readable display names
 
 > **Invariant:** Display names must convert CamelCase to title case, handle consecutive capitals, and respect explicit title overrides.
+>
+> **Rationale:** CamelCase identifiers are unreadable in generated documentation; human-readable names are essential for non-developer consumers of pattern registries.
 
 **Verified by:**
 - CamelCase pattern names transformed to title case
@@ -1109,6 +1245,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### PRD acceptance criteria are formatted with numbering and bold keywords
 
 > **Invariant:** PRD output must number acceptance criteria and bold Given/When/Then keywords when steps are enabled.
+>
+> **Rationale:** Unnumbered criteria are difficult to reference in reviews; unformatted step keywords blend into prose, making scenarios harder to parse visually.
 
 **Verified by:**
 - PRD shows numbered acceptance criteria with bold keywords
@@ -1120,6 +1258,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Business values are formatted for human readability
 
 > **Invariant:** Hyphenated business value tags must be converted to space-separated readable text in all output contexts.
+>
+> **Rationale:** Raw hyphenated tags like "enable-rich-prd" are annotation artifacts; displaying them verbatim in generated docs confuses readers expecting natural language.
 
 **Verified by:**
 - Hyphenated business value converted to spaces
@@ -1158,6 +1298,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Single-line descriptions are returned as-is when complete
 
 > **Invariant:** A single-line description that ends with sentence-ending punctuation is returned verbatim; one without gets an appended ellipsis.
+>
+> **Rationale:** Summaries appear in pattern tables where readers expect grammatically complete text; an ellipsis signals intentional truncation rather than a rendering bug.
 
 **Verified by:**
 - Complete sentence on single line
@@ -1168,6 +1310,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Multi-line descriptions are combined until sentence ending
 
 > **Invariant:** Lines are concatenated until a sentence-ending punctuation mark is found or the character limit is reached, whichever comes first.
+>
+> **Rationale:** Splitting at arbitrary line breaks produces sentence fragments that lose meaning; combining until a natural boundary preserves semantic completeness.
 
 **Verified by:**
 - Two lines combine into complete sentence
@@ -1205,6 +1349,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Edge cases are handled gracefully
 
 > **Invariant:** Degenerate inputs (empty strings, markdown-only content, bold markers) produce valid output without errors: empty input yields empty string, formatting is stripped, and multiple sentence endings use the first.
+>
+> **Rationale:** Summary extraction runs on every pattern in the dataset; an unhandled edge case would crash the entire documentation generation pipeline.
 
 **Verified by:**
 - Empty description returns empty string
@@ -1224,6 +1370,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Registry manages generator registration and retrieval
 
 > **Invariant:** Each generator name is unique within the registry; duplicate registration is rejected and lookup of unknown names returns undefined.
+>
+> **Rationale:** Allowing duplicate names would silently overwrite an existing generator, causing previously registered behavior to disappear without warning.
 
 **Verified by:**
 - Register generator with unique name
@@ -1256,6 +1404,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### All implementation links in a pattern are normalized
 
 > **Invariant:** Every implementation link in a pattern document must have its path normalized, regardless of how many implementations exist.
+>
+> **Rationale:** A single un-normalized link in a multi-implementation pattern produces a broken reference that undermines trust in the entire generated document.
 
 **Verified by:**
 - Multiple implementations with mixed prefixes
@@ -1265,6 +1415,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### normalizeImplPath strips known prefixes
 
 > **Invariant:** normalizeImplPath removes only recognized repository prefixes from the start of a path and leaves all other path segments unchanged.
+>
+> **Rationale:** Over-stripping would corrupt legitimate path segments that happen to match a prefix name, producing silent broken links.
 
 **Verified by:**
 - Strips libar-platform/ prefix
@@ -1283,6 +1435,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Layered diagrams group patterns by arch-layer
 
 > **Invariant:** Each distinct arch-layer value must produce exactly one Mermaid subgraph containing all patterns with that layer.
+>
+> **Rationale:** Without layer subgraphs, the Clean Architecture boundary between domain, application, and infrastructure is not visually enforced.
 
 **Verified by:**
 - Generate subgraphs for each layer
@@ -1345,6 +1499,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Layered diagram includes summary section
 
 > **Invariant:** The generated layered diagram document must include an Overview section with annotated source file count.
+>
+> **Rationale:** Without summary counts, readers cannot assess diagram completeness or detect missing annotated sources.
 
 **Verified by:**
 - Summary section for layered view
@@ -1378,6 +1534,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Pattern names are sanitized for Mermaid node IDs
 
 > **Invariant:** Pattern names must be transformed into valid Mermaid node IDs by replacing special characters (dots, hyphens, spaces) with underscores.
+>
+> **Rationale:** Unsanitized names containing dots, hyphens, or spaces produce invalid Mermaid syntax that fails to render.
 
 **Verified by:**
 - Special characters are replaced
@@ -1387,6 +1545,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### All relationship types appear in single graph
 
 > **Invariant:** The generated Mermaid graph must combine all relationship types (uses, depends-on, implements, extends) into a single top-down graph.
+>
+> **Rationale:** Splitting relationship types into separate graphs would fragment the dependency picture and hide cross-type interactions.
 
 **Verified by:**
 - Complete dependency graph with all relationship types
@@ -1427,6 +1587,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Category sections group patterns by domain
 
 > **Invariant:** Each category in the dataset must produce an H3 section listing its patterns, and the filterCategories option must restrict output to only the specified categories.
+>
+> **Rationale:** Without category grouping, consumers must scan the entire flat pattern list to find domain-relevant patterns; filtering avoids noise in focused documentation.
 
 **Verified by:**
 - Category sections with pattern lists
@@ -1437,6 +1599,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Dependency graph visualizes pattern relationships
 
 > **Invariant:** A Mermaid dependency graph must be included when pattern relationships exist and the includeDependencyGraph option is not disabled; it must be omitted when no relationships exist or when explicitly disabled.
+>
+> **Rationale:** Dependency relationships are invisible in flat pattern lists; the graph reveals implementation ordering and coupling that affects planning decisions.
 
 **Verified by:**
 - Dependency graph included when relationships exist
@@ -1645,6 +1809,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### PrChangesCodec generates review checklist when includeReviewChecklist is enabled
 
 > **Invariant:** When includeReviewChecklist is enabled, the codec must generate a "Review Checklist" section with standard items and context-sensitive items based on pattern state (completed, active, dependencies, deliverables). When disabled, no checklist appears.
+>
+> **Rationale:** A context-sensitive checklist prevents reviewers from missing state-specific concerns (e.g., verifying completed patterns still work, or that dependencies are satisfied) that a static checklist would not cover.
 
 **Verified by:**
 - Review checklist generated with standard items
@@ -1659,6 +1825,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### PrChangesCodec generates dependencies section when includeDependencies is enabled
 
 > **Invariant:** When includeDependencies is enabled and patterns have dependency relationships, the codec must render a "Dependencies" section with "Depends On" and "Enables" subsections. When no dependencies exist or the option is disabled, the section is omitted.
+>
+> **Rationale:** Dependency visibility in PR reviews prevents merging changes that break upstream or downstream patterns, which would otherwise only surface during integration.
 
 **Verified by:**
 - Dependencies section shows depends on relationships
@@ -1671,6 +1839,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### PrChangesCodec filters patterns by changedFiles
 
 > **Invariant:** When changedFiles filter is set, only patterns whose source files match (including partial directory path matches) are included in the output.
+>
+> **Rationale:** Filtering by changed files scopes the PR document to only the patterns actually touched, preventing reviewers from wading through unrelated patterns.
 
 **Verified by:**
 - Patterns filtered by changedFiles match
@@ -1681,6 +1851,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### PrChangesCodec filters patterns by releaseFilter
 
 > **Invariant:** When releaseFilter is set, only patterns with deliverables matching the specified release version are included.
+>
+> **Rationale:** Release filtering isolates the patterns scheduled for a specific version, enabling targeted release reviews without noise from other versions' deliverables.
 
 **Verified by:**
 - Patterns filtered by release version
@@ -1733,6 +1905,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### PrChangesCodec generates summary with filter information
 
 > **Invariant:** Every PR changes document must contain a Summary section with pattern counts and active filter information.
+>
+> **Rationale:** Without a summary, reviewers must scan the entire document to understand the scope and filtering context of the PR changes.
 
 **Verified by:**
 - Summary section shows pattern counts
@@ -1744,6 +1918,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### PrChangesCodec groups changes by phase when sortBy is "phase"
 
 > **Invariant:** When sortBy is "phase" (the default), patterns must be grouped under phase headings in ascending phase order.
+>
+> **Rationale:** Phase grouping aligns PR changes with the delivery roadmap, letting reviewers verify that changes belong to the expected implementation phase.
 
 **Verified by:**
 - Changes grouped by phase with default sortBy
@@ -1754,6 +1930,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### PrChangesCodec groups changes by priority when sortBy is "priority"
 
 > **Invariant:** When sortBy is "priority", patterns must be grouped under High/Medium/Low priority headings with correct pattern assignment.
+>
+> **Rationale:** Priority grouping lets reviewers focus on high-impact changes first, ensuring critical patterns receive the most review attention.
 
 **Verified by:**
 - Changes grouped by priority
@@ -1775,6 +1953,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### PrChangesCodec renders pattern details with metadata and description
 
 > **Invariant:** Each pattern entry must include a metadata table (status, phase, business value when available) and description text.
+>
+> **Rationale:** Metadata and description provide the context reviewers need to evaluate whether a pattern's implementation aligns with its stated purpose and delivery status.
 
 **Verified by:**
 - Pattern detail shows metadata table
@@ -1786,6 +1966,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### PrChangesCodec renders deliverables when includeDeliverables is enabled
 
 > **Invariant:** Deliverables are only rendered when includeDeliverables is enabled, and when releaseFilter is set, only deliverables matching that release are shown.
+>
+> **Rationale:** Deliverables add bulk to the PR document; gating them behind a flag keeps default output concise, while release filtering prevents reviewers from seeing unrelated work items.
 
 **Verified by:**
 - Deliverables shown when patterns have deliverables
@@ -1797,6 +1979,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### PrChangesCodec renders acceptance criteria from scenarios
 
 > **Invariant:** When patterns have associated scenarios, the codec must render an "Acceptance Criteria" section containing scenario names and step lists.
+>
+> **Rationale:** Acceptance criteria give reviewers a concrete checklist to verify that the PR's implementation satisfies the behavioral requirements defined in the spec.
 
 **Verified by:**
 - Acceptance criteria rendered when patterns have scenarios
@@ -1807,6 +1991,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### PrChangesCodec renders business rules from Gherkin Rule keyword
 
 > **Invariant:** When patterns have Gherkin Rule blocks, the codec must render a "Business Rules" section containing rule names and verification information.
+>
+> **Rationale:** Business rules surface domain invariants directly in the PR review, ensuring reviewers can verify that implementation changes respect the documented constraints.
 
 **Verified by:**
 - Business rules rendered when patterns have rules
@@ -1823,6 +2009,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Release version filtering controls which phases appear in output
 
 > **Invariant:** Only phases with deliverables matching the releaseFilter are included; roadmap phases are always excluded.
+>
+> **Rationale:** Including unrelated releases or unstarted roadmap items in a PR description misleads reviewers about the scope of actual changes.
 
 **Verified by:**
 - Filter phases by specific release version
@@ -1835,6 +2023,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Patterns are grouped by phase number in the output
 
 > **Invariant:** Each phase number produces a separate heading section in the generated output.
+>
+> **Rationale:** Without phase grouping, reviewers cannot distinguish which changes belong to which delivery phase, making incremental review impossible.
 
 **Verified by:**
 - Patterns grouped by phase number
@@ -1844,6 +2034,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Summary statistics provide a high-level overview of the PR
 
 > **Invariant:** Summary section always shows pattern counts and release tag when a releaseFilter is active.
+>
+> **Rationale:** Without a summary, reviewers must read the entire document to understand the PR's scope; the release tag anchors the summary to a specific version.
 
 **Verified by:**
 - Summary shows pattern counts in table format
@@ -1854,6 +2046,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Deliverables are displayed inline with their parent patterns
 
 > **Invariant:** When includeDeliverables is enabled, each pattern lists its deliverables with name, status, and release tag.
+>
+> **Rationale:** Hiding deliverables forces reviewers to cross-reference feature files to verify completion; inline display makes review self-contained.
 
 **Verified by:**
 - Deliverables shown inline with patterns
@@ -1864,6 +2058,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Review checklist includes standard code quality verification items
 
 > **Invariant:** Review checklist always includes code conventions, tests, documentation, and completed pattern verification items.
+>
+> **Rationale:** Omitting the checklist means quality gates depend on reviewer memory; a consistent checklist ensures no standard verification step is skipped.
 
 **Verified by:**
 - Review checklist includes standard code quality items
@@ -1874,6 +2070,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Dependencies section shows inter-pattern relationships
 
 > **Invariant:** Dependencies section surfaces both what patterns enable and what they depend on.
+>
+> **Rationale:** Hidden dependencies cause merge-order mistakes and broken builds; surfacing them in the PR lets reviewers verify prerequisite work is complete.
 
 **Verified by:**
 - Dependencies shows what patterns enable
@@ -1884,6 +2082,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Business value can be included or excluded from pattern metadata
 
 > **Invariant:** Business value display is controlled by the includeBusinessValue option.
+>
+> **Rationale:** Not all consumers need business value context; making it opt-in keeps the default output concise for technical reviewers.
 
 **Verified by:**
 - Pattern metadata includes business value when enabled
@@ -1894,6 +2094,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Output can be sorted by phase number or priority
 
 > **Invariant:** Sorting is deterministic and respects the configured sortBy option.
+>
+> **Rationale:** Non-deterministic ordering produces diff noise between regenerations, making it impossible to tell if content actually changed.
 
 **Verified by:**
 - Phases sorted by phase number
@@ -1904,6 +2106,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Edge cases produce graceful output
 
 > **Invariant:** The generator handles missing phases, missing deliverables, and missing phase numbers without errors.
+>
+> **Rationale:** Crashing on incomplete data prevents PR generation entirely; graceful degradation ensures output is always available even with partial inputs.
 
 **Verified by:**
 - No matching phases produces no changes message
@@ -1915,6 +2119,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Deliverable-level filtering shows only matching deliverables within a phase
 
 > **Invariant:** When a phase contains deliverables with different release tags, only those matching the releaseFilter are shown.
+>
+> **Rationale:** Showing all deliverables regardless of release tag pollutes the PR with unrelated work, obscuring what actually shipped in the target release.
 
 **Verified by:**
 - Mixed releases within single phase shows only matching deliverables
@@ -1972,6 +2178,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Patterns without implementations omit the section
 
 > **Invariant:** The Implementations heading must not appear in pattern documents when no implementing files exist.
+>
+> **Rationale:** Rendering an empty Implementations section misleads readers into thinking implementations were expected but are missing, rather than simply not applicable.
 
 **Verified by:**
 - No implementations section when none exist
@@ -1997,12 +2205,20 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Empty datasets produce fallback content
 
+> **Invariant:** A codec must always produce a valid document, even when no matching content exists in the dataset.
+>
+> **Rationale:** Consumers rely on a consistent document structure; a missing or null document would cause rendering failures downstream.
+
 **Verified by:**
 - Codec with no matching content produces fallback message
 
 ---
 
 #### Convention content is rendered as sections
+
+> **Invariant:** Convention-tagged patterns must render as distinct headed sections with their rule names, invariants, and tables preserved.
+>
+> **Rationale:** Conventions define project-wide constraints; losing their structure in generated docs would make them unenforceable and undiscoverable.
 
 **Verified by:**
 - Convention rules appear as H2 headings with content
@@ -2012,6 +2228,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Detail level controls output density
 
+> **Invariant:** Each detail level (summary, standard, detailed) must produce a deterministic subset of content, with summary being the most restrictive.
+>
+> **Rationale:** AI session contexts have strict token budgets; uncontrolled output density wastes context window and degrades session quality.
+
 **Verified by:**
 - Summary level omits narrative and rationale
 - Detailed level includes rationale and verified-by
@@ -2020,12 +2240,20 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Behavior sections are rendered from category-matching patterns
 
+> **Invariant:** Only patterns whose category matches the configured behavior tags may appear in the Behavior Specifications section.
+>
+> **Rationale:** Mixing unrelated categories into a single behavior section would produce misleading documentation that conflates distinct concerns.
+
 **Verified by:**
 - Behavior-tagged patterns appear in a Behavior Specifications section
 
 ---
 
 #### Shape sources are extracted from matching patterns
+
+> **Invariant:** Only shapes from patterns whose file path matches the configured shapeSources glob may appear in the API Types section.
+>
+> **Rationale:** Including shapes from unrelated source paths would pollute the API Types section with irrelevant type definitions, breaking the scoped documentation contract.
 
 **Verified by:**
 - Shapes appear when source file matches shapeSources glob
@@ -2036,6 +2264,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Convention and behavior content compose in a single document
 
+> **Invariant:** Convention and behavior content must coexist in the same RenderableDocument when both are present in the dataset.
+>
+> **Rationale:** Splitting conventions and behaviors into separate documents would force consumers to cross-reference multiple files, losing the unified view of a product area.
+
 **Verified by:**
 - Both convention and behavior sections appear when data exists
 
@@ -2043,12 +2275,20 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Composition order follows AD-5: conventions then shapes then behaviors
 
+> **Invariant:** Document sections must follow the canonical order: conventions, then API types (shapes), then behavior specifications.
+>
+> **Rationale:** AD-5 establishes a consistent reading flow (rules, then types, then specs); violating this order would confuse readers who expect a stable document structure.
+
 **Verified by:**
 - Convention headings appear before shapes before behaviors
 
 ---
 
 #### Convention code examples render as mermaid blocks
+
+> **Invariant:** Mermaid diagram content in conventions must render as fenced mermaid blocks, and must be excluded at summary detail level.
+>
+> **Rationale:** Mermaid diagrams are visual aids that require rendering support; emitting them as plain text would produce unreadable output, and including them in summaries wastes token budget.
 
 **Verified by:**
 - Convention with mermaid content produces mermaid block in output
@@ -2064,12 +2304,20 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Standard detail level includes narrative but omits rationale
 
+> **Invariant:** Standard detail level renders narrative prose for convention patterns but excludes rationale sections, reserving rationale for the detailed level only.
+>
+> **Rationale:** Progressive disclosure prevents information overload at the standard level while ensuring readers who need deeper justification can access it at the detailed level.
+
 **Verified by:**
 - Standard level includes narrative but omits rationale
 
 ---
 
 #### Deep behavior rendering with structured annotations
+
+> **Invariant:** Behavior patterns render structured rule annotations (invariant, rationale, verified-by) at detailed level, invariant-only at standard level, and a truncated table at summary level.
+>
+> **Rationale:** Structured annotations are the primary mechanism for surfacing business rules from Gherkin sources; inconsistent rendering across detail levels would produce misleading or incomplete documentation.
 
 **Verified by:**
 - Detailed level renders structured behavior rules
@@ -2081,6 +2329,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Shape JSDoc prose renders at standard and detailed levels
 
+> **Invariant:** Shape patterns with JSDoc prose include that prose in rendered code blocks at standard and detailed levels. Shapes without JSDoc render code blocks only.
+>
+> **Rationale:** JSDoc prose provides essential context for API types; omitting it would force readers to open source files to understand a shape's purpose, undermining the generated documentation's self-sufficiency.
+
 **Verified by:**
 - Standard level includes JSDoc in code blocks
 - Detailed level includes JSDoc in code block and property table
@@ -2089,6 +2341,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 ---
 
 #### Shape sections render param returns and throws documentation
+
+> **Invariant:** Function shapes render parameter, returns, and throws documentation at detailed level. Standard level renders parameter tables but omits throws. Shapes without param docs skip the parameter table entirely.
+>
+> **Rationale:** Throws documentation is diagnostic detail that clutters standard output; separating it into detailed level keeps standard output focused on the function's contract while preserving full error documentation for consumers who need it.
 
 **Verified by:**
 - Detailed level renders param table for function shapes
@@ -2133,6 +2389,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Include tags route cross-cutting content into reference documents
 
 > **Invariant:** Patterns with matching include tags appear alongside category-selected patterns in the behavior section. The merging is additive (OR semantics).
+>
+> **Rationale:** Cross-cutting patterns (e.g., shared utilities, common validators) belong in multiple reference documents; without include-tag routing, these patterns would only appear in their home category, leaving dependent documents incomplete.
 
 **Verified by:**
 - Include-tagged pattern appears in behavior section
@@ -2149,6 +2407,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Scoped diagrams are generated from diagramScope config
 
+> **Invariant:** Diagram content is determined exclusively by diagramScope filters (archContext, include, archLayer, patterns), and filters compose via OR — a pattern matching any single filter appears in the diagram.
+>
+> **Rationale:** Without filter-driven scoping, diagrams would include all patterns regardless of relevance, producing unreadable visualizations that obscure architectural boundaries.
+
 **Verified by:**
 - Config with diagramScope produces mermaid block at detailed level
 - Neighbor patterns appear in diagram with distinct style
@@ -2164,6 +2426,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 ---
 
 #### Multiple diagram scopes produce multiple mermaid blocks
+
+> **Invariant:** Each entry in the diagramScopes array produces an independent Mermaid block with its own title and direction, and legacy singular diagramScope remains supported as a fallback.
+>
+> **Rationale:** Product areas require multiple architectural views (e.g., system overview and data flow) from a single configuration, and breaking backward compatibility with the singular diagramScope would silently remove diagrams from existing consumers.
 
 **Verified by:**
 - Config with diagramScopes array produces multiple diagrams
@@ -2276,6 +2542,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Priority-based sorting surfaces critical work first
 
 > **Invariant:** Phases with higher priority always appear before lower-priority phases when sorting by priority.
+>
+> **Rationale:** Without priority sorting, critical work gets buried under low-priority items, delaying urgent deliverables.
 
 **Verified by:**
 - Next Actionable sorted by priority
@@ -2287,6 +2555,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Effort parsing converts duration strings to comparable hours
 
 > **Invariant:** Effort strings must be parsed to a common unit (hours) for accurate sorting across different time scales.
+>
+> **Rationale:** Comparing raw strings like "2h" and "3d" lexicographically produces incorrect ordering; normalization to hours ensures consistent comparison.
 
 **Verified by:**
 - Phases sorted by effort ascending
@@ -2300,6 +2570,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Quarter grouping organizes planned work into time-based buckets
 
 > **Invariant:** Phases with a quarter tag are grouped under their quarter heading; phases without a quarter appear under Unscheduled.
+>
+> **Rationale:** Flat lists obscure time-based planning; grouping by quarter lets planners see what is committed per period and what remains unscheduled.
 
 **Verified by:**
 - Planned phases grouped by quarter
@@ -2310,6 +2582,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Priority grouping organizes phases by urgency level
 
 > **Invariant:** Phases are grouped under their priority heading; phases without priority appear under Unprioritized.
+>
+> **Rationale:** Mixing priority levels in a flat list forces readers to visually scan for urgency; grouping by priority makes triage immediate.
 
 **Verified by:**
 - Planned phases grouped by priority
@@ -2319,6 +2593,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Progressive disclosure prevents information overload in large backlogs
 
 > **Invariant:** When the backlog exceeds maxNextActionable, only the top N phases are shown with a link or count for the remainder.
+>
+> **Rationale:** Displaying hundreds of phases in the summary overwhelms planners; progressive disclosure keeps the summary scannable while preserving access to the full backlog.
 
 **Verified by:**
 - Large backlog uses progressive disclosure
@@ -2329,6 +2605,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Edge cases are handled gracefully
 
 > **Invariant:** Empty or fully-blocked backlogs produce meaningful output instead of errors or blank sections.
+>
+> **Rationale:** Blank or errored output when the backlog is empty confuses users into thinking the generator is broken rather than reflecting a genuinely empty state.
 
 **Verified by:**
 - Empty backlog handling
@@ -2339,6 +2617,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Default behavior preserves backward compatibility
 
 > **Invariant:** Without explicit sortBy or groupPlannedBy options, phases are sorted by phase number in a flat list.
+>
+> **Rationale:** Changing default behavior would break existing consumers that rely on phase-number ordering without specifying options.
 
 **Verified by:**
 - Default sorting is by phase number
@@ -2391,6 +2671,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### All phases with incomplete patterns are shown
 
 > **Invariant:** The phase table must include every phase that contains at least one incomplete pattern, and phases with only completed patterns must be excluded.
+>
+> **Rationale:** Showing fully completed phases inflates the remaining work view, while omitting phases with incomplete patterns hides outstanding work.
 
 **Verified by:**
 - Multiple phases shown in order
@@ -2407,6 +2689,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Document metadata renders as frontmatter before sections
 
 > **Invariant:** Title always renders as H1, purpose and detail level render as bold key-value pairs separated by horizontal rule.
+>
+> **Rationale:** Consistent frontmatter structure allows downstream tooling and readers to reliably locate the document title and metadata without parsing the full body.
 
 **Verified by:**
 - Render minimal document with title only
@@ -2419,6 +2703,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Headings render at correct markdown levels with clamping
 
 > **Invariant:** Heading levels are clamped to the valid range 1-6 regardless of input value.
+>
+> **Rationale:** Markdown only supports heading levels 1-6; unclamped values would produce invalid syntax that renders as plain text in all markdown processors.
 
 **Verified by:**
 - Render headings at different levels
@@ -2430,6 +2716,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Paragraphs and separators render as plain text and horizontal rules
 
 > **Invariant:** Paragraph content passes through unmodified, including special markdown characters. Separators render as horizontal rules.
+>
+> **Rationale:** The renderer is a dumb printer; altering paragraph content would break codec-controlled formatting and violate the separation between codec logic and rendering.
 
 **Verified by:**
 - Render paragraph
@@ -2441,6 +2729,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Tables render with headers, alignment, and cell escaping
 
 > **Invariant:** Tables must escape pipe characters, convert newlines to line breaks, and pad short rows to match column count.
+>
+> **Rationale:** Unescaped pipes corrupt table column boundaries, raw newlines break row parsing, and short rows cause column misalignment in every markdown renderer.
 
 **Verified by:**
 - Render basic table
@@ -2455,6 +2745,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Lists render in unordered, ordered, checkbox, and nested formats
 
 > **Invariant:** List type determines prefix: dash for unordered, numbered for ordered, checkbox syntax for checked items. Nesting adds two-space indentation per level.
+>
+> **Rationale:** Incorrect prefixes or indentation levels cause markdown parsers to break list continuity, rendering nested items as separate top-level lists or plain text.
 
 **Verified by:**
 - Render unordered list
@@ -2473,6 +2765,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Code blocks and mermaid diagrams render with fenced syntax
 
 > **Invariant:** Code blocks use triple backtick fencing with optional language hint. Mermaid blocks use mermaid as the language hint.
+>
+> **Rationale:** Inconsistent fencing breaks syntax highlighting in GitHub/IDE markdown previews and prevents Mermaid renderers from detecting diagram blocks.
 
 **Verified by:**
 - Render code block with language
@@ -2484,6 +2778,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Collapsible blocks render as HTML details elements
 
 > **Invariant:** Summary text is HTML-escaped to prevent injection. Collapsible content renders between details tags.
+>
+> **Rationale:** Unescaped HTML in summary text enables XSS when generated markdown is rendered in browsers; malformed details tags break progressive disclosure in documentation.
 
 **Verified by:**
 - Render collapsible block
@@ -2495,6 +2791,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Link-out blocks render as markdown links with URL encoding
 
 > **Invariant:** Link paths with spaces are percent-encoded for valid URLs.
+>
+> **Rationale:** Unencoded spaces produce broken links in markdown renderers, making cross-document navigation fail silently for files with spaces in their paths.
 
 **Verified by:**
 - Render link-out block
@@ -2505,6 +2803,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Multi-file documents produce correct output file collections
 
 > **Invariant:** Output file count equals 1 (main) plus additional file count. The first output file always uses the provided base path.
+>
+> **Rationale:** A mismatch between expected and actual file count causes the orchestrator to write orphaned files or miss outputs, corrupting the generated documentation directory.
 
 **Verified by:**
 - Render document with additional files
@@ -2515,6 +2815,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Complex documents render all block types in sequence
 
 > **Invariant:** Multiple block types in a single document render in order without interference.
+>
+> **Rationale:** Block ordering reflects the codec's semantic structure; out-of-order or swallowed blocks would produce misleading documentation that diverges from the source of truth.
 
 **Verified by:**
 - Render complex document with multiple block types
@@ -2524,6 +2826,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### Claude context renderer produces compact AI-optimized output
 
 > **Invariant:** Claude context replaces markdown syntax with section markers, omits visual-only blocks (mermaid, separators), flattens collapsible content, and produces shorter output than markdown.
+>
+> **Rationale:** LLM context windows are token-limited; visual-only blocks waste tokens without adding semantic value, and verbose markdown syntax inflates context size unnecessarily.
 
 **Verified by:**
 - Claude context renders title and headings as section markers
@@ -2605,6 +2909,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### RequirementsDocumentCodec generates PRD-style documentation from patterns
 
 > **Invariant:** RequirementsDocumentCodec transforms MasterDataset patterns into a PRD-style document with flexible grouping (product area, user role, or phase), optional detail file generation, and business value rendering.
+>
+> **Rationale:** Flexible grouping lets stakeholders view requirements through their preferred lens (area, role, or phase), and detail files provide deep-dive context without bloating the summary document.
 
 **Verified by:**
 - No patterns with PRD metadata produces empty message
@@ -2625,6 +2931,8 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 #### AdrDocumentCodec documents architecture decisions
 
 > **Invariant:** AdrDocumentCodec transforms MasterDataset ADR patterns into an architecture decision record document with status tracking, category/phase/date grouping, supersession relationships, and optional detail file generation.
+>
+> **Rationale:** Architecture decisions lose value without status tracking and supersession chains; without them, teams act on outdated decisions and cannot trace why a previous approach was abandoned.
 
 **Verified by:**
 - No ADR patterns produces empty message
@@ -2743,8 +3051,9 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Basic arithmetic operations work correctly
 
-The calculator should perform standard math operations
-    with correct results.
+> **Invariant:** Arithmetic operations must return mathematically correct results for all valid inputs.
+>
+> **Rationale:** Incorrect arithmetic results silently corrupt downstream calculations, making errors undetectable at their source. The calculator should perform standard math operations with correct results.
 
 **Verified by:**
 - Addition of two positive numbers
@@ -2754,8 +3063,9 @@ The calculator should perform standard math operations
 
 #### Division has special constraints
 
-Division by zero must be handled gracefully to prevent
-    system errors.
+> **Invariant:** Division operations must reject a zero divisor before execution.
+>
+> **Rationale:** Unguarded division by zero causes runtime exceptions that crash the process instead of returning a recoverable error. Division by zero must be handled gracefully to prevent system errors.
 
 **Verified by:**
 - Division of two numbers
@@ -2818,6 +3128,8 @@ Division by zero must be handled gracefully to prevent
 #### Exact paths match without wildcards
 
 > **Invariant:** A pattern without glob characters must match only the exact file path, character for character.
+>
+> **Rationale:** Loose matching on non-glob patterns would silently include unintended files, causing incorrect shapes to appear in generated documentation.
 
 **Verified by:**
 - Exact path matches identical path
@@ -2828,6 +3140,8 @@ Division by zero must be handled gracefully to prevent
 #### Single-level globs match one directory level
 
 > **Invariant:** A single `*` glob must match files only within the specified directory, never crossing directory boundaries.
+>
+> **Rationale:** Crossing directory boundaries would violate standard glob semantics and pull in shapes from nested modules that belong to different product areas.
 
 **Verified by:**
 - Single glob matches file in target directory
@@ -2839,6 +3153,8 @@ Division by zero must be handled gracefully to prevent
 #### Recursive globs match any depth
 
 > **Invariant:** A `**` glob must match files at any nesting depth below the specified prefix, while still respecting extension and prefix constraints.
+>
+> **Rationale:** Recursive globs enable broad subtree selection for shape extraction; failing to respect prefix and extension constraints would leak unrelated shapes into the output.
 
 **Verified by:**
 - Recursive glob matches file at target depth
@@ -2870,6 +3186,8 @@ Division by zero must be handled gracefully to prevent
 #### Reference doc configs select shapes via shapeSelectors
 
 > **Invariant:** shapeSelectors provides three selection modes: by source path + specific names, by group tag, or by source path alone.
+>
+> **Rationale:** Multiple selection modes let reference docs curate precisely which shapes appear, preventing either over-inclusion of internal types or under-inclusion of public API surfaces.
 
 **Verified by:**
 - Select specific shapes by source and names
@@ -3064,6 +3382,8 @@ Division by zero must be handled gracefully to prevent
 #### Multiple tables in description each render exactly once
 
 > **Invariant:** When a rule description contains multiple markdown tables, each table renders as a separate formatted table block with no merging or duplication.
+>
+> **Rationale:** Merging or dropping tables would lose distinct data structures that the author intentionally separated, corrupting the rendered documentation.
 
 **Verified by:**
 - Two tables in description render as two separate tables
@@ -3073,6 +3393,8 @@ Division by zero must be handled gracefully to prevent
 #### stripMarkdownTables removes table syntax from text
 
 > **Invariant:** stripMarkdownTables removes all pipe-delimited table syntax from input text while preserving all surrounding content unchanged.
+>
+> **Rationale:** If table syntax is not stripped from the raw text, the same table data appears twice in the rendered output -- once from the extracted table block and once as raw pipe characters in the description.
 
 **Verified by:**
 - Strips single table from text
@@ -3242,6 +3564,8 @@ Division by zero must be handled gracefully to prevent
 #### Empty dataset produces valid zero-state views
 
 > **Invariant:** An empty input produces a MasterDataset with all counts at zero and no groupings.
+>
+> **Rationale:** Generators must handle the zero-state gracefully; a missing or malformed empty dataset would cause null-reference errors across all rendering codecs.
 
 **Verified by:**
 - Transform empty dataset
@@ -3267,6 +3591,8 @@ Division by zero must be handled gracefully to prevent
 #### Quarter and category grouping organizes by timeline and domain
 
 > **Invariant:** Patterns are grouped by quarter and category, with only patterns bearing the relevant metadata included in each view.
+>
+> **Rationale:** Timeline and domain views must exclude patterns without the relevant metadata to prevent misleading counts and empty groupings in generated documentation.
 
 **Verified by:**
 - Group patterns by quarter
@@ -3278,6 +3604,8 @@ Division by zero must be handled gracefully to prevent
 #### Source grouping separates TypeScript and Gherkin origins
 
 > **Invariant:** Patterns are partitioned by source file type, and patterns with phase metadata appear in the roadmap view.
+>
+> **Rationale:** Codecs that render TypeScript-specific or Gherkin-specific views depend on pre-partitioned sources; mixing sources would produce incorrect per-origin statistics and broken cross-references.
 
 **Verified by:**
 - Group patterns by source file type
@@ -3303,6 +3631,8 @@ Division by zero must be handled gracefully to prevent
 #### Completion tracking computes project progress
 
 > **Invariant:** Completion percentage is rounded to the nearest integer, and fully-completed requires all patterns in completed status with a non-zero total.
+>
+> **Rationale:** Inconsistent rounding or a false-positive fully-completed signal on an empty dataset would misrepresent project health in dashboards and generated progress reports.
 
 **Verified by:**
 - Calculate completion percentage
@@ -3313,6 +3643,8 @@ Division by zero must be handled gracefully to prevent
 #### Workflow integration conditionally includes delivery process data
 
 > **Invariant:** The workflow is included in the MasterDataset only when provided, and phase names are resolved from the workflow configuration.
+>
+> **Rationale:** Projects without a delivery workflow must still produce valid datasets; unconditionally requiring workflow data would break standalone documentation generation.
 
 **Verified by:**
 - Include workflow in result when provided
@@ -3494,6 +3826,8 @@ Division by zero must be handled gracefully to prevent
 #### Input codec parses and validates JSON in a single step
 
 > **Invariant:** Every JSON string parsed through the input codec is both syntactically valid JSON and schema-conformant before returning a typed value.
+>
+> **Rationale:** Separating parse from validate allows invalid data to leak past the boundary — a single-step codec ensures callers never hold an unvalidated value.
 
 **Verified by:**
 - Input codec parses valid JSON to typed object
@@ -3506,6 +3840,8 @@ Division by zero must be handled gracefully to prevent
 #### Output codec validates before serialization
 
 > **Invariant:** Every object serialized through the output codec is schema-validated before JSON.stringify, preventing invalid data from reaching consumers.
+>
+> **Rationale:** Serializing without validation can produce JSON that downstream consumers cannot parse, causing failures far from the source of the invalid data.
 
 **Verified by:**
 - Output codec serializes valid object to JSON
@@ -3517,6 +3853,8 @@ Division by zero must be handled gracefully to prevent
 #### LintOutputSchema validates CLI lint output structure
 
 > **Invariant:** Lint output JSON always conforms to the LintOutputSchema, ensuring consistent structure for downstream tooling.
+>
+> **Rationale:** Non-conformant lint output breaks CI pipeline parsers and IDE integrations that depend on a stable JSON contract.
 
 **Verified by:**
 - LintOutputSchema validates correct lint output
@@ -3527,6 +3865,8 @@ Division by zero must be handled gracefully to prevent
 #### ValidationSummaryOutputSchema validates cross-source analysis output
 
 > **Invariant:** Validation summary JSON always conforms to the ValidationSummaryOutputSchema, ensuring consistent reporting of cross-source pattern analysis.
+>
+> **Rationale:** Inconsistent validation summaries cause miscounted pattern coverage, leading to false confidence or missed gaps in cross-source analysis.
 
 **Verified by:**
 - ValidationSummaryOutputSchema validates correct validation output
@@ -3537,6 +3877,8 @@ Division by zero must be handled gracefully to prevent
 #### RegistryMetadataOutputSchema accepts arbitrary nested structures
 
 > **Invariant:** Registry metadata codec accepts any valid JSON-serializable object without schema constraints on nested structure.
+>
+> **Rationale:** Registry consumers attach domain-specific metadata whose shape varies per preset — constraining the nested structure would break extensibility across presets.
 
 **Verified by:**
 - RegistryMetadataOutputSchema accepts arbitrary metadata
@@ -3546,6 +3888,8 @@ Division by zero must be handled gracefully to prevent
 #### formatCodecError produces human-readable error output
 
 > **Invariant:** Formatted codec errors always include the operation context and all validation error details for debugging.
+>
+> **Rationale:** Omitting the operation context or individual field errors forces developers to reproduce failures manually instead of diagnosing from the error message alone.
 
 **Verified by:**
 - formatCodecError includes validation errors in output
@@ -3555,6 +3899,8 @@ Division by zero must be handled gracefully to prevent
 #### safeParse returns typed values or undefined without throwing
 
 > **Invariant:** safeParse never throws exceptions; it returns the typed value on success or undefined on any failure.
+>
+> **Rationale:** Throwing on invalid input forces every call site to wrap in try/catch — returning undefined lets callers use simple conditional checks and avoids unhandled exception crashes.
 
 **Verified by:**
 - safeParse returns typed value on valid JSON
@@ -3566,6 +3912,8 @@ Division by zero must be handled gracefully to prevent
 #### createFileLoader handles filesystem operations with typed errors
 
 > **Invariant:** File loader converts all filesystem errors (ENOENT, EACCES, generic) into structured CodecError values with appropriate messages and source paths.
+>
+> **Rationale:** Propagating raw filesystem exceptions leaks Node.js error internals to consumers and prevents consistent error formatting across parse, validate, and I/O failures.
 
 **Verified by:**
 - createFileLoader loads and parses valid JSON file

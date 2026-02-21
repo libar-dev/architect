@@ -19,6 +19,9 @@ Feature: TypeScript Shape Extraction - Rendering and Validation
 
   Rule: Multiple shapes are extracted in specified order
 
+    **Invariant:** Extracted shapes appear in the order specified by the tag list, not in source file declaration order.
+    **Rationale:** Documentation consumers rely on tag-specified ordering for consistent, predictable layout regardless of how source files are organized.
+
     @acceptance-criteria @unit
     Scenario: Shapes appear in tag order not source order
       Given TypeScript source code:
@@ -53,6 +56,9 @@ Feature: TypeScript Shape Extraction - Rendering and Validation
 
   Rule: Extracted shapes render as fenced code blocks
 
+    **Invariant:** Every extracted shape renders as a fenced TypeScript code block in the markdown output.
+    **Rationale:** Fenced code blocks provide syntax highlighting and preserve type definition formatting, which is essential for readable API documentation.
+
     @acceptance-criteria @unit
     Scenario: Render shapes as markdown
       Given TypeScript source code:
@@ -71,6 +77,9 @@ Feature: TypeScript Shape Extraction - Rendering and Validation
   # ============================================================================
 
   Rule: Imported and re-exported shapes are tracked separately
+
+    **Invariant:** Shapes resolved via import or re-export statements are classified distinctly from locally declared shapes.
+    **Rationale:** Silently extracting imported types as if they were local declarations would produce duplicate or misleading documentation, since the canonical definition lives in another file.
 
     @acceptance-criteria @validation
     Scenario: Imported shape produces warning
@@ -100,6 +109,9 @@ Feature: TypeScript Shape Extraction - Rendering and Validation
 
   Rule: Invalid TypeScript produces error result
 
+    **Invariant:** Malformed TypeScript source returns an error Result instead of throwing or producing partial shapes.
+    **Rationale:** Unhandled parse exceptions would crash the pipeline mid-run, preventing all subsequent files from being processed.
+
     @acceptance-criteria @validation
     Scenario: Malformed TypeScript returns error
       Given TypeScript source code:
@@ -114,6 +126,9 @@ Feature: TypeScript Shape Extraction - Rendering and Validation
   # ============================================================================
 
   Rule: Shape rendering supports grouping options
+
+    **Invariant:** The `groupInSingleBlock` option controls whether shapes render in one combined code fence or in separate per-shape code fences.
+    **Rationale:** Different documentation layouts require different grouping strategies; a single block provides compact overviews while separate blocks allow per-type commentary.
 
     @acceptance-criteria @unit
     Scenario: Grouped rendering in single code block
@@ -225,6 +240,9 @@ Feature: TypeScript Shape Extraction - Rendering and Validation
   # ============================================================================
 
   Rule: Large source files are rejected to prevent memory exhaustion
+
+    **Invariant:** Source files exceeding 5MB are rejected before parsing begins.
+    **Rationale:** Feeding unbounded input to the TypeScript parser risks out-of-memory crashes that would halt the entire extraction pipeline.
 
     @acceptance-criteria @unit @security
     Scenario: Source code exceeding 5MB limit returns error

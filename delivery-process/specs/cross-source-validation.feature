@@ -31,6 +31,9 @@ Feature: Cross-Source Validation
 
   Rule: Pattern names must be consistent across sources
 
+    **Invariant:** A pattern name referenced in one source must resolve to the same canonical name in all other sources.
+    **Rationale:** Typos or inconsistencies between TypeScript and Gherkin pattern names cause silent data loss — the pattern appears as two unrelated entries instead of a unified cross-source record.
+
     @acceptance-criteria
     Scenario: Pattern name mismatch detected
       Given TypeScript phase file with @libar-docs-pattern MyPattern
@@ -46,6 +49,9 @@ Feature: Cross-Source Validation
       Then validation passes
 
   Rule: Circular dependencies are detected
+
+    **Invariant:** The dependency graph must be a directed acyclic graph (DAG) with no cycles.
+    **Rationale:** Circular dependencies create unresolvable ordering — no pattern in the cycle can be completed first, blocking the entire chain from progressing.
 
     @acceptance-criteria
     Scenario: Direct circular dependency
@@ -63,6 +69,9 @@ Feature: Cross-Source Validation
       Then error indicates "Circular dependency: PhaseA -> PhaseB -> PhaseC -> PhaseA"
 
   Rule: Dependency references must resolve
+
+    **Invariant:** Every `@depends-on` reference must resolve to an existing pattern in the registry.
+    **Rationale:** Dangling dependency references produce incomplete ordering and missing relationship edges in generated documentation, hiding actual inter-pattern constraints.
 
     @acceptance-criteria
     Scenario: Dependency references non-existent pattern

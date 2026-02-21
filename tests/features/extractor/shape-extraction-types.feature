@@ -18,6 +18,9 @@ Feature: TypeScript Shape Extraction - Type Extraction
 
   Rule: extract-shapes tag exists in registry with CSV format
 
+    **Invariant:** The `extract-shapes` tag must be registered with CSV format so multiple shape names can be specified in a single annotation.
+    **Rationale:** Without CSV format registration, the tag parser cannot split comma-separated shape lists, causing only the first shape to be extracted.
+
     @acceptance-criteria @unit
     Scenario: Tag registry contains extract-shapes with correct format
       Given the tag registry is loaded
@@ -28,6 +31,9 @@ Feature: TypeScript Shape Extraction - Type Extraction
   # ============================================================================
 
   Rule: Interfaces are extracted from TypeScript AST
+
+    **Invariant:** Every named interface declaration in a TypeScript source file must be extractable as a shape with kind `interface`, including generics, extends clauses, and JSDoc.
+    **Rationale:** Interfaces are the primary API surface for TypeScript libraries; failing to extract them leaves the most important type contracts undocumented.
 
     @acceptance-criteria @unit
     Scenario: Extract simple interface
@@ -97,6 +103,9 @@ Feature: TypeScript Shape Extraction - Type Extraction
 
   Rule: Property-level JSDoc is extracted for interface properties
 
+    **Invariant:** Property-level JSDoc must be attributed only to the immediately adjacent property, never inherited from the parent interface declaration.
+    **Rationale:** Misattributing interface-level JSDoc to the first property produces incorrect per-field documentation and misleads consumers about individual property semantics.
+
     The extractor uses strict adjacency (gap = 1 line) to prevent
     interface-level JSDoc from being misattributed to the first property.
 
@@ -158,6 +167,9 @@ Feature: TypeScript Shape Extraction - Type Extraction
 
   Rule: Type aliases are extracted from TypeScript AST
 
+    **Invariant:** Union types, mapped types, and conditional types must all be extractable as shapes with kind `type`, preserving their full type expression.
+    **Rationale:** Type aliases encode domain constraints (e.g., discriminated unions, mapped utilities) that are essential for API documentation; omitting them hides the type-level design.
+
     @acceptance-criteria @unit
     Scenario: Extract union type alias
       Given TypeScript source code:
@@ -194,6 +206,9 @@ Feature: TypeScript Shape Extraction - Type Extraction
 
   Rule: Enums are extracted from TypeScript AST
 
+    **Invariant:** Both regular and const enums must be extractable as shapes with kind `enum`, including their member values.
+    **Rationale:** Enums define finite value sets used in validation and serialization; missing them from documentation forces consumers to read source code to discover valid values.
+
     @acceptance-criteria @unit
     Scenario: Extract string enum
       Given TypeScript source code:
@@ -229,6 +244,9 @@ Feature: TypeScript Shape Extraction - Type Extraction
 
   Rule: Function signatures are extracted with body omitted
 
+    **Invariant:** Extracted function shapes must include the full signature (name, parameters, return type, async modifier) but never the implementation body.
+    **Rationale:** Including function bodies in documentation exposes implementation details, inflates output size, and creates a maintenance burden when internals change without signature changes.
+
     @acceptance-criteria @unit
     Scenario: Extract function signature
       Given TypeScript source code:
@@ -261,6 +279,9 @@ Feature: TypeScript Shape Extraction - Type Extraction
 
   Rule: Const declarations are extracted from TypeScript AST
 
+    **Invariant:** Const declarations must be extractable as shapes with kind `const`, whether or not they carry an explicit type annotation.
+    **Rationale:** Constants define configuration defaults, version strings, and sentinel values that consumers depend on; excluding them creates documentation gaps for public API surface.
+
     @acceptance-criteria @unit
     Scenario: Extract const with type annotation
       Given TypeScript source code:
@@ -286,6 +307,9 @@ Feature: TypeScript Shape Extraction - Type Extraction
   # ============================================================================
 
   Rule: Non-exported shapes are extractable
+
+    **Invariant:** Shape extraction must succeed for declarations regardless of export status, with the `exported` flag accurately reflecting visibility.
+    **Rationale:** Internal types often define the core domain model; restricting extraction to exports only would omit types that are essential for understanding module internals.
 
     @acceptance-criteria @unit
     Scenario: Extract non-exported interface

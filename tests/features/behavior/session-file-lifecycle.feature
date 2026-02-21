@@ -29,6 +29,7 @@ Feature: Session File Lifecycle Management
   Rule: Orphaned session files are removed during generation
 
       **Invariant:** Only session files for active phases are preserved; all other phase files must be deleted during cleanup and replaced with fresh content.
+      **Rationale:** Stale session files for completed or deferred phases mislead LLMs that read the sessions directory for context, causing incorrect planning decisions.
 
       **Verified by:** Orphaned session files are deleted during generation, Active phase session files are preserved and regenerated
 
@@ -84,6 +85,7 @@ Feature: Session File Lifecycle Management
   Rule: Deleted files are tracked in cleanup results
 
       **Invariant:** The cleanup result must include the relative paths of all deleted session files for transparency and debugging.
+      **Rationale:** Without deletion tracking, operators cannot audit what the generator removed, making it impossible to diagnose missing file issues after a run.
 
       **Verified by:** Deleted files are tracked in generator output
 

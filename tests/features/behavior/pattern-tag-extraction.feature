@@ -25,6 +25,7 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
   Rule: Single value tags produce scalar metadata fields
 
       **Invariant:** Each single-value tag (pattern, phase, status, brief) maps to exactly one metadata field with the correct type.
+      **Rationale:** Incorrect type coercion (e.g., phase as string instead of number) causes downstream pipeline failures in filtering and sorting.
       **Verified by:** Extract pattern name tag, Extract phase number tag, Extract status roadmap tag, Extract status deferred tag, Extract status completed tag, Extract status active tag, Extract brief path tag
 
     @happy-path @single-tag
@@ -72,6 +73,7 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
   Rule: Array value tags accumulate into list metadata fields
 
       **Invariant:** Tags for depends-on and enables split comma-separated values and accumulate across multiple tag occurrences.
+      **Rationale:** Missing a dependency value silently breaks the dependency graph, causing incorrect build ordering and orphaned pattern references.
       **Verified by:** Extract single dependency, Extract comma-separated dependencies, Extract comma-separated enables
 
     @happy-path @dependencies
@@ -98,6 +100,7 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
   Rule: Category tags are colon-free tags filtered against known non-categories
 
       **Invariant:** Tags without colons become categories, except known non-category tags (acceptance-criteria, happy-path) and the libar-docs opt-in marker.
+      **Rationale:** Including test-control tags (acceptance-criteria, happy-path) as categories pollutes the pattern taxonomy with non-semantic values.
       **Verified by:** Extract category tags (no colon), libar-docs opt-in marker is NOT a category
 
     @happy-path @categories
@@ -120,6 +123,7 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
   Rule: Complex tag lists produce fully populated metadata
 
       **Invariant:** All tag types (scalar, array, category) are correctly extracted from a single mixed tag list.
+      **Rationale:** Real feature files combine many tag types; extraction must handle all types simultaneously without interference between parsers.
       **Verified by:** Extract all metadata from complex tag list
 
     @happy-path @complex
@@ -139,6 +143,7 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
   Rule: Edge cases produce safe defaults
 
       **Invariant:** Empty or invalid inputs produce empty metadata or omit invalid fields rather than throwing errors.
+      **Rationale:** Throwing on malformed tags would abort extraction for the entire file, losing valid metadata from well-formed tags.
       **Verified by:** Empty tag list returns empty metadata, Invalid phase number is ignored
 
     @edge-case @empty
@@ -156,6 +161,7 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
   Rule: Convention tags support CSV values with whitespace trimming
 
       **Invariant:** Convention tags split comma-separated values and trim whitespace from each value.
+      **Rationale:** Untrimmed whitespace creates distinct values for the same convention, causing false negatives in convention-based filtering and validation.
       **Verified by:** Extract single convention tag, Extract CSV convention tags, Convention tag trims whitespace in CSV values
 
     @happy-path @convention
@@ -182,6 +188,7 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
   Rule: Registry-driven extraction handles enums, transforms, and value constraints
 
       **Invariant:** Tags defined in the registry use data-driven extraction with enum validation, CSV accumulation, value transforms, and constraint checking.
+      **Rationale:** Hard-coded if/else branches for each tag type cannot scale; registry-driven extraction ensures new tags are supported by configuration, not code changes.
       **Verified by:** Registry-driven enum tag without prior if/else branch, Registry-driven enum rejects invalid value, Registry-driven CSV tag accumulates values, Transform applies hyphen-to-space on business value, Transform applies ADR number padding, Transform strips quotes from title tag, Repeatable value tag accumulates multiple occurrences, CSV with values constraint rejects invalid values
 
     @happy-path @registry-driven

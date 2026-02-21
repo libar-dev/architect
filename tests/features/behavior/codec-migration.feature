@@ -27,6 +27,7 @@ Feature: Zod Codec Migration
   Rule: Input codec parses and validates JSON in a single step
 
     **Invariant:** Every JSON string parsed through the input codec is both syntactically valid JSON and schema-conformant before returning a typed value.
+    **Rationale:** Separating parse from validate allows invalid data to leak past the boundary — a single-step codec ensures callers never hold an unvalidated value.
 
     **Verified by:** Input codec parses valid JSON to typed object, Input codec returns error for malformed JSON, Input codec returns validation errors for schema violations, Input codec strips $schema field before validation
 
@@ -75,6 +76,7 @@ Feature: Zod Codec Migration
   Rule: Output codec validates before serialization
 
     **Invariant:** Every object serialized through the output codec is schema-validated before JSON.stringify, preventing invalid data from reaching consumers.
+    **Rationale:** Serializing without validation can produce JSON that downstream consumers cannot parse, causing failures far from the source of the invalid data.
 
     **Verified by:** Output codec serializes valid object to JSON, Output codec returns error for schema violations, Output codec respects indent option
 
@@ -108,6 +110,7 @@ Feature: Zod Codec Migration
   Rule: LintOutputSchema validates CLI lint output structure
 
     **Invariant:** Lint output JSON always conforms to the LintOutputSchema, ensuring consistent structure for downstream tooling.
+    **Rationale:** Non-conformant lint output breaks CI pipeline parsers and IDE integrations that depend on a stable JSON contract.
 
     **Verified by:** LintOutputSchema validates correct lint output, LintOutputSchema rejects invalid severity
 
@@ -134,6 +137,7 @@ Feature: Zod Codec Migration
   Rule: ValidationSummaryOutputSchema validates cross-source analysis output
 
     **Invariant:** Validation summary JSON always conforms to the ValidationSummaryOutputSchema, ensuring consistent reporting of cross-source pattern analysis.
+    **Rationale:** Inconsistent validation summaries cause miscounted pattern coverage, leading to false confidence or missed gaps in cross-source analysis.
 
     **Verified by:** ValidationSummaryOutputSchema validates correct validation output, ValidationSummaryOutputSchema rejects invalid issue source
 
@@ -160,6 +164,7 @@ Feature: Zod Codec Migration
   Rule: RegistryMetadataOutputSchema accepts arbitrary nested structures
 
     **Invariant:** Registry metadata codec accepts any valid JSON-serializable object without schema constraints on nested structure.
+    **Rationale:** Registry consumers attach domain-specific metadata whose shape varies per preset — constraining the nested structure would break extensibility across presets.
 
     **Verified by:** RegistryMetadataOutputSchema accepts arbitrary metadata
 
@@ -173,6 +178,7 @@ Feature: Zod Codec Migration
   Rule: formatCodecError produces human-readable error output
 
     **Invariant:** Formatted codec errors always include the operation context and all validation error details for debugging.
+    **Rationale:** Omitting the operation context or individual field errors forces developers to reproduce failures manually instead of diagnosing from the error message alone.
 
     **Verified by:** formatCodecError includes validation errors in output
 
@@ -193,6 +199,7 @@ Feature: Zod Codec Migration
   Rule: safeParse returns typed values or undefined without throwing
 
     **Invariant:** safeParse never throws exceptions; it returns the typed value on success or undefined on any failure.
+    **Rationale:** Throwing on invalid input forces every call site to wrap in try/catch — returning undefined lets callers use simple conditional checks and avoids unhandled exception crashes.
 
     **Verified by:** safeParse returns typed value on valid JSON, safeParse returns undefined on malformed JSON, safeParse returns undefined on schema violation
 
@@ -222,6 +229,7 @@ Feature: Zod Codec Migration
   Rule: createFileLoader handles filesystem operations with typed errors
 
     **Invariant:** File loader converts all filesystem errors (ENOENT, EACCES, generic) into structured CodecError values with appropriate messages and source paths.
+    **Rationale:** Propagating raw filesystem exceptions leaks Node.js error internals to consumers and prevents consistent error formatting across parse, validate, and I/O failures.
 
     **Verified by:** createFileLoader loads and parses valid JSON file, createFileLoader handles ENOENT error, createFileLoader handles EACCES error, createFileLoader handles general read error, createFileLoader handles invalid JSON in file
 

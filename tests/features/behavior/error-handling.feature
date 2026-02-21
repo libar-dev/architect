@@ -27,6 +27,7 @@ Feature: Error Handling Unification
   Rule: isDocError type guard classifies errors correctly
 
       **Invariant:** isDocError must return true for valid DocError instances and false for non-DocError values including null and undefined.
+      **Rationale:** Without a reliable type guard, error handlers cannot safely narrow unknown caught values to DocError, forcing unsafe casts or redundant field checks at every catch site.
 
       **Verified by:** isDocError detects valid DocError instances, isDocError rejects non-DocError objects, isDocError rejects null and undefined
 
@@ -51,6 +52,7 @@ Feature: Error Handling Unification
   Rule: formatDocError produces structured human-readable output
 
       **Invariant:** formatDocError must include all context fields (error type, file path, line number) and render validation errors when present on pattern errors.
+      **Rationale:** Omitting context fields forces developers to cross-reference logs with source files manually; including all fields in a single formatted message makes errors actionable on first read.
 
       **Verified by:** formatDocError includes structured context, formatDocError includes validation errors for pattern errors
 
@@ -112,6 +114,7 @@ Feature: Error Handling Unification
   Rule: CLI error handler formats unknown errors gracefully
 
       **Invariant:** Unknown error values (non-DocError, non-Error) must be formatted as "Error: {value}" strings for safe display without crashing.
+      **Rationale:** CLI commands can receive arbitrary thrown values (strings, numbers, objects); coercing them to a safe string prevents the error handler itself from crashing on unexpected types.
 
       **Verified by:** handleCliError formats unknown errors
 

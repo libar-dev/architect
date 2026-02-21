@@ -32,6 +32,9 @@ Feature: Phase State Machine Validation
 
   Rule: Valid status values are enforced
 
+    **Invariant:** Phase status must be one of the four canonical values: roadmap, active, completed, or deferred.
+    **Rationale:** Freeform status strings bypass FSM transition enforcement and produce undefined behavior in downstream generators and validators.
+
     @acceptance-criteria
     Scenario: Only valid status values are accepted
       Given a feature file with status tag
@@ -45,6 +48,9 @@ Feature: Phase State Machine Validation
       Then validation fails with "Invalid status: must be roadmap, active, completed, or deferred"
 
   Rule: Status transitions follow state machine rules
+
+    **Invariant:** Every status transition must follow a permitted edge in the FSM transition matrix.
+    **Rationale:** Skipping states (e.g., roadmap to completed) breaks scope-lock enforcement and allows incomplete deliverables to reach terminal status.
 
     @acceptance-criteria
     Scenario Outline: Valid transitions are allowed
@@ -75,6 +81,9 @@ Feature: Phase State Machine Validation
         | roadmap   | completed|
 
   Rule: Terminal states require completion metadata
+
+    **Invariant:** Phases reaching completed status must carry a completion date and actual effort tag.
+    **Rationale:** Without completion metadata, effort variance tracking and timeline reporting produce gaps that undermine delivery process visibility.
 
     @acceptance-criteria
     Scenario: Completed status requires completion date

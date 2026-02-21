@@ -15,6 +15,7 @@ Feature: Shape Selector Filtering
 
     **Invariant:** shapeSelectors provides three selection modes: by
     source path + specific names, by group tag, or by source path alone.
+    **Rationale:** Multiple selection modes let reference docs curate precisely which shapes appear, preventing either over-inclusion of internal types or under-inclusion of public API surfaces.
 
     **Verified by:** Select by source and names,
     Select by group,

@@ -116,6 +116,7 @@ Feature: Linter Rules for Relationship Validation
   Rule: Parent references must be valid
 
     **Invariant:** A pattern's parent reference must point to an existing epic pattern in the registry.
+    **Rationale:** Dangling parent references break the epic-to-pattern hierarchy, causing patterns to appear orphaned in roadmap views and losing rollup visibility.
     **Verified by:** Invalid parent reference detected, Valid parent reference passes
 
     @validation

@@ -37,6 +37,8 @@ These are the durable constants of the delivery process.
 
 **Invariant:** The product-area tag uses one of 7 canonical values. Each value represents a reader-facing documentation section, not a source module.
 
+**Rationale:** Without canonical values, organic drift (e.g., Generator vs Generators) produces inconsistent grouping in generated documentation and fragmented product area pages.
+
 | Value         | Reader Question                     | Covers                                          |
 | ------------- | ----------------------------------- | ----------------------------------------------- |
 | Annotation    | How do I annotate code?             | Scanning, extraction, tag parsing, dual-source  |
@@ -51,6 +53,8 @@ These are the durable constants of the delivery process.
 
 **Invariant:** The adr-category tag uses one of 4 values.
 
+**Rationale:** Unbounded category values prevent meaningful grouping of architecture decisions and make cross-cutting queries unreliable.
+
 | Value         | Purpose                                       |
 | ------------- | --------------------------------------------- |
 | architecture  | System structure, component design, data flow |
@@ -62,6 +66,8 @@ These are the durable constants of the delivery process.
 
 **Invariant:** Pattern status uses exactly 4 values with defined protection levels. These are enforced by Process Guard at commit time.
 
+**Rationale:** Without protection levels, active specs accumulate scope creep and completed specs get silently modified, undermining delivery process integrity.
+
 | Status    | Protection   | Can Add Deliverables | Allowed Actions                 |
 | --------- | ------------ | -------------------- | ------------------------------- |
 | roadmap   | None         | Yes                  | Full editing                    |
@@ -71,7 +77,9 @@ These are the durable constants of the delivery process.
 
 ### Valid FSM transitions
 
-**Invariant:** Only these transitions are valid. All others are rejected by Process Guard. Completed is a terminal state. Modifications require `@libar-docs-unlock-reason` escape hatch.
+**Invariant:** Only these transitions are valid. All others are rejected by Process Guard.
+
+**Rationale:** Allowing arbitrary transitions (e.g., roadmap to completed) bypasses the active phase where scope-lock and deliverable tracking provide quality assurance. Completed is a terminal state. Modifications require `@libar-docs-unlock-reason` escape hatch.
 
 | From     | To        | Trigger               |
 | -------- | --------- | --------------------- |
@@ -84,6 +92,8 @@ These are the durable constants of the delivery process.
 ### Tag format types
 
 **Invariant:** Every tag has one of 6 format types that determines how its value is parsed.
+
+**Rationale:** Without explicit format types, parsers must guess value structure, leading to silent data corruption when CSV values are treated as single strings or numbers are treated as text.
 
 | Format       | Parsing                        | Example                        |
 | ------------ | ------------------------------ | ------------------------------ |
@@ -98,6 +108,8 @@ These are the durable constants of the delivery process.
 
 **Invariant:** Relationship tags have defined ownership by source type. Anti-pattern detection enforces these boundaries.
 
+**Rationale:** Cross-domain tag placement (e.g., runtime dependencies in Gherkin) creates conflicting sources of truth and breaks the dual-source architecture ownership model.
+
 | Tag        | Correct Source | Wrong Source  | Rationale                          |
 | ---------- | -------------- | ------------- | ---------------------------------- |
 | uses       | TypeScript     | Feature files | TS owns runtime dependencies       |
@@ -109,9 +121,13 @@ These are the durable constants of the delivery process.
 
 **Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`). ISO-year-first sorting works lexicographically.
 
+**Rationale:** Non-standard formats (e.g., Q1-2026) break lexicographic sorting, which roadmap generation and timeline queries depend on for correct ordering.
+
 ### Canonical phase definitions (6-phase USDP standard)
 
 **Invariant:** The default workflow defines exactly 6 phases in fixed order. These are the canonical phase names and ordinals used by all generated documentation.
+
+**Rationale:** Ad-hoc phase names and ordering produce inconsistent roadmap grouping across packages and make cross-package progress tracking impossible.
 
 | Order | Phase         | Purpose                                        |
 | ----- | ------------- | ---------------------------------------------- |
@@ -125,6 +141,8 @@ These are the durable constants of the delivery process.
 ### Deliverable status canonical values
 
 **Invariant:** Deliverable status (distinct from pattern FSM status) uses exactly 6 values, enforced by Zod schema at parse time.
+
+**Rationale:** Freeform status strings bypass Zod validation and break DoD checks, which rely on terminal status classification to determine pattern completeness.
 
 | Value       | Meaning              |
 | ----------- | -------------------- |

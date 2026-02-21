@@ -83,6 +83,7 @@ Feature: Architecture Index in MasterDataset
   Rule: archIndex.all contains all patterns with any arch tag
 
     **Invariant:** archIndex.all must contain exactly the set of patterns that have at least one arch tag (role, context, or layer).
+    **Rationale:** Consumers iterating over all architectural patterns need a single canonical list; omitting partially-tagged patterns would silently drop them from diagrams.
     **Verified by:** archIndex.all includes all annotated patterns
 
     The archIndex.all array contains all patterns that have at least

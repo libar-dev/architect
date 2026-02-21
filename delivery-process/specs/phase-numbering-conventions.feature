@@ -29,6 +29,9 @@ Feature: Phase Numbering Conventions and Validation
 
   Rule: Phase numbers must be unique within a release
 
+    **Invariant:** No two specs within the same release version may share the same phase number.
+    **Rationale:** Duplicate phase numbers create ambiguous ordering, causing unpredictable generation output and incorrect roadmap sequencing.
+
     @acceptance-criteria
     Scenario: Duplicate phase numbers are detected
       Given two phases both numbered 47
@@ -45,6 +48,9 @@ Feature: Phase Numbering Conventions and Validation
 
   Rule: Phase number gaps are detected
 
+    **Invariant:** Large gaps in the phase number sequence must produce warnings during validation.
+    **Rationale:** Undetected gaps signal accidentally skipped or orphaned specs, leading to misleading roadmap progress and hidden incomplete work.
+
     @acceptance-criteria
     Scenario: Large gaps trigger warnings
       Given phases numbered 1, 2, 3, 10
@@ -58,6 +64,9 @@ Feature: Phase Numbering Conventions and Validation
       Then validation passes (single gap acceptable)
 
   Rule: CLI suggests next available phase number
+
+    **Invariant:** The suggested phase number must not conflict with any existing phase in the target release.
+    **Rationale:** Without automated suggestion, authors manually guess the next number, frequently picking duplicates that are only caught later at validation time.
 
     @acceptance-criteria
     Scenario: Suggest next phase number

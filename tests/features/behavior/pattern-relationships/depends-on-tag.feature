@@ -16,6 +16,7 @@ Feature: Planning Dependency Tags
   Rule: Depends-on tag is defined in taxonomy registry
 
     **Invariant:** The depends-on and enables tags must exist in the taxonomy registry with CSV format.
+    **Rationale:** Without registry definitions, the data-driven AST parser cannot discover or extract these planning dependency tags from source files.
     **Verified by:** Depends-on tag exists in registry, Enables tag exists in registry
 
     @unit
@@ -41,6 +42,7 @@ Feature: Planning Dependency Tags
   Rule: Depends-on tag is extracted from Gherkin files
 
     **Invariant:** The Gherkin parser must extract depends-on values from feature file tags, including CSV multi-value lists.
+    **Rationale:** Missing dependency extraction causes the dependency tree and blocking-pattern queries to return incomplete results.
     **Verified by:** Depends-on extracted from feature file, Multiple depends-on values extracted as CSV
 
     @acceptance-criteria @happy-path
@@ -96,6 +98,7 @@ Feature: Planning Dependency Tags
   Rule: Enables tag is extracted from Gherkin files
 
     **Invariant:** The Gherkin parser must extract enables values from feature file tags, including CSV multi-value lists.
+    **Rationale:** Missing enables extraction breaks forward-looking dependency queries, hiding which patterns are unblocked when a prerequisite completes.
     **Verified by:** Enables extracted from feature file, Multiple enables values extracted as CSV
 
     @acceptance-criteria @happy-path
@@ -131,6 +134,7 @@ Feature: Planning Dependency Tags
   Rule: Planning dependencies are stored in relationship index
 
     **Invariant:** The relationship index must store dependsOn and enables relationships extracted from pattern metadata.
+    **Rationale:** Omitting planning dependencies from the index causes blocking-pattern and critical-path queries to return incomplete results.
     **Verified by:** DependsOn relationships stored in relationship index, Enables relationships stored explicitly
 
     The relationship index stores dependsOn and enables relationships

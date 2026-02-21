@@ -16,6 +16,7 @@ Feature: Uses Tag Extraction
   Rule: Uses tag is defined in taxonomy registry
 
     **Invariant:** The uses and used-by tags must be registered in the taxonomy with CSV format and dependency-related purpose descriptions.
+    **Rationale:** Without registry definitions, the data-driven AST parser cannot discover or extract these tags from source files.
     **Verified by:** Uses tag exists in registry, Used-by tag exists in registry
 
     @unit
@@ -41,6 +42,7 @@ Feature: Uses Tag Extraction
   Rule: Uses tag is extracted from TypeScript files
 
     **Invariant:** The AST parser must extract single and comma-separated uses values from TypeScript JSDoc annotations.
+    **Rationale:** Missing or malformed uses extraction breaks runtime dependency tracking and produces incomplete relationship diagrams.
     **Verified by:** Single uses value extracted, Multiple uses values extracted as CSV
 
     @acceptance-criteria @happy-path
@@ -80,6 +82,7 @@ Feature: Uses Tag Extraction
   Rule: Used-by tag is extracted from TypeScript files
 
     **Invariant:** The AST parser must extract single and comma-separated used-by values from TypeScript JSDoc annotations.
+    **Rationale:** Missing used-by extraction prevents reverse dependency lookups, leaving consumers unable to discover which patterns depend on them.
     **Verified by:** Single used-by value extracted, Multiple used-by values extracted as CSV
 
     @acceptance-criteria @happy-path
@@ -119,6 +122,7 @@ Feature: Uses Tag Extraction
   Rule: Uses relationships are stored in relationship index
 
     **Invariant:** All declared uses and usedBy relationships must be stored in the relationship index as explicitly declared entries.
+    **Rationale:** Omitting relationships from the index causes dependency diagrams and impact-analysis queries to silently miss connections.
     **Verified by:** Uses relationships stored in relationship index, UsedBy relationships stored explicitly
 
     The relationship index stores uses and usedBy relationships directly
@@ -149,6 +153,7 @@ Feature: Uses Tag Extraction
   Rule: Schemas validate uses field correctly
 
     **Invariant:** DocDirective and RelationshipEntry schemas must accept uses and usedBy fields as valid CSV string values.
+    **Rationale:** Schema rejection of valid uses/usedBy values causes runtime parse failures that silently drop relationship data.
     **Verified by:** DocDirective schema accepts uses, RelationshipEntry schema accepts usedBy
 
     @unit

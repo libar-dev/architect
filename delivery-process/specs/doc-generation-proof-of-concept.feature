@@ -27,6 +27,9 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
 
   Rule: Context - Manual documentation maintenance does not scale
 
+    **Invariant:** Documentation must be generated from annotated source code, never manually maintained as a separate artifact.
+    **Rationale:** Manual documentation drifts from source as the codebase evolves, creating stale references that mislead both humans and AI coding sessions.
+
     **The Problem:**
 
     Common technical documentation is the hardest part to maintain in a repository.
@@ -72,6 +75,9 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
   # ============================================================================
 
   Rule: Decision - Decisions own convention content and durable context, code owns details
+
+    **Invariant:** Each content type (intro/rationale, rules/examples, API types) is owned by exactly one source type (decision, behavior spec, or code).
+    **Rationale:** Shared ownership leads to conflicting updates and ambiguous authority over what the "correct" version is.
 
     **The Pattern:**
 
@@ -143,6 +149,9 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
   # ============================================================================
 
   Rule: Proof of Concept - Self-documentation validates the pattern
+
+    **Invariant:** The documentation generation pattern must be validated by generating documentation about itself from its own annotated sources.
+    **Rationale:** A self-referential proof of concept exposes extraction gaps and source mapping issues that synthetic test data would miss.
 
     This POC demonstrates the doc-from-decision pattern by generating docs
     about ITSELF. The DocGenerationProofOfConcept pattern produces:
@@ -235,6 +244,9 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
 
   Rule: Expected Output - Compact claude module structure
 
+    **Invariant:** Compact output must contain only essential tables and type names, with no JSDoc comments or implementation details.
+    **Rationale:** AI context windows are finite; including non-essential content displaces actionable information and degrades session effectiveness.
+
     **File:** `_claude-md/validation/process-guard.md`
 
     The compact module extracts only essential content for AI context.
@@ -264,6 +276,9 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
 
   Rule: Consequences - Durable sources with clear ownership boundaries
 
+    **Invariant:** Decision documents remain the authoritative source for intro, rationale, and convention content until explicitly superseded.
+    **Rationale:** Without durable ownership, documentation sections lose their authoritative source and degrade into unattributed prose that no one updates.
+
     **Benefits:**
 
     | Benefit | How |
@@ -291,6 +306,9 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
     | Code examples | Decision DocStrings | Example needs update |
 
   Rule: Consequences - Design stubs live in stubs, not src
+
+    **Invariant:** Pre-implementation design stubs must reside in `delivery-process/stubs/`, never in `src/`.
+    **Rationale:** Stubs in `src/` require ESLint exceptions, create confusion between production and design code, and risk accidental imports of unimplemented functions.
 
     **The Problem:**
 
@@ -389,6 +407,7 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
 
     **Invariant:** The source mapping table in a decision document defines how
     documentation sections are assembled from multiple source files.
+    **Rationale:** Without a declarative mapping, generators must hard-code source-to-section relationships, making the system brittle to new document types.
 
     **Table Format:**
 

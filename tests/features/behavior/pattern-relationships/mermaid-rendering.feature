@@ -50,6 +50,7 @@ Feature: Mermaid Graph Rendering for Relationships
   Rule: Pattern names are sanitized for Mermaid node IDs
 
     **Invariant:** Pattern names must be transformed into valid Mermaid node IDs by replacing special characters (dots, hyphens, spaces) with underscores.
+    **Rationale:** Unsanitized names containing dots, hyphens, or spaces produce invalid Mermaid syntax that fails to render.
     **Verified by:** Special characters are replaced
 
     @unit
@@ -71,6 +72,7 @@ Feature: Mermaid Graph Rendering for Relationships
   Rule: All relationship types appear in single graph
 
     **Invariant:** The generated Mermaid graph must combine all relationship types (uses, depends-on, implements, extends) into a single top-down graph.
+    **Rationale:** Splitting relationship types into separate graphs would fragment the dependency picture and hide cross-type interactions.
     **Verified by:** Complete dependency graph with all relationship types
 
     @unit

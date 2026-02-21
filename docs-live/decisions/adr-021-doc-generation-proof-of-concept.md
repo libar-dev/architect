@@ -23,6 +23,10 @@ the PROOF OF CONCEPT (demonstrating the pattern works).
 
 ## Context
 
+**Invariant:** Documentation must be generated from annotated source code, never manually maintained as a separate artifact.
+
+**Rationale:** Manual documentation drifts from source as the codebase evolves, creating stale references that mislead both humans and AI coding sessions.
+
 | Document                     | Lines    | Maintenance Burden                |
 | ---------------------------- | -------- | --------------------------------- |
 | docs/PROCESS-GUARD.md        | ~300     | High - duplicates code behavior   |
@@ -67,6 +71,10 @@ the PROOF OF CONCEPT (demonstrating the pattern works).
     **What's Missing:**
 
 ## Decision
+
+**Invariant:** Each content type (intro/rationale, rules/examples, API types) is owned by exactly one source type (decision, behavior spec, or code).
+
+**Rationale:** Shared ownership leads to conflicting updates and ambiguous authority over what the "correct" version is.
 
 | Source Type                  | Durability | Content Ownership                      |
 | ---------------------------- | ---------- | -------------------------------------- |
@@ -145,6 +153,8 @@ generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' -
 
 **Invariant:** The source mapping table in a decision document defines how documentation sections are assembled from multiple source files.
 
+**Rationale:** Without a declarative mapping, generators must hard-code source-to-section relationships, making the system brittle to new document types.
+
 | Column            | Purpose                                      | Example                          |
 | ----------------- | -------------------------------------------- | -------------------------------- |
 | Section           | Target section heading in generated doc      | "Intro & Context", "API Types"   |
@@ -183,6 +193,10 @@ generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' -
 
 ## Consequences
 
+**Invariant:** Decision documents remain the authoritative source for intro, rationale, and convention content until explicitly superseded.
+
+**Rationale:** Without durable ownership, documentation sections lose their authoritative source and degrade into unattributed prose that no one updates.
+
 | Benefit                | How                                       |
 | ---------------------- | ----------------------------------------- |
 | Single source of truth | Each content type owned by one source     |
@@ -212,6 +226,10 @@ generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' -
 
 
     **Ownership Boundaries:**
+
+**Invariant:** Pre-implementation design stubs must reside in `delivery-process/stubs/`, never in `src/`.
+
+**Rationale:** Stubs in `src/` require ESLint exceptions, create confusion between production and design code, and risk accidental imports of unimplemented functions.
 
 | Issue                    | Impact                                      |
 | ------------------------ | ------------------------------------------- |
@@ -313,6 +331,10 @@ export function extractShapes(
 
 ### Proof of Concept - Self-documentation validates the pattern
 
+**Invariant:** The documentation generation pattern must be validated by generating documentation about itself from its own annotated sources.
+
+**Rationale:** A self-referential proof of concept exposes extraction gaps and source mapping issues that synthetic test data would miss. This POC demonstrates the doc-from-decision pattern by generating docs about ITSELF. The DocGenerationProofOfConcept pattern produces:
+
 | Output                                                   | Purpose            | Detail Level |
 | -------------------------------------------------------- | ------------------ | ------------ |
 | docs/DOC-GENERATION-PROOF-OF-CONCEPT.md                  | Detailed reference | detailed     |
@@ -339,10 +361,7 @@ export function extractShapes(
 | CI treats warnings as errors  | Use strict flag       | `lint-process --all --strict`             |
 | Skip workflow (legacy import) | Multiple transitions  | Set roadmap then completed in same commit |
 
-This POC demonstrates the doc-from-decision pattern by generating docs
-about ITSELF. The DocGenerationProofOfConcept pattern produces:
-
-    **Process Guard docs are generated separately from `adr-006-process-guard.feature`.**
+**Process Guard docs are generated separately from `adr-006-process-guard.feature`.**
 
     **Source Mapping for POC Self-Documentation:**
 
@@ -403,6 +422,10 @@ if (hasErrors(result)) {
 **Escape Hatches:**
 
 ### Expected Output - Compact claude module structure
+
+**Invariant:** Compact output must contain only essential tables and type names, with no JSDoc comments or implementation details.
+
+**Rationale:** AI context windows are finite; including non-essential content displaces actionable information and degrades session effectiveness.
 
 | Section            | Content                                                     |
 | ------------------ | ----------------------------------------------------------- |

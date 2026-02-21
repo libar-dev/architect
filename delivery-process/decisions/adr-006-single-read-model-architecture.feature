@@ -49,6 +49,7 @@ Feature: ADR-006 - Single Read Model Architecture
     cross-source resolution, or dependency information consumes the
     MasterDataset. Direct scanner/extractor imports are permitted only in
     pipeline orchestration code that builds the MasterDataset.
+    **Rationale:** Bypassing the read model forces consumers to re-derive data that the MasterDataset already computes, creating duplicate logic and divergent behavior when the pipeline evolves.
 
     | Layer | May Import | Examples |
     | Pipeline Orchestration | scanner/, extractor/, pipeline/ | orchestrator.ts, process-api.ts pipeline setup |
@@ -64,6 +65,7 @@ Feature: ADR-006 - Single Read Model Architecture
     discard fields from ExtractedPattern. If a consumer needs a subset, the
     type system provides the projection — not a hand-written extraction
     function that becomes a barrier between the consumer and canonical data.
+    **Rationale:** Lossy local types silently drop fields that later become needed, causing bugs that only surface when new MasterDataset capabilities are added and the local type lacks them.
 
   Rule: Relationship resolution is computed once
 
@@ -71,11 +73,13 @@ Feature: ADR-006 - Single Read Model Architecture
     and reverse lookups (usedBy, implementedBy, extendedBy) are computed in
     `transformToMasterDataset()`. No consumer re-derives these from raw
     pattern arrays or scanned file tags.
+    **Rationale:** Re-deriving relationships in consumers duplicates the resolution logic and risks inconsistency when different consumers implement subtly different traversal or filtering rules.
 
   Rule: Three named anti-patterns
 
     **Invariant:** These are recognized violations, serving as review criteria
-    for new code and refactoring targets for existing code:
+    for new code and refactoring targets for existing code.
+    **Rationale:** Without named anti-patterns, violations appear as one-off style issues rather than systematic architectural drift, making them harder to detect and communicate in code review.
 
     | Anti-Pattern | Detection Signal |
     | Parallel Pipeline | Feature consumer imports from scanner/ or extractor/ |

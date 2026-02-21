@@ -16,6 +16,9 @@ Feature: Reference Codec - Detail Level Rendering
 
   Rule: Standard detail level includes narrative but omits rationale
 
+    **Invariant:** Standard detail level renders narrative prose for convention patterns but excludes rationale sections, reserving rationale for the detailed level only.
+    **Rationale:** Progressive disclosure prevents information overload at the standard level while ensuring readers who need deeper justification can access it at the detailed level.
+
     @happy-path
     Scenario: Standard level includes narrative but omits rationale
       Given a reference config with convention tags "fsm-rules" and behavior tags ""
@@ -25,6 +28,9 @@ Feature: Reference Codec - Detail Level Rendering
       And the document does not contain text "Rationale"
 
   Rule: Deep behavior rendering with structured annotations
+
+    **Invariant:** Behavior patterns render structured rule annotations (invariant, rationale, verified-by) at detailed level, invariant-only at standard level, and a truncated table at summary level.
+    **Rationale:** Structured annotations are the primary mechanism for surfacing business rules from Gherkin sources; inconsistent rendering across detail levels would produce misleading or incomplete documentation.
 
     @happy-path
     Scenario: Detailed level renders structured behavior rules
@@ -62,6 +68,9 @@ Feature: Reference Codec - Detail Level Rendering
 
   Rule: Shape JSDoc prose renders at standard and detailed levels
 
+    **Invariant:** Shape patterns with JSDoc prose include that prose in rendered code blocks at standard and detailed levels. Shapes without JSDoc render code blocks only.
+    **Rationale:** JSDoc prose provides essential context for API types; omitting it would force readers to open source files to understand a shape's purpose, undermining the generated documentation's self-sufficiency.
+
     @happy-path
     Scenario: Standard level includes JSDoc in code blocks
       Given a reference config with shapeSources "src/lint/*.ts"
@@ -86,6 +95,9 @@ Feature: Reference Codec - Detail Level Rendering
       And the document contains a code block with "typescript"
 
   Rule: Shape sections render param returns and throws documentation
+
+    **Invariant:** Function shapes render parameter, returns, and throws documentation at detailed level. Standard level renders parameter tables but omits throws. Shapes without param docs skip the parameter table entirely.
+    **Rationale:** Throws documentation is diagnostic detail that clutters standard output; separating it into detailed level keeps standard output focused on the function's contract while preserving full error documentation for consumers who need it.
 
     @happy-path
     Scenario: Detailed level renders param table for function shapes
@@ -196,6 +208,7 @@ Feature: Reference Codec - Detail Level Rendering
     **Invariant:** Patterns with matching include tags appear alongside
     category-selected patterns in the behavior section. The merging
     is additive (OR semantics).
+    **Rationale:** Cross-cutting patterns (e.g., shared utilities, common validators) belong in multiple reference documents; without include-tag routing, these patterns would only appear in their home category, leaving dependent documents incomplete.
 
     **Verified by:** Include-tagged pattern appears in behavior section,
     Include-tagged pattern is additive with category-selected patterns,

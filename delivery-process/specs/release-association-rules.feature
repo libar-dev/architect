@@ -30,6 +30,9 @@ Feature: Release Association Rules Validation
 
   Rule: Spec files must not contain release columns
 
+    **Invariant:** Spec file DataTables must never include a Release column; release metadata belongs exclusively in phase files.
+    **Rationale:** Mixing release metadata into specs couples planning artifacts to release timing, violating the separation defined by PDR-003.
+
     @acceptance-criteria
     Scenario: Spec with release column is rejected
       Given a feature file in delivery-process/specs/
@@ -45,6 +48,9 @@ Feature: Release Association Rules Validation
       Then validation passes
 
   Rule: TypeScript phase files must have required annotations
+
+    **Invariant:** Every TypeScript phase file must include @libar-docs-pattern, @libar-docs-phase, and @libar-docs-status annotations.
+    **Rationale:** Missing required annotations cause phase files to be invisible to the scanner, producing incomplete roadmap projections and broken cross-references.
 
     @acceptance-criteria
     Scenario: Phase file with missing required annotations
@@ -66,6 +72,9 @@ Feature: Release Association Rules Validation
         | @libar-docs-quarter | warns "Recommended annotation"   |
 
   Rule: Release version follows semantic versioning
+
+    **Invariant:** All release version identifiers must conform to the `vX.Y.Z` semantic versioning format.
+    **Rationale:** Non-semver version strings break downstream tooling that relies on version ordering and comparison for release planning.
 
     @acceptance-criteria
     Scenario Outline: Valid release version formats

@@ -15,6 +15,7 @@ Feature: TypeScript AST Parser - Relationships and Edge Cases
   Rule: Relationship tags extract uses and usedBy dependencies
 
       **Invariant:** The uses and usedBy relationship arrays are populated from directive tags, not from description content. When no relationship tags exist, the fields are undefined.
+      **Rationale:** Relationship data drives dependency diagrams and impact analysis — extracting from prose would produce false edges from incidental mentions.
       **Verified by:** Extract @libar-docs-uses with single value, Extract @libar-docs-uses with comma-separated values, Extract @libar-docs-used-by with single value, Extract @libar-docs-used-by with comma-separated values, Extract both uses and usedBy from same directive, NOT capture uses/usedBy values in description, Not set uses/usedBy when no relationship tags exist
 
     @function:parseFileDirectives @relationships
@@ -178,6 +179,7 @@ Feature: TypeScript AST Parser - Relationships and Edge Cases
   Rule: Edge cases and malformed input are handled gracefully
 
       **Invariant:** The parser never crashes on invalid input. Files without directives return empty results. Malformed TypeScript returns a structured error with the file path.
+      **Rationale:** The scanner processes hundreds of files in bulk — a single malformed file must not abort the entire pipeline or produce an undiagnosable crash.
       **Verified by:** Skip comments without @libar-docs-* tags, Skip invalid directive with incomplete tag, Handle malformed TypeScript gracefully, Handle empty file gracefully, Handle whitespace-only file, Handle file with only comments and no exports, Skip inline comments (non-block), Handle unicode characters in descriptions
 
     @function:parseFileDirectives @edge-case

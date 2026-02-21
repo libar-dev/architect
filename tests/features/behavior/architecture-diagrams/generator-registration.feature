@@ -20,6 +20,7 @@ Feature: Architecture Generator Registration
   Rule: Architecture generator is registered in the registry
 
     **Invariant:** The generator registry must contain an "architecture" generator entry available for CLI invocation.
+    **Rationale:** Without a registered entry, the CLI cannot discover or invoke architecture diagram generation.
     **Verified by:** Generator is available in registry
 
     The architecture generator must be registered like other built-in
@@ -34,6 +35,7 @@ Feature: Architecture Generator Registration
   Rule: Architecture generator produces component diagram by default
 
     **Invariant:** Running the architecture generator without diagram type options must produce a component diagram with bounded context subgraphs.
+    **Rationale:** A sensible default prevents users from needing to specify options for the most common use case.
     **Verified by:** Default generation produces component diagram
 
     Running the architecture generator without options produces
@@ -55,6 +57,7 @@ Feature: Architecture Generator Registration
   Rule: Architecture generator supports diagram type options
 
     **Invariant:** The architecture generator must accept a diagram type option that selects between component and layered diagram output.
+    **Rationale:** Different architectural perspectives (bounded context vs. layer hierarchy) require different diagram types, and the user must be able to select which to generate.
     **Verified by:** Generate layered diagram with options
 
     The generator accepts options to specify diagram type
@@ -74,6 +77,7 @@ Feature: Architecture Generator Registration
   Rule: Architecture generator supports context filtering
 
     **Invariant:** When context filtering is applied, the generated diagram must include only patterns from the specified bounded contexts and exclude all others.
+    **Rationale:** Without filtering, large monorepos would produce unreadable diagrams with dozens of bounded contexts; filtering enables focused per-context views.
     **Verified by:** Filter to specific contexts
 
     The generator can filter to specific bounded contexts

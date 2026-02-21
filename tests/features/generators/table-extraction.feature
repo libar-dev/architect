@@ -48,6 +48,7 @@ Feature: Table Extraction Without Duplication
   Rule: Multiple tables in description each render exactly once
 
     **Invariant:** When a rule description contains multiple markdown tables, each table renders as a separate formatted table block with no merging or duplication.
+    **Rationale:** Merging or dropping tables would lose distinct data structures that the author intentionally separated, corrupting the rendered documentation.
     **Verified by:** Two tables in description render as two separate tables
 
     Scenario: Two tables in description render as two separate tables
@@ -75,6 +76,7 @@ Feature: Table Extraction Without Duplication
   Rule: stripMarkdownTables removes table syntax from text
 
     **Invariant:** stripMarkdownTables removes all pipe-delimited table syntax from input text while preserving all surrounding content unchanged.
+    **Rationale:** If table syntax is not stripped from the raw text, the same table data appears twice in the rendered output -- once from the extracted table block and once as raw pipe characters in the description.
     **Verified by:** Strips single table from text, Strips multiple tables from text, Preserves text without tables
 
     Scenario: Strips single table from text

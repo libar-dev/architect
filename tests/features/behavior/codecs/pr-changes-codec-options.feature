@@ -31,6 +31,7 @@ Feature: PR Changes Codec - Options and Filters
   Rule: PrChangesCodec generates review checklist when includeReviewChecklist is enabled
 
     **Invariant:** When includeReviewChecklist is enabled, the codec must generate a "Review Checklist" section with standard items and context-sensitive items based on pattern state (completed, active, dependencies, deliverables). When disabled, no checklist appears.
+    **Rationale:** A context-sensitive checklist prevents reviewers from missing state-specific concerns (e.g., verifying completed patterns still work, or that dependencies are satisfied) that a static checklist would not cover.
     **Verified by:** Review checklist generated with standard items, Review checklist includes completed patterns item when applicable, Review checklist includes active work item when applicable, Review checklist includes dependencies item when patterns have dependencies, Review checklist includes deliverables item when patterns have deliverables, No review checklist when includeReviewChecklist is disabled
 
     @happy-path
@@ -76,6 +77,7 @@ Feature: PR Changes Codec - Options and Filters
   Rule: PrChangesCodec generates dependencies section when includeDependencies is enabled
 
     **Invariant:** When includeDependencies is enabled and patterns have dependency relationships, the codec must render a "Dependencies" section with "Depends On" and "Enables" subsections. When no dependencies exist or the option is disabled, the section is omitted.
+    **Rationale:** Dependency visibility in PR reviews prevents merging changes that break upstream or downstream patterns, which would otherwise only surface during integration.
     **Verified by:** Dependencies section shows depends on relationships, Dependencies section shows enables relationships, No dependencies section when patterns have no dependencies, No dependencies section when includeDependencies is disabled
 
     @happy-path
@@ -107,6 +109,7 @@ Feature: PR Changes Codec - Options and Filters
   Rule: PrChangesCodec filters patterns by changedFiles
 
     **Invariant:** When changedFiles filter is set, only patterns whose source files match (including partial directory path matches) are included in the output.
+    **Rationale:** Filtering by changed files scopes the PR document to only the patterns actually touched, preventing reviewers from wading through unrelated patterns.
     **Verified by:** Patterns filtered by changedFiles match, changedFiles filter matches partial paths
 
     @happy-path
@@ -123,6 +126,7 @@ Feature: PR Changes Codec - Options and Filters
   Rule: PrChangesCodec filters patterns by releaseFilter
 
     **Invariant:** When releaseFilter is set, only patterns with deliverables matching the specified release version are included.
+    **Rationale:** Release filtering isolates the patterns scheduled for a specific version, enabling targeted release reviews without noise from other versions' deliverables.
     **Verified by:** Patterns filtered by release version
 
     @happy-path

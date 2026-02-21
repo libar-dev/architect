@@ -25,6 +25,7 @@ Feature: Layer Inference from Feature File Paths
   Rule: Timeline layer is detected from /timeline/ directory segments
 
     **Invariant:** Any feature file path containing a /timeline/ directory segment is classified as timeline layer.
+    **Rationale:** Timeline features track phased delivery progress and must be grouped separately for roadmap generation and phase filtering.
     **Verified by:** Detect timeline features from /timeline/ path, Detect timeline features regardless of parent directories, Detect timeline features in delivery-process package
 
     @happy-path @timeline
@@ -48,6 +49,7 @@ Feature: Layer Inference from Feature File Paths
   Rule: Domain layer is detected from business context directory segments
 
     **Invariant:** Feature files in /deciders/, /orders/, or /inventory/ directories are classified as domain layer.
+    **Rationale:** Domain features define core business rules and must be distinguished from infrastructure tests for accurate coverage reporting.
     **Verified by:** Detect decider features as domain, Detect orders features as domain, Detect inventory features as domain
 
     @happy-path @domain
@@ -71,6 +73,7 @@ Feature: Layer Inference from Feature File Paths
   Rule: Integration layer is detected and takes priority over domain directories
 
     **Invariant:** Paths containing /integration-features/ or /integration/ are classified as integration, even when they also contain domain directory names.
+    **Rationale:** Integration tests nested under domain directories (e.g., /integration/orders/) would be misclassified as domain without explicit priority, skewing layer coverage metrics.
     **Verified by:** Detect integration-features directory as integration, Detect /integration/ directory as integration, Integration takes priority over orders subdirectory, Integration takes priority over inventory subdirectory
 
     @happy-path @integration
@@ -100,6 +103,7 @@ Feature: Layer Inference from Feature File Paths
   Rule: E2E layer is detected from /e2e/ directory segments
 
     **Invariant:** Any feature file path containing an /e2e/ directory segment is classified as e2e layer.
+    **Rationale:** E2E tests require separate execution infrastructure and longer timeouts; misclassification would mix them into faster test suites.
     **Verified by:** Detect e2e features from /e2e/ path, Detect e2e features in frontend app, Detect e2e-journeys as e2e
 
     @happy-path @e2e
@@ -123,6 +127,7 @@ Feature: Layer Inference from Feature File Paths
   Rule: Component layer is detected from tool-specific directory segments
 
     **Invariant:** Feature files in /scanner/ or /lint/ directories are classified as component layer.
+    **Rationale:** Tool-specific features test internal pipeline stages and must be isolated from business domain and integration layers in documentation grouping.
     **Verified by:** Detect scanner features as component, Detect lint features as component
 
     @happy-path @component
@@ -140,6 +145,7 @@ Feature: Layer Inference from Feature File Paths
   Rule: Unknown layer is the fallback for unclassified paths
 
     **Invariant:** Any feature file path that does not match a known layer pattern is classified as unknown.
+    **Rationale:** Silently dropping unclassified features would create invisible gaps in test coverage; the unknown fallback ensures every feature is accounted for.
     **Verified by:** Return unknown for unclassified paths, Return unknown for root-level features, Return unknown for generic test paths
 
     @edge-case @unknown
@@ -163,6 +169,7 @@ Feature: Layer Inference from Feature File Paths
   Rule: Path normalization handles cross-platform and case differences
 
     **Invariant:** Layer inference produces correct results regardless of path separators, case, or absolute vs relative paths.
+    **Rationale:** The consumer monorepo runs on multiple platforms; platform-dependent classification would produce inconsistent documentation across developer machines and CI.
     **Verified by:** Handle Windows-style paths with backslashes, Be case-insensitive, Handle mixed path separators, Handle absolute Unix paths, Handle Windows absolute paths, Timeline in filename only should not match, Timeline detected even with deep nesting
 
     @edge-case @normalization
@@ -210,6 +217,7 @@ Feature: Layer Inference from Feature File Paths
   Rule: FEATURE_LAYERS constant provides validated layer enumeration
 
     **Invariant:** FEATURE_LAYERS is a readonly array containing exactly all 6 valid layer values.
+    **Rationale:** Consumers iterate over FEATURE_LAYERS for exhaustive layer handling; a mutable or incomplete array would cause missed layers at runtime.
     **Verified by:** FEATURE_LAYERS contains all valid layer values, FEATURE_LAYERS has exactly 6 layers, FEATURE_LAYERS is a readonly array
 
     @constant @validation

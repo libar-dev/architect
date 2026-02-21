@@ -130,6 +130,8 @@
 #### isScannerConfig type guard narrows unknown values
 
 > **Invariant:** isScannerConfig returns true only for objects that have a non-empty patterns array and a string baseDir.
+>
+> **Rationale:** Without a reliable type guard, callers cannot safely narrow unknown config objects and risk accessing properties on incompatible types at runtime.
 
 **Verified by:**
 - isScannerConfig returns true for valid config
@@ -142,6 +144,8 @@
 #### isGeneratorConfig type guard narrows unknown values
 
 > **Invariant:** isGeneratorConfig returns true only for objects that have a string outputDir and a .json registryPath.
+>
+> **Rationale:** Without a reliable type guard, callers cannot safely narrow unknown config objects and risk passing malformed generator configs that bypass schema validation.
 
 **Verified by:**
 - isGeneratorConfig returns true for valid config
@@ -381,6 +385,8 @@
 #### Single directive linting validates annotations against rules
 
 > **Invariant:** Every directive is checked against all provided rules and violations include source location.
+>
+> **Rationale:** Skipping rules or omitting source locations makes violations unactionable, as developers cannot locate or understand the issue.
 
 **Verified by:**
 - Return empty array when all rules pass
@@ -393,6 +399,8 @@
 #### Multi-file batch linting aggregates results across files
 
 > **Invariant:** All files and directives are scanned, violations are collected per file, and severity counts are accurate.
+>
+> **Rationale:** Missing files or inaccurate severity counts cause silent rule violations in CI and undermine trust in the linting pipeline.
 
 **Verified by:**
 - Return empty results for clean files
@@ -405,6 +413,8 @@
 #### Failure detection respects strict mode for severity escalation
 
 > **Invariant:** Errors always indicate failure. Warnings only indicate failure in strict mode. Info never indicates failure.
+>
+> **Rationale:** Without correct severity-to-exit-code mapping, CI pipelines either miss real errors or block on informational messages, eroding developer trust in the linter.
 
 **Verified by:**
 - Return true when there are errors
@@ -418,6 +428,8 @@
 #### Violation sorting orders by severity then by line number
 
 > **Invariant:** Sorted output places errors first, then warnings, then info, with stable line-number ordering within each severity. Sorting does not mutate the original array.
+>
+> **Rationale:** Unsorted output forces developers to manually scan for critical errors among lower-severity noise, and mutating the original array would break callers that hold a reference to it.
 
 **Verified by:**
 - Sort errors first then warnings then info
@@ -429,6 +441,8 @@
 #### Pretty formatting produces human-readable output with severity counts
 
 > **Invariant:** Pretty output includes file paths, line numbers, severity labels, rule IDs, and summary counts. Quiet mode suppresses non-error violations.
+>
+> **Rationale:** Incomplete formatting (missing file paths or line numbers) prevents developers from navigating directly to violations, and noisy output in quiet mode defeats its purpose.
 
 **Verified by:**
 - Show success message when no violations
@@ -441,6 +455,8 @@
 #### JSON formatting produces machine-readable output with full details
 
 > **Invariant:** JSON output is valid, includes all summary fields, and preserves violation details including file, line, severity, rule, and message.
+>
+> **Rationale:** Machine consumers (CI pipelines, IDE integrations) depend on valid JSON with complete fields; missing or malformed output breaks automated tooling downstream.
 
 **Verified by:**
 - Return valid JSON
@@ -503,6 +519,8 @@
 #### Parent references must be valid
 
 > **Invariant:** A pattern's parent reference must point to an existing epic pattern in the registry.
+>
+> **Rationale:** Dangling parent references break the epic-to-pattern hierarchy, causing patterns to appear orphaned in roadmap views and losing rollup visibility.
 
 **Verified by:**
 - Invalid parent reference detected

@@ -16,6 +16,9 @@ Feature: Reference Codec - Diagram Scoping
 
   Rule: Scoped diagrams are generated from diagramScope config
 
+    **Invariant:** Diagram content is determined exclusively by diagramScope filters (archContext, include, archLayer, patterns), and filters compose via OR — a pattern matching any single filter appears in the diagram.
+    **Rationale:** Without filter-driven scoping, diagrams would include all patterns regardless of relevance, producing unreadable visualizations that obscure architectural boundaries.
+
     @happy-path
     Scenario: Config with diagramScope produces mermaid block at detailed level
       Given a reference config with diagramScope archContext "lint"
@@ -99,6 +102,9 @@ Feature: Reference Codec - Diagram Scoping
       Then the document does not contain a mermaid block
 
   Rule: Multiple diagram scopes produce multiple mermaid blocks
+
+    **Invariant:** Each entry in the diagramScopes array produces an independent Mermaid block with its own title and direction, and legacy singular diagramScope remains supported as a fallback.
+    **Rationale:** Product areas require multiple architectural views (e.g., system overview and data flow) from a single configuration, and breaking backward compatibility with the singular diagramScope would silently remove diagrams from existing consumers.
 
     @happy-path
     Scenario: Config with diagramScopes array produces multiple diagrams
