@@ -198,6 +198,8 @@
   "files": [
     "dist",
     "docs",
+    "docs-live",
+    "docs-generated",
     "README.md",
     "LICENSE",
     "CHANGELOG.md"
