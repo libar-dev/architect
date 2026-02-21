@@ -12,6 +12,7 @@ import {
   initState,
   renderToMarkdown,
   renderToClaudeContext,
+  renderToClaudeMdModule,
   renderDocumentWithFiles,
   heading,
   paragraph,
@@ -575,4 +576,239 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
       }
     );
   });
+
+  // ===========================================================================
+  // Claude MD Module Renderer
+  // ===========================================================================
+
+  Rule(
+    'Claude MD module renderer produces modular-claude-md compatible output',
+    ({ RuleScenario }) => {
+      RuleScenario('Module title renders as H3', ({ Given, When, Then, And }) => {
+        Given('a document with title {string}', (_ctx: unknown, title: string) => {
+          state!.sections = [];
+          state!.doc = document(title, []);
+        });
+
+        And('the document has sections:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+          for (const row of dataTable) {
+            switch (row.type) {
+              case 'heading':
+                state!.sections.push(heading(2, row.content));
+                break;
+              case 'paragraph':
+                state!.sections.push(paragraph(row.content));
+                break;
+              case 'separator':
+                state!.sections.push(separator());
+                break;
+            }
+          }
+          state!.doc = document(state!.doc!.title, state!.sections);
+        });
+
+        When('rendering to claude md module', () => {
+          state!.claudeMdModule = renderToClaudeMdModule(state!.doc!);
+        });
+
+        Then('the claude md module output contains {string}', (_ctx: unknown, expected: string) => {
+          expect(state!.claudeMdModule).toContain(expected);
+        });
+
+        And(
+          'the claude md module output does not contain {string}',
+          (_ctx: unknown, notExpected: string) => {
+            // Check that the exact H1 form doesn't appear (but H3 does)
+            // Use line-start matching to avoid substring false positives
+            const lines = state!.claudeMdModule.split('\n');
+            const hasExact = lines.some((line) => line.trim() === notExpected.trim());
+            expect(hasExact).toBe(false);
+          }
+        );
+      });
+
+      RuleScenario('Module section headings offset by plus 2', ({ Given, When, Then, And }) => {
+        Given('a document with title {string}', (_ctx: unknown, title: string) => {
+          state!.sections = [];
+          state!.doc = document(title, []);
+        });
+
+        And('the document has sections:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+          for (const row of dataTable) {
+            switch (row.type) {
+              case 'heading':
+                state!.sections.push(heading(2, row.content));
+                break;
+              case 'paragraph':
+                state!.sections.push(paragraph(row.content));
+                break;
+              case 'separator':
+                state!.sections.push(separator());
+                break;
+            }
+          }
+          state!.doc = document(state!.doc!.title, state!.sections);
+        });
+
+        When('rendering to claude md module', () => {
+          state!.claudeMdModule = renderToClaudeMdModule(state!.doc!);
+        });
+
+        Then('the claude md module output contains {string}', (_ctx: unknown, expected: string) => {
+          expect(state!.claudeMdModule).toContain(expected);
+        });
+      });
+
+      RuleScenario('Module frontmatter is omitted', ({ Given, When, Then, And }) => {
+        Given('a document with:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+          const fields: Record<string, string> = {};
+          for (const row of dataTable) {
+            fields[row.field] = row.value;
+          }
+          state!.doc = document(fields.title, [], {
+            purpose: fields.purpose,
+          });
+        });
+
+        When('rendering to claude md module', () => {
+          state!.claudeMdModule = renderToClaudeMdModule(state!.doc!);
+        });
+
+        Then(
+          'the claude md module output does not contain {string}',
+          (_ctx: unknown, notExpected: string) => {
+            expect(state!.claudeMdModule).not.toContain(notExpected);
+          }
+        );
+
+        And(
+          'the claude md module output does not contain {string}',
+          (_ctx: unknown, notExpected: string) => {
+            expect(state!.claudeMdModule).not.toContain(notExpected);
+          }
+        );
+      });
+
+      RuleScenario('Module mermaid blocks are omitted', ({ Given, When, Then, And }) => {
+        Given('a document with title {string}', (_ctx: unknown, title: string) => {
+          state!.doc = document(title, []);
+        });
+
+        And('the document has a mermaid block:', (_ctx: unknown, docString: string) => {
+          state!.doc = document(state!.doc!.title, [mermaid(docString.trim())]);
+        });
+
+        When('rendering to claude md module', () => {
+          state!.claudeMdModule = renderToClaudeMdModule(state!.doc!);
+        });
+
+        Then(
+          'the claude md module output does not contain any of:',
+          (_ctx: unknown, dataTable: DataTableRow[]) => {
+            for (const row of dataTable) {
+              expect(state!.claudeMdModule).not.toContain(row.text);
+            }
+          }
+        );
+      });
+
+      RuleScenario('Module link-out blocks are omitted', ({ Given, When, Then, And }) => {
+        Given('a document with title {string}', (_ctx: unknown, title: string) => {
+          state!.doc = document(title, []);
+        });
+
+        And(
+          'the document has a link-out {string} to {string}',
+          (_ctx: unknown, text: string, path: string) => {
+            state!.doc = document(state!.doc!.title, [linkOut(text, path)]);
+          }
+        );
+
+        When('rendering to claude md module', () => {
+          state!.claudeMdModule = renderToClaudeMdModule(state!.doc!);
+        });
+
+        Then(
+          'the claude md module output does not contain {string}',
+          (_ctx: unknown, notExpected: string) => {
+            expect(state!.claudeMdModule).not.toContain(notExpected);
+          }
+        );
+
+        And(
+          'the claude md module output does not contain {string}',
+          (_ctx: unknown, notExpected: string) => {
+            expect(state!.claudeMdModule).not.toContain(notExpected);
+          }
+        );
+      });
+
+      RuleScenario(
+        'Module collapsible blocks flatten to headings',
+        ({ Given, When, Then, And }) => {
+          Given('a document with title {string}', (_ctx: unknown, title: string) => {
+            state!.doc = document(title, []);
+          });
+
+          And('a collapsible block with summary {string}', (_ctx: unknown, summary: string) => {
+            state!.collapsibleSummary = summary;
+            state!.collapsibleContent = [];
+          });
+
+          And('the collapsible contains a paragraph {string}', (_ctx: unknown, text: string) => {
+            state!.collapsibleContent.push(paragraph(text));
+            state!.doc = document(state!.doc!.title, [
+              collapsible(state!.collapsibleSummary, state!.collapsibleContent),
+            ]);
+          });
+
+          When('rendering to claude md module', () => {
+            state!.claudeMdModule = renderToClaudeMdModule(state!.doc!);
+          });
+
+          Then(
+            'the claude md module output contains {string}',
+            (_ctx: unknown, expected: string) => {
+              expect(state!.claudeMdModule).toContain(expected);
+            }
+          );
+
+          And(
+            'the claude md module output contains {string}',
+            (_ctx: unknown, expected: string) => {
+              expect(state!.claudeMdModule).toContain(expected);
+            }
+          );
+
+          And(
+            'the claude md module output does not contain {string}',
+            (_ctx: unknown, notExpected: string) => {
+              expect(state!.claudeMdModule).not.toContain(notExpected);
+            }
+          );
+        }
+      );
+
+      RuleScenario('Module heading level clamped at H6', ({ Given, When, Then, And }) => {
+        Given('a document with title {string}', (_ctx: unknown, title: string) => {
+          state!.doc = document(title, []);
+        });
+
+        And(
+          'the document has a heading at level {int} with text {string}',
+          (_ctx: unknown, level: number, text: string) => {
+            state!.doc = document(state!.doc!.title, [{ type: 'heading', level, text }]);
+          }
+        );
+
+        When('rendering to claude md module', () => {
+          state!.claudeMdModule = renderToClaudeMdModule(state!.doc!);
+        });
+
+        Then('the claude md module output contains {string}', (_ctx: unknown, expected: string) => {
+          expect(state!.claudeMdModule).toContain(expected);
+        });
+      });
+    }
+  );
 });

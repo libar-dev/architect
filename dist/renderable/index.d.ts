@@ -26,7 +26,7 @@
  * - Generation: `generateDocument`, `generateAllDocuments`
  */
 export { RenderableDocumentSchema, HeadingBlockSchema, ParagraphBlockSchema, SeparatorBlockSchema, TableBlockSchema, ListBlockSchema, CodeBlockSchema, MermaidBlockSchema, CollapsibleBlockSchema, LinkOutBlockSchema, SectionBlockSchema, type RenderableDocument, type HeadingBlock, type ParagraphBlock, type SeparatorBlock, type TableBlock, type ListBlock, type CodeBlock, type MermaidBlock, type CollapsibleBlock, type LinkOutBlock, type SectionBlock, type ListItem, heading, paragraph, separator, table, list, code, mermaid, collapsible, linkOut, document, } from './schema.js';
-export { renderToMarkdown, renderDocumentWithFiles, type OutputFile } from './render.js';
+export { renderToMarkdown, renderToClaudeMdModule, renderDocumentWithFiles, type OutputFile } from './render.js';
 export { PatternsDocumentCodec, RoadmapDocumentCodec, CompletedMilestonesCodec, RequirementsDocumentCodec, SessionContextCodec, RemainingWorkCodec, } from './codecs/index.js';
 export { generateDocument, generateDocuments, generateAllDocuments, getAvailableDocumentTypes, isValidDocumentType, getDocumentTypeInfo, DOCUMENT_TYPES, type DocumentType, } from './generate.js';
 export { normalizeStatus } from '../taxonomy/index.js';

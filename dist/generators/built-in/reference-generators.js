@@ -10,7 +10,7 @@
  * TWO generators: detailed (docs/) and summary (_claude-md/).
  */
 import { heading, paragraph, separator, table, document } from '../../renderable/schema.js';
-import { renderToMarkdown, renderToClaudeContext } from '../../renderable/render.js';
+import { renderToMarkdown, renderToClaudeMdModule } from '../../renderable/render.js';
 import { createReferenceCodec, PRODUCT_AREA_META, buildScopedDiagram, } from '../../renderable/codecs/reference.js';
 import { toKebabCase } from '../../utils/string-utils.js';
 import { normalizeStatus } from '../../taxonomy/normalized-status.js';
@@ -99,8 +99,8 @@ class ReferenceDocGenerator {
         // Cast needed: Zod codec infers optional props as `T | undefined`,
         // but RenderableDocument uses exactOptionalPropertyTypes
         const doc = codec.decode(context.masterDataset);
-        // Summary-level output (for _claude-md/) uses token-efficient renderer
-        const render = this.detailLevel === 'summary' ? renderToClaudeContext : renderToMarkdown;
+        // Summary-level output (for _claude-md/) uses modular-claude-md compatible renderer
+        const render = this.detailLevel === 'summary' ? renderToClaudeMdModule : renderToMarkdown;
         const content = render(doc);
         return Promise.resolve({
             files: [{ path: this.outputPath, content }],
@@ -163,7 +163,7 @@ class ReferenceDocsGenerator {
             const summaryDoc = summaryCodec.decode(context.masterDataset);
             files.push({
                 path: `_claude-md/${config.claudeMdSection}/${config.claudeMdFilename}`,
-                content: renderToClaudeContext(summaryDoc),
+                content: renderToClaudeMdModule(summaryDoc),
             });
         }
         return Promise.resolve({ files });
@@ -216,7 +216,7 @@ class ProductAreaDocsGenerator {
             const summaryDoc = summaryCodec.decode(context.masterDataset);
             files.push({
                 path: `_claude-md/${config.claudeMdSection}/${config.claudeMdFilename}`,
-                content: renderToClaudeContext(summaryDoc),
+                content: renderToClaudeMdModule(summaryDoc),
             });
         }
         // Progressive disclosure index

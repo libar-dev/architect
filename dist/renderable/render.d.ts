@@ -9,17 +9,19 @@
  *
  * ## Universal Renderer
  *
- * Converts RenderableDocument to output strings. Two renderers:
+ * Converts RenderableDocument to output strings. Three renderers:
  * - `renderToMarkdown` — Full markdown for human documentation
- * - `renderToClaudeContext` — Token-efficient format for LLM consumption
+ * - `renderToClaudeMdModule` — Standard markdown with H3-rooted headings for modular-claude-md
+ * - `renderToClaudeContext` — Token-efficient format with section markers (legacy)
  *
- * Both are "dumb printers" — they know nothing about patterns, phases,
+ * All are "dumb printers" — they know nothing about patterns, phases,
  * or domain concepts. All logic lives in the codecs; these just render blocks.
  *
  * ### When to Use
  *
  * - `renderToMarkdown` for human-readable docs (`docs/` output)
- * - `renderToClaudeContext` for AI context (`_claude-md/` output)
+ * - `renderToClaudeMdModule` for AI context (`_claude-md/` output)
+ * - `renderToClaudeContext` for token-efficient AI context (legacy, not used by generators)
  * - `renderDocumentWithFiles` for multi-file output with detail files
  */
 import type { RenderableDocument } from './schema.js';
@@ -42,6 +44,18 @@ export declare function renderToMarkdown(doc: RenderableDocument): string;
  * @returns Token-efficient string for AI context
  */
 export declare function renderToClaudeContext(doc: RenderableDocument): string;
+/**
+ * Render a RenderableDocument to a modular-claude-md compatible module.
+ *
+ * Uses standard markdown headings offset by +2 (H1→H3, H2→H4) so the
+ * output plugs directly into modular-claude-md's H3-rooted module system.
+ * Omits frontmatter, mermaid blocks, and link-out blocks. Flattens
+ * collapsible blocks into headings.
+ *
+ * @param doc - The document to render
+ * @returns Markdown string compatible with modular-claude-md
+ */
+export declare function renderToClaudeMdModule(doc: RenderableDocument): string;
 /**
  * Output file descriptor
  */

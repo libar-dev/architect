@@ -511,6 +511,14 @@ function decodeProductArea(dataset, config, opts) {
             }
         }
     }
+    else {
+        // Compact boundary summary for summary-level documents (replaces diagrams)
+        const scopes = config.diagramScopes ?? meta?.diagramScopes ?? [];
+        const summary = buildBoundarySummary(dataset, scopes);
+        if (summary !== undefined) {
+            sections.push(summary);
+        }
+    }
     // 4. Shapes from TypeScript patterns in this product area
     {
         const allShapes = [];
@@ -827,6 +835,51 @@ function buildShapeSections(shapes, detailLevel) {
     }
     sections.push(separator());
     return sections;
+}
+// ============================================================================
+// Boundary Summary Builder
+// ============================================================================
+/**
+ * Build a compact boundary summary paragraph from diagram scope data.
+ *
+ * Groups scope patterns by archContext and produces a text like:
+ * **Components:** Scanner (PatternA, PatternB), Extractor (PatternC)
+ *
+ * Skips scopes with `source` override (hardcoded diagrams like fsm-lifecycle).
+ * Returns undefined if no patterns found.
+ */
+function buildBoundarySummary(dataset, scopes) {
+    const allPatterns = [];
+    const seenNames = new Set();
+    for (const scope of scopes) {
+        // Skip hardcoded source diagrams — they don't represent pattern boundaries
+        if (scope.source !== undefined)
+            continue;
+        for (const pattern of collectScopePatterns(dataset, scope)) {
+            const name = getPatternName(pattern);
+            if (!seenNames.has(name)) {
+                seenNames.add(name);
+                allPatterns.push(pattern);
+            }
+        }
+    }
+    if (allPatterns.length === 0)
+        return undefined;
+    // Group by archContext
+    const byContext = new Map();
+    for (const pattern of allPatterns) {
+        const ctx = pattern.archContext ?? 'Other';
+        const group = byContext.get(ctx) ?? [];
+        group.push(getPatternName(pattern));
+        byContext.set(ctx, group);
+    }
+    // Build compact text: "Context (A, B), Context (C)"
+    const parts = [];
+    for (const [context, names] of [...byContext.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+        const label = context.charAt(0).toUpperCase() + context.slice(1);
+        parts.push(`${label} (${names.join(', ')})`);
+    }
+    return paragraph(`**Components:** ${parts.join(', ')}`);
 }
 // ============================================================================
 // Scoped Diagram Builder

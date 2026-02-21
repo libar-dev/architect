@@ -1,18 +1,15 @@
-=== PROCESS OVERVIEW ===
-
-Purpose: Process product area overview
-Detail Level: Compact summary
+### Process Overview
 
 **How does the session workflow work?** Process defines the USDP-inspired session workflow that governs how work moves through the delivery lifecycle. Three session types (planning, design, implementation) have fixed input/output contracts: planning creates roadmap specs from pattern briefs, design produces code stubs and decision records, and implementation writes code against scope-locked specs. Git is the event store — documentation artifacts are projections of annotated source code, not hand-maintained files. The FSM enforces state transitions (roadmap → active → completed) with escalating protection levels, while handoff templates preserve context across LLM session boundaries. ADR-003 established that TypeScript source owns pattern identity; tier 1 specs are ephemeral planning documents that lose value after completion.
 
-=== KEY INVARIANTS ===
+#### Key Invariants
 
 - TypeScript source owns pattern identity: `@libar-docs-pattern` in TypeScript defines the pattern. Tier 1 specs are ephemeral working documents
 - 7 canonical product-area values: Annotation, Configuration, Generation, Validation, DataAPI, CoreTypes, Process — reader-facing sections, not source modules
 - Two distinct status domains: Pattern FSM status (4 values) vs. deliverable status (6 values). Never cross domains
 - Session types define capabilities: planning creates specs, design creates stubs, implementation writes code. Each session type has a fixed input/output contract enforced by convention
 
-=== PRODUCT AREA CANONICAL VALUES ===
+#### Product area canonical values
 
 **Invariant:** The product-area tag uses one of 7 canonical values. Each value represents a reader-facing documentation section, not a source module.
 
@@ -26,7 +23,7 @@ Detail Level: Compact summary
 | CoreTypes     | What foundational types exist?      | Result monad, error factories, string utils     |
 | Process       | How does the session workflow work? | Session lifecycle, handoffs, conventions        |
 
-=== ADR CATEGORY CANONICAL VALUES ===
+#### ADR category canonical values
 
 **Invariant:** The adr-category tag uses one of 4 values.
 
@@ -37,7 +34,7 @@ Detail Level: Compact summary
 | testing       | Test strategy, verification approach          |
 | documentation | Documentation generation, content structure   |
 
-=== FSM STATUS VALUES AND PROTECTION LEVELS ===
+#### FSM status values and protection levels
 
 **Invariant:** Pattern status uses exactly 4 values with defined protection levels. These are enforced by Process Guard at commit time.
 
@@ -48,7 +45,7 @@ Detail Level: Compact summary
 | completed | Hard-locked  | No                   | Requires unlock-reason tag      |
 | deferred  | None         | Yes                  | Full editing                    |
 
-=== VALID FSM TRANSITIONS ===
+#### Valid FSM transitions
 
 **Invariant:** Only these transitions are valid. All others are rejected by Process Guard.
 
@@ -60,7 +57,7 @@ Detail Level: Compact summary
 | active   | roadmap   | Blocked/regressed     |
 | deferred | roadmap   | Resume planning       |
 
-=== TAG FORMAT TYPES ===
+#### Tag format types
 
 **Invariant:** Every tag has one of 6 format types that determines how its value is parsed.
 
@@ -73,7 +70,7 @@ Detail Level: Compact summary
 | number       | Numeric value                  | @libar-docs-phase 15           |
 | quoted-value | Preserves spaces               | @libar-docs-brief:'Multi word' |
 
-=== SOURCE OWNERSHIP ===
+#### Source ownership
 
 **Invariant:** Relationship tags have defined ownership by source type. Anti-pattern detection enforces these boundaries.
 
@@ -84,11 +81,11 @@ Detail Level: Compact summary
 | quarter    | Feature files  | TypeScript    | Gherkin owns timeline metadata     |
 | team       | Feature files  | TypeScript    | Gherkin owns ownership metadata    |
 
-=== QUARTER FORMAT CONVENTION ===
+#### Quarter format convention
 
 **Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`). ISO-year-first sorting works lexicographically.
 
-=== CANONICAL PHASE DEFINITIONS (6-PHASE USDP STANDARD) ===
+#### Canonical phase definitions (6-phase USDP standard)
 
 **Invariant:** The default workflow defines exactly 6 phases in fixed order. These are the canonical phase names and ordinals used by all generated documentation.
 
@@ -101,7 +98,7 @@ Detail Level: Compact summary
 | 5     | Validation    | Verification, acceptance criteria confirmation |
 | 6     | Retrospective | Review, lessons learned, documentation         |
 
-=== DELIVERABLE STATUS CANONICAL VALUES ===
+#### Deliverable status canonical values
 
 **Invariant:** Deliverable status (distinct from pattern FSM status) uses exactly 6 values, enforced by Zod schema at parse time.
 
@@ -113,3 +110,5 @@ Detail Level: Compact summary
 | deferred    | Work postponed       |
 | superseded  | Replaced by another  |
 | n/a         | Not applicable       |
+
+**Components:** Other (ADR006SingleReadModelArchitecture, ADR003SourceFirstPatternArchitecture, ADR002GherkinOnlyTesting, ADR001TaxonomyCanonicalValues, ValidatorReadModelConsolidation, StepDefinitionCompletion, SessionFileCleanup, ProcessAPILayeredExtraction, OrchestratorPipelineFactoryMigration, MvpWorkflowImplementation, LivingRoadmapCLI, EffortVarianceTracking, ConfigBasedWorkflowDefinition, CliBehaviorTesting, SessionHandoffs, SessionFileLifecycle)
