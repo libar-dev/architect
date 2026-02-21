@@ -23,4 +23,12 @@
 // Transform Dataset
 // ═══════════════════════════════════════════════════════════════════════════
 export { transformToMasterDataset, transformToMasterDatasetWithValidation, completionPercentage, isFullyCompleted, } from './transform-dataset.js';
+// ═══════════════════════════════════════════════════════════════════════════
+// Merge Patterns
+// ═══════════════════════════════════════════════════════════════════════════
+export { mergePatterns } from './merge-patterns.js';
+// ═══════════════════════════════════════════════════════════════════════════
+// Pipeline Factory
+// ═══════════════════════════════════════════════════════════════════════════
+export { buildMasterDataset, } from './build-pipeline.js';
 //# sourceMappingURL=index.js.map

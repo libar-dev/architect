@@ -22,6 +22,10 @@ Session types: `planning` (minimal), `design` (full: stubs + deps + deliverables
 | `list --status roadmap` | Find available patterns to work on                                                    |
 | `arch blocking`         | Find patterns stuck on incomplete dependencies                                        |
 | `stubs --unresolved`    | Find design stubs missing implementations                                             |
+| `rules`                 | Business rules and invariants from Gherkin `Rule:` blocks                             |
+| `files <pattern>`       | File reading list with implementation paths — replaces manual path discovery          |
+| `decisions <pattern>`   | Design decisions (AD-N) from stub descriptions                                        |
+| `pdr <number>`          | Cross-reference patterns mentioning a PDR number                                      |
 | `handoff --pattern`     | Capture session-end state for multi-session work                                      |
 
 #### Annotation Exploration
@@ -36,6 +40,18 @@ Run these **before** making annotation changes — they prevent debugging cycles
 | `query getPattern <name>`  | Full pattern JSON including `extractedShapes` and `productArea`               |
 
 **Lesson learned:** `unannotated --path src/types` would have immediately caught missing `@libar-docs` annotations on `result.ts` and `errors.ts` — saving ~30 minutes of debugging why shapes weren't appearing in generated docs.
+
+#### Architecture Queries
+
+Query architectural structure directly — avoids explore agents for structural questions:
+
+| Command               | When to Use                                          |
+| --------------------- | ---------------------------------------------------- |
+| `arch coverage`       | Annotation completeness across the project           |
+| `arch context [name]` | Patterns in bounded context (list all if no name)    |
+| `arch layer [name]`   | Patterns in architecture layer (list all if no name) |
+| `arch dangling`       | Broken references — pattern names that don't resolve |
+| `arch orphans`        | Isolated patterns with no relationships              |
 
 #### Tips
 

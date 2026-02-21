@@ -3,7 +3,7 @@
  * @libar-docs-pattern DeliverableStatusTaxonomy
  * @libar-docs-status active
  * @libar-docs-core
- * @libar-docs-extract-shapes DELIVERABLE_STATUS_VALUES, DeliverableStatus, VALID_DELIVERABLE_STATUS_SET, DEFAULT_DELIVERABLE_STATUS, isDeliverableStatusComplete, isDeliverableStatusInProgress, isDeliverableStatusPending, getDeliverableStatusEmoji
+ * @libar-docs-extract-shapes DELIVERABLE_STATUS_VALUES, DeliverableStatus, VALID_DELIVERABLE_STATUS_SET, DEFAULT_DELIVERABLE_STATUS, isDeliverableStatusComplete, isDeliverableStatusInProgress, isDeliverableStatusPending, isDeliverableStatusTerminal, getDeliverableStatusEmoji
  *
  * ## Deliverable Status Taxonomy
  *
@@ -86,6 +86,20 @@ export function isDeliverableStatusInProgress(status) {
  */
 export function isDeliverableStatusPending(status) {
     return status === 'pending';
+}
+/**
+ * Check if a deliverable status is terminal (no further work expected).
+ *
+ * Terminal statuses are acceptable for DoD validation on completed patterns:
+ * - `complete`: Work is done
+ * - `n/a`: Not applicable — consciously excluded
+ * - `superseded`: Replaced by another deliverable
+ *
+ * Note: `deferred` is NOT terminal — it means "postponed," implying
+ * unfinished work that should block DoD.
+ */
+export function isDeliverableStatusTerminal(status) {
+    return status === 'complete' || status === 'n/a' || status === 'superseded';
 }
 /**
  * Get the appropriate emoji for a deliverable status.

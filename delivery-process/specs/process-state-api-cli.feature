@@ -42,7 +42,7 @@ Feature: ProcessStateAPI CLI - Direct Queries for Planning Sessions
       | process:query CLI command | complete | src/cli/process-api.ts | Yes | integration |
       | CLI argument parser | complete | src/cli/process-api.ts | Yes | integration |
       | JSON output formatter | complete | src/cli/process-api.ts | Yes | integration |
-      | Text output formatter | deferred | N/A | No | N/A |
+      | Text output formatter | n/a | N/A | No | N/A |
       | Root package.json script | complete | package.json | No | N/A |
       | CLAUDE.md documentation update | complete | CLAUDE.md | No | N/A |
 

@@ -231,6 +231,18 @@ function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 
 ## Behavior Specifications
 
+### MergePatterns
+
+[View MergePatterns source](src/generators/pipeline/merge-patterns.ts)
+
+## MergePatterns - Dual-Source Pattern Merging
+
+Merges patterns from TypeScript and Gherkin sources with conflict detection.
+Each pattern name must be unique across both sources.
+
+Target: src/generators/pipeline/merge-patterns.ts
+See: DD-2 (OrchestratorPipelineFactoryMigration)
+
 ### UniversalDocGeneratorRobustness
 
 [View UniversalDocGeneratorRobustness source](delivery-process/specs/universal-doc-generator-robustness.feature)
@@ -852,6 +864,245 @@ relationship model from PatternRelationshipModel without requiring specs to list
 
 - Section omitted when no implementations exist
 - Section omitted when empty
+
+</details>
+
+### OrchestratorPipelineFactoryMigration
+
+[View OrchestratorPipelineFactoryMigration source](delivery-process/specs/orchestrator-pipeline-factory-migration.feature)
+
+**Problem:**
+`orchestrator.ts` is the last feature consumer that wires the 8-step
+scan-extract-merge-transform pipeline inline (lines 282-427). This is
+the Parallel Pipeline anti-pattern identified in ADR-006. The shared
+pipeline factory in `build-pipeline.ts` already serves `process-api.ts`
+and `validate-patterns.ts`, but the orchestrator — the original pipeline
+host — was deferred (ProcessAPILayeredExtraction DD-3) because it
+collects structured warnings (scan errors with file details, extraction
+error counts, Gherkin parse errors with line/column) that the factory's
+flat `readonly string[]` warnings cannot represent.
+
+**Current violations in orchestrator.ts:**
+
+| Anti-Pattern | Location | Evidence |
+| Parallel Pipeline | Lines 282-427 | 8-step pipeline: loadConfig, scanPatterns, extractPatterns, scanGherkinFiles, extractPatternsFromGherkin, mergePatterns, computeHierarchyChildren, transformToMasterDataset |
+
+Additionally, `mergePatterns()` is defined in orchestrator.ts (line 701)
+but imported by `build-pipeline.ts` from `../orchestrator.js`. This
+creates a misplaced-dependency: the factory depends on the consumer it
+is meant to replace. When the orchestrator migrates to the factory, the
+import direction inverts correctly.
+
+**What the orchestrator does beyond the pipeline:**
+
+| Responsibility | Lines | Stays in orchestrator |
+| Pipeline (steps 1-8) | 282-427 | No — delegates to factory |
+| PR Changes git detection | 429-469 | Yes — generator-specific option |
+| Generator dispatch + file writing | 471-645 | Yes — core orchestrator job |
+| Session file cleanup | 647-679 | Yes — post-generation lifecycle |
+| mergePatterns utility | 701-727 | No — moves to pipeline/ |
+| cleanupOrphanedSessionFiles | 761-809 | Yes — lifecycle utility |
+| generateFromConfig | 922-998 | Yes — config-based entry point |
+| groupGenerators, mergeGenerateResults | 850-898 | Yes — batching utilities |
+
+**Solution:**
+Enrich the pipeline factory's `PipelineResult` with structured warnings
+that capture the granularity the orchestrator needs, then migrate
+`generateDocumentation()` to call `buildMasterDataset()`. Move
+`mergePatterns()` to `src/generators/pipeline/merge-patterns.ts` as a
+standalone pipeline step.
+
+The orchestrator retains: generator dispatch, file writing, PR-changes
+detection, codec option assembly, session cleanup, and the
+`generateFromConfig` entry point.
+
+**Design Decisions:**
+
+DD-1: Structured warnings replace flat strings in PipelineResult.
+The factory's `PipelineResult.warnings` changes from `readonly string[]`
+to `readonly PipelineWarning[]` where `PipelineWarning` is:
+
+See PipelineWarning and PipelineWarningDetail interfaces in
+src/generators/pipeline/build-pipeline.ts. PipelineWarning has a
+discriminated type field ('scan' | 'extraction' | 'gherkin-parse'),
+a message, optional count, and optional details array.
+
+This is structurally similar to `GenerationWarning` + `WarningDetail`
+from orchestrator.ts. The orchestrator maps `PipelineWarning` to
+`GenerationWarning` in a thin adapter — `'gherkin-parse'` maps to
+`'scan'`, and generator-level warning types (`'overwrite-skipped'`,
+`'config'`, `'cleanup'`) are produced by the orchestrator itself, not
+the pipeline. Existing consumers (process-api, validate-patterns) that
+ignore warnings or use flat strings are unaffected — they can read
+`.message` only.
+
+DD-2: mergePatterns moves to src/generators/pipeline/merge-patterns.ts.
+Currently defined in orchestrator.ts (line 701), imported by
+build-pipeline.ts. After the move:
+
+- `build-pipeline.ts` imports from `./merge-patterns.js` (sibling)
+- `orchestrator.ts` no longer exports `mergePatterns`
+- `generators/index.ts` re-exports from `pipeline/merge-patterns.js`
+- The public API (`mergePatterns`) stays available, just moves home
+
+DD-3: Pipeline factory gains an includeValidation option.
+The orchestrator calls `transformToMasterDataset` (no validation),
+while process-api calls `transformToMasterDatasetWithValidation`.
+The factory already calls the validation variant. Adding
+`includeValidation?: boolean` (default true) lets the orchestrator
+opt out, since doc generation doesn't need validation summaries.
+This was foreshadowed in ProcessAPILayeredExtraction DD-3.
+
+DD-4: Scan result counts flow through PipelineResult.
+The orchestrator needs scan result counts for constructing its warning
+messages: how many files were scanned, how many had errors, how many
+had skipped directives, how many Gherkin files had parse errors. The
+factory adds an optional `scanMetadata` field:
+
+See ScanMetadata interface in src/generators/pipeline/build-pipeline.ts.
+It carries scannedFileCount, scanErrorCount, skippedDirectiveCount,
+and gherkinErrorCount.
+
+This avoids exposing raw `ScannedFile[]` (which would be a Parallel
+Pipeline enabler) while providing the counts the orchestrator needs
+for its warning messages. The merged patterns array for
+`GenerateResult.patterns` and generator context comes from
+`PipelineResult.dataset.patterns`, not from scan metadata.
+
+DD-5: The factory supports partial success for scan errors.
+Today the factory returns `Result.err` on total scanner failure
+(e.g., invalid glob), which remains unchanged — total infrastructure
+failures are always fatal. For partial failures (individual files
+with parse errors within an otherwise successful scan), the new
+`failOnScanErrors?: boolean` option controls behavior. When true
+(default for process-api), partial scan errors produce `Result.err`.
+When false (orchestrator), partial errors are captured in
+`PipelineResult.warnings` as structured `PipelineWarning` objects
+and the pipeline continues with successfully scanned files.
+
+DD-6: generateDocumentation signature is unchanged.
+The public `GenerateOptions` and `GenerateResult` interfaces don't
+change. The orchestrator's `generateDocumentation()` becomes a thinner
+function: build PipelineOptions from GenerateOptions, call factory,
+map PipelineWarnings to GenerationWarnings, then proceed with generator
+dispatch. The programmatic API is stable. The orchestrator's config
+loading (`loadConfig`) is replaced by the factory's internal config
+step — `tagRegistry` is accessed via `dataset.tagRegistry`. The merged
+patterns array for `GenerateResult.patterns` and generator context is
+`dataset.patterns` from the MasterDataset.
+
+DD-7: validate-patterns.ts and process-api.ts are unaffected.
+They already consume the factory. The only change they see is
+`PipelineResult.warnings` widening from `readonly string[]` to
+`readonly PipelineWarning[]`, which is backward-compatible (they
+currently ignore or stringify warnings).
+
+**Implementation Order:**
+
+| Step | What | Verification |
+| 1 | Move mergePatterns to src/generators/pipeline/merge-patterns.ts | pnpm typecheck |
+| 2 | Update imports in build-pipeline.ts, orchestrator.ts, generators/index.ts, orchestrator.steps.ts | pnpm typecheck, pnpm lint |
+| 3 | Add PipelineWarning types to build-pipeline.ts | pnpm typecheck |
+| 4 | Enrich factory to collect structured warnings and scan metadata | pnpm typecheck |
+| 5 | Add includeValidation and failOnScanErrors options to factory | pnpm typecheck |
+| 6 | Migrate generateDocumentation pipeline to factory call | pnpm build, pnpm test |
+| 7 | Remove unused scanner/extractor imports from orchestrator.ts | pnpm lint |
+| 8 | Full verification | pnpm build, pnpm test, pnpm lint, pnpm validate:patterns, pnpm docs:all |
+
+**Files Modified:**
+
+| File | Change | Lines Affected |
+| src/generators/pipeline/merge-patterns.ts | NEW: mergePatterns moved from orchestrator | +~30 |
+| src/generators/pipeline/build-pipeline.ts | Enrich PipelineResult, add options, collect warnings | +~60 |
+| src/generators/pipeline/index.ts | Re-export merge-patterns | +2 |
+| src/generators/orchestrator.ts | Replace pipeline with factory call, remove mergePatterns | -~170 net |
+| src/generators/index.ts | Update mergePatterns re-export source | ~2 |
+| tests/steps/generators/orchestrator.steps.ts | Update mergePatterns import to pipeline/merge-patterns | ~1 |
+
+**What does NOT change:**
+
+- GenerateOptions, GenerateResult, GeneratedFile interfaces (stable public API)
+- Generator dispatch, file writing, PR-changes detection (orchestrator core)
+- Session cleanup, generateFromConfig, groupGenerators (orchestrator utilities)
+- generate-docs CLI (calls generateDocumentation unchanged)
+- process-api.ts, validate-patterns.ts (already migrated)
+- Existing test scenarios for orchestrator (same observable behavior)
+
+<details>
+<summary>Orchestrator delegates pipeline to factory (2 scenarios)</summary>
+
+#### Orchestrator delegates pipeline to factory
+
+**Invariant:** `generateDocumentation()` calls `buildMasterDataset()` for the scan-extract-merge-transform sequence. It does not import from `scanner/` or `extractor/` for pipeline orchestration. Direct imports are permitted only for types used in GenerateResult (e.g., `ExtractedPattern`).
+
+**Rationale:** The orchestrator is the original host of the inline pipeline. After this migration, the pipeline factory is the sole definition of the 8-step sequence. Any future changes to pipeline steps (adding caching, parallel scanning, incremental extraction) happen in one place and all consumers benefit.
+
+**Verified by:**
+
+- No pipeline imports in orchestrator
+- Factory is sole pipeline definition
+
+</details>
+
+<details>
+<summary>mergePatterns lives in pipeline module (2 scenarios)</summary>
+
+#### mergePatterns lives in pipeline module
+
+**Invariant:** The `mergePatterns()` function lives in `src/generators/pipeline/merge-patterns.ts` as a pipeline step. It is not defined in consumer code (orchestrator or CLI files).
+
+**Rationale:** `mergePatterns` is step 5 of the 8-step pipeline. It was defined in orchestrator.ts for historical reasons (the orchestrator was the first pipeline host). Now that the pipeline factory exists, the function belongs alongside other pipeline steps (scan, extract, transform). The public API re-export in `generators/index.ts` preserves backward compatibility.
+
+**Verified by:**
+
+- mergePatterns location
+- Public API preserved
+
+</details>
+
+<details>
+<summary>Factory provides structured warnings for all consumers (2 scenarios)</summary>
+
+#### Factory provides structured warnings for all consumers
+
+**Invariant:** `PipelineResult.warnings` contains typed warning objects with `type`, `message`, optional `count`, and optional `details` (file, line, column, message). Consumers that need granular diagnostics (orchestrator) use the full structure. Consumers that need simple messages (process-api) read `.message` only.
+
+**Rationale:** The orchestrator collects scan errors, skipped directives, extraction errors, and Gherkin parse errors as structured `GenerationWarning` objects. The factory must provide equivalent structure to eliminate the orchestrator's need to run the pipeline directly. The `PipelineWarning` type is structurally similar to `GenerationWarning` to minimize mapping complexity.
+
+**Verified by:**
+
+- Orchestrator warnings preserved
+- Existing consumers unaffected
+
+</details>
+
+<details>
+<summary>Pipeline factory supports partial success mode (1 scenarios)</summary>
+
+#### Pipeline factory supports partial success mode
+
+**Invariant:** When `failOnScanErrors` is false, the factory captures scan errors and extraction errors as warnings and continues with successfully processed files. When true (default), the factory returns `Result.err` on the first scan failure.
+
+**Rationale:** The orchestrator treats scan errors as non-fatal warnings — documentation generation should succeed for all scannable files even if some files have syntax errors. The process-api treats scan errors as fatal because the query layer requires a complete dataset. The factory must support both strategies via configuration.
+
+**Verified by:**
+
+- Partial success mode works
+
+</details>
+
+<details>
+<summary>End-to-end verification confirms behavioral equivalence (1 scenarios)</summary>
+
+#### End-to-end verification confirms behavioral equivalence
+
+**Invariant:** After migration, all CLI commands and doc generation produce identical output to pre-refactor behavior.
+
+**Rationale:** The migration must not change observable behavior for any consumer. Full verification confirms the factory migration is a pure refactor.
+
+**Verified by:**
+
+- Full verification passes
 
 </details>
 
@@ -2097,9 +2348,9 @@ implementation details or full feature files.
 
 </details>
 
-### ArchitectureDiagramGeneration
+### ArchitectureDiagramCore
 
-[View ArchitectureDiagramGeneration source](delivery-process/specs/architecture-diagram-generation.feature)
+[View ArchitectureDiagramCore source](delivery-process/specs/architecture-diagram-core.feature)
 
 **Problem:** Architecture documentation requires manually maintaining mermaid diagrams
 that duplicate information already encoded in source code. When code changes,
@@ -2210,6 +2461,29 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 - Render depends-on as dashed arrow
 
 </details>
+
+### ArchitectureDiagramAdvanced
+
+[View ArchitectureDiagramAdvanced source](delivery-process/specs/architecture-diagram-advanced.feature)
+
+**Problem:** Core diagram generation (see ArchitectureDiagramCore) produces
+component-level diagrams from `arch-*` tags. However, large codebases need
+additional visualization modes: layered views grouping patterns by architectural
+layer, CLI-integrated generation via the generator registry, and sequence
+diagrams showing runtime interaction flows between components.
+
+**Solution:** Extend the architecture diagram system with advanced capabilities:
+
+- Layered diagrams that group patterns by `@libar-docs-arch-layer` (domain, application, infrastructure)
+- Generator registry integration for CLI-driven generation via `pnpm docs:architecture`
+- Sequence diagram support for modeling runtime interactions between components
+
+**Why It Matters:**
+| Benefit | How |
+| Layer visibility | Layered diagrams reveal architectural boundaries |
+| CLI integration | Generator registry enables `pnpm docs:architecture` |
+| Runtime modeling | Sequence diagrams show interaction flows |
+| Composable views | Multiple diagram types from the same annotations |
 
 <details>
 <summary>Layered diagrams group patterns by architectural layer (4 scenarios)</summary>
@@ -2626,343 +2900,6 @@ system errors.
 
 - Division of two numbers
 - Division by zero is prevented
-
-### TableExtraction
-
-[View TableExtraction source](tests/features/generators/table-extraction.feature)
-
-Tables in business rule descriptions should appear exactly once in output.
-The extractTables() function extracts tables for proper formatting, and
-stripMarkdownTables() removes them from the raw text to prevent duplicates.
-
-<details>
-<summary>Tables in rule descriptions render exactly once (2 scenarios)</summary>
-
-#### Tables in rule descriptions render exactly once
-
-**Invariant:** Each markdown table in a rule description appears exactly once in the rendered output, with no residual pipe characters in surrounding text.
-
-**Rationale:** Without deduplication, tables extracted for formatting would also remain in the raw description text, producing duplicate output.
-
-**Verified by:**
-
-- Single table renders once in detailed mode
-- Table is extracted and properly formatted
-
-</details>
-
-<details>
-<summary>Multiple tables in description each render exactly once (1 scenarios)</summary>
-
-#### Multiple tables in description each render exactly once
-
-**Invariant:** When a rule description contains multiple markdown tables, each table renders as a separate formatted table block with no merging or duplication.
-
-**Verified by:**
-
-- Two tables in description render as two separate tables
-
-</details>
-
-<details>
-<summary>stripMarkdownTables removes table syntax from text (3 scenarios)</summary>
-
-#### stripMarkdownTables removes table syntax from text
-
-**Invariant:** stripMarkdownTables removes all pipe-delimited table syntax from input text while preserving all surrounding content unchanged.
-
-**Verified by:**
-
-- Strips single table from text
-- Strips multiple tables from text
-- Preserves text without tables
-
-</details>
-
-### GeneratorRegistryTesting
-
-[View GeneratorRegistryTesting source](tests/features/generators/registry.feature)
-
-Tests the GeneratorRegistry registration, lookup, and listing capabilities.
-The registry manages document generators with name uniqueness constraints.
-
-#### Registry manages generator registration and retrieval
-
-**Invariant:** Each generator name is unique within the registry; duplicate registration is rejected and lookup of unknown names returns undefined.
-
-**Verified by:**
-
-- Register generator with unique name
-- Duplicate registration throws error
-- Get registered generator
-- Get unknown generator returns undefined
-- Available returns sorted list
-
-### PrdImplementationSectionTesting
-
-[View PrdImplementationSectionTesting source](tests/features/generators/prd-implementation-section.feature)
-
-Tests the Implementations section rendering in pattern documents.
-Verifies that code stubs with @libar-docs-implements tags appear in pattern docs
-with working links to the source files.
-
-<details>
-<summary>Implementation files appear in pattern docs via @libar-docs-implements (2 scenarios)</summary>
-
-#### Implementation files appear in pattern docs via @libar-docs-implements
-
-**Invariant:** Any TypeScript file with a matching @libar-docs-implements tag must appear in the pattern document's Implementations section with a working file link.
-
-**Rationale:** Implementation discovery relies on tag-based linking — missing entries break traceability between specs and code.
-
-**Verified by:**
-
-- Implementations section renders with file links
-- Implementation includes description when available
-
-</details>
-
-<details>
-<summary>Multiple implementations are listed alphabetically (1 scenarios)</summary>
-
-#### Multiple implementations are listed alphabetically
-
-**Invariant:** When multiple files implement the same pattern, they must be listed in ascending file path order.
-
-**Rationale:** Deterministic ordering ensures stable document output across regeneration runs.
-
-**Verified by:**
-
-- Multiple implementations sorted by file path
-
-</details>
-
-<details>
-<summary>Patterns without implementations omit the section (1 scenarios)</summary>
-
-#### Patterns without implementations omit the section
-
-**Invariant:** The Implementations heading must not appear in pattern documents when no implementing files exist.
-
-**Verified by:**
-
-- No implementations section when none exist
-
-</details>
-
-<details>
-<summary>Implementation references use relative file links (1 scenarios)</summary>
-
-#### Implementation references use relative file links
-
-**Invariant:** Implementation file links must be relative paths starting from the patterns output directory.
-
-**Rationale:** Absolute paths break when documentation is viewed from different locations; relative paths ensure portability.
-
-**Verified by:**
-
-- Links are relative from patterns directory
-
-</details>
-
-### PrChangesOptions
-
-[View PrChangesOptions source](tests/features/generators/pr-changes-options.feature)
-
-Tests the PrChangesCodec filtering capabilities for generating PR-scoped
-documentation. The codec filters patterns by changed files and/or release
-version, supporting combined OR logic when both filters are provided.
-
-#### Orchestrator supports PR changes generation options
-
-**Invariant:** PR changes output includes only patterns matching the changed files list, the release version filter, or both (OR logic when combined).
-
-**Rationale:** PR-scoped documentation must reflect exactly what changed, avoiding noise from unrelated patterns.
-
-**Verified by:**
-
-- PR changes filters to explicit file list
-- PR changes filters by release version
-- Combined filters use OR logic
-
-### DocumentationOrchestrator
-
-[View DocumentationOrchestrator source](tests/features/generators/orchestrator.feature)
-
-Tests the orchestrator's pattern merging, conflict detection, and generator
-coordination capabilities. The orchestrator coordinates the full documentation
-generation pipeline: Scanner -> Extractor -> Generators -> File Writer.
-
-#### Orchestrator coordinates full documentation generation pipeline
-
-**Invariant:** Non-overlapping patterns from TypeScript and Gherkin sources must merge into a unified dataset; overlapping pattern names must fail with conflict error.
-
-**Rationale:** Silent merging of conflicting patterns would produce incorrect documentation — fail-fast ensures data integrity across the pipeline.
-
-**Verified by:**
-
-- Non-overlapping patterns merge successfully
-- Orchestrator detects pattern name conflicts
-- Orchestrator detects pattern name conflicts with status mismatch
-- Unknown generator name fails gracefully
-- Partial success when some generators are invalid
-
-### CodecBasedGeneratorTesting
-
-[View CodecBasedGeneratorTesting source](tests/features/generators/codec-based.feature)
-
-Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)
-codec system to the DocumentGenerator interface. This enables codec-based
-document generation to work seamlessly with the existing orchestrator.
-
-#### CodecBasedGenerator adapts codecs to generator interface
-
-**Invariant:** CodecBasedGenerator delegates document generation to the underlying codec and surfaces codec errors through the generator interface.
-
-**Rationale:** The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side.
-
-**Verified by:**
-
-- Generator delegates to codec
-- Missing MasterDataset returns error
-- Codec options are passed through
-
-### BusinessRulesDocumentCodec
-
-[View BusinessRulesDocumentCodec source](tests/features/generators/business-rules-codec.feature)
-
-Tests the BusinessRulesCodec transformation from MasterDataset to RenderableDocument.
-Verifies rule extraction, organization by domain/phase, and progressive disclosure.
-
-<details>
-<summary>Extracts Rule blocks with Invariant and Rationale (2 scenarios)</summary>
-
-#### Extracts Rule blocks with Invariant and Rationale
-
-**Verified by:**
-
-- Extracts annotated Rule with Invariant and Rationale
-- Extracts unannotated Rule without showing not specified
-
-</details>
-
-<details>
-<summary>Organizes rules by product area and phase (2 scenarios)</summary>
-
-#### Organizes rules by product area and phase
-
-**Verified by:**
-
-- Groups rules by product area and phase
-- Orders rules by phase within domain
-
-</details>
-
-<details>
-<summary>Summary mode generates compact output (2 scenarios)</summary>
-
-#### Summary mode generates compact output
-
-**Verified by:**
-
-- Summary mode includes statistics line
-- Summary mode excludes detailed sections
-
-</details>
-
-<details>
-<summary>Preserves code examples and tables in detailed mode (2 scenarios)</summary>
-
-#### Preserves code examples and tables in detailed mode
-
-**Verified by:**
-
-- Code examples included in detailed mode
-- Code examples excluded in standard mode
-
-</details>
-
-<details>
-<summary>Generates scenario traceability links (1 scenarios)</summary>
-
-#### Generates scenario traceability links
-
-**Verified by:**
-
-- Verification links include file path
-
-</details>
-
-<details>
-<summary>Progressive disclosure generates detail files per product area (3 scenarios)</summary>
-
-#### Progressive disclosure generates detail files per product area
-
-**Verified by:**
-
-- Detail files are generated per product area
-- Main document has product area index table with links
-- Detail files have back-link to main document
-
-</details>
-
-<details>
-<summary>Empty rules show placeholder instead of blank content (2 scenarios)</summary>
-
-#### Empty rules show placeholder instead of blank content
-
-**Verified by:**
-
-- Rule without invariant or description or scenarios shows placeholder
-- Rule without invariant but with scenarios shows verified-by instead
-
-</details>
-
-<details>
-<summary>Rules always render flat for full visibility (1 scenarios)</summary>
-
-#### Rules always render flat for full visibility
-
-**Verified by:**
-
-- Features with many rules render flat without collapsible blocks
-
-</details>
-
-<details>
-<summary>Source file shown as filename text (1 scenarios)</summary>
-
-#### Source file shown as filename text
-
-**Verified by:**
-
-- Source file rendered as plain text not link
-
-</details>
-
-<details>
-<summary>Verified-by renders as checkbox list at standard level (2 scenarios)</summary>
-
-#### Verified-by renders as checkbox list at standard level
-
-**Verified by:**
-
-- Rules with scenarios show verified-by checklist
-- Duplicate scenario names are deduplicated
-
-</details>
-
-<details>
-<summary>Feature names are humanized from camelCase pattern names (2 scenarios)</summary>
-
-#### Feature names are humanized from camelCase pattern names
-
-**Verified by:**
-
-- CamelCase pattern name becomes spaced heading
-- Testing suffix is stripped from feature names
-
-</details>
 
 ### WarningCollectorTesting
 
@@ -4121,6 +4058,343 @@ on source priority, and preserve original section order after deduplication.
 
 </details>
 
+### TableExtraction
+
+[View TableExtraction source](tests/features/generators/table-extraction.feature)
+
+Tables in business rule descriptions should appear exactly once in output.
+The extractTables() function extracts tables for proper formatting, and
+stripMarkdownTables() removes them from the raw text to prevent duplicates.
+
+<details>
+<summary>Tables in rule descriptions render exactly once (2 scenarios)</summary>
+
+#### Tables in rule descriptions render exactly once
+
+**Invariant:** Each markdown table in a rule description appears exactly once in the rendered output, with no residual pipe characters in surrounding text.
+
+**Rationale:** Without deduplication, tables extracted for formatting would also remain in the raw description text, producing duplicate output.
+
+**Verified by:**
+
+- Single table renders once in detailed mode
+- Table is extracted and properly formatted
+
+</details>
+
+<details>
+<summary>Multiple tables in description each render exactly once (1 scenarios)</summary>
+
+#### Multiple tables in description each render exactly once
+
+**Invariant:** When a rule description contains multiple markdown tables, each table renders as a separate formatted table block with no merging or duplication.
+
+**Verified by:**
+
+- Two tables in description render as two separate tables
+
+</details>
+
+<details>
+<summary>stripMarkdownTables removes table syntax from text (3 scenarios)</summary>
+
+#### stripMarkdownTables removes table syntax from text
+
+**Invariant:** stripMarkdownTables removes all pipe-delimited table syntax from input text while preserving all surrounding content unchanged.
+
+**Verified by:**
+
+- Strips single table from text
+- Strips multiple tables from text
+- Preserves text without tables
+
+</details>
+
+### GeneratorRegistryTesting
+
+[View GeneratorRegistryTesting source](tests/features/generators/registry.feature)
+
+Tests the GeneratorRegistry registration, lookup, and listing capabilities.
+The registry manages document generators with name uniqueness constraints.
+
+#### Registry manages generator registration and retrieval
+
+**Invariant:** Each generator name is unique within the registry; duplicate registration is rejected and lookup of unknown names returns undefined.
+
+**Verified by:**
+
+- Register generator with unique name
+- Duplicate registration throws error
+- Get registered generator
+- Get unknown generator returns undefined
+- Available returns sorted list
+
+### PrdImplementationSectionTesting
+
+[View PrdImplementationSectionTesting source](tests/features/generators/prd-implementation-section.feature)
+
+Tests the Implementations section rendering in pattern documents.
+Verifies that code stubs with @libar-docs-implements tags appear in pattern docs
+with working links to the source files.
+
+<details>
+<summary>Implementation files appear in pattern docs via @libar-docs-implements (2 scenarios)</summary>
+
+#### Implementation files appear in pattern docs via @libar-docs-implements
+
+**Invariant:** Any TypeScript file with a matching @libar-docs-implements tag must appear in the pattern document's Implementations section with a working file link.
+
+**Rationale:** Implementation discovery relies on tag-based linking — missing entries break traceability between specs and code.
+
+**Verified by:**
+
+- Implementations section renders with file links
+- Implementation includes description when available
+
+</details>
+
+<details>
+<summary>Multiple implementations are listed alphabetically (1 scenarios)</summary>
+
+#### Multiple implementations are listed alphabetically
+
+**Invariant:** When multiple files implement the same pattern, they must be listed in ascending file path order.
+
+**Rationale:** Deterministic ordering ensures stable document output across regeneration runs.
+
+**Verified by:**
+
+- Multiple implementations sorted by file path
+
+</details>
+
+<details>
+<summary>Patterns without implementations omit the section (1 scenarios)</summary>
+
+#### Patterns without implementations omit the section
+
+**Invariant:** The Implementations heading must not appear in pattern documents when no implementing files exist.
+
+**Verified by:**
+
+- No implementations section when none exist
+
+</details>
+
+<details>
+<summary>Implementation references use relative file links (1 scenarios)</summary>
+
+#### Implementation references use relative file links
+
+**Invariant:** Implementation file links must be relative paths starting from the patterns output directory.
+
+**Rationale:** Absolute paths break when documentation is viewed from different locations; relative paths ensure portability.
+
+**Verified by:**
+
+- Links are relative from patterns directory
+
+</details>
+
+### PrChangesOptions
+
+[View PrChangesOptions source](tests/features/generators/pr-changes-options.feature)
+
+Tests the PrChangesCodec filtering capabilities for generating PR-scoped
+documentation. The codec filters patterns by changed files and/or release
+version, supporting combined OR logic when both filters are provided.
+
+#### Orchestrator supports PR changes generation options
+
+**Invariant:** PR changes output includes only patterns matching the changed files list, the release version filter, or both (OR logic when combined).
+
+**Rationale:** PR-scoped documentation must reflect exactly what changed, avoiding noise from unrelated patterns.
+
+**Verified by:**
+
+- PR changes filters to explicit file list
+- PR changes filters by release version
+- Combined filters use OR logic
+
+### DocumentationOrchestrator
+
+[View DocumentationOrchestrator source](tests/features/generators/orchestrator.feature)
+
+Tests the orchestrator's pattern merging, conflict detection, and generator
+coordination capabilities. The orchestrator coordinates the full documentation
+generation pipeline: Scanner -> Extractor -> Generators -> File Writer.
+
+#### Orchestrator coordinates full documentation generation pipeline
+
+**Invariant:** Non-overlapping patterns from TypeScript and Gherkin sources must merge into a unified dataset; overlapping pattern names must fail with conflict error.
+
+**Rationale:** Silent merging of conflicting patterns would produce incorrect documentation — fail-fast ensures data integrity across the pipeline.
+
+**Verified by:**
+
+- Non-overlapping patterns merge successfully
+- Orchestrator detects pattern name conflicts
+- Orchestrator detects pattern name conflicts with status mismatch
+- Unknown generator name fails gracefully
+- Partial success when some generators are invalid
+
+### CodecBasedGeneratorTesting
+
+[View CodecBasedGeneratorTesting source](tests/features/generators/codec-based.feature)
+
+Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)
+codec system to the DocumentGenerator interface. This enables codec-based
+document generation to work seamlessly with the existing orchestrator.
+
+#### CodecBasedGenerator adapts codecs to generator interface
+
+**Invariant:** CodecBasedGenerator delegates document generation to the underlying codec and surfaces codec errors through the generator interface.
+
+**Rationale:** The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side.
+
+**Verified by:**
+
+- Generator delegates to codec
+- Missing MasterDataset returns error
+- Codec options are passed through
+
+### BusinessRulesDocumentCodec
+
+[View BusinessRulesDocumentCodec source](tests/features/generators/business-rules-codec.feature)
+
+Tests the BusinessRulesCodec transformation from MasterDataset to RenderableDocument.
+Verifies rule extraction, organization by domain/phase, and progressive disclosure.
+
+<details>
+<summary>Extracts Rule blocks with Invariant and Rationale (2 scenarios)</summary>
+
+#### Extracts Rule blocks with Invariant and Rationale
+
+**Verified by:**
+
+- Extracts annotated Rule with Invariant and Rationale
+- Extracts unannotated Rule without showing not specified
+
+</details>
+
+<details>
+<summary>Organizes rules by product area and phase (2 scenarios)</summary>
+
+#### Organizes rules by product area and phase
+
+**Verified by:**
+
+- Groups rules by product area and phase
+- Orders rules by phase within domain
+
+</details>
+
+<details>
+<summary>Summary mode generates compact output (2 scenarios)</summary>
+
+#### Summary mode generates compact output
+
+**Verified by:**
+
+- Summary mode includes statistics line
+- Summary mode excludes detailed sections
+
+</details>
+
+<details>
+<summary>Preserves code examples and tables in detailed mode (2 scenarios)</summary>
+
+#### Preserves code examples and tables in detailed mode
+
+**Verified by:**
+
+- Code examples included in detailed mode
+- Code examples excluded in standard mode
+
+</details>
+
+<details>
+<summary>Generates scenario traceability links (1 scenarios)</summary>
+
+#### Generates scenario traceability links
+
+**Verified by:**
+
+- Verification links include file path
+
+</details>
+
+<details>
+<summary>Progressive disclosure generates detail files per product area (3 scenarios)</summary>
+
+#### Progressive disclosure generates detail files per product area
+
+**Verified by:**
+
+- Detail files are generated per product area
+- Main document has product area index table with links
+- Detail files have back-link to main document
+
+</details>
+
+<details>
+<summary>Empty rules show placeholder instead of blank content (2 scenarios)</summary>
+
+#### Empty rules show placeholder instead of blank content
+
+**Verified by:**
+
+- Rule without invariant or description or scenarios shows placeholder
+- Rule without invariant but with scenarios shows verified-by instead
+
+</details>
+
+<details>
+<summary>Rules always render flat for full visibility (1 scenarios)</summary>
+
+#### Rules always render flat for full visibility
+
+**Verified by:**
+
+- Features with many rules render flat without collapsible blocks
+
+</details>
+
+<details>
+<summary>Source file shown as filename text (1 scenarios)</summary>
+
+#### Source file shown as filename text
+
+**Verified by:**
+
+- Source file rendered as plain text not link
+
+</details>
+
+<details>
+<summary>Verified-by renders as checkbox list at standard level (2 scenarios)</summary>
+
+#### Verified-by renders as checkbox list at standard level
+
+**Verified by:**
+
+- Rules with scenarios show verified-by checklist
+- Duplicate scenario names are deduplicated
+
+</details>
+
+<details>
+<summary>Feature names are humanized from camelCase pattern names (2 scenarios)</summary>
+
+#### Feature names are humanized from camelCase pattern names
+
+**Verified by:**
+
+- CamelCase pattern name becomes spaced heading
+- Testing suffix is stripped from feature names
+
+</details>
+
 ### TransformDatasetTesting
 
 [View TransformDatasetTesting source](tests/features/behavior/transform-dataset.feature)
@@ -4344,92 +4618,12 @@ The helpers handle edge cases like:
 
 </details>
 
-### UniversalMarkdownRenderer
+### RendererOutputFormats
 
-[View UniversalMarkdownRenderer source](tests/features/behavior/render.feature)
+[View RendererOutputFormats source](tests/features/behavior/render-output.feature)
 
 The universal renderer converts RenderableDocument to markdown.
 It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
-
-<details>
-<summary>Document metadata renders as frontmatter before sections (4 scenarios)</summary>
-
-#### Document metadata renders as frontmatter before sections
-
-**Invariant:** Title always renders as H1, purpose and detail level render as bold key-value pairs separated by horizontal rule.
-
-**Verified by:**
-
-- Render minimal document with title only
-- Render document with purpose
-- Render document with detail level
-- Render document with purpose and detail level
-
-</details>
-
-<details>
-<summary>Headings render at correct markdown levels with clamping (3 scenarios)</summary>
-
-#### Headings render at correct markdown levels with clamping
-
-**Invariant:** Heading levels are clamped to the valid range 1-6 regardless of input value.
-
-**Verified by:**
-
-- Render headings at different levels
-- Clamp heading level 0 to 1
-- Clamp heading level 7 to 6
-
-</details>
-
-<details>
-<summary>Paragraphs and separators render as plain text and horizontal rules (3 scenarios)</summary>
-
-#### Paragraphs and separators render as plain text and horizontal rules
-
-**Invariant:** Paragraph content passes through unmodified, including special markdown characters. Separators render as horizontal rules.
-
-**Verified by:**
-
-- Render paragraph
-- Render paragraph with special characters
-- Render separator
-
-</details>
-
-<details>
-<summary>Tables render with headers, alignment, and cell escaping (6 scenarios)</summary>
-
-#### Tables render with headers, alignment, and cell escaping
-
-**Invariant:** Tables must escape pipe characters, convert newlines to line breaks, and pad short rows to match column count.
-
-**Verified by:**
-
-- Render basic table
-- Render table with alignment
-- Render empty table (no columns)
-- Render table with pipe character in cell
-- Render table with newline in cell
-- Render table with short row (fewer cells than columns)
-
-</details>
-
-<details>
-<summary>Lists render in unordered, ordered, checkbox, and nested formats (4 scenarios)</summary>
-
-#### Lists render in unordered, ordered, checkbox, and nested formats
-
-**Invariant:** List type determines prefix: dash for unordered, numbered for ordered, checkbox syntax for checked items. Nesting adds two-space indentation per level.
-
-**Verified by:**
-
-- Render unordered list
-- Render ordered list
-- Render checkbox list with checked items
-- Render nested list
-
-</details>
 
 <details>
 <summary>Code blocks and mermaid diagrams render with fenced syntax (3 scenarios)</summary>
@@ -4518,6 +4712,93 @@ It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
 - Claude context renders link-out as plain text
 - Claude context omits separator tokens
 - Claude context produces fewer characters than markdown
+
+</details>
+
+### RendererBlockTypes
+
+[View RendererBlockTypes source](tests/features/behavior/render-blocks.feature)
+
+The universal renderer converts RenderableDocument to markdown.
+It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
+
+<details>
+<summary>Document metadata renders as frontmatter before sections (4 scenarios)</summary>
+
+#### Document metadata renders as frontmatter before sections
+
+**Invariant:** Title always renders as H1, purpose and detail level render as bold key-value pairs separated by horizontal rule.
+
+**Verified by:**
+
+- Render minimal document with title only
+- Render document with purpose
+- Render document with detail level
+- Render document with purpose and detail level
+
+</details>
+
+<details>
+<summary>Headings render at correct markdown levels with clamping (3 scenarios)</summary>
+
+#### Headings render at correct markdown levels with clamping
+
+**Invariant:** Heading levels are clamped to the valid range 1-6 regardless of input value.
+
+**Verified by:**
+
+- Render headings at different levels
+- Clamp heading level 0 to 1
+- Clamp heading level 7 to 6
+
+</details>
+
+<details>
+<summary>Paragraphs and separators render as plain text and horizontal rules (3 scenarios)</summary>
+
+#### Paragraphs and separators render as plain text and horizontal rules
+
+**Invariant:** Paragraph content passes through unmodified, including special markdown characters. Separators render as horizontal rules.
+
+**Verified by:**
+
+- Render paragraph
+- Render paragraph with special characters
+- Render separator
+
+</details>
+
+<details>
+<summary>Tables render with headers, alignment, and cell escaping (6 scenarios)</summary>
+
+#### Tables render with headers, alignment, and cell escaping
+
+**Invariant:** Tables must escape pipe characters, convert newlines to line breaks, and pad short rows to match column count.
+
+**Verified by:**
+
+- Render basic table
+- Render table with alignment
+- Render empty table (no columns)
+- Render table with pipe character in cell
+- Render table with newline in cell
+- Render table with short row (fewer cells than columns)
+
+</details>
+
+<details>
+<summary>Lists render in unordered, ordered, checkbox, and nested formats (4 scenarios)</summary>
+
+#### Lists render in unordered, ordered, checkbox, and nested formats
+
+**Invariant:** List type determines prefix: dash for unordered, numbered for ordered, checkbox syntax for checked items. Nesting adds two-space indentation per level.
+
+**Verified by:**
+
+- Render unordered list
+- Render ordered list
+- Render checkbox list with checked items
+- Render nested list
 
 </details>
 
@@ -5471,1308 +5752,6 @@ with distinct visual styles per relationship semantics.
 
 </details>
 
-### TimelineCodecTesting
-
-[View TimelineCodecTesting source](tests/features/behavior/codecs/timeline-codecs.feature)
-
-The timeline codecs (RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWorkCodec)
-transform MasterDataset into RenderableDocuments for different timeline views.
-
-**Problem:**
-
-- Need to generate roadmap, milestones, and current work documents from patterns
-- Each view requires different filtering and grouping logic
-
-**Solution:**
-
-- Three specialized codecs for different timeline perspectives
-- Shared phase grouping with status-specific filtering
-
-<details>
-<summary>RoadmapDocumentCodec groups patterns by phase with progress tracking (8 scenarios)</summary>
-
-#### RoadmapDocumentCodec groups patterns by phase with progress tracking
-
-**Invariant:** The roadmap must include overall progress with percentage, phase navigation table, and phase sections with pattern tables.
-
-**Rationale:** The roadmap is the primary planning artifact — progress tracking at both project and phase level enables informed prioritization.
-
-**Verified by:**
-
-- Decode empty dataset produces minimal roadmap
-- Decode dataset with multiple phases
-- Progress section shows correct status counts
-- Phase navigation table with progress
-- Phase sections show pattern tables
-- Generate phase detail files when enabled
-- No detail files when disabled
-- Quarterly timeline shown when quarters exist
-
-</details>
-
-<details>
-<summary>CompletedMilestonesCodec shows only completed patterns grouped by quarter (6 scenarios)</summary>
-
-#### CompletedMilestonesCodec shows only completed patterns grouped by quarter
-
-**Invariant:** Only completed patterns appear, grouped by quarter with navigation, recent completions, and collapsible phase details.
-
-**Rationale:** Milestone tracking provides a historical record of delivery — grouping by quarter aligns with typical reporting cadence.
-
-**Verified by:**
-
-- No completed patterns produces empty message
-- Summary shows completed counts
-- Quarterly navigation with completed patterns
-- Completed phases shown in collapsible sections
-- Recent completions section with limit
-- Generate quarterly detail files when enabled
-
-</details>
-
-<details>
-<summary>CurrentWorkCodec shows only active patterns with deliverables (6 scenarios)</summary>
-
-#### CurrentWorkCodec shows only active patterns with deliverables
-
-**Invariant:** Only active patterns appear with progress bars, deliverable tracking, and an all-active-patterns summary table.
-
-**Rationale:** Current work focus eliminates noise from completed and planned items — teams need to see only what's in flight.
-
-**Verified by:**
-
-- No active work produces empty message
-- Summary shows overall progress
-- Active phases with progress bars
-- Deliverables rendered when configured
-- All active patterns table
-- Generate current work detail files when enabled
-
-</details>
-
-### ShapeSelectorTesting
-
-[View ShapeSelectorTesting source](tests/features/behavior/codecs/shape-selector.feature)
-
-Tests the filterShapesBySelectors function that provides fine-grained
-shape selection via structural discriminated union selectors.
-
-#### Reference doc configs select shapes via shapeSelectors
-
-**Invariant:** shapeSelectors provides three selection modes: by source path + specific names, by group tag, or by source path alone.
-
-**Verified by:**
-
-- Select specific shapes by source and names
-- Select all shapes in a group
-- Select all tagged shapes from a source file
-- shapeSources without shapeSelectors returns all shapes
-- Select by source and names
-- Select by group
-- Select by source alone
-- shapeSources backward compatibility preserved
-
-### ShapeMatcherTesting
-
-[View ShapeMatcherTesting source](tests/features/behavior/codecs/shape-matcher.feature)
-
-Matches file paths against glob patterns for TypeScript shape extraction.
-Uses in-memory string matching (no filesystem access) per AD-6.
-
-<details>
-<summary>Exact paths match without wildcards (2 scenarios)</summary>
-
-#### Exact paths match without wildcards
-
-**Invariant:** A pattern without glob characters must match only the exact file path, character for character.
-
-**Verified by:**
-
-- Exact path matches identical path
-- Exact path does not match different path
-
-</details>
-
-<details>
-<summary>Single-level globs match one directory level (3 scenarios)</summary>
-
-#### Single-level globs match one directory level
-
-**Invariant:** A single `*` glob must match files only within the specified directory, never crossing directory boundaries.
-
-**Verified by:**
-
-- Single glob matches file in target directory
-- Single glob does not match nested subdirectory
-- Single glob does not match wrong extension
-
-</details>
-
-<details>
-<summary>Recursive globs match any depth (4 scenarios)</summary>
-
-#### Recursive globs match any depth
-
-**Invariant:** A `**` glob must match files at any nesting depth below the specified prefix, while still respecting extension and prefix constraints.
-
-**Verified by:**
-
-- Recursive glob matches file at target depth
-- Recursive glob matches file at deeper depth
-- Recursive glob matches file at top level
-- Recursive glob does not match wrong prefix
-
-</details>
-
-<details>
-<summary>Dataset shape extraction deduplicates by name (3 scenarios)</summary>
-
-#### Dataset shape extraction deduplicates by name
-
-**Invariant:** When multiple patterns match a source glob, the returned shapes must be deduplicated by name so each shape appears at most once.
-
-**Rationale:** Duplicate shape names in generated documentation confuse readers and inflate type registries.
-
-**Verified by:**
-
-- Shapes are extracted from matching patterns
-- Duplicate shape names are deduplicated
-- No shapes returned when glob does not match
-
-</details>
-
-### SessionCodecTesting
-
-[View SessionCodecTesting source](tests/features/behavior/codecs/session-codecs.feature)
-
-The session codecs (SessionContextCodec, RemainingWorkCodec)
-transform MasterDataset into RenderableDocuments for AI session context
-and incomplete work aggregation views.
-
-**Problem:**
-
-- Need to generate session context and remaining work documents from patterns
-- Each view requires different filtering, grouping, and prioritization logic
-
-**Solution:**
-
-- Two specialized codecs for session planning perspectives
-- SessionContextCodec focuses on current work and phase navigation
-- RemainingWorkCodec aggregates incomplete work with priority sorting
-
-#### SessionContextCodec provides working context for AI sessions
-
-**Invariant:** Session context must include session status with active/completed/remaining counts, phase navigation for incomplete phases, and active work grouped by phase.
-
-**Rationale:** AI agents need a compact, navigable view of current project state to make informed implementation decisions.
-
-**Verified by:**
-
-- Decode empty dataset produces minimal session context
-- Decode dataset with timeline patterns
-- Session status shows current focus
-- Phase navigation for incomplete phases
-- Active work grouped by phase
-- Blocked items section with dependencies
-- No blocked items section when disabled
-- Recent completions collapsible
-- Generate session phase detail files when enabled
-- No detail files when disabled
-
-#### RemainingWorkCodec aggregates incomplete work by phase
-
-**Invariant:** Remaining work must show status counts, phase-grouped navigation, priority classification (in-progress/ready/blocked), and next actionable items.
-
-**Rationale:** Remaining work visibility prevents scope blindness — knowing what's left, what's blocked, and what's ready drives efficient session planning.
-
-**Verified by:**
-
-- All work complete produces celebration message
-- Summary shows remaining counts
-- Phase navigation with remaining count
-- By priority shows ready vs blocked
-- Next actionable items section
-- Next actionable respects maxNextActionable limit
-- Sort by phase option
-- Sort by priority option
-- Generate remaining work detail files when enabled
-- No detail files when disabled for remaining
-
-### RequirementsAdrCodecTesting
-
-[View RequirementsAdrCodecTesting source](tests/features/behavior/codecs/requirements-adr-codecs.feature)
-
-The RequirementsDocumentCodec and AdrDocumentCodec transform MasterDataset
-into RenderableDocuments for PRD-style and architecture decision documentation.
-
-**Problem:**
-
-- Need to generate product requirements documents with flexible groupings
-- Need to document architecture decisions with status tracking and supersession
-
-**Solution:**
-
-- RequirementsDocumentCodec generates PRD-style docs grouped by product area, user role, or phase
-- AdrDocumentCodec generates ADR documentation with category, phase, or date groupings
-
-#### RequirementsDocumentCodec generates PRD-style documentation from patterns
-
-**Invariant:** RequirementsDocumentCodec transforms MasterDataset patterns into a PRD-style document with flexible grouping (product area, user role, or phase), optional detail file generation, and business value rendering.
-
-**Verified by:**
-
-- No patterns with PRD metadata produces empty message
-- Summary shows counts and groupings
-- By product area section groups patterns correctly
-- By user role section uses collapsible groups
-- Group by phase option changes primary grouping
-- Filter by status option limits patterns
-- All features table shows complete list
-- Business value rendering when enabled
-- Generate individual requirement detail files when enabled
-- Requirement detail file contains acceptance criteria from scenarios
-- Requirement detail file contains business rules section
-- Implementation links from relationshipIndex
-
-#### AdrDocumentCodec documents architecture decisions
-
-**Invariant:** AdrDocumentCodec transforms MasterDataset ADR patterns into an architecture decision record document with status tracking, category/phase/date grouping, supersession relationships, and optional detail file generation.
-
-**Verified by:**
-
-- No ADR patterns produces empty message
-- Summary shows status counts and categories
-- ADRs grouped by category
-- ADRs grouped by phase option
-- ADRs grouped by date (quarter) option
-- ADR index table with all decisions
-- ADR entries use clean text without emojis
-- Context, Decision, Consequences sections from Rule keywords
-- ADR supersedes rendering
-- Generate individual ADR detail files when enabled
-- ADR detail file contains full content
-- Context
-- Decision
-- Consequences sections from Rule keywords
-
-### ReportingCodecTesting
-
-[View ReportingCodecTesting source](tests/features/behavior/codecs/reporting-codecs.feature)
-
-The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
-transform MasterDataset into RenderableDocuments for reporting outputs.
-
-**Problem:**
-
-- Need to generate changelog, traceability, and overview documents
-- Each view requires different filtering, grouping, and formatting logic
-
-**Solution:**
-
-- Three specialized codecs for different reporting perspectives
-- Keep a Changelog format for ChangelogCodec
-- Coverage statistics and gap reporting for TraceabilityCodec
-- Architecture and summary views for OverviewCodec
-
-<details>
-<summary>ChangelogCodec follows Keep a Changelog format (8 scenarios)</summary>
-
-#### ChangelogCodec follows Keep a Changelog format
-
-**Invariant:** Releases must be sorted by semver descending, unreleased patterns grouped under "[Unreleased]", and change types follow the standard order (Added, Changed, Deprecated, Removed, Fixed, Security).
-
-**Rationale:** Keep a Changelog is an industry standard format — following it ensures the output is immediately familiar to developers.
-
-**Verified by:**
-
-- Decode empty dataset produces changelog header only
-- Unreleased section shows active and vNEXT patterns
-- Release sections sorted by semver descending
-- Quarter fallback for patterns without release
-- Earlier section for undated patterns
-- Category mapping to change types
-- Exclude unreleased when option disabled
-- Change type sections follow standard order
-
-</details>
-
-<details>
-<summary>TraceabilityCodec maps timeline patterns to behavior tests (8 scenarios)</summary>
-
-#### TraceabilityCodec maps timeline patterns to behavior tests
-
-**Invariant:** Coverage statistics must show total timeline phases, those with behavior tests, those missing, and a percentage. Gaps must be surfaced prominently.
-
-**Rationale:** Traceability ensures every planned pattern has executable verification — gaps represent unverified claims about system behavior.
-
-**Verified by:**
-
-- No timeline patterns produces empty message
-- Coverage statistics show totals and percentage
-- Coverage gaps table shows missing coverage
-- Covered phases in collapsible section
-- Exclude gaps when option disabled
-- Exclude stats when option disabled
-- Exclude covered when option disabled
-- Verified behavior files indicated in output
-
-</details>
-
-<details>
-<summary>OverviewCodec provides project architecture summary (8 scenarios)</summary>
-
-#### OverviewCodec provides project architecture summary
-
-**Invariant:** The overview must include architecture sections from overview-tagged patterns, pattern summary with progress percentage, and timeline summary with phase counts.
-
-**Rationale:** The architecture overview is the primary entry point for understanding the project — it must provide a complete picture at a glance.
-
-**Verified by:**
-
-- Decode empty dataset produces minimal overview
-- Architecture section from overview-tagged patterns
-- Patterns summary with progress bar
-- Timeline summary with phase counts
-- Exclude architecture when option disabled
-- Exclude patterns summary when option disabled
-- Exclude timeline summary when option disabled
-- Multiple overview patterns create multiple architecture subsections
-
-</details>
-
-### ReferenceGeneratorTesting
-
-[View ReferenceGeneratorTesting source](tests/features/behavior/codecs/reference-generators.feature)
-
-Registers reference document generators from project config. Configs with
-`productArea` set are routed to a "product-area-docs" meta-generator;
-configs without `productArea` go to "reference-docs". Each config also
-produces TWO individual generators (detailed + summary).
-
-<details>
-<summary>Registration produces the correct number of generators (1 scenarios)</summary>
-
-#### Registration produces the correct number of generators
-
-**Invariant:** Each reference config produces exactly 2 generators (detailed + summary), plus meta-generators for product-area and non-product-area routing.
-
-**Rationale:** The count is deterministic from config — any mismatch indicates a registration bug that would silently drop generated documents.
-
-**Verified by:**
-
-- Generators are registered from configs plus meta-generators
-
-</details>
-
-<details>
-<summary>Product area configs produce a separate meta-generator (1 scenarios)</summary>
-
-#### Product area configs produce a separate meta-generator
-
-**Invariant:** Configs with productArea set route to "product-area-docs" meta-generator; configs without route to "reference-docs".
-
-**Rationale:** Product area docs are rendered into per-area subdirectories while standalone references go to the root output.
-
-**Verified by:**
-
-- Product area meta-generator is registered
-
-</details>
-
-<details>
-<summary>Generator naming follows kebab-case convention (2 scenarios)</summary>
-
-#### Generator naming follows kebab-case convention
-
-**Invariant:** Detailed generators end in "-reference" and summary generators end in "-reference-claude".
-
-**Rationale:** Consistent naming enables programmatic discovery and distinguishes human-readable from AI-optimized outputs.
-
-**Verified by:**
-
-- Detailed generator has name ending in "-reference"
-- Summary generator has name ending in "-reference-claude"
-
-</details>
-
-<details>
-<summary>Generator execution produces markdown output (2 scenarios)</summary>
-
-#### Generator execution produces markdown output
-
-**Invariant:** Every registered generator must produce at least one non-empty output file when given matching data.
-
-**Rationale:** A generator that produces empty output wastes a pipeline slot and creates confusion when expected docs are missing.
-
-**Verified by:**
-
-- Product area generator with matching data produces non-empty output
-- Product area generator with no patterns still produces intro
-
-</details>
-
-### ReferenceCodecTesting
-
-[View ReferenceCodecTesting source](tests/features/behavior/codecs/reference-codec.feature)
-
-Parameterized codec factory that creates reference document codecs
-from configuration objects. Each config replaces one recipe .feature file
-and produces a RenderableDocument at configurable detail levels.
-
-<details>
-<summary>Empty datasets produce fallback content (1 scenarios)</summary>
-
-#### Empty datasets produce fallback content
-
-**Verified by:**
-
-- Codec with no matching content produces fallback message
-
-</details>
-
-<details>
-<summary>Convention content is rendered as sections (2 scenarios)</summary>
-
-#### Convention content is rendered as sections
-
-**Verified by:**
-
-- Convention rules appear as H2 headings with content
-- Convention tables are rendered in the document
-
-</details>
-
-<details>
-<summary>Detail level controls output density (2 scenarios)</summary>
-
-#### Detail level controls output density
-
-**Verified by:**
-
-- Summary level omits narrative and rationale
-- Detailed level includes rationale and verified-by
-
-</details>
-
-<details>
-<summary>Behavior sections are rendered from category-matching patterns (1 scenarios)</summary>
-
-#### Behavior sections are rendered from category-matching patterns
-
-**Verified by:**
-
-- Behavior-tagged patterns appear in a Behavior Specifications section
-
-</details>
-
-<details>
-<summary>Shape sources are extracted from matching patterns (3 scenarios)</summary>
-
-#### Shape sources are extracted from matching patterns
-
-**Verified by:**
-
-- Shapes appear when source file matches shapeSources glob
-- Summary level shows shapes as a compact table
-- No shapes when source file does not match glob
-
-</details>
-
-<details>
-<summary>Convention and behavior content compose in a single document (1 scenarios)</summary>
-
-#### Convention and behavior content compose in a single document
-
-**Verified by:**
-
-- Both convention and behavior sections appear when data exists
-
-</details>
-
-<details>
-<summary>Composition order follows AD-5: conventions then shapes then behaviors (1 scenarios)</summary>
-
-#### Composition order follows AD-5: conventions then shapes then behaviors
-
-**Verified by:**
-
-- Convention headings appear before shapes before behaviors
-
-</details>
-
-<details>
-<summary>Convention code examples render as mermaid blocks (2 scenarios)</summary>
-
-#### Convention code examples render as mermaid blocks
-
-**Verified by:**
-
-- Convention with mermaid content produces mermaid block in output
-- Summary level omits convention code examples
-
-</details>
-
-<details>
-<summary>Scoped diagrams are generated from diagramScope config (10 scenarios)</summary>
-
-#### Scoped diagrams are generated from diagramScope config
-
-**Verified by:**
-
-- Config with diagramScope produces mermaid block at detailed level
-- Neighbor patterns appear in diagram with distinct style
-- include filter selects patterns by include tag membership
-- Self-contained scope produces no Related subgraph
-- Multiple filter dimensions OR together
-- Explicit pattern names filter selects named patterns
-- Config without diagramScope produces no diagram section
-- archLayer filter selects patterns by architectural layer
-- archLayer and archContext compose via OR
-- Summary level omits scoped diagram
-
-</details>
-
-<details>
-<summary>Multiple diagram scopes produce multiple mermaid blocks (3 scenarios)</summary>
-
-#### Multiple diagram scopes produce multiple mermaid blocks
-
-**Verified by:**
-
-- Config with diagramScopes array produces multiple diagrams
-- Diagram direction is reflected in mermaid output
-- Legacy diagramScope still works when diagramScopes is absent
-
-</details>
-
-<details>
-<summary>Standard detail level includes narrative but omits rationale (1 scenarios)</summary>
-
-#### Standard detail level includes narrative but omits rationale
-
-**Verified by:**
-
-- Standard level includes narrative but omits rationale
-
-</details>
-
-<details>
-<summary>Deep behavior rendering with structured annotations (4 scenarios)</summary>
-
-#### Deep behavior rendering with structured annotations
-
-**Verified by:**
-
-- Detailed level renders structured behavior rules
-- Standard level renders behavior rules without rationale
-- Summary level shows behavior rules as truncated table
-- Scenario names and verifiedBy merge as deduplicated list
-
-</details>
-
-<details>
-<summary>Shape JSDoc prose renders at standard and detailed levels (3 scenarios)</summary>
-
-#### Shape JSDoc prose renders at standard and detailed levels
-
-**Verified by:**
-
-- Standard level includes JSDoc in code blocks
-- Detailed level includes JSDoc in code block and property table
-- Shapes without JSDoc render code blocks only
-
-</details>
-
-<details>
-<summary>Shape sections render param returns and throws documentation (4 scenarios)</summary>
-
-#### Shape sections render param returns and throws documentation
-
-**Verified by:**
-
-- Detailed level renders param table for function shapes
-- Detailed level renders returns and throws documentation
-- Standard level renders param table without throws
-- Shapes without param docs skip param table
-
-</details>
-
-<details>
-<summary>Diagram type controls Mermaid output format (9 scenarios)</summary>
-
-#### Diagram type controls Mermaid output format
-
-**Invariant:** The diagramType field on DiagramScope selects the Mermaid output format. Supported types are graph (flowchart, default), sequenceDiagram, and stateDiagram-v2. Each type produces syntactically valid Mermaid output with type-appropriate node and edge rendering.
-
-**Rationale:** Flowcharts cannot naturally express event flows (sequence), FSM visualization (state), or temporal ordering. Multiple diagram types unlock richer architectural documentation from the same relationship data.
-
-**Verified by:**
-
-- Default diagramType produces flowchart
-- Sequence diagram renders participant-message format
-- State diagram renders state transitions
-- Sequence diagram includes neighbor patterns as participants
-- State diagram adds start and end pseudo-states
-- C4 diagram renders system boundary format
-- C4 diagram renders neighbor patterns as external systems
-- Class diagram renders class members and relationships
-- Class diagram renders archRole as stereotype
-
-</details>
-
-<details>
-<summary>Edge labels and custom node shapes enrich diagram readability (4 scenarios)</summary>
-
-#### Edge labels and custom node shapes enrich diagram readability
-
-**Invariant:** Relationship edges display labels describing the relationship type (uses, depends on, implements, extends). Edge labels are enabled by default and can be disabled via showEdgeLabels false. Node shapes in flowchart diagrams vary by archRole value using Mermaid shape syntax.
-
-**Rationale:** Unlabeled edges are ambiguous without consulting a legend. Custom node shapes make archRole visually distinguishable without color reliance, improving accessibility and scanability.
-
-**Verified by:**
-
-- Relationship edges display type labels by default
-- Edge labels can be disabled for compact diagrams
-- archRole controls Mermaid node shape
-- Pattern without archRole uses default rectangle shape
-- Edge labels appear by default
-- Edge labels can be disabled
-- archRole controls node shape
-- Unknown archRole falls back to rectangle
-
-</details>
-
-<details>
-<summary>Collapsible blocks wrap behavior rules for progressive disclosure (3 scenarios)</summary>
-
-#### Collapsible blocks wrap behavior rules for progressive disclosure
-
-**Invariant:** When a behavior pattern has 3 or more rules and detail level is not summary, each rule's content is wrapped in a collapsible block with the rule name and scenario count in the summary. Patterns with fewer than 3 rules render rules flat. Summary level never produces collapsible blocks.
-
-**Rationale:** Behavior sections with many rules produce substantial content at detailed level. Collapsible blocks enable progressive disclosure so readers can expand only the rules they need.
-
-**Verified by:**
-
-- Behavior pattern with many rules uses collapsible blocks at detailed level
-- Behavior pattern with few rules does not use collapsible blocks
-- Summary level never produces collapsible blocks
-- Many rules use collapsible at detailed level
-- Few rules render flat
-- Summary level suppresses collapsible
-
-</details>
-
-<details>
-<summary>Link-out blocks provide source file cross-references (3 scenarios)</summary>
-
-#### Link-out blocks provide source file cross-references
-
-**Invariant:** At standard and detailed levels, each behavior pattern includes a link-out block referencing its source file path. At summary level, link-out blocks are omitted for compact output.
-
-**Rationale:** Cross-reference links enable readers to navigate from generated documentation to the annotated source files, closing the loop between generated docs and the single source of truth.
-
-**Verified by:**
-
-- Behavior pattern includes source file link-out at detailed level
-- Standard level includes source file link-out
-- Summary level omits link-out blocks
-- Detailed level includes source link-out
-- Standard level includes source link-out
-- Summary level omits link-out
-
-</details>
-
-<details>
-<summary>Include tags route cross-cutting content into reference documents (3 scenarios)</summary>
-
-#### Include tags route cross-cutting content into reference documents
-
-**Invariant:** Patterns with matching include tags appear alongside category-selected patterns in the behavior section. The merging is additive (OR semantics).
-
-**Verified by:**
-
-- Include-tagged pattern appears in behavior section
-- Include-tagged pattern is additive with category-selected patterns
-- Pattern without matching include tag is excluded
-
-</details>
-
-### PrChangesCodecTesting
-
-[View PrChangesCodecTesting source](tests/features/behavior/codecs/pr-changes-codec.feature)
-
-The PrChangesCodec transforms MasterDataset into RenderableDocument for
-PR-scoped documentation. It filters patterns by changed files and/or
-release version tags, groups by phase or priority, and generates
-review-focused output.
-
-**Problem:**
-
-- Need to generate PR-specific documentation from patterns
-- Filters by changed files and release version tags
-- Different grouping options (phase, priority, workflow)
-
-**Solution:**
-
-- PrChangesCodec with configurable filtering and grouping
-- Generates review checklists and dependency sections
-- OR logic for combined filters
-
-<details>
-<summary>PrChangesCodec handles empty results gracefully (3 scenarios)</summary>
-
-#### PrChangesCodec handles empty results gracefully
-
-**Invariant:** When no patterns match the applied filters, the codec must produce a valid document with a "No Changes" section describing which filters were active.
-
-**Rationale:** Reviewers need to distinguish "nothing matched" from "codec error" and understand why no patterns appear.
-
-**Verified by:**
-
-- No changes when no patterns match changedFiles filter
-- No changes when no patterns match releaseFilter
-- No changes with combined filters when nothing matches
-
-</details>
-
-<details>
-<summary>PrChangesCodec generates summary with filter information (3 scenarios)</summary>
-
-#### PrChangesCodec generates summary with filter information
-
-**Invariant:** Every PR changes document must contain a Summary section with pattern counts and active filter information.
-
-**Verified by:**
-
-- Summary section shows pattern counts
-- Summary shows release tag when releaseFilter is set
-- Summary shows files filter count when changedFiles is set
-
-</details>
-
-<details>
-<summary>PrChangesCodec groups changes by phase when sortBy is "phase" (2 scenarios)</summary>
-
-#### PrChangesCodec groups changes by phase when sortBy is "phase"
-
-**Invariant:** When sortBy is "phase" (the default), patterns must be grouped under phase headings in ascending phase order.
-
-**Verified by:**
-
-- Changes grouped by phase with default sortBy
-- Pattern details shown within phase groups
-
-</details>
-
-<details>
-<summary>PrChangesCodec groups changes by priority when sortBy is "priority" (2 scenarios)</summary>
-
-#### PrChangesCodec groups changes by priority when sortBy is "priority"
-
-**Invariant:** When sortBy is "priority", patterns must be grouped under High/Medium/Low priority headings with correct pattern assignment.
-
-**Verified by:**
-
-- Changes grouped by priority
-- Priority groups show correct patterns
-
-</details>
-
-<details>
-<summary>PrChangesCodec shows flat list when sortBy is "workflow" (1 scenarios)</summary>
-
-#### PrChangesCodec shows flat list when sortBy is "workflow"
-
-**Invariant:** When sortBy is "workflow", patterns must be rendered as a flat list without phase or priority grouping.
-
-**Rationale:** Workflow sorting presents patterns in review order without structural grouping, suited for quick PR reviews.
-
-**Verified by:**
-
-- Flat changes list with workflow sort
-
-</details>
-
-<details>
-<summary>PrChangesCodec renders pattern details with metadata and description (3 scenarios)</summary>
-
-#### PrChangesCodec renders pattern details with metadata and description
-
-**Invariant:** Each pattern entry must include a metadata table (status, phase, business value when available) and description text.
-
-**Verified by:**
-
-- Pattern detail shows metadata table
-- Pattern detail shows business value when available
-- Pattern detail shows description
-
-</details>
-
-<details>
-<summary>PrChangesCodec renders deliverables when includeDeliverables is enabled (3 scenarios)</summary>
-
-#### PrChangesCodec renders deliverables when includeDeliverables is enabled
-
-**Invariant:** Deliverables are only rendered when includeDeliverables is enabled, and when releaseFilter is set, only deliverables matching that release are shown.
-
-**Verified by:**
-
-- Deliverables shown when patterns have deliverables
-- Deliverables filtered by release when releaseFilter is set
-- No deliverables section when includeDeliverables is disabled
-
-</details>
-
-<details>
-<summary>PrChangesCodec renders acceptance criteria from scenarios (2 scenarios)</summary>
-
-#### PrChangesCodec renders acceptance criteria from scenarios
-
-**Invariant:** When patterns have associated scenarios, the codec must render an "Acceptance Criteria" section containing scenario names and step lists.
-
-**Verified by:**
-
-- Acceptance criteria rendered when patterns have scenarios
-- Acceptance criteria shows scenario steps
-
-</details>
-
-<details>
-<summary>PrChangesCodec renders business rules from Gherkin Rule keyword (2 scenarios)</summary>
-
-#### PrChangesCodec renders business rules from Gherkin Rule keyword
-
-**Invariant:** When patterns have Gherkin Rule blocks, the codec must render a "Business Rules" section containing rule names and verification information.
-
-**Verified by:**
-
-- Business rules rendered when patterns have rules
-- Business rules show rule names and verification info
-
-</details>
-
-<details>
-<summary>PrChangesCodec generates review checklist when includeReviewChecklist is enabled (6 scenarios)</summary>
-
-#### PrChangesCodec generates review checklist when includeReviewChecklist is enabled
-
-**Invariant:** When includeReviewChecklist is enabled, the codec must generate a "Review Checklist" section with standard items and context-sensitive items based on pattern state (completed, active, dependencies, deliverables). When disabled, no checklist appears.
-
-**Verified by:**
-
-- Review checklist generated with standard items
-- Review checklist includes completed patterns item when applicable
-- Review checklist includes active work item when applicable
-- Review checklist includes dependencies item when patterns have dependencies
-- Review checklist includes deliverables item when patterns have deliverables
-- No review checklist when includeReviewChecklist is disabled
-
-</details>
-
-<details>
-<summary>PrChangesCodec generates dependencies section when includeDependencies is enabled (4 scenarios)</summary>
-
-#### PrChangesCodec generates dependencies section when includeDependencies is enabled
-
-**Invariant:** When includeDependencies is enabled and patterns have dependency relationships, the codec must render a "Dependencies" section with "Depends On" and "Enables" subsections. When no dependencies exist or the option is disabled, the section is omitted.
-
-**Verified by:**
-
-- Dependencies section shows depends on relationships
-- Dependencies section shows enables relationships
-- No dependencies section when patterns have no dependencies
-- No dependencies section when includeDependencies is disabled
-
-</details>
-
-<details>
-<summary>PrChangesCodec filters patterns by changedFiles (2 scenarios)</summary>
-
-#### PrChangesCodec filters patterns by changedFiles
-
-**Invariant:** When changedFiles filter is set, only patterns whose source files match (including partial directory path matches) are included in the output.
-
-**Verified by:**
-
-- Patterns filtered by changedFiles match
-- changedFiles filter matches partial paths
-
-</details>
-
-<details>
-<summary>PrChangesCodec filters patterns by releaseFilter (1 scenarios)</summary>
-
-#### PrChangesCodec filters patterns by releaseFilter
-
-**Invariant:** When releaseFilter is set, only patterns with deliverables matching the specified release version are included.
-
-**Verified by:**
-
-- Patterns filtered by release version
-
-</details>
-
-<details>
-<summary>PrChangesCodec uses OR logic for combined filters (2 scenarios)</summary>
-
-#### PrChangesCodec uses OR logic for combined filters
-
-**Invariant:** When both changedFiles and releaseFilter are set, patterns matching either criterion are included (OR logic), and patterns matching both criteria appear only once (no duplicates).
-
-**Rationale:** OR logic maximizes PR coverage — a change may affect files not yet assigned to a release, or a release may include patterns from unchanged files.
-
-**Verified by:**
-
-- Combined filters match patterns meeting either criterion
-- Patterns matching both criteria are not duplicated
-
-</details>
-
-<details>
-<summary>PrChangesCodec only includes active and completed patterns (2 scenarios)</summary>
-
-#### PrChangesCodec only includes active and completed patterns
-
-**Invariant:** The codec must exclude roadmap and deferred patterns, including only active and completed patterns in the PR changes output.
-
-**Rationale:** PR changes reflect work that is in progress or done — roadmap and deferred patterns have no code changes to review.
-
-**Verified by:**
-
-- Roadmap patterns are excluded
-- Deferred patterns are excluded
-
-</details>
-
-### PlanningCodecTesting
-
-[View PlanningCodecTesting source](tests/features/behavior/codecs/planning-codecs.feature)
-
-The planning codecs (PlanningChecklistCodec, SessionPlanCodec, SessionFindingsCodec)
-transform MasterDataset into RenderableDocuments for planning and retrospective views.
-
-**Problem:**
-
-- Need to generate planning checklists, session plans, and findings documents from patterns
-- Each view requires different filtering, grouping, and content rendering
-
-**Solution:**
-
-- Three specialized codecs for different planning perspectives
-- PlanningChecklistCodec prepares for implementation sessions
-- SessionPlanCodec generates structured implementation plans
-- SessionFindingsCodec captures retrospective discoveries
-
-<details>
-<summary>PlanningChecklistCodec prepares for implementation sessions (9 scenarios)</summary>
-
-#### PlanningChecklistCodec prepares for implementation sessions
-
-**Invariant:** The checklist must include pre-planning questions, definition of done with deliverables, and dependency status for all actionable phases.
-
-**Rationale:** Implementation sessions fail without upfront preparation — the checklist surfaces blockers before work begins.
-
-**Verified by:**
-
-- No actionable phases produces empty message
-- Summary shows phases to plan count
-- Pre-planning questions section
-- Definition of Done with deliverables
-- Acceptance criteria from scenarios
-- Risk assessment section
-- Dependency status shows met vs unmet
-- forActivePhases option
-- forNextActionable option
-
-</details>
-
-<details>
-<summary>SessionPlanCodec generates implementation plans (8 scenarios)</summary>
-
-#### SessionPlanCodec generates implementation plans
-
-**Invariant:** The plan must include status summary, implementation approach from use cases, deliverables with status, and acceptance criteria from scenarios.
-
-**Rationale:** A structured implementation plan ensures all deliverables and acceptance criteria are visible before coding starts.
-
-**Verified by:**
-
-- No phases to plan produces empty message
-- Summary shows status counts
-- Implementation approach from useCases
-- Deliverables rendering
-- Acceptance criteria with steps
-- Business rules section
-- statusFilter option for active only
-- statusFilter option for planned only
-
-</details>
-
-<details>
-<summary>SessionFindingsCodec captures retrospective discoveries (11 scenarios)</summary>
-
-#### SessionFindingsCodec captures retrospective discoveries
-
-**Invariant:** Findings must be categorized into gaps, improvements, risks, and learnings with per-type counts in the summary.
-
-**Rationale:** Retrospective findings drive continuous improvement — categorization enables prioritized follow-up across sessions.
-
-**Verified by:**
-
-- No findings produces empty message
-- Summary shows finding type counts
-- Gaps section
-- Improvements section
-- Risks section includes risk field
-- Learnings section
-- groupBy category option
-- groupBy phase option
-- groupBy type option
-- showSourcePhase option enabled
-- showSourcePhase option disabled
-
-</details>
-
-### DedentHelper
-
-[View DedentHelper source](tests/features/behavior/codecs/dedent.feature)
-
-The dedent helper function normalizes indentation in code blocks extracted
-from DocStrings. It handles various whitespace patterns including tabs,
-mixed indentation, and edge cases.
-
-**Problem:**
-
-- DocStrings in Gherkin files have consistent indentation for alignment
-- Tab characters vs spaces create inconsistent indentation calculation
-- Edge cases like empty lines, all-empty input, single lines need handling
-
-**Solution:**
-
-- Normalize tabs to spaces before calculating minimum indentation
-- Handle edge cases gracefully without throwing errors
-- Preserve relative indentation after removing common prefix
-
-<details>
-<summary>Tabs are normalized to spaces before dedent (2 scenarios)</summary>
-
-#### Tabs are normalized to spaces before dedent
-
-**Invariant:** Tab characters must be converted to spaces before calculating the minimum indentation level.
-
-**Rationale:** Mixing tabs and spaces produces incorrect indentation calculations — normalizing first ensures consistent dedent depth.
-
-**Verified by:**
-
-- Tab-indented code is properly dedented
-- Mixed tabs and spaces are normalized
-
-</details>
-
-<details>
-<summary>Empty lines are handled correctly (2 scenarios)</summary>
-
-#### Empty lines are handled correctly
-
-**Invariant:** Empty lines (including lines with only whitespace) must not affect the minimum indentation calculation and must be preserved in output.
-
-**Verified by:**
-
-- Empty lines with trailing spaces are preserved
-- All empty lines returns original text
-
-</details>
-
-<details>
-<summary>Single line input is handled (2 scenarios)</summary>
-
-#### Single line input is handled
-
-**Invariant:** Single-line input must have its leading whitespace removed without errors or unexpected transformations.
-
-**Verified by:**
-
-- Single line with indentation is dedented
-- Single line without indentation is unchanged
-
-</details>
-
-<details>
-<summary>Unicode whitespace is handled (1 scenarios)</summary>
-
-#### Unicode whitespace is handled
-
-**Invariant:** Non-breaking spaces and other Unicode whitespace characters must be treated as content, not as indentation to be removed.
-
-**Verified by:**
-
-- Non-breaking space is treated as content
-
-</details>
-
-<details>
-<summary>Relative indentation is preserved (2 scenarios)</summary>
-
-#### Relative indentation is preserved
-
-**Invariant:** After removing the common leading whitespace, the relative indentation between lines must remain unchanged.
-
-**Verified by:**
-
-- Nested code blocks preserve relative indentation
-- Mixed indentation levels are preserved relatively
-
-</details>
-
-### ConventionExtractorTesting
-
-[View ConventionExtractorTesting source](tests/features/behavior/codecs/convention-extractor.feature)
-
-Extracts convention content from MasterDataset decision records
-tagged with @libar-docs-convention. Produces structured ConventionBundles
-with rule content, tables, and invariant/rationale metadata.
-
-<details>
-<summary>Empty and missing inputs produce empty results (2 scenarios)</summary>
-
-#### Empty and missing inputs produce empty results
-
-**Verified by:**
-
-- Empty convention tags returns empty array
-- No matching patterns returns empty array
-
-</details>
-
-<details>
-<summary>Convention bundles are extracted from matching patterns (3 scenarios)</summary>
-
-#### Convention bundles are extracted from matching patterns
-
-**Verified by:**
-
-- Single pattern with one convention tag produces one bundle
-- Pattern with CSV conventions contributes to multiple bundles
-- Multiple patterns with same convention merge into one bundle
-
-</details>
-
-<details>
-<summary>Structured content is extracted from rule descriptions (2 scenarios)</summary>
-
-#### Structured content is extracted from rule descriptions
-
-**Verified by:**
-
-- Invariant and rationale are extracted from rule description
-- Tables in rule descriptions are extracted as structured data
-
-</details>
-
-<details>
-<summary>Code examples in rule descriptions are preserved (2 scenarios)</summary>
-
-#### Code examples in rule descriptions are preserved
-
-**Verified by:**
-
-- Mermaid diagram in rule description is extracted as code example
-- Rule description without code examples has no code examples field
-
-</details>
-
-<details>
-<summary>TypeScript JSDoc conventions are extracted alongside Gherkin (6 scenarios)</summary>
-
-#### TypeScript JSDoc conventions are extracted alongside Gherkin
-
-**Verified by:**
-
-- TypeScript pattern with heading sections produces multiple rules
-- TypeScript pattern without headings becomes single rule
-- TypeScript and Gherkin conventions merge in same bundle
-- TypeScript pattern with convention but empty description
-- TypeScript description with tables is extracted correctly
-- TypeScript description with code examples
-
-</details>
-
-### CompositeCodecTesting
-
-[View CompositeCodecTesting source](tests/features/behavior/codecs/composite-codec.feature)
-
-Assembles reference documents from multiple codec outputs by
-concatenating RenderableDocument sections. Enables building
-documents composed from any combination of existing codecs.
-
-<details>
-<summary>CompositeCodec concatenates sections in codec array order (2 scenarios)</summary>
-
-#### CompositeCodec concatenates sections in codec array order
-
-**Invariant:** Sections from child codecs appear in the composite output in the same order as the codecs array.
-
-**Verified by:**
-
-- Sections from two codecs appear in order
-- Three codecs produce sections in array order
-
-</details>
-
-<details>
-<summary>Separators between codec outputs are configurable (2 scenarios)</summary>
-
-#### Separators between codec outputs are configurable
-
-**Invariant:** By default, a separator block is inserted between each child codec's sections. When separateSections is false, no separators are added.
-
-**Verified by:**
-
-- Default separator between sections
-- No separator when disabled
-
-</details>
-
-<details>
-<summary>additionalFiles merge with last-wins semantics (2 scenarios)</summary>
-
-#### additionalFiles merge with last-wins semantics
-
-**Invariant:** additionalFiles from all children are merged into a single record. When keys collide, the later codec's value wins.
-
-**Verified by:**
-
-- Non-overlapping files merged
-- Colliding keys use last-wins
-
-</details>
-
-<details>
-<summary>composeDocuments works at document level without codecs (1 scenarios)</summary>
-
-#### composeDocuments works at document level without codecs
-
-**Invariant:** composeDocuments accepts RenderableDocument array and produces a composed RenderableDocument without requiring codecs.
-
-**Verified by:**
-
-- Direct document composition
-
-</details>
-
-<details>
-<summary>Empty codec outputs are handled gracefully (1 scenarios)</summary>
-
-#### Empty codec outputs are handled gracefully
-
-**Invariant:** Codecs producing empty sections arrays contribute nothing to the output. No separator is emitted for empty outputs.
-
-**Verified by:**
-
-- Empty codec skipped without separator
-
-</details>
-
 ### LayeredDiagramGeneration
 
 [View LayeredDiagramGeneration source](tests/features/behavior/architecture-diagrams/layered-diagram.feature)
@@ -7382,6 +6361,1333 @@ So that I can efficiently look up patterns by role, context, and layer
 - arch-context
 - or arch-layer are
   not included in the archIndex at all.
+
+</details>
+
+### TimelineCodecTesting
+
+[View TimelineCodecTesting source](tests/features/behavior/codecs/timeline-codecs.feature)
+
+The timeline codecs (RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWorkCodec)
+transform MasterDataset into RenderableDocuments for different timeline views.
+
+**Problem:**
+
+- Need to generate roadmap, milestones, and current work documents from patterns
+- Each view requires different filtering and grouping logic
+
+**Solution:**
+
+- Three specialized codecs for different timeline perspectives
+- Shared phase grouping with status-specific filtering
+
+<details>
+<summary>RoadmapDocumentCodec groups patterns by phase with progress tracking (8 scenarios)</summary>
+
+#### RoadmapDocumentCodec groups patterns by phase with progress tracking
+
+**Invariant:** The roadmap must include overall progress with percentage, phase navigation table, and phase sections with pattern tables.
+
+**Rationale:** The roadmap is the primary planning artifact — progress tracking at both project and phase level enables informed prioritization.
+
+**Verified by:**
+
+- Decode empty dataset produces minimal roadmap
+- Decode dataset with multiple phases
+- Progress section shows correct status counts
+- Phase navigation table with progress
+- Phase sections show pattern tables
+- Generate phase detail files when enabled
+- No detail files when disabled
+- Quarterly timeline shown when quarters exist
+
+</details>
+
+<details>
+<summary>CompletedMilestonesCodec shows only completed patterns grouped by quarter (6 scenarios)</summary>
+
+#### CompletedMilestonesCodec shows only completed patterns grouped by quarter
+
+**Invariant:** Only completed patterns appear, grouped by quarter with navigation, recent completions, and collapsible phase details.
+
+**Rationale:** Milestone tracking provides a historical record of delivery — grouping by quarter aligns with typical reporting cadence.
+
+**Verified by:**
+
+- No completed patterns produces empty message
+- Summary shows completed counts
+- Quarterly navigation with completed patterns
+- Completed phases shown in collapsible sections
+- Recent completions section with limit
+- Generate quarterly detail files when enabled
+
+</details>
+
+<details>
+<summary>CurrentWorkCodec shows only active patterns with deliverables (6 scenarios)</summary>
+
+#### CurrentWorkCodec shows only active patterns with deliverables
+
+**Invariant:** Only active patterns appear with progress bars, deliverable tracking, and an all-active-patterns summary table.
+
+**Rationale:** Current work focus eliminates noise from completed and planned items — teams need to see only what's in flight.
+
+**Verified by:**
+
+- No active work produces empty message
+- Summary shows overall progress
+- Active phases with progress bars
+- Deliverables rendered when configured
+- All active patterns table
+- Generate current work detail files when enabled
+
+</details>
+
+### ShapeSelectorTesting
+
+[View ShapeSelectorTesting source](tests/features/behavior/codecs/shape-selector.feature)
+
+Tests the filterShapesBySelectors function that provides fine-grained
+shape selection via structural discriminated union selectors.
+
+#### Reference doc configs select shapes via shapeSelectors
+
+**Invariant:** shapeSelectors provides three selection modes: by source path + specific names, by group tag, or by source path alone.
+
+**Verified by:**
+
+- Select specific shapes by source and names
+- Select all shapes in a group
+- Select all tagged shapes from a source file
+- shapeSources without shapeSelectors returns all shapes
+- Select by source and names
+- Select by group
+- Select by source alone
+- shapeSources backward compatibility preserved
+
+### ShapeMatcherTesting
+
+[View ShapeMatcherTesting source](tests/features/behavior/codecs/shape-matcher.feature)
+
+Matches file paths against glob patterns for TypeScript shape extraction.
+Uses in-memory string matching (no filesystem access) per AD-6.
+
+<details>
+<summary>Exact paths match without wildcards (2 scenarios)</summary>
+
+#### Exact paths match without wildcards
+
+**Invariant:** A pattern without glob characters must match only the exact file path, character for character.
+
+**Verified by:**
+
+- Exact path matches identical path
+- Exact path does not match different path
+
+</details>
+
+<details>
+<summary>Single-level globs match one directory level (3 scenarios)</summary>
+
+#### Single-level globs match one directory level
+
+**Invariant:** A single `*` glob must match files only within the specified directory, never crossing directory boundaries.
+
+**Verified by:**
+
+- Single glob matches file in target directory
+- Single glob does not match nested subdirectory
+- Single glob does not match wrong extension
+
+</details>
+
+<details>
+<summary>Recursive globs match any depth (4 scenarios)</summary>
+
+#### Recursive globs match any depth
+
+**Invariant:** A `**` glob must match files at any nesting depth below the specified prefix, while still respecting extension and prefix constraints.
+
+**Verified by:**
+
+- Recursive glob matches file at target depth
+- Recursive glob matches file at deeper depth
+- Recursive glob matches file at top level
+- Recursive glob does not match wrong prefix
+
+</details>
+
+<details>
+<summary>Dataset shape extraction deduplicates by name (3 scenarios)</summary>
+
+#### Dataset shape extraction deduplicates by name
+
+**Invariant:** When multiple patterns match a source glob, the returned shapes must be deduplicated by name so each shape appears at most once.
+
+**Rationale:** Duplicate shape names in generated documentation confuse readers and inflate type registries.
+
+**Verified by:**
+
+- Shapes are extracted from matching patterns
+- Duplicate shape names are deduplicated
+- No shapes returned when glob does not match
+
+</details>
+
+### SessionCodecTesting
+
+[View SessionCodecTesting source](tests/features/behavior/codecs/session-codecs.feature)
+
+The session codecs (SessionContextCodec, RemainingWorkCodec)
+transform MasterDataset into RenderableDocuments for AI session context
+and incomplete work aggregation views.
+
+**Problem:**
+
+- Need to generate session context and remaining work documents from patterns
+- Each view requires different filtering, grouping, and prioritization logic
+
+**Solution:**
+
+- Two specialized codecs for session planning perspectives
+- SessionContextCodec focuses on current work and phase navigation
+- RemainingWorkCodec aggregates incomplete work with priority sorting
+
+#### SessionContextCodec provides working context for AI sessions
+
+**Invariant:** Session context must include session status with active/completed/remaining counts, phase navigation for incomplete phases, and active work grouped by phase.
+
+**Rationale:** AI agents need a compact, navigable view of current project state to make informed implementation decisions.
+
+**Verified by:**
+
+- Decode empty dataset produces minimal session context
+- Decode dataset with timeline patterns
+- Session status shows current focus
+- Phase navigation for incomplete phases
+- Active work grouped by phase
+- Blocked items section with dependencies
+- No blocked items section when disabled
+- Recent completions collapsible
+- Generate session phase detail files when enabled
+- No detail files when disabled
+
+#### RemainingWorkCodec aggregates incomplete work by phase
+
+**Invariant:** Remaining work must show status counts, phase-grouped navigation, priority classification (in-progress/ready/blocked), and next actionable items.
+
+**Rationale:** Remaining work visibility prevents scope blindness — knowing what's left, what's blocked, and what's ready drives efficient session planning.
+
+**Verified by:**
+
+- All work complete produces celebration message
+- Summary shows remaining counts
+- Phase navigation with remaining count
+- By priority shows ready vs blocked
+- Next actionable items section
+- Next actionable respects maxNextActionable limit
+- Sort by phase option
+- Sort by priority option
+- Generate remaining work detail files when enabled
+- No detail files when disabled for remaining
+
+### RequirementsAdrCodecTesting
+
+[View RequirementsAdrCodecTesting source](tests/features/behavior/codecs/requirements-adr-codecs.feature)
+
+The RequirementsDocumentCodec and AdrDocumentCodec transform MasterDataset
+into RenderableDocuments for PRD-style and architecture decision documentation.
+
+**Problem:**
+
+- Need to generate product requirements documents with flexible groupings
+- Need to document architecture decisions with status tracking and supersession
+
+**Solution:**
+
+- RequirementsDocumentCodec generates PRD-style docs grouped by product area, user role, or phase
+- AdrDocumentCodec generates ADR documentation with category, phase, or date groupings
+
+#### RequirementsDocumentCodec generates PRD-style documentation from patterns
+
+**Invariant:** RequirementsDocumentCodec transforms MasterDataset patterns into a PRD-style document with flexible grouping (product area, user role, or phase), optional detail file generation, and business value rendering.
+
+**Verified by:**
+
+- No patterns with PRD metadata produces empty message
+- Summary shows counts and groupings
+- By product area section groups patterns correctly
+- By user role section uses collapsible groups
+- Group by phase option changes primary grouping
+- Filter by status option limits patterns
+- All features table shows complete list
+- Business value rendering when enabled
+- Generate individual requirement detail files when enabled
+- Requirement detail file contains acceptance criteria from scenarios
+- Requirement detail file contains business rules section
+- Implementation links from relationshipIndex
+
+#### AdrDocumentCodec documents architecture decisions
+
+**Invariant:** AdrDocumentCodec transforms MasterDataset ADR patterns into an architecture decision record document with status tracking, category/phase/date grouping, supersession relationships, and optional detail file generation.
+
+**Verified by:**
+
+- No ADR patterns produces empty message
+- Summary shows status counts and categories
+- ADRs grouped by category
+- ADRs grouped by phase option
+- ADRs grouped by date (quarter) option
+- ADR index table with all decisions
+- ADR entries use clean text without emojis
+- Context, Decision, Consequences sections from Rule keywords
+- ADR supersedes rendering
+- Generate individual ADR detail files when enabled
+- ADR detail file contains full content
+- Context
+- Decision
+- Consequences sections from Rule keywords
+
+### ReportingCodecTesting
+
+[View ReportingCodecTesting source](tests/features/behavior/codecs/reporting-codecs.feature)
+
+The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
+transform MasterDataset into RenderableDocuments for reporting outputs.
+
+**Problem:**
+
+- Need to generate changelog, traceability, and overview documents
+- Each view requires different filtering, grouping, and formatting logic
+
+**Solution:**
+
+- Three specialized codecs for different reporting perspectives
+- Keep a Changelog format for ChangelogCodec
+- Coverage statistics and gap reporting for TraceabilityCodec
+- Architecture and summary views for OverviewCodec
+
+<details>
+<summary>ChangelogCodec follows Keep a Changelog format (8 scenarios)</summary>
+
+#### ChangelogCodec follows Keep a Changelog format
+
+**Invariant:** Releases must be sorted by semver descending, unreleased patterns grouped under "[Unreleased]", and change types follow the standard order (Added, Changed, Deprecated, Removed, Fixed, Security).
+
+**Rationale:** Keep a Changelog is an industry standard format — following it ensures the output is immediately familiar to developers.
+
+**Verified by:**
+
+- Decode empty dataset produces changelog header only
+- Unreleased section shows active and vNEXT patterns
+- Release sections sorted by semver descending
+- Quarter fallback for patterns without release
+- Earlier section for undated patterns
+- Category mapping to change types
+- Exclude unreleased when option disabled
+- Change type sections follow standard order
+
+</details>
+
+<details>
+<summary>TraceabilityCodec maps timeline patterns to behavior tests (8 scenarios)</summary>
+
+#### TraceabilityCodec maps timeline patterns to behavior tests
+
+**Invariant:** Coverage statistics must show total timeline phases, those with behavior tests, those missing, and a percentage. Gaps must be surfaced prominently.
+
+**Rationale:** Traceability ensures every planned pattern has executable verification — gaps represent unverified claims about system behavior.
+
+**Verified by:**
+
+- No timeline patterns produces empty message
+- Coverage statistics show totals and percentage
+- Coverage gaps table shows missing coverage
+- Covered phases in collapsible section
+- Exclude gaps when option disabled
+- Exclude stats when option disabled
+- Exclude covered when option disabled
+- Verified behavior files indicated in output
+
+</details>
+
+<details>
+<summary>OverviewCodec provides project architecture summary (8 scenarios)</summary>
+
+#### OverviewCodec provides project architecture summary
+
+**Invariant:** The overview must include architecture sections from overview-tagged patterns, pattern summary with progress percentage, and timeline summary with phase counts.
+
+**Rationale:** The architecture overview is the primary entry point for understanding the project — it must provide a complete picture at a glance.
+
+**Verified by:**
+
+- Decode empty dataset produces minimal overview
+- Architecture section from overview-tagged patterns
+- Patterns summary with progress bar
+- Timeline summary with phase counts
+- Exclude architecture when option disabled
+- Exclude patterns summary when option disabled
+- Exclude timeline summary when option disabled
+- Multiple overview patterns create multiple architecture subsections
+
+</details>
+
+### ReferenceGeneratorTesting
+
+[View ReferenceGeneratorTesting source](tests/features/behavior/codecs/reference-generators.feature)
+
+Registers reference document generators from project config. Configs with
+`productArea` set are routed to a "product-area-docs" meta-generator;
+configs without `productArea` go to "reference-docs". Each config also
+produces TWO individual generators (detailed + summary).
+
+<details>
+<summary>Registration produces the correct number of generators (1 scenarios)</summary>
+
+#### Registration produces the correct number of generators
+
+**Invariant:** Each reference config produces exactly 2 generators (detailed + summary), plus meta-generators for product-area and non-product-area routing.
+
+**Rationale:** The count is deterministic from config — any mismatch indicates a registration bug that would silently drop generated documents.
+
+**Verified by:**
+
+- Generators are registered from configs plus meta-generators
+
+</details>
+
+<details>
+<summary>Product area configs produce a separate meta-generator (1 scenarios)</summary>
+
+#### Product area configs produce a separate meta-generator
+
+**Invariant:** Configs with productArea set route to "product-area-docs" meta-generator; configs without route to "reference-docs".
+
+**Rationale:** Product area docs are rendered into per-area subdirectories while standalone references go to the root output.
+
+**Verified by:**
+
+- Product area meta-generator is registered
+
+</details>
+
+<details>
+<summary>Generator naming follows kebab-case convention (2 scenarios)</summary>
+
+#### Generator naming follows kebab-case convention
+
+**Invariant:** Detailed generators end in "-reference" and summary generators end in "-reference-claude".
+
+**Rationale:** Consistent naming enables programmatic discovery and distinguishes human-readable from AI-optimized outputs.
+
+**Verified by:**
+
+- Detailed generator has name ending in "-reference"
+- Summary generator has name ending in "-reference-claude"
+
+</details>
+
+<details>
+<summary>Generator execution produces markdown output (2 scenarios)</summary>
+
+#### Generator execution produces markdown output
+
+**Invariant:** Every registered generator must produce at least one non-empty output file when given matching data.
+
+**Rationale:** A generator that produces empty output wastes a pipeline slot and creates confusion when expected docs are missing.
+
+**Verified by:**
+
+- Product area generator with matching data produces non-empty output
+- Product area generator with no patterns still produces intro
+
+</details>
+
+### ReferenceCodecDiagramTesting
+
+[View ReferenceCodecDiagramTesting source](tests/features/behavior/codecs/reference-codec-diagrams.feature)
+
+Scoped diagram generation from diagramScope and diagramScopes config,
+including archContext, include, archLayer, patterns filters, and
+multiple diagram scope composition.
+
+#### Scoped diagrams are generated from diagramScope config
+
+**Verified by:**
+
+- Config with diagramScope produces mermaid block at detailed level
+- Neighbor patterns appear in diagram with distinct style
+- include filter selects patterns by include tag membership
+- Self-contained scope produces no Related subgraph
+- Multiple filter dimensions OR together
+- Explicit pattern names filter selects named patterns
+- Config without diagramScope produces no diagram section
+- archLayer filter selects patterns by architectural layer
+- archLayer and archContext compose via OR
+- Summary level omits scoped diagram
+
+#### Multiple diagram scopes produce multiple mermaid blocks
+
+**Verified by:**
+
+- Config with diagramScopes array produces multiple diagrams
+- Diagram direction is reflected in mermaid output
+- Legacy diagramScope still works when diagramScopes is absent
+
+### ReferenceCodecDiagramTypeTesting
+
+[View ReferenceCodecDiagramTypeTesting source](tests/features/behavior/codecs/reference-codec-diagram-types.feature)
+
+Diagram type controls Mermaid output format including flowchart,
+sequenceDiagram, stateDiagram-v2, C4Context, and classDiagram.
+Edge labels and custom node shapes enrich diagram readability.
+
+#### Diagram type controls Mermaid output format
+
+**Invariant:** The diagramType field on DiagramScope selects the Mermaid output format. Supported types are graph (flowchart, default), sequenceDiagram, and stateDiagram-v2. Each type produces syntactically valid Mermaid output with type-appropriate node and edge rendering.
+
+**Rationale:** Flowcharts cannot naturally express event flows (sequence), FSM visualization (state), or temporal ordering. Multiple diagram types unlock richer architectural documentation from the same relationship data.
+
+**Verified by:**
+
+- Default diagramType produces flowchart
+- Sequence diagram renders participant-message format
+- State diagram renders state transitions
+- Sequence diagram includes neighbor patterns as participants
+- State diagram adds start and end pseudo-states
+- C4 diagram renders system boundary format
+- C4 diagram renders neighbor patterns as external systems
+- Class diagram renders class members and relationships
+- Class diagram renders archRole as stereotype
+
+#### Edge labels and custom node shapes enrich diagram readability
+
+**Invariant:** Relationship edges display labels describing the relationship type (uses, depends on, implements, extends). Edge labels are enabled by default and can be disabled via showEdgeLabels false. Node shapes in flowchart diagrams vary by archRole value using Mermaid shape syntax.
+
+**Rationale:** Unlabeled edges are ambiguous without consulting a legend. Custom node shapes make archRole visually distinguishable without color reliance, improving accessibility and scanability.
+
+**Verified by:**
+
+- Relationship edges display type labels by default
+- Edge labels can be disabled for compact diagrams
+- archRole controls Mermaid node shape
+- Pattern without archRole uses default rectangle shape
+- Edge labels appear by default
+- Edge labels can be disabled
+- archRole controls node shape
+- Unknown archRole falls back to rectangle
+
+### ReferenceCodecDetailRendering
+
+[View ReferenceCodecDetailRendering source](tests/features/behavior/codecs/reference-codec-detail-rendering.feature)
+
+Standard detail level behavior, deep behavior rendering with structured
+annotations, shape JSDoc prose, param/returns/throws documentation,
+collapsible blocks, link-out blocks, and include tags.
+
+<details>
+<summary>Standard detail level includes narrative but omits rationale (1 scenarios)</summary>
+
+#### Standard detail level includes narrative but omits rationale
+
+**Verified by:**
+
+- Standard level includes narrative but omits rationale
+
+</details>
+
+<details>
+<summary>Deep behavior rendering with structured annotations (4 scenarios)</summary>
+
+#### Deep behavior rendering with structured annotations
+
+**Verified by:**
+
+- Detailed level renders structured behavior rules
+- Standard level renders behavior rules without rationale
+- Summary level shows behavior rules as truncated table
+- Scenario names and verifiedBy merge as deduplicated list
+
+</details>
+
+<details>
+<summary>Shape JSDoc prose renders at standard and detailed levels (3 scenarios)</summary>
+
+#### Shape JSDoc prose renders at standard and detailed levels
+
+**Verified by:**
+
+- Standard level includes JSDoc in code blocks
+- Detailed level includes JSDoc in code block and property table
+- Shapes without JSDoc render code blocks only
+
+</details>
+
+<details>
+<summary>Shape sections render param returns and throws documentation (4 scenarios)</summary>
+
+#### Shape sections render param returns and throws documentation
+
+**Verified by:**
+
+- Detailed level renders param table for function shapes
+- Detailed level renders returns and throws documentation
+- Standard level renders param table without throws
+- Shapes without param docs skip param table
+
+</details>
+
+<details>
+<summary>Collapsible blocks wrap behavior rules for progressive disclosure (3 scenarios)</summary>
+
+#### Collapsible blocks wrap behavior rules for progressive disclosure
+
+**Invariant:** When a behavior pattern has 3 or more rules and detail level is not summary, each rule's content is wrapped in a collapsible block with the rule name and scenario count in the summary. Patterns with fewer than 3 rules render rules flat. Summary level never produces collapsible blocks.
+
+**Rationale:** Behavior sections with many rules produce substantial content at detailed level. Collapsible blocks enable progressive disclosure so readers can expand only the rules they need.
+
+**Verified by:**
+
+- Behavior pattern with many rules uses collapsible blocks at detailed level
+- Behavior pattern with few rules does not use collapsible blocks
+- Summary level never produces collapsible blocks
+- Many rules use collapsible at detailed level
+- Few rules render flat
+- Summary level suppresses collapsible
+
+</details>
+
+<details>
+<summary>Link-out blocks provide source file cross-references (3 scenarios)</summary>
+
+#### Link-out blocks provide source file cross-references
+
+**Invariant:** At standard and detailed levels, each behavior pattern includes a link-out block referencing its source file path. At summary level, link-out blocks are omitted for compact output.
+
+**Rationale:** Cross-reference links enable readers to navigate from generated documentation to the annotated source files, closing the loop between generated docs and the single source of truth.
+
+**Verified by:**
+
+- Behavior pattern includes source file link-out at detailed level
+- Standard level includes source file link-out
+- Summary level omits link-out blocks
+- Detailed level includes source link-out
+- Standard level includes source link-out
+- Summary level omits link-out
+
+</details>
+
+<details>
+<summary>Include tags route cross-cutting content into reference documents (3 scenarios)</summary>
+
+#### Include tags route cross-cutting content into reference documents
+
+**Invariant:** Patterns with matching include tags appear alongside category-selected patterns in the behavior section. The merging is additive (OR semantics).
+
+**Verified by:**
+
+- Include-tagged pattern appears in behavior section
+- Include-tagged pattern is additive with category-selected patterns
+- Pattern without matching include tag is excluded
+
+</details>
+
+### ReferenceCodecCoreTesting
+
+[View ReferenceCodecCoreTesting source](tests/features/behavior/codecs/reference-codec-core.feature)
+
+Parameterized codec factory that creates reference document codecs
+from configuration objects. Core behavior including empty datasets,
+conventions, detail levels, shapes, composition, and mermaid blocks.
+
+<details>
+<summary>Empty datasets produce fallback content (1 scenarios)</summary>
+
+#### Empty datasets produce fallback content
+
+**Verified by:**
+
+- Codec with no matching content produces fallback message
+
+</details>
+
+<details>
+<summary>Convention content is rendered as sections (2 scenarios)</summary>
+
+#### Convention content is rendered as sections
+
+**Verified by:**
+
+- Convention rules appear as H2 headings with content
+- Convention tables are rendered in the document
+
+</details>
+
+<details>
+<summary>Detail level controls output density (2 scenarios)</summary>
+
+#### Detail level controls output density
+
+**Verified by:**
+
+- Summary level omits narrative and rationale
+- Detailed level includes rationale and verified-by
+
+</details>
+
+<details>
+<summary>Behavior sections are rendered from category-matching patterns (1 scenarios)</summary>
+
+#### Behavior sections are rendered from category-matching patterns
+
+**Verified by:**
+
+- Behavior-tagged patterns appear in a Behavior Specifications section
+
+</details>
+
+<details>
+<summary>Shape sources are extracted from matching patterns (3 scenarios)</summary>
+
+#### Shape sources are extracted from matching patterns
+
+**Verified by:**
+
+- Shapes appear when source file matches shapeSources glob
+- Summary level shows shapes as a compact table
+- No shapes when source file does not match glob
+
+</details>
+
+<details>
+<summary>Convention and behavior content compose in a single document (1 scenarios)</summary>
+
+#### Convention and behavior content compose in a single document
+
+**Verified by:**
+
+- Both convention and behavior sections appear when data exists
+
+</details>
+
+<details>
+<summary>Composition order follows AD-5: conventions then shapes then behaviors (1 scenarios)</summary>
+
+#### Composition order follows AD-5: conventions then shapes then behaviors
+
+**Verified by:**
+
+- Convention headings appear before shapes before behaviors
+
+</details>
+
+<details>
+<summary>Convention code examples render as mermaid blocks (2 scenarios)</summary>
+
+#### Convention code examples render as mermaid blocks
+
+**Verified by:**
+
+- Convention with mermaid content produces mermaid block in output
+- Summary level omits convention code examples
+
+</details>
+
+### PrChangesCodecRenderingTesting
+
+[View PrChangesCodecRenderingTesting source](tests/features/behavior/codecs/pr-changes-codec-rendering.feature)
+
+The PrChangesCodec transforms MasterDataset into RenderableDocument for
+PR-scoped documentation. It filters patterns by changed files and/or
+release version tags, groups by phase or priority, and generates
+review-focused output.
+
+**Problem:**
+
+- Need to generate PR-specific documentation from patterns
+- Filters by changed files and release version tags
+- Different grouping options (phase, priority, workflow)
+
+**Solution:**
+
+- PrChangesCodec with configurable filtering and grouping
+- Generates review checklists and dependency sections
+- OR logic for combined filters
+
+<details>
+<summary>PrChangesCodec handles empty results gracefully (3 scenarios)</summary>
+
+#### PrChangesCodec handles empty results gracefully
+
+**Invariant:** When no patterns match the applied filters, the codec must produce a valid document with a "No Changes" section describing which filters were active.
+
+**Rationale:** Reviewers need to distinguish "nothing matched" from "codec error" and understand why no patterns appear.
+
+**Verified by:**
+
+- No changes when no patterns match changedFiles filter
+- No changes when no patterns match releaseFilter
+- No changes with combined filters when nothing matches
+
+</details>
+
+<details>
+<summary>PrChangesCodec generates summary with filter information (3 scenarios)</summary>
+
+#### PrChangesCodec generates summary with filter information
+
+**Invariant:** Every PR changes document must contain a Summary section with pattern counts and active filter information.
+
+**Verified by:**
+
+- Summary section shows pattern counts
+- Summary shows release tag when releaseFilter is set
+- Summary shows files filter count when changedFiles is set
+
+</details>
+
+<details>
+<summary>PrChangesCodec groups changes by phase when sortBy is "phase" (2 scenarios)</summary>
+
+#### PrChangesCodec groups changes by phase when sortBy is "phase"
+
+**Invariant:** When sortBy is "phase" (the default), patterns must be grouped under phase headings in ascending phase order.
+
+**Verified by:**
+
+- Changes grouped by phase with default sortBy
+- Pattern details shown within phase groups
+
+</details>
+
+<details>
+<summary>PrChangesCodec groups changes by priority when sortBy is "priority" (2 scenarios)</summary>
+
+#### PrChangesCodec groups changes by priority when sortBy is "priority"
+
+**Invariant:** When sortBy is "priority", patterns must be grouped under High/Medium/Low priority headings with correct pattern assignment.
+
+**Verified by:**
+
+- Changes grouped by priority
+- Priority groups show correct patterns
+
+</details>
+
+<details>
+<summary>PrChangesCodec shows flat list when sortBy is "workflow" (1 scenarios)</summary>
+
+#### PrChangesCodec shows flat list when sortBy is "workflow"
+
+**Invariant:** When sortBy is "workflow", patterns must be rendered as a flat list without phase or priority grouping.
+
+**Rationale:** Workflow sorting presents patterns in review order without structural grouping, suited for quick PR reviews.
+
+**Verified by:**
+
+- Flat changes list with workflow sort
+
+</details>
+
+<details>
+<summary>PrChangesCodec renders pattern details with metadata and description (3 scenarios)</summary>
+
+#### PrChangesCodec renders pattern details with metadata and description
+
+**Invariant:** Each pattern entry must include a metadata table (status, phase, business value when available) and description text.
+
+**Verified by:**
+
+- Pattern detail shows metadata table
+- Pattern detail shows business value when available
+- Pattern detail shows description
+
+</details>
+
+<details>
+<summary>PrChangesCodec renders deliverables when includeDeliverables is enabled (3 scenarios)</summary>
+
+#### PrChangesCodec renders deliverables when includeDeliverables is enabled
+
+**Invariant:** Deliverables are only rendered when includeDeliverables is enabled, and when releaseFilter is set, only deliverables matching that release are shown.
+
+**Verified by:**
+
+- Deliverables shown when patterns have deliverables
+- Deliverables filtered by release when releaseFilter is set
+- No deliverables section when includeDeliverables is disabled
+
+</details>
+
+<details>
+<summary>PrChangesCodec renders acceptance criteria from scenarios (2 scenarios)</summary>
+
+#### PrChangesCodec renders acceptance criteria from scenarios
+
+**Invariant:** When patterns have associated scenarios, the codec must render an "Acceptance Criteria" section containing scenario names and step lists.
+
+**Verified by:**
+
+- Acceptance criteria rendered when patterns have scenarios
+- Acceptance criteria shows scenario steps
+
+</details>
+
+<details>
+<summary>PrChangesCodec renders business rules from Gherkin Rule keyword (2 scenarios)</summary>
+
+#### PrChangesCodec renders business rules from Gherkin Rule keyword
+
+**Invariant:** When patterns have Gherkin Rule blocks, the codec must render a "Business Rules" section containing rule names and verification information.
+
+**Verified by:**
+
+- Business rules rendered when patterns have rules
+- Business rules show rule names and verification info
+
+</details>
+
+### PrChangesCodecOptionsTesting
+
+[View PrChangesCodecOptionsTesting source](tests/features/behavior/codecs/pr-changes-codec-options.feature)
+
+The PrChangesCodec transforms MasterDataset into RenderableDocument for
+PR-scoped documentation. It filters patterns by changed files and/or
+release version tags, groups by phase or priority, and generates
+review-focused output.
+
+**Problem:**
+
+- Need to generate PR-specific documentation from patterns
+- Filters by changed files and release version tags
+- Different grouping options (phase, priority, workflow)
+
+**Solution:**
+
+- PrChangesCodec with configurable filtering and grouping
+- Generates review checklists and dependency sections
+- OR logic for combined filters
+
+<details>
+<summary>PrChangesCodec generates review checklist when includeReviewChecklist is enabled (6 scenarios)</summary>
+
+#### PrChangesCodec generates review checklist when includeReviewChecklist is enabled
+
+**Invariant:** When includeReviewChecklist is enabled, the codec must generate a "Review Checklist" section with standard items and context-sensitive items based on pattern state (completed, active, dependencies, deliverables). When disabled, no checklist appears.
+
+**Verified by:**
+
+- Review checklist generated with standard items
+- Review checklist includes completed patterns item when applicable
+- Review checklist includes active work item when applicable
+- Review checklist includes dependencies item when patterns have dependencies
+- Review checklist includes deliverables item when patterns have deliverables
+- No review checklist when includeReviewChecklist is disabled
+
+</details>
+
+<details>
+<summary>PrChangesCodec generates dependencies section when includeDependencies is enabled (4 scenarios)</summary>
+
+#### PrChangesCodec generates dependencies section when includeDependencies is enabled
+
+**Invariant:** When includeDependencies is enabled and patterns have dependency relationships, the codec must render a "Dependencies" section with "Depends On" and "Enables" subsections. When no dependencies exist or the option is disabled, the section is omitted.
+
+**Verified by:**
+
+- Dependencies section shows depends on relationships
+- Dependencies section shows enables relationships
+- No dependencies section when patterns have no dependencies
+- No dependencies section when includeDependencies is disabled
+
+</details>
+
+<details>
+<summary>PrChangesCodec filters patterns by changedFiles (2 scenarios)</summary>
+
+#### PrChangesCodec filters patterns by changedFiles
+
+**Invariant:** When changedFiles filter is set, only patterns whose source files match (including partial directory path matches) are included in the output.
+
+**Verified by:**
+
+- Patterns filtered by changedFiles match
+- changedFiles filter matches partial paths
+
+</details>
+
+<details>
+<summary>PrChangesCodec filters patterns by releaseFilter (1 scenarios)</summary>
+
+#### PrChangesCodec filters patterns by releaseFilter
+
+**Invariant:** When releaseFilter is set, only patterns with deliverables matching the specified release version are included.
+
+**Verified by:**
+
+- Patterns filtered by release version
+
+</details>
+
+<details>
+<summary>PrChangesCodec uses OR logic for combined filters (2 scenarios)</summary>
+
+#### PrChangesCodec uses OR logic for combined filters
+
+**Invariant:** When both changedFiles and releaseFilter are set, patterns matching either criterion are included (OR logic), and patterns matching both criteria appear only once (no duplicates).
+
+**Rationale:** OR logic maximizes PR coverage — a change may affect files not yet assigned to a release, or a release may include patterns from unchanged files.
+
+**Verified by:**
+
+- Combined filters match patterns meeting either criterion
+- Patterns matching both criteria are not duplicated
+
+</details>
+
+<details>
+<summary>PrChangesCodec only includes active and completed patterns (2 scenarios)</summary>
+
+#### PrChangesCodec only includes active and completed patterns
+
+**Invariant:** The codec must exclude roadmap and deferred patterns, including only active and completed patterns in the PR changes output.
+
+**Rationale:** PR changes reflect work that is in progress or done — roadmap and deferred patterns have no code changes to review.
+
+**Verified by:**
+
+- Roadmap patterns are excluded
+- Deferred patterns are excluded
+
+</details>
+
+### PlanningCodecTesting
+
+[View PlanningCodecTesting source](tests/features/behavior/codecs/planning-codecs.feature)
+
+The planning codecs (PlanningChecklistCodec, SessionPlanCodec, SessionFindingsCodec)
+transform MasterDataset into RenderableDocuments for planning and retrospective views.
+
+**Problem:**
+
+- Need to generate planning checklists, session plans, and findings documents from patterns
+- Each view requires different filtering, grouping, and content rendering
+
+**Solution:**
+
+- Three specialized codecs for different planning perspectives
+- PlanningChecklistCodec prepares for implementation sessions
+- SessionPlanCodec generates structured implementation plans
+- SessionFindingsCodec captures retrospective discoveries
+
+<details>
+<summary>PlanningChecklistCodec prepares for implementation sessions (9 scenarios)</summary>
+
+#### PlanningChecklistCodec prepares for implementation sessions
+
+**Invariant:** The checklist must include pre-planning questions, definition of done with deliverables, and dependency status for all actionable phases.
+
+**Rationale:** Implementation sessions fail without upfront preparation — the checklist surfaces blockers before work begins.
+
+**Verified by:**
+
+- No actionable phases produces empty message
+- Summary shows phases to plan count
+- Pre-planning questions section
+- Definition of Done with deliverables
+- Acceptance criteria from scenarios
+- Risk assessment section
+- Dependency status shows met vs unmet
+- forActivePhases option
+- forNextActionable option
+
+</details>
+
+<details>
+<summary>SessionPlanCodec generates implementation plans (8 scenarios)</summary>
+
+#### SessionPlanCodec generates implementation plans
+
+**Invariant:** The plan must include status summary, implementation approach from use cases, deliverables with status, and acceptance criteria from scenarios.
+
+**Rationale:** A structured implementation plan ensures all deliverables and acceptance criteria are visible before coding starts.
+
+**Verified by:**
+
+- No phases to plan produces empty message
+- Summary shows status counts
+- Implementation approach from useCases
+- Deliverables rendering
+- Acceptance criteria with steps
+- Business rules section
+- statusFilter option for active only
+- statusFilter option for planned only
+
+</details>
+
+<details>
+<summary>SessionFindingsCodec captures retrospective discoveries (11 scenarios)</summary>
+
+#### SessionFindingsCodec captures retrospective discoveries
+
+**Invariant:** Findings must be categorized into gaps, improvements, risks, and learnings with per-type counts in the summary.
+
+**Rationale:** Retrospective findings drive continuous improvement — categorization enables prioritized follow-up across sessions.
+
+**Verified by:**
+
+- No findings produces empty message
+- Summary shows finding type counts
+- Gaps section
+- Improvements section
+- Risks section includes risk field
+- Learnings section
+- groupBy category option
+- groupBy phase option
+- groupBy type option
+- showSourcePhase option enabled
+- showSourcePhase option disabled
+
+</details>
+
+### DedentHelper
+
+[View DedentHelper source](tests/features/behavior/codecs/dedent.feature)
+
+The dedent helper function normalizes indentation in code blocks extracted
+from DocStrings. It handles various whitespace patterns including tabs,
+mixed indentation, and edge cases.
+
+**Problem:**
+
+- DocStrings in Gherkin files have consistent indentation for alignment
+- Tab characters vs spaces create inconsistent indentation calculation
+- Edge cases like empty lines, all-empty input, single lines need handling
+
+**Solution:**
+
+- Normalize tabs to spaces before calculating minimum indentation
+- Handle edge cases gracefully without throwing errors
+- Preserve relative indentation after removing common prefix
+
+<details>
+<summary>Tabs are normalized to spaces before dedent (2 scenarios)</summary>
+
+#### Tabs are normalized to spaces before dedent
+
+**Invariant:** Tab characters must be converted to spaces before calculating the minimum indentation level.
+
+**Rationale:** Mixing tabs and spaces produces incorrect indentation calculations — normalizing first ensures consistent dedent depth.
+
+**Verified by:**
+
+- Tab-indented code is properly dedented
+- Mixed tabs and spaces are normalized
+
+</details>
+
+<details>
+<summary>Empty lines are handled correctly (2 scenarios)</summary>
+
+#### Empty lines are handled correctly
+
+**Invariant:** Empty lines (including lines with only whitespace) must not affect the minimum indentation calculation and must be preserved in output.
+
+**Verified by:**
+
+- Empty lines with trailing spaces are preserved
+- All empty lines returns original text
+
+</details>
+
+<details>
+<summary>Single line input is handled (2 scenarios)</summary>
+
+#### Single line input is handled
+
+**Invariant:** Single-line input must have its leading whitespace removed without errors or unexpected transformations.
+
+**Verified by:**
+
+- Single line with indentation is dedented
+- Single line without indentation is unchanged
+
+</details>
+
+<details>
+<summary>Unicode whitespace is handled (1 scenarios)</summary>
+
+#### Unicode whitespace is handled
+
+**Invariant:** Non-breaking spaces and other Unicode whitespace characters must be treated as content, not as indentation to be removed.
+
+**Verified by:**
+
+- Non-breaking space is treated as content
+
+</details>
+
+<details>
+<summary>Relative indentation is preserved (2 scenarios)</summary>
+
+#### Relative indentation is preserved
+
+**Invariant:** After removing the common leading whitespace, the relative indentation between lines must remain unchanged.
+
+**Verified by:**
+
+- Nested code blocks preserve relative indentation
+- Mixed indentation levels are preserved relatively
+
+</details>
+
+### ConventionExtractorTesting
+
+[View ConventionExtractorTesting source](tests/features/behavior/codecs/convention-extractor.feature)
+
+Extracts convention content from MasterDataset decision records
+tagged with @libar-docs-convention. Produces structured ConventionBundles
+with rule content, tables, and invariant/rationale metadata.
+
+<details>
+<summary>Empty and missing inputs produce empty results (2 scenarios)</summary>
+
+#### Empty and missing inputs produce empty results
+
+**Verified by:**
+
+- Empty convention tags returns empty array
+- No matching patterns returns empty array
+
+</details>
+
+<details>
+<summary>Convention bundles are extracted from matching patterns (3 scenarios)</summary>
+
+#### Convention bundles are extracted from matching patterns
+
+**Verified by:**
+
+- Single pattern with one convention tag produces one bundle
+- Pattern with CSV conventions contributes to multiple bundles
+- Multiple patterns with same convention merge into one bundle
+
+</details>
+
+<details>
+<summary>Structured content is extracted from rule descriptions (2 scenarios)</summary>
+
+#### Structured content is extracted from rule descriptions
+
+**Verified by:**
+
+- Invariant and rationale are extracted from rule description
+- Tables in rule descriptions are extracted as structured data
+
+</details>
+
+<details>
+<summary>Code examples in rule descriptions are preserved (2 scenarios)</summary>
+
+#### Code examples in rule descriptions are preserved
+
+**Verified by:**
+
+- Mermaid diagram in rule description is extracted as code example
+- Rule description without code examples has no code examples field
+
+</details>
+
+<details>
+<summary>TypeScript JSDoc conventions are extracted alongside Gherkin (6 scenarios)</summary>
+
+#### TypeScript JSDoc conventions are extracted alongside Gherkin
+
+**Verified by:**
+
+- TypeScript pattern with heading sections produces multiple rules
+- TypeScript pattern without headings becomes single rule
+- TypeScript and Gherkin conventions merge in same bundle
+- TypeScript pattern with convention but empty description
+- TypeScript description with tables is extracted correctly
+- TypeScript description with code examples
+
+</details>
+
+### CompositeCodecTesting
+
+[View CompositeCodecTesting source](tests/features/behavior/codecs/composite-codec.feature)
+
+Assembles reference documents from multiple codec outputs by
+concatenating RenderableDocument sections. Enables building
+documents composed from any combination of existing codecs.
+
+<details>
+<summary>CompositeCodec concatenates sections in codec array order (2 scenarios)</summary>
+
+#### CompositeCodec concatenates sections in codec array order
+
+**Invariant:** Sections from child codecs appear in the composite output in the same order as the codecs array.
+
+**Verified by:**
+
+- Sections from two codecs appear in order
+- Three codecs produce sections in array order
+
+</details>
+
+<details>
+<summary>Separators between codec outputs are configurable (2 scenarios)</summary>
+
+#### Separators between codec outputs are configurable
+
+**Invariant:** By default, a separator block is inserted between each child codec's sections. When separateSections is false, no separators are added.
+
+**Verified by:**
+
+- Default separator between sections
+- No separator when disabled
+
+</details>
+
+<details>
+<summary>additionalFiles merge with last-wins semantics (2 scenarios)</summary>
+
+#### additionalFiles merge with last-wins semantics
+
+**Invariant:** additionalFiles from all children are merged into a single record. When keys collide, the later codec's value wins.
+
+**Verified by:**
+
+- Non-overlapping files merged
+- Colliding keys use last-wins
+
+</details>
+
+<details>
+<summary>composeDocuments works at document level without codecs (1 scenarios)</summary>
+
+#### composeDocuments works at document level without codecs
+
+**Invariant:** composeDocuments accepts RenderableDocument array and produces a composed RenderableDocument without requiring codecs.
+
+**Verified by:**
+
+- Direct document composition
+
+</details>
+
+<details>
+<summary>Empty codec outputs are handled gracefully (1 scenarios)</summary>
+
+#### Empty codec outputs are handled gracefully
+
+**Invariant:** Codecs producing empty sections arrays contribute nothing to the output. No separator is emitted for empty outputs.
+
+**Verified by:**
+
+- Empty codec skipped without separator
 
 </details>
 

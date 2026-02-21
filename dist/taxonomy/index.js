@@ -22,7 +22,7 @@
 // Status values (PDR-005 FSM)
 export { ACCEPTED_STATUS_VALUES, DEFAULT_STATUS, PROCESS_STATUS_VALUES, VALID_PROCESS_STATUS_SET, } from './status-values.js';
 // Deliverable status (6 canonical values for Background table Status column)
-export { DEFAULT_DELIVERABLE_STATUS, DELIVERABLE_STATUS_VALUES, VALID_DELIVERABLE_STATUS_SET, getDeliverableStatusEmoji, isDeliverableStatusComplete, isDeliverableStatusInProgress, isDeliverableStatusPending, } from './deliverable-status.js';
+export { DEFAULT_DELIVERABLE_STATUS, DELIVERABLE_STATUS_VALUES, VALID_DELIVERABLE_STATUS_SET, getDeliverableStatusEmoji, isDeliverableStatusComplete, isDeliverableStatusInProgress, isDeliverableStatusPending, isDeliverableStatusTerminal, } from './deliverable-status.js';
 // Normalized status (display buckets) and pattern-domain helpers
 export { normalizeStatus, isPatternComplete, isPatternActive, isPatternPlanned, NORMALIZED_STATUS_VALUES, STATUS_NORMALIZATION_MAP, } from './normalized-status.js';
 // Format types (tag value formats)

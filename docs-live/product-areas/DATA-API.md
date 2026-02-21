@@ -41,7 +41,9 @@ graph TB
     subgraph related["Related"]
         Pattern_Scanner["Pattern Scanner"]:::neighbor
         StubResolverImpl["StubResolverImpl"]:::neighbor
+        RulesQueryModule["RulesQueryModule"]:::neighbor
         FSMValidator["FSMValidator"]:::neighbor
+        PipelineFactory["PipelineFactory"]:::neighbor
         ProcessStateAPICLI["ProcessStateAPICLI"]:::neighbor
         PhaseStateMachineValidation["PhaseStateMachineValidation"]:::neighbor
         DataAPIDesignSessionSupport["DataAPIDesignSessionSupport"]:::neighbor
@@ -51,7 +53,8 @@ graph TB
     end
     ProcessAPICLIImpl -->|uses| ProcessStateAPI
     ProcessAPICLIImpl -->|uses| MasterDataset
-    ProcessAPICLIImpl -->|uses| Pattern_Scanner
+    ProcessAPICLIImpl -->|uses| PipelineFactory
+    ProcessAPICLIImpl -->|uses| RulesQueryModule
     ProcessAPICLIImpl -->|uses| PatternSummarizerImpl
     ProcessAPICLIImpl -->|uses| FuzzyMatcherImpl
     ProcessAPICLIImpl -->|uses| OutputPipelineImpl
@@ -89,6 +92,7 @@ graph TB
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
     StubResolverImpl -->|uses| ProcessStateAPI
     FSMValidator ..->|implements| PhaseStateMachineValidation
+    PipelineFactory -->|uses| MasterDataset
     DataAPIDesignSessionSupport -.->|depends on| DataAPIContextAssembly
     DataAPIContextAssembly -.->|depends on| DataAPIOutputShaping
     DataAPIArchitectureQueries -.->|depends on| DataAPIOutputShaping
@@ -352,6 +356,31 @@ ArchIndexSchema = z.object({
 ---
 
 ## Behavior Specifications
+
+### RulesQueryModule
+
+[View RulesQueryModule source](src/api/rules-query.ts)
+
+## RulesQueryModule - Business Rules Domain Query
+
+Pure query function for business rules extracted from Gherkin Rule: blocks.
+Groups rules by product area, phase, and feature pattern.
+
+Target: src/api/rules-query.ts
+See: DD-4 (ProcessAPILayeredExtraction)
+
+### PipelineFactory
+
+[View PipelineFactory source](src/generators/pipeline/build-pipeline.ts)
+
+## PipelineFactory - Shared Pipeline Orchestration
+
+Shared factory that executes the 8-step scan-extract-merge-transform pipeline.
+Replaces inline pipeline orchestration in CLI consumers.
+
+Target: src/generators/pipeline/build-pipeline.ts
+See: ADR-006 (Single Read Model Architecture)
+See: DD-1, DD-2 (ProcessAPILayeredExtraction)
 
 ### ProcessStateAPIRelationshipQueries
 
@@ -630,80 +659,240 @@ Add a CLI command `pnpm process:query` that exposes key ProcessStateAPI methods:
 [View ProcessAPILayeredExtraction source](delivery-process/specs/process-api-layered-extraction.feature)
 
 **Problem:**
-`process-api.ts` is 1,700 lines containing three distinct responsibilities
-in one file: CLI shell (arg parsing, help, output formatting), pipeline
-orchestration (scan, extract, transform), and subcommand domain logic
-(rules grouping, stub resolution, scope validation).
+`process-api.ts` is 1,700 lines containing two remaining architectural
+violations of ADR-006:
 
-The subcommand handlers are feature consumers of the MasterDataset —
-per ADR-006 they belong in the API layer, not the CLI layer. Some already
-have API counterparts (`context-assembler.ts`, `arch-queries.ts`,
-`scope-validator.ts`), but others (`handleRules`, `handleStubs`,
-`handleDecisions`, `handlePdr`) do domain logic inline in the CLI file.
+1. **Parallel Pipeline**: `buildPipeline()` (lines 488-561) wires the
+   same 8-step scan-extract-transform sequence that `validate-patterns.ts`
+   and `orchestrator.ts` also wire independently. Three consumers, three
+   copies of identical pipeline orchestration code.
 
-This means:
+2. **Inline Domain Logic**: `handleRules()` (lines 1096-1279, 184 lines)
+   builds nested `Map` hierarchies (area -> phase -> feature -> rules),
+   parses business rule annotations via codec-layer imports
+   (`parseBusinessRuleAnnotations`, `deduplicateScenarioNames`), and
+   computes aggregate statistics. This is query logic that belongs in the
+   API layer, not the CLI file.
 
-- Domain logic is only accessible via CLI (not programmatically testable)
-- `handleRules()` alone is 183 lines building its own Map hierarchies
-- Adding a new query requires modifying the CLI file
-- Pipeline orchestration is duplicated between process-api.ts,
-  orchestrator.ts, and validate-patterns.ts (three consumers wiring
-  the same scan-extract-transform sequence)
+Most subcommand handlers already delegate correctly. Of the 16 handlers
+in process-api.ts, 13 are thin wrappers over `src/api/` modules:
+
+| Handler | Delegates To |
+| handleStatus | ProcessStateAPI methods |
+| handleQuery | Dynamic API method dispatch |
+| handlePattern | ProcessStateAPI methods |
+| handleList | output-pipeline.ts |
+| handleSearch | fuzzy-match.ts, pattern-helpers.ts |
+| handleStubs | stub-resolver.ts |
+| handleDecisions | stub-resolver.ts, pattern-helpers.ts |
+| handlePdr | stub-resolver.ts |
+| handleContext | context-assembler.ts, context-formatter.ts |
+| handleFiles | context-assembler.ts, context-formatter.ts |
+| handleDepTreeCmd | context-assembler.ts, context-formatter.ts |
+| handleOverviewCmd | context-assembler.ts, context-formatter.ts |
+| handleScopeValidate | scope-validator.ts |
+
+The remaining violations are:
+
+| Handler | Issue | Lines |
+| handleRules | Inline domain logic: nested Maps, codec imports | 184 |
+| handleArch | Partial: 6 sub-handlers delegate, 3 have trivial inline projections | 121 |
+| buildPipeline | Parallel Pipeline: duplicates 8-step sequence | 74 |
 
 **Solution:**
-Extract process-api.ts into three clean layers that mirror the project's
-own architecture (ADR-006 boundary: orchestration vs feature consumption):
+Extract the two remaining violations into their proper layers:
 
-| Layer | Responsibility | Location |
-| CLI Shell | Arg parsing, help text, output formatting, error envelope | src/cli/process-api.ts (slim) |
-| Pipeline Factory | Shared scan-extract-transform sequence | src/generators/pipeline/ (reusable) |
-| Query Handlers | Domain logic consuming MasterDataset | src/api/ modules |
+| Layer | Extraction | Location |
+| Pipeline Factory | Shared scan-extract-transform sequence from buildPipeline | src/generators/pipeline/build-pipeline.ts |
+| Query Handler | Business rules domain logic from handleRules | src/api/rules-query.ts |
 
-The CLI becomes a thin routing layer: parse args, call pipeline factory,
-route subcommand to API module, format output. No domain logic in the CLI.
+The CLI retains its routing responsibility: parse args, call pipeline
+factory, route subcommand to API module, format output.
 
-This also enables the ValidatorReadModelConsolidation spec — once the
-pipeline factory exists, validate-patterns.ts can consume it instead of
-wiring its own mini-pipeline.
+**Design Decisions:**
+
+DD-1: Pipeline factory location and return type.
+Location: `src/generators/pipeline/build-pipeline.ts`, re-exported from
+`src/generators/pipeline/index.ts`. The factory returns
+`Result<PipelineResult, PipelineError>` so each consumer can map errors
+to its own strategy (process-api calls `process.exit(1)`,
+validate-patterns throws, orchestrator returns `Result.err()`).
+`PipelineResult` contains `{ dataset: RuntimeMasterDataset, validation:
+  ValidationSummary }`. The `TagRegistry` is accessible via
+`dataset.tagRegistry` and does not need a separate field.
+
+DD-2: Merge conflict strategy as a pipeline option.
+The factory accepts `mergeConflictStrategy: 'fatal' | 'concatenate'`.
+`'fatal'` returns `Result.err()` on conflicts (process-api behavior).
+`'concatenate'` falls back to `[...ts, ...gherkin]` (validate-patterns
+behavior per DD-1 in ValidatorReadModelConsolidation). This is the most
+significant semantic difference between consumers.
+
+DD-3: Factory interface designed for future orchestrator migration.
+The `PipelineOptions` interface includes `exclude`, `contextInferenceRules`,
+and `includeValidation` fields that orchestrator.ts needs. However, the
+actual orchestrator migration is deferred to a follow-up spec. The
+orchestrator has 155 lines of pipeline with structured warning collection
+(scan errors, extraction errors, Gherkin parse errors as
+`GenerationWarning[]`). Integrating this into the factory adds risk to a
+first extraction. This spec migrates process-api.ts and
+validate-patterns.ts only.
+
+DD-4: handleRules domain logic extracts to `src/api/rules-query.ts`.
+The new module exports `queryBusinessRules(dataset: RuntimeMasterDataset,
+  filters: RulesFilters): RulesQueryResult`. The `RulesFilters` interface,
+`RuleOutput` interface, and all nested Map construction move to this module.
+The `parseBusinessRuleAnnotations` and `deduplicateScenarioNames` imports
+move from CLI to API layer, which is the correct placement per ADR-006.
+The CLI handler becomes: parse filters from args, call
+`queryBusinessRules`, apply output modifiers, return.
+
+DD-5: handleStubs, handleDecisions, handlePdr already delegate correctly.
+These handlers are thin CLI wrappers over `stub-resolver.ts` functions
+(`findStubPatterns`, `resolveStubs`, `groupStubsByPattern`,
+`extractDecisionItems`, `findPdrReferences`). The residual CLI code is
+argument parsing and error formatting, which is CLI-shell responsibility.
+No extraction needed. The original deliverables are marked n/a.
+
+DD-6: handleArch inline logic stays in CLI.
+The `roles`, `context`, and `layer` listing sub-handlers have 3-5 line
+`.map()` projections over `archIndex` pre-computed views. These are trivial
+view formatting, not domain logic. The `dangling`, `orphans`, `blocking`,
+`neighborhood`, `compare`, and `coverage` sub-handlers already delegate
+to `arch-queries.ts` and `context-assembler.ts`. Extracting 3-line `.map()`
+calls would add indirection with no architectural benefit.
+
+DD-7: validate-patterns.ts partially adopts the pipeline factory.
+The factory replaces the MasterDataset construction pipeline (steps 1-8).
+DoD validation and anti-pattern detection remain as direct stage-1
+consumers using raw scanned files (`scanResult.value.files`,
+`gherkinScanResult.value.files`). This is correct per ADR-006: the
+exception for `lint-patterns.ts` ("pure stage-1 consumer, no
+relationships, no cross-source resolution, direct scanner consumption is
+correct") applies equally to DoD validation (checking deliverable
+completeness on raw Gherkin) and anti-pattern detection (checking tag
+placement on raw scanned files).
+
+DD-8: Line count invariant replaced with qualitative criterion.
+The original 500-line target for process-api.ts is unrealistic. After
+extracting buildPipeline (74 lines) and handleRules (184 lines), the
+file is ~1,400 lines. The remaining code is legitimate CLI responsibility:
+parseArgs (134), showHelp (143), routeSubcommand (96), main (59), 13 thin
+delegation handlers (~350), config defaults (50), types (60), imports (120).
+Reaching 500 lines would require extracting arg parsing and help text to
+separate files, which is file hygiene, not architectural layering.
+The invariant becomes: no Map/Set construction in handler functions, each
+domain query delegates to an `src/api/` module.
+
+**Implementation Order:**
+
+| Step | What | Verification |
+| 1 | Create src/generators/pipeline/build-pipeline.ts with PipelineOptions and factory | pnpm typecheck |
+| 2 | Export from src/generators/pipeline/index.ts barrel | pnpm typecheck |
+| 3 | Migrate process-api.ts buildPipeline to factory call | pnpm typecheck, pnpm process:query -- overview |
+| 4 | Remove unused scanner/extractor imports from process-api.ts | pnpm lint |
+| 5 | Migrate validate-patterns.ts MasterDataset pipeline to factory call | pnpm validate:patterns (0 errors, 0 warnings) |
+| 6 | Create src/api/rules-query.ts with queryBusinessRules | pnpm typecheck |
+| 7 | Slim handleRules in process-api.ts to thin delegation | pnpm process:query -- rules |
+| 8 | Export from src/api/index.ts barrel | pnpm typecheck |
+| 9 | Full verification | pnpm build, pnpm test, pnpm lint, pnpm validate:patterns |
+
+**Files Modified:**
+
+| File | Change | Lines Affected |
+| src/generators/pipeline/build-pipeline.ts | NEW: shared pipeline factory | +~100 |
+| src/generators/pipeline/index.ts | Add re-export of build-pipeline | +2 |
+| src/api/rules-query.ts | NEW: business rules query from handleRules | +~200 |
+| src/api/index.ts | Add re-exports for rules-query | +5 |
+| src/cli/process-api.ts | Replace buildPipeline + handleRules with delegations | -~280 net |
+| src/cli/validate-patterns.ts | Replace MasterDataset pipeline with factory call | -~30 net |
+
+**What does NOT change:**
+
+- parseArgs(), showHelp(), routeSubcommand(), main() (CLI shell)
+- handleArch inline logic (trivial projections per DD-6)
+- handleStubs/handleDecisions/handlePdr (already delegate per DD-5)
+- generateEmptyHint (UX concern, correctly in CLI)
+- DoD validation and anti-pattern detection in validate-patterns.ts (stage-1 consumers per DD-7)
+- orchestrator.ts pipeline wiring (deferred per DD-3)
+- parseListFilters, parseRulesFilters (arg parsing, not domain logic)
+- ValidationIssue, ValidationSummary, ValidateCLIConfig (stable API in validate-patterns)
 
 <details>
-<summary>CLI file contains only routing, no domain logic (1 scenarios)</summary>
+<summary>CLI file contains only routing, no domain logic (2 scenarios)</summary>
 
 #### CLI file contains only routing, no domain logic
 
-**Invariant:** `process-api.ts` parses arguments, calls a pipeline factory for the MasterDataset, routes subcommands to API modules, and formats output. It does not build Maps, filter patterns, group data, or resolve relationships.
+**Invariant:** `process-api.ts` parses arguments, calls the pipeline factory for the MasterDataset, routes subcommands to API modules, and formats output. It does not build Maps, filter patterns, group data, or resolve relationships. Thin view projections (3-5 line `.map()` calls over pre-computed archIndex views) are acceptable as formatting.
+
+**Rationale:** Domain logic in the CLI file is only accessible via the command line. Extracting it to `src/api/` makes it programmatically testable, reusable by future consumers (MCP server, watch mode), and aligned with the feature-consumption layer defined in ADR-006.
 
 **Verified by:**
 
-- CLI routing shell
-- Domain logic in API modules
+- No domain data structures in handlers
+- All domain queries delegate
 
 </details>
 
 <details>
-<summary>Pipeline factory is shared across consumers (2 scenarios)</summary>
+<summary>Pipeline factory is shared across CLI consumers (2 scenarios)</summary>
 
-#### Pipeline factory is shared across consumers
+#### Pipeline factory is shared across CLI consumers
 
-**Invariant:** The scan-extract-transform sequence is defined once in a reusable factory. All consumers that need a MasterDataset — orchestrator, process-api, validate-patterns — call the same factory rather than wiring the pipeline independently.
+**Invariant:** The scan-extract-transform sequence is defined once in `src/generators/pipeline/build-pipeline.ts`. CLI consumers that need a MasterDataset call the factory rather than wiring the pipeline independently. The factory accepts `mergeConflictStrategy` to handle behavioral differences between consumers.
+
+**Rationale:** Three consumers (process-api, validate-patterns, orchestrator) independently wire the same 8-step sequence: loadConfig, scanPatterns, extractPatterns, scanGherkinFiles, extractPatternsFromGherkin, mergePatterns, computeHierarchyChildren, transformToMasterDataset. The only semantic difference is merge-conflict handling (fatal vs concatenate). This is a Parallel Pipeline anti-pattern per ADR-006.
 
 **Verified by:**
 
-- Pipeline factory is shared
-- No parallel pipelines
+- CLI consumers use factory
+- Orchestrator migration deferred
 
 </details>
 
 <details>
-<summary>Domain logic lives in API modules (1 scenarios)</summary>
+<summary>Domain logic lives in API modules (2 scenarios)</summary>
 
 #### Domain logic lives in API modules
 
-**Invariant:** Query logic that operates on MasterDataset lives in `src/api/` modules. This makes it programmatically testable, reusable by future consumers (e.g. MCP server, watch mode), and aligned with the feature-consumption layer defined in ADR-006.
+**Invariant:** Query logic that operates on MasterDataset lives in `src/api/` modules. The `rules-query.ts` module provides business rules querying with the same grouping logic that was inline in handleRules: filter by product area and pattern, group by area -> phase -> feature -> rules, parse annotations, compute totals.
+
+**Rationale:** `handleRules` is 184 lines with 5 Map/Set constructions, codec-layer imports (`parseBusinessRuleAnnotations`, `deduplicateScenarioNames`), and a complex 3-level grouping algorithm. This is the last significant inline domain logic in process-api.ts. Moving it to `src/api/` follows the same pattern as the 12 existing API modules (context-assembler, arch-queries, scope-validator, etc.).
 
 **Verified by:**
 
-- Domain logic in API modules
+- rules-query module exports
+- handleRules slim wrapper
+
+</details>
+
+<details>
+<summary>Pipeline factory returns Result for consumer-owned error handling (1 scenarios)</summary>
+
+#### Pipeline factory returns Result for consumer-owned error handling
+
+**Invariant:** The factory returns `Result<PipelineResult, PipelineError>` rather than throwing or calling `process.exit()`. Each consumer maps the error to its own strategy: process-api.ts calls `process.exit(1)`, validate-patterns.ts throws, and orchestrator.ts (future) returns `Result.err()`.
+
+**Rationale:** The current `buildPipeline()` in process-api.ts calls `process.exit(1)` on errors, making it non-reusable. The factory must work across consumers with different error handling models. The Result monad is the project's established pattern for this (see `src/types/result.ts`).
+
+**Verified by:**
+
+- Factory uses Result monad
+
+</details>
+
+<details>
+<summary>End-to-end verification confirms behavioral equivalence (1 scenarios)</summary>
+
+#### End-to-end verification confirms behavioral equivalence
+
+**Invariant:** After extraction, all CLI commands produce identical output to pre-refactor behavior with zero build, test, lint, and validation errors.
+
+**Rationale:** The refactor must not change observable behavior. Full CLI verification confirms the extraction is a pure refactor.
+
+**Verified by:**
+
+- Full verification passes
 
 </details>
 
@@ -1907,11 +2096,154 @@ Command-line interface for cross-validating TypeScript patterns vs Gherkin featu
 
 </details>
 
-### ProcessApiCli
+### ProcessApiCliSubcommands
 
-[View ProcessApiCli source](tests/features/cli/process-api.feature)
+[View ProcessApiCliSubcommands source](tests/features/cli/process-api-subcommands.feature)
 
-Command-line interface for querying delivery process state via ProcessStateAPI.
+Discovery subcommands: list, search, context assembly, tags/sources, extended arch, unannotated.
+
+<details>
+<summary>CLI list subcommand filters patterns (2 scenarios)</summary>
+
+#### CLI list subcommand filters patterns
+
+**Verified by:**
+
+- List all patterns returns JSON array
+- List with invalid phase shows error
+
+</details>
+
+<details>
+<summary>CLI search subcommand finds patterns by fuzzy match (2 scenarios)</summary>
+
+#### CLI search subcommand finds patterns by fuzzy match
+
+**Verified by:**
+
+- Search returns matching patterns
+- Search without query shows error
+
+</details>
+
+<details>
+<summary>CLI context assembly subcommands return text output (4 scenarios)</summary>
+
+#### CLI context assembly subcommands return text output
+
+**Verified by:**
+
+- Context returns curated text bundle
+- Context without pattern name shows error
+- Overview returns executive summary text
+- Dep-tree returns dependency tree text
+
+</details>
+
+<details>
+<summary>CLI tags and sources subcommands return JSON (2 scenarios)</summary>
+
+#### CLI tags and sources subcommands return JSON
+
+**Verified by:**
+
+- Tags returns tag usage counts
+- Sources returns file inventory
+
+</details>
+
+<details>
+<summary>CLI extended arch subcommands query architecture relationships (3 scenarios)</summary>
+
+#### CLI extended arch subcommands query architecture relationships
+
+**Verified by:**
+
+- Arch neighborhood returns pattern relationships
+- Arch compare returns context comparison
+- Arch coverage returns annotation coverage
+
+</details>
+
+<details>
+<summary>CLI unannotated subcommand finds files without annotations (1 scenarios)</summary>
+
+#### CLI unannotated subcommand finds files without annotations
+
+**Verified by:**
+
+- Unannotated finds files missing libar-docs marker
+
+</details>
+
+### ProcessApiCliModifiersAndRules
+
+[View ProcessApiCliModifiersAndRules source](tests/features/cli/process-api-modifiers-rules.feature)
+
+Output modifiers, arch health, and rules subcommand.
+
+<details>
+<summary>Output modifiers work when placed after the subcommand (3 scenarios)</summary>
+
+#### Output modifiers work when placed after the subcommand
+
+**Invariant:** Output modifiers (--count, --names-only, --fields) produce identical results regardless of position relative to the subcommand and its filters.
+
+**Rationale:** Users should not need to memorize argument ordering rules; the CLI should be forgiving.
+
+**Verified by:**
+
+- Count modifier after list subcommand returns count
+- Names-only modifier after list subcommand returns names
+- Count modifier combined with list filter
+
+</details>
+
+<details>
+<summary>CLI arch health subcommands detect graph quality issues (3 scenarios)</summary>
+
+#### CLI arch health subcommands detect graph quality issues
+
+**Invariant:** Health subcommands (dangling, orphans, blocking) operate on the relationship index, not the architecture index, and return results without requiring arch annotations.
+
+**Rationale:** Graph quality issues (broken references, isolated patterns, blocked dependencies) are relationship-level concerns that should be queryable even when no architecture metadata exists.
+
+**Verified by:**
+
+- Arch dangling returns broken references
+- Arch orphans returns isolated patterns
+- Arch blocking returns blocked patterns
+
+</details>
+
+<details>
+<summary>CLI rules subcommand queries business rules and invariants (9 scenarios)</summary>
+
+#### CLI rules subcommand queries business rules and invariants
+
+**Invariant:** The rules subcommand returns structured business rules extracted from Gherkin Rule: blocks, grouped by product area and phase, with parsed invariant and rationale annotations.
+
+**Rationale:** Live business rule queries replace static generated markdown, enabling on-demand filtering by product area, pattern, and invariant presence.
+
+**Verified by:**
+
+- Rules returns business rules from feature files
+- Rules filters by product area
+- Rules with count modifier returns totals
+- Rules with names-only returns flat array
+- Rules filters by pattern name
+- Rules with only-invariants excludes rules without invariants
+- Rules product area filter excludes non-matching areas
+- Rules for non-existent product area returns hint
+- Rules combines product area and only-invariants filters
+
+</details>
+
+### ProcessApiCliCore
+
+[View ProcessApiCliCore source](tests/features/cli/process-api-core.feature)
+
+Core CLI infrastructure: help, version, input validation, status, query, pattern, arch basics, missing args, edge cases.
 
 <details>
 <summary>CLI displays help and version information (3 scenarios)</summary>
@@ -2009,137 +2341,6 @@ Command-line interface for querying delivery process state via ProcessStateAPI.
 
 - Integer arguments are coerced for phase queries
 - Double-dash separator is handled gracefully
-
-</details>
-
-<details>
-<summary>CLI list subcommand filters patterns (2 scenarios)</summary>
-
-#### CLI list subcommand filters patterns
-
-**Verified by:**
-
-- List all patterns returns JSON array
-- List with invalid phase shows error
-
-</details>
-
-<details>
-<summary>CLI search subcommand finds patterns by fuzzy match (2 scenarios)</summary>
-
-#### CLI search subcommand finds patterns by fuzzy match
-
-**Verified by:**
-
-- Search returns matching patterns
-- Search without query shows error
-
-</details>
-
-<details>
-<summary>CLI context assembly subcommands return text output (4 scenarios)</summary>
-
-#### CLI context assembly subcommands return text output
-
-**Verified by:**
-
-- Context returns curated text bundle
-- Context without pattern name shows error
-- Overview returns executive summary text
-- Dep-tree returns dependency tree text
-
-</details>
-
-<details>
-<summary>CLI tags and sources subcommands return JSON (2 scenarios)</summary>
-
-#### CLI tags and sources subcommands return JSON
-
-**Verified by:**
-
-- Tags returns tag usage counts
-- Sources returns file inventory
-
-</details>
-
-<details>
-<summary>CLI extended arch subcommands query architecture relationships (3 scenarios)</summary>
-
-#### CLI extended arch subcommands query architecture relationships
-
-**Verified by:**
-
-- Arch neighborhood returns pattern relationships
-- Arch compare returns context comparison
-- Arch coverage returns annotation coverage
-
-</details>
-
-<details>
-<summary>CLI unannotated subcommand finds files without annotations (1 scenarios)</summary>
-
-#### CLI unannotated subcommand finds files without annotations
-
-**Verified by:**
-
-- Unannotated finds files missing libar-docs marker
-
-</details>
-
-<details>
-<summary>Output modifiers work when placed after the subcommand (3 scenarios)</summary>
-
-#### Output modifiers work when placed after the subcommand
-
-**Invariant:** Output modifiers (--count, --names-only, --fields) produce identical results regardless of position relative to the subcommand and its filters.
-
-**Rationale:** Users should not need to memorize argument ordering rules; the CLI should be forgiving.
-
-**Verified by:**
-
-- Count modifier after list subcommand returns count
-- Names-only modifier after list subcommand returns names
-- Count modifier combined with list filter
-
-</details>
-
-<details>
-<summary>CLI arch health subcommands detect graph quality issues (3 scenarios)</summary>
-
-#### CLI arch health subcommands detect graph quality issues
-
-**Invariant:** Health subcommands (dangling, orphans, blocking) operate on the relationship index, not the architecture index, and return results without requiring arch annotations.
-
-**Rationale:** Graph quality issues (broken references, isolated patterns, blocked dependencies) are relationship-level concerns that should be queryable even when no architecture metadata exists.
-
-**Verified by:**
-
-- Arch dangling returns broken references
-- Arch orphans returns isolated patterns
-- Arch blocking returns blocked patterns
-
-</details>
-
-<details>
-<summary>CLI rules subcommand queries business rules and invariants (9 scenarios)</summary>
-
-#### CLI rules subcommand queries business rules and invariants
-
-**Invariant:** The rules subcommand returns structured business rules extracted from Gherkin Rule: blocks, grouped by product area and phase, with parsed invariant and rationale annotations.
-
-**Rationale:** Live business rule queries replace static generated markdown, enabling on-demand filtering by product area, pattern, and invariant presence.
-
-**Verified by:**
-
-- Rules returns business rules from feature files
-- Rules filters by product area
-- Rules with count modifier returns totals
-- Rules with names-only returns flat array
-- Rules filters by pattern name
-- Rules with only-invariants excludes rules without invariants
-- Rules product area filter excludes non-matching areas
-- Rules for non-existent product area returns hint
-- Rules combines product area and only-invariants filters
 
 </details>
 
@@ -2987,6 +3188,62 @@ Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein.
 
 </details>
 
+### ArchQueriesTest
+
+[View ArchQueriesTest source](tests/features/api/architecture-queries/arch-queries.feature)
+
+<details>
+<summary>Neighborhood and comparison views (3 scenarios)</summary>
+
+#### Neighborhood and comparison views
+
+**Invariant:** The architecture query API must provide pattern neighborhood views (direct connections) and cross-context comparison views (shared/unique dependencies), returning undefined for nonexistent patterns.
+
+**Rationale:** Neighborhood and comparison views are the primary navigation tools for understanding architecture — without them, developers must manually trace relationship chains across files.
+
+**Verified by:**
+
+- Pattern neighborhood shows direct connections
+- Cross-context comparison shows shared and unique dependencies
+- Neighborhood for nonexistent pattern returns undefined
+
+</details>
+
+<details>
+<summary>Taxonomy discovery via tags and sources (3 scenarios)</summary>
+
+#### Taxonomy discovery via tags and sources
+
+**Invariant:** The API must aggregate tag values with counts across all patterns and categorize source files by type, returning empty reports when no patterns match.
+
+**Rationale:** Tag aggregation reveals annotation coverage gaps and source inventory helps teams understand their codebase composition — both are essential for project health monitoring.
+
+**Verified by:**
+
+- Tag aggregation counts values across patterns
+- Source inventory categorizes files by type
+- Tags with no patterns returns empty report
+
+</details>
+
+<details>
+<summary>Coverage analysis reports annotation completeness (4 scenarios)</summary>
+
+#### Coverage analysis reports annotation completeness
+
+**Invariant:** Coverage analysis must detect unused taxonomy entries, cross-context integration points, and include all relationship types (implements, dependsOn, enables) in neighborhood views.
+
+**Rationale:** Unused taxonomy entries indicate dead configuration while missing relationship types produce incomplete architecture views — both degrade the reliability of generated documentation.
+
+**Verified by:**
+
+- Unused taxonomy detection
+- Cross-context comparison with integration points
+- Neighborhood includes implements relationships
+- Neighborhood includes dependsOn and enables relationships
+
+</details>
+
 ### StubTaxonomyTagTests
 
 [View StubTaxonomyTagTests source](tests/features/api/stub-integration/taxonomy-tags.feature)
@@ -3247,62 +3504,6 @@ buildOverview() pure functions that operate on MasterDataset.
 - File list includes primary and related files
 - File list includes implementation files for completed dependencies
 - File list without related returns only primary
-
-</details>
-
-### ArchQueriesTest
-
-[View ArchQueriesTest source](tests/features/api/architecture-queries/arch-queries.feature)
-
-<details>
-<summary>Neighborhood and comparison views (3 scenarios)</summary>
-
-#### Neighborhood and comparison views
-
-**Invariant:** The architecture query API must provide pattern neighborhood views (direct connections) and cross-context comparison views (shared/unique dependencies), returning undefined for nonexistent patterns.
-
-**Rationale:** Neighborhood and comparison views are the primary navigation tools for understanding architecture — without them, developers must manually trace relationship chains across files.
-
-**Verified by:**
-
-- Pattern neighborhood shows direct connections
-- Cross-context comparison shows shared and unique dependencies
-- Neighborhood for nonexistent pattern returns undefined
-
-</details>
-
-<details>
-<summary>Taxonomy discovery via tags and sources (3 scenarios)</summary>
-
-#### Taxonomy discovery via tags and sources
-
-**Invariant:** The API must aggregate tag values with counts across all patterns and categorize source files by type, returning empty reports when no patterns match.
-
-**Rationale:** Tag aggregation reveals annotation coverage gaps and source inventory helps teams understand their codebase composition — both are essential for project health monitoring.
-
-**Verified by:**
-
-- Tag aggregation counts values across patterns
-- Source inventory categorizes files by type
-- Tags with no patterns returns empty report
-
-</details>
-
-<details>
-<summary>Coverage analysis reports annotation completeness (4 scenarios)</summary>
-
-#### Coverage analysis reports annotation completeness
-
-**Invariant:** Coverage analysis must detect unused taxonomy entries, cross-context integration points, and include all relationship types (implements, dependsOn, enables) in neighborhood views.
-
-**Rationale:** Unused taxonomy entries indicate dead configuration while missing relationship types produce incomplete architecture views — both degrade the reliability of generated documentation.
-
-**Verified by:**
-
-- Unused taxonomy detection
-- Cross-context comparison with integration points
-- Neighborhood includes implements relationships
-- Neighborhood includes dependsOn and enables relationships
 
 </details>
 

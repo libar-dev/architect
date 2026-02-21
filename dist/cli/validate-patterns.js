@@ -4,7 +4,7 @@
  * @libar-docs-cli
  * @libar-docs-pattern ValidatePatternsCLI
  * @libar-docs-status completed
- * @libar-docs-uses PatternScanner, GherkinScanner, DocExtractor, DualSourceExtractor, CodecUtils
+ * @libar-docs-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, MasterDataset, CodecUtils
  * @libar-docs-extract-shapes ValidateCLIConfig, ValidationIssue, ValidationSummary
  *
  * ## ValidatePatternsCLI - Cross-Source Pattern Validator
@@ -29,9 +29,8 @@ import { handleCliError } from './error-handler.js';
 import { getPatternName } from '../api/pattern-helpers.js';
 import { scanPatterns } from '../scanner/index.js';
 import { scanGherkinFiles } from '../scanner/gherkin-scanner.js';
-import { extractPatterns } from '../extractor/doc-extractor.js';
-import { extractProcessMetadata, extractDeliverables } from '../extractor/dual-source-extractor.js';
 import { loadConfig, applyProjectSourceDefaults, formatConfigError, } from '../config/config-loader.js';
+import { buildMasterDataset } from '../generators/pipeline/index.js';
 import { ScannerConfigSchema, createJsonOutputCodec, ValidationSummaryOutputSchema, } from '../validation-schemas/index.js';
 import { normalizeStatus, isPatternComplete } from '../taxonomy/index.js';
 import { validateDoD, formatDoDSummary, detectAntiPatterns, formatAntiPatternReport, toValidationIssues, DEFAULT_THRESHOLDS, } from '../validation/index.js';
@@ -58,6 +57,7 @@ export function parseArgs(argv = process.argv.slice(2)) {
         megaFeatureLineThreshold: DEFAULT_THRESHOLDS.megaFeatureLineThreshold,
         magicCommentThreshold: DEFAULT_THRESHOLDS.magicCommentThreshold,
         version: false,
+        verbose: false,
     };
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i];
@@ -158,6 +158,9 @@ export function parseArgs(argv = process.argv.slice(2)) {
         else if (arg === '--version' || arg === '-v') {
             config.version = true;
         }
+        else if (arg === '--verbose') {
+            config.verbose = true;
+        }
         else if (arg?.startsWith('-') === true) {
             console.warn(`Warning: Unknown flag '${arg}' ignored`);
         }
@@ -180,6 +183,7 @@ Options:
   -e, --exclude <pattern>     Glob pattern to exclude (repeatable)
   -b, --base-dir <dir>        Base directory for paths (default: cwd)
   --strict                    Treat warnings as errors (exit 2 on warnings)
+  --verbose                   Show info-level messages (hidden by default)
   -f, --format <type>         Output format: "pretty" (default) or "json"
   -h, --help                  Show this help message
   -v, --version               Show version number
@@ -240,64 +244,106 @@ Examples:
   `);
 }
 /**
- * Extract pattern info from Gherkin feature files
+ * Check if a TS pattern has a cross-source match via implements relationships.
+ *
+ * DD-3 Phase 2: For TS patterns not matched by name, check:
+ * 1. If any Gherkin pattern implements this TS pattern (implementedBy)
+ * 2. If this TS pattern implements a Gherkin pattern (implementsPatterns)
  */
-function extractGherkinPatternInfo(files) {
-    const patterns = [];
-    for (const file of files) {
-        const metadata = extractProcessMetadata(file);
-        if (metadata) {
-            const deliverables = extractDeliverables(file);
-            patterns.push({
-                name: metadata.pattern,
-                phase: metadata.phase,
-                status: metadata.status,
-                file: file.filePath,
-                deliverables,
-            });
+function hasImplementsMatch(tsPattern, tsName, gherkinByName, dataset) {
+    // Check if a Gherkin pattern implements this TS pattern
+    if ((dataset.relationshipIndex?.[tsName]?.implementedBy.length ?? 0) > 0) {
+        return true;
+    }
+    // Check if this TS pattern implements a Gherkin pattern
+    const implements_ = tsPattern.implementsPatterns ?? [];
+    for (const implName of implements_) {
+        if (gherkinByName.has(implName.toLowerCase())) {
+            return true;
         }
     }
-    return patterns;
+    return false;
 }
 /**
- * Validate cross-source consistency
+ * Check if a Gherkin pattern has a cross-source match via implements relationships.
+ *
+ * Symmetric counterpart to hasImplementsMatch for the Gherkin→TS direction:
+ * 1. If a TS pattern implements this Gherkin pattern (implementedBy)
+ * 2. If this Gherkin pattern implements a TS pattern (implementsPatterns)
+ */
+function hasGherkinImplementsMatch(gherkinPattern, tsByName, dataset) {
+    const name = getPatternName(gherkinPattern);
+    // Check reverse: a TS pattern implements this Gherkin pattern
+    if (dataset.relationshipIndex?.[name]?.implementedBy.some((ref) => tsByName.has(ref.name.toLowerCase())) === true) {
+        return true;
+    }
+    // Check forward: this Gherkin pattern implements a TS pattern
+    const implements_ = gherkinPattern.implementsPatterns ?? [];
+    for (const implName of implements_) {
+        if (tsByName.has(implName.toLowerCase())) {
+            return true;
+        }
+    }
+    return false;
+}
+/**
+ * Validate cross-source consistency using the MasterDataset read model.
  *
  * Compares TypeScript patterns against Gherkin patterns to find:
- * - Missing patterns in either source
+ * - Missing patterns in either source (with implements-aware resolution)
  * - Phase number mismatches
  * - Status mismatches (after normalization)
  * - Missing deliverables for completed phases
  * - Invalid dependencies
  *
- * @param tsPatterns - Patterns extracted from TypeScript source
- * @param gherkinPatterns - Pattern info extracted from Gherkin features
+ * DD-2: Consumes RuntimeMasterDataset instead of raw scanner/extractor output.
+ * DD-3: Two-phase matching — name-based first, then relationshipIndex fallback.
+ *
+ * @param dataset - The pre-computed MasterDataset read model
  * @returns Validation summary with issues and statistics
  */
-export function validatePatterns(tsPatterns, gherkinPatterns) {
+export function validatePatterns(dataset) {
     const issues = [];
-    // Build maps for efficient lookups
+    const tsPatterns = dataset.bySource.typescript;
+    const gherkinPatterns = dataset.bySource.gherkin;
+    // Phase 1: Build name-based maps for efficient lookups
     const tsByName = new Map();
     const gherkinByName = new Map();
     for (const p of tsPatterns) {
-        const name = getPatternName(p);
-        tsByName.set(name.toLowerCase(), p);
+        tsByName.set(getPatternName(p).toLowerCase(), p);
     }
     for (const p of gherkinPatterns) {
-        gherkinByName.set(p.name.toLowerCase(), p);
+        gherkinByName.set(getPatternName(p).toLowerCase(), p);
     }
     let matched = 0;
+    let missingInGherkinCount = 0;
     // Check TypeScript patterns against Gherkin
     for (const tsPattern of tsPatterns) {
         const tsName = getPatternName(tsPattern).toLowerCase();
-        const gherkinMatch = gherkinByName.get(tsName);
+        let gherkinMatch = gherkinByName.get(tsName);
+        // If the Gherkin pattern explicitly implements a DIFFERENT pattern, it's not
+        // a true name match — it's a naming collision. The Gherkin pattern belongs to
+        // whichever pattern it declares in @libar-docs-implements.
+        if (gherkinMatch !== undefined) {
+            const gherkinImpl = gherkinMatch.implementsPatterns ?? [];
+            if (gherkinImpl.length > 0 && !gherkinImpl.some((n) => n.toLowerCase() === tsName)) {
+                gherkinMatch = undefined;
+            }
+        }
         if (!gherkinMatch) {
-            // Only report for roadmap patterns (those with phase numbers)
-            if (tsPattern.phase !== undefined) {
+            // Phase 2: Check implements relationships before reporting
+            if (hasImplementsMatch(tsPattern, getPatternName(tsPattern), gherkinByName, dataset)) {
+                matched++;
+            }
+            else if (tsPattern.phase !== undefined) {
+                // Only report for roadmap patterns (those with phase numbers)
+                const name = getPatternName(tsPattern);
+                missingInGherkinCount++;
                 issues.push({
                     severity: 'warning',
-                    message: `Pattern "${getPatternName(tsPattern)}" in TypeScript has no matching Gherkin feature`,
+                    message: `Pattern "${name}" in TypeScript has no matching Gherkin feature`,
                     source: 'cross-source',
-                    pattern: getPatternName(tsPattern),
+                    pattern: name,
                     file: tsPattern.source.file,
                 });
             }
@@ -307,11 +353,12 @@ export function validatePatterns(tsPatterns, gherkinPatterns) {
             // Check phase consistency
             if (tsPattern.phase !== undefined && gherkinMatch.phase !== undefined) {
                 if (tsPattern.phase !== gherkinMatch.phase) {
+                    const name = getPatternName(tsPattern);
                     issues.push({
                         severity: 'error',
-                        message: `Phase mismatch for "${getPatternName(tsPattern)}": TypeScript=${tsPattern.phase}, Gherkin=${gherkinMatch.phase}`,
+                        message: `Phase mismatch for "${name}": TypeScript=${tsPattern.phase}, Gherkin=${gherkinMatch.phase}`,
                         source: 'cross-source',
-                        pattern: getPatternName(tsPattern),
+                        pattern: name,
                     });
                 }
             }
@@ -320,56 +367,74 @@ export function validatePatterns(tsPatterns, gherkinPatterns) {
                 const tsStatus = normalizeStatus(tsPattern.status);
                 const gherkinStatus = normalizeStatus(gherkinMatch.status);
                 if (tsStatus !== gherkinStatus) {
+                    const name = getPatternName(tsPattern);
                     // Include both raw and normalized values for clarity when they differ textually
                     const rawDiffers = tsPattern.status.toLowerCase() !== gherkinMatch.status.toLowerCase();
                     const message = rawDiffers
-                        ? `Status mismatch for "${getPatternName(tsPattern)}": TypeScript="${tsPattern.status}" (→${tsStatus}), Gherkin="${gherkinMatch.status}" (→${gherkinStatus})`
-                        : `Status mismatch for "${getPatternName(tsPattern)}": TypeScript=${tsStatus}, Gherkin=${gherkinStatus}`;
+                        ? `Status mismatch for "${name}": TypeScript="${tsPattern.status}" (→${tsStatus}), Gherkin="${gherkinMatch.status}" (→${gherkinStatus})`
+                        : `Status mismatch for "${name}": TypeScript=${tsStatus}, Gherkin=${gherkinStatus}`;
                     issues.push({
                         severity: 'error',
                         message,
                         source: 'cross-source',
-                        pattern: getPatternName(tsPattern),
+                        pattern: name,
                     });
                 }
             }
         }
     }
     // Check Gherkin patterns against TypeScript
+    let missingInTsCount = 0;
     for (const gherkinPattern of gherkinPatterns) {
-        const gherkinName = gherkinPattern.name.toLowerCase();
-        const tsMatch = tsByName.get(gherkinName);
+        const gherkinName = getPatternName(gherkinPattern).toLowerCase();
+        let tsMatch = tsByName.get(gherkinName);
+        // Symmetric collision guard: if the TS pattern implements a DIFFERENT Gherkin
+        // pattern, it's a naming collision, not a true match.
+        if (tsMatch !== undefined) {
+            const tsImpl = tsMatch.implementsPatterns ?? [];
+            if (tsImpl.length > 0 && !tsImpl.some((n) => n.toLowerCase() === gherkinName)) {
+                tsMatch = undefined;
+            }
+        }
         if (!tsMatch) {
-            issues.push({
-                severity: 'info',
-                message: `Pattern "${gherkinPattern.name}" in Gherkin has no matching TypeScript pattern`,
-                source: 'cross-source',
-                pattern: gherkinPattern.name,
-                file: gherkinPattern.file,
-            });
+            // Two-phase implements resolution (symmetric with TS→Gherkin direction)
+            if (!hasGherkinImplementsMatch(gherkinPattern, tsByName, dataset)) {
+                const name = getPatternName(gherkinPattern);
+                missingInTsCount++;
+                issues.push({
+                    severity: 'info',
+                    message: `Pattern "${name}" in Gherkin has no matching TypeScript pattern`,
+                    source: 'cross-source',
+                    pattern: name,
+                    file: gherkinPattern.source.file,
+                });
+            }
         }
     }
-    // Check deliverables for completed patterns
+    // Check deliverables for completed roadmap patterns (those with phase numbers).
+    // Test features and ADRs are completed but don't participate in the deliverables workflow.
     for (const gherkinPattern of gherkinPatterns) {
-        if (isPatternComplete(gherkinPattern.status)) {
-            if (gherkinPattern.deliverables.length === 0) {
+        if (isPatternComplete(gherkinPattern.status) && gherkinPattern.phase !== undefined) {
+            const deliverables = gherkinPattern.deliverables ?? [];
+            const name = getPatternName(gherkinPattern);
+            if (deliverables.length === 0) {
                 issues.push({
                     severity: 'warning',
-                    message: `Completed pattern "${gherkinPattern.name}" has no deliverables defined`,
+                    message: `Completed pattern "${name}" has no deliverables defined`,
                     source: 'gherkin',
-                    pattern: gherkinPattern.name,
-                    file: gherkinPattern.file,
+                    pattern: name,
+                    file: gherkinPattern.source.file,
                 });
             }
             else {
                 // Validate deliverable fields
-                for (const d of gherkinPattern.deliverables) {
+                for (const d of deliverables) {
                     if (!d.name || d.name.trim() === '') {
                         issues.push({
                             severity: 'warning',
-                            message: `Deliverable in "${gherkinPattern.name}" missing name`,
+                            message: `Deliverable in "${name}" missing name`,
                             source: 'gherkin',
-                            pattern: gherkinPattern.name,
+                            pattern: name,
                         });
                     }
                 }
@@ -382,11 +447,12 @@ export function validatePatterns(tsPatterns, gherkinPatterns) {
         const deps = pattern.dependsOn ?? [];
         for (const dep of deps) {
             if (!allPatternNames.has(dep.toLowerCase())) {
+                const name = getPatternName(pattern);
                 issues.push({
                     severity: 'info',
-                    message: `Pattern "${getPatternName(pattern)}" depends on "${dep}" which does not exist`,
+                    message: `Pattern "${name}" depends on "${dep}" which does not exist`,
                     source: 'typescript',
-                    pattern: getPatternName(pattern),
+                    pattern: name,
                 });
             }
         }
@@ -397,21 +463,15 @@ export function validatePatterns(tsPatterns, gherkinPatterns) {
             typescriptPatterns: tsPatterns.length,
             gherkinPatterns: gherkinPatterns.length,
             matched,
-            missingInGherkin: tsPatterns.filter((p) => {
-                const name = getPatternName(p).toLowerCase();
-                return !gherkinByName.has(name) && p.phase !== undefined;
-            }).length,
-            missingInTypeScript: gherkinPatterns.filter((p) => {
-                const name = p.name.toLowerCase();
-                return !tsByName.has(name);
-            }).length,
+            missingInGherkin: missingInGherkinCount,
+            missingInTypeScript: missingInTsCount,
         },
     };
 }
 /**
  * Format summary for pretty output
  */
-function formatPretty(summary) {
+function formatPretty(summary, verbose = false) {
     const lines = [];
     lines.push('Pattern Validation Summary');
     lines.push('==========================');
@@ -445,7 +505,7 @@ function formatPretty(summary) {
         }
         lines.push('');
     }
-    if (infos.length > 0) {
+    if (infos.length > 0 && verbose) {
         lines.push(`Info (${infos.length}):`);
         for (const issue of infos) {
             lines.push(`  [INFO]  ${issue.message}`);
@@ -524,7 +584,25 @@ async function main() {
             console.log(`  Gherkin patterns: ${config.features.join(', ')}`);
             console.log('');
         }
-        // Scan TypeScript files
+        // Build MasterDataset via shared pipeline factory (DD-7)
+        const pipelineResult = await buildMasterDataset({
+            input: config.input,
+            features: config.features,
+            baseDir: config.baseDir,
+            mergeConflictStrategy: 'concatenate',
+            ...(config.exclude.length > 0 ? { exclude: config.exclude } : {}),
+        });
+        if (!pipelineResult.ok) {
+            throw new Error(`Pipeline error [${pipelineResult.error.step}]: ${pipelineResult.error.message}`);
+        }
+        const { dataset, warnings: pipelineWarnings } = pipelineResult.value;
+        if (config.format === 'pretty') {
+            for (const w of pipelineWarnings) {
+                console.warn(`⚠️  ${w.message}`);
+            }
+        }
+        // Raw scans for stage-1 consumers (DoD validation, anti-pattern detection)
+        // These correctly use scanned file data, not the MasterDataset — see DD-7
         const scannerConfig = ScannerConfigSchema.parse({
             patterns: config.input,
             exclude: config.exclude.length > 0 ? config.exclude : undefined,
@@ -534,10 +612,6 @@ async function main() {
         if (!scanResult.ok) {
             throw new Error('Unexpected scan failure');
         }
-        // Extract TypeScript patterns
-        const extractionResult = extractPatterns(scanResult.value.files, config.baseDir, registry);
-        const tsPatterns = extractionResult.patterns;
-        // Scan Gherkin files
         const gherkinScanResult = await scanGherkinFiles({
             patterns: config.features,
             baseDir: config.baseDir,
@@ -545,20 +619,18 @@ async function main() {
         if (!gherkinScanResult.ok) {
             throw new Error('Unexpected Gherkin scan failure');
         }
-        // Extract Gherkin patterns
-        const gherkinPatterns = extractGherkinPatternInfo(gherkinScanResult.value.files);
         // Warn if no patterns found (common misconfiguration)
-        if (tsPatterns.length === 0) {
+        if (dataset.bySource.typescript.length === 0) {
             console.warn('⚠️  Warning: No TypeScript patterns found. Check your --input patterns.');
         }
-        if (gherkinPatterns.length === 0) {
+        if (dataset.bySource.gherkin.length === 0) {
             console.warn('⚠️  Warning: No Gherkin patterns found. Check your --features patterns.');
         }
-        // Run cross-source validation
-        const summary = validatePatterns(tsPatterns, gherkinPatterns);
+        // Run cross-source validation against the read model (DD-2)
+        const summary = validatePatterns(dataset);
         // Output cross-source results
         if (config.format === 'pretty') {
-            console.log(formatPretty(summary));
+            console.log(formatPretty(summary, config.verbose));
         }
         // Run DoD validation if enabled
         let dodHasErrors = false;

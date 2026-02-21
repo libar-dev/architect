@@ -43,6 +43,8 @@ Deliverable status is enforced by `z.enum()` at schema level. The 6 canonical va
 
 **NEVER** use freeform status strings. The Zod schema rejects non-canonical values at parse time.
 
+**Terminal statuses:** `complete`, `n/a`, and `superseded` are terminal per `isDeliverableStatusTerminal()`. Used by DoD validation — `deferred` is NOT terminal.
+
 ### Efficient Debugging Strategy
 
 - **Don't** try to debug by running the full test suite repeatedly.

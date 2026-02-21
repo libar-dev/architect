@@ -85,10 +85,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
+                deferred: "deferred";
                 roadmap: "roadmap";
                 active: "active";
                 completed: "completed";
-                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -150,10 +150,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
+            deferred: "deferred";
             roadmap: "roadmap";
             active: "active";
             completed: "completed";
-            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -180,8 +180,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -211,10 +211,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
-                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
+                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -240,8 +240,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             superseded: "superseded";
+            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -327,8 +327,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                enum: "enum";
                 value: "value";
+                enum: "enum";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -366,10 +366,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
+                    deferred: "deferred";
                     roadmap: "roadmap";
                     active: "active";
                     completed: "completed";
-                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -431,10 +431,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
+                deferred: "deferred";
                 roadmap: "roadmap";
                 active: "active";
                 completed: "completed";
-                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -461,8 +461,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -492,10 +492,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -521,8 +521,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -608,10 +608,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
+                    deferred: "deferred";
                     roadmap: "roadmap";
                     active: "active";
                     completed: "completed";
-                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -673,10 +673,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
+                deferred: "deferred";
                 roadmap: "roadmap";
                 active: "active";
                 completed: "completed";
-                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -703,8 +703,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -734,10 +734,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -763,8 +763,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -850,10 +850,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
+                    deferred: "deferred";
                     roadmap: "roadmap";
                     active: "active";
                     completed: "completed";
-                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -915,10 +915,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
+                deferred: "deferred";
                 roadmap: "roadmap";
                 active: "active";
                 completed: "completed";
-                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -945,8 +945,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -976,10 +976,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -1005,8 +1005,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -1096,10 +1096,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
+                    deferred: "deferred";
                     roadmap: "roadmap";
                     active: "active";
                     completed: "completed";
-                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1161,10 +1161,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
+                deferred: "deferred";
                 roadmap: "roadmap";
                 active: "active";
                 completed: "completed";
-                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1191,8 +1191,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -1222,10 +1222,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -1251,8 +1251,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -1345,10 +1345,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
+                deferred: "deferred";
                 roadmap: "roadmap";
                 active: "active";
                 completed: "completed";
-                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1410,10 +1410,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
+            deferred: "deferred";
             roadmap: "roadmap";
             active: "active";
             completed: "completed";
-            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1440,8 +1440,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -1471,10 +1471,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
-                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
+                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -1500,8 +1500,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             superseded: "superseded";
+            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -1587,10 +1587,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
+                deferred: "deferred";
                 roadmap: "roadmap";
                 active: "active";
                 completed: "completed";
-                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1652,10 +1652,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
+            deferred: "deferred";
             roadmap: "roadmap";
             active: "active";
             completed: "completed";
-            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1682,8 +1682,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -1713,10 +1713,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
-                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
+                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -1742,8 +1742,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             superseded: "superseded";
+            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -1830,10 +1830,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
+                    deferred: "deferred";
                     roadmap: "roadmap";
                     active: "active";
                     completed: "completed";
-                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1895,10 +1895,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
+                deferred: "deferred";
                 roadmap: "roadmap";
                 active: "active";
                 completed: "completed";
-                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1925,8 +1925,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -1956,10 +1956,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -1985,8 +1985,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -2072,10 +2072,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
+                    deferred: "deferred";
                     roadmap: "roadmap";
                     active: "active";
                     completed: "completed";
-                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2137,10 +2137,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
+                deferred: "deferred";
                 roadmap: "roadmap";
                 active: "active";
                 completed: "completed";
-                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2167,8 +2167,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -2198,10 +2198,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -2227,8 +2227,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -2314,10 +2314,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
+                    deferred: "deferred";
                     roadmap: "roadmap";
                     active: "active";
                     completed: "completed";
-                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2379,10 +2379,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
+                deferred: "deferred";
                 roadmap: "roadmap";
                 active: "active";
                 completed: "completed";
-                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2409,8 +2409,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -2440,10 +2440,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -2469,8 +2469,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -2556,10 +2556,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
+                    deferred: "deferred";
                     roadmap: "roadmap";
                     active: "active";
                     completed: "completed";
-                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2621,10 +2621,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
+                deferred: "deferred";
                 roadmap: "roadmap";
                 active: "active";
                 completed: "completed";
-                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2651,8 +2651,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -2682,10 +2682,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -2711,8 +2711,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -2824,10 +2824,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
+                    deferred: "deferred";
                     roadmap: "roadmap";
                     active: "active";
                     completed: "completed";
-                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2889,10 +2889,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
+                deferred: "deferred";
                 roadmap: "roadmap";
                 active: "active";
                 completed: "completed";
-                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2919,8 +2919,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -2950,10 +2950,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -2979,8 +2979,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -3066,10 +3066,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
+                    deferred: "deferred";
                     roadmap: "roadmap";
                     active: "active";
                     completed: "completed";
-                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3131,10 +3131,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
+                deferred: "deferred";
                 roadmap: "roadmap";
                 active: "active";
                 completed: "completed";
-                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3161,8 +3161,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -3192,10 +3192,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -3221,8 +3221,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -3308,10 +3308,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
+                    deferred: "deferred";
                     roadmap: "roadmap";
                     active: "active";
                     completed: "completed";
-                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3373,10 +3373,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
+                deferred: "deferred";
                 roadmap: "roadmap";
                 active: "active";
                 completed: "completed";
-                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3403,8 +3403,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -3434,10 +3434,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -3463,8 +3463,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -3550,10 +3550,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
+                    deferred: "deferred";
                     roadmap: "roadmap";
                     active: "active";
                     completed: "completed";
-                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3615,10 +3615,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
+                deferred: "deferred";
                 roadmap: "roadmap";
                 active: "active";
                 completed: "completed";
-                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3645,8 +3645,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -3676,10 +3676,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -3705,8 +3705,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -3792,10 +3792,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
+                    deferred: "deferred";
                     roadmap: "roadmap";
                     active: "active";
                     completed: "completed";
-                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3857,10 +3857,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
+                deferred: "deferred";
                 roadmap: "roadmap";
                 active: "active";
                 completed: "completed";
-                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3887,8 +3887,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -3918,10 +3918,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -3947,8 +3947,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;

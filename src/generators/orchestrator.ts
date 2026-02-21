@@ -45,26 +45,12 @@ import type {
   GeneratorSourceOverride,
 } from '../config/project-config.js';
 import { mergeSourcesForGenerator } from '../config/merge-sources.js';
-import { getPatternName } from '../api/pattern-helpers.js';
-import { loadConfig, formatConfigError } from '../config/config-loader.js';
 import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../config/defaults.js';
-import { scanPatterns } from '../scanner/index.js';
-import { extractPatterns } from '../extractor/doc-extractor.js';
-import { scanGherkinFiles } from '../scanner/gherkin-scanner.js';
-import {
-  extractPatternsFromGherkin,
-  computeHierarchyChildren,
-} from '../extractor/gherkin-extractor.js';
 import { generatorRegistry } from './registry.js';
 import type { GeneratorContext } from './types.js';
 import type { Result } from '../types/index.js';
 import { Result as R } from '../types/index.js';
-import {
-  loadDefaultWorkflow,
-  loadWorkflowFromPath,
-  type LoadedWorkflow,
-} from '../config/workflow-loader.js';
-import { transformToMasterDataset } from './pipeline/index.js';
+import { buildMasterDataset } from './pipeline/index.js';
 import { detectBranchChanges, getAllChangedFiles } from '../lint/process-guard/detect-changes.js';
 import type { CodecOptions } from '../renderable/generate.js';
 import { registerReferenceGenerators } from './built-in/reference-generators.js';
@@ -279,152 +265,53 @@ export async function generateDocumentation(
   // Resolve base directory
   const baseDir = path.resolve(options.baseDir);
 
-  // Step 1: Load configuration (discovers delivery-process.config.ts)
-  const configResult = await loadConfig(baseDir);
-  if (!configResult.ok) {
-    return R.err(`Failed to load config: ${formatConfigError(configResult.error)}`);
-  }
-  const registry = configResult.value.instance.registry;
+  // DD-6: Normalize features (string | string[] | null → string[])
+  const features: readonly string[] =
+    options.features === null || options.features === undefined
+      ? []
+      : typeof options.features === 'string'
+        ? [options.features]
+        : options.features;
 
-  // Step 2: Scan source files
-  const scanResult = await scanPatterns(
-    {
-      patterns: options.input,
-      exclude: options.exclude,
-      baseDir,
-    },
-    registry
-  );
-
-  if (!scanResult.ok) {
-    return R.err('Failed to scan source files');
-  }
-
-  const { files: scannedFiles, errors: scanErrors, skippedDirectives } = scanResult.value;
-
-  // Record scan warnings
-  if (scanErrors.length > 0) {
-    warnings.push({
-      type: 'scan',
-      message: `Failed to scan ${scanErrors.length} files (syntax errors)`,
-      count: scanErrors.length,
-    });
-  }
-
-  if (skippedDirectives.length > 0) {
-    warnings.push({
-      type: 'scan',
-      message: `Skipped ${skippedDirectives.length} invalid directives`,
-      count: skippedDirectives.length,
-    });
-  }
-
-  // Step 3: Extract patterns from TypeScript
-  const extraction = extractPatterns(scannedFiles, baseDir, registry);
-
-  if (extraction.errors.length > 0) {
-    warnings.push({
-      type: 'extraction',
-      message: `${extraction.errors.length} TypeScript patterns had errors`,
-      count: extraction.errors.length,
-    });
-  }
-
-  // Step 4: Scan and extract patterns from Gherkin feature files (if provided)
-  let gherkinPatterns: readonly ExtractedPattern[] = [];
-
-  if (options.features !== null && options.features !== undefined && options.features.length > 0) {
-    const gherkinScanResult = await scanGherkinFiles({
-      patterns: options.features as string | readonly string[],
-      baseDir,
-      ...(options.exclude && { exclude: options.exclude }),
-    });
-
-    if (gherkinScanResult.ok) {
-      const { files: gherkinFiles, errors: gherkinErrors } = gherkinScanResult.value;
-
-      if (gherkinErrors.length > 0) {
-        warnings.push({
-          type: 'scan',
-          message: `Failed to parse ${gherkinErrors.length} feature file${gherkinErrors.length === 1 ? '' : 's'}`,
-          count: gherkinErrors.length,
-          details: gherkinErrors.map((e) => ({
-            file: e.file,
-            // Use spread pattern for optional properties (exactOptionalPropertyTypes)
-            ...(e.error.line !== undefined && { line: e.error.line }),
-            ...(e.error.column !== undefined && { column: e.error.column }),
-            message: e.error.message,
-          })),
-        });
-      }
-
-      // Extract patterns from Gherkin
-      const gherkinResult = extractPatternsFromGherkin(gherkinFiles, {
-        baseDir: options.baseDir,
-        tagRegistry: registry,
-        scenariosAsUseCases: true,
-      });
-
-      gherkinPatterns = gherkinResult.patterns;
-
-      // Report Gherkin extraction errors as warnings (partial success)
-      if (gherkinResult.errors.length > 0) {
-        for (const error of gherkinResult.errors) {
-          // Include validation error details if available
-          const details =
-            error.validationErrors && error.validationErrors.length > 0
-              ? ` [${error.validationErrors.join('; ')}]`
-              : '';
-          warnings.push({
-            type: 'extraction',
-            message: `${error.file}: ${error.patternName} - ${error.reason}${details}`,
-          });
-        }
-      }
-    }
-    // Note: scanGherkinFiles returns Result<T, never> so it always succeeds
-    // Individual file errors are collected in gherkinScanResult.value.errors
-  }
-
-  // Step 5: Merge patterns and detect conflicts
-  const mergeResult = mergePatterns(extraction.patterns, gherkinPatterns);
-
-  if (!mergeResult.ok) {
-    return R.err(mergeResult.error);
-  }
-
-  // Step 6: Compute hierarchy relationships (parent → children)
-  // This populates the `children` field on each pattern based on `parent` references
-  const allPatterns = computeHierarchyChildren(mergeResult.value);
-
-  // Step 7: Load workflow configuration
-  let workflow: LoadedWorkflow;
-  if (options.workflowPath) {
-    const workflowResult = await loadWorkflowFromPath(options.workflowPath);
-    if (!workflowResult.ok) {
-      return R.err(`Failed to load workflow: ${workflowResult.error.message}`);
-    }
-    workflow = workflowResult.value;
-  } else {
-    workflow = loadDefaultWorkflow();
-  }
-
-  // Step 8: Transform patterns into MasterDataset with pre-computed views
-  // This is a single-pass transformation that computes all derived views:
-  // byStatus, byPhase, byQuarter, byCategory, bySource, counts, relationships
-  // Also applies context auto-inference from file paths for architecture diagrams
-  //
   // Merge context inference rules: user rules take precedence (prepended to defaults)
   const mergedContextRules = options.contextInferenceRules
     ? [...options.contextInferenceRules, ...DEFAULT_CONTEXT_INFERENCE_RULES]
-    : DEFAULT_CONTEXT_INFERENCE_RULES;
+    : undefined; // let factory use defaults
 
-  const masterDataset = transformToMasterDataset({
-    patterns: allPatterns,
-    tagRegistry: registry,
-    workflow,
-    contextInferenceRules: mergedContextRules,
+  // DD-6: Delegate 8-step pipeline to shared factory
+  const pipelineResult = await buildMasterDataset({
+    input: options.input,
+    features,
+    baseDir,
+    mergeConflictStrategy: 'fatal',
+    ...(options.exclude !== undefined ? { exclude: options.exclude } : {}),
+    ...(options.workflowPath !== null && options.workflowPath !== undefined
+      ? { workflowPath: options.workflowPath }
+      : {}),
+    ...(mergedContextRules !== undefined ? { contextInferenceRules: mergedContextRules } : {}),
+    includeValidation: false, // DD-3: orchestrator doesn't need validation
+    failOnScanErrors: false, // DD-5: orchestrator collects errors as warnings
   });
+
+  if (!pipelineResult.ok) {
+    return R.err(`Pipeline error [${pipelineResult.error.step}]: ${pipelineResult.error.message}`);
+  }
+
+  // DD-6: Extract values from pipeline result
+  const { dataset: masterDataset } = pipelineResult.value;
+  const allPatterns = masterDataset.patterns;
+  const registry = masterDataset.tagRegistry;
+  const workflow = masterDataset.workflow;
+
+  // DD-1: Map PipelineWarning[] → GenerationWarning[]
+  for (const pw of pipelineResult.value.warnings) {
+    warnings.push({
+      type: pw.type === 'gherkin-parse' ? 'scan' : pw.type,
+      message: pw.message,
+      ...(pw.count !== undefined ? { count: pw.count } : {}),
+      ...(pw.details !== undefined ? { details: [...pw.details] } : {}),
+    });
+  }
 
   // Step 9: Build codec options
   // Start with user-provided options, then overlay computed options
@@ -489,8 +376,8 @@ export async function generateDocumentation(
       outputDir: options.outputDir,
       registry,
       masterDataset,
-      workflow,
-      ...(codecOptions && { codecOptions }),
+      ...(workflow !== undefined ? { workflow } : {}),
+      ...(codecOptions !== undefined ? { codecOptions } : {}),
     };
 
     // Generate files with merged patterns (TypeScript + Gherkin)
@@ -686,44 +573,6 @@ export async function generateDocumentation(
     errors,
     warnings,
   });
-}
-
-/**
- * Merge patterns from TypeScript and Gherkin sources with conflict detection
- *
- * Exported for testing purposes - allows direct unit testing of merge logic
- * without running the full pipeline.
- *
- * @param tsPatterns - Patterns extracted from TypeScript files
- * @param gherkinPatterns - Patterns extracted from Gherkin feature files
- * @returns Result containing merged patterns or error if conflicts detected
- */
-export function mergePatterns(
-  tsPatterns: readonly ExtractedPattern[],
-  gherkinPatterns: readonly ExtractedPattern[]
-): Result<readonly ExtractedPattern[], string> {
-  // Check for conflicts (same pattern name in both sources)
-  const conflicts: string[] = [];
-
-  const tsPatternNames = new Set(tsPatterns.map((p) => getPatternName(p)));
-
-  for (const gherkinPattern of gherkinPatterns) {
-    const patternName = getPatternName(gherkinPattern);
-    if (tsPatternNames.has(patternName)) {
-      conflicts.push(patternName);
-    }
-  }
-
-  if (conflicts.length > 0) {
-    return R.err(
-      `Pattern conflicts detected: ${conflicts.join(', ')}. ` +
-        `These patterns are defined in both TypeScript and Gherkin sources. ` +
-        `Each pattern should only be defined in one source.`
-    );
-  }
-
-  // No conflicts - merge patterns
-  return R.ok([...tsPatterns, ...gherkinPatterns]);
 }
 
 /**

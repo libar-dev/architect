@@ -37,3 +37,23 @@ export {
   type DanglingReference,
   type TransformResult,
 } from './transform-dataset.js';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Merge Patterns
+// ═══════════════════════════════════════════════════════════════════════════
+
+export { mergePatterns } from './merge-patterns.js';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Pipeline Factory
+// ═══════════════════════════════════════════════════════════════════════════
+
+export {
+  buildMasterDataset,
+  type PipelineOptions,
+  type PipelineResult,
+  type PipelineError,
+  type PipelineWarning,
+  type PipelineWarningDetail,
+  type ScanMetadata,
+} from './build-pipeline.js';

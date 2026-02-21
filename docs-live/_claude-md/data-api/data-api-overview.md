@@ -25,6 +25,10 @@ Detail Level: Compact summary
 
 === BEHAVIOR SPECIFICATIONS ===
 
+--- RulesQueryModule ---
+
+--- PipelineFactory ---
+
 --- ProcessStateAPIRelationshipQueries ---
 
 | Rule                                             | Description                                                                                                               |
@@ -47,11 +51,13 @@ Detail Level: Compact summary
 
 --- ProcessAPILayeredExtraction ---
 
-| Rule                                            | Description                                                                                                              |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| CLI file contains only routing, no domain logic | **Invariant:** `process-api.ts` parses arguments, calls a pipeline<br> factory for the MasterDataset, routes...          |
-| Pipeline factory is shared across consumers     | **Invariant:** The scan-extract-transform sequence is defined once in a<br> reusable factory. All consumers that need... |
-| Domain logic lives in API modules               | **Invariant:** Query logic that operates on MasterDataset lives in<br> `src/api/` modules. This makes it...              |
+| Rule                                                              | Description                                                                                                          |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| CLI file contains only routing, no domain logic                   | **Invariant:** `process-api.ts` parses arguments, calls the pipeline<br> factory for the MasterDataset, routes...    |
+| Pipeline factory is shared across CLI consumers                   | **Invariant:** The scan-extract-transform sequence is defined once in...                                             |
+| Domain logic lives in API modules                                 | **Invariant:** Query logic that operates on MasterDataset lives in<br> `src/api/` modules. The `rules-query.ts`...   |
+| Pipeline factory returns Result for consumer-owned error handling | **Invariant:** The factory returns `Result<PipelineResult, PipelineError>`<br> rather than throwing or calling...    |
+| End-to-end verification confirms behavioral equivalence           | **Invariant:** After extraction, all CLI commands produce identical output<br> to pre-refactor behavior with zero... |
 
 --- DataAPIStubIntegration ---
 
@@ -145,27 +151,37 @@ Detail Level: Compact summary
 | Strict mode treats warnings as errors                        | **Invariant:** When --strict is enabled, warnings must be promoted to errors causing a non-zero exit code (exit 2);...   |
 | CLI warns about unknown flags                                | **Invariant:** Unrecognized CLI flags must produce a warning message but allow execution to continue....                 |
 
---- ProcessApiCli ---
+--- ProcessApiCliSubcommands ---
 
-| Rule                                                           | Description                                                                                                              |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| CLI displays help and version information                      |                                                                                                                          |
-| CLI requires input flag for subcommands                        |                                                                                                                          |
-| CLI status subcommand shows delivery state                     |                                                                                                                          |
-| CLI query subcommand executes API methods                      |                                                                                                                          |
-| CLI pattern subcommand shows pattern detail                    |                                                                                                                          |
-| CLI arch subcommand queries architecture                       |                                                                                                                          |
-| CLI shows errors for missing subcommand arguments              |                                                                                                                          |
-| CLI handles argument edge cases                                |                                                                                                                          |
-| CLI list subcommand filters patterns                           |                                                                                                                          |
-| CLI search subcommand finds patterns by fuzzy match            |                                                                                                                          |
-| CLI context assembly subcommands return text output            |                                                                                                                          |
-| CLI tags and sources subcommands return JSON                   |                                                                                                                          |
-| CLI extended arch subcommands query architecture relationships |                                                                                                                          |
-| CLI unannotated subcommand finds files without annotations     |                                                                                                                          |
-| Output modifiers work when placed after the subcommand         | **Invariant:** Output modifiers (--count, --names-only, --fields) produce identical results regardless of position...    |
-| CLI arch health subcommands detect graph quality issues        | **Invariant:** Health subcommands (dangling, orphans, blocking) operate on the relationship index, not the...            |
-| CLI rules subcommand queries business rules and invariants     | **Invariant:** The rules subcommand returns structured business rules extracted from Gherkin Rule: blocks, grouped by... |
+| Rule                                                           | Description |
+| -------------------------------------------------------------- | ----------- |
+| CLI list subcommand filters patterns                           |             |
+| CLI search subcommand finds patterns by fuzzy match            |             |
+| CLI context assembly subcommands return text output            |             |
+| CLI tags and sources subcommands return JSON                   |             |
+| CLI extended arch subcommands query architecture relationships |             |
+| CLI unannotated subcommand finds files without annotations     |             |
+
+--- ProcessApiCliModifiersAndRules ---
+
+| Rule                                                       | Description                                                                                                              |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Output modifiers work when placed after the subcommand     | **Invariant:** Output modifiers (--count, --names-only, --fields) produce identical results regardless of position...    |
+| CLI arch health subcommands detect graph quality issues    | **Invariant:** Health subcommands (dangling, orphans, blocking) operate on the relationship index, not the...            |
+| CLI rules subcommand queries business rules and invariants | **Invariant:** The rules subcommand returns structured business rules extracted from Gherkin Rule: blocks, grouped by... |
+
+--- ProcessApiCliCore ---
+
+| Rule                                              | Description |
+| ------------------------------------------------- | ----------- |
+| CLI displays help and version information         |             |
+| CLI requires input flag for subcommands           |             |
+| CLI status subcommand shows delivery state        |             |
+| CLI query subcommand executes API methods         |             |
+| CLI pattern subcommand shows pattern detail       |             |
+| CLI arch subcommand queries architecture          |             |
+| CLI shows errors for missing subcommand arguments |             |
+| CLI handles argument edge cases                   |             |
 
 --- LintProcessCli ---
 
@@ -268,6 +284,14 @@ Detail Level: Compact summary
 | findBestMatch returns single suggestion | **Invariant:** findBestMatch must return the single highest-scoring match above the threshold, or undefined when no...  |
 | Levenshtein distance computation        | **Invariant:** The Levenshtein distance function must correctly compute edit distance between strings, returning 0...   |
 
+--- ArchQueriesTest ---
+
+| Rule                                              | Description                                                                                                              |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Neighborhood and comparison views                 | **Invariant:** The architecture query API must provide pattern neighborhood views (direct connections) and...            |
+| Taxonomy discovery via tags and sources           | **Invariant:** The API must aggregate tag values with counts across all patterns and categorize source files by type,... |
+| Coverage analysis reports annotation completeness | **Invariant:** Coverage analysis must detect unused taxonomy entries, cross-context integration points, and include...   |
+
 --- StubTaxonomyTagTests ---
 
 | Rule                                         | Description                                                                                                             |
@@ -301,11 +325,3 @@ Detail Level: Compact summary
 | buildDepTree walks dependency chains with cycle detection | **Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate... |
 | buildOverview provides executive project summary          | **Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and...        |
 | buildFileReadingList returns paths by relevance           | **Invariant:** Primary files (spec, implementation) must always be included; related files (dependency...                |
-
---- ArchQueriesTest ---
-
-| Rule                                              | Description                                                                                                              |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Neighborhood and comparison views                 | **Invariant:** The architecture query API must provide pattern neighborhood views (direct connections) and...            |
-| Taxonomy discovery via tags and sources           | **Invariant:** The API must aggregate tag values with counts across all patterns and categorize source files by type,... |
-| Coverage analysis reports annotation completeness | **Invariant:** Coverage analysis must detect unused taxonomy entries, cross-context integration points, and include...   |

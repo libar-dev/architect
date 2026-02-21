@@ -78,7 +78,8 @@ function createGherkinPatternFile(patternName: string, phase: number, status: st
 `
       : '';
 
-  return `@libar-docs-pattern:${patternName}
+  return `@libar-docs
+@libar-docs-pattern:${patternName}
 @libar-docs-phase:${phase}
 @libar-docs-status:${status}
 Feature: ${patternName}

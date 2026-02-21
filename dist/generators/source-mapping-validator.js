@@ -3,7 +3,6 @@
  * @libar-docs-core
  * @libar-docs-pattern SourceMappingValidator
  * @libar-docs-status completed
- * @libar-docs-phase 28
  *
  * ## Source Mapping Validator - Pre-flight Validation
  *

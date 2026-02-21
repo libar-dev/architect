@@ -6,7 +6,7 @@
 
 ## Overview
 
-The `process-api` CLI provides 27 query subcommands with JSON output. It runs the full scan-extract-transform pipeline on annotated TypeScript and Gherkin sources, then routes queries to the internal query layer.
+The `process-api` CLI provides query subcommands with JSON output. It delegates to the shared pipeline factory (`buildMasterDataset()`) to build a MasterDataset from annotated sources, then routes queries to the internal query layer.
 
 **Primary use case:** Claude Code sessions querying delivery state without regenerating markdown documentation.
 
@@ -92,6 +92,34 @@ Architecture queries using `@libar-docs-arch-*` annotations.
 | `dangling`               | Broken references (names that don't exist) | `arch dangling`                |
 | `orphans`                | Patterns with no relationships (isolated)  | `arch orphans`                 |
 | `blocking`               | Patterns blocked by incomplete deps        | `arch blocking`                |
+
+### `rules`
+
+Query business rules extracted from Gherkin `Rule:` blocks, grouped by product area, phase, and feature.
+
+```bash
+# All rules across all product areas
+pnpm process:query -- rules
+
+# Filter by product area
+pnpm process:query -- rules --product-area Validation
+
+# Filter by pattern name
+pnpm process:query -- rules --pattern ProcessGuardDecider
+
+# Only rules with invariants
+pnpm process:query -- rules --only-invariants
+```
+
+**Filters:**
+
+| Flag                 | Description                                       |
+| -------------------- | ------------------------------------------------- |
+| `--product-area <X>` | Filter to rules in a specific product area        |
+| `--pattern <Y>`      | Filter to rules in a specific pattern             |
+| `--only-invariants`  | Only show rules with `**Invariant:**` annotations |
+
+**Output shape:** `{ productAreas: [{ productArea, ruleCount, invariantCount, phases: [{ phase, features: [{ pattern, source, rules }] }] }], totalRules, totalInvariants }`
 
 ---
 

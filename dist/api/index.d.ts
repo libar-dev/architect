@@ -55,5 +55,7 @@ export type { NeighborhoodResult, ContextComparison, TagUsageReport, SourceInven
 export { computeNeighborhood, compareContexts, aggregateTagUsage, buildSourceInventory, } from './arch-queries.js';
 export type { CoverageReport } from './coverage-analyzer.js';
 export { analyzeCoverage, findUnannotatedFiles, findUnusedTaxonomy } from './coverage-analyzer.js';
+export type { RulesFilters, RuleOutput, RulesQueryResult } from './rules-query.js';
+export { queryBusinessRules } from './rules-query.js';
 export { deriveSource } from './summarize.js';
 //# sourceMappingURL=index.d.ts.map

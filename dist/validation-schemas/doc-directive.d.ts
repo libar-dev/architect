@@ -55,10 +55,10 @@ export declare function createDirectiveTagSchema(tagPrefix: string): z.ZodPipe<z
  * @see src/taxonomy/status-values.ts
  */
 export declare const DefaultPatternStatusSchema: z.ZodEnum<{
+    deferred: "deferred";
     roadmap: "roadmap";
     active: "active";
     completed: "completed";
-    deferred: "deferred";
 }>;
 /**
  * Extended status values accepted for directive validation
@@ -70,10 +70,10 @@ export declare const DefaultPatternStatusSchema: z.ZodEnum<{
  * @see src/taxonomy/normalized-status.ts
  */
 export declare const AcceptedPatternStatusSchema: z.ZodEnum<{
+    deferred: "deferred";
     roadmap: "roadmap";
     active: "active";
     completed: "completed";
-    deferred: "deferred";
 }>;
 /**
  * Pattern status schema for directive validation
@@ -82,10 +82,10 @@ export declare const AcceptedPatternStatusSchema: z.ZodEnum<{
  * Legacy values are normalized to display values via normalizeStatus().
  */
 export declare const PatternStatusSchema: z.ZodEnum<{
+    deferred: "deferred";
     roadmap: "roadmap";
     active: "active";
     completed: "completed";
-    deferred: "deferred";
 }>;
 export type PatternStatus = AcceptedStatusValue;
 /**
@@ -131,10 +131,10 @@ export declare const DocDirectiveSchema: z.ZodObject<{
     }, z.core.$strict>;
     patternName: z.ZodOptional<z.ZodString>;
     status: z.ZodOptional<z.ZodEnum<{
+        deferred: "deferred";
         roadmap: "roadmap";
         active: "active";
         completed: "completed";
-        deferred: "deferred";
     }>>;
     isCore: z.ZodOptional<z.ZodBoolean>;
     useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;

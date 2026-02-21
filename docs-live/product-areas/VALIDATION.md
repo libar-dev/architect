@@ -224,12 +224,14 @@ type ProtectionLevel = 'none' | 'scope' | 'hard';
 
 ```typescript
 /**
- * Check if a deliverable status indicates completion
+ * Check if a deliverable has "complete" status.
  *
- * Uses canonical deliverable status taxonomy. Status must be 'complete'.
+ * This checks for the literal 'complete' status value only.
+ * For DoD validation (which also accepts 'n/a' and 'superseded'),
+ * see isDeliverableStatusTerminal().
  *
  * @param deliverable - The deliverable to check
- * @returns True if the deliverable is complete
+ * @returns True if the deliverable status is 'complete'
  */
 ```
 
@@ -241,7 +243,7 @@ function isDeliverableComplete(deliverable: Deliverable): boolean;
 | ----------- | ---- | ------------------------ |
 | deliverable |      | The deliverable to check |
 
-**Returns:** True if the deliverable is complete
+**Returns:** True if the deliverable status is 'complete'
 
 ### hasAcceptanceCriteria (function)
 
@@ -295,7 +297,7 @@ function extractAcceptanceCriteriaScenarios(feature: ScannedGherkinFile): readon
  * Validate DoD for a single phase/pattern
  *
  * Checks:
- * 1. All deliverables have "complete" status
+ * 1. All deliverables must be in a terminal state (complete, n/a, superseded)
  * 2. At least one @acceptance-criteria scenario exists
  *
  * @param patternName - Name of the pattern being validated
@@ -1916,6 +1918,262 @@ Implements Convergence Opportunity 2: DoD as Machine-Checkable.
 
 See: docs/ideation-convergence/01-delivery-process-opportunities.md
 
+### LintRuleIndividualTesting
+
+[View LintRuleIndividualTesting source](tests/features/lint/lint-rules-individual.feature)
+
+Individual lint rules that check parsed directives for completeness.
+Tests presence/absence checks: pattern name, status, whenToUse, and relationships.
+
+<details>
+<summary>Files must declare an explicit pattern name (5 scenarios)</summary>
+
+#### Files must declare an explicit pattern name
+
+**Invariant:** Every annotated file must have a non-empty patternName to be identifiable in the registry.
+
+**Rationale:** Without a pattern name, the file cannot be tracked, linked, or referenced in generated documentation.
+
+**Verified by:**
+
+- Detect missing pattern name
+- Detect empty string pattern name
+- Detect whitespace-only pattern name
+- Accept valid pattern name
+- Include file and line in violation
+
+</details>
+
+<details>
+<summary>Files should declare a lifecycle status (5 scenarios)</summary>
+
+#### Files should declare a lifecycle status
+
+**Invariant:** Every annotated file should have a status tag to track its position in the delivery lifecycle.
+
+**Rationale:** Missing status prevents FSM validation and roadmap tracking.
+
+**Verified by:**
+
+- Detect missing status
+- Accept completed status
+- Accept active status
+- Accept roadmap status
+- Accept deferred status
+
+</details>
+
+<details>
+<summary>Files should document when to use the pattern (3 scenarios)</summary>
+
+#### Files should document when to use the pattern
+
+**Invariant:** Annotated files should include whenToUse guidance so consumers know when to apply the pattern.
+
+**Rationale:** Without usage guidance, patterns become undiscoverable despite being documented.
+
+**Verified by:**
+
+- Detect missing whenToUse
+- Detect empty whenToUse array
+- Accept whenToUse with content
+
+</details>
+
+<details>
+<summary>Files should declare relationship tags (5 scenarios)</summary>
+
+#### Files should declare relationship tags
+
+**Invariant:** Annotated files should declare uses or usedBy relationships to enable dependency tracking and architecture diagrams.
+
+**Rationale:** Isolated patterns without relationships produce diagrams with no edges and prevent dependency analysis.
+
+**Verified by:**
+
+- Detect missing relationship tags
+- Detect empty uses array
+- Accept uses with content
+- Accept usedBy with content
+- Accept both uses and usedBy
+
+</details>
+
+### LintRuleAdvancedTesting
+
+[View LintRuleAdvancedTesting source](tests/features/lint/lint-rules-advanced.feature)
+
+Complex lint rule logic and collection-level behavior.
+Tests tautological description detection, default collection, and severity filtering.
+
+<details>
+<summary>Descriptions must not repeat the pattern name (9 scenarios)</summary>
+
+#### Descriptions must not repeat the pattern name
+
+**Invariant:** A description that merely echoes the pattern name adds no value and must be rejected.
+
+**Rationale:** Tautological descriptions waste reader attention and indicate missing documentation effort.
+
+**Verified by:**
+
+- Detect description that equals pattern name
+- Detect description that is pattern name with punctuation
+- Detect short description starting with pattern name
+- Accept description with substantial content after name
+- Accept meaningfully different description
+- Ignore empty descriptions
+- Ignore missing pattern name
+- Skip headings when finding first line
+- Skip "When to use" sections when finding first line
+
+</details>
+
+<details>
+<summary>Default rules collection is complete and well-ordered (4 scenarios)</summary>
+
+#### Default rules collection is complete and well-ordered
+
+**Invariant:** The default rules collection must contain all defined rules with unique IDs, ordered by severity (errors first).
+
+**Rationale:** A complete, ordered collection ensures no rule is silently dropped and severity-based filtering works correctly.
+
+**Verified by:**
+
+- Default rules contains all 8 rules
+- Default rules have unique IDs
+- Default rules are ordered by severity
+- Default rules include all named rules
+
+</details>
+
+<details>
+<summary>Rules can be filtered by minimum severity (3 scenarios)</summary>
+
+#### Rules can be filtered by minimum severity
+
+**Invariant:** Filtering by severity must return only rules at or above the specified level.
+
+**Rationale:** CI pipelines need to control which violations block merges vs. which are advisory.
+
+**Verified by:**
+
+- Filter returns all rules for info severity
+- Filter excludes info rules for warning severity
+- Filter returns only errors for error severity
+
+</details>
+
+### LintEngineTesting
+
+[View LintEngineTesting source](tests/features/lint/lint-engine.feature)
+
+The lint engine orchestrates rule execution, aggregates violations,
+and formats output for human and machine consumption.
+
+The engine provides:
+
+- Single directive linting
+- Multi-file batch linting
+- Failure detection (with strict mode)
+- Violation sorting
+- Pretty and JSON output formats
+
+<details>
+<summary>Single directive linting validates annotations against rules (4 scenarios)</summary>
+
+#### Single directive linting validates annotations against rules
+
+**Invariant:** Every directive is checked against all provided rules and violations include source location.
+
+**Verified by:**
+
+- Return empty array when all rules pass
+- Return violations for failing rules
+- Run all provided rules
+- Include correct file and line in violations
+
+</details>
+
+<details>
+<summary>Multi-file batch linting aggregates results across files (4 scenarios)</summary>
+
+#### Multi-file batch linting aggregates results across files
+
+**Invariant:** All files and directives are scanned, violations are collected per file, and severity counts are accurate.
+
+**Verified by:**
+
+- Return empty results for clean files
+- Collect violations by file
+- Count violations by severity
+- Handle multiple directives per file
+
+</details>
+
+<details>
+<summary>Failure detection respects strict mode for severity escalation (5 scenarios)</summary>
+
+#### Failure detection respects strict mode for severity escalation
+
+**Invariant:** Errors always indicate failure. Warnings only indicate failure in strict mode. Info never indicates failure.
+
+**Verified by:**
+
+- Return true when there are errors
+- Return false for warnings only in non-strict mode
+- Return true for warnings in strict mode
+- Return false for info only
+- Return false when no violations
+
+</details>
+
+<details>
+<summary>Violation sorting orders by severity then by line number (3 scenarios)</summary>
+
+#### Violation sorting orders by severity then by line number
+
+**Invariant:** Sorted output places errors first, then warnings, then info, with stable line-number ordering within each severity. Sorting does not mutate the original array.
+
+**Verified by:**
+
+- Sort errors first then warnings then info
+- Sort by line number within same severity
+- Not mutate original array
+
+</details>
+
+<details>
+<summary>Pretty formatting produces human-readable output with severity counts (4 scenarios)</summary>
+
+#### Pretty formatting produces human-readable output with severity counts
+
+**Invariant:** Pretty output includes file paths, line numbers, severity labels, rule IDs, and summary counts. Quiet mode suppresses non-error violations.
+
+**Verified by:**
+
+- Show success message when no violations
+- Format violations with file line severity and message
+- Show summary line with counts
+- Filter out warnings and info in quiet mode
+
+</details>
+
+<details>
+<summary>JSON formatting produces machine-readable output with full details (3 scenarios)</summary>
+
+#### JSON formatting produces machine-readable output with full details
+
+**Invariant:** JSON output is valid, includes all summary fields, and preserves violation details including file, line, severity, rule, and message.
+
+**Verified by:**
+
+- Return valid JSON
+- Include all summary fields
+- Include violation details
+
+</details>
+
 ### StatusTransitionDetectionTesting
 
 [View StatusTransitionDetectionTesting source](tests/features/validation/status-transition-detection.feature)
@@ -2650,263 +2908,6 @@ process hygiene issues that lead to documentation drift.
 
 - Empty violations produce clean report
 - Violations are grouped by severity
-
-</details>
-
-### LintRulesTesting
-
-[View LintRulesTesting source](tests/features/lint/lint-rules.feature)
-
-The lint system validates @libar-docs-\* documentation annotations for quality.
-
-Rules check parsed directives for completeness and quality, enabling
-CI enforcement of documentation standards.
-
-Each rule has a severity level:
-
-- error: Must fix before merge
-- warning: Should fix for quality
-- info: Suggestions for improvement
-
-<details>
-<summary>Files must declare an explicit pattern name (5 scenarios)</summary>
-
-#### Files must declare an explicit pattern name
-
-**Invariant:** Every annotated file must have a non-empty patternName to be identifiable in the registry.
-
-**Rationale:** Without a pattern name, the file cannot be tracked, linked, or referenced in generated documentation.
-
-**Verified by:**
-
-- Detect missing pattern name
-- Detect empty string pattern name
-- Detect whitespace-only pattern name
-- Accept valid pattern name
-- Include file and line in violation
-
-</details>
-
-<details>
-<summary>Files should declare a lifecycle status (5 scenarios)</summary>
-
-#### Files should declare a lifecycle status
-
-**Invariant:** Every annotated file should have a status tag to track its position in the delivery lifecycle.
-
-**Rationale:** Missing status prevents FSM validation and roadmap tracking.
-
-**Verified by:**
-
-- Detect missing status
-- Accept completed status
-- Accept active status
-- Accept roadmap status
-- Accept deferred status
-
-</details>
-
-<details>
-<summary>Files should document when to use the pattern (3 scenarios)</summary>
-
-#### Files should document when to use the pattern
-
-**Invariant:** Annotated files should include whenToUse guidance so consumers know when to apply the pattern.
-
-**Rationale:** Without usage guidance, patterns become undiscoverable despite being documented.
-
-**Verified by:**
-
-- Detect missing whenToUse
-- Detect empty whenToUse array
-- Accept whenToUse with content
-
-</details>
-
-<details>
-<summary>Descriptions must not repeat the pattern name (9 scenarios)</summary>
-
-#### Descriptions must not repeat the pattern name
-
-**Invariant:** A description that merely echoes the pattern name adds no value and must be rejected.
-
-**Rationale:** Tautological descriptions waste reader attention and indicate missing documentation effort.
-
-**Verified by:**
-
-- Detect description that equals pattern name
-- Detect description that is pattern name with punctuation
-- Detect short description starting with pattern name
-- Accept description with substantial content after name
-- Accept meaningfully different description
-- Ignore empty descriptions
-- Ignore missing pattern name
-- Skip headings when finding first line
-- Skip "When to use" sections when finding first line
-
-</details>
-
-<details>
-<summary>Files should declare relationship tags (5 scenarios)</summary>
-
-#### Files should declare relationship tags
-
-**Invariant:** Annotated files should declare uses or usedBy relationships to enable dependency tracking and architecture diagrams.
-
-**Rationale:** Isolated patterns without relationships produce diagrams with no edges and prevent dependency analysis.
-
-**Verified by:**
-
-- Detect missing relationship tags
-- Detect empty uses array
-- Accept uses with content
-- Accept usedBy with content
-- Accept both uses and usedBy
-
-</details>
-
-<details>
-<summary>Default rules collection is complete and well-ordered (4 scenarios)</summary>
-
-#### Default rules collection is complete and well-ordered
-
-**Invariant:** The default rules collection must contain all defined rules with unique IDs, ordered by severity (errors first).
-
-**Rationale:** A complete, ordered collection ensures no rule is silently dropped and severity-based filtering works correctly.
-
-**Verified by:**
-
-- Default rules contains all 8 rules
-- Default rules have unique IDs
-- Default rules are ordered by severity
-- Default rules include all named rules
-
-</details>
-
-<details>
-<summary>Rules can be filtered by minimum severity (3 scenarios)</summary>
-
-#### Rules can be filtered by minimum severity
-
-**Invariant:** Filtering by severity must return only rules at or above the specified level.
-
-**Rationale:** CI pipelines need to control which violations block merges vs. which are advisory.
-
-**Verified by:**
-
-- Filter returns all rules for info severity
-- Filter excludes info rules for warning severity
-- Filter returns only errors for error severity
-
-</details>
-
-### LintEngineTesting
-
-[View LintEngineTesting source](tests/features/lint/lint-engine.feature)
-
-The lint engine orchestrates rule execution, aggregates violations,
-and formats output for human and machine consumption.
-
-The engine provides:
-
-- Single directive linting
-- Multi-file batch linting
-- Failure detection (with strict mode)
-- Violation sorting
-- Pretty and JSON output formats
-
-<details>
-<summary>Single directive linting validates annotations against rules (4 scenarios)</summary>
-
-#### Single directive linting validates annotations against rules
-
-**Invariant:** Every directive is checked against all provided rules and violations include source location.
-
-**Verified by:**
-
-- Return empty array when all rules pass
-- Return violations for failing rules
-- Run all provided rules
-- Include correct file and line in violations
-
-</details>
-
-<details>
-<summary>Multi-file batch linting aggregates results across files (4 scenarios)</summary>
-
-#### Multi-file batch linting aggregates results across files
-
-**Invariant:** All files and directives are scanned, violations are collected per file, and severity counts are accurate.
-
-**Verified by:**
-
-- Return empty results for clean files
-- Collect violations by file
-- Count violations by severity
-- Handle multiple directives per file
-
-</details>
-
-<details>
-<summary>Failure detection respects strict mode for severity escalation (5 scenarios)</summary>
-
-#### Failure detection respects strict mode for severity escalation
-
-**Invariant:** Errors always indicate failure. Warnings only indicate failure in strict mode. Info never indicates failure.
-
-**Verified by:**
-
-- Return true when there are errors
-- Return false for warnings only in non-strict mode
-- Return true for warnings in strict mode
-- Return false for info only
-- Return false when no violations
-
-</details>
-
-<details>
-<summary>Violation sorting orders by severity then by line number (3 scenarios)</summary>
-
-#### Violation sorting orders by severity then by line number
-
-**Invariant:** Sorted output places errors first, then warnings, then info, with stable line-number ordering within each severity. Sorting does not mutate the original array.
-
-**Verified by:**
-
-- Sort errors first then warnings then info
-- Sort by line number within same severity
-- Not mutate original array
-
-</details>
-
-<details>
-<summary>Pretty formatting produces human-readable output with severity counts (4 scenarios)</summary>
-
-#### Pretty formatting produces human-readable output with severity counts
-
-**Invariant:** Pretty output includes file paths, line numbers, severity labels, rule IDs, and summary counts. Quiet mode suppresses non-error violations.
-
-**Verified by:**
-
-- Show success message when no violations
-- Format violations with file line severity and message
-- Show summary line with counts
-- Filter out warnings and info in quiet mode
-
-</details>
-
-<details>
-<summary>JSON formatting produces machine-readable output with full details (3 scenarios)</summary>
-
-#### JSON formatting produces machine-readable output with full details
-
-**Invariant:** JSON output is valid, includes all summary fields, and preserves violation details including file, line, severity, rule, and message.
-
-**Verified by:**
-
-- Return valid JSON
-- Include all summary fields
-- Include violation details
 
 </details>
 

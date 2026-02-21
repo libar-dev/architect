@@ -8,7 +8,7 @@
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
-import { mergePatterns } from '../../../src/generators/orchestrator.js';
+import { mergePatterns } from '../../../src/generators/pipeline/merge-patterns.js';
 import { generatorRegistry } from '../../../src/generators/registry.js';
 // Import built-in generators to register them
 import '../../../src/generators/built-in/index.js';

@@ -3,7 +3,6 @@
  * @libar-docs-core
  * @libar-docs-pattern WarningCollector
  * @libar-docs-status completed
- * @libar-docs-phase 28
  *
  * ## Warning Collector - Unified Warning Handling
  *

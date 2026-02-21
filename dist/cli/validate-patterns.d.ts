@@ -4,7 +4,7 @@
  * @libar-docs-cli
  * @libar-docs-pattern ValidatePatternsCLI
  * @libar-docs-status completed
- * @libar-docs-uses PatternScanner, GherkinScanner, DocExtractor, DualSourceExtractor, CodecUtils
+ * @libar-docs-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, MasterDataset, CodecUtils
  * @libar-docs-extract-shapes ValidateCLIConfig, ValidationIssue, ValidationSummary
  *
  * ## ValidatePatternsCLI - Cross-Source Pattern Validator
@@ -24,8 +24,7 @@
  * - CI pipeline to catch documentation drift early
  * - Strict mode (`--strict`) for production readiness checks
  */
-import type { ExtractedPattern } from '../validation-schemas/index.js';
-import type { Deliverable } from '../validation-schemas/index.js';
+import type { RuntimeMasterDataset } from '../generators/pipeline/index.js';
 /**
  * Validation issue severity
  */
@@ -39,16 +38,6 @@ export interface ValidationIssue {
     source: 'typescript' | 'gherkin' | 'cross-source';
     pattern?: string;
     file?: string;
-}
-/**
- * Gherkin pattern metadata extracted for validation
- */
-export interface GherkinPatternInfo {
-    name: string;
-    phase?: number;
-    status?: string;
-    file: string;
-    deliverables: readonly Deliverable[];
 }
 /**
  * Validation summary
@@ -95,6 +84,8 @@ export interface ValidateCLIConfig {
     magicCommentThreshold: number;
     /** Show version */
     version: boolean;
+    /** Show info-level messages in pretty output */
+    verbose: boolean;
 }
 /**
  * Parse command line arguments
@@ -105,18 +96,20 @@ export declare function parseArgs(argv?: string[]): ValidateCLIConfig;
  */
 export declare function printHelp(): void;
 /**
- * Validate cross-source consistency
+ * Validate cross-source consistency using the MasterDataset read model.
  *
  * Compares TypeScript patterns against Gherkin patterns to find:
- * - Missing patterns in either source
+ * - Missing patterns in either source (with implements-aware resolution)
  * - Phase number mismatches
  * - Status mismatches (after normalization)
  * - Missing deliverables for completed phases
  * - Invalid dependencies
  *
- * @param tsPatterns - Patterns extracted from TypeScript source
- * @param gherkinPatterns - Pattern info extracted from Gherkin features
+ * DD-2: Consumes RuntimeMasterDataset instead of raw scanner/extractor output.
+ * DD-3: Two-phase matching — name-based first, then relationshipIndex fallback.
+ *
+ * @param dataset - The pre-computed MasterDataset read model
  * @returns Validation summary with issues and statistics
  */
-export declare function validatePatterns(tsPatterns: readonly ExtractedPattern[], gherkinPatterns: GherkinPatternInfo[]): ValidationSummary;
+export declare function validatePatterns(dataset: RuntimeMasterDataset): ValidationSummary;
 //# sourceMappingURL=validate-patterns.d.ts.map

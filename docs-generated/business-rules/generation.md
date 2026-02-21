@@ -4,7 +4,7 @@
 
 ---
 
-**264 rules** from 50 features. 230 rules have explicit invariants.
+**264 rules** from 55 features. 230 rules have explicit invariants.
 
 ---
 
@@ -1636,7 +1636,82 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 *poc-integration.feature*
 
-### Pr Changes Codec
+### Pr Changes Codec Options
+
+*- Need to generate PR-specific documentation from patterns*
+
+---
+
+#### PrChangesCodec generates review checklist when includeReviewChecklist is enabled
+
+> **Invariant:** When includeReviewChecklist is enabled, the codec must generate a "Review Checklist" section with standard items and context-sensitive items based on pattern state (completed, active, dependencies, deliverables). When disabled, no checklist appears.
+
+**Verified by:**
+- Review checklist generated with standard items
+- Review checklist includes completed patterns item when applicable
+- Review checklist includes active work item when applicable
+- Review checklist includes dependencies item when patterns have dependencies
+- Review checklist includes deliverables item when patterns have deliverables
+- No review checklist when includeReviewChecklist is disabled
+
+---
+
+#### PrChangesCodec generates dependencies section when includeDependencies is enabled
+
+> **Invariant:** When includeDependencies is enabled and patterns have dependency relationships, the codec must render a "Dependencies" section with "Depends On" and "Enables" subsections. When no dependencies exist or the option is disabled, the section is omitted.
+
+**Verified by:**
+- Dependencies section shows depends on relationships
+- Dependencies section shows enables relationships
+- No dependencies section when patterns have no dependencies
+- No dependencies section when includeDependencies is disabled
+
+---
+
+#### PrChangesCodec filters patterns by changedFiles
+
+> **Invariant:** When changedFiles filter is set, only patterns whose source files match (including partial directory path matches) are included in the output.
+
+**Verified by:**
+- Patterns filtered by changedFiles match
+- changedFiles filter matches partial paths
+
+---
+
+#### PrChangesCodec filters patterns by releaseFilter
+
+> **Invariant:** When releaseFilter is set, only patterns with deliverables matching the specified release version are included.
+
+**Verified by:**
+- Patterns filtered by release version
+
+---
+
+#### PrChangesCodec uses OR logic for combined filters
+
+> **Invariant:** When both changedFiles and releaseFilter are set, patterns matching either criterion are included (OR logic), and patterns matching both criteria appear only once (no duplicates).
+>
+> **Rationale:** OR logic maximizes PR coverage — a change may affect files not yet assigned to a release, or a release may include patterns from unchanged files.
+
+**Verified by:**
+- Combined filters match patterns meeting either criterion
+- Patterns matching both criteria are not duplicated
+
+---
+
+#### PrChangesCodec only includes active and completed patterns
+
+> **Invariant:** The codec must exclude roadmap and deferred patterns, including only active and completed patterns in the PR changes output.
+>
+> **Rationale:** PR changes reflect work that is in progress or done — roadmap and deferred patterns have no code changes to review.
+
+**Verified by:**
+- Roadmap patterns are excluded
+- Deferred patterns are excluded
+
+*pr-changes-codec-options.feature*
+
+### Pr Changes Codec Rendering
 
 *- Need to generate PR-specific documentation from patterns*
 
@@ -1737,76 +1812,7 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 - Business rules rendered when patterns have rules
 - Business rules show rule names and verification info
 
----
-
-#### PrChangesCodec generates review checklist when includeReviewChecklist is enabled
-
-> **Invariant:** When includeReviewChecklist is enabled, the codec must generate a "Review Checklist" section with standard items and context-sensitive items based on pattern state (completed, active, dependencies, deliverables). When disabled, no checklist appears.
-
-**Verified by:**
-- Review checklist generated with standard items
-- Review checklist includes completed patterns item when applicable
-- Review checklist includes active work item when applicable
-- Review checklist includes dependencies item when patterns have dependencies
-- Review checklist includes deliverables item when patterns have deliverables
-- No review checklist when includeReviewChecklist is disabled
-
----
-
-#### PrChangesCodec generates dependencies section when includeDependencies is enabled
-
-> **Invariant:** When includeDependencies is enabled and patterns have dependency relationships, the codec must render a "Dependencies" section with "Depends On" and "Enables" subsections. When no dependencies exist or the option is disabled, the section is omitted.
-
-**Verified by:**
-- Dependencies section shows depends on relationships
-- Dependencies section shows enables relationships
-- No dependencies section when patterns have no dependencies
-- No dependencies section when includeDependencies is disabled
-
----
-
-#### PrChangesCodec filters patterns by changedFiles
-
-> **Invariant:** When changedFiles filter is set, only patterns whose source files match (including partial directory path matches) are included in the output.
-
-**Verified by:**
-- Patterns filtered by changedFiles match
-- changedFiles filter matches partial paths
-
----
-
-#### PrChangesCodec filters patterns by releaseFilter
-
-> **Invariant:** When releaseFilter is set, only patterns with deliverables matching the specified release version are included.
-
-**Verified by:**
-- Patterns filtered by release version
-
----
-
-#### PrChangesCodec uses OR logic for combined filters
-
-> **Invariant:** When both changedFiles and releaseFilter are set, patterns matching either criterion are included (OR logic), and patterns matching both criteria appear only once (no duplicates).
->
-> **Rationale:** OR logic maximizes PR coverage — a change may affect files not yet assigned to a release, or a release may include patterns from unchanged files.
-
-**Verified by:**
-- Combined filters match patterns meeting either criterion
-- Patterns matching both criteria are not duplicated
-
----
-
-#### PrChangesCodec only includes active and completed patterns
-
-> **Invariant:** The codec must exclude roadmap and deferred patterns, including only active and completed patterns in the PR changes output.
->
-> **Rationale:** PR changes reflect work that is in progress or done — roadmap and deferred patterns have no code changes to review.
-
-**Verified by:**
-- Roadmap patterns are excluded
-- Deferred patterns are excluded
-
-*pr-changes-codec.feature*
+*pr-changes-codec-rendering.feature*
 
 ### Pr Changes Generation
 
@@ -1983,7 +1989,7 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 *prd-implementation-section.feature*
 
-### Reference Codec
+### Reference Codec Core
 
 *Parameterized codec factory that creates reference document codecs*
 
@@ -2048,30 +2054,11 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 - Convention with mermaid content produces mermaid block in output
 - Summary level omits convention code examples
 
----
+*reference-codec-core.feature*
 
-#### Scoped diagrams are generated from diagramScope config
+### Reference Codec Detail Rendering
 
-**Verified by:**
-- Config with diagramScope produces mermaid block at detailed level
-- Neighbor patterns appear in diagram with distinct style
-- include filter selects patterns by include tag membership
-- Self-contained scope produces no Related subgraph
-- Multiple filter dimensions OR together
-- Explicit pattern names filter selects named patterns
-- Config without diagramScope produces no diagram section
-- archLayer filter selects patterns by architectural layer
-- archLayer and archContext compose via OR
-- Summary level omits scoped diagram
-
----
-
-#### Multiple diagram scopes produce multiple mermaid blocks
-
-**Verified by:**
-- Config with diagramScopes array produces multiple diagrams
-- Diagram direction is reflected in mermaid output
-- Legacy diagramScope still works when diagramScopes is absent
+*Standard detail level behavior, deep behavior rendering with structured*
 
 ---
 
@@ -2108,43 +2095,6 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 - Detailed level renders returns and throws documentation
 - Standard level renders param table without throws
 - Shapes without param docs skip param table
-
----
-
-#### Diagram type controls Mermaid output format
-
-> **Invariant:** The diagramType field on DiagramScope selects the Mermaid output format. Supported types are graph (flowchart, default), sequenceDiagram, and stateDiagram-v2. Each type produces syntactically valid Mermaid output with type-appropriate node and edge rendering.
->
-> **Rationale:** Flowcharts cannot naturally express event flows (sequence), FSM visualization (state), or temporal ordering. Multiple diagram types unlock richer architectural documentation from the same relationship data.
-
-**Verified by:**
-- Default diagramType produces flowchart
-- Sequence diagram renders participant-message format
-- State diagram renders state transitions
-- Sequence diagram includes neighbor patterns as participants
-- State diagram adds start and end pseudo-states
-- C4 diagram renders system boundary format
-- C4 diagram renders neighbor patterns as external systems
-- Class diagram renders class members and relationships
-- Class diagram renders archRole as stereotype
-
----
-
-#### Edge labels and custom node shapes enrich diagram readability
-
-> **Invariant:** Relationship edges display labels describing the relationship type (uses, depends on, implements, extends). Edge labels are enabled by default and can be disabled via showEdgeLabels false. Node shapes in flowchart diagrams vary by archRole value using Mermaid shape syntax.
->
-> **Rationale:** Unlabeled edges are ambiguous without consulting a legend. Custom node shapes make archRole visually distinguishable without color reliance, improving accessibility and scanability.
-
-**Verified by:**
-- Relationship edges display type labels by default
-- Edge labels can be disabled for compact diagrams
-- archRole controls Mermaid node shape
-- Pattern without archRole uses default rectangle shape
-- Edge labels appear by default
-- Edge labels can be disabled
-- archRole controls node shape
-- Unknown archRole falls back to rectangle
 
 ---
 
@@ -2189,7 +2139,81 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 - Include-tagged pattern is additive with category-selected patterns
 - Pattern without matching include tag is excluded
 
-*reference-codec.feature*
+*reference-codec-detail-rendering.feature*
+
+### Reference Codec Diagram
+
+*Scoped diagram generation from diagramScope and diagramScopes config,*
+
+---
+
+#### Scoped diagrams are generated from diagramScope config
+
+**Verified by:**
+- Config with diagramScope produces mermaid block at detailed level
+- Neighbor patterns appear in diagram with distinct style
+- include filter selects patterns by include tag membership
+- Self-contained scope produces no Related subgraph
+- Multiple filter dimensions OR together
+- Explicit pattern names filter selects named patterns
+- Config without diagramScope produces no diagram section
+- archLayer filter selects patterns by architectural layer
+- archLayer and archContext compose via OR
+- Summary level omits scoped diagram
+
+---
+
+#### Multiple diagram scopes produce multiple mermaid blocks
+
+**Verified by:**
+- Config with diagramScopes array produces multiple diagrams
+- Diagram direction is reflected in mermaid output
+- Legacy diagramScope still works when diagramScopes is absent
+
+*reference-codec-diagrams.feature*
+
+### Reference Codec Diagram Type
+
+*Diagram type controls Mermaid output format including flowchart,*
+
+---
+
+#### Diagram type controls Mermaid output format
+
+> **Invariant:** The diagramType field on DiagramScope selects the Mermaid output format. Supported types are graph (flowchart, default), sequenceDiagram, and stateDiagram-v2. Each type produces syntactically valid Mermaid output with type-appropriate node and edge rendering.
+>
+> **Rationale:** Flowcharts cannot naturally express event flows (sequence), FSM visualization (state), or temporal ordering. Multiple diagram types unlock richer architectural documentation from the same relationship data.
+
+**Verified by:**
+- Default diagramType produces flowchart
+- Sequence diagram renders participant-message format
+- State diagram renders state transitions
+- Sequence diagram includes neighbor patterns as participants
+- State diagram adds start and end pseudo-states
+- C4 diagram renders system boundary format
+- C4 diagram renders neighbor patterns as external systems
+- Class diagram renders class members and relationships
+- Class diagram renders archRole as stereotype
+
+---
+
+#### Edge labels and custom node shapes enrich diagram readability
+
+> **Invariant:** Relationship edges display labels describing the relationship type (uses, depends on, implements, extends). Edge labels are enabled by default and can be disabled via showEdgeLabels false. Node shapes in flowchart diagrams vary by archRole value using Mermaid shape syntax.
+>
+> **Rationale:** Unlabeled edges are ambiguous without consulting a legend. Custom node shapes make archRole visually distinguishable without color reliance, improving accessibility and scanability.
+
+**Verified by:**
+- Relationship edges display type labels by default
+- Edge labels can be disabled for compact diagrams
+- archRole controls Mermaid node shape
+- Pattern without archRole uses default rectangle shape
+- Edge labels appear by default
+- Edge labels can be disabled
+- archRole controls node shape
+- Unknown archRole falls back to rectangle
+
+*reference-codec-diagram-types.feature*
 
 ### Reference Generator
 
@@ -2373,6 +2397,144 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 - Completed phases not shown in remaining work
 
 *remaining-work-totals.feature*
+
+### Renderer Block Types
+
+*The universal renderer converts RenderableDocument to markdown.*
+
+---
+
+#### Document metadata renders as frontmatter before sections
+
+> **Invariant:** Title always renders as H1, purpose and detail level render as bold key-value pairs separated by horizontal rule.
+
+**Verified by:**
+- Render minimal document with title only
+- Render document with purpose
+- Render document with detail level
+- Render document with purpose and detail level
+
+---
+
+#### Headings render at correct markdown levels with clamping
+
+> **Invariant:** Heading levels are clamped to the valid range 1-6 regardless of input value.
+
+**Verified by:**
+- Render headings at different levels
+- Clamp heading level 0 to 1
+- Clamp heading level 7 to 6
+
+---
+
+#### Paragraphs and separators render as plain text and horizontal rules
+
+> **Invariant:** Paragraph content passes through unmodified, including special markdown characters. Separators render as horizontal rules.
+
+**Verified by:**
+- Render paragraph
+- Render paragraph with special characters
+- Render separator
+
+---
+
+#### Tables render with headers, alignment, and cell escaping
+
+> **Invariant:** Tables must escape pipe characters, convert newlines to line breaks, and pad short rows to match column count.
+
+**Verified by:**
+- Render basic table
+- Render table with alignment
+- Render empty table (no columns)
+- Render table with pipe character in cell
+- Render table with newline in cell
+- Render table with short row (fewer cells than columns)
+
+---
+
+#### Lists render in unordered, ordered, checkbox, and nested formats
+
+> **Invariant:** List type determines prefix: dash for unordered, numbered for ordered, checkbox syntax for checked items. Nesting adds two-space indentation per level.
+
+**Verified by:**
+- Render unordered list
+- Render ordered list
+- Render checkbox list with checked items
+- Render nested list
+
+*render-blocks.feature*
+
+### Renderer Output Formats
+
+*The universal renderer converts RenderableDocument to markdown.*
+
+---
+
+#### Code blocks and mermaid diagrams render with fenced syntax
+
+> **Invariant:** Code blocks use triple backtick fencing with optional language hint. Mermaid blocks use mermaid as the language hint.
+
+**Verified by:**
+- Render code block with language
+- Render code block without language
+- Render mermaid diagram
+
+---
+
+#### Collapsible blocks render as HTML details elements
+
+> **Invariant:** Summary text is HTML-escaped to prevent injection. Collapsible content renders between details tags.
+
+**Verified by:**
+- Render collapsible block
+- Render collapsible with HTML entities in summary
+- Render nested collapsible content
+
+---
+
+#### Link-out blocks render as markdown links with URL encoding
+
+> **Invariant:** Link paths with spaces are percent-encoded for valid URLs.
+
+**Verified by:**
+- Render link-out block
+- Render link-out with spaces in path
+
+---
+
+#### Multi-file documents produce correct output file collections
+
+> **Invariant:** Output file count equals 1 (main) plus additional file count. The first output file always uses the provided base path.
+
+**Verified by:**
+- Render document with additional files
+- Render document without additional files
+
+---
+
+#### Complex documents render all block types in sequence
+
+> **Invariant:** Multiple block types in a single document render in order without interference.
+
+**Verified by:**
+- Render complex document with multiple block types
+
+---
+
+#### Claude context renderer produces compact AI-optimized output
+
+> **Invariant:** Claude context replaces markdown syntax with section markers, omits visual-only blocks (mermaid, separators), flattens collapsible content, and produces shorter output than markdown.
+
+**Verified by:**
+- Claude context renders title and headings as section markers
+- Claude context renders sub-headings with different markers
+- Claude context omits mermaid blocks
+- Claude context flattens collapsible blocks
+- Claude context renders link-out as plain text
+- Claude context omits separator tokens
+- Claude context produces fewer characters than markdown
+
+*render-output.feature*
 
 ### Reporting Codec
 
@@ -3157,138 +3319,6 @@ Division by zero must be handled gracefully to prevent
 - Result omits workflow when not provided
 
 *transform-dataset.feature*
-
-### Universal Markdown Renderer
-
-*The universal renderer converts RenderableDocument to markdown.*
-
----
-
-#### Document metadata renders as frontmatter before sections
-
-> **Invariant:** Title always renders as H1, purpose and detail level render as bold key-value pairs separated by horizontal rule.
-
-**Verified by:**
-- Render minimal document with title only
-- Render document with purpose
-- Render document with detail level
-- Render document with purpose and detail level
-
----
-
-#### Headings render at correct markdown levels with clamping
-
-> **Invariant:** Heading levels are clamped to the valid range 1-6 regardless of input value.
-
-**Verified by:**
-- Render headings at different levels
-- Clamp heading level 0 to 1
-- Clamp heading level 7 to 6
-
----
-
-#### Paragraphs and separators render as plain text and horizontal rules
-
-> **Invariant:** Paragraph content passes through unmodified, including special markdown characters. Separators render as horizontal rules.
-
-**Verified by:**
-- Render paragraph
-- Render paragraph with special characters
-- Render separator
-
----
-
-#### Tables render with headers, alignment, and cell escaping
-
-> **Invariant:** Tables must escape pipe characters, convert newlines to line breaks, and pad short rows to match column count.
-
-**Verified by:**
-- Render basic table
-- Render table with alignment
-- Render empty table (no columns)
-- Render table with pipe character in cell
-- Render table with newline in cell
-- Render table with short row (fewer cells than columns)
-
----
-
-#### Lists render in unordered, ordered, checkbox, and nested formats
-
-> **Invariant:** List type determines prefix: dash for unordered, numbered for ordered, checkbox syntax for checked items. Nesting adds two-space indentation per level.
-
-**Verified by:**
-- Render unordered list
-- Render ordered list
-- Render checkbox list with checked items
-- Render nested list
-
----
-
-#### Code blocks and mermaid diagrams render with fenced syntax
-
-> **Invariant:** Code blocks use triple backtick fencing with optional language hint. Mermaid blocks use mermaid as the language hint.
-
-**Verified by:**
-- Render code block with language
-- Render code block without language
-- Render mermaid diagram
-
----
-
-#### Collapsible blocks render as HTML details elements
-
-> **Invariant:** Summary text is HTML-escaped to prevent injection. Collapsible content renders between details tags.
-
-**Verified by:**
-- Render collapsible block
-- Render collapsible with HTML entities in summary
-- Render nested collapsible content
-
----
-
-#### Link-out blocks render as markdown links with URL encoding
-
-> **Invariant:** Link paths with spaces are percent-encoded for valid URLs.
-
-**Verified by:**
-- Render link-out block
-- Render link-out with spaces in path
-
----
-
-#### Multi-file documents produce correct output file collections
-
-> **Invariant:** Output file count equals 1 (main) plus additional file count. The first output file always uses the provided base path.
-
-**Verified by:**
-- Render document with additional files
-- Render document without additional files
-
----
-
-#### Complex documents render all block types in sequence
-
-> **Invariant:** Multiple block types in a single document render in order without interference.
-
-**Verified by:**
-- Render complex document with multiple block types
-
----
-
-#### Claude context renderer produces compact AI-optimized output
-
-> **Invariant:** Claude context replaces markdown syntax with section markers, omits visual-only blocks (mermaid, separators), flattens collapsible content, and produces shorter output than markdown.
-
-**Verified by:**
-- Claude context renders title and headings as section markers
-- Claude context renders sub-headings with different markers
-- Claude context omits mermaid blocks
-- Claude context flattens collapsible blocks
-- Claude context renders link-out as plain text
-- Claude context omits separator tokens
-- Claude context produces fewer characters than markdown
-
-*render.feature*
 
 ### Validation Rules Codec
 

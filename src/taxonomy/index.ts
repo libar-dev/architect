@@ -39,6 +39,7 @@ export {
   isDeliverableStatusComplete,
   isDeliverableStatusInProgress,
   isDeliverableStatusPending,
+  isDeliverableStatusTerminal,
   type DeliverableStatus,
 } from './deliverable-status.js';
 

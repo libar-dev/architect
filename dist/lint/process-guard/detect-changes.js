@@ -298,6 +298,7 @@ function detectStatusTransitions(diff, files, tagPrefix = DEFAULT_TAG_PREFIX) {
                     foundTags: [],
                     validAddedTag: null,
                     removedTag: null,
+                    hasUnlockReason: false,
                 });
             }
             continue;
@@ -324,6 +325,10 @@ function detectStatusTransitions(diff, files, tagPrefix = DEFAULT_TAG_PREFIX) {
         const lineContent = line.startsWith('+') || line.startsWith('-') ? line.substring(1) : line;
         if (/^\s*"""/.test(lineContent)) {
             state.insideDocstring = !state.insideDocstring;
+        }
+        // Detect unlock-reason tags in added lines
+        if (line.startsWith('+') && line.includes('unlock-reason')) {
+            state.hasUnlockReason = true;
         }
         // Look for removed status tags (old value for modified files)
         if (line.startsWith('-') && !line.startsWith('---')) {
@@ -392,6 +397,7 @@ function detectStatusTransitions(diff, files, tagPrefix = DEFAULT_TAG_PREFIX) {
             from: fromStatus,
             to: toStatus,
             isNewFile,
+            ...(state.hasUnlockReason ? { hasUnlockReason: true } : {}),
             toLocation: state.validAddedTag,
             // Include all detected tags if there were multiple (helps debug false positives)
             ...(state.foundTags.length > 1 ? { allDetectedTags: state.foundTags } : {}),

@@ -12,7 +12,7 @@
  * ## DoDValidator - Definition of Done Validation
  *
  * Validates that completed phases meet Definition of Done criteria:
- * 1. All deliverables must have "complete" status
+ * 1. All deliverables must be in a terminal state (complete, n/a, or superseded)
  * 2. At least one @acceptance-criteria scenario must exist
  *
  * ### When to Use
@@ -25,15 +25,21 @@
 import type { Deliverable, ScannedGherkinFile } from '../validation-schemas/index.js';
 import { extractProcessMetadata, extractDeliverables } from '../extractor/dual-source-extractor.js';
 import type { DoDValidationResult, DoDValidationSummary } from './types.js';
-import { isDeliverableStatusComplete, isPatternComplete } from '../taxonomy/index.js';
+import {
+  isDeliverableStatusComplete,
+  isDeliverableStatusTerminal,
+  isPatternComplete,
+} from '../taxonomy/index.js';
 
 /**
- * Check if a deliverable status indicates completion
+ * Check if a deliverable has "complete" status.
  *
- * Uses canonical deliverable status taxonomy. Status must be 'complete'.
+ * This checks for the literal 'complete' status value only.
+ * For DoD validation (which also accepts 'n/a' and 'superseded'),
+ * see isDeliverableStatusTerminal().
  *
  * @param deliverable - The deliverable to check
- * @returns True if the deliverable is complete
+ * @returns True if the deliverable status is 'complete'
  */
 export function isDeliverableComplete(deliverable: Deliverable): boolean {
   return isDeliverableStatusComplete(deliverable.status);
@@ -70,7 +76,7 @@ export function extractAcceptanceCriteriaScenarios(feature: ScannedGherkinFile):
  * Validate DoD for a single phase/pattern
  *
  * Checks:
- * 1. All deliverables have "complete" status
+ * 1. All deliverables must be in a terminal state (complete, n/a, superseded)
  * 2. At least one @acceptance-criteria scenario exists
  *
  * @param patternName - Name of the pattern being validated
@@ -86,8 +92,8 @@ export function validateDoDForPhase(
   const deliverables = extractDeliverables(feature);
   const messages: string[] = [];
 
-  // Check deliverables completion
-  const incompleteDeliverables = deliverables.filter((d) => !isDeliverableComplete(d));
+  // Check deliverables — terminal states (complete, n/a, superseded) pass DoD
+  const incompleteDeliverables = deliverables.filter((d) => !isDeliverableStatusTerminal(d.status));
   const allDeliverablesComplete = incompleteDeliverables.length === 0;
 
   if (deliverables.length === 0) {

@@ -129,6 +129,34 @@ Detail Level: Compact summary
 
 --- DoDValidation ---
 
+--- LintRuleIndividualTesting ---
+
+| Rule                                          | Description                                                                                                      |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Files must declare an explicit pattern name   | **Invariant:** Every annotated file must have a non-empty patternName to be identifiable in the registry....     |
+| Files should declare a lifecycle status       | **Invariant:** Every annotated file should have a status tag to track its position in the delivery lifecycle.... |
+| Files should document when to use the pattern | **Invariant:** Annotated files should include whenToUse guidance so consumers know when to apply the pattern.... |
+| Files should declare relationship tags        | **Invariant:** Annotated files should declare uses or usedBy relationships to enable dependency tracking and...  |
+
+--- LintRuleAdvancedTesting ---
+
+| Rule                                                  | Description                                                                                                           |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Descriptions must not repeat the pattern name         | **Invariant:** A description that merely echoes the pattern name adds no value and must be rejected....               |
+| Default rules collection is complete and well-ordered | **Invariant:** The default rules collection must contain all defined rules with unique IDs, ordered by severity...    |
+| Rules can be filtered by minimum severity             | **Invariant:** Filtering by severity must return only rules at or above the specified level.<br> **Rationale:** CI... |
+
+--- LintEngineTesting ---
+
+| Rule                                                                  | Description                                                                                                             |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Single directive linting validates annotations against rules          | **Invariant:** Every directive is checked against all provided rules and violations include source location....         |
+| Multi-file batch linting aggregates results across files              | **Invariant:** All files and directives are scanned, violations are collected per file, and severity counts are...      |
+| Failure detection respects strict mode for severity escalation        | **Invariant:** Errors always indicate failure. Warnings only indicate failure in strict mode. Info never indicates...   |
+| Violation sorting orders by severity then by line number              | **Invariant:** Sorted output places errors first, then warnings, then info, with stable line-number ordering within...  |
+| Pretty formatting produces human-readable output with severity counts | **Invariant:** Pretty output includes file paths, line numbers, severity labels, rule IDs, and summary counts. Quiet... |
+| JSON formatting produces machine-readable output with full details    | **Invariant:** JSON output is valid, includes all summary fields, and preserves violation details including file,...    |
+
 --- StatusTransitionDetectionTesting ---
 
 | Rule                                                 | Description                                                                                                              |
@@ -200,29 +228,6 @@ Detail Level: Compact summary
 | Feature files should not exceed size thresholds       | **Invariant:** A single feature file must not exceed the configured maximum line count.<br> **Rationale:**...        |
 | All anti-patterns can be detected in one pass         | **Invariant:** The anti-pattern detector must evaluate all registered rules in a single scan pass over the source... |
 | Violations can be formatted for console output        | **Invariant:** Anti-pattern violations must be renderable as grouped, human-readable console output....              |
-
---- LintRulesTesting ---
-
-| Rule                                                  | Description                                                                                                           |
-| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Files must declare an explicit pattern name           | **Invariant:** Every annotated file must have a non-empty patternName to be identifiable in the registry....          |
-| Files should declare a lifecycle status               | **Invariant:** Every annotated file should have a status tag to track its position in the delivery lifecycle....      |
-| Files should document when to use the pattern         | **Invariant:** Annotated files should include whenToUse guidance so consumers know when to apply the pattern....      |
-| Descriptions must not repeat the pattern name         | **Invariant:** A description that merely echoes the pattern name adds no value and must be rejected....               |
-| Files should declare relationship tags                | **Invariant:** Annotated files should declare uses or usedBy relationships to enable dependency tracking and...       |
-| Default rules collection is complete and well-ordered | **Invariant:** The default rules collection must contain all defined rules with unique IDs, ordered by severity...    |
-| Rules can be filtered by minimum severity             | **Invariant:** Filtering by severity must return only rules at or above the specified level.<br> **Rationale:** CI... |
-
---- LintEngineTesting ---
-
-| Rule                                                                  | Description                                                                                                             |
-| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Single directive linting validates annotations against rules          | **Invariant:** Every directive is checked against all provided rules and violations include source location....         |
-| Multi-file batch linting aggregates results across files              | **Invariant:** All files and directives are scanned, violations are collected per file, and severity counts are...      |
-| Failure detection respects strict mode for severity escalation        | **Invariant:** Errors always indicate failure. Warnings only indicate failure in strict mode. Info never indicates...   |
-| Violation sorting orders by severity then by line number              | **Invariant:** Sorted output places errors first, then warnings, then info, with stable line-number ordering within...  |
-| Pretty formatting produces human-readable output with severity counts | **Invariant:** Pretty output includes file paths, line numbers, severity labels, rule IDs, and summary counts. Quiet... |
-| JSON formatting produces machine-readable output with full details    | **Invariant:** JSON output is valid, includes all summary fields, and preserves violation details including file,...    |
 
 --- LinterValidationTesting ---
 
