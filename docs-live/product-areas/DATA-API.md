@@ -51,6 +51,16 @@ graph TB
         DataAPIContextAssembly["DataAPIContextAssembly"]:::neighbor
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
     end
+    ProcessAPICLIImpl -->|uses| ProcessStateAPI
+    ProcessAPICLIImpl -->|uses| MasterDataset
+    ProcessAPICLIImpl -->|uses| PipelineFactory
+    ProcessAPICLIImpl -->|uses| RulesQueryModule
+    ProcessAPICLIImpl -->|uses| PatternSummarizerImpl
+    ProcessAPICLIImpl -->|uses| FuzzyMatcherImpl
+    ProcessAPICLIImpl -->|uses| OutputPipelineImpl
+    ProcessAPICLIImpl ..->|implements| ProcessStateAPICLI
+    OutputPipelineImpl -->|uses| PatternSummarizerImpl
+    OutputPipelineImpl ..->|implements| DataAPIOutputShaping
     PatternSummarizerImpl -->|uses| ProcessStateAPI
     PatternSummarizerImpl ..->|implements| DataAPIOutputShaping
     ScopeValidatorImpl -->|uses| ProcessStateAPI
@@ -80,16 +90,6 @@ graph TB
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
-    ProcessAPICLIImpl -->|uses| ProcessStateAPI
-    ProcessAPICLIImpl -->|uses| MasterDataset
-    ProcessAPICLIImpl -->|uses| PipelineFactory
-    ProcessAPICLIImpl -->|uses| RulesQueryModule
-    ProcessAPICLIImpl -->|uses| PatternSummarizerImpl
-    ProcessAPICLIImpl -->|uses| FuzzyMatcherImpl
-    ProcessAPICLIImpl -->|uses| OutputPipelineImpl
-    ProcessAPICLIImpl ..->|implements| ProcessStateAPICLI
-    OutputPipelineImpl -->|uses| PatternSummarizerImpl
-    OutputPipelineImpl ..->|implements| DataAPIOutputShaping
     StubResolverImpl -->|uses| ProcessStateAPI
     FSMValidator ..->|implements| PhaseStateMachineValidation
     PipelineFactory -->|uses| MasterDataset
@@ -381,109 +381,6 @@ Replaces inline pipeline orchestration in CLI consumers.
 Target: src/generators/pipeline/build-pipeline.ts
 See: ADR-006 (Single Read Model Architecture)
 See: DD-1, DD-2 (ProcessAPILayeredExtraction)
-
-### PDR001SessionWorkflowCommands
-
-[View PDR001SessionWorkflowCommands source](delivery-process/decisions/pdr-001-session-workflow-commands.feature)
-
-**Context:**
-DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session
-readiness check) and `handoff` (session-end state summary) CLI subcommands.
-Seven design decisions affect how these commands behave.
-
-**Decision:**
-Seven design decisions (DD-1 through DD-7) captured as Rules below.
-
-<details>
-<summary>DD-1 - Text output with section markers</summary>
-
-#### DD-1 - Text output with section markers
-
-Both scope-validate and handoff return string from the router, using
-=== SECTION === markers. Follows the dual output path where text
-commands bypass JSON.stringify.
-
-</details>
-
-<details>
-<summary>DD-2 - Git integration is opt-in via --git flag</summary>
-
-#### DD-2 - Git integration is opt-in via --git flag
-
-The handoff command accepts an optional --git flag. The CLI handler
-calls git diff and passes file list to the pure generator function.
-No shell dependency in domain logic.
-
-</details>
-
-<details>
-<summary>DD-3 - Session type inferred from FSM status</summary>
-
-#### DD-3 - Session type inferred from FSM status
-
-Handoff infers session type from pattern's current FSM status.
-An explicit --session flag overrides inference.
-
-| Status    | Inferred Session |
-| --------- | ---------------- |
-| roadmap   | design           |
-| active    | implement        |
-| completed | review           |
-| deferred  | design           |
-
-</details>
-
-<details>
-<summary>DD-4 - Severity levels match Process Guard model</summary>
-
-#### DD-4 - Severity levels match Process Guard model
-
-Scope validation uses three severity levels:
-
-    The --strict flag promotes WARN to BLOCKED.
-
-| Severity | Meaning                   |
-| -------- | ------------------------- |
-| PASS     | Check passed              |
-| BLOCKED  | Hard prerequisite missing |
-| WARN     | Recommendation not met    |
-
-</details>
-
-<details>
-<summary>DD-5 - Current date only for handoff</summary>
-
-#### DD-5 - Current date only for handoff
-
-Handoff always uses the current date. No --date flag.
-
-</details>
-
-<details>
-<summary>DD-6 - Both positional and flag forms for scope type</summary>
-
-#### DD-6 - Both positional and flag forms for scope type
-
-scope-validate accepts scope type as both positional argument
-and --type flag.
-
-</details>
-
-<details>
-<summary>DD-7 - Co-located formatter functions (2 scenarios)</summary>
-
-#### DD-7 - Co-located formatter functions
-
-Each module (scope-validator.ts, handoff-generator.ts) exports
-both the data builder and the text formatter. Simpler than the
-context-assembler/context-formatter split.
-
-**Verified by:**
-
-- scope-validate outputs structured text
-- Active pattern infers implement session
-
-</details>
 
 ### ProcessStateAPIRelationshipQueries
 
@@ -1992,113 +1889,106 @@ Extend the `arch` subcommand and add new discovery commands:
 
 </details>
 
-### ProcessStateAPITesting
+### PDR001SessionWorkflowCommands
 
-[View ProcessStateAPITesting source](tests/features/api/process-state-api.feature)
+[View PDR001SessionWorkflowCommands source](delivery-process/decisions/pdr-001-session-workflow-commands.feature)
 
-Programmatic interface for querying delivery process state.
-Designed for Claude Code integration and tool automation.
+**Context:**
+DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session
+readiness check) and `handoff` (session-end state summary) CLI subcommands.
+Seven design decisions affect how these commands behave.
 
-**Problem:**
-
-- Markdown generation is not ideal for programmatic access
-- Claude Code needs structured data to answer process questions
-- Multiple queries require redundant parsing of MasterDataset
-
-**Solution:**
-
-- ProcessStateAPI wraps MasterDataset with typed query methods
-- Returns structured data suitable for programmatic consumption
-- Integrates FSM validation for transition checks
+**Decision:**
+Seven design decisions (DD-1 through DD-7) captured as Rules below.
 
 <details>
-<summary>Status queries return correct patterns (6 scenarios)</summary>
+<summary>DD-1 - Text output with section markers</summary>
 
-#### Status queries return correct patterns
+#### DD-1 - Text output with section markers
 
-**Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
-
-**Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
-
-**Verified by:**
-
-- Get patterns by normalized status
-- Get patterns by FSM status
-- Get current work returns active patterns
-- Get roadmap items returns roadmap and deferred
-- Get status counts
-- Get completion percentage
+Both scope-validate and handoff return string from the router, using
+=== SECTION === markers. Follows the dual output path where text
+commands bypass JSON.stringify.
 
 </details>
 
 <details>
-<summary>Phase queries return correct phase data (4 scenarios)</summary>
+<summary>DD-2 - Git integration is opt-in via --git flag</summary>
 
-#### Phase queries return correct phase data
+#### DD-2 - Git integration is opt-in via --git flag
 
-**Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
-
-**Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
-
-**Verified by:**
-
-- Get patterns by phase
-- Get phase progress
-- Get nonexistent phase returns undefined
-- Get active phases
+The handoff command accepts an optional --git flag. The CLI handler
+calls git diff and passes file list to the pure generator function.
+No shell dependency in domain logic.
 
 </details>
 
 <details>
-<summary>FSM queries expose transition validation (4 scenarios)</summary>
+<summary>DD-3 - Session type inferred from FSM status</summary>
 
-#### FSM queries expose transition validation
+#### DD-3 - Session type inferred from FSM status
 
-**Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
+Handoff infers session type from pattern's current FSM status.
+An explicit --session flag overrides inference.
 
-**Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
-
-**Verified by:**
-
-- Check valid transition
-- Check invalid transition
-- Get valid transitions from status
-- Get protection info
-
-</details>
-
-<details>
-<summary>Pattern queries find and retrieve pattern data (4 scenarios)</summary>
-
-#### Pattern queries find and retrieve pattern data
-
-**Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
-
-**Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
-
-**Verified by:**
-
-- Find pattern by name (case insensitive)
-- Find nonexistent pattern returns undefined
-- Get patterns by category
-- Get all categories with counts
+| Status    | Inferred Session |
+| --------- | ---------------- |
+| roadmap   | design           |
+| active    | implement        |
+| completed | review           |
+| deferred  | design           |
 
 </details>
 
 <details>
-<summary>Timeline queries group patterns by time (3 scenarios)</summary>
+<summary>DD-4 - Severity levels match Process Guard model</summary>
 
-#### Timeline queries group patterns by time
+#### DD-4 - Severity levels match Process Guard model
 
-**Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
+Scope validation uses three severity levels:
 
-**Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
+    The --strict flag promotes WARN to BLOCKED.
+
+| Severity | Meaning                   |
+| -------- | ------------------------- |
+| PASS     | Check passed              |
+| BLOCKED  | Hard prerequisite missing |
+| WARN     | Recommendation not met    |
+
+</details>
+
+<details>
+<summary>DD-5 - Current date only for handoff</summary>
+
+#### DD-5 - Current date only for handoff
+
+Handoff always uses the current date. No --date flag.
+
+</details>
+
+<details>
+<summary>DD-6 - Both positional and flag forms for scope type</summary>
+
+#### DD-6 - Both positional and flag forms for scope type
+
+scope-validate accepts scope type as both positional argument
+and --type flag.
+
+</details>
+
+<details>
+<summary>DD-7 - Co-located formatter functions (2 scenarios)</summary>
+
+#### DD-7 - Co-located formatter functions
+
+Each module (scope-validator.ts, handoff-generator.ts) exports
+both the data builder and the text formatter. Simpler than the
+context-assembler/context-formatter split.
 
 **Verified by:**
 
-- Get patterns by quarter
-- Get all quarters
-- Get recently completed sorted by date
+- scope-validate outputs structured text
+- Active pattern infers implement session
 
 </details>
 
@@ -2843,112 +2733,113 @@ Command-line interface for generating documentation from annotated TypeScript.
 
 </details>
 
-### StubTaxonomyTagTests
+### ProcessStateAPITesting
 
-[View StubTaxonomyTagTests source](tests/features/api/stub-integration/taxonomy-tags.feature)
+[View ProcessStateAPITesting source](tests/features/api/process-state-api.feature)
 
-**Problem:**
-Stub metadata (target path, design session) was stored as plain text
-in JSDoc descriptions, invisible to structured queries.
-
-**Solution:**
-Register libar-docs-target and libar-docs-since as taxonomy tags
-so they flow through the extraction pipeline as structured fields.
-
-#### Taxonomy tags are registered in the registry
-
-**Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy entries.
-
-**Rationale:** Unregistered tags would be flagged as unknown by the linter — registration ensures stub metadata tags pass validation alongside standard annotation tags.
-
-**Verified by:**
-
-- Target and since tags exist in registry
-
-#### Tags are part of the stub metadata group
-
-**Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry.
-
-**Rationale:** Domain grouping enables the taxonomy codec to render stub metadata tags in their own section — ungrouped tags would be lost in the "Other" category.
-
-**Verified by:**
-
-- Built registry groups target and since as stub tags
-
-### StubResolverTests
-
-[View StubResolverTests source](tests/features/api/stub-integration/stub-resolver.feature)
+Programmatic interface for querying delivery process state.
+Designed for Claude Code integration and tool automation.
 
 **Problem:**
-Design session stubs need structured discovery and resolution
-to determine which stubs have been implemented and which remain.
+
+- Markdown generation is not ideal for programmatic access
+- Claude Code needs structured data to answer process questions
+- Multiple queries require redundant parsing of MasterDataset
 
 **Solution:**
-StubResolver functions identify, resolve, and group stubs from
-the MasterDataset with filesystem existence checks.
+
+- ProcessStateAPI wraps MasterDataset with typed query methods
+- Returns structured data suitable for programmatic consumption
+- Integrates FSM validation for transition checks
 
 <details>
-<summary>Stubs are identified by path or target metadata (2 scenarios)</summary>
+<summary>Status queries return correct patterns (6 scenarios)</summary>
 
-#### Stubs are identified by path or target metadata
+#### Status queries return correct patterns
 
-**Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath metadata field.
+**Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
 
-**Rationale:** Dual identification supports both convention-based (directory) and metadata-based (targetPath) stub detection — relying on only one would miss stubs organized differently.
+**Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
 
 **Verified by:**
 
-- Patterns in stubs directory are identified as stubs
-- Patterns with targetPath are identified as stubs
+- Get patterns by normalized status
+- Get patterns by FSM status
+- Get current work returns active patterns
+- Get roadmap items returns roadmap and deferred
+- Get status counts
+- Get completion percentage
 
 </details>
 
 <details>
-<summary>Stubs are resolved against the filesystem (2 scenarios)</summary>
+<summary>Phase queries return correct phase data (4 scenarios)</summary>
 
-#### Stubs are resolved against the filesystem
+#### Phase queries return correct phase data
 
-**Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the pattern they implement.
+**Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
 
-**Rationale:** Target existence status tells developers whether a stub has been implemented — grouping by pattern enables the "stubs --unresolved" command to show per-pattern implementation gaps.
+**Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
 
 **Verified by:**
 
-- Resolved stubs show target existence status
-- Stubs are grouped by implementing pattern
+- Get patterns by phase
+- Get phase progress
+- Get nonexistent phase returns undefined
+- Get active phases
 
 </details>
 
 <details>
-<summary>Decision items are extracted from descriptions (3 scenarios)</summary>
+<summary>FSM queries expose transition validation (4 scenarios)</summary>
 
-#### Decision items are extracted from descriptions
+#### FSM queries expose transition validation
 
-**Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions returning no items and malformed items being skipped.
+**Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
 
-**Rationale:** Decision items (AD-1, AD-2, etc.) link stubs to architectural decisions — extracting them enables traceability from code stubs back to the design rationale.
+**Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
 
 **Verified by:**
 
-- AD-N items are extracted from description text
-- Empty description returns no decision items
-- Malformed AD items are skipped
+- Check valid transition
+- Check invalid transition
+- Get valid transitions from status
+- Get protection info
 
 </details>
 
 <details>
-<summary>PDR references are found across patterns (2 scenarios)</summary>
+<summary>Pattern queries find and retrieve pattern data (4 scenarios)</summary>
 
-#### PDR references are found across patterns
+#### Pattern queries find and retrieve pattern data
 
-**Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results when no references exist.
+**Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
 
-**Rationale:** PDR cross-referencing enables impact analysis — knowing which patterns reference a decision helps assess the blast radius of changing that decision.
+**Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
 
 **Verified by:**
 
-- Patterns referencing a PDR are found
-- No references returns empty result
+- Find pattern by name (case insensitive)
+- Find nonexistent pattern returns undefined
+- Get patterns by category
+- Get all categories with counts
+
+</details>
+
+<details>
+<summary>Timeline queries group patterns by time (3 scenarios)</summary>
+
+#### Timeline queries group patterns by time
+
+**Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
+
+**Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
+
+**Verified by:**
+
+- Get patterns by quarter
+- Get all quarters
+- Get recently completed sorted by date
 
 </details>
 
@@ -3297,6 +3188,171 @@ Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein.
 
 </details>
 
+### ArchQueriesTest
+
+[View ArchQueriesTest source](tests/features/api/architecture-queries/arch-queries.feature)
+
+<details>
+<summary>Neighborhood and comparison views (3 scenarios)</summary>
+
+#### Neighborhood and comparison views
+
+**Invariant:** The architecture query API must provide pattern neighborhood views (direct connections) and cross-context comparison views (shared/unique dependencies), returning undefined for nonexistent patterns.
+
+**Rationale:** Neighborhood and comparison views are the primary navigation tools for understanding architecture — without them, developers must manually trace relationship chains across files.
+
+**Verified by:**
+
+- Pattern neighborhood shows direct connections
+- Cross-context comparison shows shared and unique dependencies
+- Neighborhood for nonexistent pattern returns undefined
+
+</details>
+
+<details>
+<summary>Taxonomy discovery via tags and sources (3 scenarios)</summary>
+
+#### Taxonomy discovery via tags and sources
+
+**Invariant:** The API must aggregate tag values with counts across all patterns and categorize source files by type, returning empty reports when no patterns match.
+
+**Rationale:** Tag aggregation reveals annotation coverage gaps and source inventory helps teams understand their codebase composition — both are essential for project health monitoring.
+
+**Verified by:**
+
+- Tag aggregation counts values across patterns
+- Source inventory categorizes files by type
+- Tags with no patterns returns empty report
+
+</details>
+
+<details>
+<summary>Coverage analysis reports annotation completeness (4 scenarios)</summary>
+
+#### Coverage analysis reports annotation completeness
+
+**Invariant:** Coverage analysis must detect unused taxonomy entries, cross-context integration points, and include all relationship types (implements, dependsOn, enables) in neighborhood views.
+
+**Rationale:** Unused taxonomy entries indicate dead configuration while missing relationship types produce incomplete architecture views — both degrade the reliability of generated documentation.
+
+**Verified by:**
+
+- Unused taxonomy detection
+- Cross-context comparison with integration points
+- Neighborhood includes implements relationships
+- Neighborhood includes dependsOn and enables relationships
+
+</details>
+
+### StubTaxonomyTagTests
+
+[View StubTaxonomyTagTests source](tests/features/api/stub-integration/taxonomy-tags.feature)
+
+**Problem:**
+Stub metadata (target path, design session) was stored as plain text
+in JSDoc descriptions, invisible to structured queries.
+
+**Solution:**
+Register libar-docs-target and libar-docs-since as taxonomy tags
+so they flow through the extraction pipeline as structured fields.
+
+#### Taxonomy tags are registered in the registry
+
+**Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy entries.
+
+**Rationale:** Unregistered tags would be flagged as unknown by the linter — registration ensures stub metadata tags pass validation alongside standard annotation tags.
+
+**Verified by:**
+
+- Target and since tags exist in registry
+
+#### Tags are part of the stub metadata group
+
+**Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry.
+
+**Rationale:** Domain grouping enables the taxonomy codec to render stub metadata tags in their own section — ungrouped tags would be lost in the "Other" category.
+
+**Verified by:**
+
+- Built registry groups target and since as stub tags
+
+### StubResolverTests
+
+[View StubResolverTests source](tests/features/api/stub-integration/stub-resolver.feature)
+
+**Problem:**
+Design session stubs need structured discovery and resolution
+to determine which stubs have been implemented and which remain.
+
+**Solution:**
+StubResolver functions identify, resolve, and group stubs from
+the MasterDataset with filesystem existence checks.
+
+<details>
+<summary>Stubs are identified by path or target metadata (2 scenarios)</summary>
+
+#### Stubs are identified by path or target metadata
+
+**Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath metadata field.
+
+**Rationale:** Dual identification supports both convention-based (directory) and metadata-based (targetPath) stub detection — relying on only one would miss stubs organized differently.
+
+**Verified by:**
+
+- Patterns in stubs directory are identified as stubs
+- Patterns with targetPath are identified as stubs
+
+</details>
+
+<details>
+<summary>Stubs are resolved against the filesystem (2 scenarios)</summary>
+
+#### Stubs are resolved against the filesystem
+
+**Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the pattern they implement.
+
+**Rationale:** Target existence status tells developers whether a stub has been implemented — grouping by pattern enables the "stubs --unresolved" command to show per-pattern implementation gaps.
+
+**Verified by:**
+
+- Resolved stubs show target existence status
+- Stubs are grouped by implementing pattern
+
+</details>
+
+<details>
+<summary>Decision items are extracted from descriptions (3 scenarios)</summary>
+
+#### Decision items are extracted from descriptions
+
+**Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions returning no items and malformed items being skipped.
+
+**Rationale:** Decision items (AD-1, AD-2, etc.) link stubs to architectural decisions — extracting them enables traceability from code stubs back to the design rationale.
+
+**Verified by:**
+
+- AD-N items are extracted from description text
+- Empty description returns no decision items
+- Malformed AD items are skipped
+
+</details>
+
+<details>
+<summary>PDR references are found across patterns (2 scenarios)</summary>
+
+#### PDR references are found across patterns
+
+**Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results when no references exist.
+
+**Rationale:** PDR cross-referencing enables impact analysis — knowing which patterns reference a decision helps assess the blast radius of changing that decision.
+
+**Verified by:**
+
+- Patterns referencing a PDR are found
+- No references returns empty result
+
+</details>
+
 ### ContextFormatterTests
 
 [View ContextFormatterTests source](tests/features/api/context-assembly/context-formatter.feature)
@@ -3448,62 +3504,6 @@ buildOverview() pure functions that operate on MasterDataset.
 - File list includes primary and related files
 - File list includes implementation files for completed dependencies
 - File list without related returns only primary
-
-</details>
-
-### ArchQueriesTest
-
-[View ArchQueriesTest source](tests/features/api/architecture-queries/arch-queries.feature)
-
-<details>
-<summary>Neighborhood and comparison views (3 scenarios)</summary>
-
-#### Neighborhood and comparison views
-
-**Invariant:** The architecture query API must provide pattern neighborhood views (direct connections) and cross-context comparison views (shared/unique dependencies), returning undefined for nonexistent patterns.
-
-**Rationale:** Neighborhood and comparison views are the primary navigation tools for understanding architecture — without them, developers must manually trace relationship chains across files.
-
-**Verified by:**
-
-- Pattern neighborhood shows direct connections
-- Cross-context comparison shows shared and unique dependencies
-- Neighborhood for nonexistent pattern returns undefined
-
-</details>
-
-<details>
-<summary>Taxonomy discovery via tags and sources (3 scenarios)</summary>
-
-#### Taxonomy discovery via tags and sources
-
-**Invariant:** The API must aggregate tag values with counts across all patterns and categorize source files by type, returning empty reports when no patterns match.
-
-**Rationale:** Tag aggregation reveals annotation coverage gaps and source inventory helps teams understand their codebase composition — both are essential for project health monitoring.
-
-**Verified by:**
-
-- Tag aggregation counts values across patterns
-- Source inventory categorizes files by type
-- Tags with no patterns returns empty report
-
-</details>
-
-<details>
-<summary>Coverage analysis reports annotation completeness (4 scenarios)</summary>
-
-#### Coverage analysis reports annotation completeness
-
-**Invariant:** Coverage analysis must detect unused taxonomy entries, cross-context integration points, and include all relationship types (implements, dependsOn, enables) in neighborhood views.
-
-**Rationale:** Unused taxonomy entries indicate dead configuration while missing relationship types produce incomplete architecture views — both degrade the reliability of generated documentation.
-
-**Verified by:**
-
-- Unused taxonomy detection
-- Cross-context comparison with integration points
-- Neighborhood includes implements relationships
-- Neighborhood includes dependsOn and enables relationships
 
 </details>
 

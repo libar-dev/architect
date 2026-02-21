@@ -29,18 +29,6 @@ Detail Level: Compact summary
 
 --- PipelineFactory ---
 
---- PDR001SessionWorkflowCommands ---
-
-| Rule                                                 | Description                                                                                                                        |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| DD-1 - Text output with section markers              | Both scope-validate and handoff return string from the router, using<br> === SECTION === markers. Follows the dual...              |
-| DD-2 - Git integration is opt-in via --git flag      | The handoff command accepts an optional --git flag. The CLI handler<br> calls git diff and passes file list to the...              |
-| DD-3 - Session type inferred from FSM status         | Handoff infers session type from pattern's current FSM status.<br> An explicit --session flag overrides inference....              |
-| DD-4 - Severity levels match Process Guard model     | Scope validation uses three severity levels:<br><br> \| Severity \| Meaning \|<br> \| PASS \| Check passed \|<br> \| BLOCKED \|... |
-| DD-5 - Current date only for handoff                 | Handoff always uses the current date. No --date flag.                                                                              |
-| DD-6 - Both positional and flag forms for scope type | scope-validate accepts scope type as both positional argument<br> and --type flag.                                                 |
-| DD-7 - Co-located formatter functions                | Each module (scope-validator.ts, handoff-generator.ts) exports<br> both the data builder and the text formatter....                |
-
 --- ProcessStateAPIRelationshipQueries ---
 
 | Rule                                             | Description                                                                                                               |
@@ -140,15 +128,17 @@ Detail Level: Compact summary
 | Coverage analysis reports annotation completeness with gaps    | **Invariant:** Coverage reports identify unannotated files that should have<br> the libar-docs opt-in marker based on... |
 | Tags and sources commands provide taxonomy and inventory views | **Invariant:** All tag values in use are discoverable without reading<br> configuration files. Source file inventory...  |
 
---- ProcessStateAPITesting ---
+--- PDR001SessionWorkflowCommands ---
 
-| Rule                                           | Description                                                                                                              |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Status queries return correct patterns         | **Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM...  |
-| Phase queries return correct phase data        | **Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and...      |
-| FSM queries expose transition validation       | **Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels...   |
-| Pattern queries find and retrieve pattern data | **Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with...   |
-| Timeline queries group patterns by time        | **Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date... |
+| Rule                                                 | Description                                                                                                                        |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| DD-1 - Text output with section markers              | Both scope-validate and handoff return string from the router, using<br> === SECTION === markers. Follows the dual...              |
+| DD-2 - Git integration is opt-in via --git flag      | The handoff command accepts an optional --git flag. The CLI handler<br> calls git diff and passes file list to the...              |
+| DD-3 - Session type inferred from FSM status         | Handoff infers session type from pattern's current FSM status.<br> An explicit --session flag overrides inference....              |
+| DD-4 - Severity levels match Process Guard model     | Scope validation uses three severity levels:<br><br> \| Severity \| Meaning \|<br> \| PASS \| Check passed \|<br> \| BLOCKED \|... |
+| DD-5 - Current date only for handoff                 | Handoff always uses the current date. No --date flag.                                                                              |
+| DD-6 - Both positional and flag forms for scope type | scope-validate accepts scope type as both positional argument<br> and --type flag.                                                 |
+| DD-7 - Co-located formatter functions                | Each module (scope-validator.ts, handoff-generator.ts) exports<br> both the data builder and the text formatter....                |
 
 --- ValidatePatternsCli ---
 
@@ -236,21 +226,15 @@ Detail Level: Compact summary
 | CLI generates documentation from source files | **Invariant:** Given valid input patterns and a generator name, the CLI must scan sources, extract patterns, and... |
 | CLI rejects unknown options                   | **Invariant:** Unrecognized CLI flags must cause an error with a descriptive message rather than being silently...  |
 
---- StubTaxonomyTagTests ---
+--- ProcessStateAPITesting ---
 
-| Rule                                         | Description                                                                                                             |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Taxonomy tags are registered in the registry | **Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy... |
-| Tags are part of the stub metadata group     | **Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry....       |
-
---- StubResolverTests ---
-
-| Rule                                            | Description                                                                                                              |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Stubs are identified by path or target metadata | **Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath...        |
-| Stubs are resolved against the filesystem       | **Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the... |
-| Decision items are extracted from descriptions  | **Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions...          |
-| PDR references are found across patterns        | **Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results...     |
+| Rule                                           | Description                                                                                                              |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Status queries return correct patterns         | **Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM...  |
+| Phase queries return correct phase data        | **Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and...      |
+| FSM queries expose transition validation       | **Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels...   |
+| Pattern queries find and retrieve pattern data | **Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with...   |
+| Timeline queries group patterns by time        | **Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date... |
 
 --- ScopeValidatorTests ---
 
@@ -300,6 +284,30 @@ Detail Level: Compact summary
 | findBestMatch returns single suggestion | **Invariant:** findBestMatch must return the single highest-scoring match above the threshold, or undefined when no...  |
 | Levenshtein distance computation        | **Invariant:** The Levenshtein distance function must correctly compute edit distance between strings, returning 0...   |
 
+--- ArchQueriesTest ---
+
+| Rule                                              | Description                                                                                                              |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Neighborhood and comparison views                 | **Invariant:** The architecture query API must provide pattern neighborhood views (direct connections) and...            |
+| Taxonomy discovery via tags and sources           | **Invariant:** The API must aggregate tag values with counts across all patterns and categorize source files by type,... |
+| Coverage analysis reports annotation completeness | **Invariant:** Coverage analysis must detect unused taxonomy entries, cross-context integration points, and include...   |
+
+--- StubTaxonomyTagTests ---
+
+| Rule                                         | Description                                                                                                             |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Taxonomy tags are registered in the registry | **Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy... |
+| Tags are part of the stub metadata group     | **Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry....       |
+
+--- StubResolverTests ---
+
+| Rule                                            | Description                                                                                                              |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Stubs are identified by path or target metadata | **Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath...        |
+| Stubs are resolved against the filesystem       | **Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the... |
+| Decision items are extracted from descriptions  | **Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions...          |
+| PDR references are found across patterns        | **Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results...     |
+
 --- ContextFormatterTests ---
 
 | Rule                                                 | Description                                                                                                              |
@@ -317,11 +325,3 @@ Detail Level: Compact summary
 | buildDepTree walks dependency chains with cycle detection | **Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate... |
 | buildOverview provides executive project summary          | **Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and...        |
 | buildFileReadingList returns paths by relevance           | **Invariant:** Primary files (spec, implementation) must always be included; related files (dependency...                |
-
---- ArchQueriesTest ---
-
-| Rule                                              | Description                                                                                                              |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Neighborhood and comparison views                 | **Invariant:** The architecture query API must provide pattern neighborhood views (direct connections) and...            |
-| Taxonomy discovery via tags and sources           | **Invariant:** The API must aggregate tag values with counts across all patterns and categorize source files by type,... |
-| Coverage analysis reports annotation completeness | **Invariant:** Coverage analysis must detect unused taxonomy entries, cross-context integration points, and include...   |
