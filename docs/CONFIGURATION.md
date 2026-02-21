@@ -157,8 +157,8 @@ The `defineConfig()` function centralizes taxonomy, sources, output, and generat
 
 ### Discovery Order
 
-1. Current directory
-2. Walk up to repo root (`.git` folder)
+1. Current directory: check `delivery-process.config.ts`, then `.js`
+2. Walk up to repo root (`.git` folder), checking each directory
 3. Fall back to libar-generic preset (3 categories, `@libar-docs-` prefix)
 
 ### Config File Format
@@ -324,7 +324,8 @@ import { mergeSourcesForGenerator } from '@libar-dev/delivery-process/config';
 
 const effectiveSources = mergeSourcesForGenerator(
   resolved.project.sources,
-  resolved.project.generatorOverrides['changelog']
+  'changelog',
+  resolved.project.generatorOverrides
 );
 // effectiveSources.typescript - merged TypeScript globs
 // effectiveSources.features   - merged or replaced feature globs

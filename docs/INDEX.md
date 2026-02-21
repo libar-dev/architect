@@ -7,7 +7,7 @@
 | Field            | Value                                                              |
 | ---------------- | ------------------------------------------------------------------ |
 | **Package**      | @libar-dev/delivery-process                                        |
-| **Version**      | 0.1.0-pre.0                                                        |
+| **Version**      | 1.0.0-pre.0                                                        |
 | **Purpose**      | Source-first delivery process — code is the single source of truth |
 | **Key Features** | Living docs, FSM enforcement, AI-native Data API CLI               |
 | **Node.js**      | >= 18.0.0                                                          |
@@ -19,17 +19,20 @@
 
 | If you want to...              | Read this                                    | Lines  |
 | ------------------------------ | -------------------------------------------- | ------ |
-| Get started quickly            | [README.md](../README.md)                    | 1-377  |
+| Get started quickly            | [README.md](../README.md)                    | 1-651  |
 | Configure presets and tags     | [CONFIGURATION.md](./CONFIGURATION.md)       | 1-357  |
-| Understand the "why"           | [METHODOLOGY.md](./METHODOLOGY.md)           | 1-234  |
-| Learn the architecture         | [ARCHITECTURE.md](./ARCHITECTURE.md)         | 1-1515 |
-| Run AI coding sessions         | [SESSION-GUIDES.md](./SESSION-GUIDES.md)     | 1-351  |
-| Write Gherkin specs            | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | 1-343  |
-| Enforce delivery process rules | [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | 1-335  |
-| Validate annotation quality    | [VALIDATION.md](./VALIDATION.md)             | 1-206  |
-| Query process state via CLI    | [PROCESS-API.md](./PROCESS-API.md)           | 1-259  |
-| Understand the taxonomy        | [TAXONOMY.md](./TAXONOMY.md)                 | 1-110  |
-| Publish to npm                 | [PUBLISHING.md](./PUBLISHING.md)             | 1-149  |
+| Understand the "why"           | [METHODOLOGY.md](./METHODOLOGY.md)           | 1-238  |
+| Learn the architecture         | [ARCHITECTURE.md](./ARCHITECTURE.md)         | 1-1638 |
+| Run AI coding sessions         | [SESSION-GUIDES.md](./SESSION-GUIDES.md)     | 1-389  |
+| Write Gherkin specs            | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | 1-515  |
+| Enforce delivery process rules | [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | 1-341  |
+| Validate annotation quality    | [VALIDATION.md](./VALIDATION.md)             | 1-281  |
+| Query process state via CLI    | [PROCESS-API.md](./PROCESS-API.md)           | 1-507  |
+| Understand the taxonomy        | [TAXONOMY.md](./TAXONOMY.md)                 | 1-105  |
+| Publish to npm                 | [PUBLISHING.md](./PUBLISHING.md)             | 1-144  |
+| Learn annotation patterns      | [ANNOTATION-GUIDE.md](./ANNOTATION-GUIDE.md) | 1-268  |
+| Review the changelog           | [CHANGELOG.md](../CHANGELOG.md)              | 1-26   |
+| Security policy                | [SECURITY.md](../SECURITY.md)                | 1-21   |
 
 ---
 
@@ -47,6 +50,7 @@
 5. **[PROCESS-API.md](./PROCESS-API.md)** — Data API CLI query interface
 6. **[SESSION-GUIDES.md](./SESSION-GUIDES.md)** — Planning/Design/Implementation workflows
 7. **[GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md)** — Writing effective Gherkin specs
+8. **[ANNOTATION-GUIDE.md](./ANNOTATION-GUIDE.md)** — Annotation mechanics, shape extraction, tag quick reference
 
 ### For Team Leads / CI
 
@@ -57,22 +61,26 @@
 
 ## Detailed Table of Contents
 
-### README.md (Lines 1-377)
+### README.md (Lines 1-651)
 
-| Section                    | Lines   | Key Topics                                    |
-| -------------------------- | ------- | --------------------------------------------- |
-| The Problem / The Solution | 16-33   | Documentation drift, code as source of truth  |
-| Built for AI-Assisted Dev  | 36-57   | Data API CLI typed queries                    |
-| How It Works               | 60-111  | Annotation examples, dual-source              |
-| Quick Start                | 114-170 | Install, annotate, generate, lint             |
-| CLI Commands               | 173-183 | Command summary table                         |
-| FSM-Enforced Workflow      | 187-217 | State diagram, protection levels              |
-| Data API CLI               | 221-246 | CLI example, context cost comparison          |
-| Rich Relationship Model    | 269-291 | Dependency tags, Mermaid graph                |
-| How It Compares            | 294-309 | Comparison with Backstage, Confluence, etc.   |
-| Use Cases                  | 312-322 | Multi-phase roadmaps, AI sessions, validation |
-| Configuration              | 325-346 | Presets table, custom config                  |
-| Documentation              | 350-359 | Doc links table                               |
+| Section                    | Lines   | Key Topics                                        |
+| -------------------------- | ------- | ------------------------------------------------- |
+| The Problem / The Solution | 16-33   | Documentation drift, code as source of truth      |
+| Built for AI-Assisted Dev  | 36-53   | Data API CLI typed queries                        |
+| Proven: Structured Specs   | 55-178  | Discovery, real results, scale validation         |
+| How It Works               | 181-232 | Annotation examples, dual-source                  |
+| Quick Start                | 235-292 | Install, annotate, generate, lint                 |
+| CLI Commands               | 294-362 | generate-docs, process-api, generate-tag-taxonomy |
+| Design-First Development   | 364-417 | Stub pattern, src/ isolation, design artifacts    |
+| FSM-Enforced Workflow      | 421-451 | State diagram, protection levels                  |
+| Data API CLI               | 455-479 | CLI example, context cost comparison              |
+| Rich Relationship Model    | 483-504 | Dependency tags, Mermaid graph                    |
+| How It Compares            | 508-527 | Comparison with Backstage, Confluence, etc.       |
+| Document Durability Model  | 531-571 | Durability via generation, regeneration from code |
+| Use Cases                  | 575-584 | Multi-phase roadmaps, AI sessions, validation     |
+| Configuration              | 588-620 | Presets table, custom config                      |
+| Documentation              | 624-646 | Doc links table                                   |
+| License                    | 649-651 | MIT license                                       |
 
 ---
 
@@ -85,152 +93,194 @@
 | Unified Config File    | 154-244 | defineConfig(), sources, output, gen overrides  |
 | Custom Configuration   | 248-295 | Custom tag prefix, custom categories            |
 | Programmatic Config    | 299-331 | loadProjectConfig(), mergeSourcesForGenerator() |
-| Backward Compatibility | 335-345 | Legacy createDeliveryProcess() support          |
+| Backward Compatibility | 336-346 | Legacy createDeliveryProcess() support          |
+| Related Documentation  | 350-357 | Links to README, TAXONOMY, ARCHITECTURE         |
 
 ---
 
-### METHODOLOGY.md (Lines 1-234)
+### METHODOLOGY.md (Lines 1-238)
 
-| Section                     | Lines   | Key Topics                               |
-| --------------------------- | ------- | ---------------------------------------- |
-| Core Thesis                 | 9-30    | USDP inversion, event sourcing analogy   |
-| Dogfooding                  | 34-64   | Real annotation examples from codebase   |
-| Four-Stage Workflow         | 68-84   | Ideation → Design → Planning → Coding    |
-| Annotation Ownership        | 87-137  | Split-ownership principle, example split |
-| Two-Tier Spec Architecture  | 140-153 | Roadmap tier vs Package tier             |
-| Code Stubs                  | 156-177 | Minimal, Interface, Partial levels       |
-| Planning Stubs Architecture | 180-198 | tests/planning-stubs/ exclusion pattern  |
+| Section                    | Lines   | Key Topics                               |
+| -------------------------- | ------- | ---------------------------------------- |
+| Core Thesis                | 9-30    | USDP inversion, event sourcing analogy   |
+| Dogfooding                 | 34-68   | Real annotation examples from codebase   |
+| Session Workflow           | 72-87   | Planning → Design → Implementation       |
+| Annotation Ownership       | 91-140  | Split-ownership principle, example split |
+| Two-Tier Spec Architecture | 144-156 | Roadmap tier vs Package tier             |
+| Code Stubs                 | 160-180 | Minimal, Interface, Partial levels       |
+| Stubs Architecture         | 184-226 | Design stubs + planning stubs locations  |
+| Related Documentation      | 230-238 | Links to PROCESS-GUARD, CONFIG, GHERKIN  |
 
 ---
 
-### ARCHITECTURE.md (Lines 1-1515)
+### ARCHITECTURE.md (Lines 1-1638)
 
-| Section                    | Lines     | Key Topics                                                       |
-| -------------------------- | --------- | ---------------------------------------------------------------- |
-| Executive Summary          | 28-69     | What it does, key principles (incl. Single Read Model), overview |
-| Configuration Architecture | 70-139    | Entry point, pipeline effects, resolution                        |
-| Four-Stage Pipeline        | 140-321   | Scanner → Extractor → Pipeline Factory → Transformer → Codec     |
-| Unified Transformation     | 322-448   | MasterDataset schema (10-field relationshipIndex), single-pass   |
-| Codec Architecture         | 449-494   | Concepts, block vocabulary, factory                              |
-| Available Codecs           | 495-759   | All 16 codecs with options tables                                |
-| Progressive Disclosure     | 760-805   | Split logic, detail levels                                       |
-| Source Systems             | 806-912   | TypeScript scanner, Gherkin scanner                              |
-| Key Design Patterns        | 913-993   | Result monad, schema-first, tag registry                         |
-| Data Flow Diagrams         | 994-1178  | Pipeline flow, factory entry point, MasterDataset views, codecs  |
-| Workflow Integration       | 1179-1289 | Planning, implementing, release workflows                        |
-| Programmatic Usage         | 1290-1346 | Direct codec usage, generateDocument                             |
-| Extending the System       | 1347-1415 | Custom codec, custom generator                                   |
-| Quick Reference            | 1416-1487 | Codec-to-generator mapping, CLI, filters                         |
+| Section                    | Lines     | Key Topics                                                        |
+| -------------------------- | --------- | ----------------------------------------------------------------- |
+| Executive Summary          | 28-69     | What it does, key principles (incl. Single Read Model), overview  |
+| Configuration Architecture | 70-139    | Entry point, pipeline effects, resolution                         |
+| Four-Stage Pipeline        | 140-343   | Scanner → Extractor → Pipeline Factory → Transformer → Codec      |
+| Unified Transformation     | 345-478   | MasterDataset schema (relationshipIndex + archIndex), single-pass |
+| Codec Architecture         | 481-527   | Concepts, block vocabulary, factory, 3 renderers                  |
+| Available Codecs           | 529-870   | All 20 codecs with options tables                                 |
+| Progressive Disclosure     | 871-917   | Split logic, detail levels                                        |
+| Source Systems             | 919-1024  | TypeScript scanner, Gherkin scanner                               |
+| Key Design Patterns        | 1026-1105 | Result monad, schema-first, tag registry                          |
+| Data Flow Diagrams         | 1107-1290 | Pipeline flow, factory entry point, MasterDataset views, codecs   |
+| Workflow Integration       | 1292-1401 | Planning, implementing, release workflows                         |
+| Programmatic Usage         | 1403-1458 | Direct codec usage, generateDocument                              |
+| Extending the System       | 1460-1527 | Custom codec, custom generator                                    |
+| Quick Reference            | 1529-1604 | Codec-to-generator mapping, CLI, filters                          |
 
 #### Available Codecs Reference
 
-| Codec                     | Lines   | Output Files                |
-| ------------------------- | ------- | --------------------------- |
-| PatternsDocumentCodec     | 502-521 | PATTERNS.md, patterns/\*.md |
-| RequirementsDocumentCodec | 523-545 | PRODUCT-REQUIREMENTS.md     |
-| RoadmapDocumentCodec      | 547-564 | ROADMAP.md, phases/\*.md    |
-| CompletedMilestonesCodec  | 566-573 | COMPLETED-MILESTONES.md     |
-| CurrentWorkCodec          | 575-582 | CURRENT-WORK.md             |
-| ChangelogCodec            | 584-602 | CHANGELOG.md                |
-| SessionContextCodec       | 604-611 | SESSION-CONTEXT.md          |
-| RemainingWorkCodec        | 613-635 | REMAINING-WORK.md           |
-| PlanningChecklistCodec    | 637-641 | PLANNING-CHECKLIST.md       |
-| SessionPlanCodec          | 643-647 | SESSION-PLAN.md             |
-| SessionFindingsCodec      | 649-664 | SESSION-FINDINGS.md         |
-| AdrDocumentCodec          | 666-673 | DECISIONS.md                |
-| PrChangesCodec            | 675-679 | working/PR-CHANGES.md       |
-| TraceabilityCodec         | 681-685 | TRACEABILITY.md             |
-| OverviewCodec             | 687-693 | OVERVIEW.md                 |
+| Codec                     | Lines   | Output Files                          |
+| ------------------------- | ------- | ------------------------------------- |
+| PatternsDocumentCodec     | 536-556 | PATTERNS.md, patterns/\*.md           |
+| RequirementsDocumentCodec | 557-578 | PRODUCT-REQUIREMENTS.md               |
+| RoadmapDocumentCodec      | 581-598 | ROADMAP.md, phases/\*.md              |
+| CompletedMilestonesCodec  | 600-607 | COMPLETED-MILESTONES.md               |
+| CurrentWorkCodec          | 609-616 | CURRENT-WORK.md                       |
+| ChangelogCodec            | 618-634 | CHANGELOG.md                          |
+| SessionContextCodec       | 638-645 | SESSION-CONTEXT.md                    |
+| RemainingWorkCodec        | 647-667 | REMAINING-WORK.md                     |
+| PlanningChecklistCodec    | 671-675 | PLANNING-CHECKLIST.md                 |
+| SessionPlanCodec          | 677-681 | SESSION-PLAN.md                       |
+| SessionFindingsCodec      | 683-696 | SESSION-FINDINGS.md                   |
+| AdrDocumentCodec          | 700-707 | DECISIONS.md                          |
+| PrChangesCodec            | 709-713 | working/PR-CHANGES.md                 |
+| TraceabilityCodec         | 715-719 | TRACEABILITY.md                       |
+| OverviewCodec             | 721-725 | OVERVIEW.md                           |
+| BusinessRulesCodec        | 727-749 | BUSINESS-RULES.md                     |
+| ArchitectureDocumentCodec | 751-766 | ARCHITECTURE.md (generated)           |
+| TaxonomyDocumentCodec     | 768-784 | TAXONOMY.md, taxonomy/\*.md           |
+| ValidationRulesCodec      | 786-804 | VALIDATION-RULES.md, validation/\*.md |
+| ReferenceCodec            | 808-850 | Configured per-instance               |
 
 ---
 
-### SESSION-GUIDES.md (Lines 1-351)
+### SESSION-GUIDES.md (Lines 1-389)
 
-| Section                  | Lines   | Key Topics                               |
-| ------------------------ | ------- | ---------------------------------------- |
-| Session Decision Tree    | 7-24    | Which session type to use                |
-| Planning Session         | 27-83   | Create roadmap spec, checklist, do NOT   |
-| Design Session           | 86-132  | When required, checklist, code stubs     |
-| Implementation Session   | 135-192 | Pre-flight, execution, FSM transitions   |
-| Planning + Design        | 195-274 | Combined workflow, handoff complete when |
-| Handoff Documentation    | 277-313 | Template, discovery tags                 |
-| FSM Protection Quick Ref | 316-326 | State protection levels table            |
-
----
-
-### GHERKIN-PATTERNS.md (Lines 1-343)
-
-| Section                     | Lines   | Key Topics                                  |
-| --------------------------- | ------- | ------------------------------------------- |
-| Essential Patterns          | 9-152   | Roadmap spec, Rule blocks, Scenario Outline |
-| — Roadmap Spec Structure    | 11-45   | Tags, Problem/Solution, Background table    |
-| — Rule Blocks               | 46-79   | Business constraints, ScenarioOutline       |
-| — Scenario Outline          | 81-98   | Examples table for variations               |
-| — Executable Test Feature   | 100-150 | Section dividers, behavior verification     |
-| DataTable & DocString Usage | 155-202 | Background vs Scenario tables, code blocks  |
-| Tag Conventions             | 205-223 | @happy-path, @edge-case, @validation, etc.  |
-| Feature File Rich Content   | 226-323 | Code-first, Rule annotations, syntax notes  |
-| Quick Reference             | 326-335 | Element-to-use-case mapping table           |
+| Section                  | Lines   | Key Topics                                 |
+| ------------------------ | ------- | ------------------------------------------ |
+| Session Decision Tree    | 7-25    | Which session type to use                  |
+| Planning Session         | 27-91   | Context gathering, checklist, do NOT       |
+| Design Session           | 93-161  | Context gathering, when required, stubs    |
+| Implementation Session   | 163-235 | scope-validate, execution, FSM transitions |
+| Planning + Design        | 237-317 | Combined workflow, handoff complete when   |
+| Handoff Documentation    | 319-365 | CLI handoff, template, discovery tags      |
+| FSM Protection Quick Ref | 367-376 | State protection levels table              |
+| Related Documentation    | 380-389 | Links to Methodology, Gherkin, Config, etc |
 
 ---
 
-### PROCESS-GUARD.md (Lines 1-335)
+### GHERKIN-PATTERNS.md (Lines 1-515)
 
-| Section                          | Lines   | Key Topics                              |
-| -------------------------------- | ------- | --------------------------------------- |
-| Quick Reference                  | 9-37    | Protection levels, transitions, escapes |
-| Error: completed-protection      | 40-65   | Fix with unlock reason                  |
-| Error: invalid-status-transition | 68-98   | Follow FSM path, common invalid table   |
-| Error: scope-creep               | 101-124 | Remove deliverable or revert status     |
-| Warning: session-scope           | 127-146 | Add to scope or --ignore-session        |
-| Error: session-excluded          | 149-168 | Remove from exclusion or override       |
-| Warning: deliverable-removed     | 171-184 | Informational, document if intentional  |
-| CLI Usage                        | 187-235 | Modes, options, exit codes, examples    |
-| Pre-commit Setup                 | 238-260 | Husky, package.json scripts             |
-| Programmatic API                 | 263-311 | Full code example, API functions table  |
-| Architecture                     | 314-326 | Decider pattern diagram                 |
-
----
-
-### VALIDATION.md (Lines 1-206)
-
-| Section           | Lines   | Key Topics                            |
-| ----------------- | ------- | ------------------------------------- |
-| Which Command?    | 7-20    | Decision tree for validation commands |
-| Command Summary   | 22-30   | lint-patterns, lint-process, validate |
-| lint-patterns     | 33-56   | Rules table, CLI reference            |
-| lint-process      | 59-81   | What it validates, reference links    |
-| validate-patterns | 84-124  | Checks available, anti-pattern, DoD   |
-| CI/CD Integration | 127-158 | package.json scripts, GitHub Actions  |
-| Exit Codes        | 161-170 | 0 = no errors, 1 = errors             |
-| Programmatic API  | 173-188 | Import paths for all validators       |
+| Section                     | Lines   | Key Topics                                              |
+| --------------------------- | ------- | ------------------------------------------------------- |
+| Essential Patterns          | 9-152   | Roadmap spec, Rule blocks, Scenario Outline             |
+| — Roadmap Spec Structure    | 11-45   | Tags, Problem/Solution, Background table                |
+| — Rule Blocks               | 47-79   | Business constraints, ScenarioOutline                   |
+| — Scenario Outline          | 82-98   | Examples table for variations                           |
+| — Executable Test Feature   | 101-150 | Section dividers, behavior verification                 |
+| DataTable & DocString Usage | 155-202 | Background vs Scenario tables, code blocks              |
+| Tag Conventions             | 205-243 | Semantic tags, convention tags, combining               |
+| Feature File Rich Content   | 246-344 | Code-first, Rule annotations, syntax notes              |
+| Step Linting                | 346-493 | lint-steps rules, CLI, feature/step/cross-file checks   |
+| Quick Reference             | 495-506 | Element-to-use-case mapping table                       |
+| Related Documentation       | 508-515 | Links to ANNOTATION-GUIDE, TAXONOMY, CONFIG, VALIDATION |
 
 ---
 
-### TAXONOMY.md (Lines 1-110)
+### PROCESS-API.md (Lines 1-507)
 
-| Section              | Lines | Key Topics                             |
-| -------------------- | ----- | -------------------------------------- |
-| Concept              | 7-19  | What taxonomy defines                  |
-| Architecture         | 22-57 | File structure, TagRegistry, presets   |
-| Format Types         | 60-73 | flag, value, enum, csv, number, quoted |
-| Generating Reference | 76-84 | generate-tag-taxonomy command          |
+| Section                   | Lines   | Key Topics                                                  |
+| ------------------------- | ------- | ----------------------------------------------------------- |
+| Why Use This              | 12-28   | Context cost comparison, AI agent tiers, two output modes   |
+| Quick Start               | 30-63   | Session recipe (overview → scope-validate → context)        |
+| Session Types             | 65-77   | planning/design/implement decision tree                     |
+| Session Workflow Commands | 79-204  | overview, scope-validate, context, dep-tree, files, handoff |
+| Pattern Discovery         | 206-302 | status, list, search, pattern, stubs, decisions, pdr, rules |
+| Architecture Queries      | 304-333 | 11 arch subcommands table, examples                         |
+| Metadata & Inventory      | 335-375 | tags, sources, unannotated, query escape hatch              |
+| Output Reference          | 377-465 | Options, modifiers, filters, JSON envelope, exit codes      |
+| Common Recipes            | 467-507 | Starting, finding work, investigating, design, ending       |
 
 ---
 
-### PUBLISHING.md (Lines 1-149)
+### PROCESS-GUARD.md (Lines 1-341)
 
-| Section              | Lines   | Key Topics                           |
-| -------------------- | ------- | ------------------------------------ |
-| Prerequisites        | 5-9     | npm account, login, tests            |
-| Version Strategy     | 11-19   | Semantic versioning, pre/latest tags |
-| Pre-releases         | 23-45   | First pre-release, subsequent        |
-| Stable Releases      | 48-61   | patch, minor, major                  |
-| Automated Publishing | 63-78   | GitHub Actions workflow              |
-| Pre-commit/Pre-push  | 80-96   | Husky hooks, dist sync verification  |
-| Dry Run              | 98-105  | Test before publishing               |
-| Verifying Published  | 107-119 | npm view, test install               |
-| Troubleshooting      | 121-149 | dist sync, auth errors, not found    |
+| Section                          | Lines   | Key Topics                                      |
+| -------------------------------- | ------- | ----------------------------------------------- |
+| Quick Reference                  | 9-37    | Protection levels, transitions, escapes         |
+| Error: completed-protection      | 40-72   | Fix with unlock reason, validation requirements |
+| Error: invalid-status-transition | 74-105  | Follow FSM path, common invalid table           |
+| Error: scope-creep               | 107-131 | Remove deliverable or revert status             |
+| Warning: session-scope           | 133-153 | Add to scope or --ignore-session                |
+| Error: session-excluded          | 155-175 | Remove from exclusion or override               |
+| Warning: deliverable-removed     | 177-191 | Informational, document if intentional          |
+| CLI Usage                        | 193-243 | Modes, options (incl. --base-dir), exit codes   |
+| Pre-commit Setup                 | 246-269 | Husky, package.json scripts                     |
+| Programmatic API                 | 271-318 | Full code example, API functions table          |
+| Architecture                     | 321-333 | Decider pattern diagram                         |
+| Related Documentation            | 335-341 | Links to METHODOLOGY, TAXONOMY, VALIDATION      |
+
+---
+
+### VALIDATION.md (Lines 1-281)
+
+| Section               | Lines   | Key Topics                                        |
+| --------------------- | ------- | ------------------------------------------------- |
+| Which Command?        | 7-24    | Decision tree for validation commands             |
+| Command Summary       | 26-35   | lint-patterns, lint-steps, lint-process, validate |
+| lint-patterns         | 37-74   | 8 rules table, CLI flags                          |
+| lint-steps            | 76-98   | 12 rules, 3 categories, vitest-cucumber traps     |
+| lint-process          | 100-121 | What it validates, reference links                |
+| validate-patterns     | 123-197 | CLI flags, checks, anti-patterns, DoD             |
+| CI/CD Integration     | 199-238 | Consumer scripts, hooks, GitHub Actions           |
+| Exit Codes            | 240-248 | Per-command exit code table                       |
+| Programmatic API      | 250-272 | Import paths for all validators                   |
+| Related Documentation | 274-281 | Links to GHERKIN-PATTERNS, PROCESS-GUARD, CONFIG  |
+
+---
+
+### TAXONOMY.md (Lines 1-105)
+
+| Section               | Lines   | Key Topics                                   |
+| --------------------- | ------- | -------------------------------------------- |
+| Concept               | 7-18    | What taxonomy defines, FSM states            |
+| Architecture          | 22-65   | File structure, TagRegistry, presets         |
+| Format Types          | 69-80   | flag, value, enum, csv, number, quoted-value |
+| Generating Reference  | 84-96   | generate-docs (preferred), deprecated CLI    |
+| Related Documentation | 100-105 | Links to CONFIGURATION, METHODOLOGY          |
+
+---
+
+### PUBLISHING.md (Lines 1-144)
+
+| Section                       | Lines   | Key Topics                           |
+| ----------------------------- | ------- | ------------------------------------ |
+| Prerequisites                 | 5-9     | npm account, login, tests            |
+| Version Strategy              | 11-18   | Semantic versioning, pre/latest tags |
+| Publishing Workflow           | 20-67   | Pre-releases, subsequent, stable     |
+| Automated Publishing          | 69-85   | GitHub Actions, provenance           |
+| Pre-commit and Pre-push Hooks | 87-99   | Husky hooks, lint-staged, typecheck  |
+| Dry Run                       | 101-109 | Test before publishing               |
+| Verifying a Published Package | 111-126 | npm view, test install               |
+| Troubleshooting               | 128-144 | Auth errors, package not found       |
+
+---
+
+### ANNOTATION-GUIDE.md (Lines 1-268)
+
+| Section                          | Lines   | Key Topics                                             |
+| -------------------------------- | ------- | ------------------------------------------------------ |
+| Getting Started                  | 9-67    | Opt-in marker, TS/Gherkin examples, presets, ownership |
+| Shape Extraction                 | 69-125  | 3 modes: explicit, wildcard, declaration-level         |
+| Annotation Patterns by File Type | 127-191 | Zod, interface, function, Gherkin examples             |
+| Tag Groups Quick Reference       | 193-223 | 12 groups with representative tags and format types    |
+| Verification                     | 225-257 | CLI commands, common issues table                      |
+| Related Documentation            | 259-268 | Links to TAXONOMY, CONFIGURATION, ARCHITECTURE         |
 
 ---
 
@@ -254,13 +304,17 @@ roadmap ──→ active ──→ completed
 deferred ──→ roadmap
 ```
 
-### Data API CLI
+### Data API CLI — Primary Context Source
+
+The CLI is the **recommended way** to gather context in any session type.
+It queries annotated sources in real time — not generated snapshots.
+See [PROCESS-API.md](./PROCESS-API.md).
 
 ```bash
-pnpm process:query -- query getCurrentWork       # What's active
-pnpm process:query -- query getRoadmapItems      # What can be started
-pnpm process:query -- query isValidTransition roadmap active
-pnpm process:query -- pattern TransformDataset
+pnpm process:query -- scope-validate MyPattern implement      # ALWAYS run first
+pnpm process:query -- context MyPattern --session implement    # Curated context bundle
+pnpm process:query -- files MyPattern --related                # Implementation paths
+pnpm process:query -- handoff --pattern MyPattern              # Capture session end state
 ```
 
 ---
@@ -279,4 +333,20 @@ pnpm process:query -- pattern TransformDataset
 | PROCESS-GUARD.md    | Team Leads  | Governance — enforcement rules    |
 | VALIDATION.md       | CI/CD       | Quality — automated checks        |
 | TAXONOMY.md         | Reference   | Lookup — tag taxonomy and API     |
+| ANNOTATION-GUIDE.md | Developers  | Reference — annotation mechanics  |
 | PUBLISHING.md       | Maintainers | Release — npm publishing          |
+| CHANGELOG.md        | Everyone    | Version history and changes       |
+| SECURITY.md         | Everyone    | Security policy and reporting     |
+
+---
+
+## Auto-Generated Documentation
+
+The `docs-live/` directory contains documentation **generated from annotated sources** using the codec pipeline. These files should not be edited manually — regenerate with `pnpm docs:all` or `pnpm docs:product-areas`.
+
+| Directory                  | Contents                                             | Generated By         |
+| -------------------------- | ---------------------------------------------------- | -------------------- |
+| `docs-live/product-areas/` | 7 product area docs with diagrams and shapes         | `docs:product-areas` |
+| `docs-live/decisions/`     | Architecture Decision Records (ADR-001–006, ADR-021) | `docs:all`           |
+| `docs-live/_claude-md/`    | Compact AI context modules per product area          | `docs:product-areas` |
+| `docs-live/`               | DECISIONS.md, PRODUCT-AREAS.md (indexes)             | `docs:all`           |

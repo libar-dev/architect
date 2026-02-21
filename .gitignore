@@ -1,7 +1,8 @@
 # Dependencies
 node_modules/
 
-# Build cache (but NOT dist/ - needed for git dependencies)
+# Build output
+dist/
 *.tsbuildinfo
 
 # IDE

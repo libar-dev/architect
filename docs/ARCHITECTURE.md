@@ -228,23 +228,44 @@ function buildMasterDataset(
 
 **PipelineOptions:**
 
-| Field                   | Type                                         | Description                                          |
-| ----------------------- | -------------------------------------------- | ---------------------------------------------------- |
-| `input`                 | `readonly string[]`                          | TypeScript source glob patterns                      |
-| `features`              | `readonly string[]`                          | Gherkin feature glob patterns                        |
-| `baseDir`               | `string`                                     | Base directory for glob resolution                   |
-| `mergeConflictStrategy` | `'fatal' \| 'concatenate'`                   | How to handle duplicate pattern names across sources |
-| `exclude`               | `readonly string[]` (optional)               | Glob patterns to exclude from scanning               |
-| `workflowPath`          | `string` (optional)                          | Custom workflow config JSON path                     |
-| `contextInferenceRules` | `readonly ContextInferenceRule[]` (optional) | Custom context inference rules                       |
+| Field                   | Type                                         | Description                                              |
+| ----------------------- | -------------------------------------------- | -------------------------------------------------------- |
+| `input`                 | `readonly string[]`                          | TypeScript source glob patterns                          |
+| `features`              | `readonly string[]`                          | Gherkin feature glob patterns                            |
+| `baseDir`               | `string`                                     | Base directory for glob resolution                       |
+| `mergeConflictStrategy` | `'fatal' \| 'concatenate'`                   | How to handle duplicate pattern names across sources     |
+| `exclude`               | `readonly string[]` (optional)               | Glob patterns to exclude from scanning                   |
+| `workflowPath`          | `string` (optional)                          | Custom workflow config JSON path                         |
+| `contextInferenceRules` | `readonly ContextInferenceRule[]` (optional) | Custom context inference rules                           |
+| `includeValidation`     | `boolean` (optional)                         | When false, skip validation pass (default true)          |
+| `failOnScanErrors`      | `boolean` (optional)                         | When true, return error on scan failures (default false) |
 
 **PipelineResult:**
 
-| Field        | Type                   | Description                                      |
-| ------------ | ---------------------- | ------------------------------------------------ |
-| `dataset`    | `RuntimeMasterDataset` | The fully-computed read model                    |
-| `validation` | `ValidationSummary`    | Schema validation results for all patterns       |
-| `warnings`   | `readonly string[]`    | Non-fatal warnings (e.g., Gherkin scan failures) |
+| Field          | Type                         | Description                                |
+| -------------- | ---------------------------- | ------------------------------------------ |
+| `dataset`      | `RuntimeMasterDataset`       | The fully-computed read model              |
+| `validation`   | `ValidationSummary`          | Schema validation results for all patterns |
+| `warnings`     | `readonly PipelineWarning[]` | Structured non-fatal warnings              |
+| `scanMetadata` | `ScanMetadata`               | Aggregate scan counts for reporting        |
+
+**PipelineWarning:**
+
+| Field     | Type                                          | Description                |
+| --------- | --------------------------------------------- | -------------------------- |
+| `type`    | `'scan' \| 'extraction' \| 'gherkin-parse'`   | Warning category           |
+| `message` | `string`                                      | Human-readable description |
+| `count`   | `number` (optional)                           | Number of affected items   |
+| `details` | `readonly PipelineWarningDetail[]` (optional) | File-level diagnostics     |
+
+**ScanMetadata:**
+
+| Field                   | Type     | Description                        |
+| ----------------------- | -------- | ---------------------------------- |
+| `scannedFileCount`      | `number` | Total files successfully scanned   |
+| `scanErrorCount`        | `number` | Files that failed to scan          |
+| `skippedDirectiveCount` | `number` | Invalid directives skipped         |
+| `gherkinErrorCount`     | `number` | Feature files that failed to parse |
 
 **PipelineError:**
 
@@ -309,7 +330,7 @@ const phase3 = masterDataset.byPhase.find((p) => p.phaseNumber === 3);
 **Key Files:**
 
 - `src/renderable/codecs/*.ts` - Document codecs
-- `src/renderable/renderer.ts` - Markdown renderer
+- `src/renderable/render.ts` - Markdown renderer
 
 ```typescript
 // Codec transforms to universal intermediate format
@@ -365,7 +386,7 @@ interface MasterDataset {
   categoryCount: number;
 
   // ─── Relationship Index (10 fields) ─────────────────────────────────────
-  relationshipIndex: Record<
+  relationshipIndex?: Record<
     string,
     {
       // Forward relationships (from annotations)
@@ -383,6 +404,15 @@ interface MasterDataset {
       extendedBy: string[]; // inverse of extendsPattern
     }
   >;
+
+  // ─── Architecture Data (optional) ──────────────────────────────────────
+  archIndex?: {
+    byRole: Record<string, ExtractedPattern[]>;
+    byContext: Record<string, ExtractedPattern[]>;
+    byLayer: Record<string, ExtractedPattern[]>;
+    byView: Record<string, ExtractedPattern[]>;
+    all: ExtractedPattern[];
+  };
 }
 ```
 
@@ -455,17 +485,19 @@ export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset 
 The delivery-process package uses a codec-based architecture for document generation:
 
 ```
-MasterDataset → Codec.decode() → RenderableDocument ─┬→ renderToMarkdown    → Markdown Files
-                                                      └→ renderToClaudeContext → Token-efficient text
+MasterDataset → Codec.decode() → RenderableDocument ─┬→ renderToMarkdown       → Markdown Files
+                                                      ├→ renderToClaudeMdModule → Modular Claude.md
+                                                      └→ renderToClaudeContext  → Token-efficient text
 ```
 
-| Component                 | Description                                                                         |
-| ------------------------- | ----------------------------------------------------------------------------------- |
-| **MasterDataset**         | Aggregated view of all extracted patterns with indexes by category, phase, status   |
-| **Codec**                 | Zod 4 codec that transforms MasterDataset into RenderableDocument                   |
-| **RenderableDocument**    | Universal intermediate format with typed section blocks                             |
-| **renderToMarkdown**      | Domain-agnostic markdown renderer for human documentation                           |
-| **renderToClaudeContext** | LLM-optimized renderer (~20-40% fewer tokens, omits Mermaid, flattens collapsibles) |
+| Component                  | Description                                                                                    |
+| -------------------------- | ---------------------------------------------------------------------------------------------- |
+| **MasterDataset**          | Aggregated view of all extracted patterns with indexes by category, phase, status              |
+| **Codec**                  | Zod 4 codec that transforms MasterDataset into RenderableDocument                              |
+| **RenderableDocument**     | Universal intermediate format with typed section blocks                                        |
+| **renderToMarkdown**       | Domain-agnostic markdown renderer for human documentation                                      |
+| **renderToClaudeMdModule** | Modular-claude-md renderer (H3-rooted headings, omits Mermaid/link-outs)                       |
+| **renderToClaudeContext**  | LLM-optimized renderer (~20-40% fewer tokens, omits Mermaid, flattens collapsibles) _(legacy)_ |
 
 ### Block Vocabulary (9 Types)
 
@@ -692,6 +724,83 @@ const doc = codec.decode(dataset);
 
 **Output Files:** `OVERVIEW.md`
 
+#### BusinessRulesCodec
+
+**Purpose:** Business rules documentation organized by product area, phase, and feature. Extracts domain constraints from Gherkin `Rule:` blocks.
+
+**Output Files:**
+
+- `BUSINESS-RULES.md` - Main index with statistics and all rules
+
+**Options (BusinessRulesCodecOptions extends BaseCodecOptions):**
+
+| Option                 | Type                                         | Default               | Description                               |
+| ---------------------- | -------------------------------------------- | --------------------- | ----------------------------------------- |
+| `groupBy`              | `"domain" \| "phase" \| "domain-then-phase"` | `"domain-then-phase"` | Primary grouping strategy                 |
+| `includeCodeExamples`  | boolean                                      | `false`               | Include code examples from DocStrings     |
+| `includeTables`        | boolean                                      | `true`                | Include markdown tables from descriptions |
+| `includeRationale`     | boolean                                      | `true`                | Include rationale section per rule        |
+| `filterDomains`        | string[]                                     | `[]`                  | Filter by domain categories (empty = all) |
+| `filterPhases`         | number[]                                     | `[]`                  | Filter by phases (empty = all)            |
+| `onlyWithInvariants`   | boolean                                      | `false`               | Show only rules with explicit invariants  |
+| `includeSource`        | boolean                                      | `true`                | Include source feature file link          |
+| `includeVerifiedBy`    | boolean                                      | `true`                | Include "Verified by" scenario links      |
+| `maxDescriptionLength` | number                                       | `150`                 | Max description length in standard mode   |
+| `excludeSourcePaths`   | string[]                                     | `[]`                  | Exclude patterns by source path prefix    |
+
+#### ArchitectureDocumentCodec
+
+**Purpose:** Architecture diagrams (Mermaid) generated from source annotations. Supports component and layered views.
+
+**Output Files:**
+
+- `ARCHITECTURE.md` (generated) - Architecture diagrams with component inventory
+
+**Options (ArchitectureCodecOptions extends BaseCodecOptions):**
+
+| Option             | Type                       | Default       | Description                               |
+| ------------------ | -------------------------- | ------------- | ----------------------------------------- |
+| `diagramType`      | `"component" \| "layered"` | `"component"` | Type of diagram to generate               |
+| `includeInventory` | boolean                    | `true`        | Include component inventory table         |
+| `includeLegend`    | boolean                    | `true`        | Include legend for arrow styles           |
+| `filterContexts`   | string[]                   | `[]`          | Filter to specific contexts (empty = all) |
+
+#### TaxonomyDocumentCodec
+
+**Purpose:** Taxonomy reference documentation with tag definitions, preset comparison, and format type reference.
+
+**Output Files:**
+
+- `TAXONOMY.md` - Main taxonomy reference
+- `taxonomy/*.md` - Detail files per tag domain
+
+**Options (TaxonomyCodecOptions extends BaseCodecOptions):**
+
+| Option               | Type    | Default | Description                     |
+| -------------------- | ------- | ------- | ------------------------------- |
+| `includePresets`     | boolean | `true`  | Include preset comparison table |
+| `includeFormatTypes` | boolean | `true`  | Include format type reference   |
+| `includeArchDiagram` | boolean | `true`  | Include architecture diagram    |
+| `groupByDomain`      | boolean | `true`  | Group metadata tags by domain   |
+
+#### ValidationRulesCodec
+
+**Purpose:** Process Guard validation rules reference with FSM diagrams and protection level matrix.
+
+**Output Files:**
+
+- `VALIDATION-RULES.md` - Main validation rules reference
+- `validation/*.md` - Detail files per rule category
+
+**Options (ValidationRulesCodecOptions extends BaseCodecOptions):**
+
+| Option                    | Type    | Default | Description                      |
+| ------------------------- | ------- | ------- | -------------------------------- |
+| `includeFSMDiagram`       | boolean | `true`  | Include FSM state diagram        |
+| `includeCLIUsage`         | boolean | `true`  | Include CLI usage section        |
+| `includeEscapeHatches`    | boolean | `true`  | Include escape hatches section   |
+| `includeProtectionMatrix` | boolean | `true`  | Include protection levels matrix |
+
 ---
 
 ### Reference & Composition Codecs
@@ -772,17 +881,19 @@ Progressive disclosure splits large documents into a main index plus detail file
 
 ### Codec Split Logic
 
-| Codec          | Split By               | Detail Path Pattern             |
-| -------------- | ---------------------- | ------------------------------- |
-| `patterns`     | Category               | `patterns/<category>.md`        |
-| `roadmap`      | Phase                  | `phases/phase-<N>-<name>.md`    |
-| `milestones`   | Quarter                | `milestones/<quarter>.md`       |
-| `current`      | Active Phase           | `current/phase-<N>-<name>.md`   |
-| `requirements` | Product Area           | `requirements/<area-slug>.md`   |
-| `session`      | Incomplete Phase       | `sessions/phase-<N>-<name>.md`  |
-| `remaining`    | Incomplete Phase       | `remaining/phase-<N>-<name>.md` |
-| `adrs`         | Category (≥ threshold) | `decisions/<category-slug>.md`  |
-| `pr-changes`   | None                   | Single file only                |
+| Codec              | Split By               | Detail Path Pattern             |
+| ------------------ | ---------------------- | ------------------------------- |
+| `patterns`         | Category               | `patterns/<category>.md`        |
+| `roadmap`          | Phase                  | `phases/phase-<N>-<name>.md`    |
+| `milestones`       | Quarter                | `milestones/<quarter>.md`       |
+| `current`          | Active Phase           | `current/phase-<N>-<name>.md`   |
+| `requirements`     | Product Area           | `requirements/<area-slug>.md`   |
+| `session`          | Incomplete Phase       | `sessions/phase-<N>-<name>.md`  |
+| `remaining`        | Incomplete Phase       | `remaining/phase-<N>-<name>.md` |
+| `adrs`             | Category (≥ threshold) | `decisions/<category-slug>.md`  |
+| `taxonomy`         | Tag Domain             | `taxonomy/<domain>.md`          |
+| `validation-rules` | Rule Category          | `validation/<category>.md`      |
+| `pr-changes`       | None                   | Single file only                |
 
 ### Disabling Progressive Disclosure
 
@@ -1436,7 +1547,12 @@ generatorRegistry.register(new MyCustomGenerator());
 | `ChangelogCodec`            | `changelog`          | `-g changelog`          |
 | `TraceabilityCodec`         | `traceability`       | `-g traceability`       |
 | `OverviewCodec`             | `overview-rdm`       | `-g overview-rdm`       |
+| `BusinessRulesCodec`        | `business-rules`     | `-g business-rules`     |
+| `ArchitectureDocumentCodec` | `architecture`       | `-g architecture`       |
+| `TaxonomyDocumentCodec`     | `taxonomy`           | `-g taxonomy`           |
+| `ValidationRulesCodec`      | `validation-rules`   | `-g validation-rules`   |
 | `ReferenceCodec`            | `reference-sample`   | `-g reference-sample`   |
+| `DecisionDocGenerator`      | `doc-from-decision`  | `-g doc-from-decision`  |
 
 ### CLI Usage
 
@@ -1498,20 +1614,25 @@ filterQuarters: []; // All (default)
 
 ## Code References
 
-| Component                | File                                            | Purpose                                        |
-| ------------------------ | ----------------------------------------------- | ---------------------------------------------- |
-| MasterDataset Schema     | `src/validation-schemas/master-dataset.ts`      | Central data structure                         |
-| transformToMasterDataset | `src/generators/pipeline/transform-dataset.ts`  | Single-pass transformation                     |
-| Document Codecs          | `src/renderable/codecs/*.ts`                    | Zod 4 codec implementations                    |
-| Reference Codec          | `src/renderable/codecs/reference.ts`            | Scoped reference documents                     |
-| Composite Codec          | `src/renderable/codecs/composite.ts`            | Multi-codec assembly                           |
-| Convention Extractor     | `src/renderable/codecs/convention-extractor.ts` | Convention content extraction                  |
-| Shape Matcher            | `src/renderable/codecs/shape-matcher.ts`        | Declaration-level filtering                    |
-| Markdown Renderer        | `src/renderable/render.ts`                      | Block → Markdown                               |
-| Claude Context Renderer  | `src/renderable/render.ts`                      | LLM-optimized rendering                        |
-| Orchestrator             | `src/generators/orchestrator.ts`                | Pipeline coordination                          |
-| TypeScript Scanner       | `src/scanner/pattern-scanner.ts`                | TS AST parsing                                 |
-| Gherkin Scanner          | `src/scanner/gherkin-scanner.ts`                | Feature file parsing                           |
-| Pipeline Factory         | `src/generators/pipeline/build-pipeline.ts`     | Shared 8-step pipeline for CLI consumers       |
-| Business Rules Query     | `src/api/rules-query.ts`                        | Rules domain query (from Gherkin Rule: blocks) |
-| Shape Extractor          | `src/extractor/shape-extractor.ts`              | Shape extraction from TS                       |
+| Component                | File                                                | Purpose                                        |
+| ------------------------ | --------------------------------------------------- | ---------------------------------------------- |
+| MasterDataset Schema     | `src/validation-schemas/master-dataset.ts`          | Central data structure                         |
+| transformToMasterDataset | `src/generators/pipeline/transform-dataset.ts`      | Single-pass transformation                     |
+| Document Codecs          | `src/renderable/codecs/*.ts`                        | Zod 4 codec implementations                    |
+| Reference Codec          | `src/renderable/codecs/reference.ts`                | Scoped reference documents                     |
+| Composite Codec          | `src/renderable/codecs/composite.ts`                | Multi-codec assembly                           |
+| Convention Extractor     | `src/renderable/codecs/convention-extractor.ts`     | Convention content extraction                  |
+| Shape Matcher            | `src/renderable/codecs/shape-matcher.ts`            | Declaration-level filtering                    |
+| Markdown Renderer        | `src/renderable/render.ts`                          | Block → Markdown                               |
+| Claude Context Renderer  | `src/renderable/render.ts`                          | LLM-optimized rendering                        |
+| Orchestrator             | `src/generators/orchestrator.ts`                    | Pipeline coordination                          |
+| TypeScript Scanner       | `src/scanner/pattern-scanner.ts`                    | TS AST parsing                                 |
+| Gherkin Scanner          | `src/scanner/gherkin-scanner.ts`                    | Feature file parsing                           |
+| Pipeline Factory         | `src/generators/pipeline/build-pipeline.ts`         | Shared 8-step pipeline for CLI consumers       |
+| Business Rules Query     | `src/api/rules-query.ts`                            | Rules domain query (from Gherkin Rule: blocks) |
+| Business Rules Codec     | `src/renderable/codecs/business-rules.ts`           | Business rules from Gherkin Rule: blocks       |
+| Architecture Codec       | `src/renderable/codecs/architecture.ts`             | Architecture diagrams from annotations         |
+| Taxonomy Codec           | `src/renderable/codecs/taxonomy.ts`                 | Taxonomy reference documentation               |
+| Validation Rules Codec   | `src/renderable/codecs/validation-rules.ts`         | Process Guard validation rules reference       |
+| Decision Doc Generator   | `src/generators/built-in/decision-doc-generator.ts` | ADR/PDR decision documents                     |
+| Shape Extractor          | `src/extractor/shape-extractor.ts`                  | Shape extraction from TS                       |

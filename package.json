@@ -1,6 +1,6 @@
 {
   "name": "@libar-dev/delivery-process",
-  "version": "0.1.0-pre.0",
+  "version": "1.0.0-pre.0",
   "description": "Turn TypeScript annotations and Gherkin specs into living docs, architecture graphs, and AI-queryable delivery state. FSM-enforced workflows.",
   "type": "module",
   "sideEffects": false,
@@ -11,6 +11,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./api": {
+      "types": "./dist/api/index.d.ts",
+      "import": "./dist/api/index.js"
     },
     "./config": {
       "types": "./dist/config/index.d.ts",
@@ -51,7 +55,8 @@
     "./validation": {
       "types": "./dist/validation/index.d.ts",
       "import": "./dist/validation/index.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "bin": {
     "generate-docs": "./dist/cli/generate-docs.js",
@@ -170,7 +175,6 @@
   "dependencies": {
     "@cucumber/gherkin": "^29.0.0",
     "@cucumber/messages": "^25.0.1",
-    "@libar-dev/modular-claude-md": "github:libar-dev/modular-claude-md#3a37c573ae8611f1e0e92c00f565bb0ab45e1263",
     "@typescript-eslint/typescript-estree": "^8.18.0",
     "glob": "^10.3.10",
     "zod": "^4.1.11"
@@ -188,15 +192,15 @@
     "tsx": "^4.7.0",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.2",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.8",
+    "@libar-dev/modular-claude-md": "github:libar-dev/modular-claude-md#3a37c573ae8611f1e0e92c00f565bb0ab45e1263"
   },
   "files": [
     "dist",
     "docs",
-    "docs-generated",
-    "docs-live",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "private": false,
   "publishConfig": {
@@ -211,11 +215,6 @@
     ],
     "*.{json,md,yml,yaml}": [
       "prettier --write"
-    ]
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@libar-dev/modular-claude-md"
     ]
   }
 }

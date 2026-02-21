@@ -8,12 +8,12 @@ The taxonomy defines the vocabulary for pattern annotations: what tags exist, th
 
 A **taxonomy** is a classification system. In `@libar-dev/delivery-process`, the taxonomy defines:
 
-| Component        | Purpose                                           |
-| ---------------- | ------------------------------------------------- |
-| **Categories**   | Domain classifications (e.g., `core`, `api`)      |
-| **Status**       | FSM states (`roadmap`, `active`, `completed`)     |
-| **Format Types** | How tag values are parsed (`flag`, `csv`, `enum`) |
-| **Hierarchy**    | Work item levels (`epic`, `phase`, `task`)        |
+| Component        | Purpose                                                   |
+| ---------------- | --------------------------------------------------------- |
+| **Categories**   | Domain classifications (e.g., `core`, `api`)              |
+| **Status**       | FSM states (`roadmap`, `active`, `completed`, `deferred`) |
+| **Format Types** | How tag values are parsed (`flag`, `csv`, `enum`)         |
+| **Hierarchy**    | Work item levels (`epic`, `phase`, `task`)                |
 
 The taxonomy is NOT a fixed schema. Presets (`libar-generic`, `generic`, `ddd-es-cqrs`) select different subsets, and you can define custom categories.
 
@@ -23,14 +23,19 @@ The taxonomy is NOT a fixed schema. Presets (`libar-generic`, `generic`, `ddd-es
 
 ```
 src/taxonomy/
-├── registry-builder.ts   # buildRegistry() - creates TagRegistry
-├── categories.ts         # Category definitions
-├── status-values.ts      # FSM state values (PDR-005)
-├── normalized-status.ts  # Display normalization (3 buckets)
-├── format-types.ts       # Tag value parsing rules
-├── hierarchy-levels.ts   # epic/phase/task
-├── risk-levels.ts        # low/medium/high
-└── layer-types.ts        # timeline/domain/integration/e2e
+├── index.ts               # Barrel exports
+├── registry-builder.ts    # buildRegistry() — creates TagRegistry
+├── categories.ts          # Category definitions (core, api, ddd, …)
+├── status-values.ts       # FSM state values: roadmap/active/completed/deferred
+├── deliverable-status.ts  # Deliverable statuses: complete/in-progress/pending/deferred/superseded/n-a
+├── normalized-status.ts   # Display normalization (3 buckets)
+├── format-types.ts        # Tag value parsing rules
+├── hierarchy-levels.ts    # epic/phase/task
+├── risk-levels.ts         # low/medium/high
+├── severity-types.ts      # error/warning/info
+├── layer-types.ts         # timeline/domain/integration/e2e/component/unknown
+├── generator-options.ts   # Format, groupBy, sortBy, workflow, priority, ADR enums
+└── conventions.ts         # Convention values for reference document generation
 ```
 
 ### TagRegistry
@@ -44,7 +49,9 @@ const registry = buildRegistry();
 // registry.tagPrefix       → "@libar-docs-"
 // registry.fileOptInTag    → "@libar-docs"
 // registry.categories      → CategoryDefinition[]
-// registry.statusValues    → ["roadmap", "active", "completed", "deferred"]
+// registry.metadataTags    → MetadataTagDefinition[]
+// registry.aggregationTags → AggregationTagDefinition[]
+// registry.formatOptions   → string[]
 ```
 
 ### Presets Select Taxonomy Subsets
@@ -76,26 +83,14 @@ Tags have different value formats:
 
 ## Generating a Tag Reference
 
-To generate a human-readable taxonomy reference:
+Generate a human-readable taxonomy reference from the TypeScript taxonomy source:
 
 ```bash
-npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f
-```
-
-This creates a markdown file documenting all tags with their formats, valid values, and examples.
-
----
-
-## Generated Tag Reference
-
-For a complete, always-current tag reference generated from the TypeScript taxonomy source:
-
-```bash
-# Flat single-file reference
-npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f
-
-# Progressive disclosure with detail files (via docs generator)
+# Via the docs generator (recommended)
 npx generate-docs -g taxonomy -i "src/**/*.ts" -o docs -f
+
+# Flat single-file reference (deprecated — use generate-docs instead)
+npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f
 ```
 
 The generated output reflects every tag the system supports — including all 21 categories available with the `ddd-es-cqrs` preset.

@@ -9,7 +9,7 @@ Turn TypeScript annotations and Gherkin feature files into **living documentatio
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/node/v/@libar-dev/delivery-process.svg)](https://nodejs.org/)
 
-> **Pre-release v0.1.0-pre.0** — We welcome feedback and contributions.
+> **v1.0.0-pre.0** — Pre-release for validation. We welcome feedback and contributions.
 
 ---
 
@@ -273,7 +273,7 @@ export class UserAuthentication {
 }
 ```
 
-> **Note:** Tag prefix is configurable. Default generic preset uses `@docs-*`. See [Configuration](#configuration).
+> **Note:** Tag prefix is configurable. The `generic` preset uses `@docs-*` (shown above). The default `libar-generic` preset uses `@libar-docs-*`. See [Configuration](#configuration).
 
 ### 3. Generate Documentation
 
@@ -296,10 +296,12 @@ This validates FSM transitions and blocks invalid status changes.
 | Command                 | Purpose                                                | Docs                                      |
 | ----------------------- | ------------------------------------------------------ | ----------------------------------------- |
 | `generate-docs`         | Generate documentation from annotated sources          | See flags below                           |
+| `process-api`           | Query delivery state for AI coding sessions            | [PROCESS-API.md](docs/PROCESS-API.md)     |
 | `lint-patterns`         | Validate annotation quality (missing tags, etc.)       | [VALIDATION.md](docs/VALIDATION.md)       |
 | `lint-process`          | Validate delivery workflow FSM transitions             | [PROCESS-GUARD.md](docs/PROCESS-GUARD.md) |
+| `lint-steps`            | Validate vitest-cucumber feature/step compatibility    | [VALIDATION.md](docs/VALIDATION.md)       |
 | `validate-patterns`     | Cross-source validation with Definition of Done checks | [VALIDATION.md](docs/VALIDATION.md)       |
-| `generate-tag-taxonomy` | Generate tag reference from TypeScript taxonomy        | See flags below                           |
+| `generate-tag-taxonomy` | _(Deprecated)_ Generate tag reference from taxonomy    | See flags below                           |
 
 ### generate-docs
 
@@ -311,8 +313,8 @@ generate-docs [options]
 
 | Flag                         | Short | Description                                    | Default             |
 | ---------------------------- | ----- | ---------------------------------------------- | ------------------- |
-| `--input <pattern>`          | `-i`  | Glob pattern for TypeScript files (repeatable) | required            |
-| `--generators <names>`       | `-g`  | Generator names (comma-separated)              | required            |
+| `--input <pattern>`          | `-i`  | Glob pattern for TypeScript files (repeatable) | from config         |
+| `--generators <names>`       | `-g`  | Generator names (comma-separated)              | `patterns`          |
 | `--features <pattern>`       |       | Glob pattern for Gherkin files                 | -                   |
 | `--exclude <pattern>`        | `-e`  | Exclude pattern (repeatable)                   | -                   |
 | `--output <dir>`             | `-o`  | Output directory                               | `docs/architecture` |
@@ -337,7 +339,9 @@ generate-docs -g patterns -i "src/**/*.ts" --features "specs/**/*.feature" -o do
 
 ### generate-tag-taxonomy
 
-Generate a complete tag reference document from the TypeScript taxonomy source. The output is always current — it reflects exactly what tags the system supports.
+> **Deprecated:** Use `generate-docs -g taxonomy` instead for codec-based generation with progressive disclosure. This standalone command will be removed in a future version.
+
+Generate a complete tag reference document from the TypeScript taxonomy source.
 
 ```bash
 generate-tag-taxonomy [options]
@@ -639,17 +643,6 @@ See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for custom presets.
 | [PROCESS-GUARD](docs/PROCESS-GUARD.md)       | Team Leads | FSM enforcement rules     |
 | [VALIDATION](docs/VALIDATION.md)             | CI/CD      | Automated quality checks  |
 | [TAXONOMY](docs/TAXONOMY.md)                 | Reference  | Tag taxonomy and API      |
-
----
-
-## Contributing
-
-We welcome contributions! Please see our [contributing guidelines](CONTRIBUTING.md).
-
-1. Fork the repository
-2. Create a feature branch
-3. Run tests: `pnpm test`
-4. Submit a pull request
 
 ---
 

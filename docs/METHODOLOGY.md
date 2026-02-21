@@ -35,52 +35,56 @@ When you run `generate-docs`, you're rebuilding read models from the event strea
 
 Every pattern in this package uses its own annotation system. Real examples:
 
-**ProcessGuardDecider** (pure validation logic):
+**Document Extractor** (pattern extraction):
 
 ```typescript
 /**
  * @libar-docs
- * @libar-docs-pattern ProcessGuardDecider
+ * @libar-docs-pattern Document Extractor
  * @libar-docs-status completed
- * @libar-docs-uses FSMTransitions, FSMStates
- * @libar-docs-used-by LintModule
+ * @libar-docs-uses Pattern Scanner, Tag Registry, Zod
+ * @libar-docs-used-by Orchestrator, Generators
  */
-export function validateChanges(input: ValidationInput): ValidationOutput { ... }
+export function extractPatterns(
+  scannedFiles: readonly ScannedFile[], baseDir: string, registry?: TagRegistry
+): ExtractionResults { ... }
 ```
 
-**PatternScanner** (file discovery):
+**Pattern Scanner** (file discovery):
 
 ```typescript
 /**
  * @libar-docs
- * @libar-docs-pattern PatternScanner
+ * @libar-docs-pattern Pattern Scanner
  * @libar-docs-status completed
- * @libar-docs-uses GherkinASTParser, TypeScriptASTParser
- * @libar-docs-used-by Orchestrator, DualSourceExtractor
+ * @libar-docs-uses glob, AST Parser
+ * @libar-docs-used-by Doc Extractor, Orchestrator
  */
-export async function scanPatterns(config: ScanConfig): Promise<ScannedFile[]> { ... }
+export async function scanPatterns(
+  config: ScannerConfig, registry?: TagRegistry
+): Promise<Result<ScanResults, never>> { ... }
 ```
 
 Run `pnpm docs:patterns` and these annotations become a searchable pattern registry with dependency graphs.
 
 ---
 
-## Four-Stage Workflow
+## Session Workflow
 
-| Stage        | Input               | Output                      | FSM State                            |
-| ------------ | ------------------- | --------------------------- | ------------------------------------ |
-| **Ideation** | Pattern brief       | Roadmap spec (`.feature`)   | `roadmap`                            |
-| **Design**   | Complex requirement | Decision specs + code stubs | `roadmap`                            |
-| **Planning** | Roadmap spec        | Implementation plan         | `roadmap`                            |
-| **Coding**   | Implementation plan | Code + tests                | `roadmap` -> `active` -> `completed` |
+| Session               | Input               | Output                      | FSM State                          |
+| --------------------- | ------------------- | --------------------------- | ---------------------------------- |
+| **Planning**          | Pattern brief       | Roadmap spec (`.feature`)   | Creates `roadmap`                  |
+| **Design**            | Complex requirement | Decision specs + code stubs | None                               |
+| **Implementation**    | Roadmap spec        | Code + tests                | `roadmap` → `active` → `completed` |
+| **Planning + Design** | Pattern brief       | Spec + stubs                | Creates `roadmap`                  |
 
-**When to skip stages:**
+**When to skip sessions:**
 
-| Skip     | When                                                  |
-| -------- | ----------------------------------------------------- |
-| Design   | Single valid approach, straightforward implementation |
-| Planning | Single-session work, clear scope                      |
-| Neither  | Multi-session work, architectural decisions           |
+| Skip              | When                                                  |
+| ----------------- | ----------------------------------------------------- |
+| Design            | Single valid approach, straightforward implementation |
+| Planning + Design | Ready to code, clear scope, no decisions              |
+| Neither           | Multi-session work, architectural decisions           |
 
 ---
 
@@ -139,10 +143,10 @@ Note: Code stubs must NOT use `@<prefix>-pattern`. The feature file is the canon
 
 ## Two-Tier Spec Architecture
 
-| Tier        | Location                | Purpose                                     | Executable |
-| ----------- | ----------------------- | ------------------------------------------- | ---------- |
-| **Roadmap** | `specs/{area}/`         | Planning, deliverables, acceptance criteria | No         |
-| **Package** | `{pkg}/tests/features/` | Implementation proof, regression testing    | Yes        |
+| Tier        | Location                  | Purpose                                     | Executable |
+| ----------- | ------------------------- | ------------------------------------------- | ---------- |
+| **Roadmap** | `delivery-process/specs/` | Planning, deliverables, acceptance criteria | No         |
+| **Package** | `{pkg}/tests/features/`   | Implementation proof, regression testing    | Yes        |
 
 **Traceability:**
 
@@ -165,7 +169,7 @@ Code is the source of truth. Feature files reference code, not duplicate it.
  * ## Reservation Pattern - TTL-Based Pre-Creation Uniqueness
  */
 export function reserve(ctx: MutationCtx, args: ReserveArgs): Promise<ReservationResult> {
-  throw new Error('Not yet implemented - roadmap pattern');
+  throw new Error('ReservationPattern not yet implemented - roadmap pattern');
 }
 ```
 

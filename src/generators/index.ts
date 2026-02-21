@@ -57,6 +57,8 @@ export {
 
 // Pipeline - MasterDataset transformation for ProcessStateAPI usage
 export {
+  buildMasterDataset,
+  type PipelineOptions,
   mergePatterns,
   transformToMasterDataset,
   type RawDataset,

@@ -4,7 +4,7 @@
 
 ---
 
-**264 rules** from 55 features. 264 rules have explicit invariants.
+**265 rules** from 55 features. 265 rules have explicit invariants.
 
 ---
 
@@ -2837,6 +2837,23 @@
 - Claude context renders link-out as plain text
 - Claude context omits separator tokens
 - Claude context produces fewer characters than markdown
+
+---
+
+#### Claude MD module renderer produces modular-claude-md compatible output
+
+> **Invariant:** Title renders as H3 (offset +2), section headings are offset by +2 clamped at H6, frontmatter is omitted, mermaid blocks are omitted, link-out blocks are omitted, and collapsible blocks are flattened to headings.
+>
+> **Rationale:** The modular-claude-md system manages CLAUDE.md as composable H3-rooted modules. Generating incompatible formats (like section markers) produces orphaned files that are never consumed.
+
+**Verified by:**
+- Module title renders as H3
+- Module section headings offset by plus 2
+- Module frontmatter is omitted
+- Module mermaid blocks are omitted
+- Module link-out blocks are omitted
+- Module collapsible blocks flatten to headings
+- Module heading level clamped at H6
 
 *render-output.feature*
 

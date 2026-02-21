@@ -14,9 +14,6 @@ importers:
       '@cucumber/messages':
         specifier: ^25.0.1
         version: 25.0.1
-      '@libar-dev/modular-claude-md':
-        specifier: github:libar-dev/modular-claude-md#3a37c573ae8611f1e0e92c00f565bb0ab45e1263
-        version: https://codeload.github.com/libar-dev/modular-claude-md/tar.gz/3a37c573ae8611f1e0e92c00f565bb0ab45e1263
       '@typescript-eslint/typescript-estree':
         specifier: ^8.18.0
         version: 8.53.1(typescript@5.9.3)
@@ -30,6 +27,9 @@ importers:
       '@amiceli/vitest-cucumber':
         specifier: ^5.2.1
         version: 5.2.1(vitest@2.1.9(@types/node@20.10.0))
+      '@libar-dev/modular-claude-md':
+        specifier: github:libar-dev/modular-claude-md#3a37c573ae8611f1e0e92c00f565bb0ab45e1263
+        version: https://codeload.github.com/libar-dev/modular-claude-md/tar.gz/3a37c573ae8611f1e0e92c00f565bb0ab45e1263
       '@types/node':
         specifier: 20.10.0
         version: 20.10.0
