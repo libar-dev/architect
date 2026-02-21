@@ -1,6 +1,6 @@
 {
   "name": "@libar-dev/delivery-process",
-  "version": "1.0.0-pre.0",
+  "version": "1.0.0-pre.1",
   "description": "Context engineering toolkit: extract patterns from TypeScript and Gherkin into a queryable delivery state with living docs, architecture graphs, and FSM-enforced workflows.",
   "type": "module",
   "sideEffects": false,
