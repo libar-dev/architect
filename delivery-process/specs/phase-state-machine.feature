@@ -65,7 +65,7 @@ Feature: Phase State Machine Validation
         | roadmap  | active    |
         | roadmap  | deferred  |
         | roadmap  | roadmap   |
-        | active   | complete |
+        | active   | completed |
         | active   | roadmap   |
         | deferred | roadmap   |
 
@@ -78,8 +78,8 @@ Feature: Phase State Machine Validation
 
       Examples:
         | from      | to       |
-        | complete | active   |
-        | complete | roadmap  |
+        | completed | active   |
+        | completed | roadmap  |
         | roadmap   | completed|
 
   Rule: Terminal states require completion metadata

@@ -79,7 +79,7 @@ Feature: MVP Workflow Implementation
       Then they appear as active work
 
     @acceptance-criteria
-    Scenario: Completed appears in CHANGELOG
+    Scenario: Completed appears in CHANGELOG-GENERATED.md
       Given patterns with status "completed"
       When generating CHANGELOG-GENERATED.md
       Then they appear in the changelog
