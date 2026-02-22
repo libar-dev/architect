@@ -115,10 +115,10 @@
 
 | Type | Kind |
 | --- | --- |
-| SectionBlock | type |
 | normalizeStatus | function |
 | DELIVERABLE_STATUS_VALUES | const |
 | CategoryDefinition | interface |
+| SectionBlock | type |
 
 
 #### Behavior Specifications

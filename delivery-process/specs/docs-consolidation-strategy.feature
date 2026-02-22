@@ -31,11 +31,12 @@ Feature: Documentation Consolidation Strategy
   | AI context accuracy | Compact claude-md versions stay current automatically |
   | Incremental delivery | Each phase is independently deliverable as a single PR |
 
-  Phase-specific scenarios will be added when each phase enters `active` status.
+  Phase-specific scenarios are added when each phase enters `active` status.
+  Phase 4 scenarios are detailed in ArchitectureDocRefactoring spec (8 Rules, 18 scenarios).
 
   **Scope:**
   | Document | Lines | Disposition |
-  | ARCHITECTURE.md | 1,287 | Phases 2 + 4: codec listings extracted, remaining sections decomposed |
+  | ARCHITECTURE.md | 1,287 | Phases 2 + 4: codec listings extracted, remaining sections decomposed to ~320 lines (DD-9) |
   | PROCESS-GUARD.md | 341 | Phase 3: enhanced ValidationRulesCodec |
   | TAXONOMY.md | 105 | Phase 1: redirect to generated taxonomy output |
   | ANNOTATION-GUIDE.md | 268 | Phase 5: trim 30 lines of duplicated tag reference |
