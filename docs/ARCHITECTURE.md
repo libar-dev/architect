@@ -69,71 +69,8 @@ The tag prefix is configurable via presets or custom configuration (see [Configu
 
 ## Configuration Architecture
 
-The package supports configurable tag prefixes via the Configuration API.
-
-### Entry Point
-
-```typescript
-// delivery-process.config.ts
-import { defineConfig } from '@libar-dev/delivery-process/config';
-
-export default defineConfig({
-  preset: 'libar-generic',
-  sources: { typescript: ['src/**/*.ts'], features: ['specs/*.feature'] },
-  output: { directory: 'docs-generated', overwrite: true },
-});
-// Resolved to: ResolvedConfig { instance, project, isDefault, configPath }
-```
-
-### How Configuration Affects the Pipeline
-
-| Stage           | Configuration Input              | Effect                                      |
-| --------------- | -------------------------------- | ------------------------------------------- |
-| **Scanner**     | `regexBuilders.hasFileOptIn()`   | Detects files with configured opt-in marker |
-| **Scanner**     | `regexBuilders.directivePattern` | Matches tags with configured prefix         |
-| **Extractor**   | `registry.categories`            | Maps tags to category names                 |
-| **Transformer** | `registry`                       | Builds MasterDataset with category indexes  |
-
-### Configuration Resolution
-
-```
-defineConfig(userConfig)
-         │
-         ▼
-┌──────────────────────────────────────────┐
-│ 1. loadProjectConfig() discovers file    │
-│    and validates via Zod schema          │
-└──────────────────────────────────────────┘
-         │
-         ▼
-┌──────────────────────────────────────────┐
-│ 2. resolveProjectConfig()                │
-│    - Select preset (or use default)      │
-│    - Apply tagPrefix/fileOptInTag/cats   │
-│    - Build registry + RegexBuilders      │
-│    - Merge stubs into TypeScript sources │
-│    - Apply output defaults               │
-│    - Resolve generator overrides         │
-└──────────────────────────────────────────┘
-         │
-         ▼
-    ResolvedConfig { instance, project, isDefault, configPath }
-```
-
-### Key Files
-
-| File                                  | Purpose                                                    |
-| ------------------------------------- | ---------------------------------------------------------- |
-| `src/config/define-config.ts`         | `defineConfig()` identity function for type-safe authoring |
-| `src/config/project-config.ts`        | `DeliveryProcessProjectConfig`, `ResolvedConfig` types     |
-| `src/config/project-config-schema.ts` | Zod validation schema, `isProjectConfig()` type guard      |
-| `src/config/resolve-config.ts`        | `resolveProjectConfig()` — defaults + taxonomy resolution  |
-| `src/config/merge-sources.ts`         | `mergeSourcesForGenerator()` — per-generator sources       |
-| `src/config/config-loader.ts`         | `loadProjectConfig()` — file discovery + loading           |
-| `src/config/factory.ts`               | `createDeliveryProcess()` — taxonomy factory (internal)    |
-| `src/config/presets.ts`               | GENERIC_PRESET, LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET   |
-
-> **See:** [CONFIGURATION.md](./CONFIGURATION.md) for usage examples and API reference.
+> **Configuration Architecture** — See [CONFIGURATION.md](../docs-live/product-areas/CONFIGURATION.md) for config resolution, presets, and core configuration types.
+> This content moved to generated product-area docs so configuration behavior stays synchronized with source annotations and schema evolution.
 
 ---
 
