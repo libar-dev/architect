@@ -553,80 +553,21 @@ The `detailLevel` option controls output verbosity:
 
 ### Result Monad
 
-All operations return `Result<T, E>` for explicit error handling:
-
-```typescript
-// types/result.ts
-type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
-
-// Usage
-const result = await scanPatterns(options);
-if (result.ok) {
-  const { files } = result.value;
-} else {
-  console.error(result.error); // Explicit error handling
-}
-```
-
-**Benefits:**
-
-- No exception swallowing
-- Partial success scenarios supported
-- Type-safe error handling at boundaries
+> **Result Monad** — See [CORE-TYPES.md](../docs-live/product-areas/CORE-TYPES.md) for Result shape, type guards, and error-handling invariants.
+> Core type semantics are maintained in generated type docs; architecture retains only high-level design rationale.
 
 ### Schema-First Validation
 
-Types are defined as Zod schemas first, TypeScript types inferred:
-
-```typescript
-// src/validation-schemas/extracted-pattern.ts
-export const ExtractedPatternSchema = z
-  .object({
-    id: PatternIdSchema,
-    name: z.string().min(1),
-    category: CategoryNameSchema,
-    status: PatternStatusSchema.optional(),
-    phase: z.number().int().positive().optional(),
-    // ... 30+ fields
-  })
-  .strict();
-
-export type ExtractedPattern = z.infer<typeof ExtractedPatternSchema>;
-```
-
-**Benefits:**
-
-- Runtime validation at all boundaries
-- Type inference from schemas (single source of truth)
-- Codec support for transformations
+Schemas are authored first and TypeScript types are inferred from the schema definitions.
+This keeps runtime validation and compile-time contracts aligned at every pipeline boundary.
+Source: `src/validation-schemas/extracted-pattern.ts`.
 
 ### Tag Registry
 
-Data-driven configuration for pattern categorization:
-
-```json
-// Generated from TypeScript taxonomy (src/taxonomy/)
-{
-  "categories": [
-    { "tag": "core", "domain": "Core", "priority": 1, "description": "Core patterns" },
-    { "tag": "scanner", "domain": "Scanner", "priority": 10, "aliases": ["scan"] },
-    { "tag": "generator", "domain": "Generator", "priority": 20, "aliases": ["gen"] }
-  ],
-  "metadataTags": [
-    { "tag": "status", "format": "enum", "values": ["roadmap", "active", "completed", "deferred"] },
-    { "tag": "phase", "format": "number" },
-    { "tag": "release", "format": "value" },
-    { "tag": "usecase", "format": "quoted-value", "repeatable": true }
-  ]
-}
-```
-
-**Category Inference Algorithm:**
-
-1. Extract tag parts (e.g., `@libar-docs-core-utils` → `["core", "utils"]`)
-2. Find matching categories in registry (with aliases)
-3. Select highest priority (lowest number)
-4. Fallback to "uncategorized"
+Tag behavior is data-driven: scanner and extractor dispatch through registry metadata instead of hardcoded parser logic.
+Categories, aliases, and priorities in the registry determine how annotation tags map to pattern domains.
+This centralizes taxonomy evolution so adding tags changes data configuration, not extraction code.
+Source: `src/taxonomy/`.
 
 ---
 
