@@ -27,6 +27,12 @@ After dataset creation, the orchestrator owns Step 9 (codec execution per genera
 output rendering, additional file fan-out) and Step 10 (path validation, overwrite
 policy, and persisted file writes).
 
+### When to Use
+
+- Running complete documentation generation programmatically
+- Integrating doc generation into build scripts
+- Testing the full pipeline without CLI overhead
+
 ---
 
 ## Shared Pipeline Factory Responsibilities
@@ -51,6 +57,12 @@ Three consumers share this factory: `process-api`, `validate-patterns`, and the
 generation orchestrator. `PipelineOptions` differentiates behavior by
 `mergeConflictStrategy` (`fatal` vs `concatenate`), `includeValidation` toggles,
 and `failOnScanErrors` policy without forking pipeline logic.
+
+### When to Use
+
+- Any consumer needs a MasterDataset without rewriting scan/extract/merge flow
+- CLI consumers require differentiated conflict strategy and validation behavior
+- Orchestrator needs a shared steps 1-8 implementation before codec/file execution
 
 ---
 

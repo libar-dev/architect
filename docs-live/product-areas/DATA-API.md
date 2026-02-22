@@ -38,6 +38,12 @@ generation orchestrator. `PipelineOptions` differentiates behavior by
 `mergeConflictStrategy` (`fatal` vs `concatenate`), `includeValidation` toggles,
 and `failOnScanErrors` policy without forking pipeline logic.
 
+### When to Use
+
+- Any consumer needs a MasterDataset without rewriting scan/extract/merge flow
+- CLI consumers require differentiated conflict strategy and validation behavior
+- Orchestrator needs a shared steps 1-8 implementation before codec/file execution
+
 ---
 
 ## DataAPI Components
