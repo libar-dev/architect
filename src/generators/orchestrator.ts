@@ -33,6 +33,12 @@
  * After dataset creation, the orchestrator owns Step 9 (codec execution per generator,
  * output rendering, additional file fan-out) and Step 10 (path validation, overwrite
  * policy, and persisted file writes).
+ *
+ * ### When to Use
+ *
+ * - Running complete documentation generation programmatically
+ * - Integrating doc generation into build scripts
+ * - Testing the full pipeline without CLI overhead
  */
 
 import * as path from 'path';
