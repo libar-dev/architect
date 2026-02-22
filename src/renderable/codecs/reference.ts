@@ -128,7 +128,11 @@ import type { ExtractedShape } from '../../validation-schemas/extracted-shape.js
 // ============================================================================
 
 /** Content source identifiers for hardcoded domain diagrams */
-export const DIAGRAM_SOURCE_VALUES = ['fsm-lifecycle', 'generation-pipeline'] as const;
+export const DIAGRAM_SOURCE_VALUES = [
+  'fsm-lifecycle',
+  'generation-pipeline',
+  'master-dataset-views',
+] as const;
 
 /** Discriminated source type for DiagramScope.source */
 export type DiagramSource = (typeof DIAGRAM_SOURCE_VALUES)[number];
@@ -177,6 +181,7 @@ export interface DiagramScope {
    * instead of computing from pattern relationships.
    * - 'fsm-lifecycle': FSM state transitions with protection levels
    * - 'generation-pipeline': 4-stage generation pipeline temporal flow
+   * - 'master-dataset-views': MasterDataset pre-computed view fan-out
    */
   readonly source?: DiagramSource;
 }
@@ -1725,6 +1730,22 @@ function buildGenerationPipelineSequenceDiagram(): string[] {
   ];
 }
 
+/** Build MasterDataset fan-out diagram from hardcoded domain knowledge */
+function buildMasterDatasetViewsDiagram(): string[] {
+  return [
+    'graph TB',
+    '    MD[MasterDataset]',
+    '    MD --> byStatus["byStatus<br/>(completed / active / planned)"]',
+    '    MD --> byPhase["byPhase<br/>(sorted, with counts)"]',
+    '    MD --> byQuarter["byQuarter<br/>(keyed by Q-YYYY)"]',
+    '    MD --> byCategory["byCategory<br/>(keyed by category name)"]',
+    '    MD --> bySource["bySource<br/>(typescript / gherkin / roadmap / prd)"]',
+    '    MD --> counts["counts<br/>(aggregate statistics)"]',
+    '    MD --> RI["relationshipIndex?<br/>(forward + reverse lookups)"]',
+    '    MD --> AI["archIndex?<br/>(role / context / layer / view)"]',
+  ];
+}
+
 /** Build a Mermaid C4 context diagram with system boundaries */
 function buildC4Diagram(ctx: DiagramContext, scope: DiagramScope): string[] {
   const showLabels = scope.showEdgeLabels !== false;
@@ -1899,6 +1920,14 @@ export function buildScopedDiagram(dataset: MasterDataset, scope: DiagramScope):
       heading(2, title),
       paragraph('Temporal flow of the documentation generation pipeline:'),
       mermaid(buildGenerationPipelineSequenceDiagram().join('\n')),
+      separator(),
+    ];
+  }
+  if (scope.source === 'master-dataset-views') {
+    return [
+      heading(2, title),
+      paragraph('Pre-computed view fan-out from MasterDataset (single-pass transform):'),
+      mermaid(buildMasterDatasetViewsDiagram().join('\n')),
       separator(),
     ];
   }

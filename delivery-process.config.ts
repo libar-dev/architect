@@ -42,6 +42,22 @@ export default defineConfig({
       claudeMdFilename: 'architecture-codecs.md',
     },
     {
+      title: 'Architecture Types Reference',
+      conventionTags: ['pipeline-architecture'],
+      shapeSources: [],
+      shapeSelectors: [{ group: 'master-dataset' }],
+      behaviorCategories: [],
+      claudeMdSection: 'architecture',
+      docsFilename: 'ARCHITECTURE-TYPES.md',
+      claudeMdFilename: 'architecture-types.md',
+      diagramScopes: [
+        {
+          title: 'MasterDataset View Fan-out',
+          source: 'master-dataset-views',
+        },
+      ],
+    },
+    {
       title: 'Reference Generation Sample',
       conventionTags: ['taxonomy-rules'],
       shapeSources: [],
