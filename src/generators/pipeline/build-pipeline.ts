@@ -6,17 +6,29 @@
  * @libar-docs-implements ProcessAPILayeredExtraction
  * @libar-docs-product-area DataAPI
  * @libar-docs-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, MasterDataset
+ * @libar-docs-convention pipeline-architecture
  *
- * ## PipelineFactory - Shared Pipeline Orchestration
+ * ## Shared Pipeline Factory Responsibilities
  *
- * Shared factory that executes the 8-step scan-extract-merge-transform pipeline.
- * Replaces inline pipeline orchestration in CLI consumers.
+ * **Invariant:** `buildMasterDataset()` is the shared factory for Steps 1-8 of the
+ * architecture pipeline and returns `Result<PipelineResult, PipelineError>` without
+ * process-level side effects.
  *
- * Target: src/generators/pipeline/build-pipeline.ts
- * See: ADR-006 (Single Read Model Architecture)
- * See: DD-1, DD-2 (ProcessAPILayeredExtraction)
+ * **Rationale:** Centralizing scan/extract/merge/transform flow prevents divergence
+ * between CLI consumers and preserves a single ADR-006 read-model path.
  *
- * **When to Use:** When any consumer needs a MasterDataset — call buildMasterDataset() instead of wiring the scan-extract-merge-transform pipeline inline.
+ * ## 8-Step Dataset Build Flow
+ *
+ * The factory owns: configuration load, TypeScript scan + extraction, Gherkin scan +
+ * extraction, merge conflict handling, hierarchy child derivation, workflow load,
+ * and `transformToMasterDataset` with validation summary.
+ *
+ * ## Consumer Architecture and PipelineOptions Differentiation
+ *
+ * Three consumers share this factory: `process-api`, `validate-patterns`, and the
+ * generation orchestrator. `PipelineOptions` differentiates behavior by
+ * `mergeConflictStrategy` (`fatal` vs `concatenate`), `includeValidation` toggles,
+ * and `failOnScanErrors` policy without forking pipeline logic.
  */
 
 import * as path from 'path';

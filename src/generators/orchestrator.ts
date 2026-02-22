@@ -10,25 +10,29 @@
  * @libar-docs-used-by CLI, Programmatic API
  * @libar-docs-usecase "When running full documentation generation pipeline"
  * @libar-docs-usecase "When merging TypeScript and Gherkin patterns"
+ * @libar-docs-convention pipeline-architecture
  *
- * ## Documentation Generation Orchestrator - Full Pipeline Coordination
+ * ## Orchestrator Pipeline Responsibilities
  *
- * Orchestrates the complete documentation generation pipeline:
- * Scanner → Extractor → Generators → File Writer
+ * **Invariant:** The orchestrator is the integration boundary for full docs generation:
+ * it delegates dataset construction to the shared pipeline, then executes codecs and
+ * writes files.
  *
- * Extracts business logic from CLI for programmatic use and testing.
+ * **Rationale:** Splitting orchestration into dataset construction (shared) and output
+ * execution (orchestrator-owned) keeps Data API and validation consumers aligned on one
+ * read-model path while preserving generator-specific output handling.
  *
- * ### When to Use
+ * ## Steps 1-8 via buildMasterDataset()
  *
- * - Running complete documentation generation programmatically
- * - Integrating doc generation into build scripts
- * - Testing the full pipeline without CLI overhead
+ * Steps 1-8 (config load, TypeScript/Gherkin scan + extraction, merge, hierarchy
+ * derivation, workflow load, and `transformToMasterDataset`) are delegated to
+ * `buildMasterDataset()`.
  *
- * ### Key Concepts
+ * ## Steps 9-10: Codec Execution and File Writing
  *
- * - **Dual-Source Merging**: Combines TypeScript and Gherkin patterns
- * - **Generator Registry**: Looks up registered generators by name
- * - **Result Monad**: Returns detailed errors for partial failures
+ * After dataset creation, the orchestrator owns Step 9 (codec execution per generator,
+ * output rendering, additional file fan-out) and Step 10 (path validation, overwrite
+ * policy, and persisted file writes).
  */
 
 import * as path from 'path';
