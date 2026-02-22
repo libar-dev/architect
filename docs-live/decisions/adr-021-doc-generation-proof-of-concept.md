@@ -70,6 +70,10 @@ the PROOF OF CONCEPT (demonstrating the pattern works).
 
     **What's Missing:**
 
+**Verified by:**
+
+- Full pipeline generates documentation from decision documents
+
 ## Decision
 
 **Invariant:** Each content type (intro/rationale, rules/examples, API types) is owned by exactly one source type (decision, behavior spec, or code).
@@ -151,6 +155,10 @@ the PROOF OF CONCEPT (demonstrating the pattern works).
 generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' --typescript 'src/**/*.ts' --generators doc-from-decision --output docs
 ```
 
+**Verified by:**
+
+- Decision Rule descriptions become documentation sections; Decision DocStrings become code examples
+
 **Invariant:** The source mapping table in a decision document defines how documentation sections are assembled from multiple source files.
 
 **Rationale:** Without a declarative mapping, generators must hard-code source-to-section relationships, making the system brittle to new document types.
@@ -191,6 +199,10 @@ generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' -
     - `THIS DECISION` resolves to the current decision document
     - Missing files produce warnings but generation continues
 
+**Verified by:**
+
+- Source mapping aggregates multiple files; Source mapping validated at generation time
+
 ## Consequences
 
 **Invariant:** Decision documents remain the authoritative source for intro, rationale, and convention content until explicitly superseded.
@@ -226,6 +238,10 @@ generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' -
 
 
     **Ownership Boundaries:**
+
+**Verified by:**
+
+- Decision Rule descriptions become documentation sections
 
 **Invariant:** Pre-implementation design stubs must reside in `delivery-process/stubs/`, never in `src/`.
 
@@ -327,13 +343,18 @@ export function extractShapes(
 
     Once proven with Process Guard, the pattern applies to all documentation:
 
+**Verified by:**
+
+- N/A - architectural constraint verified by code structure
+- not runtime scenario
+
 ## Rules
 
 ### Proof of Concept - Self-documentation validates the pattern
 
 **Invariant:** The documentation generation pattern must be validated by generating documentation about itself from its own annotated sources.
 
-**Rationale:** A self-referential proof of concept exposes extraction gaps and source mapping issues that synthetic test data would miss. This POC demonstrates the doc-from-decision pattern by generating docs about ITSELF. The DocGenerationProofOfConcept pattern produces:
+**Rationale:** A self-referential proof of concept exposes extraction gaps and source mapping issues that synthetic test data would miss.
 
 | Output                                                   | Purpose            | Detail Level |
 | -------------------------------------------------------- | ------------------ | ------------ |
@@ -421,6 +442,13 @@ if (hasErrors(result)) {
 
 **Escape Hatches:**
 
+**Verified by:**
+
+- Full pipeline generates documentation from decision documents
+
+  This POC demonstrates the doc-from-decision pattern by generating docs
+  about ITSELF. The DocGenerationProofOfConcept pattern produces:
+
 ### Expected Output - Compact claude module structure
 
 **Invariant:** Compact output must contain only essential tables and type names, with no JSDoc comments or implementation details.
@@ -451,6 +479,10 @@ if (hasErrors(result)) {
     - Tables for structured data (rules, protection levels)
     - Inline code blocks for CLI examples
     - Cross-reference to detailed documentation
+
+**Verified by:**
+
+- Compact and detailed outputs from same sources
 
 ---
 

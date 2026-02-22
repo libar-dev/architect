@@ -55,6 +55,10 @@ artifacts are annotated source code, executable specs, and decision specs.
     workflow concerns) may be defined in decision specs. The constraint is:
     one definition per pattern, regardless of source type.
 
+**Verified by:**
+
+- TypeScript source is canonical pattern definition
+
 ### Tier 1 specs are ephemeral working documents
 
 **Invariant:** Tier 1 roadmap specs serve planning and delivery tracking. They are not the source of truth for pattern identity, invariants, or acceptance criteria. After completion, they may be archived.
@@ -69,6 +73,10 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 **Value by lifecycle phase:**
 
+**Verified by:**
+
+- TypeScript source is canonical pattern definition
+
 ### Three durable artifact types
 
 **Invariant:** The delivery process produces three artifact types with long-term value. All other artifacts are projections or ephemeral.
@@ -81,6 +89,10 @@ artifacts are annotated source code, executable specs, and decision specs.
 | Executable specs         | Behavior verification, invariants    | Rules, rationale, acceptance criteria |
 | Decision specs (ADR/PDR) | Architectural choices, rationale     | Why decisions were made               |
 
+**Verified by:**
+
+- TypeScript source is canonical pattern definition
+
 ### Implements is UML Realization (many-to-one)
 
 **Invariant:** `@libar-docs-implements` declares a realization relationship. Multiple files can implement the same pattern. One file can implement multiple patterns (CSV format).
@@ -91,6 +103,10 @@ artifacts are annotated source code, executable specs, and decision specs.
 | ------------ | ------------------------ | ----------------------- |
 | Definition   | `@libar-docs-pattern`    | Exactly one per pattern |
 | Realization  | `@libar-docs-implements` | Many-to-one             |
+
+**Verified by:**
+
+- TypeScript source is canonical pattern definition
 
 ### Single-definition constraint
 
@@ -107,6 +123,10 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 **Migration path for existing conflicts:**
 
+**Verified by:**
+
+- TypeScript source is canonical pattern definition
+
 ### Reverse links preferred over forward links
 
 **Invariant:** `@libar-docs-implements` (reverse: "I verify this pattern") is the primary traceability mechanism. `@libar-docs-executable-specs` (forward: "my tests live here") is retained but not required.
@@ -117,6 +137,10 @@ artifacts are annotated source code, executable specs, and decision specs.
 | ----------------------------- | ----------------- | -------------------------------- |
 | `@implements` (reverse)       | 14 patterns (32%) | Self-maintaining, lives in test  |
 | `@executable-specs` (forward) | 9 patterns (20%)  | Requires tier 1 spec maintenance |
+
+**Verified by:**
+
+- TypeScript source is canonical pattern definition
 
 ---
 

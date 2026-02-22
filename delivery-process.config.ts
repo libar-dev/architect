@@ -33,6 +33,15 @@ export default defineConfig({
     // Output redirected to docs-live/ via product-area-docs generatorOverride
     ...createProductAreaConfigs(),
     {
+      title: 'Available Codecs Reference',
+      conventionTags: ['codec-registry'],
+      shapeSources: [],
+      behaviorCategories: [],
+      claudeMdSection: 'architecture',
+      docsFilename: 'ARCHITECTURE-CODECS.md',
+      claudeMdFilename: 'architecture-codecs.md',
+    },
+    {
       title: 'Reference Generation Sample',
       conventionTags: ['taxonomy-rules'],
       shapeSources: [],

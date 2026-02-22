@@ -3,11 +3,24 @@
  * @libar-docs-core
  * @libar-docs-pattern ValidationRulesCodec
  * @libar-docs-status completed
+ * @libar-docs-convention codec-registry
+ * @libar-docs-product-area:Generation
  *
- * ## Validation Rules Document Codec
+ * ## ValidationRulesCodec
  *
  * Transforms MasterDataset into a RenderableDocument for Process Guard validation
  * rules reference. Generates VALIDATION-RULES.md and detail files (validation/*.md).
+ *
+ * **Purpose:** Process Guard validation rules reference with FSM diagrams and protection level matrix.
+ *
+ * **Output Files:** `VALIDATION-RULES.md` (main reference), `validation/<category>.md` (category details)
+ *
+ * | Option | Type | Default | Description |
+ * | --- | --- | --- | --- |
+ * | includeFSMDiagram | boolean | true | Include FSM state diagram |
+ * | includeCLIUsage | boolean | true | Include CLI usage section |
+ * | includeEscapeHatches | boolean | true | Include escape hatches section |
+ * | includeProtectionMatrix | boolean | true | Include protection levels matrix |
  *
  * ### When to Use
  *

@@ -31,7 +31,7 @@ Configuration is the entry boundary — it transforms a user-authored `delivery-
 
 The generation pipeline transforms annotated source code into markdown documents. It follows a four-stage architecture: Scanner → Extractor → Transformer → Codec. Codecs are pure functions — given a MasterDataset, they produce a RenderableDocument without side effects. CompositeCodec composes multiple codecs into a single document.
 
-**75 patterns** — 62 completed, 1 active, 12 planned
+**77 patterns** — 62 completed, 1 active, 14 planned
 
 **Key patterns:** ADR005CodecBasedMarkdownRendering, CodecDrivenReferenceGeneration, CrossCuttingDocumentInclusion, ArchitectureDiagramGeneration, ScopedArchitecturalView
 
@@ -83,12 +83,12 @@ Process defines the USDP-inspired session workflow that governs how work moves t
 | ----------------------------------------------- | -------- | --------- | ------ | ------- |
 | [Annotation](product-areas/ANNOTATION.md)       | 26       | 23        | 2      | 1       |
 | [Configuration](product-areas/CONFIGURATION.md) | 9        | 8         | 0      | 1       |
-| [Generation](product-areas/GENERATION.md)       | 75       | 62        | 1      | 12      |
+| [Generation](product-areas/GENERATION.md)       | 77       | 62        | 1      | 14      |
 | [Validation](product-areas/VALIDATION.md)       | 22       | 14        | 1      | 7       |
 | [DataAPI](product-areas/DATA-API.md)            | 34       | 20        | 10     | 4       |
 | [CoreTypes](product-areas/CORE-TYPES.md)        | 7        | 6         | 0      | 1       |
 | [Process](product-areas/PROCESS.md)             | 11       | 4         | 0      | 7       |
-| **Total**                                       | **184**  | **137**   | **14** | **33**  |
+| **Total**                                       | **186**  | **137**   | **14** | **35**  |
 
 ---
 
@@ -107,6 +107,8 @@ C4Context
         System(DefineConfig, "DefineConfig")
         System(ConfigLoader, "ConfigLoader")
     }
+    System(ADR003SourceFirstPatternArchitecture, "ADR003SourceFirstPatternArchitecture")
+    System(ADR001TaxonomyCanonicalValues, "ADR001TaxonomyCanonicalValues")
     System(ShapeExtraction, "ShapeExtraction")
     System(ScopedArchitecturalView, "ScopedArchitecturalView")
     System(DeclarationLevelShapeTagging, "DeclarationLevelShapeTagging")
@@ -115,11 +117,9 @@ C4Context
     System(DataAPIContextAssembly, "DataAPIContextAssembly")
     System(CrossCuttingDocumentInclusion, "CrossCuttingDocumentInclusion")
     System(CodecDrivenReferenceGeneration, "CodecDrivenReferenceGeneration")
-    System(ADR003SourceFirstPatternArchitecture, "ADR003SourceFirstPatternArchitecture")
-    System(ADR001TaxonomyCanonicalValues, "ADR001TaxonomyCanonicalValues")
+    System(StringUtils, "StringUtils")
     System(ResultMonad, "ResultMonad")
     System(ErrorFactories, "ErrorFactories")
-    System(StringUtils, "StringUtils")
     System(ExtractionPipelineEnhancementsTesting, "ExtractionPipelineEnhancementsTesting")
     System(KebabCaseSlugs, "KebabCaseSlugs")
     System(ErrorHandlingUnification, "ErrorHandlingUnification")
@@ -141,6 +141,7 @@ C4Context
     Rel(DefineConfig, ProjectConfigTypes, "uses")
     Rel(ConfigLoader, DeliveryProcessFactory, "uses")
     Rel(ConfigLoader, ConfigurationTypes, "uses")
+    Rel(ADR003SourceFirstPatternArchitecture, ADR001TaxonomyCanonicalValues, "depends on")
     Rel(ScopedArchitecturalView, ShapeExtraction, "depends on")
     Rel(DeclarationLevelShapeTagging, ShapeExtraction, "depends on")
     Rel(DeclarationLevelShapeTagging, ReferenceDocShowcase, "depends on")
@@ -152,7 +153,6 @@ C4Context
     Rel(CrossCuttingDocumentInclusion, ReferenceDocShowcase, "depends on")
     Rel(CodecDrivenReferenceGeneration, DocGenerationProofOfConcept, "depends on")
     Rel(CodecDrivenReferenceGeneration, ScopedArchitecturalView, "depends on")
-    Rel(ADR003SourceFirstPatternArchitecture, ADR001TaxonomyCanonicalValues, "depends on")
     Rel(ExtractionPipelineEnhancementsTesting, ReferenceDocShowcase, "implements")
     Rel(KebabCaseSlugs, StringUtils, "depends on")
     Rel(ErrorHandlingUnification, ResultMonad, "depends on")
@@ -182,6 +182,8 @@ graph LR
         DefineConfig[/"DefineConfig"/]
         ConfigLoader[/"ConfigLoader"/]
     end
+    ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
+    ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
     ShapeExtraction["ShapeExtraction"]
     ScopedArchitecturalView["ScopedArchitecturalView"]
     DeclarationLevelShapeTagging["DeclarationLevelShapeTagging"]
@@ -190,11 +192,9 @@ graph LR
     DataAPIContextAssembly["DataAPIContextAssembly"]
     CrossCuttingDocumentInclusion["CrossCuttingDocumentInclusion"]
     CodecDrivenReferenceGeneration["CodecDrivenReferenceGeneration"]
-    ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
-    ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
+    StringUtils["StringUtils"]
     ResultMonad["ResultMonad"]
     ErrorFactories["ErrorFactories"]
-    StringUtils["StringUtils"]
     ExtractionPipelineEnhancementsTesting["ExtractionPipelineEnhancementsTesting"]
     KebabCaseSlugs["KebabCaseSlugs"]
     ErrorHandlingUnification["ErrorHandlingUnification"]
@@ -218,6 +218,7 @@ graph LR
     DefineConfig -->|uses| ProjectConfigTypes
     ConfigLoader -->|uses| DeliveryProcessFactory
     ConfigLoader -->|uses| ConfigurationTypes
+    ADR003SourceFirstPatternArchitecture -.->|depends on| ADR001TaxonomyCanonicalValues
     ScopedArchitecturalView -.->|depends on| ShapeExtraction
     DeclarationLevelShapeTagging -.->|depends on| ShapeExtraction
     DeclarationLevelShapeTagging -.->|depends on| ReferenceDocShowcase
@@ -229,7 +230,6 @@ graph LR
     CrossCuttingDocumentInclusion -.->|depends on| ReferenceDocShowcase
     CodecDrivenReferenceGeneration -.->|depends on| DocGenerationProofOfConcept
     CodecDrivenReferenceGeneration -.->|depends on| ScopedArchitecturalView
-    ADR003SourceFirstPatternArchitecture -.->|depends on| ADR001TaxonomyCanonicalValues
     ExtractionPipelineEnhancementsTesting ..->|implements| ReferenceDocShowcase
     KebabCaseSlugs -.->|depends on| StringUtils
     ErrorHandlingUnification -.->|depends on| ResultMonad

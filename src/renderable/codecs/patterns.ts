@@ -8,11 +8,25 @@
  * @libar-docs-arch-layer application
  * @libar-docs-include codec-transformation,pipeline-stages
  * @libar-docs-implements PatternRelationshipModel
+ * @libar-docs-convention codec-registry
+ * @libar-docs-product-area:Generation
  *
- * ## Patterns Document Codec
+ * ## PatternsDocumentCodec
  *
  * Transforms MasterDataset into a RenderableDocument for pattern registry output.
  * Generates PATTERNS.md and category detail files (patterns/*.md).
+ *
+ * **Purpose:** Pattern registry with category-based organization.
+ *
+ * **Output Files:** `PATTERNS.md` (main index), `patterns/<category>.md` (category details)
+ *
+ * | Option | Type | Default | Description |
+ * | --- | --- | --- | --- |
+ * | generateDetailFiles | boolean | true | Create category detail files |
+ * | detailLevel | "summary" \| "standard" \| "detailed" | "standard" | Output verbosity |
+ * | includeDependencyGraph | boolean | true | Render Mermaid dependency graph |
+ * | includeUseCases | boolean | true | Show use cases section |
+ * | filterCategories | string[] | [] | Filter to specific categories (empty = all) |
  *
  * ### When to Use
  *

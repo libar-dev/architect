@@ -4,22 +4,37 @@
  * @libar-docs-pattern BusinessRulesCodec
  * @libar-docs-status completed
  * @libar-docs-unlock-reason:Progressive-disclosure-by-product-area
+ * @libar-docs-convention codec-registry
+ * @libar-docs-product-area:Generation
  *
- * ## Business Rules Document Codec
+ * ## BusinessRulesCodec
  *
  * Transforms MasterDataset into a RenderableDocument for business rules output.
  * Generates BUSINESS-RULES.md organized by product area, phase, and feature.
+ *
+ * **Purpose:** Business rules documentation organized by product area, phase, and feature. Extracts domain constraints from Gherkin Rule: blocks.
+ *
+ * **Output Files:** `BUSINESS-RULES.md` (main index), `business-rules/<area-slug>.md` (area details)
+ *
+ * | Option | Type | Default | Description |
+ * | --- | --- | --- | --- |
+ * | groupBy | "domain" \| "phase" \| "domain-then-phase" | "domain-then-phase" | Primary grouping strategy |
+ * | includeCodeExamples | boolean | false | Include code examples from DocStrings |
+ * | includeTables | boolean | true | Include markdown tables from descriptions |
+ * | includeRationale | boolean | true | Include rationale section per rule |
+ * | filterDomains | string[] | [] | Filter by domain categories (empty = all) |
+ * | filterPhases | number[] | [] | Filter by phases (empty = all) |
+ * | onlyWithInvariants | boolean | false | Show only rules with explicit invariants |
+ * | includeSource | boolean | true | Include source feature file link |
+ * | includeVerifiedBy | boolean | true | Include Verified by scenario links |
+ * | maxDescriptionLength | number | 150 | Max description length in standard mode |
+ * | excludeSourcePaths | string[] | [] | Exclude patterns by source path prefix |
  *
  * ### When to Use
  *
  * - When generating business rules documentation for stakeholders
  * - When extracting domain constraints without implementation details
  * - When creating compliance or audit documentation from feature specs
- *
- * ### Purpose
- *
- * Enable stakeholders to understand domain constraints without reading
- * implementation details or full feature files.
  *
  * ### Information Architecture
  *

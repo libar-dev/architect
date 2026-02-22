@@ -21,6 +21,8 @@
 | CoreTypes | What foundational types exist? | Result monad, error factories, string utils |
 | Process | How does the session workflow work? | Session lifecycle, handoffs, conventions |
 
+**Verified by:** Canonical values are enforced
+
 ---
 
 ## ADR category canonical values
@@ -35,6 +37,8 @@
 | process | Workflow, conventions, annotation rules |
 | testing | Test strategy, verification approach |
 | documentation | Documentation generation, content structure |
+
+**Verified by:** Canonical values are enforced
 
 ---
 
@@ -51,13 +55,15 @@
 | completed | Hard-locked | No | Requires unlock-reason tag |
 | deferred | None | Yes | Full editing |
 
+**Verified by:** Canonical values are enforced
+
 ---
 
 ## Valid FSM transitions
 
 **Invariant:** Only these transitions are valid. All others are rejected by Process Guard.
 
-**Rationale:** Allowing arbitrary transitions (e.g., roadmap to completed) bypasses the active phase where scope-lock and deliverable tracking provide quality assurance. Completed is a terminal state. Modifications require `@libar-docs-unlock-reason` escape hatch.
+**Rationale:** Allowing arbitrary transitions (e.g., roadmap to completed) bypasses the active phase where scope-lock and deliverable tracking provide quality assurance.
 
 | From | To | Trigger |
 | --- | --- | --- |
@@ -66,6 +72,12 @@
 | active | completed | All deliverables done |
 | active | roadmap | Blocked/regressed |
 | deferred | roadmap | Resume planning |
+
+**Verified by:** Canonical values are enforced
+
+
+    Completed is a terminal state. Modifications require
+    `@libar-docs-unlock-reason` escape hatch.
 
 ---
 
@@ -84,6 +96,8 @@
 | number | Numeric value | @libar-docs-phase 15 |
 | quoted-value | Preserves spaces | @libar-docs-brief:'Multi word' |
 
+**Verified by:** Canonical values are enforced
+
 ---
 
 ## Source ownership
@@ -99,6 +113,8 @@
 | quarter | Feature files | TypeScript | Gherkin owns timeline metadata |
 | team | Feature files | TypeScript | Gherkin owns ownership metadata |
 
+**Verified by:** Canonical values are enforced
+
 ---
 
 ## Quarter format convention
@@ -106,6 +122,8 @@
 **Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`). ISO-year-first sorting works lexicographically.
 
 **Rationale:** Non-standard formats (e.g., Q1-2026) break lexicographic sorting, which roadmap generation and timeline queries depend on for correct ordering.
+
+**Verified by:** Canonical values are enforced
 
 ---
 
@@ -124,6 +142,8 @@
 | 5 | Validation | Verification, acceptance criteria confirmation |
 | 6 | Retrospective | Review, lessons learned, documentation |
 
+**Verified by:** Canonical values are enforced
+
 ---
 
 ## Deliverable status canonical values
@@ -140,6 +160,8 @@
 | deferred | Work postponed |
 | superseded | Replaced by another |
 | n/a | Not applicable |
+
+**Verified by:** Canonical values are enforced
 
 ---
 
@@ -505,16 +527,7 @@ Validation happens later at load time via Zod schema in `loadProjectConfig()`.
 
 ### When to Use
 
-In `delivery-process.config.ts` at project root:
-
-```typescript
-import { defineConfig } from '@libar-dev/delivery-process/config';
-
-export default defineConfig({
-  preset: 'ddd-es-cqrs',
-  sources: { typescript: ['src/** /*.ts'] },
-});
-```
+- In `delivery-process.config.ts` at project root to get type-safe configuration with autocompletion.
 
 ### ADR005CodecBasedMarkdownRendering
 
@@ -714,6 +727,10 @@ const referenceDoc = CompositeCodec.create({
 | CoreTypes | What foundational types exist? | Result monad, error factories, string utils |
 | Process | How does the session workflow work? | Session lifecycle, handoffs, conventions |
 
+**Verified by:**
+
+- Canonical values are enforced
+
 </details>
 
 <details>
@@ -731,6 +748,10 @@ const referenceDoc = CompositeCodec.create({
 | process | Workflow, conventions, annotation rules |
 | testing | Test strategy, verification approach |
 | documentation | Documentation generation, content structure |
+
+**Verified by:**
+
+- Canonical values are enforced
 
 </details>
 
@@ -750,6 +771,10 @@ const referenceDoc = CompositeCodec.create({
 | completed | Hard-locked | No | Requires unlock-reason tag |
 | deferred | None | Yes | Full editing |
 
+**Verified by:**
+
+- Canonical values are enforced
+
 </details>
 
 <details>
@@ -759,7 +784,7 @@ const referenceDoc = CompositeCodec.create({
 
 **Invariant:** Only these transitions are valid. All others are rejected by Process Guard.
 
-**Rationale:** Allowing arbitrary transitions (e.g., roadmap to completed) bypasses the active phase where scope-lock and deliverable tracking provide quality assurance. Completed is a terminal state. Modifications require `@libar-docs-unlock-reason` escape hatch.
+**Rationale:** Allowing arbitrary transitions (e.g., roadmap to completed) bypasses the active phase where scope-lock and deliverable tracking provide quality assurance.
 
 | From | To | Trigger |
 | --- | --- | --- |
@@ -768,6 +793,14 @@ const referenceDoc = CompositeCodec.create({
 | active | completed | All deliverables done |
 | active | roadmap | Blocked/regressed |
 | deferred | roadmap | Resume planning |
+
+**Verified by:**
+
+- Canonical values are enforced
+
+
+    Completed is a terminal state. Modifications require
+    `@libar-docs-unlock-reason` escape hatch.
 
 </details>
 
@@ -789,6 +822,10 @@ const referenceDoc = CompositeCodec.create({
 | number | Numeric value | @libar-docs-phase 15 |
 | quoted-value | Preserves spaces | @libar-docs-brief:'Multi word' |
 
+**Verified by:**
+
+- Canonical values are enforced
+
 </details>
 
 <details>
@@ -807,6 +844,10 @@ const referenceDoc = CompositeCodec.create({
 | quarter | Feature files | TypeScript | Gherkin owns timeline metadata |
 | team | Feature files | TypeScript | Gherkin owns ownership metadata |
 
+**Verified by:**
+
+- Canonical values are enforced
+
 </details>
 
 <details>
@@ -817,6 +858,10 @@ const referenceDoc = CompositeCodec.create({
 **Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`). ISO-year-first sorting works lexicographically.
 
 **Rationale:** Non-standard formats (e.g., Q1-2026) break lexicographic sorting, which roadmap generation and timeline queries depend on for correct ordering.
+
+**Verified by:**
+
+- Canonical values are enforced
 
 </details>
 
@@ -837,6 +882,10 @@ const referenceDoc = CompositeCodec.create({
 | 4 | Construction | Implementation, testing, integration |
 | 5 | Validation | Verification, acceptance criteria confirmation |
 | 6 | Retrospective | Review, lessons learned, documentation |
+
+**Verified by:**
+
+- Canonical values are enforced
 
 </details>
 
@@ -965,7 +1014,25 @@ const referenceDoc = CompositeCodec.create({
 
 **Invariant:** The inline default workflow constant is the only workflow source until preset integration is implemented. No preset or project config field exposes workflow customization.
 
-**Rationale:** Coupling workflow into the preset/config system before the inline fix ships would widen the blast radius and risk type regressions across all config consumers. Adding `workflow` as a field on `DeliveryProcessConfig` (presets) and `DeliveryProcessProjectConfig` (project config) is a natural next step but NOT required for the MVP fix. The inline constant in `workflow-loader.ts` resolves the warning. Moving workflow into the preset/config system enables: - Different presets with different default phases (e.g., 3-phase generic) - Per-project phase customization in delivery-process.config.ts - Phase definitions appearing in generated documentation See ideation artifact for design options: delivery-process/ideations/2026-02-15-workflow-config-and-fsm-extensibility.feature
+**Rationale:** Coupling workflow into the preset/config system before the inline fix ships would widen the blast radius and risk type regressions across all config consumers.
+
+**Verified by:**
+
+- N/A - deferred until preset integration
+
+    Adding `workflow` as a field on `DeliveryProcessConfig` (presets) and
+    `DeliveryProcessProjectConfig` (project config) is a natural next step
+    but NOT required for the MVP fix.
+
+    The inline constant in `workflow-loader.ts` resolves the warning. Moving
+    workflow into the preset/config system enables:
+    - Different presets with different default phases (e.g.
+- 3-phase generic)
+    - Per-project phase customization in delivery-process.config.ts
+    - Phase definitions appearing in generated documentation
+
+    See ideation artifact for design options:
+    delivery-process/ideations/2026-02-15-workflow-config-and-fsm-extensibility.feature
 
 </details>
 

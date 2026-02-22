@@ -12,6 +12,10 @@
  * Both sources produce the same `ConventionRuleContent` output, enabling
  * Gherkin and TypeScript convention content to merge in the same bundle.
  *
+ * TODO: Pipe characters (`|`) inside markdown table cells in JSDoc options tables
+ * are not escaped in the _claude-md summary output, producing broken table rendering.
+ * Affects codecs with enum-type options (e.g., `"phase" | "priority"`).
+ *
  * @see CodecDrivenReferenceGeneration spec
  * @see ReferenceDocShowcase spec
  */
@@ -222,13 +226,17 @@ function extractConventionRulesFromDescription(
   // Split by ## headings (level 2 only, not ### or deeper)
   // Allow optional leading whitespace for DocString content
   const headingPattern = /^\s*## (?!#)(.+)$/gm;
-  const headings: Array<{ name: string; index: number }> = [];
+  const headings: Array<{ name: string; index: number; matchEnd: number }> = [];
   let match;
 
   while ((match = headingPattern.exec(description)) !== null) {
     const captured = match[1];
     if (captured) {
-      headings.push({ name: captured.trim(), index: match.index });
+      headings.push({
+        name: captured.trim(),
+        index: match.index,
+        matchEnd: match.index + match[0].length,
+      });
     }
   }
 
@@ -244,9 +252,11 @@ function extractConventionRulesFromDescription(
     if (!heading) continue;
     const nextIndex =
       i + 1 < headings.length ? (headings[i + 1]?.index ?? description.length) : description.length;
-    // Content starts after the heading line
-    const headingLineEnd = description.indexOf('\n', heading.index);
-    const contentStart = headingLineEnd >= 0 ? headingLineEnd + 1 : description.length;
+    // Content starts after the heading match (match includes the full "## Name" line)
+    // Use matchEnd instead of indexOf('\n', heading.index) because \s* in the regex
+    // can consume leading newlines, making heading.index point to those newlines
+    const contentStart =
+      heading.matchEnd < description.length ? heading.matchEnd + 1 : description.length;
     const content = description.slice(contentStart, nextIndex).trim();
 
     if (content.length > 0) {

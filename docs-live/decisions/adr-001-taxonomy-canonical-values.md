@@ -49,6 +49,10 @@ These are the durable constants of the delivery process.
 | CoreTypes     | What foundational types exist?      | Result monad, error factories, string utils     |
 | Process       | How does the session workflow work? | Session lifecycle, handoffs, conventions        |
 
+**Verified by:**
+
+- Canonical values are enforced
+
 ### ADR category canonical values
 
 **Invariant:** The adr-category tag uses one of 4 values.
@@ -61,6 +65,10 @@ These are the durable constants of the delivery process.
 | process       | Workflow, conventions, annotation rules       |
 | testing       | Test strategy, verification approach          |
 | documentation | Documentation generation, content structure   |
+
+**Verified by:**
+
+- Canonical values are enforced
 
 ### FSM status values and protection levels
 
@@ -75,11 +83,15 @@ These are the durable constants of the delivery process.
 | completed | Hard-locked  | No                   | Requires unlock-reason tag      |
 | deferred  | None         | Yes                  | Full editing                    |
 
+**Verified by:**
+
+- Canonical values are enforced
+
 ### Valid FSM transitions
 
 **Invariant:** Only these transitions are valid. All others are rejected by Process Guard.
 
-**Rationale:** Allowing arbitrary transitions (e.g., roadmap to completed) bypasses the active phase where scope-lock and deliverable tracking provide quality assurance. Completed is a terminal state. Modifications require `@libar-docs-unlock-reason` escape hatch.
+**Rationale:** Allowing arbitrary transitions (e.g., roadmap to completed) bypasses the active phase where scope-lock and deliverable tracking provide quality assurance.
 
 | From     | To        | Trigger               |
 | -------- | --------- | --------------------- |
@@ -88,6 +100,13 @@ These are the durable constants of the delivery process.
 | active   | completed | All deliverables done |
 | active   | roadmap   | Blocked/regressed     |
 | deferred | roadmap   | Resume planning       |
+
+**Verified by:**
+
+- Canonical values are enforced
+
+  Completed is a terminal state. Modifications require
+  `@libar-docs-unlock-reason` escape hatch.
 
 ### Tag format types
 
@@ -104,6 +123,10 @@ These are the durable constants of the delivery process.
 | number       | Numeric value                  | @libar-docs-phase 15           |
 | quoted-value | Preserves spaces               | @libar-docs-brief:'Multi word' |
 
+**Verified by:**
+
+- Canonical values are enforced
+
 ### Source ownership
 
 **Invariant:** Relationship tags have defined ownership by source type. Anti-pattern detection enforces these boundaries.
@@ -117,11 +140,19 @@ These are the durable constants of the delivery process.
 | quarter    | Feature files  | TypeScript    | Gherkin owns timeline metadata     |
 | team       | Feature files  | TypeScript    | Gherkin owns ownership metadata    |
 
+**Verified by:**
+
+- Canonical values are enforced
+
 ### Quarter format convention
 
 **Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`). ISO-year-first sorting works lexicographically.
 
 **Rationale:** Non-standard formats (e.g., Q1-2026) break lexicographic sorting, which roadmap generation and timeline queries depend on for correct ordering.
+
+**Verified by:**
+
+- Canonical values are enforced
 
 ### Canonical phase definitions (6-phase USDP standard)
 
@@ -138,6 +169,10 @@ These are the durable constants of the delivery process.
 | 5     | Validation    | Verification, acceptance criteria confirmation |
 | 6     | Retrospective | Review, lessons learned, documentation         |
 
+**Verified by:**
+
+- Canonical values are enforced
+
 ### Deliverable status canonical values
 
 **Invariant:** Deliverable status (distinct from pattern FSM status) uses exactly 6 values, enforced by Zod schema at parse time.
@@ -152,6 +187,10 @@ These are the durable constants of the delivery process.
 | deferred    | Work postponed       |
 | superseded  | Replaced by another  |
 | n/a         | Not applicable       |
+
+**Verified by:**
+
+- Canonical values are enforced
 
 ---
 

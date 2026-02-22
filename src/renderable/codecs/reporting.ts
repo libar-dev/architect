@@ -3,19 +3,44 @@
  * @libar-docs-core
  * @libar-docs-pattern ReportingCodecs
  * @libar-docs-status completed
+ * @libar-docs-convention codec-registry
+ * @libar-docs-product-area:Generation
  *
- * ## Reporting Document Codecs
+ * ## ChangelogCodec
  *
- * Transforms MasterDataset into RenderableDocuments for reporting outputs:
- * - CHANGELOG-GENERATED.md (Keep a Changelog format)
- * - TRACEABILITY.md (Timeline to behavior file coverage)
- * - OVERVIEW.md (Project architecture overview)
+ * **Purpose:** Keep a Changelog format changelog grouped by release version.
+ *
+ * **Output Files:** `CHANGELOG.md`
+ *
+ * | Option | Type | Default | Description |
+ * | --- | --- | --- | --- |
+ * | includeUnreleased | boolean | true | Include unreleased section |
+ * | includeLinks | boolean | true | Include links |
+ * | categoryMapping | Record<string, string> | {} | Map categories to changelog types |
+ *
+ * ## TraceabilityCodec
+ *
+ * **Purpose:** Timeline to behavior file coverage report.
+ *
+ * **Output Files:** `TRACEABILITY.md`
  *
  * ### When to Use
  *
- * - When generating changelogs in Keep a Changelog format
- * - When creating traceability reports for spec-to-test coverage
- * - When building project overview documentation
+ * - When auditing which timeline patterns have associated behavior specifications
+ * - When checking feature file coverage across roadmap phases
+ * - When identifying patterns missing executable specs
+ *
+ * ## OverviewCodec
+ *
+ * **Purpose:** Project architecture and status overview.
+ *
+ * **Output Files:** `OVERVIEW.md`
+ *
+ * ### When to Use
+ *
+ * - When generating a high-level project dashboard with architecture summary
+ * - When providing stakeholder-facing status reports
+ * - When combining completion stats with architecture context
  */
 
 import { z } from 'zod';

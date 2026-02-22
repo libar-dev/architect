@@ -48,6 +48,10 @@ Enforce strict Gherkin-only testing for the delivery-process package:
 | Acceptance criteria | Implicit in test code       | Explicit @acceptance-criteria tags |
 | Traceability        | Manual cross-referencing    | @libar-docs-implements links       |
 
+**Verified by:**
+
+- Gherkin-only policy enforced
+
 ---
 
 [← Back to All Decisions](../DECISIONS.md)

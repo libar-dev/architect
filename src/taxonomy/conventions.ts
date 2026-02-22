@@ -3,8 +3,8 @@
  *
  * Each value maps to a convention domain that can be used to tag
  * decision records with `@libar-docs-convention:value1,value2`.
- * The 11 values correspond to the 11 convention domains extracted
- * from the former recipe .feature files.
+ * Values correspond to convention domains extracted from the former
+ * recipe .feature files, plus `codec-registry` for auto-generated codec docs.
  *
  * @see CodecDrivenReferenceGeneration spec
  */
@@ -22,6 +22,7 @@ export const CONVENTION_VALUES = [
   'publishing',
   'doc-generation',
   'taxonomy-rules',
+  'codec-registry',
 ] as const;
 
 export type ConventionValue = (typeof CONVENTION_VALUES)[number];

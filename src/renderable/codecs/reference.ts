@@ -3,17 +3,65 @@
  * @libar-docs-pattern ReferenceDocumentCodec
  * @libar-docs-status active
  * @libar-docs-implements CodecDrivenReferenceGeneration
+ * @libar-docs-convention codec-registry
+ * @libar-docs-product-area:Generation
  *
- * ## Parameterized Reference Document Codec
+ * ## ReferenceDocumentCodec
  *
  * A single codec factory that creates reference document codecs from
  * configuration objects. Convention content is sourced from
  * decision records tagged with @libar-docs-convention.
  *
+ * **Purpose:** Scoped reference documentation assembling four content layers (conventions, diagrams, shapes, behaviors) into a single document.
+ *
+ * **Output Files:** Configured per-instance (e.g., `docs/REFERENCE-SAMPLE.md`, `_claude-md/architecture/reference-sample.md`)
+ *
+ * ### 4-Layer Composition (in order)
+ *
+ * 1. **Convention content** -- Extracted from `@libar-docs-convention`-tagged patterns (rules, invariants, tables)
+ * 2. **Scoped diagrams** -- Mermaid diagrams filtered by `archContext`, `archLayer`, `patterns`, or `include` tags
+ * 3. **TypeScript shapes** -- API surfaces from `shapeSources` globs or `shapeSelectors` (declaration-level filtering)
+ * 4. **Behavior content** -- Gherkin-sourced patterns from `behaviorCategories`
+ *
+ * ### Key Options (ReferenceDocConfig)
+ *
+ * | Option | Type | Description |
+ * | --- | --- | --- |
+ * | conventionTags | string[] | Convention tag values to extract from decision records |
+ * | diagramScope | DiagramScope | Single diagram configuration |
+ * | diagramScopes | DiagramScope[] | Multiple diagrams (takes precedence over diagramScope) |
+ * | shapeSources | string[] | Glob patterns for TypeScript shape extraction |
+ * | shapeSelectors | ShapeSelector[] | Fine-grained declaration-level shape filtering |
+ * | behaviorCategories | string[] | Category tags for behavior pattern content |
+ * | includeTags | string[] | Cross-cutting content routing via include tags |
+ * | preamble | SectionBlock[] | Static editorial sections prepended before generated content |
+ * | productArea | string | Pre-filter all content sources to matching product area |
+ * | excludeSourcePaths | string[] | Exclude patterns by source path prefix |
+ *
+ * ### DiagramScope.diagramType Values
+ *
+ * | Type | Description |
+ * | --- | --- |
+ * | graph (default) | Flowchart with subgraphs by archContext, custom node shapes |
+ * | sequenceDiagram | Sequence diagram with typed messages between participants |
+ * | stateDiagram-v2 | State diagram with transitions from dependsOn relationships |
+ * | C4Context | C4 context diagram with boundaries, systems, and relationships |
+ * | classDiagram | Class diagram with archRole stereotypes and typed arrows |
+ *
+ * ### ShapeSelector Variants
+ *
+ * | Variant | Example | Behavior |
+ * | --- | --- | --- |
+ * | group only | `{ group: "api-types" }` | Match shapes by group tag |
+ * | source + names | `{ source: "src/types.ts", names: ["Config"] }` | Named shapes from file |
+ * | source only | `{ source: "src/path/*.ts" }` | All tagged shapes from glob |
+ *
  * ### When to Use
  *
  * - When generating reference documentation from convention-tagged decisions
+ * - When creating scoped product area documents with live diagrams
  * - When creating both detailed (docs/) and summary (_claude-md/) outputs
+ * - When assembling multi-layer documents that combine conventions, diagrams, shapes, and behaviors
  *
  * ### Factory Pattern
  *
@@ -190,6 +238,13 @@ export interface ReferenceDocConfig {
    * @example ['delivery-process/specs/']
    */
   readonly excludeSourcePaths?: readonly string[];
+
+  /**
+   * Static preamble sections prepended before all generated content.
+   * Use for editorial intro prose that cannot be expressed as annotations.
+   * Appears in both detailed and summary outputs.
+   */
+  readonly preamble?: readonly SectionBlock[];
 }
 
 // ============================================================================
@@ -515,6 +570,7 @@ export function createReferenceCodec(
       const sections: SectionBlock[] = [];
 
       // Product area filtering: when set, pre-filter and auto-derive content sources
+      // Preamble is applied inside decodeProductArea() — not here, to avoid dead code
       if (config.productArea !== undefined) {
         return decodeProductArea(dataset, config, opts);
       }
@@ -685,6 +741,12 @@ function decodeProductArea(
     return document('Error', [paragraph('No product area specified.')], {});
   }
   const sections: SectionBlock[] = [];
+
+  // Static preamble: editorial sections before generated content
+  if (config.preamble !== undefined && config.preamble.length > 0) {
+    sections.push(...config.preamble);
+    sections.push(separator());
+  }
 
   // Pre-filter patterns by product area
   const areaPatterns = dataset.patterns.filter((p) => p.productArea === area);

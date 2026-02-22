@@ -7,26 +7,35 @@
  * @libar-docs-arch-context renderer
  * @libar-docs-arch-layer application
  * @libar-docs-include codec-transformation
+ * @libar-docs-convention codec-registry
+ * @libar-docs-product-area:Generation
  *
- * ## Session Document Codec
+ * ## SessionContextCodec
  *
- * Transforms MasterDataset into RenderableDocuments for session/planning outputs:
- * - SESSION-CONTEXT.md (current session context)
- * - REMAINING-WORK.md (incomplete work aggregation)
+ * **Purpose:** Current session context for AI agents and developers.
+ *
+ * **Output Files:** `SESSION-CONTEXT.md` (session status), `sessions/phase-<N>-<name>.md` (incomplete phase details)
  *
  * ### When to Use
  *
- * - When generating session context for Claude Code integration
- * - When tracking remaining work and incomplete deliverables
- * - When building session handoff documentation
+ * - When starting a new implementation session and need to see active work status
+ * - When generating compact context for AI agent consumption (_claude-md/ output)
+ * - When checking incomplete phases and their deliverable progress
  *
- * ### Factory Pattern
+ * ## RemainingWorkCodec
  *
- * Use factory functions for custom options:
- * ```typescript
- * const codec = createSessionContextCodec({ includeRelatedPatterns: true });
- * const remainingCodec = createRemainingWorkCodec({ sortBy: "priority" });
- * ```
+ * **Purpose:** Aggregate view of all incomplete work across phases.
+ *
+ * **Output Files:** `REMAINING-WORK.md` (summary), `remaining/phase-<N>-<name>.md` (phase details)
+ *
+ * | Option | Type | Default | Description |
+ * | --- | --- | --- | --- |
+ * | includeIncomplete | boolean | true | Include planned items |
+ * | includeBlocked | boolean | true | Show blocked items analysis |
+ * | includeNextActionable | boolean | true | Next actionable items section |
+ * | maxNextActionable | number | 5 | Max items in next actionable |
+ * | sortBy | "phase" \| "priority" \| "effort" \| "quarter" | "phase" | Sort order |
+ * | groupPlannedBy | "quarter" \| "priority" \| "level" \| "none" | "none" | Group planned items |
  */
 
 import { z } from 'zod';
