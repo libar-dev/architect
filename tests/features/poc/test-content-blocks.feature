@@ -29,6 +29,9 @@ Feature: Test Content Blocks
 
   Rule: Business rules appear as a separate section
 
+    **Invariant:** Every Rule block must produce a distinct Business Rule entry containing its description and associated scenarios.
+    **Rationale:** Without guaranteed capture, rule descriptions and rich content (DocStrings, DataTables) would be silently dropped from generated documentation.
+
     Rule descriptions provide context for why this business rule exists.
     You can include multiple paragraphs here.
 
@@ -64,6 +67,9 @@ Feature: Test Content Blocks
       Then access is granted based on permissions
 
   Rule: Multiple rules create multiple Business Rule entries
+
+    **Invariant:** Each Rule keyword in a feature file must produce its own independent Business Rule entry in generated output.
+    **Rationale:** Merging rules into a single entry would collapse distinct business domains, making it impossible to trace scenarios back to their governing constraint.
 
     Each Rule keyword creates a separate entry in the Business Rules section.
     This helps organize complex features into logical business domains.

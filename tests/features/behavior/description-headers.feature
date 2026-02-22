@@ -65,6 +65,7 @@ Feature: Description Header Normalization
   Rule: Edge cases are handled correctly
 
     **Invariant:** Header stripping handles degenerate inputs (header-only, whitespace-only, mid-description headers) without data loss or rendering errors.
+    **Rationale:** Patterns with unusual descriptions (header-only stubs, whitespace padding) are common in early roadmap stages; crashing on these would block documentation generation for the entire dataset.
     **Verified by:** Empty description after stripping headers, Description with only whitespace and headers, Header in middle of description is preserved
 
     Scenario: Empty description after stripping headers
@@ -98,6 +99,7 @@ Feature: Description Header Normalization
   Rule: stripLeadingHeaders removes only leading headers
 
     **Invariant:** The helper function strips only headers that appear before any non-header content; headers occurring after body text are preserved.
+    **Rationale:** Mid-description headers are intentional structural elements authored by the user; stripping them would silently destroy document structure.
     **Verified by:** Strips h1 header, Strips h2 through h6 headers, Strips leading empty lines before header, Preserves content starting with text, Returns empty string for header-only input, Handles null/undefined input
 
     Scenario: Strips h1 header

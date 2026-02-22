@@ -21,6 +21,7 @@ Feature: Slug Generation for Progressive Disclosure
   Rule: CamelCase names convert to kebab-case
 
     **Invariant:** CamelCase pattern names must be split at word boundaries and joined with hyphens in lowercase.
+    **Rationale:** Generated file names and URL fragments must be human-readable and URL-safe; unsplit CamelCase produces opaque slugs that are difficult to scan in directory listings.
     **Verified by:** Convert pattern names to readable slugs
 
     Scenario Outline: Convert pattern names to readable slugs
@@ -44,6 +45,7 @@ Feature: Slug Generation for Progressive Disclosure
   Rule: Edge cases are handled correctly
 
     **Invariant:** Slug generation must handle special characters, consecutive separators, and leading/trailing hyphens without producing invalid slugs.
+    **Rationale:** Unhandled edge cases produce malformed file names (double hyphens, leading dashes) that break cross-platform path resolution and make generated links inconsistent.
     **Verified by:** Handle edge cases in slug generation
 
     Scenario Outline: Handle edge cases in slug generation
@@ -62,6 +64,7 @@ Feature: Slug Generation for Progressive Disclosure
   Rule: Requirements include phase prefix
 
     **Invariant:** Requirement slugs must be prefixed with "phase-NN-" where NN is the zero-padded phase number, defaulting to "00" when no phase is assigned.
+    **Rationale:** Phase prefixes enable lexicographic sorting of requirement files by delivery order, so directory listings naturally reflect the roadmap sequence.
     **Verified by:** Requirement slugs include phase number, Requirement without phase uses phase 00
 
     Scenario Outline: Requirement slugs include phase number
@@ -84,6 +87,7 @@ Feature: Slug Generation for Progressive Disclosure
   Rule: Phase slugs use kebab-case for names
 
     **Invariant:** Phase slugs must combine a zero-padded phase number with the kebab-case name in the format "phase-NN-name", defaulting to "unnamed" when no name is provided.
+    **Rationale:** A consistent "phase-NN-name" format ensures phase files sort numerically and remain identifiable even when the phase number alone would be ambiguous across roadmap versions.
     **Verified by:** Phase slugs combine number and kebab-case name, Phase without name uses "unnamed"
 
     Scenario Outline: Phase slugs combine number and kebab-case name

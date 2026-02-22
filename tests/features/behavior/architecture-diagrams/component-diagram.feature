@@ -20,6 +20,7 @@ Feature: Component Diagram Generation
   Rule: Component diagrams group patterns by bounded context
 
     **Invariant:** Each distinct arch-context value must produce exactly one Mermaid subgraph containing all patterns with that context.
+    **Rationale:** Without subgraph grouping, the visual relationship between components and their bounded context is lost, making the diagram structurally meaningless.
     **Verified by:** Generate subgraphs for bounded contexts
 
     Patterns with arch-context are grouped into Mermaid subgraphs.
@@ -115,6 +116,7 @@ Feature: Component Diagram Generation
   Rule: Component diagram includes summary section
 
     **Invariant:** The generated component diagram document must include an Overview section with component count and bounded context count.
+    **Rationale:** Without summary counts, readers cannot quickly assess diagram scope or detect missing components.
     **Verified by:** Summary section with counts
 
     The generated document starts with an overview section
@@ -137,6 +139,7 @@ Feature: Component Diagram Generation
   Rule: Component diagram includes legend when enabled
 
     **Invariant:** When the legend is enabled, the document must include a Legend section explaining relationship arrow styles.
+    **Rationale:** Without a legend, readers cannot distinguish uses, depends-on, implements, and extends arrows, making relationship semantics ambiguous.
     **Verified by:** Legend section with arrow explanations
 
     The legend explains arrow style meanings for readers.
@@ -156,6 +159,7 @@ Feature: Component Diagram Generation
   Rule: Component diagram includes inventory table when enabled
 
     **Invariant:** When the inventory is enabled, the document must include a Component Inventory table with Component, Context, Role, and Layer columns.
+    **Rationale:** The inventory provides a searchable, text-based alternative to the visual diagram for tooling and accessibility.
     **Verified by:** Inventory table with component details
 
     The inventory lists all components with their metadata.

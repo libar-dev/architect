@@ -22,6 +22,9 @@ Feature: Universal Document Generator - Robustness Foundation
 
   Rule: Context - PoC limitations prevent monorepo-scale operation
 
+    **Invariant:** The document generator must produce correct, deduplicated output and surface all errors explicitly before operating at monorepo scale.
+    **Rationale:** Silent failures and duplicated content in the PoC corrupt generated docs across all 210 target files, making bugs invisible until downstream consumers encounter broken documentation.
+
     **The Problem:**
 
     The DecisionDocGenerator PoC (Phase 27) successfully demonstrated code-first
@@ -52,6 +55,9 @@ Feature: Universal Document Generator - Robustness Foundation
   # ============================================================================
 
   Rule: Decision - Robustness requires four coordinated improvements
+
+    **Invariant:** Robustness improvements must be implemented as four distinct, coordinated modules (deduplication, validation, warning collection, file validation) rather than ad-hoc fixes.
+    **Rationale:** Scattering reliability fixes across existing code creates coupling and makes individual concerns untestable; isolated modules enable independent verification and replacement.
 
     **Architecture:**
 
@@ -113,6 +119,9 @@ Feature: Universal Document Generator - Robustness Foundation
 
   Rule: Duplicate content must be detected and merged
 
+    **Invariant:** No two sections in a generated document may have identical content fingerprints; duplicates must be merged into a single section with source attribution.
+    **Rationale:** Duplicate sections confuse readers and inflate document size, undermining trust in generated documentation as a reliable replacement for manually maintained docs.
+
     Content fingerprinting identifies duplicate sections extracted from multiple
     sources. When duplicates are found, the system merges them intelligently
     based on source priority.
@@ -137,6 +146,9 @@ Feature: Universal Document Generator - Robustness Foundation
   # ============================================================================
 
   Rule: Invalid source mappings must fail fast with clear errors
+
+    **Invariant:** Every source mapping must pass pre-flight validation (file existence, method validity, readability) before any extraction is attempted.
+    **Rationale:** Without pre-flight validation, invalid mappings produce silent failures or cryptic runtime errors, making it impossible to diagnose configuration problems at monorepo scale.
 
     Pre-flight validation catches configuration errors before extraction begins.
     This prevents silent failures and provides actionable error messages.
@@ -177,6 +189,9 @@ Feature: Universal Document Generator - Robustness Foundation
 
   Rule: Warnings must be collected and reported consistently
 
+    **Invariant:** All non-fatal issues during extraction must be captured in a structured warning collector grouped by source, never emitted via console.warn.
+    **Rationale:** Scattered console.warn calls are lost in CI output and lack source context, making it impossible to trace warnings back to the configuration entry that caused them.
+
     The warning collector replaces scattered console.warn calls with a
     structured system that aggregates warnings and reports them consistently.
 
@@ -207,6 +222,9 @@ Feature: Universal Document Generator - Robustness Foundation
   # ============================================================================
 
   Rule: Consequence - Improved reliability at cost of stricter validation
+
+    **Invariant:** Existing source mappings that previously succeeded silently may now fail validation and must be updated to conform to the stricter checks.
+    **Rationale:** Allowing invalid mappings to bypass validation would preserve the silent-failure behavior the robustness work was designed to eliminate.
 
     **Positive:**
 

@@ -15,6 +15,8 @@ Feature: Universal Markdown Renderer - Block Types
   Rule: Document metadata renders as frontmatter before sections
 
       **Invariant:** Title always renders as H1, purpose and detail level render as bold key-value pairs separated by horizontal rule.
+      **Rationale:** Consistent frontmatter structure allows downstream tooling and readers to reliably locate the document title and metadata without parsing the full body.
+
       **Verified by:** Render minimal document with title only, Render document with purpose, Render document with detail level, Render document with purpose and detail level
 
     @happy-path
@@ -48,6 +50,8 @@ Feature: Universal Markdown Renderer - Block Types
   Rule: Headings render at correct markdown levels with clamping
 
       **Invariant:** Heading levels are clamped to the valid range 1-6 regardless of input value.
+      **Rationale:** Markdown only supports heading levels 1-6; unclamped values would produce invalid syntax that renders as plain text in all markdown processors.
+
       **Verified by:** Render headings at different levels, Clamp heading level 0 to 1, Clamp heading level 7 to 6
 
     Scenario Outline: Render headings at different levels
@@ -79,6 +83,8 @@ Feature: Universal Markdown Renderer - Block Types
   Rule: Paragraphs and separators render as plain text and horizontal rules
 
       **Invariant:** Paragraph content passes through unmodified, including special markdown characters. Separators render as horizontal rules.
+      **Rationale:** The renderer is a dumb printer; altering paragraph content would break codec-controlled formatting and violate the separation between codec logic and rendering.
+
       **Verified by:** Render paragraph, Render paragraph with special characters, Render separator
 
     Scenario: Render paragraph
@@ -99,6 +105,8 @@ Feature: Universal Markdown Renderer - Block Types
   Rule: Tables render with headers, alignment, and cell escaping
 
       **Invariant:** Tables must escape pipe characters, convert newlines to line breaks, and pad short rows to match column count.
+      **Rationale:** Unescaped pipes corrupt table column boundaries, raw newlines break row parsing, and short rows cause column misalignment in every markdown renderer.
+
       **Verified by:** Render basic table, Render table with alignment, Render empty table (no columns), Render table with pipe character in cell, Render table with newline in cell, Render table with short row (fewer cells than columns)
 
     @happy-path
@@ -148,6 +156,8 @@ Feature: Universal Markdown Renderer - Block Types
   Rule: Lists render in unordered, ordered, checkbox, and nested formats
 
       **Invariant:** List type determines prefix: dash for unordered, numbered for ordered, checkbox syntax for checked items. Nesting adds two-space indentation per level.
+      **Rationale:** Incorrect prefixes or indentation levels cause markdown parsers to break list continuity, rendering nested items as separate top-level lists or plain text.
+
       **Verified by:** Render unordered list, Render ordered list, Render checkbox list with checked items, Render nested list
 
     @happy-path

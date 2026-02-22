@@ -20,6 +20,7 @@ Feature: Result Monad
   Rule: Result.ok wraps values into success results
 
     **Invariant:** Result.ok always produces a result where isOk is true, regardless of the wrapped value type (primitives, objects, null, undefined).
+    **Rationale:** Consumers rely on isOk to branch logic; if Result.ok could produce an ambiguous state, every call site would need defensive checks beyond the type guard.
     **Verified by:** Result.ok wraps a primitive value, Result.ok wraps an object value, Result.ok wraps null value, Result.ok wraps undefined value
 
     @function:Result.ok @happy-path
@@ -52,6 +53,7 @@ Feature: Result Monad
   Rule: Result.err wraps values into error results
 
     **Invariant:** Result.err always produces a result where isErr is true, supporting Error instances, strings, and structured objects as error values.
+    **Rationale:** Supporting multiple error value types allows callers to propagate rich context (structured objects) or simple messages (strings) without forcing a single error representation.
     **Verified by:** Result.err wraps an Error instance, Result.err wraps a string error, Result.err wraps a structured error object
 
     @function:Result.err @happy-path
@@ -79,6 +81,7 @@ Feature: Result Monad
   Rule: Type guards distinguish success from error results
 
     **Invariant:** isOk and isErr are mutually exclusive: exactly one returns true for any Result value.
+    **Rationale:** If both guards could return true (or both false), TypeScript type narrowing would break, leaving the value/error branch unreachable or unsound.
     **Verified by:** Type guards correctly identify success results, Type guards correctly identify error results
 
     @function:Result.isOk @function:Result.isErr
@@ -96,6 +99,7 @@ Feature: Result Monad
   Rule: unwrap extracts the value or throws the error
 
     **Invariant:** unwrap on a success result returns the value; unwrap on an error result always throws an Error instance (wrapping non-Error values for stack trace preservation).
+    **Rationale:** Wrapping non-Error values in Error instances ensures stack traces are always available for debugging, preventing the loss of call-site context when string or object errors are thrown.
     **Verified by:** unwrap extracts value from success result, unwrap throws the Error from error result, unwrap wraps non-Error in Error for proper stack trace, unwrap serializes object error to JSON in message
 
     @function:Result.unwrap @happy-path
@@ -132,6 +136,7 @@ Feature: Result Monad
   Rule: unwrapOr extracts the value or returns a default
 
     **Invariant:** unwrapOr on a success result returns the contained value (ignoring the default); on an error result it returns the provided default value.
+    **Rationale:** Providing a safe fallback path avoids forcing callers to handle errors explicitly when a sensible default exists, reducing boilerplate in non-critical error recovery.
     **Verified by:** unwrapOr returns value from success result, unwrapOr returns default from error result, unwrapOr returns numeric default from error result
 
     @function:Result.unwrapOr @happy-path
@@ -155,6 +160,7 @@ Feature: Result Monad
   Rule: map transforms the success value without affecting errors
 
     **Invariant:** map applies the transformation function only to success results; error results pass through unchanged. Multiple maps can be chained.
+    **Rationale:** Skipping the transformation on error results enables chained pipelines to short-circuit on the first failure without requiring explicit error checks at each step.
     **Verified by:** map transforms success value, map passes through error unchanged, map chains multiple transformations
 
     @function:Result.map @happy-path
@@ -181,6 +187,7 @@ Feature: Result Monad
   Rule: mapErr transforms the error value without affecting successes
 
     **Invariant:** mapErr applies the transformation function only to error results; success results pass through unchanged. Error types can be converted.
+    **Rationale:** Allowing error-type conversion at boundaries (e.g., low-level I/O errors to domain errors) keeps success paths untouched and preserves the original value through error-handling layers.
     **Verified by:** mapErr transforms error value, mapErr passes through success unchanged, mapErr converts error type
 
     @function:Result.mapErr @happy-path

@@ -25,6 +25,7 @@ Feature: Transform Dataset Pipeline
   Rule: Empty dataset produces valid zero-state views
 
     **Invariant:** An empty input produces a MasterDataset with all counts at zero and no groupings.
+    **Rationale:** Generators must handle the zero-state gracefully; a missing or malformed empty dataset would cause null-reference errors across all rendering codecs.
 
     **Verified by:** Transform empty dataset
 
@@ -107,6 +108,7 @@ Feature: Transform Dataset Pipeline
   Rule: Quarter and category grouping organizes by timeline and domain
 
     **Invariant:** Patterns are grouped by quarter and category, with only patterns bearing the relevant metadata included in each view.
+    **Rationale:** Timeline and domain views must exclude patterns without the relevant metadata to prevent misleading counts and empty groupings in generated documentation.
 
     **Verified by:** Group patterns by quarter, Patterns without quarter are not in byQuarter, Group patterns by category
 
@@ -148,6 +150,7 @@ Feature: Transform Dataset Pipeline
   Rule: Source grouping separates TypeScript and Gherkin origins
 
     **Invariant:** Patterns are partitioned by source file type, and patterns with phase metadata appear in the roadmap view.
+    **Rationale:** Codecs that render TypeScript-specific or Gherkin-specific views depend on pre-partitioned sources; mixing sources would produce incorrect per-origin statistics and broken cross-references.
 
     **Verified by:** Group patterns by source file type, Patterns with phase are also in roadmap view
 
@@ -224,6 +227,7 @@ Feature: Transform Dataset Pipeline
   Rule: Completion tracking computes project progress
 
     **Invariant:** Completion percentage is rounded to the nearest integer, and fully-completed requires all patterns in completed status with a non-zero total.
+    **Rationale:** Inconsistent rounding or a false-positive fully-completed signal on an empty dataset would misrepresent project health in dashboards and generated progress reports.
 
     **Verified by:** Calculate completion percentage, Check if fully completed
 
@@ -260,6 +264,7 @@ Feature: Transform Dataset Pipeline
   Rule: Workflow integration conditionally includes delivery process data
 
     **Invariant:** The workflow is included in the MasterDataset only when provided, and phase names are resolved from the workflow configuration.
+    **Rationale:** Projects without a delivery workflow must still produce valid datasets; unconditionally requiring workflow data would break standalone documentation generation.
 
     **Verified by:** Include workflow in result when provided, Result omits workflow when not provided
 

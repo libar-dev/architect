@@ -14,6 +14,8 @@
  * Reports annotation completeness by comparing scannable files (from glob)
  * against annotated patterns in MasterDataset. Uses independent glob via
  * findFilesToScan() — cheap (~1ms) and avoids changing buildPipeline().
+ *
+ * **When to Use:** When checking annotation completeness or finding unannotated files via `arch coverage` or `unannotated` CLI subcommands.
  */
 
 import * as fs from 'node:fs/promises';

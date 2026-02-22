@@ -59,6 +59,10 @@ Feature: Process Guard Linter
 
   Rule: Protection levels determine modification restrictions
 
+    **Invariant:** Every file's modification restrictions are determined solely by its `@libar-docs-status` tag, with `completed` requiring an explicit unlock reason for any change.
+    **Rationale:** Without status-derived protection, completed and approved work can be silently overwritten by bulk edits or accidental modifications.
+    **Verified by:** Scenario Outline: Protection level from status; Completed file modification without unlock fails; Completed file modification with unlock passes; Active file modification is allowed but scope-locked
+
     Files inherit protection from their `@libar-docs-status` tag. Higher
     protection levels require explicit unlock to modify.
 
@@ -101,6 +105,10 @@ Feature: Process Guard Linter
   # ============================================================================
 
   Rule: Session definition files scope what can be modified
+
+    **Invariant:** When an active session exists, only specs explicitly listed in the session definition may be modified without warning, and excluded specs cannot be modified at all.
+    **Rationale:** Without session scoping, bulk operations and context switches cause unintended modifications to specs outside the current work focus.
+    **Verified by:** Session file defines modification scope; Modifying spec outside active session scope warns; Modifying explicitly excluded spec fails; No active session allows all modifications
 
     Optional session files (`delivery-process/sessions/*.feature`) explicitly
     declare which specs are in-scope for modification during a work session.
@@ -149,6 +157,10 @@ Feature: Process Guard Linter
 
   Rule: Status transitions follow PDR-005 FSM
 
+    **Invariant:** Every status change must follow a valid edge in the PDR-005 finite state machine; no transition may skip intermediate states.
+    **Rationale:** Skipping states (e.g., `roadmap` directly to `completed`) bypasses scope-locking and review gates, allowing incomplete work to be marked as done.
+    **Verified by:** Scenario Outline: Valid status transitions; Scenario Outline: Invalid status transitions
+
     Status changes in a file must follow a valid transition per PDR-005.
     This extends phase-state-machine.feature to the linter context.
 
@@ -189,6 +201,10 @@ Feature: Process Guard Linter
 
   Rule: Active specs cannot add new deliverables
 
+    **Invariant:** The deliverables table of an `active` spec is immutable with respect to new rows; only existing deliverable statuses may change.
+    **Rationale:** Adding deliverables after work has begun constitutes scope creep, undermining effort estimates and blocking completion.
+    **Verified by:** Adding deliverable to active spec fails; Updating deliverable status in active spec passes; Removing deliverable from active spec warns
+
     Once a spec transitions to `active`, its deliverables table is
     considered scope-locked. Adding new rows indicates scope creep.
 
@@ -225,6 +241,10 @@ Feature: Process Guard Linter
   # ============================================================================
 
   Rule: CLI provides flexible validation modes
+
+    **Invariant:** The CLI must support both pre-commit (staged-only) and CI (all-files) validation modes with deterministic exit codes reflecting violation severity.
+    **Rationale:** Without flexible modes, teams cannot integrate process guard into both local developer workflows and CI pipelines with appropriate strictness levels.
+    **Verified by:** Validate staged changes (pre-commit default); Validate all tracked files; Show derived state for debugging; Strict mode treats warnings as errors; Ignore session flag bypasses session rules
 
     @acceptance-criteria
     Scenario: Validate staged changes (pre-commit default)
@@ -266,6 +286,10 @@ Feature: Process Guard Linter
 
   Rule: Integrates with existing lint infrastructure
 
+    **Invariant:** Process guard output format and exit code semantics must be consistent with the existing `lint-patterns` tool.
+    **Rationale:** Inconsistent output formats force consumers to maintain separate parsers, and inconsistent exit codes break combined lint pipelines.
+    **Verified by:** Output format matches lint-patterns; Can run alongside lint-patterns
+
     @acceptance-criteria
     Scenario: Output format matches lint-patterns
       When lint-process reports violations
@@ -283,6 +307,10 @@ Feature: Process Guard Linter
   # ============================================================================
 
   Rule: New tags support process guard functionality
+
+    **Invariant:** Session and protection tags must be registered in the TypeScript taxonomy with defined formats before use in feature files.
+    **Rationale:** Unregistered tags bypass schema validation and are silently ignored by the scanner, causing process guard rules to fail without diagnostics.
+    **Verified by:** Session-related tags are recognized; Protection-related tags are recognized
 
     The following tags are defined in the TypeScript taxonomy to support process guard:
 

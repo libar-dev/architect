@@ -8,6 +8,8 @@
  *
  * Registers all reference document generators. Each config produces
  * TWO generators: detailed (docs/) and summary (_claude-md/).
+ *
+ * **When to Use:** When adding or modifying reference document generators — register new product-area or reference configs here.
  */
 
 import type { DocumentGenerator, GeneratorContext, GeneratorOutput } from '../types.js';
@@ -17,7 +19,7 @@ import type { DetailLevel } from '../../renderable/codecs/types/base.js';
 import type { RenderableDocument, SectionBlock } from '../../renderable/schema.js';
 import { heading, paragraph, separator, table, document } from '../../renderable/schema.js';
 import type { GeneratorRegistry } from '../registry.js';
-import { renderToMarkdown, renderToClaudeContext } from '../../renderable/render.js';
+import { renderToMarkdown, renderToClaudeMdModule } from '../../renderable/render.js';
 import {
   createReferenceCodec,
   PRODUCT_AREA_META,
@@ -127,8 +129,8 @@ class ReferenceDocGenerator implements DocumentGenerator {
     // Cast needed: Zod codec infers optional props as `T | undefined`,
     // but RenderableDocument uses exactOptionalPropertyTypes
     const doc = codec.decode(context.masterDataset) as RenderableDocument;
-    // Summary-level output (for _claude-md/) uses token-efficient renderer
-    const render = this.detailLevel === 'summary' ? renderToClaudeContext : renderToMarkdown;
+    // Summary-level output (for _claude-md/) uses modular-claude-md compatible renderer
+    const render = this.detailLevel === 'summary' ? renderToClaudeMdModule : renderToMarkdown;
     const content = render(doc);
 
     return Promise.resolve({
@@ -201,7 +203,7 @@ class ReferenceDocsGenerator implements DocumentGenerator {
       const summaryDoc = summaryCodec.decode(context.masterDataset) as RenderableDocument;
       files.push({
         path: `_claude-md/${config.claudeMdSection}/${config.claudeMdFilename}`,
-        content: renderToClaudeContext(summaryDoc),
+        content: renderToClaudeMdModule(summaryDoc),
       });
     }
 
@@ -262,7 +264,7 @@ class ProductAreaDocsGenerator implements DocumentGenerator {
       const summaryDoc = summaryCodec.decode(context.masterDataset) as RenderableDocument;
       files.push({
         path: `_claude-md/${config.claudeMdSection}/${config.claudeMdFilename}`,
-        content: renderToClaudeContext(summaryDoc),
+        content: renderToClaudeMdModule(summaryDoc),
       });
     }
 

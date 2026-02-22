@@ -26,8 +26,7 @@ Pre-releases allow testing before marking as stable.
 ```bash
 # First pre-release (e.g., 1.0.0-pre.0)
 npm version 1.0.0-pre.0 --no-git-tag-version
-pnpm build
-git add -A
+git add package.json
 git commit -m "chore: prepare 1.0.0-pre.0"
 git tag v1.0.0-pre.0
 git push && git push --tags
@@ -45,6 +44,13 @@ npm publish --tag pre --access public
 ```
 
 ### Stable Releases
+
+**Before the first stable release**, update `publishConfig` in `package.json`:
+
+1. Remove `"tag": "pre"` from `publishConfig` (or change to `"tag": "latest"`)
+2. Verify with `npm publish --dry-run --access public` (should show tag `latest`, not `pre`)
+
+If you skip this step, stable versions will be published under the `pre` dist-tag and users running `npm install @libar-dev/delivery-process` won't get them.
 
 ```bash
 # Patch release (1.0.0 → 1.0.1)
@@ -71,9 +77,10 @@ The repository includes a GitHub Actions workflow that publishes automatically w
 
 The workflow will:
 
+- Build the package fresh (`pnpm build`)
 - Run tests
-- Build the package
 - Publish to npm with the appropriate tag (`pre` for pre-releases, `latest` for stable)
+- Include provenance attestation for supply chain security
 
 **Required secret:** `NPM_TOKEN` - npm automation token with publish permissions.
 
@@ -85,14 +92,11 @@ The repository uses Husky for git hooks:
 
 - Runs `lint-staged` (ESLint + Prettier on staged files)
 - Runs `typecheck`
+- Runs `lint:process` (FSM validation on staged files)
 
 ### Pre-push
 
 - Runs full test suite
-- Rebuilds `dist/`
-- **Verifies `dist/` is in sync** - fails if the build produces changes
-
-This ensures the committed `dist/` is never stale.
 
 ## Dry Run
 
@@ -112,6 +116,9 @@ After publishing, verify the package:
 # Check npm registry
 npm view @libar-dev/delivery-process
 
+# Check dist-tags
+npm view @libar-dev/delivery-process dist-tags
+
 # Install in a test project
 mkdir /tmp/test-install && cd /tmp/test-install
 npm init -y
@@ -119,17 +126,6 @@ npm install @libar-dev/delivery-process@pre
 ```
 
 ## Troubleshooting
-
-### "dist/ is out of sync" error on push
-
-The pre-push hook detected that `dist/` differs from what's committed. Fix:
-
-```bash
-pnpm build
-git add dist/
-git commit --amend --no-edit
-git push
-```
 
 ### npm publish fails with authentication error
 

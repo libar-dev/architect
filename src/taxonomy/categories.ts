@@ -13,9 +13,14 @@
  * Categories are used to classify patterns and organize documentation.
  * Priority determines display order (lower = higher priority).
  * The ddd-es-cqrs preset includes all 21 categories; simpler presets use subsets.
+ *
+ * **When to Use:** When adding new pattern categories or configuring preset category subsets for tag registries.
  */
 
-/** @libar-docs-shape reference-sample */
+/**
+ * @libar-docs-implements CategoryDefinitions
+ * @libar-docs-shape reference-sample
+ */
 export interface CategoryDefinition {
   /** Category tag name without prefix (e.g., "core", "api", "ddd", "saga") */
   readonly tag: string;

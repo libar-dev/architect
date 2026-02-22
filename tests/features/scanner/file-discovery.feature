@@ -126,6 +126,7 @@ Feature: File Discovery
   Rule: Custom configuration extends discovery behavior
 
     **Invariant:** User-provided exclude patterns must be applied in addition to (not replacing) the default exclusions.
+    **Rationale:** Replacing defaults with custom patterns would silently re-include node_modules and dist, causing false positives in the pattern registry.
     **Verified by:** Respect custom exclude patterns, Return empty array when no files match, Handle nested directory structures
 
     @function:findFilesToScan @exclusions

@@ -10,6 +10,8 @@
  *
  * Explicit error handling via discriminated union.
  * Functions return `Result.ok(value)` or `Result.err(error)` instead of throwing.
+ *
+ * **When to Use:** When a function can fail with a recoverable error — return Result instead of throwing exceptions.
  */
 
 /**

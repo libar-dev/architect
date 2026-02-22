@@ -15,6 +15,7 @@ Feature: Extends Tag Extraction and Processing
   Rule: Extends tag is defined in taxonomy registry
 
     **Invariant:** The extends tag must exist in the taxonomy registry with single-value format.
+    **Rationale:** Without a registry definition, the data-driven AST parser cannot discover or extract the extends tag from source files.
     **Verified by:** Extends tag exists in registry
 
     @unit
@@ -63,6 +64,7 @@ Feature: Extends Tag Extraction and Processing
   Rule: Transform builds extendedBy reverse lookup
 
     **Invariant:** The transform must compute an extendedBy reverse index so base patterns know which patterns extend them.
+    **Rationale:** Without the reverse index, base patterns cannot discover their extensions, breaking generalization hierarchy navigation in generated docs.
     **Verified by:** Extended pattern knows its extensions
 
     @unit

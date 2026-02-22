@@ -17,6 +17,9 @@ Feature: Process API CLI - Core Infrastructure
 
   Rule: CLI displays help and version information
 
+    **Invariant:** The CLI must always provide discoverable usage and version information via standard flags.
+    **Rationale:** Without accessible help and version output, users cannot self-serve CLI usage or report issues with a specific version.
+
     @happy-path
     Scenario: Display help with --help flag
       When running "process-api --help"
@@ -40,6 +43,9 @@ Feature: Process API CLI - Core Infrastructure
 
   Rule: CLI requires input flag for subcommands
 
+    **Invariant:** Every data-querying subcommand must receive an explicit `--input` glob specifying the source files to scan.
+    **Rationale:** Without an input source, the pipeline has no files to scan and would produce empty or misleading results instead of a clear error.
+
     @validation
     Scenario: Fail without --input flag when running status
       When running "process-api status"
@@ -58,6 +64,9 @@ Feature: Process API CLI - Core Infrastructure
 
   Rule: CLI status subcommand shows delivery state
 
+    **Invariant:** The status subcommand must return structured JSON containing delivery progress derived from the MasterDataset.
+    **Rationale:** Consumers depend on machine-readable status output for scripting and CI integration; unstructured output breaks downstream automation.
+
     @happy-path
     Scenario: Status shows counts and completion percentage
       Given TypeScript files with pattern annotations
@@ -70,6 +79,9 @@ Feature: Process API CLI - Core Infrastructure
   # ============================================================================
 
   Rule: CLI query subcommand executes API methods
+
+    **Invariant:** The query subcommand must dispatch to any public Data API method by name and pass positional arguments through.
+    **Rationale:** The CLI is the primary interface for ad-hoc queries; failing to resolve a valid method name or its arguments silently drops the user's request.
 
     @happy-path
     Scenario: Query getStatusCounts returns count object
@@ -98,6 +110,9 @@ Feature: Process API CLI - Core Infrastructure
 
   Rule: CLI pattern subcommand shows pattern detail
 
+    **Invariant:** The pattern subcommand must return the full JSON detail for an exact pattern name match, or a clear error if not found.
+    **Rationale:** Pattern lookup is the primary debugging tool for annotation issues; ambiguous or silent failures waste investigation time.
+
     @happy-path
     Scenario: Pattern lookup returns full detail
       Given TypeScript files with pattern annotations
@@ -118,6 +133,9 @@ Feature: Process API CLI - Core Infrastructure
   # ============================================================================
 
   Rule: CLI arch subcommand queries architecture
+
+    **Invariant:** The arch subcommand must expose role, bounded context, and layer queries over the MasterDataset's architecture metadata.
+    **Rationale:** Architecture queries replace manual exploration of annotated sources; missing or incorrect results lead to wrong structural assumptions during design sessions.
 
     @happy-path
     Scenario: Arch roles lists roles with counts
@@ -146,6 +164,9 @@ Feature: Process API CLI - Core Infrastructure
 
   Rule: CLI shows errors for missing subcommand arguments
 
+    **Invariant:** Subcommands that require arguments must reject invocations with missing arguments and display usage guidance.
+    **Rationale:** Silent acceptance of incomplete input would produce confusing pipeline errors instead of actionable feedback at the CLI boundary.
+
     @validation
     Scenario: Query without method name shows error
       Given TypeScript files with pattern annotations
@@ -172,6 +193,9 @@ Feature: Process API CLI - Core Infrastructure
   # ============================================================================
 
   Rule: CLI handles argument edge cases
+
+    **Invariant:** The CLI must gracefully handle non-standard argument forms including numeric coercion and the `--` pnpm separator.
+    **Rationale:** Real-world invocations via pnpm pass `--` separators and numeric strings; mishandling these causes silent data loss or crashes in automated workflows.
 
     @edge-case
     Scenario: Integer arguments are coerced for phase queries

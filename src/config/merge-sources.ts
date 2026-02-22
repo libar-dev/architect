@@ -23,9 +23,7 @@
  *
  * ### When to Use
  *
- * Called by the orchestrator before invoking each generator, so that
- * generators like `changelog` can pull from different feature sets
- * than the base config specifies.
+ * - Called by the orchestrator before invoking each generator to apply per-generator source overrides.
  */
 
 import type { GeneratorSourceOverride, ResolvedSourcesConfig } from './project-config.js';

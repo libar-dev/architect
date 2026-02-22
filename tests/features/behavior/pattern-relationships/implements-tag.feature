@@ -15,6 +15,7 @@ Feature: Implements Tag Extraction and Processing
   Rule: Implements tag is defined in taxonomy registry
 
     **Invariant:** The implements tag must exist in the taxonomy registry with CSV format.
+    **Rationale:** Without a registry definition, the data-driven AST parser cannot discover or extract the implements tag from source files.
     **Verified by:** Implements tag exists in registry
 
     The tag registry defines `implements` with CSV format, enabling the
@@ -35,6 +36,7 @@ Feature: Implements Tag Extraction and Processing
   Rule: Files can implement a single pattern
 
     **Invariant:** The AST parser must extract a single implements value and preserve it through the extraction pipeline.
+    **Rationale:** Lost implements values sever the link between implementation files and their roadmap specs, breaking traceability.
     **Verified by:** Parse implements with single pattern, Implements preserved through extraction pipeline
 
     @unit
@@ -64,6 +66,7 @@ Feature: Implements Tag Extraction and Processing
   Rule: Files can implement multiple patterns using CSV format
 
     **Invariant:** The AST parser must split CSV implements values into individual pattern references with whitespace trimming.
+    **Rationale:** Unsplit or untrimmed CSV values produce invalid pattern references that fail relationship index lookups.
     **Verified by:** Parse implements with multiple patterns, CSV values are trimmed
 
     @unit
@@ -92,6 +95,7 @@ Feature: Implements Tag Extraction and Processing
   Rule: Transform builds implementedBy reverse lookup
 
     **Invariant:** The transform must compute an implementedBy reverse index so spec patterns know which files implement them.
+    **Rationale:** Without the reverse index, roadmap specs cannot discover their implementation files, breaking traceability and DoD validation.
     **Verified by:** Single implementation creates reverse lookup, Multiple implementations aggregate
 
     @unit
@@ -121,6 +125,7 @@ Feature: Implements Tag Extraction and Processing
   Rule: Schemas validate implements field correctly
 
     **Invariant:** The Zod schemas must accept implements and implementedBy fields with correct array-of-string types.
+    **Rationale:** Schema rejection of valid implements/implementedBy values causes runtime parse failures that silently drop traceability links.
     **Verified by:** DocDirective schema accepts implements, RelationshipEntry schema accepts implementedBy
 
     @unit

@@ -47,6 +47,8 @@ Feature: Generator Infrastructure Testing
 
     **Invariant:** Orchestrator merges TypeScript and Gherkin patterns,
     handles conflicts, and produces requested document types.
+    **Rationale:** Without centralized orchestration, consumers would wire pipelines
+    independently, leading to inconsistent merging and silent data loss.
 
     **API:** See `src/generators/orchestrator.ts`
 
@@ -97,6 +99,8 @@ Feature: Generator Infrastructure Testing
 
     **Invariant:** Registry prevents duplicate names, returns undefined for
     unknown generators, and lists available generators alphabetically.
+    **Rationale:** Duplicate registrations would silently overwrite generators,
+    causing unpredictable output depending on registration order.
 
     **API:** See `src/generators/registry.ts`
 
@@ -143,6 +147,8 @@ Feature: Generator Infrastructure Testing
 
     **Invariant:** Generator delegates to underlying codec for transformation.
     Missing MasterDataset produces descriptive error.
+    **Rationale:** If the adapter silently proceeds without a MasterDataset, codecs
+    receive undefined input and produce corrupt or empty documents.
 
     **API:** See `src/generators/codec-based.ts`
 
@@ -178,6 +184,8 @@ Feature: Generator Infrastructure Testing
   Rule: Orchestrator supports PR changes generation options
 
     **Invariant:** PR changes can filter by git diff, changed files, or release version.
+    **Rationale:** Without filtering, PR documentation would include all patterns
+    in the dataset, making change review noisy and hiding actual modifications.
 
     **API:** See `src/generators/orchestrator.ts` prChangesOptions
 

@@ -117,9 +117,9 @@ C4Context
     System(CodecDrivenReferenceGeneration, "CodecDrivenReferenceGeneration")
     System(ADR003SourceFirstPatternArchitecture, "ADR003SourceFirstPatternArchitecture")
     System(ADR001TaxonomyCanonicalValues, "ADR001TaxonomyCanonicalValues")
-    System(StringUtils, "StringUtils")
     System(ResultMonad, "ResultMonad")
     System(ErrorFactories, "ErrorFactories")
+    System(StringUtils, "StringUtils")
     System(ExtractionPipelineEnhancementsTesting, "ExtractionPipelineEnhancementsTesting")
     System(KebabCaseSlugs, "KebabCaseSlugs")
     System(ErrorHandlingUnification, "ErrorHandlingUnification")
@@ -192,9 +192,9 @@ graph LR
     CodecDrivenReferenceGeneration["CodecDrivenReferenceGeneration"]
     ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
     ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
-    StringUtils["StringUtils"]
     ResultMonad["ResultMonad"]
     ErrorFactories["ErrorFactories"]
+    StringUtils["StringUtils"]
     ExtractionPipelineEnhancementsTesting["ExtractionPipelineEnhancementsTesting"]
     KebabCaseSlugs["KebabCaseSlugs"]
     ErrorHandlingUnification["ErrorHandlingUnification"]

@@ -50,6 +50,7 @@ Feature: Implementation Link Path Normalization
   Rule: All implementation links in a pattern are normalized
 
     **Invariant:** Every implementation link in a pattern document must have its path normalized, regardless of how many implementations exist.
+    **Rationale:** A single un-normalized link in a multi-implementation pattern produces a broken reference that undermines trust in the entire generated document.
     **Verified by:** Multiple implementations with mixed prefixes
 
     Scenario: Multiple implementations with mixed prefixes
@@ -73,6 +74,7 @@ Feature: Implementation Link Path Normalization
   Rule: normalizeImplPath strips known prefixes
 
     **Invariant:** normalizeImplPath removes only recognized repository prefixes from the start of a path and leaves all other path segments unchanged.
+    **Rationale:** Over-stripping would corrupt legitimate path segments that happen to match a prefix name, producing silent broken links.
     **Verified by:** Strips libar-platform/ prefix, Strips monorepo/ prefix, Returns unchanged path without known prefix, Only strips prefix at start of path
 
     Scenario: Strips libar-platform/ prefix

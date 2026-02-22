@@ -9,14 +9,14 @@
  *
  * THE single source of truth for FSM state values in the monorepo (per PDR-005 FSM).
  *
- * FSM transitions:
+ * FSM transitions (canonical source: src/validation/fsm/transitions.ts):
  * - roadmap to active (start work)
- * - roadmap to deferred (pause before start)
+ * - roadmap to deferred (postpone)
  * - deferred to roadmap (resume planning)
  * - active to completed (finish work)
- * - active to deferred (pause work)
- * - deferred to active (resume work)
- * - active cannot regress to roadmap
+ * - active to roadmap (blocked/regressed)
+ *
+ * **When to Use:** When validating or referencing FSM state values — import these constants instead of hardcoding status strings.
  */
 export const PROCESS_STATUS_VALUES = [
   'roadmap', // Planned work, fully editable

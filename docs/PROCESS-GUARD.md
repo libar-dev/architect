@@ -61,6 +61,12 @@ Process Guard validates delivery workflow changes at commit time. For FSM concep
 Feature: Phase State Machine
 ```
 
+**Unlock reason requirements:**
+
+- Minimum **10 characters** (short reasons like "fix" are rejected)
+- Cannot be a placeholder: `test`, `xxx`, `bypass`, `temp`, `todo`, `fixme`
+- If the reason is invalid, the error still fires — Process Guard treats it as no unlock reason
+
 **Alternative:** If this should be new work, create a new spec instead of modifying completed work.
 
 ---
@@ -207,6 +213,7 @@ lint-process [options]
 | `--show-state`      | Debug: show derived process state      |
 | `--format json`     | Machine-readable output                |
 | `-f, --file <path>` | Specific file to validate (repeatable) |
+| `-b, --base-dir`    | Base directory for file resolution     |
 
 ### Exit Codes
 
@@ -327,8 +334,8 @@ State is derived from file annotations — there is no separate state file to ma
 
 ## Related Documentation
 
-| Document                              | Content                         |
-| ------------------------------------- | ------------------------------- |
-| [METHODOLOGY.md](./METHODOLOGY.md)    | FSM concepts, state definitions |
-| [README.md](../README.md)             | Package overview, quick start   |
-| [INSTRUCTIONS.md](../INSTRUCTIONS.md) | Complete tag reference          |
+| Document                           | Content                         |
+| ---------------------------------- | ------------------------------- |
+| [METHODOLOGY.md](./METHODOLOGY.md) | FSM concepts, state definitions |
+| [README.md](../README.md)          | Package overview, quick start   |
+| [TAXONOMY.md](./TAXONOMY.md)       | Tag taxonomy concepts and API   |

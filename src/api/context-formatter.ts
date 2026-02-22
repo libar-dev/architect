@@ -15,6 +15,8 @@
  * through the Codec/RenderableDocument/UniversalRenderer markdown pipeline.
  * Context bundles are rendered as compact structured text with === section
  * markers for easy AI parsing (see ADR-008).
+ *
+ * **When to Use:** When rendering a ContextBundle as plain text for CLI output — use this instead of the markdown codec pipeline.
  */
 
 import type {
@@ -204,6 +206,23 @@ export function formatOverview(overview: OverviewSummary): string {
     });
     sections.push('=== BLOCKING ===\n' + lines.join('\n'));
   }
+
+  sections.push(
+    '=== DATA API — Use Instead of Explore Agents ===\n' +
+      'pnpm process:query -- <subcommand>\n' +
+      '\n' +
+      '  overview                             Project health (this output)\n' +
+      '  context <pattern> --session <type>   Curated context bundle (planning/design/implement)\n' +
+      '  scope-validate <pattern> <session>   Pre-flight check before starting work\n' +
+      '  dep-tree <pattern>                   Dependency chains\n' +
+      '  list --status roadmap                Available patterns to work on\n' +
+      '  stubs --unresolved                   Design stubs missing implementations\n' +
+      '  files <pattern>                      File paths for a pattern\n' +
+      '  rules                                Business rules from Gherkin\n' +
+      '  arch blocking                        Patterns stuck on incomplete deps\n' +
+      '\n' +
+      'Full reference: pnpm process:query -- --help'
+  );
 
   return sections.join('\n\n') + '\n';
 }

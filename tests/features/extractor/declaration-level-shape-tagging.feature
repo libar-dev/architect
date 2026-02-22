@@ -15,6 +15,7 @@ Feature: Declaration-Level Shape Tagging - Extraction
 
     **Invariant:** Only declarations with the libar-docs-shape tag in their
     immediately preceding JSDoc are collected as tagged shapes.
+    **Rationale:** Extracting shapes without an explicit opt-in tag would surface internal implementation details in generated API documentation, violating information hiding.
 
     **Verified by:** Tagged declaration is extracted,
     Untagged export is ignored,
@@ -137,6 +138,7 @@ Feature: Declaration-Level Shape Tagging - Extraction
 
     **Invariant:** The discoverTaggedShapes function uses the existing
     typescript-estree parse() and extractPrecedingJsDoc() approach.
+    **Rationale:** Introducing a second parser would create divergent AST behavior — reusing the established parser ensures consistent JSDoc handling and avoids subtle extraction differences.
 
     **Verified by:** All 5 declaration kinds supported,
     JSDoc gap enforcement,

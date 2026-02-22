@@ -15,6 +15,7 @@ Feature: TypeScript AST Parser - Metadata Extraction
   Rule: Metadata is correctly extracted from JSDoc comments
 
       **Invariant:** Examples, multi-line descriptions, line numbers, function signatures, and standard JSDoc tags are all correctly parsed and separated.
+      **Rationale:** Downstream codecs render each metadata field independently — incorrect parsing causes examples to leak into descriptions or signatures to be lost in generated documentation.
       **Verified by:** Extract examples from directive, Extract multi-line description, Track line numbers correctly, Extract function signature information, Ignore @param and @returns in description
 
     @function:parseFileDirectives @metadata
@@ -134,6 +135,7 @@ Feature: TypeScript AST Parser - Metadata Extraction
   Rule: Tags are extracted only from the directive section, not from description or examples
 
       **Invariant:** Only tags appearing in the directive section (before the description) are extracted. Tags mentioned in description prose or example code blocks are ignored.
+      **Rationale:** Tags control taxonomy classification and pattern routing — extracting them from prose or examples would create phantom patterns and corrupt the registry.
       **Verified by:** Extract multiple tags from directive section, Extract tag with description on same line, NOT extract tags mentioned in description, NOT extract tags mentioned in @example sections
 
     @function:parseFileDirectives @tags
@@ -228,6 +230,7 @@ Feature: TypeScript AST Parser - Metadata Extraction
   Rule: When to Use sections are extracted in all supported formats
 
       **Invariant:** When to Use content is extracted from heading format with bullet points, inline bold format, and asterisk bullet format. When no When to Use section exists, the field is undefined.
+      **Rationale:** Generated pattern documentation includes a When to Use section — failing to recognize any supported format means valid guidance silently disappears from output.
       **Verified by:** Extract When to Use heading format with bullet points, Extract When to use inline format, Extract asterisk bullets in When to Use section, Not set whenToUse when section is missing
 
     @function:parseFileDirectives @when-to-use

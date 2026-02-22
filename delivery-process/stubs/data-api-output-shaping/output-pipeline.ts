@@ -22,6 +22,8 @@
  * via a static PATTERN_ARRAY_METHODS set.
  *
  * See: DataAPIOutputShaping spec, Rule 2 (Output Modifiers), Rule 3 (Output Format)
+ *
+ * **When to Use:** When processing CLI query results that need output shaping via --names-only, --count, --fields, or --full modifiers.
  */
 
 // ---------------------------------------------------------------------------

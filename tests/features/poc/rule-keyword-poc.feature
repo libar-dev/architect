@@ -11,6 +11,10 @@ Feature: PoC - Rule Keyword Support
     Given a test context is initialized
 
   Rule: Basic arithmetic operations work correctly
+
+    **Invariant:** Arithmetic operations must return mathematically correct results for all valid inputs.
+    **Rationale:** Incorrect arithmetic results silently corrupt downstream calculations, making errors undetectable at their source.
+
     The calculator should perform standard math operations
     with correct results.
 
@@ -29,6 +33,10 @@ Feature: PoC - Rule Keyword Support
       Then the result should be 6
 
   Rule: Division has special constraints
+
+    **Invariant:** Division operations must reject a zero divisor before execution.
+    **Rationale:** Unguarded division by zero causes runtime exceptions that crash the process instead of returning a recoverable error.
+
     Division by zero must be handled gracefully to prevent
     system errors.
 

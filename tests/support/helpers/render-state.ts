@@ -7,6 +7,7 @@
 import {
   renderToMarkdown,
   renderToClaudeContext,
+  renderToClaudeMdModule,
   renderDocumentWithFiles,
   type OutputFile,
 } from '../../../src/renderable/render.js';
@@ -31,6 +32,7 @@ import type { DataTableRow } from '../world.js';
 export {
   renderToMarkdown,
   renderToClaudeContext,
+  renderToClaudeMdModule,
   renderDocumentWithFiles,
   heading,
   paragraph,
@@ -57,6 +59,7 @@ export interface RenderScenarioState {
   // Results
   markdown: string;
   claudeContext: string;
+  claudeMdModule: string;
   outputFiles: OutputFile[];
 
   // Collapsible builder state
@@ -70,6 +73,7 @@ export function initState(): RenderScenarioState {
     sections: [],
     markdown: '',
     claudeContext: '',
+    claudeMdModule: '',
     outputFiles: [],
     collapsibleSummary: '',
     collapsibleContent: [],

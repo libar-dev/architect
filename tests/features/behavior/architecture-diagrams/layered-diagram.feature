@@ -20,6 +20,7 @@ Feature: Layered Architecture Diagram Generation
   Rule: Layered diagrams group patterns by arch-layer
 
     **Invariant:** Each distinct arch-layer value must produce exactly one Mermaid subgraph containing all patterns with that layer.
+    **Rationale:** Without layer subgraphs, the Clean Architecture boundary between domain, application, and infrastructure is not visually enforced.
     **Verified by:** Generate subgraphs for each layer
 
     Patterns with arch-layer are grouped into Mermaid subgraphs.
@@ -105,6 +106,7 @@ Feature: Layered Architecture Diagram Generation
   Rule: Layered diagram includes summary section
 
     **Invariant:** The generated layered diagram document must include an Overview section with annotated source file count.
+    **Rationale:** Without summary counts, readers cannot assess diagram completeness or detect missing annotated sources.
     **Verified by:** Summary section for layered view
 
     The generated document starts with an overview section

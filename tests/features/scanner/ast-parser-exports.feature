@@ -15,6 +15,7 @@ Feature: TypeScript AST Parser - Export Type Identification
   Rule: Export types are correctly identified from TypeScript declarations
 
       **Invariant:** Every exported TypeScript declaration type (function, type, interface, const, class, enum, abstract class, arrow function, async function, generic function, default export, re-export) is correctly classified.
+      **Rationale:** Export type classification drives how codecs render API documentation — misclassifying a function as a const (or vice versa) produces incorrect signatures and misleading docs.
       **Verified by:** Parse function export with directive, Parse type export with directive, Parse interface export with directive, Parse const export with directive, Parse class export with directive, Parse enum export with directive, Parse const enum export with directive, Parse abstract class export with directive, Parse arrow function export with directive, Parse async function export with directive, Parse generic function export with directive, Parse default export with directive, Parse re-exports with directive, Parse multiple exports in single statement, Parse multiple directives in same file
 
     @function:parseFileDirectives @happy-path

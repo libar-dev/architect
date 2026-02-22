@@ -17,6 +17,9 @@ Feature: Process API CLI - Discovery Subcommands
 
   Rule: CLI list subcommand filters patterns
 
+    **Invariant:** The list subcommand must return a valid JSON result for valid filters and a non-zero exit code with a descriptive error for invalid filters.
+    **Rationale:** Consumers parse list output programmatically; malformed JSON or silent failures cause downstream tooling to break without diagnosis.
+
     @happy-path
     Scenario: List all patterns returns JSON array
       Given TypeScript files with pattern annotations
@@ -36,6 +39,9 @@ Feature: Process API CLI - Discovery Subcommands
   # ============================================================================
 
   Rule: CLI search subcommand finds patterns by fuzzy match
+
+    **Invariant:** The search subcommand must require a query argument and return only patterns whose names match the query.
+    **Rationale:** Missing query validation would produce unfiltered result sets, defeating the purpose of search and wasting context budget in AI sessions.
 
     @happy-path
     Scenario: Search returns matching patterns
@@ -57,6 +63,9 @@ Feature: Process API CLI - Discovery Subcommands
   # ============================================================================
 
   Rule: CLI context assembly subcommands return text output
+
+    **Invariant:** Context assembly subcommands (context, overview, dep-tree) must produce non-empty human-readable text containing the requested pattern or summary, and require a pattern argument where applicable.
+    **Rationale:** These subcommands replace manual file reads in AI sessions; empty or off-target output forces expensive explore-agent fallbacks that consume 5-10x more context.
 
     @happy-path
     Scenario: Context returns curated text bundle
@@ -94,6 +103,9 @@ Feature: Process API CLI - Discovery Subcommands
 
   Rule: CLI tags and sources subcommands return JSON
 
+    **Invariant:** The tags and sources subcommands must return valid JSON with the expected top-level structure (data key for tags, array for sources).
+    **Rationale:** Annotation exploration depends on machine-parseable output; invalid JSON prevents automated enrichment workflows from detecting unannotated files and tag gaps.
+
     @happy-path
     Scenario: Tags returns tag usage counts
       Given TypeScript files with pattern annotations
@@ -113,6 +125,9 @@ Feature: Process API CLI - Discovery Subcommands
   # ============================================================================
 
   Rule: CLI extended arch subcommands query architecture relationships
+
+    **Invariant:** Extended arch subcommands (neighborhood, compare, coverage) must return valid JSON reflecting the actual architecture relationships present in the scanned sources.
+    **Rationale:** Architecture queries drive design-session decisions; stale or structurally invalid output leads to incorrect dependency analysis and missed coupling between bounded contexts.
 
     @happy-path
     Scenario: Arch neighborhood returns pattern relationships
@@ -141,6 +156,9 @@ Feature: Process API CLI - Discovery Subcommands
   # ============================================================================
 
   Rule: CLI unannotated subcommand finds files without annotations
+
+    **Invariant:** The unannotated subcommand must return valid JSON listing every TypeScript file that lacks the `@libar-docs` opt-in marker.
+    **Rationale:** Files missing the opt-in marker are invisible to the scanner; without this subcommand, unannotated files silently drop out of generated documentation and validation.
 
     @happy-path
     Scenario: Unannotated finds files missing libar-docs marker

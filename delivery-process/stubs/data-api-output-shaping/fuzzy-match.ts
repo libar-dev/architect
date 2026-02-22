@@ -18,6 +18,8 @@
  * - `pattern` subcommand: "Did you mean...?" fallback via findBestMatch()
  *
  * See: DataAPIOutputShaping spec, Rule 4 (Filtering and Search)
+ *
+ * **When to Use:** When resolving user-typed pattern names that may contain typos or partial matches.
  */
 
 // ---------------------------------------------------------------------------

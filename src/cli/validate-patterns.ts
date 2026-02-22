@@ -270,8 +270,8 @@ DoD Validation:
 
 Anti-Pattern Detection:
   --anti-patterns             Enable anti-pattern detection
-  --scenario-threshold <N>    Max scenarios per feature (default: 20)
-  --mega-feature-threshold <N> Max lines per feature (default: 500)
+  --scenario-threshold <N>    Max scenarios per feature (default: 30)
+  --mega-feature-threshold <N> Max lines per feature (default: 750)
   --magic-comment-threshold <N> Max magic comments (default: 5)
 
 Exit Codes:

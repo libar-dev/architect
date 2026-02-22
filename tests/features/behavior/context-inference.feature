@@ -69,6 +69,7 @@ Feature: Context Auto-Inference from File Paths
   Rule: matchPattern supports prefix matching
 
     **Invariant:** A trailing slash pattern matches any file whose path starts with that directory prefix.
+    **Rationale:** Without prefix matching, users would need separate wildcard patterns for each nesting depth, making rule configuration verbose and error-prone.
     **Verified by:** Prefix matching behavior
 
     @edge-case @pattern-matching
@@ -162,6 +163,7 @@ Feature: Context Auto-Inference from File Paths
   Rule: Inference works independently of archLayer
 
     **Invariant:** Context inference operates on file path alone; the presence or absence of archLayer does not affect context assignment.
+    **Rationale:** Coupling context inference to archLayer would prevent context-based queries from finding patterns that lack explicit layer annotations.
     **Verified by:** Pattern without archLayer is still added to byContext if context is inferred
 
     @edge-case @inference

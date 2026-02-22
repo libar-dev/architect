@@ -56,6 +56,8 @@ Feature: Codec Behavior Testing
 
     **Invariant:** Roadmap shows planned work, Milestones shows completed work,
     CurrentWork shows active patterns only.
+    **Rationale:** Mixing statuses across timeline views would bury actionable
+    information and make it impossible to distinguish planned from delivered work.
 
     **API:** See `src/renderable/codecs/timeline.ts`
 
@@ -97,6 +99,8 @@ Feature: Codec Behavior Testing
 
     **Invariant:** SessionContext shows active patterns with deliverables.
     RemainingWork aggregates incomplete work by phase.
+    **Rationale:** AI sessions without curated context waste tokens on irrelevant
+    patterns, and unaggregated remaining work obscures project health.
 
     **API:** See `src/renderable/codecs/session.ts`
 
@@ -125,6 +129,8 @@ Feature: Codec Behavior Testing
 
     **Invariant:** Features include problem, solution, business value.
     Acceptance criteria are formatted with bold keywords.
+    **Rationale:** Omitting problem/solution context produces specs that lack
+    justification, and unformatted acceptance criteria are difficult to scan.
 
     **API:** See `src/renderable/codecs/requirements.ts`
 
@@ -151,6 +157,8 @@ Feature: Codec Behavior Testing
 
     **Invariant:** Changelog follows Keep a Changelog format.
     Traceability maps rules to scenarios.
+    **Rationale:** Non-standard changelog formats break tooling that parses release
+    notes, and unmapped rules represent unverified business constraints.
 
     **API:** See `src/renderable/codecs/reporting.ts`
 
@@ -178,6 +186,8 @@ Feature: Codec Behavior Testing
 
     **Invariant:** Planning checklist includes DoD items.
     Session plan shows implementation steps.
+    **Rationale:** Missing DoD items in checklists allow incomplete patterns to
+    pass validation, and sessions without implementation steps lose focus.
 
     **API:** See `src/renderable/codecs/planning.ts`
 

@@ -24,6 +24,7 @@ Feature: Remaining Work Enhancement
   Rule: Priority-based sorting surfaces critical work first
 
     **Invariant:** Phases with higher priority always appear before lower-priority phases when sorting by priority.
+    **Rationale:** Without priority sorting, critical work gets buried under low-priority items, delaying urgent deliverables.
     **Verified by:** Next Actionable sorted by priority, Undefined priority sorts last, Priority icons displayed in table
 
     @acceptance-criteria
@@ -60,6 +61,7 @@ Feature: Remaining Work Enhancement
   Rule: Effort parsing converts duration strings to comparable hours
 
     **Invariant:** Effort strings must be parsed to a common unit (hours) for accurate sorting across different time scales.
+    **Rationale:** Comparing raw strings like "2h" and "3d" lexicographically produces incorrect ordering; normalization to hours ensures consistent comparison.
     **Verified by:** Phases sorted by effort ascending, Effort parsing handles hours, Effort parsing handles days, Effort parsing handles weeks, Effort parsing handles months
 
     Scenario: Phases sorted by effort ascending
@@ -94,6 +96,7 @@ Feature: Remaining Work Enhancement
   Rule: Quarter grouping organizes planned work into time-based buckets
 
     **Invariant:** Phases with a quarter tag are grouped under their quarter heading; phases without a quarter appear under Unscheduled.
+    **Rationale:** Flat lists obscure time-based planning; grouping by quarter lets planners see what is committed per period and what remains unscheduled.
     **Verified by:** Planned phases grouped by quarter, Quarters sorted chronologically
 
     @acceptance-criteria
@@ -122,6 +125,7 @@ Feature: Remaining Work Enhancement
   Rule: Priority grouping organizes phases by urgency level
 
     **Invariant:** Phases are grouped under their priority heading; phases without priority appear under Unprioritized.
+    **Rationale:** Mixing priority levels in a flat list forces readers to visually scan for urgency; grouping by priority makes triage immediate.
     **Verified by:** Planned phases grouped by priority
 
     Scenario: Planned phases grouped by priority
@@ -138,6 +142,7 @@ Feature: Remaining Work Enhancement
   Rule: Progressive disclosure prevents information overload in large backlogs
 
     **Invariant:** When the backlog exceeds maxNextActionable, only the top N phases are shown with a link or count for the remainder.
+    **Rationale:** Displaying hundreds of phases in the summary overwhelms planners; progressive disclosure keeps the summary scannable while preserving access to the full backlog.
     **Verified by:** Large backlog uses progressive disclosure, Moderate backlog shows count without link
 
     @acceptance-criteria
@@ -163,6 +168,7 @@ Feature: Remaining Work Enhancement
   Rule: Edge cases are handled gracefully
 
     **Invariant:** Empty or fully-blocked backlogs produce meaningful output instead of errors or blank sections.
+    **Rationale:** Blank or errored output when the backlog is empty confuses users into thinking the generator is broken rather than reflecting a genuinely empty state.
     **Verified by:** Empty backlog handling, All phases blocked
 
     Scenario: Empty backlog handling
@@ -182,6 +188,7 @@ Feature: Remaining Work Enhancement
   Rule: Default behavior preserves backward compatibility
 
     **Invariant:** Without explicit sortBy or groupPlannedBy options, phases are sorted by phase number in a flat list.
+    **Rationale:** Changing default behavior would break existing consumers that rely on phase-number ordering without specifying options.
     **Verified by:** Default sorting is by phase number, Default grouping is none (flat list)
 
     Scenario: Default sorting is by phase number

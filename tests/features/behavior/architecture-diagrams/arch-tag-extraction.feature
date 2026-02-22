@@ -45,6 +45,7 @@ Feature: Architecture Tag Extraction
   Rule: arch-context tag is defined in the registry
 
     **Invariant:** The tag registry must contain an arch-context tag with value format for free-form bounded context names.
+    **Rationale:** Without a registry-defined arch-context tag, bounded context groupings cannot be validated and diagrams may contain arbitrary context names.
     **Verified by:** arch-context tag exists with value format
 
     Context tags group components into bounded context subgraphs.
@@ -60,6 +61,7 @@ Feature: Architecture Tag Extraction
   Rule: arch-layer tag is defined in the registry
 
     **Invariant:** The tag registry must contain an arch-layer tag with enum format and exactly three values: domain, application, infrastructure.
+    **Rationale:** Allowing arbitrary layer values would break the fixed Clean Architecture ordering that layered diagrams depend on.
     **Verified by:** arch-layer tag exists with enum format, arch-layer has exactly three values
 
     Layer tags enable layered architecture diagrams.
@@ -86,6 +88,7 @@ Feature: Architecture Tag Extraction
   Rule: AST parser extracts arch-role from TypeScript annotations
 
     **Invariant:** The AST parser must extract the arch-role value from JSDoc annotations and populate the directive's archRole field.
+    **Rationale:** If arch-role is not extracted, patterns cannot be classified by architectural role and diagram node styling is lost.
     **Verified by:** Extract arch-role projection, Extract arch-role command-handler
 
     The AST parser must extract arch-role alongside other pattern metadata.
@@ -123,6 +126,7 @@ Feature: Architecture Tag Extraction
   Rule: AST parser extracts arch-context from TypeScript annotations
 
     **Invariant:** The AST parser must extract the arch-context value from JSDoc annotations and populate the directive's archContext field.
+    **Rationale:** If arch-context is not extracted, component diagrams cannot group patterns into bounded context subgraphs.
     **Verified by:** Extract arch-context orders, Extract arch-context inventory
 
     Context values are free-form strings naming the bounded context.
@@ -160,6 +164,7 @@ Feature: Architecture Tag Extraction
   Rule: AST parser extracts arch-layer from TypeScript annotations
 
     **Invariant:** The AST parser must extract the arch-layer value from JSDoc annotations and populate the directive's archLayer field.
+    **Rationale:** If arch-layer is not extracted, layered diagrams cannot group patterns into domain/application/infrastructure subgraphs.
     **Verified by:** Extract arch-layer application, Extract arch-layer infrastructure
 
     Layer tags classify components by architectural layer.
@@ -197,6 +202,7 @@ Feature: Architecture Tag Extraction
   Rule: AST parser handles multiple arch tags together
 
     **Invariant:** When a JSDoc block contains arch-role, arch-context, and arch-layer tags, all three must be extracted into the directive.
+    **Rationale:** Partial extraction would cause components to be missing from role, context, or layer groupings depending on which tag was dropped.
     **Verified by:** Extract all three arch tags
 
     Components often have role + context + layer together.

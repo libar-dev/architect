@@ -49,6 +49,4 @@ jobs:
       - name: Test
         run: pnpm test
 
-  # Note: verify-dist check removed due to non-deterministic TypeScript
-  # declaration file ordering between macOS and Ubuntu builds.
-  # The dist/ is rebuilt during test jobs and tests verify correctness.
+  # dist/ is not tracked in git — built fresh during CI and publish workflows.

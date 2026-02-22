@@ -53,6 +53,7 @@ Feature: Error Factory Functions
   Rule: createDirectiveValidationError formats file location with line number
 
     **Invariant:** Every DirectiveValidationError must include the source file path, line number, and reason, with the message formatted as "file:line" for IDE-clickable error output.
+    **Rationale:** The "file:line" format enables click-to-navigate in IDEs and terminals, turning validation errors into actionable links rather than requiring manual file/line lookup.
     **Verified by:** createDirectiveValidationError includes line number in message, createDirectiveValidationError includes optional directive snippet, createDirectiveValidationError omits directive when not provided
 
     @function:createDirectiveValidationError @happy-path
@@ -77,6 +78,7 @@ Feature: Error Factory Functions
   Rule: createPatternValidationError captures pattern identity and validation details
 
     **Invariant:** Every PatternValidationError must include the pattern name, source file path, and reason, with an optional array of specific validation errors for detailed diagnostics.
+    **Rationale:** Pattern names appear across many source files; without the pattern name and file path in the error, developers cannot locate which annotation triggered the validation failure.
     **Verified by:** createPatternValidationError formats pattern name and file, createPatternValidationError includes validation errors array, createPatternValidationError omits validationErrors when not provided
 
     @function:createPatternValidationError @happy-path
@@ -109,6 +111,7 @@ Feature: Error Factory Functions
   Rule: createProcessMetadataValidationError validates Gherkin process metadata
 
     **Invariant:** Every ProcessMetadataValidationError must include the feature file path and a reason describing which metadata field failed validation.
+    **Rationale:** Process metadata (status, phase, deliverables) drives FSM validation and documentation generation; silent metadata errors propagate incorrect state across all downstream consumers.
     **Verified by:** createProcessMetadataValidationError formats file and reason, createProcessMetadataValidationError includes readonly validation errors
 
     @function:createProcessMetadataValidationError @happy-path
@@ -131,6 +134,7 @@ Feature: Error Factory Functions
   Rule: createDeliverableValidationError tracks deliverable-specific failures
 
     **Invariant:** Every DeliverableValidationError must include the feature file path and reason, with optional deliverableName for pinpointing which deliverable failed validation.
+    **Rationale:** Features often contain multiple deliverables; without the deliverable name in the error, developers must manually inspect the entire Background table to find the failing row.
     **Verified by:** createDeliverableValidationError formats file and reason, createDeliverableValidationError includes optional deliverableName, createDeliverableValidationError omits deliverableName when not provided, createDeliverableValidationError includes validation errors
 
     @function:createDeliverableValidationError @happy-path

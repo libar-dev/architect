@@ -7,6 +7,7 @@
 @libar-docs-product-area:Generation
 @libar-docs-include:process-workflow,codec-transformation
 @libar-docs-depends-on:ADR005CodecBasedMarkdownRendering
+@libar-docs-unlock-reason:Add-Verified-by-sections-and-acceptance-criteria
 Feature: ADR-006 - Single Read Model Architecture
 
   **Context:**
@@ -49,6 +50,8 @@ Feature: ADR-006 - Single Read Model Architecture
     cross-source resolution, or dependency information consumes the
     MasterDataset. Direct scanner/extractor imports are permitted only in
     pipeline orchestration code that builds the MasterDataset.
+    **Rationale:** Bypassing the read model forces consumers to re-derive data that the MasterDataset already computes, creating duplicate logic and divergent behavior when the pipeline evolves.
+    **Verified by:** Feature consumers import from MasterDataset not from raw pipeline stages
 
     | Layer | May Import | Examples |
     | Pipeline Orchestration | scanner/, extractor/, pipeline/ | orchestrator.ts, process-api.ts pipeline setup |
@@ -64,6 +67,8 @@ Feature: ADR-006 - Single Read Model Architecture
     discard fields from ExtractedPattern. If a consumer needs a subset, the
     type system provides the projection — not a hand-written extraction
     function that becomes a barrier between the consumer and canonical data.
+    **Rationale:** Lossy local types silently drop fields that later become needed, causing bugs that only surface when new MasterDataset capabilities are added and the local type lacks them.
+    **Verified by:** Feature consumers import from MasterDataset not from raw pipeline stages
 
   Rule: Relationship resolution is computed once
 
@@ -71,11 +76,15 @@ Feature: ADR-006 - Single Read Model Architecture
     and reverse lookups (usedBy, implementedBy, extendedBy) are computed in
     `transformToMasterDataset()`. No consumer re-derives these from raw
     pattern arrays or scanned file tags.
+    **Rationale:** Re-deriving relationships in consumers duplicates the resolution logic and risks inconsistency when different consumers implement subtly different traversal or filtering rules.
+    **Verified by:** Feature consumers import from MasterDataset not from raw pipeline stages
 
   Rule: Three named anti-patterns
 
     **Invariant:** These are recognized violations, serving as review criteria
-    for new code and refactoring targets for existing code:
+    for new code and refactoring targets for existing code.
+    **Rationale:** Without named anti-patterns, violations appear as one-off style issues rather than systematic architectural drift, making them harder to detect and communicate in code review.
+    **Verified by:** Feature consumers import from MasterDataset not from raw pipeline stages
 
     | Anti-Pattern | Detection Signal |
     | Parallel Pipeline | Feature consumer imports from scanner/ or extractor/ |
@@ -85,24 +94,31 @@ Feature: ADR-006 - Single Read Model Architecture
     Naming them makes them visible in code review — including AI-assisted
     sessions where the default proposal is often "add a helper function."
 
-**Good vs Bad**
+    **Good vs Bad**
 
-  """typescript
-  // Good: consume the read model
-  function validateCrossSource(dataset: RuntimeMasterDataset): ValidationSummary {
-    const rel = dataset.relationshipIndex[patternName];
-    const isImplemented = rel.implementedBy.length > 0;
-  }
+    """typescript
+    // Good: consume the read model
+    function validateCrossSource(dataset: RuntimeMasterDataset): ValidationSummary {
+      const rel = dataset.relationshipIndex[patternName];
+      const isImplemented = rel.implementedBy.length > 0;
+    }
 
-  // Bad: re-derive from raw state (Parallel Pipeline + Re-derived Relationship)
-  function buildImplementsLookup(
-    gherkinFiles: readonly ScannedGherkinFile[],
-    tsPatterns: readonly ExtractedPattern[]
-  ): ReadonlySet<string> { ... }
-  """
+    // Bad: re-derive from raw state (Parallel Pipeline + Re-derived Relationship)
+    function buildImplementsLookup(
+      gherkinFiles: readonly ScannedGherkinFile[],
+      tsPatterns: readonly ExtractedPattern[]
+    ): ReadonlySet<string> { ... }
+    """
 
-**References**
+    **References**
 
-  - Monorepo ADR-006: Projections for All Reads (same principle, application domain)
-  - ADR-005: Codec-Based Markdown Rendering (established MasterDataset as codec input)
-  - Order-management ARCHITECTURE.md: CommandOrchestrator + Read Model separation
+    - Monorepo ADR-006: Projections for All Reads (same principle, application domain)
+    - ADR-005: Codec-Based Markdown Rendering (established MasterDataset as codec input)
+    - Order-management ARCHITECTURE.md: CommandOrchestrator + Read Model separation
+
+  @acceptance-criteria
+  Scenario: Feature consumers import from MasterDataset not from raw pipeline stages
+    Given a feature consumer that needs pattern relationships or status groupings
+    When reviewing its import statements
+    Then it imports from MasterDataset or relationshipIndex
+    And it does not import directly from scanner/ or extractor/ modules

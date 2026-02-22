@@ -18,6 +18,8 @@
  * DD-1: Inline constant in workflow-loader.ts, not preset integration.
  * DD-2: Constant satisfies existing WorkflowConfig type from workflow-config.ts.
  * DD-4: loadDefaultWorkflow() returns LoadedWorkflow synchronously (not Promise).
+ *
+ * **When to Use:** When the workflow loader needs a default workflow config — import this constant instead of loading from a JSON file.
  */
 
 import type { WorkflowConfig } from '../../src/validation-schemas/workflow-config.js';

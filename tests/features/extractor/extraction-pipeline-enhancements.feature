@@ -16,6 +16,7 @@ Feature: Extraction Pipeline Enhancements
 
     **Invariant:** ExportInfo.signature shows full parameter types and
     return type instead of the placeholder value.
+    **Rationale:** Reference documentation renders signatures verbatim — placeholder values instead of real types make the API docs unusable for consumers.
 
     **Verified by:** Simple function signature, Async function keeps async prefix,
     Multi-parameter function, Function with object parameter type
@@ -92,6 +93,7 @@ Feature: Extraction Pipeline Enhancements
 
     **Invariant:** Property-level JSDoc preserves full multi-line content
     without first-line truncation.
+    **Rationale:** Truncated property descriptions lose important behavioral details (defaults, units, constraints) that consumers rely on when integrating with the API.
 
     **Verified by:** Multi-line property JSDoc preserved,
     Single-line property JSDoc unchanged
@@ -136,6 +138,7 @@ Feature: Extraction Pipeline Enhancements
 
     **Invariant:** JSDoc param, returns, and throws tags are extracted
     and stored on ExtractedShape for function-kind shapes.
+    **Rationale:** Function reference docs require parameter, return, and exception documentation — missing extraction means consumers must read source code instead of generated docs.
 
     **Verified by:** Param tags extracted, Returns tag extracted,
     Throws tags extracted, TypeScript-style params without braces
@@ -223,6 +226,7 @@ Feature: Extraction Pipeline Enhancements
 
     **Invariant:** When extract-shapes tag value is the wildcard character,
     all exported declarations are extracted without listing names.
+    **Rationale:** Requiring explicit names for every export creates maintenance burden and stale annotations — wildcard discovery keeps shape docs in sync as exports are added or removed.
 
     **Verified by:** Wildcard extracts all exports,
     Non-exported declarations excluded,

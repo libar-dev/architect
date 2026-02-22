@@ -20,16 +20,7 @@
  *
  * ### When to Use
  *
- * In `delivery-process.config.ts` at project root:
- *
- * ```typescript
- * import { defineConfig } from '@libar-dev/delivery-process/config';
- *
- * export default defineConfig({
- *   preset: 'ddd-es-cqrs',
- *   sources: { typescript: ['src/** /*.ts'] },
- * });
- * ```
+ * - In `delivery-process.config.ts` at project root to get type-safe configuration with autocompletion.
  */
 
 import type { DeliveryProcessProjectConfig } from './project-config.js';

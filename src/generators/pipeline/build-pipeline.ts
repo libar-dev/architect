@@ -15,6 +15,8 @@
  * Target: src/generators/pipeline/build-pipeline.ts
  * See: ADR-006 (Single Read Model Architecture)
  * See: DD-1, DD-2 (ProcessAPILayeredExtraction)
+ *
+ * **When to Use:** When any consumer needs a MasterDataset — call buildMasterDataset() instead of wiring the scan-extract-merge-transform pipeline inline.
  */
 
 import * as path from 'path';

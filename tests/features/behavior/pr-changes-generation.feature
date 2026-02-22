@@ -24,6 +24,7 @@ Feature: PR Changes Generation
   Rule: Release version filtering controls which phases appear in output
 
       **Invariant:** Only phases with deliverables matching the releaseFilter are included; roadmap phases are always excluded.
+      **Rationale:** Including unrelated releases or unstarted roadmap items in a PR description misleads reviewers about the scope of actual changes.
       **Verified by:** Filter phases by specific release version, Show all active and completed phases when no releaseFilter, Active phases with matching deliverables are included, Roadmap phases are excluded even with matching deliverables
 
       @happy-path @release-filter
@@ -77,6 +78,7 @@ Feature: PR Changes Generation
   Rule: Patterns are grouped by phase number in the output
 
       **Invariant:** Each phase number produces a separate heading section in the generated output.
+      **Rationale:** Without phase grouping, reviewers cannot distinguish which changes belong to which delivery phase, making incremental review impossible.
       **Verified by:** Patterns grouped by phase number
 
       @happy-path @phase-grouping
@@ -97,6 +99,7 @@ Feature: PR Changes Generation
   Rule: Summary statistics provide a high-level overview of the PR
 
       **Invariant:** Summary section always shows pattern counts and release tag when a releaseFilter is active.
+      **Rationale:** Without a summary, reviewers must read the entire document to understand the PR's scope; the release tag anchors the summary to a specific version.
       **Verified by:** Summary shows pattern counts in table format, Summary shows release tag when filtering
 
       @happy-path @summary
@@ -123,6 +126,7 @@ Feature: PR Changes Generation
   Rule: Deliverables are displayed inline with their parent patterns
 
       **Invariant:** When includeDeliverables is enabled, each pattern lists its deliverables with name, status, and release tag.
+      **Rationale:** Hiding deliverables forces reviewers to cross-reference feature files to verify completion; inline display makes review self-contained.
       **Verified by:** Deliverables shown inline with patterns, Deliverables show release tags
 
       @happy-path @deliverables
@@ -150,6 +154,7 @@ Feature: PR Changes Generation
   Rule: Review checklist includes standard code quality verification items
 
       **Invariant:** Review checklist always includes code conventions, tests, documentation, and completed pattern verification items.
+      **Rationale:** Omitting the checklist means quality gates depend on reviewer memory; a consistent checklist ensures no standard verification step is skipped.
       **Verified by:** Review checklist includes standard code quality items, Review checklist includes completed pattern verification
 
       @happy-path @review-checklist
@@ -175,6 +180,7 @@ Feature: PR Changes Generation
   Rule: Dependencies section shows inter-pattern relationships
 
       **Invariant:** Dependencies section surfaces both what patterns enable and what they depend on.
+      **Rationale:** Hidden dependencies cause merge-order mistakes and broken builds; surfacing them in the PR lets reviewers verify prerequisite work is complete.
       **Verified by:** Dependencies shows what patterns enable, Dependencies shows what patterns depend on
 
       @happy-path @enables
@@ -202,6 +208,7 @@ Feature: PR Changes Generation
   Rule: Business value can be included or excluded from pattern metadata
 
       **Invariant:** Business value display is controlled by the includeBusinessValue option.
+      **Rationale:** Not all consumers need business value context; making it opt-in keeps the default output concise for technical reviewers.
       **Verified by:** Pattern metadata includes business value when enabled, Business value can be excluded
 
       @happy-path @business-value
@@ -225,6 +232,7 @@ Feature: PR Changes Generation
   Rule: Output can be sorted by phase number or priority
 
       **Invariant:** Sorting is deterministic and respects the configured sortBy option.
+      **Rationale:** Non-deterministic ordering produces diff noise between regenerations, making it impossible to tell if content actually changed.
       **Verified by:** Phases sorted by phase number, Phases sorted by priority
 
       @config @sort-by-phase
@@ -251,6 +259,7 @@ Feature: PR Changes Generation
   Rule: Edge cases produce graceful output
 
       **Invariant:** The generator handles missing phases, missing deliverables, and missing phase numbers without errors.
+      **Rationale:** Crashing on incomplete data prevents PR generation entirely; graceful degradation ensures output is always available even with partial inputs.
       **Verified by:** No matching phases produces no changes message, Patterns without deliverables still display, Patterns without phase show in phase 0 group
 
       @edge-case @no-phases
@@ -282,6 +291,7 @@ Feature: PR Changes Generation
   Rule: Deliverable-level filtering shows only matching deliverables within a phase
 
       **Invariant:** When a phase contains deliverables with different release tags, only those matching the releaseFilter are shown.
+      **Rationale:** Showing all deliverables regardless of release tag pollutes the PR with unrelated work, obscuring what actually shipped in the target release.
       **Verified by:** Mixed releases within single phase shows only matching deliverables
 
       @happy-path @mixed-release @deliverable-level

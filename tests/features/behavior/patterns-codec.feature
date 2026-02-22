@@ -96,6 +96,7 @@ Feature: Patterns Document Codec
   Rule: Category sections group patterns by domain
 
     **Invariant:** Each category in the dataset must produce an H3 section listing its patterns, and the filterCategories option must restrict output to only the specified categories.
+    **Rationale:** Without category grouping, consumers must scan the entire flat pattern list to find domain-relevant patterns; filtering avoids noise in focused documentation.
     **Verified by:** Category sections with pattern lists, Filter to specific categories
 
     @happy-path
@@ -126,6 +127,7 @@ Feature: Patterns Document Codec
   Rule: Dependency graph visualizes pattern relationships
 
     **Invariant:** A Mermaid dependency graph must be included when pattern relationships exist and the includeDependencyGraph option is not disabled; it must be omitted when no relationships exist or when explicitly disabled.
+    **Rationale:** Dependency relationships are invisible in flat pattern lists; the graph reveals implementation ordering and coupling that affects planning decisions.
     **Verified by:** Dependency graph included when relationships exist, No dependency graph when no relationships, Dependency graph disabled by option
 
     Scenario: Dependency graph included when relationships exist

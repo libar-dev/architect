@@ -82,6 +82,7 @@ Feature: PRD Implementation Section
   Rule: Patterns without implementations omit the section
 
     **Invariant:** The Implementations heading must not appear in pattern documents when no implementing files exist.
+    **Rationale:** Rendering an empty Implementations section misleads readers into thinking implementations were expected but are missing, rather than simply not applicable.
     **Verified by:** No implementations section when none exist
 
     Scenario: No implementations section when none exist

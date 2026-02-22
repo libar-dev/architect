@@ -14,6 +14,8 @@
  * - e2e: End-to-end user journey tests
  * - component: Unit/component level tests
  * - unknown: Cannot determine layer from path
+ *
+ * **When to Use:** When categorizing feature files by test layer based on their directory path.
  */
 export const LAYER_TYPES = [
   'timeline',

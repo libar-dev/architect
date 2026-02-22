@@ -15,6 +15,9 @@ Feature: Convention Extractor
 
   Rule: Empty and missing inputs produce empty results
 
+    **Invariant:** Extraction with no tags or no matching patterns always produces an empty result.
+    **Rationale:** Callers must be able to distinguish "no conventions found" from errors without special-casing nulls or exceptions.
+
     @happy-path @edge-case
     Scenario: Empty convention tags returns empty array
       Given an empty MasterDataset
@@ -28,6 +31,9 @@ Feature: Convention Extractor
       Then the convention result is empty
 
   Rule: Convention bundles are extracted from matching patterns
+
+    **Invariant:** Each unique convention tag produces exactly one bundle, and patterns sharing a tag are merged into that bundle.
+    **Rationale:** Without tag-based grouping and merging, convention content would be fragmented across duplicates, making downstream rendering unreliable.
 
     @happy-path
     Scenario: Single pattern with one convention tag produces one bundle
@@ -53,6 +59,9 @@ Feature: Convention Extractor
       And the bundle has 2 rules
 
   Rule: Structured content is extracted from rule descriptions
+
+    **Invariant:** Invariant, rationale, and table content embedded in rule descriptions must be extracted as structured metadata, not raw text.
+    **Rationale:** Downstream renderers depend on structured fields to produce consistent documentation; unstructured text would require re-parsing at every consumption point.
 
     @happy-path
     Scenario: Invariant and rationale are extracted from rule description
@@ -86,6 +95,9 @@ Feature: Convention Extractor
 
   Rule: Code examples in rule descriptions are preserved
 
+    **Invariant:** Fenced code blocks (including Mermaid diagrams) in rule descriptions must be extracted as typed code examples and never discarded.
+    **Rationale:** Losing code examples during extraction would silently degrade generated documentation, removing diagrams and samples authors intended to publish.
+
     @happy-path
     Scenario: Mermaid diagram in rule description is extracted as code example
       Given a convention pattern with a mermaid diagram in tag "fsm-rules"
@@ -105,6 +117,9 @@ Feature: Convention Extractor
       Then the first rule has no code examples
 
   Rule: TypeScript JSDoc conventions are extracted alongside Gherkin
+
+    **Invariant:** TypeScript JSDoc and Gherkin convention sources sharing the same tag must merge into a single bundle with all rules preserved from both sources.
+    **Rationale:** Conventions are defined across both TypeScript and Gherkin; failing to merge them would split a single logical convention into incomplete fragments.
 
     @happy-path
     Scenario: TypeScript pattern with heading sections produces multiple rules

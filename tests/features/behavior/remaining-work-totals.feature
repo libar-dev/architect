@@ -118,6 +118,7 @@ Feature: Remaining Work Summary Accuracy
   Rule: All phases with incomplete patterns are shown
 
     **Invariant:** The phase table must include every phase that contains at least one incomplete pattern, and phases with only completed patterns must be excluded.
+    **Rationale:** Showing fully completed phases inflates the remaining work view, while omitting phases with incomplete patterns hides outstanding work.
     **Verified by:** Multiple phases shown in order, Completed phases not shown in remaining work
 
     Scenario: Multiple phases shown in order

@@ -28,6 +28,13 @@ Starting from pattern brief?
 
 **Goal:** Create a roadmap spec. Do not write implementation code.
 
+### Context Gathering
+
+```bash
+pnpm process:query -- overview                                # Project health
+pnpm process:query -- list --status roadmap --names-only      # Available patterns
+```
+
 ### Checklist
 
 - [ ] **Extract metadata** from pattern brief:
@@ -59,7 +66,7 @@ Starting from pattern brief?
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status  | Location | Tests | Test Type |
-      | Core types  | planned | src/types.ts | Yes | unit |
+      | Core types  | pending | src/types.ts | Yes | unit |
   ```
 
 - [ ] **Convert tables to Rules** — Each business constraint becomes a `Rule:` block
@@ -86,6 +93,16 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 ## Design Session
 
 **Goal:** Make architectural decisions. Create code stubs with interfaces. Do not implement.
+
+### Context Gathering
+
+```bash
+pnpm process:query -- context <PatternName> --session design  # Full context bundle
+pnpm process:query -- dep-tree <PatternName>                  # Dependency chain
+pnpm process:query -- stubs <PatternName>                     # Existing design stubs
+```
+
+Use these **before** launching explore agents. See [PROCESS-API.md](./PROCESS-API.md).
 
 ### When Required
 
@@ -147,11 +164,22 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 
 **Goal:** Write code. The roadmap spec is the source of truth.
 
-### Pre-flight
+### Context Gathering (Step 0)
 
-- [ ] Roadmap spec exists with `@<prefix>-status:roadmap`
-- [ ] Decision specs approved (if needed)
-- [ ] Implementation plan exists (for multi-session work)
+```bash
+# Pre-flight — catches FSM violations, missing deps, incomplete deliverables
+pnpm process:query -- scope-validate <PatternName> implement
+
+# Curated context — deliverables, FSM state, test files
+pnpm process:query -- context <PatternName> --session implement
+
+# File paths for implementation
+pnpm process:query -- files <PatternName> --related
+```
+
+The `scope-validate` command replaces the manual pre-flight checklist — it checks
+dependency completion, deliverable definitions, FSM validity, and design decisions.
+See [PROCESS-API.md](./PROCESS-API.md#scope-validate).
 
 ### Execution Checklist
 
@@ -178,7 +206,7 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
    - [ ] Write tests
    - [ ] Update deliverable status:
      ```gherkin
-     | Core types | completed | src/types.ts | Yes | unit |
+     | Core types | complete | src/types.ts | Yes | unit |
      ```
 
 4. **Verify all design decisions addressed:**
@@ -292,6 +320,14 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 
 For multi-session work, capture state at session boundaries.
 
+```bash
+# Generate handoff from actual annotation state (preferred over manual template)
+pnpm process:query -- handoff --pattern <PatternName>
+pnpm process:query -- handoff --pattern <PatternName> --git   # include recent commits
+```
+
+The CLI handoff always reflects current annotation state. The template below is for additional context:
+
 ### Handoff Template
 
 ```markdown
@@ -343,9 +379,11 @@ Valid transitions: See [METHODOLOGY.md#fsm-enforced-workflow](./METHODOLOGY.md#f
 
 ## Related Documentation
 
-| Document                                     | Content                                        |
-| -------------------------------------------- | ---------------------------------------------- |
-| [METHODOLOGY.md](./METHODOLOGY.md)           | Core thesis, FSM states, two-tier architecture |
-| [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | DataTables, DocStrings, Rule blocks            |
-| [CONFIGURATION.md](./CONFIGURATION.md)       | Tag prefixes, presets                          |
-| [../INSTRUCTIONS.md](../INSTRUCTIONS.md)     | CLI commands, full tag reference               |
+| Document                                     | Content                                           |
+| -------------------------------------------- | ------------------------------------------------- |
+| [METHODOLOGY.md](./METHODOLOGY.md)           | Core thesis, FSM states, two-tier architecture    |
+| [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | DataTables, DocStrings, Rule blocks               |
+| [CONFIGURATION.md](./CONFIGURATION.md)       | Tag prefixes, presets                             |
+| [TAXONOMY.md](./TAXONOMY.md)                 | Tag taxonomy concepts and API                     |
+| [PROCESS-API.md](./PROCESS-API.md)           | Data API CLI commands for all session types       |
+| [VALIDATION.md](./VALIDATION.md)             | CLI flags for lint-patterns and validate-patterns |

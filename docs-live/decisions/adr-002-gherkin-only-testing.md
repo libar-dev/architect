@@ -39,6 +39,8 @@ Enforce strict Gherkin-only testing for the delivery-process package:
 
 **Invariant:** Feature files serve as both executable specs and documentation source. This dual purpose is the primary benefit of Gherkin-only testing for this package.
 
+**Rationale:** Parallel `.test.ts` files create a hidden test layer invisible to the documentation pipeline, undermining the single source of truth principle this package enforces.
+
 | Artifact            | Without Gherkin-Only        | With Gherkin-Only                  |
 | ------------------- | --------------------------- | ---------------------------------- |
 | Tests               | .test.ts (hidden from docs) | .feature (visible in docs)         |

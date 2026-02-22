@@ -17,6 +17,9 @@ Feature: Business Rules Document Codec
 
   Rule: Extracts Rule blocks with Invariant and Rationale
 
+    **Invariant:** Annotated Rule blocks must have their Invariant, Rationale, and Verified-by fields faithfully extracted and rendered.
+    **Rationale:** These structured annotations are the primary content of business rules documentation; losing them silently produces incomplete output.
+
     Scenario: Extracts annotated Rule with Invariant and Rationale
       Given a pattern with a rule containing:
         | Field | Value |
@@ -46,6 +49,9 @@ Feature: Business Rules Document Codec
 
   Rule: Organizes rules by product area and phase
 
+    **Invariant:** Rules must be grouped by product area and ordered by phase number within each group.
+    **Rationale:** Ungrouped or misordered rules make it impossible to find domain-specific constraints or understand their delivery sequence.
+
     Scenario: Groups rules by product area and phase
       Given patterns with rules in these categories:
         | Category | Rule Name |
@@ -70,6 +76,9 @@ Feature: Business Rules Document Codec
 
   Rule: Summary mode generates compact output
 
+    **Invariant:** Summary mode must produce only a statistics line and omit all detailed rule headings and content.
+    **Rationale:** AI context windows have strict token limits; including full detail in summary mode wastes context budget and degrades session quality.
+
     Scenario: Summary mode includes statistics line
       Given multiple patterns with a total of 5 rules
       When decoding with BusinessRulesCodec in summary mode
@@ -85,6 +94,9 @@ Feature: Business Rules Document Codec
   # ===========================================================================
 
   Rule: Preserves code examples and tables in detailed mode
+
+    **Invariant:** Code examples must appear only in detailed mode and must be excluded from standard mode output.
+    **Rationale:** Code blocks in standard mode clutter the overview and push important rule summaries out of view; detailed mode is the opt-in path for full content.
 
     Scenario: Code examples included in detailed mode
       Given a pattern with a rule containing code examples
@@ -102,6 +114,9 @@ Feature: Business Rules Document Codec
 
   Rule: Generates scenario traceability links
 
+    **Invariant:** Verification links must include the source file path so readers can locate the verifying scenario.
+    **Rationale:** Links without file paths are unresolvable, breaking the traceability chain between business rules and their executable specifications.
+
     Scenario: Verification links include file path
       Given a pattern with scenarios in "reservation-pattern.feature" at line 42
       When decoding with BusinessRulesCodec in detailed mode with verification enabled
@@ -112,6 +127,9 @@ Feature: Business Rules Document Codec
   # ===========================================================================
 
   Rule: Progressive disclosure generates detail files per product area
+
+    **Invariant:** Each product area with rules must produce a separate detail file, and the main document must link to all detail files via an index table.
+    **Rationale:** A single monolithic document becomes unnavigable at scale; progressive disclosure lets readers drill into only the product area they need.
 
     Scenario: Detail files are generated per product area
       Given patterns with rules in product areas:
@@ -144,6 +162,9 @@ Feature: Business Rules Document Codec
 
   Rule: Empty rules show placeholder instead of blank content
 
+    **Invariant:** Rules with no invariant, description, or scenarios must render a placeholder message; rules with scenarios but no invariant must show the verified-by list instead.
+    **Rationale:** Blank rule sections are indistinguishable from rendering bugs; explicit placeholders signal intentional incompleteness versus broken extraction.
+
     Scenario: Rule without invariant or description or scenarios shows placeholder
       Given a pattern with a rule containing:
         | Field | Value |
@@ -164,6 +185,9 @@ Feature: Business Rules Document Codec
 
   Rule: Rules always render flat for full visibility
 
+    **Invariant:** Rule output must never use collapsible blocks regardless of rule count; all rule headings must be directly visible.
+    **Rationale:** Business rules are compliance-critical content; hiding them behind collapsible sections risks rules being overlooked during review.
+
     Scenario: Features with many rules render flat without collapsible blocks
       Given a pattern with 4 rules each having 2 scenarios
       When decoding with BusinessRulesCodec in standard mode
@@ -176,6 +200,9 @@ Feature: Business Rules Document Codec
 
   Rule: Source file shown as filename text
 
+    **Invariant:** Source file references must render as plain filename text, not as markdown links.
+    **Rationale:** Markdown links to local file paths break in every viewer except the local filesystem, producing dead links that erode trust in the documentation.
+
     Scenario: Source file rendered as plain text not link
       Given a pattern with a rule in file "tests/features/my-feature.feature"
       When decoding with BusinessRulesCodec in standard mode
@@ -186,6 +213,9 @@ Feature: Business Rules Document Codec
   # ===========================================================================
 
   Rule: Verified-by renders as checkbox list at standard level
+
+    **Invariant:** Verified-by must render as a checkbox list of scenario names, with duplicate names deduplicated.
+    **Rationale:** Duplicate entries inflate the checklist and mislead reviewers into thinking more verification exists than actually does.
 
     Scenario: Rules with scenarios show verified-by checklist
       Given a pattern with a rule having scenarios "Create order" and "Cancel order"
@@ -202,6 +232,9 @@ Feature: Business Rules Document Codec
   # ===========================================================================
 
   Rule: Feature names are humanized from camelCase pattern names
+
+    **Invariant:** CamelCase pattern names must be converted to space-separated headings with trailing "Testing" suffixes stripped.
+    **Rationale:** Raw camelCase names are unreadable in documentation headings, and "Testing" suffixes leak implementation concerns into user-facing output.
 
     Scenario: CamelCase pattern name becomes spaced heading
       Given a pattern named "ConfigResolution" with a rule

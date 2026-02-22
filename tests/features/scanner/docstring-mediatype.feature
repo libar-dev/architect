@@ -51,6 +51,7 @@ Feature: DocString MediaType Preservation
   Rule: MediaType is used when rendering code blocks
 
     **Invariant:** The rendered code block language must match the DocString mediaType; when mediaType is absent, the renderer falls back to a caller-specified default language.
+    **Rationale:** Using the wrong language hint causes syntax highlighters to misrender code blocks, and losing mediaType entirely can trigger incorrect escaping (e.g., asterisks in JSDoc).
     **Verified by:** TypeScript mediaType renders as typescript code block, JSDoc mediaType prevents asterisk escaping, Missing mediaType falls back to default language
 
     Scenario: TypeScript mediaType renders as typescript code block

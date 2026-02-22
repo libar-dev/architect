@@ -9,17 +9,19 @@
  *
  * ## Universal Renderer
  *
- * Converts RenderableDocument to output strings. Two renderers:
+ * Converts RenderableDocument to output strings. Three renderers:
  * - `renderToMarkdown` — Full markdown for human documentation
- * - `renderToClaudeContext` — Token-efficient format for LLM consumption
+ * - `renderToClaudeMdModule` — Standard markdown with H3-rooted headings for modular-claude-md
+ * - `renderToClaudeContext` — Token-efficient format with section markers (legacy)
  *
- * Both are "dumb printers" — they know nothing about patterns, phases,
+ * All are "dumb printers" — they know nothing about patterns, phases,
  * or domain concepts. All logic lives in the codecs; these just render blocks.
  *
  * ### When to Use
  *
  * - `renderToMarkdown` for human-readable docs (`docs/` output)
- * - `renderToClaudeContext` for AI context (`_claude-md/` output)
+ * - `renderToClaudeMdModule` for AI context (`_claude-md/` output)
+ * - `renderToClaudeContext` for token-efficient AI context (legacy, not used by generators)
  * - `renderDocumentWithFiles` for multi-file output with detail files
  */
 
@@ -243,6 +245,105 @@ function renderCollapsibleClaudeContext(block: CollapsibleBlock): string[] {
   // Render nested content directly
   for (const contentBlock of block.content) {
     lines.push(...renderBlockClaudeContext(contentBlock));
+  }
+
+  return lines;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Claude MD Module Renderer
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Heading offset for modular-claude-md: H1 → H3, H2 → H4, etc. */
+const CLAUDE_MD_MODULE_HEADING_OFFSET = 2;
+
+/**
+ * Render a RenderableDocument to a modular-claude-md compatible module.
+ *
+ * Uses standard markdown headings offset by +2 (H1→H3, H2→H4) so the
+ * output plugs directly into modular-claude-md's H3-rooted module system.
+ * Omits frontmatter, mermaid blocks, and link-out blocks. Flattens
+ * collapsible blocks into headings.
+ *
+ * @param doc - The document to render
+ * @returns Markdown string compatible with modular-claude-md
+ */
+export function renderToClaudeMdModule(doc: RenderableDocument): string {
+  const lines: string[] = [];
+
+  // Title as H3 (H1 + offset 2)
+  const titleLevel = Math.min(1 + CLAUDE_MD_MODULE_HEADING_OFFSET, 6);
+  lines.push(`${'#'.repeat(titleLevel)} ${doc.title}`, '');
+
+  // Frontmatter intentionally omitted — no Purpose/Detail Level lines
+
+  // Sections
+  for (const block of doc.sections) {
+    lines.push(...renderBlockClaudeMdModule(block));
+  }
+
+  // Ensure single trailing newline
+  return lines.join('\n').trimEnd() + '\n';
+}
+
+/**
+ * Render a single block for modular-claude-md output.
+ */
+function renderBlockClaudeMdModule(block: SectionBlock): string[] {
+  switch (block.type) {
+    case 'heading': {
+      const level = Math.min(block.level + CLAUDE_MD_MODULE_HEADING_OFFSET, 6);
+      return [`${'#'.repeat(level)} ${block.text}`, ''];
+    }
+
+    case 'paragraph':
+      return [block.text, ''];
+
+    case 'separator':
+      return [''];
+
+    case 'table':
+      return renderTable(block);
+
+    case 'list':
+      return renderList(block);
+
+    case 'code': {
+      const fence = block.content.includes('```') ? '````' : '```';
+      return [`${fence}${block.language ?? ''}`, block.content, fence, ''];
+    }
+
+    case 'mermaid':
+      // Omit mermaid — modular-claude-md targets LLM context
+      return [];
+
+    case 'collapsible':
+      return renderCollapsibleClaudeMdModule(block);
+
+    case 'link-out':
+      // Omit link-out — file links not useful in CLAUDE.md context
+      return [];
+
+    default: {
+      const _exhaustive: never = block;
+      return [`<!-- Unknown block type: ${JSON.stringify(_exhaustive)} -->`];
+    }
+  }
+}
+
+/**
+ * Flatten a collapsible block — summary becomes a heading, inner blocks rendered directly.
+ */
+function renderCollapsibleClaudeMdModule(block: CollapsibleBlock): string[] {
+  const lines: string[] = [];
+
+  // Summary becomes a heading at offset level (clamped to 6)
+  const level = Math.min(2 + CLAUDE_MD_MODULE_HEADING_OFFSET, 6);
+  lines.push(`${'#'.repeat(level)} ${block.summary}`, '');
+
+  // Render nested content directly
+  for (const contentBlock of block.content) {
+    lines.push(...renderBlockClaudeMdModule(contentBlock));
   }
 
   return lines;

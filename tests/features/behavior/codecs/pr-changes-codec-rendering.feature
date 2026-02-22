@@ -62,6 +62,7 @@ Feature: PR Changes Codec - Core Rendering
   Rule: PrChangesCodec generates summary with filter information
 
     **Invariant:** Every PR changes document must contain a Summary section with pattern counts and active filter information.
+    **Rationale:** Without a summary, reviewers must scan the entire document to understand the scope and filtering context of the PR changes.
     **Verified by:** Summary section shows pattern counts, Summary shows release tag when releaseFilter is set, Summary shows files filter count when changedFiles is set
 
     @happy-path
@@ -95,6 +96,7 @@ Feature: PR Changes Codec - Core Rendering
   Rule: PrChangesCodec groups changes by phase when sortBy is "phase"
 
     **Invariant:** When sortBy is "phase" (the default), patterns must be grouped under phase headings in ascending phase order.
+    **Rationale:** Phase grouping aligns PR changes with the delivery roadmap, letting reviewers verify that changes belong to the expected implementation phase.
     **Verified by:** Changes grouped by phase with default sortBy, Pattern details shown within phase groups
 
     @happy-path
@@ -119,6 +121,7 @@ Feature: PR Changes Codec - Core Rendering
   Rule: PrChangesCodec groups changes by priority when sortBy is "priority"
 
     **Invariant:** When sortBy is "priority", patterns must be grouped under High/Medium/Low priority headings with correct pattern assignment.
+    **Rationale:** Priority grouping lets reviewers focus on high-impact changes first, ensuring critical patterns receive the most review attention.
     **Verified by:** Changes grouped by priority, Priority groups show correct patterns
 
     @happy-path
@@ -162,6 +165,7 @@ Feature: PR Changes Codec - Core Rendering
   Rule: PrChangesCodec renders pattern details with metadata and description
 
     **Invariant:** Each pattern entry must include a metadata table (status, phase, business value when available) and description text.
+    **Rationale:** Metadata and description provide the context reviewers need to evaluate whether a pattern's implementation aligns with its stated purpose and delivery status.
     **Verified by:** Pattern detail shows metadata table, Pattern detail shows business value when available, Pattern detail shows description
 
     @happy-path
@@ -192,6 +196,7 @@ Feature: PR Changes Codec - Core Rendering
   Rule: PrChangesCodec renders deliverables when includeDeliverables is enabled
 
     **Invariant:** Deliverables are only rendered when includeDeliverables is enabled, and when releaseFilter is set, only deliverables matching that release are shown.
+    **Rationale:** Deliverables add bulk to the PR document; gating them behind a flag keeps default output concise, while release filtering prevents reviewers from seeing unrelated work items.
     **Verified by:** Deliverables shown when patterns have deliverables, Deliverables filtered by release when releaseFilter is set, No deliverables section when includeDeliverables is disabled
 
     @happy-path
@@ -217,6 +222,7 @@ Feature: PR Changes Codec - Core Rendering
   Rule: PrChangesCodec renders acceptance criteria from scenarios
 
     **Invariant:** When patterns have associated scenarios, the codec must render an "Acceptance Criteria" section containing scenario names and step lists.
+    **Rationale:** Acceptance criteria give reviewers a concrete checklist to verify that the PR's implementation satisfies the behavioral requirements defined in the spec.
     **Verified by:** Acceptance criteria rendered when patterns have scenarios, Acceptance criteria shows scenario steps
 
     @happy-path
@@ -233,6 +239,7 @@ Feature: PR Changes Codec - Core Rendering
   Rule: PrChangesCodec renders business rules from Gherkin Rule keyword
 
     **Invariant:** When patterns have Gherkin Rule blocks, the codec must render a "Business Rules" section containing rule names and verification information.
+    **Rationale:** Business rules surface domain invariants directly in the PR review, ensuring reviewers can verify that implementation changes respect the documented constraints.
     **Verified by:** Business rules rendered when patterns have rules, Business rules show rule names and verification info
 
     @happy-path

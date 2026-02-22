@@ -230,6 +230,7 @@ Feature: Dual-Source Extraction
   Rule: Include tags are extracted from Gherkin feature tags
 
     **Invariant:** Include tags are parsed as comma-separated values; absence of the tag means the pattern has no includes.
+    **Rationale:** Include tags control which patterns appear in scoped diagrams — incorrect parsing drops patterns from diagrams or includes unrelated ones.
     **Verified by:** Single include tag is extracted, CSV include tag produces multiple values, Feature without include tag has no include field
 
     @happy-path

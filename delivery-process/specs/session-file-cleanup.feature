@@ -33,6 +33,10 @@ Feature: Session File Cleanup Behavior
 
   Rule: Cleanup triggers during session-context generation
 
+    **Invariant:** Orphaned session files for inactive phases must be removed during session-context generation.
+    **Rationale:** Stale session files mislead developers into thinking a phase is still active, causing wasted effort on completed or paused work.
+    **Verified by:** Cleanup runs after generating session files
+
     @acceptance-criteria
     Scenario: Cleanup runs after generating session files
       Given session files exist for phases 31 and 33
@@ -43,6 +47,10 @@ Feature: Session File Cleanup Behavior
       And log message indicates "Cleaned up orphaned session file: sessions/phase-31.md"
 
   Rule: Only phase-*.md files are candidates for cleanup
+
+    **Invariant:** Cleanup must only target files matching the `phase-*.md` naming convention.
+    **Rationale:** Deleting non-session files (infrastructure files, manual notes) would destroy user content that cannot be regenerated.
+    **Verified by:** Non-session files are preserved
 
     @acceptance-criteria
     Scenario: Non-session files are preserved
@@ -57,6 +65,10 @@ Feature: Session File Cleanup Behavior
       And notes.md is preserved
 
   Rule: Cleanup failures are non-fatal
+
+    **Invariant:** A cleanup failure must never prevent session-context generation from completing successfully.
+    **Rationale:** Cleanup is a housekeeping side-effect; blocking the primary generation workflow on a file-system error would break the developer's session for a non-critical concern.
+    **Verified by:** Permission error during cleanup; Missing sessions directory
 
     @acceptance-criteria
     Scenario: Permission error during cleanup

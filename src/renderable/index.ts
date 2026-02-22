@@ -73,7 +73,12 @@ export {
 // Renderer Exports
 // ═══════════════════════════════════════════════════════════════════════════
 
-export { renderToMarkdown, renderDocumentWithFiles, type OutputFile } from './render.js';
+export {
+  renderToMarkdown,
+  renderToClaudeMdModule,
+  renderDocumentWithFiles,
+  type OutputFile,
+} from './render.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Codec Exports

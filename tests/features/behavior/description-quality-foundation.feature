@@ -24,6 +24,7 @@ Feature: Description Quality Foundation
   Rule: Behavior files are verified during pattern extraction
 
     **Invariant:** Every timeline pattern must report whether its corresponding behavior file exists.
+    **Rationale:** Without verification at extraction time, traceability reports would silently include broken references to non-existent behavior files.
     **Verified by:** Behavior file existence verified during extraction, Missing behavior file sets verification to false, Explicit behavior file tag skips verification, Behavior file inferred from timeline naming convention
 
     @acceptance-criteria
@@ -57,6 +58,7 @@ Feature: Description Quality Foundation
   Rule: Traceability coverage reports verified and unverified behavior files
 
     **Invariant:** Coverage reports must distinguish between patterns with verified behavior files and those without.
+    **Rationale:** Conflating verified and unverified coverage would overstate test confidence, hiding gaps that should be addressed before release.
     **Verified by:** Traceability shows covered phases with verified behavior files
 
     @acceptance-criteria
@@ -74,6 +76,7 @@ Feature: Description Quality Foundation
   Rule: Pattern names are transformed to human-readable display names
 
     **Invariant:** Display names must convert CamelCase to title case, handle consecutive capitals, and respect explicit title overrides.
+    **Rationale:** CamelCase identifiers are unreadable in generated documentation; human-readable names are essential for non-developer consumers of pattern registries.
     **Verified by:** CamelCase pattern names transformed to title case, PascalCase with consecutive caps handled correctly, Falls back to name when no patternName, Explicit title tag overrides CamelCase transformation
 
     @acceptance-criteria
@@ -104,6 +107,7 @@ Feature: Description Quality Foundation
   Rule: PRD acceptance criteria are formatted with numbering and bold keywords
 
     **Invariant:** PRD output must number acceptance criteria and bold Given/When/Then keywords when steps are enabled.
+    **Rationale:** Unnumbered criteria are difficult to reference in reviews; unformatted step keywords blend into prose, making scenarios harder to parse visually.
     **Verified by:** PRD shows numbered acceptance criteria with bold keywords, PRD respects includeScenarioSteps flag, PRD shows full Feature description without truncation
 
     @acceptance-criteria
@@ -133,6 +137,7 @@ Feature: Description Quality Foundation
   Rule: Business values are formatted for human readability
 
     **Invariant:** Hyphenated business value tags must be converted to space-separated readable text in all output contexts.
+    **Rationale:** Raw hyphenated tags like "enable-rich-prd" are annotation artifacts; displaying them verbatim in generated docs confuses readers expecting natural language.
     **Verified by:** Hyphenated business value converted to spaces, Business value displayed in Next Actionable table, File extensions not treated as sentence endings
 
     @acceptance-criteria

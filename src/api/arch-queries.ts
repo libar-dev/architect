@@ -13,6 +13,8 @@
  *
  * Pure functions over MasterDataset for deep architecture exploration.
  * No I/O — all data comes from pre-computed views.
+ *
+ * **When to Use:** When exploring architecture structure (neighborhoods, comparisons, tags, sources) via the Data API CLI.
  */
 
 import type {

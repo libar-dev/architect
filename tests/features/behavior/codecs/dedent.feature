@@ -63,6 +63,7 @@ Feature: Dedent Helper Function Edge Cases
   Rule: Empty lines are handled correctly
 
     **Invariant:** Empty lines (including lines with only whitespace) must not affect the minimum indentation calculation and must be preserved in output.
+    **Rationale:** Counting whitespace-only lines as indented content would inflate the minimum indentation, causing non-empty lines to retain unwanted leading spaces.
     **Verified by:** Empty lines with trailing spaces are preserved, All empty lines returns original text
 
     @edge-case @empty-lines
@@ -91,6 +92,7 @@ Feature: Dedent Helper Function Edge Cases
   Rule: Single line input is handled
 
     **Invariant:** Single-line input must have its leading whitespace removed without errors or unexpected transformations.
+    **Rationale:** Failing or returning empty output on single-line input would break callers that extract individual lines from multi-line DocStrings.
     **Verified by:** Single line with indentation is dedented, Single line without indentation is unchanged
 
     @edge-case @single-line
@@ -112,6 +114,7 @@ Feature: Dedent Helper Function Edge Cases
   Rule: Unicode whitespace is handled
 
     **Invariant:** Non-breaking spaces and other Unicode whitespace characters must be treated as content, not as indentation to be removed.
+    **Rationale:** Stripping Unicode whitespace as indentation would corrupt intentional formatting in source code and documentation content.
     **Verified by:** Non-breaking space is treated as content
 
     @edge-case @unicode
@@ -127,6 +130,7 @@ Feature: Dedent Helper Function Edge Cases
   Rule: Relative indentation is preserved
 
     **Invariant:** After removing the common leading whitespace, the relative indentation between lines must remain unchanged.
+    **Rationale:** Altering relative indentation would break the syntactic structure of extracted code blocks, making them unparseable or semantically incorrect.
     **Verified by:** Nested code blocks preserve relative indentation, Mixed indentation levels are preserved relatively
 
     @happy-path @relative-indent

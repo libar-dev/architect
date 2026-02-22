@@ -25,6 +25,7 @@ Feature: Extract Summary from Pattern Descriptions
   Rule: Single-line descriptions are returned as-is when complete
 
     **Invariant:** A single-line description that ends with sentence-ending punctuation is returned verbatim; one without gets an appended ellipsis.
+    **Rationale:** Summaries appear in pattern tables where readers expect grammatically complete text; an ellipsis signals intentional truncation rather than a rendering bug.
     **Verified by:** Complete sentence on single line, Single line without sentence ending gets ellipsis
 
     Scenario: Complete sentence on single line
@@ -49,6 +50,7 @@ Feature: Extract Summary from Pattern Descriptions
   Rule: Multi-line descriptions are combined until sentence ending
 
     **Invariant:** Lines are concatenated until a sentence-ending punctuation mark is found or the character limit is reached, whichever comes first.
+    **Rationale:** Splitting at arbitrary line breaks produces sentence fragments that lose meaning; combining until a natural boundary preserves semantic completeness.
     **Verified by:** Two lines combine into complete sentence, Combines lines up to sentence boundary within limit, Long multi-line text truncates when exceeds limit, Multi-line without sentence ending gets ellipsis
 
     Scenario: Two lines combine into complete sentence
@@ -156,6 +158,7 @@ Feature: Extract Summary from Pattern Descriptions
   Rule: Edge cases are handled gracefully
 
     **Invariant:** Degenerate inputs (empty strings, markdown-only content, bold markers) produce valid output without errors: empty input yields empty string, formatting is stripped, and multiple sentence endings use the first.
+    **Rationale:** Summary extraction runs on every pattern in the dataset; an unhandled edge case would crash the entire documentation generation pipeline.
     **Verified by:** Empty description returns empty string, Markdown headers are stripped, Bold markdown is stripped, Multiple sentence endings - takes first complete sentence, Question mark as sentence ending
 
     Scenario: Empty description returns empty string

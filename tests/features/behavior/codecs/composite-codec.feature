@@ -20,6 +20,7 @@ Feature: Composite Codec
 
     **Invariant:** Sections from child codecs appear in the composite
     output in the same order as the codecs array.
+    **Rationale:** Non-deterministic section ordering would make generated documents unstable across runs, breaking diff-based review workflows.
 
     **Verified by:** Sections from two codecs appear in order,
     Three codecs produce sections in array order
@@ -47,6 +48,7 @@ Feature: Composite Codec
     **Invariant:** By default, a separator block is inserted between
     each child codec's sections. When separateSections is false, no
     separators are added.
+    **Rationale:** Without configurable separators, consumers cannot control visual grouping — some documents need clear boundaries between codec outputs while others need seamless flow.
 
     **Verified by:** Default separator between sections,
     No separator when disabled
@@ -73,6 +75,7 @@ Feature: Composite Codec
 
     **Invariant:** additionalFiles from all children are merged into
     a single record. When keys collide, the later codec's value wins.
+    **Rationale:** Silently dropping colliding keys would lose content without warning, while throwing on collision would prevent composing codecs that intentionally override shared file paths.
 
     **Verified by:** Non-overlapping files merged,
     Colliding keys use last-wins
@@ -99,6 +102,7 @@ Feature: Composite Codec
 
     **Invariant:** composeDocuments accepts RenderableDocument array and
     produces a composed RenderableDocument without requiring codecs.
+    **Rationale:** Requiring a full codec instance for simple document merging would force unnecessary schema definitions when callers already hold pre-rendered documents.
 
     **Verified by:** Direct document composition
 
@@ -118,6 +122,7 @@ Feature: Composite Codec
 
     **Invariant:** Codecs producing empty sections arrays contribute
     nothing to the output. No separator is emitted for empty outputs.
+    **Rationale:** Emitting separators around empty sections would produce orphaned dividers in the generated markdown, creating visual noise with no content between them.
 
     **Verified by:** Empty codec skipped without separator
 
