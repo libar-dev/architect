@@ -53,6 +53,7 @@ Feature: Streaming Git Diff for Process Guard
 
     **Invariant:** Git diff output must be consumed as a stream with constant memory usage, never buffered entirely in memory.
     **Rationale:** Buffering full diff output causes ENOBUFS crashes on large repositories where diff size exceeds Node.js buffer limits.
+    **Verified by:** Large diff does not cause memory overflow; Streaming produces same results as buffered
 
     @acceptance-criteria
     Scenario: Large diff does not cause memory overflow
@@ -77,6 +78,7 @@ Feature: Streaming Git Diff for Process Guard
 
     **Invariant:** Status transitions and deliverable changes must be extracted incrementally as each file section completes, not after the entire diff is collected.
     **Rationale:** Batch-processing the full diff reintroduces the memory bottleneck that streaming is designed to eliminate.
+    **Verified by:** Status transitions detected incrementally; Deliverable changes detected incrementally
 
     @acceptance-criteria
     Scenario: Status transitions detected incrementally
@@ -100,6 +102,7 @@ Feature: Streaming Git Diff for Process Guard
 
     **Invariant:** Stream failures and malformed diff lines must return Result errors or be skipped without throwing exceptions.
     **Rationale:** Unhandled stream errors crash the CLI process, preventing any validation output from reaching the user.
+    **Verified by:** Git command failure returns Result error; Malformed diff lines are skipped
 
     @acceptance-criteria
     Scenario: Git command failure returns Result error

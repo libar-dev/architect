@@ -22,7 +22,7 @@ What you expected to happen.
 
 ## Error Output
 
-```
+```text
 Paste any error messages or unexpected output here.
 ```
 

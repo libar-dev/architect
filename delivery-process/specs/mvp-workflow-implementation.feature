@@ -38,6 +38,8 @@ Feature: MVP Workflow Implementation
     **Invariant:** The scanner and validation schemas must accept exactly the four PDR-005 status values: roadmap, active, completed, deferred.
     **Rationale:** Unrecognized status values silently drop patterns from generated documents, causing missing documentation across the entire monorepo.
 
+    **Verified by:** Scanner extracts new status values; Scenario Outline: All four status values are valid
+
     @acceptance-criteria
     Scenario: Scanner extracts new status values
       Given a feature file with @libar-docs-status:roadmap
@@ -59,8 +61,10 @@ Feature: MVP Workflow Implementation
 
   Rule: Generators map statuses to documents
 
-    **Invariant:** Each status value must route to exactly one target document: roadmap/deferred to ROADMAP.md, active to CURRENT-WORK.md, completed to CHANGELOG.
+    **Invariant:** Each status value must route to exactly one target document: roadmap/deferred to ROADMAP.md, active to CURRENT-WORK.md, completed to CHANGELOG-GENERATED.md.
     **Rationale:** Incorrect status-to-document mapping causes patterns to appear in the wrong document or be omitted entirely, breaking the project overview for all consumers.
+
+    **Verified by:** Roadmap and deferred appear in ROADMAP.md; Active appears in CURRENT-WORK.md; Completed appears in CHANGELOG-GENERATED.md
 
     @acceptance-criteria
     Scenario: Roadmap and deferred appear in ROADMAP.md

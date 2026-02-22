@@ -52,6 +52,7 @@ Feature: ADR-003 - Source-First Pattern Architecture
     **Invariant:** A pattern is defined by `@libar-docs-pattern` in a TypeScript
     file — either a stub (pre-implementation) or source code (post-implementation).
     **Rationale:** If pattern identity lives in tier 1 specs, it becomes stale after implementation and diverges from the code that actually realizes the pattern.
+    **Verified by:** TypeScript source is canonical pattern definition
 
     **Pattern Definition Lifecycle:**
 
@@ -74,6 +75,7 @@ Feature: ADR-003 - Source-First Pattern Architecture
     They are not the source of truth for pattern identity, invariants, or
     acceptance criteria. After completion, they may be archived.
     **Rationale:** Treating tier 1 specs as durable creates a maintenance burden — at scale only 39% maintain traceability, and duplicated Rules/Scenarios average 200-400 stale lines.
+    **Verified by:** TypeScript source is canonical pattern definition
 
     **Value by lifecycle phase:**
 
@@ -91,6 +93,7 @@ Feature: ADR-003 - Source-First Pattern Architecture
     **Invariant:** The delivery process produces three artifact types with
     long-term value. All other artifacts are projections or ephemeral.
     **Rationale:** Without a clear boundary between durable and ephemeral artifacts, teams maintain redundant documents that inevitably drift from the source of truth.
+    **Verified by:** TypeScript source is canonical pattern definition
 
     | Artifact | Purpose | Owns |
     | Annotated TypeScript | Pattern identity, architecture graph | Name, status, uses, categories |
@@ -107,6 +110,7 @@ Feature: ADR-003 - Source-First Pattern Architecture
     Multiple files can implement the same pattern. One file can implement
     multiple patterns (CSV format).
     **Rationale:** Without many-to-one realization, cross-cutting patterns that span multiple files cannot be traced back to a single canonical definition.
+    **Verified by:** TypeScript source is canonical pattern definition
 
     | Relationship | Tag | Cardinality |
     | Definition | `@libar-docs-pattern` | Exactly one per pattern |
@@ -122,6 +126,7 @@ Feature: ADR-003 - Source-First Pattern Architecture
     across the entire codebase. The `mergePatterns()` conflict check in
     `orchestrator.ts` correctly enforces this.
     **Rationale:** Duplicate pattern definitions cause merge conflicts in the MasterDataset and produce ambiguous ownership in generated documentation.
+    **Verified by:** TypeScript source is canonical pattern definition
 
     **Migration path for existing conflicts:**
 
@@ -141,6 +146,7 @@ Feature: ADR-003 - Source-First Pattern Architecture
     is the primary traceability mechanism. `@libar-docs-executable-specs`
     (forward: "my tests live here") is retained but not required.
     **Rationale:** Forward links in tier 1 specs go stale when specs are archived, while reverse links in test files are self-maintaining because the test cannot run without the implementation.
+    **Verified by:** TypeScript source is canonical pattern definition
 
     | Mechanism | Usage | Reliability |
     | `@implements` (reverse) | 14 patterns (32%) | Self-maintaining, lives in test |

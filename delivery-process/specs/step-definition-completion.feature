@@ -166,6 +166,7 @@ Feature: Step Definition Completion
 
     **Invariant:** All step definition files must follow the established state-management and import patterns from existing .steps.ts files.
     **Rationale:** Inconsistent step definition structure makes tests harder to review, debug, and maintain across the 10+ feature files in this deliverable.
+    **Verified by:** Existing .steps.ts review, PR review checklist
 
     **Pattern:** All step definitions should follow the established patterns in
     existing .steps.ts files for consistency.

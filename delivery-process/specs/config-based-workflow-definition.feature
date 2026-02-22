@@ -155,6 +155,8 @@ Feature: Config-Based Workflow Definition
     **Invariant:** The inline default workflow constant is the only workflow source until preset integration is implemented. No preset or project config field exposes workflow customization.
     **Rationale:** Coupling workflow into the preset/config system before the inline fix ships would widen the blast radius and risk type regressions across all config consumers.
 
+    **Verified by:** N/A - deferred until preset integration
+
     Adding `workflow` as a field on `DeliveryProcessConfig` (presets) and
     `DeliveryProcessProjectConfig` (project config) is a natural next step
     but NOT required for the MVP fix.

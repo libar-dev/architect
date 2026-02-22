@@ -48,6 +48,7 @@ Feature: ADR-002 - Gherkin-Only Testing Policy
     documentation source. This dual purpose is the primary benefit
     of Gherkin-only testing for this package.
     **Rationale:** Parallel `.test.ts` files create a hidden test layer invisible to the documentation pipeline, undermining the single source of truth principle this package enforces.
+    **Verified by:** Gherkin-only policy enforced
 
     | Artifact | Without Gherkin-Only | With Gherkin-Only |
     | Tests | .test.ts (hidden from docs) | .feature (visible in docs) |
