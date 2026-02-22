@@ -19,9 +19,7 @@ This document describes the architecture of the `@libar-dev/delivery-process` pa
 9. [Key Design Patterns](#key-design-patterns)
 10. [Data Flow Diagrams](#data-flow-diagrams)
 11. [Workflow Integration](#workflow-integration)
-12. [Programmatic Usage](#programmatic-usage)
-13. [Extending the System](#extending-the-system)
-14. [Quick Reference](#quick-reference)
+12. [Quick Reference](#quick-reference)
 
 ---
 
@@ -76,78 +74,23 @@ The tag prefix is configurable via presets or custom configuration (see [Configu
 
 ## Four-Stage Pipeline
 
-The pipeline has two entry points. The orchestrator (`src/generators/orchestrator.ts`) runs all 10 steps end-to-end for documentation generation. The shared pipeline factory `buildMasterDataset()` (`src/generators/pipeline/build-pipeline.ts`) runs steps 1-8 and returns a `Result<PipelineResult, PipelineError>` for CLI consumers like process-api and validate-patterns (see [Pipeline Factory](#pipeline-factory-adr-006)).
+The architecture has two coordinated entry points. The orchestrator (`src/generators/orchestrator.ts`) runs full generation, while the shared pipeline factory `buildMasterDataset()` (`src/generators/pipeline/build-pipeline.ts`) exposes the same scan/extract/transform core to CLI consumers.
 
 ### Stage 1: Scanner
 
-**Purpose:** Discover source files and parse them into structured AST representations.
+Scanner discovers TypeScript and Gherkin sources, then parses each file into normalized scan outputs for extraction.
 
-| Scanner Type | Input                          | Output                 | Key File                         |
-| ------------ | ------------------------------ | ---------------------- | -------------------------------- |
-| TypeScript   | `.ts` files with `@libar-docs` | `ScannedFile[]`        | `src/scanner/pattern-scanner.ts` |
-| Gherkin      | `.feature` files               | `ScannedGherkinFile[]` | `src/scanner/gherkin-scanner.ts` |
-
-**TypeScript Scanning Flow:**
-
-```
-findFilesToScan()     →  hasFileOptIn()      →  parseFileDirectives()
-(glob patterns)          (@libar-docs check)    (AST extraction)
-```
-
-**Gherkin Scanning Flow:**
-
-```
-findFeatureFiles()    →  parseFeatureFile()  →  extractPatternTags()
-(glob patterns)          (Cucumber parser)      (tag extraction)
-```
+- TypeScript scanner: `src/scanner/pattern-scanner.ts` + AST parser support.
+- Gherkin scanner: `src/scanner/gherkin-scanner.ts` + Gherkin AST parser support.
+- Configuration-controlled regex builders determine opt-in and directive matching.
 
 ### Stage 2: Extractor
 
-**Purpose:** Convert scanned files into normalized `ExtractedPattern` objects.
+Extractor converts scan outputs into `ExtractedPattern[]` with normalized metadata, relationships, and optional shape data.
 
-**Key Files:**
-
-- `src/extractor/doc-extractor.ts:extractPatterns()` - Pattern extraction
-- `src/extractor/shape-extractor.ts` - Shape extraction (3 modes)
-
-**Shape Extraction Modes:**
-
-| Mode                    | Trigger                                | Behavior                                       |
-| ----------------------- | -------------------------------------- | ---------------------------------------------- |
-| Explicit names          | `@libar-docs-extract-shapes Foo, Bar`  | Extracts named declarations only               |
-| Wildcard auto-discovery | `@libar-docs-extract-shapes *`         | Extracts all exported declarations from file   |
-| Declaration-level       | `@libar-docs-shape` on individual decl | Extracts tagged declarations (exported or not) |
-
-Shapes now include `params`, `returns`, and `throws` fields (parsed from `@param`/`@returns`/`@throws` JSDoc tags on function shapes), and an optional `group` field from the `@libar-docs-shape` tag value. `ExportInfo` includes an optional `signature` field for function/const/class declarations.
-
-```typescript
-interface ExtractedPattern {
-  id: string; // pattern-{8-char-hex}
-  name: string;
-  category: string;
-  directive: DocDirective;
-  code: string;
-  source: SourceInfo; // { file, lines: [start, end] }
-
-  // Metadata from annotations
-  patternName?: string;
-  status?: PatternStatus; // roadmap|active|completed|deferred
-  phase?: number;
-  quarter?: string; // Q1-2025
-  release?: string; // v0.1.0 or vNEXT
-  useCases?: string[];
-  uses?: string[];
-  usedBy?: string[];
-  dependsOn?: string[];
-  enables?: string[];
-
-  // ... 30+ additional fields
-}
-```
-
-**Dual-Source Merging:**
-
-After extraction, patterns from both sources are merged with conflict detection. Merge behavior varies by consumer: `'fatal'` mode (used by process-api and orchestrator) returns an error if the same pattern name exists in both TypeScript and Gherkin; `'concatenate'` mode (used by validate-patterns) falls back to concatenation on conflict, since the validator needs both sources for cross-source matching.
+- Pattern extraction: `src/extractor/doc-extractor.ts`
+- Shape extraction: `src/extractor/shape-extractor.ts`
+- Merge behavior is consumer-aware: `fatal` for orchestration/query paths, `concatenate` for cross-source validation scenarios.
 
 ### Annotation Format Examples
 
@@ -173,131 +116,17 @@ export interface PipelineConfig { ... }
 
 ### Pipeline Factory (ADR-006)
 
-ADR-006 established the **Single Read Model Architecture**: the MasterDataset is the sole read model for all consumers. The shared pipeline factory extracts the 8-step scan-extract-merge-transform pipeline into a reusable function.
-
-**Key File:** `src/generators/pipeline/build-pipeline.ts`
-
-**Signature:**
-
-```typescript
-function buildMasterDataset(
-  options: PipelineOptions
-): Promise<Result<PipelineResult, PipelineError>>;
-```
-
-**PipelineOptions:**
-
-| Field                   | Type                                         | Description                                              |
-| ----------------------- | -------------------------------------------- | -------------------------------------------------------- |
-| `input`                 | `readonly string[]`                          | TypeScript source glob patterns                          |
-| `features`              | `readonly string[]`                          | Gherkin feature glob patterns                            |
-| `baseDir`               | `string`                                     | Base directory for glob resolution                       |
-| `mergeConflictStrategy` | `'fatal' \| 'concatenate'`                   | How to handle duplicate pattern names across sources     |
-| `exclude`               | `readonly string[]` (optional)               | Glob patterns to exclude from scanning                   |
-| `workflowPath`          | `string` (optional)                          | Custom workflow config JSON path                         |
-| `contextInferenceRules` | `readonly ContextInferenceRule[]` (optional) | Custom context inference rules                           |
-| `includeValidation`     | `boolean` (optional)                         | When false, skip validation pass (default true)          |
-| `failOnScanErrors`      | `boolean` (optional)                         | When true, return error on scan failures (default false) |
-
-**PipelineResult:**
-
-| Field          | Type                         | Description                                |
-| -------------- | ---------------------------- | ------------------------------------------ |
-| `dataset`      | `RuntimeMasterDataset`       | The fully-computed read model              |
-| `validation`   | `ValidationSummary`          | Schema validation results for all patterns |
-| `warnings`     | `readonly PipelineWarning[]` | Structured non-fatal warnings              |
-| `scanMetadata` | `ScanMetadata`               | Aggregate scan counts for reporting        |
-
-**PipelineWarning:**
-
-| Field     | Type                                          | Description                |
-| --------- | --------------------------------------------- | -------------------------- |
-| `type`    | `'scan' \| 'extraction' \| 'gherkin-parse'`   | Warning category           |
-| `message` | `string`                                      | Human-readable description |
-| `count`   | `number` (optional)                           | Number of affected items   |
-| `details` | `readonly PipelineWarningDetail[]` (optional) | File-level diagnostics     |
-
-**ScanMetadata:**
-
-| Field                   | Type     | Description                        |
-| ----------------------- | -------- | ---------------------------------- |
-| `scannedFileCount`      | `number` | Total files successfully scanned   |
-| `scanErrorCount`        | `number` | Files that failed to scan          |
-| `skippedDirectiveCount` | `number` | Invalid directives skipped         |
-| `gherkinErrorCount`     | `number` | Feature files that failed to parse |
-
-**PipelineError:**
-
-| Field     | Type     | Description                                             |
-| --------- | -------- | ------------------------------------------------------- |
-| `step`    | `string` | Pipeline step that failed (e.g., `'config'`, `'merge'`) |
-| `message` | `string` | Human-readable error description                        |
-
-**Consumer Table:**
-
-| Consumer            | `mergeConflictStrategy`          | Error Handling              |
-| ------------------- | -------------------------------- | --------------------------- |
-| `process-api`       | `'fatal'`                        | Maps to `process.exit(1)`   |
-| `validate-patterns` | `'concatenate'`                  | Falls back to concatenation |
-| `orchestrator`      | inline (equivalent to `'fatal'`) | Inline error reporting      |
-
-**Consumer Layers (ADR-006):**
-
-| Layer                  | May Import                            | Examples                                              |
-| ---------------------- | ------------------------------------- | ----------------------------------------------------- |
-| Pipeline Orchestration | `scanner/`, `extractor/`, `pipeline/` | `orchestrator.ts`, pipeline setup in CLI entry points |
-| Feature Consumption    | `MasterDataset`, `relationshipIndex`  | codecs, ProcessStateAPI, validators, query handlers   |
-
-**Named Anti-Patterns (ADR-006):**
-
-| Anti-Pattern            | Detection Signal                                                                                   |
-| ----------------------- | -------------------------------------------------------------------------------------------------- |
-| Parallel Pipeline       | Feature consumer imports from `scanner/` or `extractor/`                                           |
-| Lossy Local Type        | Local interface with subset of `ExtractedPattern` fields + dedicated extraction function           |
-| Re-derived Relationship | Building `Map` or `Set` from `pattern.implementsPatterns`, `uses`, or `dependsOn` in consumer code |
+ADR-006 defines MasterDataset as the single read model. `buildMasterDataset()` packages scan, extract, merge, and transform into a reusable boundary for process-api and validators.
+Key contract: `Promise<Result<PipelineResult, PipelineError>>` from `src/generators/pipeline/build-pipeline.ts`.
+The factory centralizes warnings/scan metadata and prevents feature consumers from re-implementing parallel mini-pipelines.
 
 ### Stage 3: Transformer
 
-**Purpose:** Compute all derived views in a single O(n) pass.
-
-**Key File:** `src/generators/pipeline/transform-dataset.ts:transformToMasterDataset()`
-
-This is the **key innovation** of the unified pipeline. Instead of each section calling `.filter()` repeatedly:
-
-```typescript
-// OLD: Each section filters independently - O(n) per section
-const completed = patterns.filter((p) => normalizeStatus(p.status) === 'completed');
-const active = patterns.filter((p) => normalizeStatus(p.status) === 'active');
-const phase3 = patterns.filter((p) => p.phase === 3);
-```
-
-The transformer computes ALL views upfront:
-
-```typescript
-// NEW: Single-pass transformation - O(n) total
-const masterDataset = transformToMasterDataset({ patterns, tagRegistry, workflow });
-
-// Sections access pre-computed views - O(1)
-const completed = masterDataset.byStatus.completed;
-const phase3 = masterDataset.byPhase.find((p) => p.phaseNumber === 3);
-```
+Transformer computes all derived indexes in one pass (`byStatus`, `byPhase`, `byCategory`, relationships), so downstream codecs and validators read precomputed views instead of repeatedly filtering raw arrays.
 
 ### Stage 4: Codec
 
-**Purpose:** Transform MasterDataset into RenderableDocument, then render to markdown.
-
-**Key Files:**
-
-- `src/renderable/codecs/*.ts` - Document codecs
-- `src/renderable/render.ts` - Markdown renderer
-
-```typescript
-// Codec transforms to universal intermediate format
-const doc = PatternsDocumentCodec.decode(masterDataset);
-
-// Renderer produces markdown files
-const files = renderDocumentWithFiles(doc, 'PATTERNS.md');
-```
+Codecs decode MasterDataset into a RenderableDocument block tree, and renderers emit markdown and Claude-oriented outputs. This keeps domain logic in codecs and output formatting in renderer functions.
 
 ---
 
@@ -441,7 +270,7 @@ export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset 
 
 ### Key Concepts
 
-The delivery-process package uses a codec-based architecture for document generation:
+The package uses a stable two-step boundary: `MasterDataset -> codec decode -> RenderableDocument -> render`.
 
 ```
 MasterDataset → Codec.decode() → RenderableDocument ─┬→ renderToMarkdown       → Markdown Files
@@ -449,39 +278,19 @@ MasterDataset → Codec.decode() → RenderableDocument ─┬→ renderToMarkdo
                                                       └→ renderToClaudeContext  → Token-efficient text
 ```
 
-| Component                  | Description                                                                                    |
-| -------------------------- | ---------------------------------------------------------------------------------------------- |
-| **MasterDataset**          | Aggregated view of all extracted patterns with indexes by category, phase, status              |
-| **Codec**                  | Zod 4 codec that transforms MasterDataset into RenderableDocument                              |
-| **RenderableDocument**     | Universal intermediate format with typed section blocks                                        |
-| **renderToMarkdown**       | Domain-agnostic markdown renderer for human documentation                                      |
-| **renderToClaudeMdModule** | Modular-claude-md renderer (H3-rooted headings, omits Mermaid/link-outs)                       |
-| **renderToClaudeContext**  | LLM-optimized renderer (~20-40% fewer tokens, omits Mermaid, flattens collapsibles) _(legacy)_ |
+This separation allows one dataset to be projected into multiple output modes without duplicating domain transforms.
 
 ### Block Vocabulary (9 Types)
 
-The RenderableDocument uses a fixed vocabulary of section blocks:
+RenderableDocument blocks stay fixed across codecs:
 
-| Category        | Block Types                         |
-| --------------- | ----------------------------------- |
-| **Structural**  | `heading`, `paragraph`, `separator` |
-| **Content**     | `table`, `list`, `code`, `mermaid`  |
-| **Progressive** | `collapsible`, `link-out`           |
+- Structural: `heading`, `paragraph`, `separator`
+- Content: `table`, `list`, `code`, `mermaid`
+- Progressive: `collapsible`, `link-out`
 
 ### Factory Pattern
 
-Every codec provides two exports:
-
-```typescript
-// Default codec with standard options
-import { PatternsDocumentCodec } from './codecs';
-const doc = PatternsDocumentCodec.decode(dataset);
-
-// Factory for custom options
-import { createPatternsCodec } from './codecs';
-const codec = createPatternsCodec({ generateDetailFiles: false });
-const doc = codec.decode(dataset);
-```
+Codecs expose a default export for standard options and a `create*Codec(...)` factory for per-run customization.
 
 ---
 
@@ -500,45 +309,32 @@ Progressive disclosure splits large documents into a main index plus detail file
 
 ### How It Works
 
-1. Main document contains summaries and navigation links
-2. Detail files contain full information for each grouping
-3. `link-out` blocks in main doc point to detail files
-4. `additionalFiles` in RenderableDocument specifies detail paths
+1. Main file contains summary sections and navigation.
+2. Detail files hold full grouped content.
+3. `link-out` blocks connect the main file to detail paths.
+4. `additionalFiles` carries the generated detail document map.
 
 ### Codec Split Logic
 
-| Codec              | Split By               | Detail Path Pattern             |
-| ------------------ | ---------------------- | ------------------------------- |
-| `patterns`         | Category               | `patterns/<category>.md`        |
-| `roadmap`          | Phase                  | `phases/phase-<N>-<name>.md`    |
-| `milestones`       | Quarter                | `milestones/<quarter>.md`       |
-| `current`          | Active Phase           | `current/phase-<N>-<name>.md`   |
-| `requirements`     | Product Area           | `requirements/<area-slug>.md`   |
-| `session`          | Incomplete Phase       | `sessions/phase-<N>-<name>.md`  |
-| `remaining`        | Incomplete Phase       | `remaining/phase-<N>-<name>.md` |
-| `adrs`             | Category (≥ threshold) | `decisions/<category-slug>.md`  |
-| `taxonomy`         | Tag Domain             | `taxonomy/<domain>.md`          |
-| `validation-rules` | Rule Category          | `validation/<category>.md`      |
-| `pr-changes`       | None                   | Single file only                |
+Representative splits:
+
+- `patterns` by category -> `patterns/<category>.md`
+- `roadmap` by phase -> `phases/phase-<N>-<name>.md`
+- `milestones` by quarter -> `milestones/<quarter>.md`
+- `session` and `remaining` by incomplete phase
+- `pr-changes` emits a single focused file
 
 ### Disabling Progressive Disclosure
 
-All codecs accept `generateDetailFiles: false` to produce compact single-file output:
-
-```typescript
-const codec = createPatternsCodec({ generateDetailFiles: false });
-// Only produces PATTERNS.md, no patterns/*.md files
-```
+Set `generateDetailFiles: false` for compact single-file output.
 
 ### Detail Level
 
-The `detailLevel` option controls output verbosity:
+`detailLevel` controls verbosity:
 
-| Value        | Behavior                              |
-| ------------ | ------------------------------------- |
-| `"summary"`  | Minimal output, key metrics only      |
-| `"standard"` | Default with all sections             |
-| `"detailed"` | Maximum detail, all optional sections |
+- `summary`: compact signal
+- `standard`: default sections
+- `detailed`: maximum optional detail
 
 ---
 
@@ -760,132 +556,6 @@ buildMasterDataset(options)
 
 > **Workflow Integration** — See [PROCESS.md](../docs-live/product-areas/PROCESS.md) for FSM lifecycle, session types, and handoff protocol.
 > API tutorial code moved out of architecture overview because source and generated process docs are the authoritative references.
-
----
-
-## Programmatic Usage
-
-### Direct Codec Usage
-
-```typescript
-import { createPatternsCodec, type MasterDataset } from '@libar-dev/delivery-process';
-import { renderToMarkdown } from '@libar-dev/delivery-process/renderable';
-
-// Create custom codec
-const codec = createPatternsCodec({
-  filterCategories: ['core'],
-  generateDetailFiles: false,
-});
-
-// Transform dataset
-const document = codec.decode(masterDataset);
-
-// Render to markdown
-const markdown = renderToMarkdown(document);
-```
-
-### Using generateDocument
-
-```typescript
-import { generateDocument, type DocumentType } from '@libar-dev/delivery-process/renderable';
-
-// Generate with default options
-const files = generateDocument('patterns', masterDataset);
-
-// files is OutputFile[]
-for (const file of files) {
-  console.log(`${file.path}: ${file.content.length} bytes`);
-}
-```
-
-### Accessing Additional Files
-
-The RenderableDocument includes detail files in `additionalFiles`:
-
-```typescript
-const document = PatternsDocumentCodec.decode(dataset);
-
-// Main content
-console.log(document.title); // "Pattern Registry"
-console.log(document.sections.length);
-
-// Detail files (for progressive disclosure)
-if (document.additionalFiles) {
-  for (const [path, subDoc] of Object.entries(document.additionalFiles)) {
-    console.log(`Detail file: ${path}`);
-    console.log(`  Title: ${subDoc.title}`);
-  }
-}
-```
-
----
-
-## Extending the System
-
-### Creating a Custom Codec
-
-```typescript
-import { z } from 'zod';
-import { MasterDatasetSchema, type MasterDataset } from '../validation-schemas/master-dataset';
-import { type RenderableDocument, document, heading, paragraph } from '../renderable/schema';
-import { RenderableDocumentOutputSchema } from '../renderable/codecs/shared-schema';
-
-// Define options
-interface MyCodecOptions {
-  includeCustomSection?: boolean;
-}
-
-// Create factory
-export function createMyCodec(options?: MyCodecOptions) {
-  const opts = { includeCustomSection: true, ...options };
-
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      const sections = [
-        heading(2, 'Summary'),
-        paragraph(`Total patterns: ${dataset.counts.total}`),
-      ];
-
-      if (opts.includeCustomSection) {
-        sections.push(heading(2, 'Custom Section'));
-        sections.push(paragraph('Custom content here'));
-      }
-
-      return document('My Custom Document', sections, {
-        purpose: 'Custom document purpose',
-      });
-    },
-    encode: () => {
-      throw new Error('MyCodec is decode-only');
-    },
-  });
-}
-```
-
-### Registering a Custom Generator
-
-```typescript
-import { generatorRegistry } from '@libar-dev/delivery-process/generators';
-import { createCodecGenerator } from '@libar-dev/delivery-process/generators/codec-based';
-
-// Register if using existing document type
-generatorRegistry.register(createCodecGenerator('my-patterns', 'patterns'));
-
-// Or create custom generator class for new codec
-class MyCustomGenerator implements DocumentGenerator {
-  readonly name = 'my-custom';
-  readonly description = 'My custom generator';
-
-  generate(patterns, context) {
-    const codec = createMyCodec();
-    const doc = codec.decode(context.masterDataset);
-    const files = renderDocumentWithFiles(doc, 'MY-CUSTOM.md');
-    return Promise.resolve({ files });
-  }
-}
-
-generatorRegistry.register(new MyCustomGenerator());
-```
 
 ---
 
