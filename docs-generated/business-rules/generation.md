@@ -4,7 +4,7 @@
 
 ---
 
-**265 rules** from 55 features. 265 rules have explicit invariants.
+**268 rules** from 56 features. 266 rules have explicit invariants.
 
 ---
 
@@ -279,6 +279,28 @@
     not included in the archIndex at all.
 
 *arch-index.feature*
+
+### Architecture Doc Refactoring
+
+*Validates that ARCHITECTURE.md section replacements from docs consolidation*
+
+---
+
+#### Product area pointer replacements link to covering documents
+
+**Verified by:**
+- Configuration Architecture pointer links to covering document
+- Source Systems pointer links to annotation product area
+- Workflow Integration pointer links to process product area
+
+---
+
+#### Annotation examples remain in Four-Stage Pipeline section
+
+**Verified by:**
+- Annotation format examples appear before Source Systems
+
+*architecture-doc-refactoring.feature*
 
 ### Arch Tag Extraction
 
@@ -2425,6 +2447,18 @@
 
 ---
 
+#### Hardcoded diagram sources render deterministic output
+
+> **Invariant:** Hardcoded diagram sources render without relationship-scoping input and emit stable, source-specific Mermaid content.
+>
+> **Rationale:** Domain diagrams such as pipeline and MasterDataset fan-out encode canonical architecture views that should not depend on ad-hoc test dataset shape.
+
+**Verified by:**
+- master-dataset-views source produces MasterDataset fan-out diagram
+- master-dataset-views source renders expected fan-out nodes
+
+---
+
 #### Multiple diagram scopes produce multiple mermaid blocks
 
 > **Invariant:** Each entry in the diagramScopes array produces an independent Mermaid block with its own title and direction, and legacy singular diagramScope remains supported as a fallback.
@@ -2518,6 +2552,7 @@
 **Verified by:**
 - Detailed generator has name ending in "-reference"
 - Summary generator has name ending in "-reference-claude"
+- Architecture-types generators are registered
 
 ---
 
@@ -2530,6 +2565,7 @@
 **Verified by:**
 - Product area generator with matching data produces non-empty output
 - Product area generator with no patterns still produces intro
+- ARCHITECTURE-TYPES generator produces shapes and convention content
 
 *reference-generators.feature*
 
