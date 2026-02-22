@@ -249,10 +249,10 @@ classDiagram
     class Documentation_Generation_Orchestrator {
         <<service>>
     }
-    class DecisionDocGenerator {
+    class TransformDataset {
         <<service>>
     }
-    class TransformDataset {
+    class DecisionDocGenerator {
         <<service>>
     }
     class MasterDataset
@@ -265,10 +265,10 @@ classDiagram
     SourceMapper ..> ShapeExtractor : depends on
     SourceMapper ..> GherkinASTParser : depends on
     Documentation_Generation_Orchestrator ..> Pattern_Scanner : uses
-    DecisionDocGenerator ..> DecisionDocCodec : depends on
-    DecisionDocGenerator ..> SourceMapper : depends on
     TransformDataset ..> MasterDataset : uses
     TransformDataset ..|> PatternRelationshipModel : implements
+    DecisionDocGenerator ..> DecisionDocCodec : depends on
+    DecisionDocGenerator ..> SourceMapper : depends on
 ```
 
 ---
