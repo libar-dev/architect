@@ -149,6 +149,28 @@ interface ExtractedPattern {
 
 After extraction, patterns from both sources are merged with conflict detection. Merge behavior varies by consumer: `'fatal'` mode (used by process-api and orchestrator) returns an error if the same pattern name exists in both TypeScript and Gherkin; `'concatenate'` mode (used by validate-patterns) falls back to concatenation on conflict, since the validator needs both sources for cross-source matching.
 
+### Annotation Format Examples
+
+These examples stay in the pipeline section because they explain the scanner/extractor contract that feeds every downstream stage.
+
+```typescript
+/**
+ * @libar-docs
+ * @libar-docs-core
+ * @libar-docs-pattern MyPatternName
+ * @libar-docs-status completed
+ * @libar-docs-extract-shapes *
+ */
+```
+
+```typescript
+/**
+ * @libar-docs-shape api-types
+ * Declaration-level shape extraction with optional group.
+ */
+export interface PipelineConfig { ... }
+```
+
 ### Pipeline Factory (ADR-006)
 
 ADR-006 established the **Single Read Model Architecture**: the MasterDataset is the sole read model for all consumers. The shared pipeline factory extracts the 8-step scan-extract-merge-transform pipeline into a reusable function.
@@ -522,108 +544,8 @@ The `detailLevel` option controls output verbosity:
 
 ## Source Systems
 
-### TypeScript Scanner
-
-**Key Files:**
-
-- `src/scanner/pattern-scanner.ts` - File discovery and opt-in detection
-- `src/scanner/ast-parser.ts` - TypeScript AST parsing
-
-> **Note:** The scanner uses `RegexBuilders` from configuration to detect tags.
-> The examples below use `@libar-docs-*` (DDD_ES_CQRS_PRESET). For other prefixes, substitute accordingly.
-
-**Annotation Format:**
-
-```typescript
-/**
- * @libar-docs                              // Required opt-in (file level)
- * @libar-docs-core @libar-docs-infra       // Category tags
- * @libar-docs-pattern MyPatternName        // Pattern name
- * @libar-docs-status completed             // Status: roadmap|active|completed|deferred
- * @libar-docs-phase 14                     // Roadmap phase number
- * @libar-docs-uses OtherPattern, Another   // Dependencies (CSV)
- * @libar-docs-usecase "When doing X"       // Use cases (repeatable)
- * @libar-docs-convention fsm-rules         // Convention tag (CSV, links to decisions)
- * @libar-docs-extract-shapes *             // Auto-shape discovery (wildcard = all exports)
- *
- * ## Pattern Description                   // Markdown description
- *
- * Detailed description of the pattern...
- */
-```
-
-**Declaration-Level Shape Tagging:**
-
-Individual declarations can be tagged with `@libar-docs-shape` in their JSDoc, without requiring a file-level `@libar-docs-extract-shapes` tag:
-
-```typescript
-/**
- * @libar-docs-shape api-types
- * Configuration for the delivery process pipeline.
- */
-export interface PipelineConfig { ... }
-```
-
-The optional value (e.g., `api-types`) sets the shape's `group` field, enabling `ShapeSelector` filtering by group in reference codecs.
-
-**Tag Registry:** Defines categories, priorities, and metadata formats. Source: `src/taxonomy/` TypeScript modules.
-
-### Gherkin Scanner
-
-**Key Files:**
-
-- `src/scanner/gherkin-scanner.ts` - Feature file discovery
-- `src/scanner/gherkin-ast-parser.ts` - Cucumber Gherkin parsing
-
-**Annotation Format:**
-
-```gherkin
-@libar-docs-pattern:MyPattern @libar-docs-phase:15 @libar-docs-status:roadmap
-@libar-docs-quarter:Q1-2025 @libar-docs-effort:2w @libar-docs-team:platform
-@libar-docs-depends-on:OtherPattern @libar-docs-enables:NextPattern
-@libar-docs-product-area:Generators @libar-docs-user-role:Developer
-@libar-docs-release:v0.1.0
-Feature: My Pattern Implementation
-
-  Background:
-    Given the following deliverables:
-      | Deliverable          | Status    |
-      | Core implementation  | completed |
-      | Tests                | active    |
-
-  @acceptance-criteria
-  Scenario: Basic usage
-    When user does X
-    Then Y happens
-```
-
-**Data-Driven Tag Extraction:**
-
-The Gherkin parser uses a data-driven approach — a `TAG_LOOKUP` map is built from `buildRegistry().metadataTags` at module load. For each tag, the registry definition provides: format (number/enum/csv/flag/value/quoted-value), optional transforms (`hyphenToSpace`, `padAdr`, `stripQuotes`), and the target `metadataKey`. Adding new Gherkin tags requires only a registry definition — no parser code changes.
-
-**Tag Mapping:**
-
-| Gherkin Tag                    | ExtractedPattern Field |
-| ------------------------------ | ---------------------- |
-| `@libar-docs-pattern:Name`     | `patternName`          |
-| `@libar-docs-phase:N`          | `phase`                |
-| `@libar-docs-status:*`         | `status`               |
-| `@libar-docs-quarter:*`        | `quarter`              |
-| `@libar-docs-release:*`        | `release`              |
-| `@libar-docs-depends-on:*`     | `dependsOn`            |
-| `@libar-docs-product-area:*`   | `productArea`          |
-| `@libar-docs-convention:*`     | `convention`           |
-| `@libar-docs-discovered-gap:*` | `discoveredGaps`       |
-
-### Status Normalization
-
-All codecs normalize status to three canonical values:
-
-| Input Status                            | Normalized To |
-| --------------------------------------- | ------------- |
-| `"completed"`                           | `"completed"` |
-| `"active"`                              | `"active"`    |
-| `"roadmap"`, `"deferred"`, or undefined | `"planned"`   |
+> **Source Systems** — See [ANNOTATION.md](../docs-live/product-areas/ANNOTATION.md) for scanner types, tag dispatch, and extraction behavior.
+> Scanner/extractor implementation details were consolidated into generated annotation docs; only pipeline-level annotation usage examples are retained here.
 
 ---
 
