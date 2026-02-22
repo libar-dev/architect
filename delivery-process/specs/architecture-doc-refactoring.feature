@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:ArchitectureDocRefactoring
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:36
 @libar-docs-effort:2d
 @libar-docs-product-area:Generation

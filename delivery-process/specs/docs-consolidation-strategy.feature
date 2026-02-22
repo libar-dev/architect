@@ -56,7 +56,7 @@ Feature: Documentation Consolidation Strategy
       | Phase 1 - Taxonomy consolidation | pending | delivery-process.config.ts | Yes | integration |
       | Phase 2 - Codec listings extraction | complete | delivery-process.config.ts, src/renderable/codecs/*.ts | Yes | integration |
       | Phase 3 - Process Guard consolidation | pending | src/renderable/codecs/validation-rules.ts | Yes | integration |
-      | Phase 4 - Architecture decomposition | pending | docs/ARCHITECTURE.md | Yes | integration |
+      | Phase 4 - Architecture decomposition | complete | docs/ARCHITECTURE.md | Yes | integration |
       | Phase 5 - Guide trimming | pending | docs/ANNOTATION-GUIDE.md, docs/CONFIGURATION.md | No | n/a |
       | Phase 6 - Index navigation update | pending | docs/INDEX.md | No | n/a |
 
