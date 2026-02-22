@@ -144,6 +144,8 @@ export interface ContextInferenceRule {
  * Extends the Zod-compatible MasterDataset with workflow reference.
  * LoadedWorkflow contains Maps which aren't JSON-serializable,
  * so it's kept separate from the Zod schema.
+ *
+ * @libar-docs-shape master-dataset
  */
 export interface RuntimeMasterDataset extends MasterDataset {
   /** Optional workflow configuration (not serializable) */
@@ -152,6 +154,8 @@ export interface RuntimeMasterDataset extends MasterDataset {
 
 /**
  * Raw input data for transformation
+ *
+ * @libar-docs-shape master-dataset
  */
 export interface RawDataset {
   /** Extracted patterns from TypeScript and/or Gherkin sources */

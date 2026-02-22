@@ -56,6 +56,8 @@ import type {
  * DD-2: mergeConflictStrategy controls per-consumer conflict handling.
  * DD-3: exclude, contextInferenceRules support future orchestrator
  *        migration without breaking changes.
+ *
+ * @libar-docs-shape master-dataset
  */
 export interface PipelineOptions {
   readonly input: readonly string[];
@@ -114,6 +116,8 @@ export interface ScanMetadata {
 
 /**
  * Successful pipeline result containing the dataset and validation summary.
+ *
+ * @libar-docs-shape master-dataset
  */
 export interface PipelineResult {
   readonly dataset: RuntimeMasterDataset;
