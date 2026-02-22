@@ -24,8 +24,8 @@ graph TB
     subgraph generator["Generator"]
         SourceMapper[/"SourceMapper"/]
         Documentation_Generation_Orchestrator("Documentation Generation Orchestrator")
-        TransformDataset("TransformDataset")
         DecisionDocGenerator("DecisionDocGenerator")
+        TransformDataset("TransformDataset")
     end
     subgraph renderer["Renderer"]
         PatternsCodec[("PatternsCodec")]
@@ -48,10 +48,10 @@ graph TB
     PatternsCodec ..->|implements| PatternRelationshipModel
     CompositeCodec ..->|implements| ReferenceDocShowcase
     ArchitectureCodec -->|uses| MasterDataset
-    TransformDataset -->|uses| MasterDataset
-    TransformDataset ..->|implements| PatternRelationshipModel
     DecisionDocGenerator -.->|depends on| DecisionDocCodec
     DecisionDocGenerator -.->|depends on| SourceMapper
+    TransformDataset -->|uses| MasterDataset
+    TransformDataset ..->|implements| PatternRelationshipModel
     classDef neighbor stroke-dasharray: 5 5
 ```
 
@@ -68,6 +68,7 @@ graph TB
  * Extends the Zod-compatible MasterDataset with workflow reference.
  * LoadedWorkflow contains Maps which aren't JSON-serializable,
  * so it's kept separate from the Zod schema.
+ *
  */
 ```
 
@@ -87,6 +88,7 @@ interface RuntimeMasterDataset extends MasterDataset {
 ```typescript
 /**
  * Raw input data for transformation
+ *
  */
 ```
 

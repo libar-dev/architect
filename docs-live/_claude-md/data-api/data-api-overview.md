@@ -8,14 +8,24 @@
 - Session type tailoring: `planning` (~500B, brief + deps), `design` (~1.5KB, spec + stubs + deps), `implement` (deliverables + FSM + tests)
 - Direct API queries replace doc reading: JSON output is 5-10x smaller than generated docs
 
+#### Shared Pipeline Factory Responsibilities
+
+**Invariant:** `buildMasterDataset()` is the shared factory for Steps 1-8 of the architecture pipeline and returns `Result<PipelineResult, PipelineError>` without process-level side effects.
+
+#### 8-Step Dataset Build Flow
+
+#### Consumer Architecture and PipelineOptions Differentiation
+
 #### API Types
 
-| Type                    | Kind  |
-| ----------------------- | ----- |
-| MasterDatasetSchema     | const |
-| StatusGroupsSchema      | const |
-| StatusCountsSchema      | const |
-| PhaseGroupSchema        | const |
-| SourceViewsSchema       | const |
-| RelationshipEntrySchema | const |
-| ArchIndexSchema         | const |
+| Type                    | Kind      |
+| ----------------------- | --------- |
+| PipelineOptions         | interface |
+| PipelineResult          | interface |
+| MasterDatasetSchema     | const     |
+| StatusGroupsSchema      | const     |
+| StatusCountsSchema      | const     |
+| PhaseGroupSchema        | const     |
+| SourceViewsSchema       | const     |
+| RelationshipEntrySchema | const     |
+| ArchIndexSchema         | const     |

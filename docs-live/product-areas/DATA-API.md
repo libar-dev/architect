@@ -15,6 +15,31 @@
 
 ---
 
+## Shared Pipeline Factory Responsibilities
+
+**Invariant:** `buildMasterDataset()` is the shared factory for Steps 1-8 of the architecture pipeline and returns `Result<PipelineResult, PipelineError>` without process-level side effects.
+
+**Rationale:** Centralizing scan/extract/merge/transform flow prevents divergence between CLI consumers and preserves a single ADR-006 read-model path.
+
+---
+
+## 8-Step Dataset Build Flow
+
+The factory owns: configuration load, TypeScript scan + extraction, Gherkin scan +
+extraction, merge conflict handling, hierarchy child derivation, workflow load,
+and `transformToMasterDataset` with validation summary.
+
+---
+
+## Consumer Architecture and PipelineOptions Differentiation
+
+Three consumers share this factory: `process-api`, `validate-patterns`, and the
+generation orchestrator. `PipelineOptions` differentiates behavior by
+`mergeConflictStrategy` (`fatal` vs `concatenate`), `includeValidation` toggles,
+and `failOnScanErrors` policy without forking pipeline logic.
+
+---
+
 ## DataAPI Components
 
 Scoped architecture diagram showing component relationships:
@@ -103,6 +128,59 @@ graph TB
 
 ## API Types
 
+### PipelineOptions (interface)
+
+```typescript
+/**
+ * Options for building a MasterDataset via the shared pipeline.
+ *
+ * DD-1: Factory lives at src/generators/pipeline/build-pipeline.ts.
+ * DD-2: mergeConflictStrategy controls per-consumer conflict handling.
+ * DD-3: exclude, contextInferenceRules support future orchestrator
+ *        migration without breaking changes.
+ *
+ */
+```
+
+```typescript
+interface PipelineOptions {
+  readonly input: readonly string[];
+  readonly features: readonly string[];
+  readonly baseDir: string;
+  readonly mergeConflictStrategy: 'fatal' | 'concatenate';
+  readonly exclude?: readonly string[];
+  readonly workflowPath?: string;
+  readonly contextInferenceRules?: readonly ContextInferenceRule[];
+  /** DD-3: When false, skip validation pass (default true). */
+  readonly includeValidation?: boolean;
+  /** DD-5: When true, return error on individual scan failures (default false). */
+  readonly failOnScanErrors?: boolean;
+}
+```
+
+| Property          | Description                                                                |
+| ----------------- | -------------------------------------------------------------------------- |
+| includeValidation | DD-3: When false, skip validation pass (default true).                     |
+| failOnScanErrors  | DD-5: When true, return error on individual scan failures (default false). |
+
+### PipelineResult (interface)
+
+```typescript
+/**
+ * Successful pipeline result containing the dataset and validation summary.
+ *
+ */
+```
+
+```typescript
+interface PipelineResult {
+  readonly dataset: RuntimeMasterDataset;
+  readonly validation: ValidationSummary;
+  readonly warnings: readonly PipelineWarning[];
+  readonly scanMetadata: ScanMetadata;
+}
+```
+
 ### MasterDatasetSchema (const)
 
 ```typescript
@@ -111,6 +189,7 @@ graph TB
  *
  * Contains raw patterns plus pre-computed views and statistics.
  * This is the primary data structure passed to generators and sections.
+ *
  */
 ```
 
@@ -188,6 +267,7 @@ MasterDatasetSchema = z.object({
  * - completed: implemented, completed
  * - active: active, partial, in-progress
  * - planned: roadmap, planned, undefined
+ *
  */
 ```
 
@@ -209,6 +289,7 @@ StatusGroupsSchema = z.object({
 ```typescript
 /**
  * Status counts for aggregate statistics
+ *
  */
 ```
 
@@ -236,6 +317,7 @@ StatusCountsSchema = z.object({
  *
  * Groups patterns by their phase number, with pre-computed
  * status counts for each phase.
+ *
  */
 ```
 
@@ -260,6 +342,7 @@ PhaseGroupSchema = z.object({
 ```typescript
 /**
  * Source-based views for different data origins
+ *
  */
 ```
 
@@ -286,6 +369,7 @@ SourceViewsSchema = z.object({
  * Relationship index for dependency tracking
  *
  * Maps pattern names to their relationship metadata.
+ *
  */
 ```
 
