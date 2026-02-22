@@ -23,7 +23,7 @@ Feature: Reference Document Generator Registration
     @happy-path
     Scenario: Generators are registered from configs plus meta-generators
       When registering reference generators
-      Then 18 generators are registered
+      Then 20 generators are registered
 
   Rule: Product area configs produce a separate meta-generator
 
@@ -55,6 +55,12 @@ Feature: Reference Document Generator Registration
       Then a generator named "annotation-overview-reference-claude" exists
       And a generator named "reference-generation-sample-reference-claude" exists
 
+    @happy-path
+    Scenario: Architecture-types generators are registered
+      When registering reference generators
+      Then a generator named "architecture-types-reference" exists
+      And a generator named "architecture-types-reference-claude" exists
+
   Rule: Generator execution produces markdown output
 
     **Invariant:** Every registered generator must produce at least one non-empty output file when given matching data.
@@ -75,3 +81,11 @@ Feature: Reference Document Generator Registration
       When running the "annotation-overview-reference" generator
       Then the output has 1 file
       And the output file content contains "How do I annotate code?"
+
+    @integration
+    Scenario: ARCHITECTURE-TYPES generator produces shapes and convention content
+      Given a MasterDataset with pipeline architecture conventions and master dataset shapes
+      When running the "architecture-types-reference" generator
+      Then the output has 1 file
+      And the output file path starts with "docs/"
+      And the output file content contains all of "MasterDatasetSchema", "PipelineOptions", "Orchestrator Pipeline Responsibilities", and "graph TB"

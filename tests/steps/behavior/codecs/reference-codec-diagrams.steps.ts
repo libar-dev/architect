@@ -646,6 +646,80 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
   });
 
   // ──────────────────────────────────────────────────────────────────────
+  // Rule: Hardcoded diagram sources render deterministic output
+  // ──────────────────────────────────────────────────────────────────────
+
+  Rule('Hardcoded diagram sources render deterministic output', ({ RuleScenario }) => {
+    RuleScenario(
+      'master-dataset-views source produces MasterDataset fan-out diagram',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with diagramScope source {string}',
+          (_ctx: unknown, source: string) => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: [],
+              shapeSources: [],
+              behaviorCategories: [],
+              diagramScope: { source: source as 'master-dataset-views' },
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And(
+          'a MasterDataset with arch-annotated patterns in context {string}',
+          (_ctx: unknown, context: string) => {
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'LintRules',
+                  archContext: context,
+                  archRole: 'service',
+                }),
+              ],
+            });
+          }
+        );
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document contains a mermaid block', () => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+        });
+
+        And('the mermaid content contains {string}', (_ctx: unknown, text: string) => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+          const content = mermaidBlocks[0]!.content;
+          expect(content).toContain(text);
+        });
+
+        And(
+          'the mermaid content contains all of {string}, {string}, {string}, and {string}',
+          (_ctx: unknown, text1: string, text2: string, text3: string, text4: string) => {
+            const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+            expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+            const content = mermaidBlocks[0]!.content;
+            expect(content).toContain(text1);
+            expect(content).toContain(text2);
+            expect(content).toContain(text3);
+            expect(content).toContain(text4);
+          }
+        );
+      }
+    );
+  });
+
+  // ──────────────────────────────────────────────────────────────────────
   // Rule: Multiple diagram scopes produce multiple mermaid blocks
   // ──────────────────────────────────────────────────────────────────────
 

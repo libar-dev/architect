@@ -101,6 +101,21 @@ Feature: Reference Codec - Diagram Scoping
       When decoding at detail level "summary"
       Then the document does not contain a mermaid block
 
+  Rule: Hardcoded diagram sources render deterministic output
+
+    **Invariant:** Hardcoded diagram sources render without relationship-scoping input and emit stable, source-specific Mermaid content.
+    **Rationale:** Domain diagrams such as pipeline and MasterDataset fan-out encode canonical architecture views that should not depend on ad-hoc test dataset shape.
+    **Verified by:** master-dataset-views source renders expected fan-out nodes
+
+    @happy-path
+    Scenario: master-dataset-views source produces MasterDataset fan-out diagram
+      Given a reference config with diagramScope source "master-dataset-views"
+      And a MasterDataset with arch-annotated patterns in context "lint"
+      When decoding at detail level "detailed"
+      Then the document contains a mermaid block
+      And the mermaid content contains "graph TB"
+      And the mermaid content contains all of "MasterDataset", "byStatus", "byPhase", and "relationshipIndex"
+
   Rule: Multiple diagram scopes produce multiple mermaid blocks
 
     **Invariant:** Each entry in the diagramScopes array produces an independent Mermaid block with its own title and direction, and legacy singular diagramScope remains supported as a fallback.
