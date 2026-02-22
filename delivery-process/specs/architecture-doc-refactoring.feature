@@ -56,13 +56,13 @@ Feature: Architecture Document Refactoring
       | Codec-registry reference config | complete | delivery-process.config.ts | Yes | integration |
       | Convention-extractor heading match bugfix | complete | src/renderable/codecs/convention-extractor.ts | Yes | unit |
       | Available Codecs section replaced with pointer | complete | docs/ARCHITECTURE.md | No | n/a |
-      | Configuration Architecture to product area | pending | docs/ARCHITECTURE.md | Yes | integration |
+      | Configuration Architecture to product area | complete | docs/ARCHITECTURE.md | Yes | integration |
       | MasterDataset Schema to shapes reference | pending | docs/ARCHITECTURE.md | Yes | integration |
-      | Source Systems to Annotation product area | pending | docs/ARCHITECTURE.md | Yes | integration |
+      | Source Systems to Annotation product area | complete | docs/ARCHITECTURE.md | Yes | integration |
       | Data Flow Diagrams to architecture diagrams | pending | docs/ARCHITECTURE.md | Yes | integration |
-      | Workflow Integration to Process product area | pending | docs/ARCHITECTURE.md | Yes | integration |
-      | Key Design Patterns to CoreTypes product area | pending | docs/ARCHITECTURE.md | Yes | integration |
-      | Usefulness-driven editorial trim (DD-9) | pending | docs/ARCHITECTURE.md | No | n/a |
+      | Workflow Integration to Process product area | complete | docs/ARCHITECTURE.md | Yes | integration |
+      | Key Design Patterns to CoreTypes product area | complete | docs/ARCHITECTURE.md | Yes | integration |
+      | Usefulness-driven editorial trim (DD-9) | complete | docs/ARCHITECTURE.md | No | n/a |
 
   Rule: Convention-tagged JSDoc produces machine-extractable codec documentation
 
