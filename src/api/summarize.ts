@@ -18,6 +18,8 @@
  *
  * Uses Zod schema-first pattern: PatternSummarySchema defines the type,
  * and PatternSummary is inferred from it.
+ *
+ * **When to Use:** When projecting full ExtractedPattern data down to compact summaries for list and overview queries.
  */
 
 import { z } from 'zod';

@@ -19,6 +19,8 @@
  * Used by:
  * - `search` subcommand: ranked results via fuzzyMatchPatterns()
  * - `pattern` subcommand: "Did you mean...?" fallback via findBestMatch()
+ *
+ * **When to Use:** When resolving user-typed pattern names that may contain typos or partial matches.
  */
 
 // ---------------------------------------------------------------------------

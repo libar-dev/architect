@@ -14,6 +14,8 @@
  *
  * Target: src/api/rules-query.ts
  * See: DD-4 (ProcessAPILayeredExtraction)
+ *
+ * **When to Use:** When querying business rules and invariants from Gherkin specs via the `rules` CLI subcommand.
  */
 
 import { parseBusinessRuleAnnotations } from '../renderable/codecs/helpers.js';

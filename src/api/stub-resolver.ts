@@ -18,6 +18,8 @@
  * Resolution uses a `fileExists` callback (defaulting to `fs.existsSync()`) on
  * targetPath — not pipeline data — because target files may not have `@libar-docs`
  * annotations. The callback enables testing without filesystem side effects.
+ *
+ * **When to Use:** When querying design stub status via the `stubs` CLI subcommand or when checking stub resolution in scope validation.
  */
 
 import { existsSync } from 'node:fs';

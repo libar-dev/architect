@@ -38,6 +38,8 @@
  * | Test files | no | no | yes |
  *
  * See: DataAPIContextAssembly spec, Rules 1-5
+ *
+ * **When to Use:** When building a session context bundle for a pattern — use this instead of manually querying MasterDataset views.
  */
 
 // ---------------------------------------------------------------------------

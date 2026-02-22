@@ -8,6 +8,8 @@
  *
  * Registers all reference document generators. Each config produces
  * TWO generators: detailed (docs/) and summary (_claude-md/).
+ *
+ * **When to Use:** When adding or modifying reference document generators — register new product-area or reference configs here.
  */
 
 import type { DocumentGenerator, GeneratorContext, GeneratorOutput } from '../types.js';

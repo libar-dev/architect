@@ -11,6 +11,8 @@
  * - epic: Multi-quarter strategic initiatives
  * - phase: Standard work units (2-5 days)
  * - task: Fine-grained session-level work (1-4 hours)
+ *
+ * **When to Use:** When assigning or validating work item granularity in roadmap specs and feature annotations.
  */
 export const HIERARCHY_LEVELS = ['epic', 'phase', 'task'] as const;
 

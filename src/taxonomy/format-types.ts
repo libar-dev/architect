@@ -9,6 +9,8 @@
  *
  * Defines how tag values are parsed and validated.
  * Each format type determines the parsing strategy for tag values.
+ *
+ * **When to Use:** When defining new tag registry entries — choose the format type that matches the tag's value syntax.
  */
 export const FORMAT_TYPES = [
   'value', // Simple string value

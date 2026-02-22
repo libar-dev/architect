@@ -21,6 +21,8 @@
  * - No parent directory traversal in glob patterns (security)
  * - Preset name must be one of the known presets
  * - `replaceFeatures` and `additionalFeatures` are mutually exclusive
+ *
+ * **When to Use:** When loading and validating project configuration from `delivery-process.config.ts` at startup.
  */
 
 import { z } from 'zod';

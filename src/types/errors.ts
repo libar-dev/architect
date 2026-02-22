@@ -10,6 +10,8 @@
  *
  * Structured, discriminated error types with factory functions.
  * Each error type has a unique `type` discriminator for exhaustive pattern matching.
+ *
+ * **When to Use:** When creating or handling domain-specific errors — use these factory types instead of plain Error for exhaustive matching.
  */
 
 import type { SourceFilePath } from './branded.js';

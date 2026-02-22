@@ -94,31 +94,31 @@ Feature: ADR-006 - Single Read Model Architecture
     Naming them makes them visible in code review — including AI-assisted
     sessions where the default proposal is often "add a helper function."
 
+    **Good vs Bad**
+
+    """typescript
+    // Good: consume the read model
+    function validateCrossSource(dataset: RuntimeMasterDataset): ValidationSummary {
+      const rel = dataset.relationshipIndex[patternName];
+      const isImplemented = rel.implementedBy.length > 0;
+    }
+
+    // Bad: re-derive from raw state (Parallel Pipeline + Re-derived Relationship)
+    function buildImplementsLookup(
+      gherkinFiles: readonly ScannedGherkinFile[],
+      tsPatterns: readonly ExtractedPattern[]
+    ): ReadonlySet<string> { ... }
+    """
+
+    **References**
+
+    - Monorepo ADR-006: Projections for All Reads (same principle, application domain)
+    - ADR-005: Codec-Based Markdown Rendering (established MasterDataset as codec input)
+    - Order-management ARCHITECTURE.md: CommandOrchestrator + Read Model separation
+
   @acceptance-criteria
   Scenario: Feature consumers import from MasterDataset not from raw pipeline stages
     Given a feature consumer that needs pattern relationships or status groupings
     When reviewing its import statements
     Then it imports from MasterDataset or relationshipIndex
     And it does not import directly from scanner/ or extractor/ modules
-
-**Good vs Bad**
-
-  """typescript
-  // Good: consume the read model
-  function validateCrossSource(dataset: RuntimeMasterDataset): ValidationSummary {
-    const rel = dataset.relationshipIndex[patternName];
-    const isImplemented = rel.implementedBy.length > 0;
-  }
-
-  // Bad: re-derive from raw state (Parallel Pipeline + Re-derived Relationship)
-  function buildImplementsLookup(
-    gherkinFiles: readonly ScannedGherkinFile[],
-    tsPatterns: readonly ExtractedPattern[]
-  ): ReadonlySet<string> { ... }
-  """
-
-**References**
-
-  - Monorepo ADR-006: Projections for All Reads (same principle, application domain)
-  - ADR-005: Codec-Based Markdown Rendering (established MasterDataset as codec input)
-  - Order-management ARCHITECTURE.md: CommandOrchestrator + Read Model separation

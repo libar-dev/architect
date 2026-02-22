@@ -8,6 +8,8 @@
  * ## Risk Levels for Planning and Assessment
  *
  * Three-tier risk classification for roadmap planning.
+ *
+ * **When to Use:** When classifying or validating risk levels in roadmap specs and planning sessions.
  */
 export const RISK_LEVELS = ['low', 'medium', 'high'] as const;
 

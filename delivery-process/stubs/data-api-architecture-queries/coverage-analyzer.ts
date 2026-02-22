@@ -30,6 +30,8 @@
  * - Same exclusion rules as the scanner: findFilesToScan() defaults
  *
  * See: DataAPIArchitectureQueries spec, Rule 2 (Architecture Coverage)
+ *
+ * **When to Use:** When checking annotation completeness or finding unannotated files via `arch coverage` or `unannotated` CLI subcommands.
  */
 
 // ---------------------------------------------------------------------------

@@ -18,6 +18,8 @@
  * - **No eviction needed**: Generation runs are bounded in duration and file count
  * - **Thread-safe**: Single-threaded Node.js, no locking required
  * - **Stats tracking**: Optional hit/miss tracking for performance analysis
+ *
+ * **When to Use:** When a generation run reads the same file multiple times — create a cache instance per orchestrator run.
  */
 
 /**

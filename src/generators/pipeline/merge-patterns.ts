@@ -14,6 +14,8 @@
  *
  * Target: src/generators/pipeline/merge-patterns.ts
  * See: DD-2 (OrchestratorPipelineFactoryMigration)
+ *
+ * **When to Use:** When combining TypeScript and Gherkin extracted patterns into a single list with conflict detection.
  */
 
 import type { ExtractedPattern } from '../../validation-schemas/index.js';

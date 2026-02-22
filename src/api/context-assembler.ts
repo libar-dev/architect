@@ -17,6 +17,8 @@
  *
  * The assembler does NOT format output. It produces structured data that
  * the ContextFormatter renders as plain text (see ADR-008).
+ *
+ * **When to Use:** When building a session context bundle for a pattern — use this instead of manually querying MasterDataset views.
  */
 
 import type { ProcessStateAPI } from './process-state.js';

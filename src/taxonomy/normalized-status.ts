@@ -17,6 +17,8 @@
  *
  * This separation follows DDD principles - the domain model (raw) is
  * distinct from the view model (normalized).
+ *
+ * **When to Use:** When mapping raw FSM statuses to display buckets for UI or generated documentation output.
  */
 
 /**

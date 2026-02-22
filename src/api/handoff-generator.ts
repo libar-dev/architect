@@ -15,6 +15,8 @@
  * Pure function that assembles a handoff document from ProcessStateAPI
  * and MasterDataset. Captures everything the next session needs to
  * continue work without context loss.
+ *
+ * **When to Use:** When ending a work session and capturing state for the next session via the `handoff` CLI subcommand.
  */
 
 import type { SessionType } from './context-assembler.js';

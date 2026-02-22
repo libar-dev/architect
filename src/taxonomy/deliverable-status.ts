@@ -21,6 +21,8 @@
  * Previously, deliverable status was z.string() with 29-pattern fuzzy
  * matching at read-time. This caused 3 real bugs (drift campaign 10bab44).
  * Now enforced at schema level like pattern status.
+ *
+ * **When to Use:** When validating or querying deliverable statuses — import these constants instead of hardcoding status strings.
  */
 
 /**

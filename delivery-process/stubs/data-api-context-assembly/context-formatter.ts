@@ -31,6 +31,8 @@
  * - truncateText() for long descriptions
  *
  * See: DataAPIContextAssembly spec, ADR-008 (text output path)
+ *
+ * **When to Use:** When rendering a ContextBundle as plain text for CLI output — use this instead of the markdown codec pipeline.
  */
 
 import type {

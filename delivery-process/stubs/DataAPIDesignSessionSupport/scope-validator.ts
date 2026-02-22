@@ -48,6 +48,8 @@
  * | WARN | Recommendation not met | No (unless --strict) |
  *
  * See: PDR-002 (DD-1 through DD-7), DataAPIDesignSessionSupport spec Rule 1
+ *
+ * **When to Use:** When running pre-flight checks before a session via the `scope-validate` CLI subcommand.
  */
 
 // ---------------------------------------------------------------------------

@@ -50,6 +50,8 @@
  * and passes the resulting file list. Without --git, the section is omitted.
  *
  * See: PDR-002 (DD-1 through DD-7), DataAPIDesignSessionSupport spec Rule 2
+ *
+ * **When to Use:** When ending a work session and capturing state for the next session via the `handoff` CLI subcommand.
  */
 
 import type { SessionType } from '../data-api-context-assembly/context-assembler.js';

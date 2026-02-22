@@ -15,6 +15,8 @@
  * through the Codec/RenderableDocument/UniversalRenderer markdown pipeline.
  * Context bundles are rendered as compact structured text with === section
  * markers for easy AI parsing (see ADR-008).
+ *
+ * **When to Use:** When rendering a ContextBundle as plain text for CLI output — use this instead of the markdown codec pipeline.
  */
 
 import type {

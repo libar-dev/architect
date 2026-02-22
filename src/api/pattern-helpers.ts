@@ -10,6 +10,8 @@
  *
  * Common helper functions used by context-assembler, arch-queries, and other
  * API modules that need pattern name resolution and relationship lookups.
+ *
+ * **When to Use:** When resolving pattern names, looking up relationships, or finding patterns by name in API module code.
  */
 
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';

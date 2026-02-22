@@ -15,6 +15,8 @@
  * Pure function composition over ProcessStateAPI and MasterDataset.
  * Runs a checklist of prerequisite validations before starting a
  * design or implementation session.
+ *
+ * **When to Use:** When running pre-flight checks before a session via the `scope-validate` CLI subcommand.
  */
 
 import type { ProcessStateAPI } from './process-state.js';

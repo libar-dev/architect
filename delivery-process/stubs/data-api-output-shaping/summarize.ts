@@ -17,6 +17,8 @@
  * and PatternSummary is inferred from it.
  *
  * See: DataAPIOutputShaping spec, Rule 1 (Pattern Summarization)
+ *
+ * **When to Use:** When projecting full ExtractedPattern data down to compact summaries for list and overview queries.
  */
 
 import { z } from 'zod';

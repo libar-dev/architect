@@ -21,6 +21,8 @@
  * annotations. The callback enables testing without filesystem side effects.
  *
  * See: DataAPIStubIntegration spec, Rule 2 (Stubs Subcommand)
+ *
+ * **When to Use:** When querying design stub status via the `stubs` CLI subcommand or when checking stub resolution in scope validation.
  */
 
 // ---------------------------------------------------------------------------

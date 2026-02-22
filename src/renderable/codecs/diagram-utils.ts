@@ -1,5 +1,7 @@
 /**
  * @libar-docs
+ * @libar-docs-pattern MermaidDiagramUtils
+ * @libar-docs-status completed
  * @libar-docs-used-by Architecture Codec, Reference Codec
  * @libar-docs-arch-context renderer
  *
@@ -7,6 +9,10 @@
  *
  * Sanitization and formatting helpers shared across architecture.ts and reference.ts
  * diagram builders.
+ *
+ * **When to Use:** When building Mermaid diagram output in a codec — use
+ * `sanitizeNodeId()`, `EDGE_STYLES`, `NODE_SHAPES`, and `formatNodeDeclaration()`
+ * rather than inlining diagram syntax in the codec directly.
  */
 
 import type { ExtractedPattern } from '../../validation-schemas/extracted-pattern.js';

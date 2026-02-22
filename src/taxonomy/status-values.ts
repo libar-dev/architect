@@ -15,6 +15,8 @@
  * - deferred to roadmap (resume planning)
  * - active to completed (finish work)
  * - active to roadmap (blocked/regressed)
+ *
+ * **When to Use:** When validating or referencing FSM state values — import these constants instead of hardcoding status strings.
  */
 export const PROCESS_STATUS_VALUES = [
   'roadmap', // Planned work, fully editable
