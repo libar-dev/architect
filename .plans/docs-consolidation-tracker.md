@@ -251,55 +251,62 @@ pnpm process:query -- files GeneratedDocQuality
 
 ---
 
-### Phase 40 — PublishingRelocation | DESIGN-NEEDED
+### Phase 40 — PublishingRelocation | DESIGN COMPLETE
 
 **Pattern:** PublishingRelocation | **Effort:** 0.25d | **Depends on:** DocsConsolidationStrategy
 
-**What:** Move `docs/PUBLISHING.md` (144 lines) to `MAINTAINERS.md` at repo root. Delete original.
+**What:** Move `docs/PUBLISHING.md` (144 lines) to `MAINTAINERS.md` at repo root. Delete original. Update INDEX.md and website manifest.
 
-**Current spec gaps:**
+**Current status:** DESIGN COMPLETE. Spec refined with 3 Rule blocks, 5 deliverables (up from 2), full section audit, and website impact analysis. Fixed stale "Phase 6" reference.
 
-- No exact section headers listed
-- No website manifest update deliverable
-- No INDEX.md update deliverable
+#### Design Session Report (2026-03-05)
 
-#### Design Session Prompt
+**Key findings that changed the plan:**
 
-```
-Design session for PublishingRelocation (Phase 40).
+| Finding                                                          | Impact                                           | Resolution                                          |
+| ---------------------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------- |
+| PUBLISHING.md has zero relative links                            | No link rewriting needed in MAINTAINERS.md       | Simplifies move to pure copy + header rename        |
+| Spec references non-existent "Phase 6 (IndexNavigationUpdate)"   | False dependency for INDEX.md cleanup            | INDEX.md update is now deliverable #3 of this phase |
+| Website manifest maps PUBLISHING.md to /guides/publishing/       | Dead sync target after deletion                  | Deliverable #4 removes manifest entry               |
+| docs-live/GENERATION.md references PUBLISHING.md 4 times         | Generated content, auto-updated by pnpm docs:all | No manual action needed                             |
+| INDEX.md has 3 PUBLISHING.md references (lines 32, 260-272, 338) | Broken links and stale navigation                | All 3 removed in deliverable #3                     |
+| MAINTAINERS.md is NOT published on website                       | URL /guides/publishing/ disappears               | Acceptable — maintainer-only content                |
 
-IMPORTANT: This is a DESIGN session. Produce only spec refinements. No code.
+**Deliverables (5, all pending):**
 
-Pre-flight:
-  pnpm process:query -- context PublishingRelocation --session design
-  pnpm process:query -- dep-tree PublishingRelocation
+| #   | Deliverable                                                         | Status  | Location                                       |
+| --- | ------------------------------------------------------------------- | ------- | ---------------------------------------------- |
+| 1   | Create MAINTAINERS.md at repo root with all PUBLISHING.md content   | pending | MAINTAINERS.md                                 |
+| 2   | Delete docs/PUBLISHING.md                                           | pending | docs/PUBLISHING.md                             |
+| 3   | Remove PUBLISHING.md entries from docs/INDEX.md (3 locations)       | pending | docs/INDEX.md                                  |
+| 4   | Remove PUBLISHING.md from website content-manifest.mjs guides array | pending | libar-dev-website/scripts/content-manifest.mjs |
+| 5   | Add MAINTAINERS.md link rewrite to content-manifest.mjs             | pending | libar-dev-website/scripts/content-manifest.mjs |
 
-Goals:
-1. SECTION AUDIT: Read docs/PUBLISHING.md. List every section header.
-   These become the explicit content list in the spec deliverable.
+**Changes made (1 file):**
 
-2. WEBSITE IMPACT: The website manifest maps PUBLISHING.md to
-   /delivery-process/guides/publishing/. After deletion:
-   - Remove entry from content-manifest.mjs:
-     { source: 'PUBLISHING.md', slug: 'publishing', order: 6 }
-   - Decision: Does MAINTAINERS.md get published on the website? If yes, where?
-     If no, the URL disappears (acceptable for internal-only content).
-   Add deliverable for website manifest update.
+| File                                                   | Change                                                                                                                                                                                                                 |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `delivery-process/specs/publishing-relocation.feature` | Added 3 new deliverables, full section audit table (8 H2s, 6 H3s), design findings table, new Rule 3 (cross-references and website manifest), fixed "Phase 6" reference, expanded Rule 1 invariant with H2 enumeration |
 
-3. INDEX.MD UPDATE: docs/INDEX.md links to PUBLISHING.md.
-   Add deliverable to update INDEX.md cross-reference.
+**Result:**
 
-4. CROSS-REFERENCE SCAN: Check if any other docs link to PUBLISHING.md:
-     grep -r 'PUBLISHING.md' docs/ docs-live/
+- 3 Rule blocks with concrete invariants and acceptance criteria
+- 5 deliverables covering file move, deletion, INDEX.md cleanup, manifest removal, and link rewrite
+- 123 test files, 7,972 tests all passing
 
-Input files:
-- delivery-process/specs/publishing-relocation.feature
-- docs/PUBLISHING.md (enumerate headers)
-- docs/INDEX.md (find link to update)
-- ~/dev-projects/libar-dev-website/scripts/content-manifest.mjs (line 22)
+**Next steps (implementation session):**
 
-Output: Updated feature file with section headers, website deliverable,
-and INDEX.md deliverable.
+1. Create MAINTAINERS.md (pure copy with H1 rename to "Maintainer Guide")
+2. Delete docs/PUBLISHING.md
+3. Remove 3 references from docs/INDEX.md
+4. Update libar-dev-website content-manifest.mjs (remove entry + add link rewrite)
+5. Regenerate docs: `pnpm build && pnpm docs:all`
+
+**Pre-flight:**
+
+```bash
+pnpm process:query -- context PublishingRelocation --session implement
+pnpm process:query -- files PublishingRelocation
 ```
 
 ---
