@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:GherkinPatternsRestructure
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-phase:41
 @libar-docs-effort:0.5d
 @libar-docs-product-area:Generation
