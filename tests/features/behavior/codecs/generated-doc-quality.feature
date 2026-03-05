@@ -1,7 +1,7 @@
 @libar-docs
 @behavior @reference-codec
 @libar-docs-pattern:GeneratedDocQualityTests
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-implements:GeneratedDocQuality
 @libar-docs-product-area:Generation
 Feature: Generated Documentation Quality Improvements
