@@ -10,68 +10,79 @@
 Feature: Session Guides as Annotated Module Source
 
   **Problem:**
-  CLAUDE.md contains a "Session Workflows" section (~220 lines) that is hand-maintained
-  with no link to any annotated source. When session workflow guidance changes, both
-  `docs/SESSION-GUIDES.md` and `CLAUDE.md` require manual synchronization — exactly
-  the drift risk USDP is designed to eliminate. The `_claude-md/workflow/` directory
-  (3 files: session-workflows.md, session-details.md, fsm-handoff.md) is equally
-  opaque: hand-written blobs with no machine-readable origin.
+  CLAUDE.md contains a "Session Workflows" section (~160 lines) that is hand-maintained
+  with no link to any annotated source. Three hand-written files in `_claude-md/workflow/`
+  (session-workflows.md, session-details.md, fsm-handoff.md) are equally opaque: no
+  machine-readable origin, no regeneration from source annotations.
 
-  The prior plan (Phase 39 as SessionGuidesElimination) proposed deleting
-  SESSION-GUIDES.md and merging its Handoff section into CLAUDE.md. This inverted
-  the USDP principle: CLAUDE.md should be a derived artifact, not canonical storage.
-  SESSION-GUIDES.md is a public-facing document deployed to libar.dev — its audience
-  is developers visiting the website, not AI sessions.
+  The prior plan proposed tagging ADR-001, ADR-003, and PDR-001 with `@libar-docs-claude-module`
+  to make them the source for generated workflow modules. Design analysis revealed this is
+  fundamentally flawed: `claude-module` is a file-level tag that pulls ALL Rules from a file,
+  but most Rules in those decision specs are irrelevant to session workflows (ADR-001 has 9
+  Rules, only 2-3 are workflow-relevant; PDR-001 has 7 Rules about CLI implementation
+  decisions, not workflow guidance).
 
   **Solution:**
-  Retain SESSION-GUIDES.md as the authoritative public human reference. Express the
-  session workflow invariants as annotated Gherkin Rule: blocks in a dedicated behavior
-  spec and in the existing session workflow decision specs (ADR-001, ADR-003, PDR-001).
-  Annotate these specs with `@libar-docs-claude-module` and
-  `@libar-docs-claude-section:workflow` tags so ClaudeModuleGeneration (Phase 25)
-  produces the `_claude-md/workflow/` compact modules automatically. The
-  hand-maintained CLAUDE.md "Session Workflows" section is replaced with a
-  modular-claude-md composition reference.
+  This spec file itself becomes the annotated source for session workflow content.
+  Session workflow invariants are captured as Rule: blocks here, covering session type
+  contracts, FSM protection, execution order, error recovery, and handoff patterns.
+
+  Once ClaudeModuleGeneration (Phase 25) ships, adding `@libar-docs-claude-module` and
+  `@libar-docs-claude-section:workflow` tags to this spec will cause the codec to produce
+  `_claude-md/workflow/` modules automatically. The hand-written files are then deleted
+  and the CLAUDE.md section becomes a generated include.
+
+  Retain `docs/SESSION-GUIDES.md` (389 lines) as the authoritative public human reference
+  deployed to libar.dev. It serves developers with comprehensive checklists and full CLI
+  examples — content that cannot be expressed as compact invariants.
 
   Three-layer architecture after Phase 39:
 
   | Layer | Location | Content | Maintenance |
   | Public human reference | docs/SESSION-GUIDES.md | Full checklists, CLI examples, decision trees | Manual (editorial) |
-  | Compact AI context | _claude-md/workflow/ | Invariants, session contracts, FSM reference | Generated from annotated specs |
-  | Machine-queryable source | Process Data API | Rules from annotated specs via `rules` command | Derived from annotations |
+  | Compact AI context | _claude-md/workflow/ | Invariants, session contracts, FSM reference | Generated from this spec |
+  | Machine-queryable source | Process Data API | Rules from this spec via `rules` command | Derived from annotations |
 
   **Why It Matters:**
   | Benefit | How |
   | No CLAUDE.md drift | Session workflow section generated, not hand-authored |
-  | Single annotated source | Decision specs own session workflow invariants |
+  | Single annotated source | This spec owns all session workflow invariants |
   | Correct audience alignment | Public guide stays in docs/, AI context in _claude-md/ |
-  | Process API coverage | Session workflow content queryable without reading flat files |
-  | USDP applied to itself | The doc system generates its own workflow documentation |
+  | Process API coverage | Session workflow content queryable via `pnpm process:query -- rules` |
+  | Immediately useful | Rule: blocks are queryable today, generation follows when Phase 25 ships |
+
+  **Design Session Findings (2026-03-05):**
+  | Finding | Impact |
+  | claude-module is file-level, not Rule-level | Cannot selectively tag individual Rules in ADR/PDR files |
+  | ADR-001 has 9 Rules, only 2-3 workflow-relevant | Tagging ADR-001 would create noisy, diluted context |
+  | PDR-001 Rules are CLI implementation decisions | Not session workflow guidance, wrong audience |
+  | Phase 25 claude-section enum lacks workflow value | Must add workflow to enum before annotation |
+  | Self-referential spec is correct source | This spec captures invariants, SESSION-GUIDES.md has editorial content |
 
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Session workflow behavior spec with Rule blocks and claude-module tags | pending | delivery-process/specs/session-guides-module-source.feature | No | n/a |
-      | Add claude-module + claude-section:workflow tags to ADR-001 | pending | delivery-process/decisions/adr-001-taxonomy-canonical-values.feature | No | n/a |
-      | Add claude-module + claude-section:workflow tags to ADR-003 | pending | delivery-process/decisions/adr-003-source-first-pattern-architecture.feature | No | n/a |
-      | Add claude-module + claude-section:workflow tags to PDR-001 | pending | delivery-process/decisions/pdr-001-session-workflow-commands.feature | No | n/a |
-      | Generated _claude-md/workflow/session-workflows.md replaces hand-written version | pending | _claude-md/workflow/session-workflows.md | No | n/a |
-      | Generated _claude-md/workflow/fsm-handoff.md replaces hand-written version | pending | _claude-md/workflow/fsm-handoff.md | No | n/a |
-      | CLAUDE.md Session Workflows section replaced with modular-claude-md include | pending | CLAUDE.md | No | n/a |
+      | Session workflow behavior spec with Rule blocks (session types, FSM contracts, escape hatches, handoff) | pending | delivery-process/specs/session-guides-module-source.feature | No | n/a |
+      | Verify SESSION-GUIDES.md retained with correct INDEX.md links | pending | docs/SESSION-GUIDES.md | No | n/a |
+      | Add workflow to Phase 25 claude-section enum | complete | delivery-process/specs/claude-module-generation.feature | No | n/a |
+      | Add claude-module and claude-section:workflow tags to this spec | deferred | delivery-process/specs/session-guides-module-source.feature | No | n/a |
+      | Generated _claude-md/workflow/session-workflows.md replaces hand-written version | deferred | _claude-md/workflow/session-workflows.md | No | n/a |
+      | Generated _claude-md/workflow/fsm-handoff.md replaces hand-written version | deferred | _claude-md/workflow/fsm-handoff.md | No | n/a |
+      | CLAUDE.md Session Workflows section replaced with modular-claude-md include | deferred | CLAUDE.md | No | n/a |
+
+  # ===========================================================================
+  # RULE 1: SESSION-GUIDES.MD IS THE PUBLIC HUMAN REFERENCE
+  # ===========================================================================
 
   Rule: SESSION-GUIDES.md is the authoritative public human reference
 
     **Invariant:** `docs/SESSION-GUIDES.md` exists and is not deleted, shortened, or
     replaced with a redirect. Its comprehensive checklists, CLI command examples, and
-    session decision trees serve developers on libar.dev — content that is editorial
-    and cannot be expressed as Gherkin invariants without losing operational detail.
+    session decision trees serve developers on libar.dev.
 
-    **Rationale:** Session workflow guidance requires two different formats for two
-    different audiences. Public developers need comprehensive checklists with full
-    examples. AI sessions need compact invariants they can apply without reading 389
-    lines. Collapsing both formats into one file — either by deleting SESSION-GUIDES.md
-    or by making CLAUDE.md its source — serves neither audience well. The two-format
-    approach is exactly what the ClaudeModuleGeneration pattern was designed to enable.
+    **Rationale:** Session workflow guidance requires two formats for two audiences.
+    Public developers need comprehensive checklists with full examples. AI sessions
+    need compact invariants they can apply without reading 389 lines.
 
     **Verified by:** SESSION-GUIDES.md exists after Phase 39,
     No broken links after Phase 39
@@ -89,75 +100,249 @@ Feature: Session Guides as Annotated Module Source
       Then no retained file in docs/ contains a broken link to a deleted file
       And docs/INDEX.md navigation is consistent with docs/ directory contents
 
+  # ===========================================================================
+  # RULE 2: CLAUDE.MD SESSION CONTENT IS DERIVED
+  # ===========================================================================
+
   Rule: CLAUDE.md session workflow content is derived, not hand-authored
 
-    **Invariant:** After Phase 39, the "Session Workflows" section in CLAUDE.md
-    contains no manually-authored content. It is composed from generated
-    `_claude-md/workflow/` modules via the modular-claude-md framework include
-    mechanism.
+    **Invariant:** After Phase 39 generation deliverables complete, the "Session
+    Workflows" section in CLAUDE.md contains no manually-authored content. It is
+    composed from generated `_claude-md/workflow/` modules.
 
     **Rationale:** A hand-maintained CLAUDE.md session section creates two copies of
-    session workflow guidance with no enforcement mechanism to keep them synchronized.
-    Once ClaudeModuleGeneration produces `_claude-md/workflow/` from annotated specs,
-    CLAUDE.md becomes a derived view — it cannot drift because regeneration always
-    reflects current annotation state. This applies the same principle the package
-    uses for all its other documentation: generate, do not manually maintain.
+    session workflow guidance with no synchronization mechanism. Regeneration from
+    annotated source eliminates drift.
 
     **Verified by:** CLAUDE.md session section is a generated module reference
 
     @acceptance-criteria @happy-path
     Scenario: CLAUDE.md session section is a generated module reference
-      Given Phase 39 (SessionGuidesModuleSource) is complete
+      Given Phase 39 generation deliverables are complete
       When inspecting CLAUDE.md under the Session Workflows heading
       Then the section contains a modular-claude-md include reference to the generated module
       And the section contains no manually-authored do/do-not tables or checklist steps
 
-  Rule: Session workflow invariants exist as annotated Gherkin Rule blocks
+  # ===========================================================================
+  # RULE 3: SESSION TYPE DETERMINES ARTIFACTS AND FSM CHANGES
+  # ===========================================================================
 
-    **Invariant:** The three canonical session workflow decision specs (ADR-001,
-    ADR-003, PDR-001) each carry `@libar-docs-claude-module` and
-    `@libar-docs-claude-section:workflow` tags. Their existing Rule: blocks — which
-    already capture FSM state invariants (ADR-001), session lifecycle and artifact
-    ownership (ADR-003), and session command behavior (PDR-001) — become the
-    extractable source for compact _claude-md modules.
+  Rule: Session type determines artifacts and FSM changes
 
-    **Rationale:** The decision specs contain machine-readable invariants today.
-    Adding two annotation tags to each spec is the minimal change needed to connect
-    existing structured content to the ClaudeModuleGeneration pipeline. No new content
-    needs to be authored — the annotations reveal structure that already exists.
+    **Invariant:** Four session types exist, each with defined input, output, and
+    FSM impact. Mixing outputs across session types (e.g., writing code in a planning
+    session) violates session discipline.
 
-    **Verified by:** Process Data API returns session workflow invariants
+    **Rationale:** Session type confusion causes wasted work — a design mistake
+    discovered mid-implementation wastes the entire session. Clear contracts prevent
+    scope bleeding between session types.
+
+    **Verified by:** Session type contracts are enforced
+
+    | Session | Input | Output | FSM Change |
+    | Planning | Pattern brief | Roadmap spec (.feature) | Creates roadmap |
+    | Design | Complex requirement | Decision specs + code stubs | None |
+    | Implementation | Roadmap spec | Code + tests | roadmap to active to completed |
+    | Planning + Design | Pattern brief | Spec + stubs | Creates roadmap |
 
     @acceptance-criteria @happy-path
-    Scenario: Process Data API returns session workflow invariants
-      Given ADR-001, ADR-003, and PDR-001 are annotated with claude-module tags
-      When running "pnpm process:query -- rules ADR001TaxonomyCanonicalValues"
-      Then the output contains FSM state invariants including protection levels
-      And the output contains valid transition invariants
-      And the content is consistent with the FSM Quick Reference table in SESSION-GUIDES.md
+    Scenario: Session type contracts are enforced
+      Given a planning session is active
+      Then the session produces only a roadmap spec
+      And no TypeScript implementation code is created
+      And the FSM status is set to roadmap
+
+  # ===========================================================================
+  # RULE 4: PLANNING SESSIONS PRODUCE SPECS ONLY
+  # ===========================================================================
+
+  Rule: Planning sessions produce roadmap specs only
+
+    **Invariant:** A planning session creates a roadmap spec with metadata, deliverables
+    table, Rule: blocks with invariants, and scenarios. It must not produce implementation
+    code, transition to active, or prompt for implementation readiness.
+
+    **Rationale:** Planning is the cheapest session type — it produces .feature file
+    edits, no compilation needed. Mixing implementation into planning defeats the cost
+    advantage and introduces untested code without a locked scope.
+
+    **Verified by:** Planning session output constraints
+
+    | Do | Do NOT |
+    | Extract metadata from pattern brief | Create .ts implementation |
+    | Create spec file with proper tags | Transition to active |
+    | Add deliverables table in Background | Ask Ready to implement |
+    | Convert constraints to Rule: blocks | Write full implementations |
+    | Add scenarios: 1 happy-path + 1 validation per Rule | |
+
+    @acceptance-criteria @happy-path
+    Scenario: Planning session output constraints
+      Given a planning session for a new pattern
+      When the session completes
+      Then a .feature file exists with libar-docs-status:roadmap
+      And the file contains a Background with deliverables table
+      And no .ts files were created in src/
+
+  # ===========================================================================
+  # RULE 5: DESIGN SESSIONS PRODUCE DECISIONS AND STUBS
+  # ===========================================================================
+
+  Rule: Design sessions produce decisions and stubs only
+
+    **Invariant:** A design session makes architectural decisions and creates code stubs
+    with interfaces. It must not produce implementation code. Context gathering via the
+    Process Data API must precede any explore agent usage.
+
+    **Rationale:** Design sessions resolve ambiguity before implementation begins. Code
+    stubs in delivery-process/stubs/ live outside src/ to avoid TypeScript compilation
+    and ESLint issues, making them zero-risk artifacts.
+
+    **Verified by:** Design session output constraints
+
+    | Use Design Session | Skip Design Session |
+    | Multiple valid approaches | Single obvious path |
+    | New patterns/capabilities | Bug fix |
+    | Cross-context coordination | Clear requirements |
+
+    @acceptance-criteria @happy-path
+    Scenario: Design session output constraints
+      Given a design session for a pattern with multiple valid approaches
+      When the session completes
+      Then code stubs exist in delivery-process/stubs/
+      And no implementation code was written in src/
+      And decision rationale is captured in Rule: blocks
+
+  # ===========================================================================
+  # RULE 6: IMPLEMENTATION FOLLOWS FSM-ENFORCED EXECUTION ORDER
+  # ===========================================================================
+
+  Rule: Implementation sessions follow FSM-enforced execution order
+
+    **Invariant:** Implementation sessions must follow a strict 5-step execution order.
+    Transition to active must happen before any code changes. Transition to completed
+    must happen only when ALL deliverables are done. Skipping steps causes Process Guard
+    rejection at commit time.
+
+    **Rationale:** The execution order ensures FSM state accurately reflects work state
+    at every point. Writing code before transitioning to active means Process Guard
+    sees changes to a roadmap spec (no scope protection). Marking completed with
+    incomplete work creates a hard-locked state that requires unlock-reason to fix.
+
+    **Verified by:** Implementation execution order is enforced
+
+    Execution order:
+    1. Transition to active FIRST (before any code changes)
+    2. Create executable spec stubs (if libar-docs-executable-specs present)
+    3. For each deliverable: implement, test, update status to complete
+    4. Transition to completed (only when ALL deliverables done)
+    5. Regenerate docs: pnpm docs:all
+
+    | Do NOT | Why |
+    | Add new deliverables to active spec | Scope-locked state prevents scope creep |
+    | Mark completed with incomplete work | Hard-locked state cannot be undone |
+    | Skip FSM transitions | Process Guard will reject |
+    | Edit generated docs directly | Regenerate from source |
+
+    @acceptance-criteria @happy-path
+    Scenario: Implementation execution order is enforced
+      Given an implementation session for a roadmap pattern
+      When the session begins
+      Then the first action is transitioning status to active
+      And code changes follow the FSM transition
+      And completed is only set after all deliverables are done
+
+  # ===========================================================================
+  # RULE 7: FSM ERRORS HAVE DOCUMENTED FIXES
+  # ===========================================================================
+
+  Rule: FSM errors have documented fixes
+
+    **Invariant:** Every Process Guard error code has a defined cause and fix. The
+    error codes, causes, and fixes form a closed set — no undocumented error states
+    exist.
+
+    **Rationale:** Undocumented FSM errors cause session-blocking confusion. A lookup
+    table from error code to fix eliminates guesswork and prevents workarounds that
+    bypass process integrity.
+
+    **Verified by:** All FSM errors have documented recovery paths
+
+    | Error | Cause | Fix |
+    | completed-protection | File has completed status but no unlock tag | Add libar-docs-unlock-reason tag |
+    | invalid-status-transition | Skipped FSM state (e.g., roadmap to completed) | Follow path: roadmap to active to completed |
+    | scope-creep | Added deliverable to active spec | Remove deliverable OR revert to roadmap |
+    | session-scope (warning) | Modified file outside session scope | Add to scope OR use --ignore-session |
+    | session-excluded | Modified excluded pattern during session | Remove from exclusion OR override |
+
+    Escape hatches for exceptional situations:
+
+    | Situation | Solution | Example |
+    | Fix bug in completed spec | Add unlock reason tag | libar-docs-unlock-reason:Fix-typo |
+    | Modify outside session scope | Use ignore flag | lint-process --staged --ignore-session |
+    | CI treats warnings as errors | Use strict flag | lint-process --all --strict |
+
+    @acceptance-criteria @happy-path
+    Scenario: All FSM errors have documented recovery paths
+      Given Process Guard reports a validation error
+      Then the error code appears in the FSM error reference table
+      And the table entry includes both cause and fix
+
+  # ===========================================================================
+  # RULE 8: HANDOFF CAPTURES SESSION-END STATE
+  # ===========================================================================
+
+  Rule: Handoff captures session-end state for continuity
+
+    **Invariant:** Multi-session work requires handoff documentation generated from
+    the Process Data API. Handoff output always reflects actual annotation state,
+    not manual notes.
+
+    **Rationale:** Manual session notes drift from actual deliverable state. The
+    handoff command derives state from annotations, ensuring the next session starts
+    from ground truth rather than stale notes.
+
+    **Verified by:** Handoff output reflects annotation state
+
+    Generate handoff via: pnpm process:query -- handoff --pattern PatternName
+    Options: --git (include recent commits), --session (session identifier)
+
+    Output includes: deliverable statuses, blockers, modification date, and next
+    steps — all derived from current annotation state.
+
+    @acceptance-criteria @happy-path
+    Scenario: Handoff output reflects annotation state
+      Given a multi-session implementation with 3 deliverables
+      When running the handoff command after completing 2 deliverables
+      Then the output shows 2 complete and 1 pending
+      And the output reflects the current annotation state, not manual notes
+
+  # ===========================================================================
+  # RULE 9: CLAUDE MODULE GENERATION IS THE MECHANISM (DEFERRED)
+  # ===========================================================================
 
   Rule: ClaudeModuleGeneration is the generation mechanism
 
-    **Invariant:** Phase 39 depends on ClaudeModuleGeneration (Phase 25). The
-    `@libar-docs-claude-module` and `@libar-docs-claude-section:workflow` tags on
-    annotated spec files cause ClaudeModuleGeneration to produce
-    `_claude-md/workflow/{module}.md` output files. The three hand-written
-    `_claude-md/workflow/` files are deleted after successful verified generation.
+    **Invariant:** Phase 39 depends on ClaudeModuleGeneration (Phase 25). Adding
+    `@libar-docs-claude-module` and `@libar-docs-claude-section:workflow` tags to
+    this spec will cause ClaudeModuleGeneration to produce `_claude-md/workflow/`
+    output files. The hand-written `_claude-md/workflow/` files are deleted after
+    successful verified generation.
 
-    **Rationale:** Phase 39 annotation work (tagging decision specs) can proceed
-    immediately and independently. Generation deliverables — the actual produced
-    `_claude-md/workflow/` files and the CLAUDE.md section removal — cannot complete
-    until Phase 25 ships the ClaudeModuleCodec. This sequencing is intentional: the
-    annotation investment is zero-risk because the tags are valid regardless of
+    **Rationale:** The annotation work (Rule blocks in this spec) is immediately
+    useful — queryable via `pnpm process:query -- rules`. Generation deliverables
+    cannot complete until Phase 25 ships the ClaudeModuleCodec. This sequencing is
+    intentional: the annotation investment has standalone value regardless of
     whether the codec exists yet.
+
+    **Prerequisite:** Phase 25 must add `workflow` to the `claude-section` enum
+    values (currently: core, delivery-process, testing, infrastructure).
 
     **Verified by:** Generated modules replace hand-written workflow files
 
     @acceptance-criteria @happy-path
     Scenario: Generated modules replace hand-written workflow files
       Given ClaudeModuleGeneration (Phase 25) is complete
-      And the decision specs are annotated with claude-module and claude-section tags
-      When running "pnpm docs:claude-modules"
-      Then _claude-md/workflow/ contains generated files derived from annotated specs
+      And this spec is annotated with claude-module and claude-section tags
+      When running pnpm docs:claude-modules
+      Then _claude-md/workflow/ contains generated files derived from this spec
       And the generated files replace the prior hand-written versions
-      And pnpm process:query -- context SessionGuidesModuleSource shows all deliverables complete

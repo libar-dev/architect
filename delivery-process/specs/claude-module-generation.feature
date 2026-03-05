@@ -83,7 +83,7 @@ Feature: CLAUDE.md Module Generation from Source Annotations
       When querying for tag "claude-section"
       Then the tag should exist
       And the tag format should be "enum"
-      And the tag should have values including "core", "delivery-process", "testing", "infrastructure"
+      And the tag should have values including "core", "delivery-process", "testing", "infrastructure", "workflow"
 
     @acceptance-criteria @happy-path
     Scenario: Tag registry contains claude-tags

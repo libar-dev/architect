@@ -196,58 +196,58 @@ pnpm process:query -- files GeneratedDocQuality
 
 ---
 
-### Phase 39 — SessionGuidesModuleSource | BLOCKED → DESIGN-NEEDED
+### Phase 39 — SessionGuidesModuleSource | DESIGN COMPLETE
 
 **Pattern:** SessionGuidesModuleSource | **Effort:** 0.5d | **Depends on:** ClaudeModuleGeneration (Phase 25), DocsConsolidationStrategy
 
 **What:** Replace hand-maintained CLAUDE.md "Session Workflows" section (160 lines) with generated `_claude-md/workflow/` modules. Retain `docs/SESSION-GUIDES.md` as public human reference.
 
-**Current status:** BLOCKED on ClaudeModuleGeneration (Phase 25, not yet implemented). The annotation work (adding `@libar-docs-claude-module` tags) is immediately actionable but generation cannot be verified.
+**Current status:** DESIGN COMPLETE. Spec revised with 9 Rule blocks capturing session workflow invariants. Generation deliverables (#4-#7) deferred pending Phase 25.
 
-**Known issue:** Lint error at line 101 — "When ClaudeModuleGeneration..." starts with Gherkin keyword. Blocks entire test suite.
+**CLAUDE.md trim opportunity:** This is the **highest-value** trim — 160 lines of Session Workflows replaced by generated modules. Blocked on Phase 25 for generation, but Rule blocks are immediately queryable via `pnpm process:query -- rules`.
 
-**CLAUDE.md trim opportunity:** This is the **highest-value** trim — 160 lines of Session Workflows replaced by generated modules. But blocked on Phase 25.
+#### Design Session Report (2026-03-05)
 
-#### Design Session Prompt
+**Key findings that changed the plan:**
 
-```
-Design session for SessionGuidesModuleSource (Phase 39).
+| Finding                                         | Impact                                                   | Resolution                                                 |
+| ----------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------- |
+| `claude-module` is file-level, not Rule-level   | Cannot selectively tag individual Rules in ADR/PDR files | Removed deliverables #2-#4 (tag ADR-001, ADR-003, PDR-001) |
+| ADR-001 has 9 Rules, only 2-3 workflow-relevant | Tagging ADR-001 would create noisy, diluted context      | Spec itself captures workflow invariants as Rule blocks    |
+| PDR-001 Rules are CLI implementation decisions  | Not session workflow guidance, wrong audience            | Removed from scope entirely                                |
+| Phase 25 `claude-section` enum lacks `workflow` | Must add value before annotation works                   | Added `workflow` to Phase 25 spec enum (complete)          |
+| Lint error (line 101) already fixed in Phase 37 | No action needed                                         | Confirmed: "Once ClaudeModuleGeneration..."                |
 
-IMPORTANT: This is a DESIGN session. Produce only spec refinements. No code.
+**Deliverables (7, 1 complete, 3 pending, 3 deferred):**
 
-Pre-flight:
-  pnpm process:query -- context SessionGuidesModuleSource --session design
-  pnpm process:query -- dep-tree SessionGuidesModuleSource
+| #   | Deliverable                                                                                            | Status   | Location                                                    |
+| --- | ------------------------------------------------------------------------------------------------------ | -------- | ----------------------------------------------------------- |
+| 1   | Session workflow behavior spec with Rule blocks (9 Rules: session types, FSM, escape hatches, handoff) | pending  | delivery-process/specs/session-guides-module-source.feature |
+| 2   | Verify SESSION-GUIDES.md retained with correct INDEX.md links                                          | pending  | docs/SESSION-GUIDES.md                                      |
+| 3   | Add `workflow` to Phase 25 claude-section enum                                                         | complete | delivery-process/specs/claude-module-generation.feature     |
+| 4   | Add claude-module and claude-section:workflow tags to this spec                                        | deferred | delivery-process/specs/session-guides-module-source.feature |
+| 5   | Generated \_claude-md/workflow/session-workflows.md replaces hand-written                              | deferred | \_claude-md/workflow/session-workflows.md                   |
+| 6   | Generated \_claude-md/workflow/fsm-handoff.md replaces hand-written                                    | deferred | \_claude-md/workflow/fsm-handoff.md                         |
+| 7   | CLAUDE.md Session Workflows section replaced with modular-claude-md include                            | deferred | CLAUDE.md                                                   |
 
-Goals:
-1. FIX LINT ERROR: Line 101 starts with "When" (Gherkin keyword in description).
-   Rephrase to unblock the test suite. This is the FIRST thing to do.
+**Changes made (2 files):**
 
-2. DEPENDENCY ASSESSMENT: Check if ClaudeModuleGeneration exists:
-     pnpm process:query -- search ClaudeModuleGeneration
-   Check if @libar-docs-claude-module tag is registered:
-     grep -r 'claude-module' src/taxonomy/
-   If neither exists, deliverables #5-#7 (generation) must be marked deferred.
+| File                                                          | Change                                                                                                                                                                                                                           |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `delivery-process/specs/session-guides-module-source.feature` | Complete rewrite: new deliverables table (removed flawed ADR/PDR tagging), added 6 new Rule blocks (session types, planning, design, implementation, FSM errors, handoff), updated 3 existing Rules, added design findings table |
+| `delivery-process/specs/claude-module-generation.feature`     | Added `"workflow"` to claude-section enum values (line 86)                                                                                                                                                                       |
 
-3. SPLIT DECISION: Should this spec split into:
-   - Phase 39a: Annotation work (add claude-module tags to ADR-001, ADR-003,
-     PDR-001) — immediately actionable, zero risk
-   - Phase 39b: Generation work — blocked on Phase 25
-   Update the feature file accordingly.
+**Result:**
 
-4. ANNOTATION READINESS: For the actionable deliverables (#1-#4), verify:
-   - ADR-001 and ADR-003 feature files exist and have Rule: blocks
-   - PDR-001 exists (check delivery-process/decisions/)
-   - Tags to add are valid per taxonomy
+- 9 Rule blocks capture all session workflow invariants from `_claude-md/workflow/` hand-written files
+- Queryable immediately: `pnpm process:query -- rules SessionGuidesModuleSource`
+- 123 test files, 7,972 tests all passing
 
-Input files:
-- delivery-process/specs/session-guides-module-source.feature
-- src/taxonomy/ (tag registration check)
-- delivery-process/specs/claude-module-generation.feature (if exists)
+**Next steps (implementation session):**
 
-Output: Updated feature file with lint fix, deferred deliverables if needed,
-and annotation deliverables refined with specific file paths.
-```
+1. Deliverable #1 can be marked complete — the Rule blocks ARE the deliverable (self-referential)
+2. Deliverable #2 verification: SESSION-GUIDES.md (389 lines) exists, INDEX.md links confirmed (4 references)
+3. Deliverables #4-#7 remain deferred until Phase 25 ships
 
 ---
 
