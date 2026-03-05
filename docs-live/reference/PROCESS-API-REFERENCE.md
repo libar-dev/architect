@@ -46,8 +46,18 @@ For the `list` subcommand. All filters are composable.
 | `--status <status>` | Filter by FSM status (roadmap, active, completed, deferred) |
 | `--phase <number>` | Filter by roadmap phase number |
 | `--category <name>` | Filter by category |
-| `--source <ts|gherkin>` | Filter by source type |
+| `--source <ts\|gherkin>` | Filter by source type |
 | `--arch-context <name>` | Filter by architecture context |
 | `--product-area <name>` | Filter by product area |
 | `--limit <n>` | Maximum results |
 | `--offset <n>` | Skip first n results |
+
+---
+
+## Session Types
+
+For the `--session` flag used with `context` and `scope-validate`.
+
+| Session Types | Description |
+| --- | --- |
+| `--session <type>` | Session type: `planning`, `design`, or `implement` |

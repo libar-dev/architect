@@ -370,6 +370,8 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
     prd: [],
   };
 
+  const byProductAreaMap: Record<string, ExtractedPattern[]> = {};
+
   const relationshipIndex: Record<string, RelationshipEntry> = {};
 
   // Architecture index for diagram generation
@@ -426,6 +428,12 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
     // ─── PRD grouping (has productArea, userRole, or businessValue) ────────
     if (pattern.productArea || pattern.userRole || pattern.businessValue) {
       bySource.prd.push(p);
+    }
+
+    // ─── Product area grouping ──────────────────────────────────────────
+    if (pattern.productArea) {
+      const areaPatterns = (byProductAreaMap[pattern.productArea] ??= []);
+      areaPatterns.push(p);
     }
 
     // ─── Relationship index ────────────────────────────────────────────────
@@ -665,6 +673,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
     byQuarter,
     byCategory,
     bySource,
+    byProductArea: byProductAreaMap,
     counts,
     phaseCount: byPhaseMap.size,
     categoryCount: byCategoryMap.size,

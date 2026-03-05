@@ -285,6 +285,7 @@ function showHelp(): void {
   const options = formatHelpOptions(CLI_SCHEMA.globalOptions);
   const modifiers = formatHelpOptions(CLI_SCHEMA.outputModifiers);
   const filters = formatHelpOptions(CLI_SCHEMA.listFilters);
+  const sessions = formatHelpOptions(CLI_SCHEMA.sessionOptions);
 
   console.log(`
 process-api - Query delivery process state from annotated sources
@@ -361,6 +362,10 @@ ${modifiers}
 List Filters (for 'list' subcommand):
 
 ${filters}
+
+Session Types (for 'context' and 'scope-validate'):
+
+${sessions}
 
 Common Recipes:
 

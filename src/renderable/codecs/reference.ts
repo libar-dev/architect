@@ -799,8 +799,8 @@ function decodeProductArea(
     sections.push(separator());
   }
 
-  // Pre-filter patterns by product area
-  const areaPatterns = dataset.patterns.filter((p) => p.productArea === area);
+  // Pre-computed view: O(1) lookup instead of linear filter
+  const areaPatterns = dataset.byProductArea[area] ?? [];
 
   // Also collect TypeScript patterns by archContext mapping (for shapes + diagrams)
   const archContexts = PRODUCT_AREA_ARCH_CONTEXT_MAP[area] ?? [];

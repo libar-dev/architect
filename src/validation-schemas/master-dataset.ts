@@ -249,6 +249,9 @@ export const MasterDatasetSchema = z.object({
   /** Patterns grouped by source type */
   bySource: SourceViewsSchema,
 
+  /** Patterns grouped by product area (for O(1) product area lookups) */
+  byProductArea: z.record(z.string(), z.array(ExtractedPatternSchema)),
+
   // ─────────────────────────────────────────────────────────────────────────
   // Aggregate Statistics
   // ─────────────────────────────────────────────────────────────────────────

@@ -294,6 +294,16 @@ function buildProductAreaIndex(
 ): string {
   const sections: SectionBlock[] = [];
 
+  // Pre-compute per-area stats in a single pass (avoids 2x linear scans per area)
+  const areaStats = new Map<string, { total: number; completed: number; active: number; planned: number }>();
+  for (const p of dataset.patterns) {
+    if (p.productArea === undefined) continue;
+    const stats = areaStats.get(p.productArea) ?? { total: 0, completed: 0, active: 0, planned: 0 };
+    stats.total++;
+    stats[normalizeStatus(p.status)]++;
+    areaStats.set(p.productArea, stats);
+  }
+
   // Per-area sections with intro prose and live statistics
   for (const config of configs) {
     const area = config.productArea;
@@ -305,18 +315,12 @@ function buildProductAreaIndex(
     sections.push(paragraph(`> **${meta.question}**`));
     sections.push(paragraph(meta.intro));
 
-    // Live per-area statistics
-    const areaPatterns = dataset.patterns.filter((p) => p.productArea === area);
-    if (areaPatterns.length > 0) {
-      const completed = areaPatterns.filter(
-        (p) => normalizeStatus(p.status) === 'completed'
-      ).length;
-      const active = areaPatterns.filter((p) => normalizeStatus(p.status) === 'active').length;
-      const planned = areaPatterns.filter((p) => normalizeStatus(p.status) === 'planned').length;
-
+    // Live per-area statistics from pre-computed stats
+    const stats = areaStats.get(area);
+    if (stats !== undefined && stats.total > 0) {
       sections.push(
         paragraph(
-          `**${areaPatterns.length} patterns** — ${completed} completed, ${active} active, ${planned} planned`
+          `**${stats.total} patterns** — ${stats.completed} completed, ${stats.active} active, ${stats.planned} planned`
         )
       );
     }
@@ -329,7 +333,7 @@ function buildProductAreaIndex(
 
   sections.push(separator());
 
-  // Cross-area progress summary table
+  // Cross-area progress summary table (reuses pre-computed stats)
   const tableHeaders = ['Area', 'Patterns', 'Completed', 'Active', 'Planned'];
   const tableRows: string[][] = [];
   let totalPatterns = 0;
@@ -341,23 +345,20 @@ function buildProductAreaIndex(
     const area = config.productArea;
     if (area === undefined) continue;
 
-    const areaPatterns = dataset.patterns.filter((p) => p.productArea === area);
-    const completed = areaPatterns.filter((p) => normalizeStatus(p.status) === 'completed').length;
-    const active = areaPatterns.filter((p) => normalizeStatus(p.status) === 'active').length;
-    const planned = areaPatterns.filter((p) => normalizeStatus(p.status) === 'planned').length;
+    const stats = areaStats.get(area) ?? { total: 0, completed: 0, active: 0, planned: 0 };
 
     tableRows.push([
       `[${area}](product-areas/${config.docsFilename})`,
-      String(areaPatterns.length),
-      String(completed),
-      String(active),
-      String(planned),
+      String(stats.total),
+      String(stats.completed),
+      String(stats.active),
+      String(stats.planned),
     ]);
 
-    totalPatterns += areaPatterns.length;
-    totalCompleted += completed;
-    totalActive += active;
-    totalPlanned += planned;
+    totalPatterns += stats.total;
+    totalCompleted += stats.completed;
+    totalActive += stats.active;
+    totalPlanned += stats.planned;
   }
 
   tableRows.push([

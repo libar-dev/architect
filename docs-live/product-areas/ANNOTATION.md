@@ -46,15 +46,15 @@ C4Context
     }
     System_Ext(DocDirectiveSchema, "DocDirectiveSchema")
     System_Ext(GherkinRulesSupport, "GherkinRulesSupport")
-    Rel(GherkinScanner, GherkinASTParser, "uses")
-    Rel(GherkinScanner, GherkinRulesSupport, "implements")
-    Rel(GherkinASTParser, GherkinRulesSupport, "implements")
-    Rel(TypeScript_AST_Parser, DocDirectiveSchema, "uses")
     Rel(GherkinExtractor, GherkinASTParser, "uses")
     Rel(GherkinExtractor, GherkinRulesSupport, "implements")
     Rel(DualSourceExtractor, GherkinExtractor, "uses")
     Rel(DualSourceExtractor, GherkinScanner, "uses")
     Rel(Document_Extractor, Pattern_Scanner, "uses")
+    Rel(GherkinScanner, GherkinASTParser, "uses")
+    Rel(GherkinScanner, GherkinRulesSupport, "implements")
+    Rel(GherkinASTParser, GherkinRulesSupport, "implements")
+    Rel(TypeScript_AST_Parser, DocDirectiveSchema, "uses")
 ```
 
 ---
@@ -80,15 +80,15 @@ graph LR
         DocDirectiveSchema["DocDirectiveSchema"]:::neighbor
         GherkinRulesSupport["GherkinRulesSupport"]:::neighbor
     end
-    GherkinScanner -->|uses| GherkinASTParser
-    GherkinScanner ..->|implements| GherkinRulesSupport
-    GherkinASTParser ..->|implements| GherkinRulesSupport
-    TypeScript_AST_Parser -->|uses| DocDirectiveSchema
     GherkinExtractor -->|uses| GherkinASTParser
     GherkinExtractor ..->|implements| GherkinRulesSupport
     DualSourceExtractor -->|uses| GherkinExtractor
     DualSourceExtractor -->|uses| GherkinScanner
     Document_Extractor -->|uses| Pattern_Scanner
+    GherkinScanner -->|uses| GherkinASTParser
+    GherkinScanner ..->|implements| GherkinRulesSupport
+    GherkinASTParser ..->|implements| GherkinRulesSupport
+    TypeScript_AST_Parser -->|uses| DocDirectiveSchema
     classDef neighbor stroke-dasharray: 5 5
 ```
 

@@ -16,91 +16,85 @@
 
 import type { DocumentGenerator, GeneratorContext, GeneratorOutput } from '../types.js';
 import { CLI_SCHEMA } from '../../cli/cli-schema.js';
-import type { CLIOptionDef, CLIOptionGroup } from '../../cli/cli-schema.js';
+import type { CLIOptionGroup } from '../../cli/cli-schema.js';
+import { heading, paragraph, table, separator, document } from '../../renderable/schema.js';
+import type { SectionBlock } from '../../renderable/schema.js';
+import { renderToMarkdown } from '../../renderable/render.js';
 
 // =============================================================================
-// Table Rendering
+// Section Building
 // =============================================================================
 
-function renderGlobalOptionsTable(options: readonly CLIOptionDef[]): string {
-  const header = '| Flag | Short | Description | Default |';
-  const separator = '| --- | --- | --- | --- |';
-  const rows = options.map((opt) => {
-    const flag = `\`${opt.flag}\``;
-    const short = opt.short !== undefined ? `\`${opt.short}\`` : '---';
-    const def = opt.default ?? '---';
-    return `| ${flag} | ${short} | ${opt.description} | ${def} |`;
-  });
-  return [header, separator, ...rows].join('\n');
-}
+function buildGlobalOptionsSection(group: CLIOptionGroup): SectionBlock[] {
+  const sections: SectionBlock[] = [];
 
-function renderTwoColumnTable(
-  col1: string,
-  col2: string,
-  options: readonly CLIOptionDef[]
-): string {
-  const header = `| ${col1} | ${col2} |`;
-  const separator = '| --- | --- |';
-  const rows = options.map((opt) => {
-    const flag = `\`${opt.flag}\``;
-    return `| ${flag} | ${opt.description} |`;
-  });
-  return [header, separator, ...rows].join('\n');
-}
-
-// =============================================================================
-// Section Rendering
-// =============================================================================
-
-function renderSection(group: CLIOptionGroup, tableType: 'global' | 'two-column'): string {
-  const parts: string[] = [];
-
-  parts.push(`## ${group.title}`);
-  parts.push('');
+  sections.push(heading(2, group.title));
 
   if (group.description !== undefined) {
-    parts.push(group.description);
-    parts.push('');
+    sections.push(paragraph(group.description));
   }
 
-  if (tableType === 'global') {
-    parts.push(renderGlobalOptionsTable(group.options));
-  } else {
-    parts.push(renderTwoColumnTable(group.singularTitle ?? group.title, 'Description', group.options));
-  }
-  parts.push('');
+  const columns = ['Flag', 'Short', 'Description', 'Default'];
+  const rows = group.options.map((opt) => [
+    `\`${opt.flag}\``,
+    opt.short !== undefined ? `\`${opt.short}\`` : '---',
+    opt.description,
+    opt.default ?? '---',
+  ]);
+
+  sections.push(table(columns, rows));
 
   if (group.postNote !== undefined) {
-    parts.push(group.postNote);
-    parts.push('');
+    sections.push(paragraph(group.postNote));
   }
 
-  return parts.join('\n');
+  return sections;
+}
+
+function buildTwoColumnSection(group: CLIOptionGroup): SectionBlock[] {
+  const sections: SectionBlock[] = [];
+
+  sections.push(heading(2, group.title));
+
+  if (group.description !== undefined) {
+    sections.push(paragraph(group.description));
+  }
+
+  const columns = [group.singularTitle ?? group.title, 'Description'];
+  const rows = group.options.map((opt) => [`\`${opt.flag}\``, opt.description]);
+
+  sections.push(table(columns, rows));
+
+  if (group.postNote !== undefined) {
+    sections.push(paragraph(group.postNote));
+  }
+
+  return sections;
 }
 
 // =============================================================================
 // Document Assembly
 // =============================================================================
 
-function generateReferenceDocument(): string {
-  const parts: string[] = [];
+function buildReferenceDocument(): string {
+  const sections: SectionBlock[] = [];
 
-  parts.push('# Process API CLI Reference');
-  parts.push('');
-  parts.push(
-    '> Auto-generated from CLI schema. See [Process API Guide](../../docs/PROCESS-API.md) for usage examples and recipes.'
+  sections.push(
+    paragraph(
+      '> Auto-generated from CLI schema. See [Process API Guide](../../docs/PROCESS-API.md) for usage examples and recipes.'
+    )
   );
-  parts.push('');
 
-  parts.push(renderSection(CLI_SCHEMA.globalOptions, 'global'));
-  parts.push('---');
-  parts.push('');
-  parts.push(renderSection(CLI_SCHEMA.outputModifiers, 'two-column'));
-  parts.push('---');
-  parts.push('');
-  parts.push(renderSection(CLI_SCHEMA.listFilters, 'two-column'));
+  sections.push(...buildGlobalOptionsSection(CLI_SCHEMA.globalOptions));
+  sections.push(separator());
+  sections.push(...buildTwoColumnSection(CLI_SCHEMA.outputModifiers));
+  sections.push(separator());
+  sections.push(...buildTwoColumnSection(CLI_SCHEMA.listFilters));
+  sections.push(separator());
+  sections.push(...buildTwoColumnSection(CLI_SCHEMA.sessionOptions));
 
-  return parts.join('\n');
+  const doc = document('Process API CLI Reference', sections);
+  return renderToMarkdown(doc);
 }
 
 // =============================================================================
@@ -112,7 +106,7 @@ class ProcessApiReferenceGeneratorImpl implements DocumentGenerator {
   readonly description = 'Generate CLI reference tables from declarative schema';
 
   generate(_patterns: readonly unknown[], _context: GeneratorContext): Promise<GeneratorOutput> {
-    const content = generateReferenceDocument();
+    const content = buildReferenceDocument();
 
     return Promise.resolve({
       files: [

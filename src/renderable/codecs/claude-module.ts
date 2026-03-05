@@ -281,6 +281,11 @@ function extractDescriptionSections(description: string): SectionBlock[] {
 
 /**
  * Build a Rule section (H4 heading + invariant + rationale + tables).
+ *
+ * Related: `renderRuleDescription()` in helpers.ts performs the same
+ * annotation-parse-to-blocks sequence but produces full-detail output
+ * (includes verifiedBy, codeExamples, remainingContent). This function
+ * intentionally produces compact output for _claude-md/ modules.
  */
 function buildRuleSection(
   rule: BusinessRule,

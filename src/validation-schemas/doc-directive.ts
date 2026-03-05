@@ -25,6 +25,7 @@ import {
 } from '../taxonomy/index.js';
 import { asDirectiveTag } from '../types/branded.js';
 import type { TagRegistry } from './tag-registry.js';
+import { CLAUDE_SECTION_VALUES } from '../taxonomy/claude-section-values.js';
 
 /**
  * Position information for a directive in source code
@@ -277,7 +278,7 @@ export const DocDirectiveSchema = z
     claudeModule: z.string().optional(),
 
     /** Target section directory in _claude-md/ (from @libar-docs-claude-section tag) */
-    claudeSection: z.string().optional(),
+    claudeSection: z.enum(CLAUDE_SECTION_VALUES).optional(),
 
     /** Variation filtering tags for modular-claude-md (from @libar-docs-claude-tags CSV tag) */
     claudeTags: z.array(z.string()).readonly().optional(),

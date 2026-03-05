@@ -50,9 +50,9 @@ graph TB
     end
     subgraph related["Related"]
         MasterDataset["MasterDataset"]:::neighbor
+        ShapeExtractor["ShapeExtractor"]:::neighbor
         Pattern_Scanner["Pattern Scanner"]:::neighbor
         GherkinASTParser["GherkinASTParser"]:::neighbor
-        ShapeExtractor["ShapeExtractor"]:::neighbor
         ReferenceDocShowcase["ReferenceDocShowcase"]:::neighbor
         ProcessApiHybridGeneration["ProcessApiHybridGeneration"]:::neighbor
         PatternRelationshipModel["PatternRelationshipModel"]:::neighbor
