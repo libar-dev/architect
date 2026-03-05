@@ -70,7 +70,7 @@ Every PR in this consolidation should identify CLAUDE.md sections that can be re
 
 ---
 
-## Current Branch State (as of 2026-03-05, post Phase 38)
+## Current Branch State (as of 2026-03-05, post Phase 39)
 
 ### Completed Phases
 
@@ -78,15 +78,20 @@ Every PR in this consolidation should identify CLAUDE.md sections that can be re
 - **Phase 37 (DocsLiveConsolidation):** Committed. Reference docs consolidated into `docs-live/reference/`, compacts into `docs-live/_claude-md/architecture/`. `docs-generated/` reduced to intermediates only.
 - **Phase 38 (GeneratedDocQuality):** Implemented. Duplicate tables fixed, Generation compact enriched (4.3 KB), ARCHITECTURE-TYPES reordered (types first), TOC added to all product area docs. 123 test files, 7,972 tests passing.
 
+### Active Phases
+
+- **Phase 39 (SessionGuidesModuleSource):** Active (partial). Deliverables #1-#3 complete, #4-#7 deferred pending Phase 25. Pattern stays `active` until ClaudeModuleGeneration ships.
+
 ### Blockers
 
-None.
+Phase 39 completion blocked on Phase 25 (ClaudeModuleGeneration).
 
 ### To Complete This PR
 
 1. Commit Phase 38 changes + regenerated docs
-2. Run final test suite verification (already verified: 123 files, 7972 tests pass)
-3. Identify CLAUDE.md lines to trim (target: remove ~80 lines from Guides section)
+2. Commit Phase 39 spec transition (roadmap → active, deliverables #1-#2 complete)
+3. Run final test suite verification (already verified: 123 files, 7972 tests pass)
+4. Identify CLAUDE.md lines to trim (target: remove ~80 lines from Guides section)
 
 ---
 
@@ -196,13 +201,13 @@ pnpm process:query -- files GeneratedDocQuality
 
 ---
 
-### Phase 39 — SessionGuidesModuleSource | DESIGN COMPLETE
+### Phase 39 — SessionGuidesModuleSource | ACTIVE (partial)
 
 **Pattern:** SessionGuidesModuleSource | **Effort:** 0.5d | **Depends on:** ClaudeModuleGeneration (Phase 25), DocsConsolidationStrategy
 
 **What:** Replace hand-maintained CLAUDE.md "Session Workflows" section (160 lines) with generated `_claude-md/workflow/` modules. Retain `docs/SESSION-GUIDES.md` as public human reference.
 
-**Current status:** DESIGN COMPLETE. Spec revised with 9 Rule blocks capturing session workflow invariants. Generation deliverables (#4-#7) deferred pending Phase 25.
+**Current status:** ACTIVE. Deliverables #1-#3 complete, #4-#7 deferred pending Phase 25. Pattern stays `active` because `deferred` is not a terminal deliverable status.
 
 **CLAUDE.md trim opportunity:** This is the **highest-value** trim — 160 lines of Session Workflows replaced by generated modules. Blocked on Phase 25 for generation, but Rule blocks are immediately queryable via `pnpm process:query -- rules`.
 
@@ -218,36 +223,42 @@ pnpm process:query -- files GeneratedDocQuality
 | Phase 25 `claude-section` enum lacks `workflow` | Must add value before annotation works                   | Added `workflow` to Phase 25 spec enum (complete)          |
 | Lint error (line 101) already fixed in Phase 37 | No action needed                                         | Confirmed: "Once ClaudeModuleGeneration..."                |
 
-**Deliverables (7, 1 complete, 3 pending, 3 deferred):**
+#### Implementation Session Report (2026-03-05)
+
+**Deliverables (7, 3 complete, 4 deferred):**
 
 | #   | Deliverable                                                                                            | Status   | Location                                                    |
 | --- | ------------------------------------------------------------------------------------------------------ | -------- | ----------------------------------------------------------- |
-| 1   | Session workflow behavior spec with Rule blocks (9 Rules: session types, FSM, escape hatches, handoff) | pending  | delivery-process/specs/session-guides-module-source.feature |
-| 2   | Verify SESSION-GUIDES.md retained with correct INDEX.md links                                          | pending  | docs/SESSION-GUIDES.md                                      |
+| 1   | Session workflow behavior spec with Rule blocks (9 Rules: session types, FSM, escape hatches, handoff) | complete | delivery-process/specs/session-guides-module-source.feature |
+| 2   | Verify SESSION-GUIDES.md retained with correct INDEX.md links                                          | complete | docs/SESSION-GUIDES.md                                      |
 | 3   | Add `workflow` to Phase 25 claude-section enum                                                         | complete | delivery-process/specs/claude-module-generation.feature     |
 | 4   | Add claude-module and claude-section:workflow tags to this spec                                        | deferred | delivery-process/specs/session-guides-module-source.feature |
 | 5   | Generated \_claude-md/workflow/session-workflows.md replaces hand-written                              | deferred | \_claude-md/workflow/session-workflows.md                   |
 | 6   | Generated \_claude-md/workflow/fsm-handoff.md replaces hand-written                                    | deferred | \_claude-md/workflow/fsm-handoff.md                         |
 | 7   | CLAUDE.md Session Workflows section replaced with modular-claude-md include                            | deferred | CLAUDE.md                                                   |
 
-**Changes made (2 files):**
+**Changes made (1 file):**
 
-| File                                                          | Change                                                                                                                                                                                                                           |
-| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `delivery-process/specs/session-guides-module-source.feature` | Complete rewrite: new deliverables table (removed flawed ADR/PDR tagging), added 6 new Rule blocks (session types, planning, design, implementation, FSM errors, handoff), updated 3 existing Rules, added design findings table |
-| `delivery-process/specs/claude-module-generation.feature`     | Added `"workflow"` to claude-section enum values (line 86)                                                                                                                                                                       |
+| File                                                          | Change                                                                       |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `delivery-process/specs/session-guides-module-source.feature` | FSM: roadmap → active, deliverables #1 and #2 marked complete (were pending) |
 
-**Result:**
+**Verification performed:**
 
-- 9 Rule blocks capture all session workflow invariants from `_claude-md/workflow/` hand-written files
-- Queryable immediately: `pnpm process:query -- rules SessionGuidesModuleSource`
+- `docs/SESSION-GUIDES.md` exists (389 lines, unchanged)
+- `docs/INDEX.md` has 4 references to SESSION-GUIDES.md (lines 26, 51, 163, 332)
+- `CLAUDE.md` line 525 links to `./docs/SESSION-GUIDES.md`
 - 123 test files, 7,972 tests all passing
 
-**Next steps (implementation session):**
+**Why not completed:** `deferred` is not a terminal deliverable status per `isDeliverableStatusTerminal()`. Pattern must stay `active` until Phase 25 (ClaudeModuleGeneration) ships, enabling deliverables #4-#7.
 
-1. Deliverable #1 can be marked complete — the Rule blocks ARE the deliverable (self-referential)
-2. Deliverable #2 verification: SESSION-GUIDES.md (389 lines) exists, INDEX.md links confirmed (4 references)
-3. Deliverables #4-#7 remain deferred until Phase 25 ships
+**Next steps (when Phase 25 ships):**
+
+1. Add `@libar-docs-claude-module` and `@libar-docs-claude-section:workflow` tags to this spec
+2. Run `pnpm docs:claude-modules` to generate `_claude-md/workflow/` files
+3. Delete hand-written `_claude-md/workflow/` files
+4. Replace CLAUDE.md Session Workflows section with modular-claude-md include
+5. Transition to `completed`
 
 ---
 

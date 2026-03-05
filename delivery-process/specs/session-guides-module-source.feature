@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:SessionGuidesModuleSource
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:39
 @libar-docs-effort:0.5d
 @libar-docs-product-area:Generation
@@ -62,8 +62,8 @@ Feature: Session Guides as Annotated Module Source
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Session workflow behavior spec with Rule blocks (session types, FSM contracts, escape hatches, handoff) | pending | delivery-process/specs/session-guides-module-source.feature | No | n/a |
-      | Verify SESSION-GUIDES.md retained with correct INDEX.md links | pending | docs/SESSION-GUIDES.md | No | n/a |
+      | Session workflow behavior spec with Rule blocks (session types, FSM contracts, escape hatches, handoff) | complete | delivery-process/specs/session-guides-module-source.feature | No | n/a |
+      | Verify SESSION-GUIDES.md retained with correct INDEX.md links | complete | docs/SESSION-GUIDES.md | No | n/a |
       | Add workflow to Phase 25 claude-section enum | complete | delivery-process/specs/claude-module-generation.feature | No | n/a |
       | Add claude-module and claude-section:workflow tags to this spec | deferred | delivery-process/specs/session-guides-module-source.feature | No | n/a |
       | Generated _claude-md/workflow/session-workflows.md replaces hand-written version | deferred | _claude-md/workflow/session-workflows.md | No | n/a |
