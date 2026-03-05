@@ -133,7 +133,7 @@ Codecs decode MasterDataset into a RenderableDocument block tree, and renderers 
 ## Unified Transformation Architecture
 
 > **Unified Transformation Architecture** — See
-> [ARCHITECTURE-TYPES.md](../docs-generated/docs/ARCHITECTURE-TYPES.md)
+> [ARCHITECTURE-TYPES.md](../docs-live/reference/ARCHITECTURE-TYPES.md)
 > for MasterDataset schema, RuntimeMasterDataset, RawDataset, PipelineOptions,
 > PipelineResult, and the MasterDataset view fan-out diagram.
 > MasterDataset types and transformation code moved to the generated reference
@@ -180,7 +180,7 @@ Codecs expose a default export for standard options and a `create*Codec(...)` fa
 The codec system includes 20+ codecs organized by purpose: pattern-focused, timeline-focused, session-focused, planning, reference/composition, and other specialized codecs.
 
 For the complete reference with options tables, factory patterns, and usage examples, see:
-**[Available Codecs Reference](../docs-generated/docs/ARCHITECTURE-CODECS.md)** (auto-generated from source annotations)
+**[Available Codecs Reference](../docs-live/reference/ARCHITECTURE-CODECS.md)** (auto-generated from source annotations)
 
 ---
 
@@ -251,7 +251,7 @@ Source: `src/taxonomy/`.
 ## Data Flow Diagrams
 
 > **Data Flow Diagrams** — See
-> [ARCHITECTURE-TYPES.md](../docs-generated/docs/ARCHITECTURE-TYPES.md)
+> [ARCHITECTURE-TYPES.md](../docs-live/reference/ARCHITECTURE-TYPES.md)
 > for the pipeline flow (convention-tagged orchestrator walkthrough) and the
 > MasterDataset view fan-out Mermaid diagram.
 > ASCII diagrams replaced by generated Mermaid output from source annotations.
@@ -270,7 +270,7 @@ Source: `src/taxonomy/`.
 ### Codec Reference
 
 For codec descriptions, options, and factory patterns, see:
-**[Available Codecs Reference](../docs-generated/docs/ARCHITECTURE-CODECS.md)**
+**[Available Codecs Reference](../docs-live/reference/ARCHITECTURE-CODECS.md)**
 
 To list available generators and their CLI flags: `generate-docs --list-generators`
 

@@ -115,6 +115,7 @@ export default defineConfig({
     },
     'reference-docs': {
       additionalFeatures: ['delivery-process/decisions/*.feature'],
+      outputDirectory: 'docs-live',
     },
     'product-area-docs': {
       outputDirectory: 'docs-live',

@@ -5,6 +5,9 @@ node_modules/
 dist/
 *.tsbuildinfo
 
+# Generated intermediate artifacts (not website-published)
+docs-generated/
+
 # IDE
 .idea/
 .vscode/

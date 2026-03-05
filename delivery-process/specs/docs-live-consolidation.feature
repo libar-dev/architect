@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:DocsLiveConsolidation
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:37
 @libar-docs-effort:0.5d
 @libar-docs-product-area:Generation

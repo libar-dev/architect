@@ -193,7 +193,10 @@ class ReferenceDocsGenerator implements DocumentGenerator {
         generateDetailFiles: false,
       });
       const detailedDoc = detailedCodec.decode(context.masterDataset) as RenderableDocument;
-      files.push({ path: `docs/${config.docsFilename}`, content: renderToMarkdown(detailedDoc) });
+      files.push({
+        path: `reference/${config.docsFilename}`,
+        content: renderToMarkdown(detailedDoc),
+      });
 
       // Summary output -> _claude-md/{section}/{filename}
       const summaryCodec = createReferenceCodec(config, {
@@ -437,7 +440,7 @@ export function registerReferenceGenerators(
   // Individual generators: selective invocation per document
   for (const config of configs) {
     const kebabName = toGeneratorName(config.title);
-    const docsPrefix = config.productArea !== undefined ? 'product-areas' : 'docs';
+    const docsPrefix = config.productArea !== undefined ? 'product-areas' : 'reference';
 
     registry.register(
       new ReferenceDocGenerator(

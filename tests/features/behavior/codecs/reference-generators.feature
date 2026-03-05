@@ -87,5 +87,5 @@ Feature: Reference Document Generator Registration
       Given a MasterDataset with pipeline architecture conventions and master dataset shapes
       When running the "architecture-types-reference" generator
       Then the output has 1 file
-      And the output file path starts with "docs/"
+      And the output file path starts with "reference/"
       And the output file content contains all of "MasterDatasetSchema", "PipelineOptions", "Orchestrator Pipeline Responsibilities", and "graph TB"

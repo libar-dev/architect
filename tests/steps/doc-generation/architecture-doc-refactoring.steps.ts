@@ -11,6 +11,7 @@ interface ArchitectureRefactoringState {
   architectureContent: string | null;
   currentSectionName: string | null;
   currentSectionContent: string | null;
+  currentFileContent: string | null;
 }
 
 function initState(): ArchitectureRefactoringState {
@@ -18,6 +19,7 @@ function initState(): ArchitectureRefactoringState {
     architectureContent: null,
     currentSectionName: null,
     currentSectionContent: null,
+    currentFileContent: null,
   };
 }
 
@@ -182,5 +184,264 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
       }
     );
+  });
+
+  Rule(
+    'Convention extraction produces ARCHITECTURE-CODECS reference document',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'Session codecs file produces multiple convention sections',
+        ({ When, Then }) => {
+          When('reading file {string}', (_ctx: unknown, filePath: string) => {
+            const fullPath = path.join(process.cwd(), filePath);
+            state!.currentFileContent = fs.readFileSync(fullPath, 'utf-8');
+          });
+
+          Then('the file contains each of the following:', (_ctx: unknown, docString: string) => {
+            for (const line of docString.trim().split('\n')) {
+              if (line.trim().length > 0) {
+                expect(state!.currentFileContent).toContain(line.trim());
+              }
+            }
+          });
+        }
+      );
+
+      RuleScenario('Convention sections include output file references', ({ When, Then, And }) => {
+        When('reading file {string}', (_ctx: unknown, filePath: string) => {
+          const fullPath = path.join(process.cwd(), filePath);
+          state!.currentFileContent = fs.readFileSync(fullPath, 'utf-8');
+        });
+
+        Then('the file contains {string}', (_ctx: unknown, text: string) => {
+          expect(state!.currentFileContent).toContain(text);
+        });
+
+        And('the file also contains {string}', (_ctx: unknown, text: string) => {
+          expect(state!.currentFileContent).toContain(text);
+        });
+      });
+
+      RuleScenario(
+        'ARCHITECTURE-CODECS document has substantial content from all codec files',
+        ({ When, Then }) => {
+          When('reading file {string}', (_ctx: unknown, filePath: string) => {
+            const fullPath = path.join(process.cwd(), filePath);
+            state!.currentFileContent = fs.readFileSync(fullPath, 'utf-8');
+          });
+
+          Then('the file has more than {int} lines', (_ctx: unknown, minLines: number) => {
+            const lineCount = state!.currentFileContent!.split('\n').length;
+            expect(lineCount).toBeGreaterThan(minLines);
+          });
+        }
+      );
+
+      RuleScenario('Session codec source file has structured JSDoc headings', ({ When, Then }) => {
+        When('reading file {string}', (_ctx: unknown, filePath: string) => {
+          const fullPath = path.join(process.cwd(), filePath);
+          state!.currentFileContent = fs.readFileSync(fullPath, 'utf-8');
+        });
+
+        Then('the file contains each of the following:', (_ctx: unknown, docString: string) => {
+          for (const line of docString.trim().split('\n')) {
+            if (line.trim().length > 0) {
+              expect(state!.currentFileContent).toContain(line.trim());
+            }
+          }
+        });
+      });
+
+      RuleScenario(
+        'Convention rule titles match source heading text in generated output',
+        ({ When, Then, And }) => {
+          When('reading file {string}', (_ctx: unknown, filePath: string) => {
+            const fullPath = path.join(process.cwd(), filePath);
+            state!.currentFileContent = fs.readFileSync(fullPath, 'utf-8');
+          });
+
+          Then('the file contains {string}', (_ctx: unknown, text: string) => {
+            expect(state!.currentFileContent).toContain(text);
+          });
+
+          And('the file also contains {string}', (_ctx: unknown, text: string) => {
+            expect(state!.currentFileContent).toContain(text);
+          });
+        }
+      );
+    }
+  );
+
+  Rule('Section disposition routes content to generated equivalents', ({ RuleScenario }) => {
+    RuleScenario(
+      'Unified Transformation Architecture section is a pointer to ARCHITECTURE-TYPES',
+      ({ When, Then, And }) => {
+        When('reading the {string} section', (_ctx: unknown, section: string) => {
+          state!.currentSectionName = section;
+          state!.currentSectionContent = getSectionContent(state!.architectureContent!, section);
+          expect(state!.currentSectionContent.length).toBeGreaterThan(0);
+        });
+
+        Then('the section contains {string}', (_ctx: unknown, text: string) => {
+          expect(state!.currentSectionContent).toContain(text);
+        });
+
+        And('the section does not contain {string}', (_ctx: unknown, text: string) => {
+          expect(state!.currentSectionContent).not.toContain(text);
+        });
+      }
+    );
+
+    RuleScenario('Data Flow Diagrams section is a pointer', ({ When, Then }) => {
+      When('reading the {string} section', (_ctx: unknown, section: string) => {
+        state!.currentSectionName = section;
+        state!.currentSectionContent = getSectionContent(state!.architectureContent!, section);
+        expect(state!.currentSectionContent.length).toBeGreaterThan(0);
+      });
+
+      Then('the section contains {string}', (_ctx: unknown, text: string) => {
+        expect(state!.currentSectionContent).toContain(text);
+      });
+    });
+
+    RuleScenario('Quick Reference section points to ARCHITECTURE-CODECS', ({ When, Then }) => {
+      When('reading the {string} section', (_ctx: unknown, section: string) => {
+        state!.currentSectionName = section;
+        state!.currentSectionContent = getSectionContent(state!.architectureContent!, section);
+        expect(state!.currentSectionContent.length).toBeGreaterThan(0);
+      });
+
+      Then('the section contains {string}', (_ctx: unknown, text: string) => {
+        expect(state!.currentSectionContent).toContain(text);
+      });
+    });
+  });
+
+  Rule('MasterDataset shapes appear in ARCHITECTURE-TYPES reference', ({ RuleScenario }) => {
+    RuleScenario('Core MasterDataset types appear in ARCHITECTURE-TYPES', ({ When, Then }) => {
+      When('reading file {string}', (_ctx: unknown, filePath: string) => {
+        const fullPath = path.join(process.cwd(), filePath);
+        state!.currentFileContent = fs.readFileSync(fullPath, 'utf-8');
+      });
+
+      Then('the file contains each of the following:', (_ctx: unknown, docString: string) => {
+        for (const line of docString.trim().split('\n')) {
+          if (line.trim().length > 0) {
+            expect(state!.currentFileContent).toContain(line.trim());
+          }
+        }
+      });
+    });
+
+    RuleScenario('Pipeline types appear in ARCHITECTURE-TYPES reference', ({ When, Then, And }) => {
+      When('reading file {string}', (_ctx: unknown, filePath: string) => {
+        const fullPath = path.join(process.cwd(), filePath);
+        state!.currentFileContent = fs.readFileSync(fullPath, 'utf-8');
+      });
+
+      Then('the file contains {string}', (_ctx: unknown, text: string) => {
+        expect(state!.currentFileContent).toContain(text);
+      });
+
+      And('the file also contains {string}', (_ctx: unknown, text: string) => {
+        expect(state!.currentFileContent).toContain(text);
+      });
+    });
+
+    RuleScenario(
+      'Unified Transformation section replaced with pointer and narrative',
+      ({ When, Then, And }) => {
+        When('reading the {string} section', (_ctx: unknown, section: string) => {
+          state!.currentSectionName = section;
+          state!.currentSectionContent = getSectionContent(state!.architectureContent!, section);
+          expect(state!.currentSectionContent.length).toBeGreaterThan(0);
+        });
+
+        Then('the section contains {string}', (_ctx: unknown, text: string) => {
+          expect(state!.currentSectionContent).toContain(text);
+        });
+
+        And('the section also contains {string}', (_ctx: unknown, text: string) => {
+          expect(state!.currentSectionContent).toContain(text);
+        });
+      }
+    );
+  });
+
+  Rule('Pipeline architecture convention appears in generated reference', ({ RuleScenario }) => {
+    RuleScenario(
+      'Orchestrator source file has pipeline-architecture convention tag',
+      ({ When, Then }) => {
+        When('reading file {string}', (_ctx: unknown, filePath: string) => {
+          const fullPath = path.join(process.cwd(), filePath);
+          state!.currentFileContent = fs.readFileSync(fullPath, 'utf-8');
+        });
+
+        Then('the file contains {string}', (_ctx: unknown, text: string) => {
+          expect(state!.currentFileContent).toContain(text);
+        });
+      }
+    );
+
+    RuleScenario(
+      'Build-pipeline source file has pipeline-architecture convention tag',
+      ({ When, Then }) => {
+        When('reading file {string}', (_ctx: unknown, filePath: string) => {
+          const fullPath = path.join(process.cwd(), filePath);
+          state!.currentFileContent = fs.readFileSync(fullPath, 'utf-8');
+        });
+
+        Then('the file contains {string}', (_ctx: unknown, text: string) => {
+          expect(state!.currentFileContent).toContain(text);
+        });
+      }
+    );
+
+    RuleScenario('Data Flow Diagrams section points to ARCHITECTURE-TYPES', ({ When, Then }) => {
+      When('reading the {string} section', (_ctx: unknown, section: string) => {
+        state!.currentSectionName = section;
+        state!.currentSectionContent = getSectionContent(state!.architectureContent!, section);
+        expect(state!.currentSectionContent.length).toBeGreaterThan(0);
+      });
+
+      Then('the section contains {string}', (_ctx: unknown, text: string) => {
+        expect(state!.currentSectionContent).toContain(text);
+      });
+    });
+  });
+
+  Rule('Editorial trimming removes tutorial sections and reduces file size', ({ RuleScenario }) => {
+    RuleScenario('Programmatic Usage section removed from ARCHITECTURE.md', ({ Then }) => {
+      Then('section {string} is absent from ARCHITECTURE.md', (_ctx: unknown, heading: string) => {
+        const idx = getHeadingStart(state!.architectureContent!, heading);
+        expect(idx).toBe(-1);
+      });
+    });
+
+    RuleScenario('Extending the System section removed from ARCHITECTURE.md', ({ Then }) => {
+      Then('section {string} is absent from ARCHITECTURE.md', (_ctx: unknown, heading: string) => {
+        const idx = getHeadingStart(state!.architectureContent!, heading);
+        expect(idx).toBe(-1);
+      });
+    });
+
+    RuleScenario('Key Design Patterns section has pointer to CORE-TYPES', ({ When, Then }) => {
+      When('reading the {string} section', (_ctx: unknown, section: string) => {
+        state!.currentSectionName = section;
+        state!.currentSectionContent = getSectionContent(state!.architectureContent!, section);
+        expect(state!.currentSectionContent.length).toBeGreaterThan(0);
+      });
+
+      Then('the section contains {string}', (_ctx: unknown, text: string) => {
+        expect(state!.currentSectionContent).toContain(text);
+      });
+    });
+
+    RuleScenario('ARCHITECTURE.md is under 400 lines after editorial trimming', ({ Then }) => {
+      Then('ARCHITECTURE.md has fewer than {int} lines', (_ctx: unknown, limit: number) => {
+        const lineCount = state!.architectureContent!.split('\n').length;
+        expect(lineCount).toBeLessThan(limit);
+      });
+    });
   });
 });
