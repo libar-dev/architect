@@ -374,57 +374,67 @@ pnpm process:query -- files GherkinPatternsRestructure
 
 ---
 
-### Phase 42 — ReadmeRationalization | DESIGN-NEEDED
+### Phase 42 — ReadmeRationalization | DESIGN COMPLETE
 
 **Pattern:** ReadmeRationalization | **Effort:** 0.5d | **Depends on:** DocsConsolidationStrategy
 
-**What:** Trim `README.md` from 504 → ~150 lines. Extract enterprise pitch content for the website landing page.
+**What:** Trim `README.md` from 504 → ~150 lines. Enterprise pitch content already fully covered by 9 website landing page components — extraction is pure deletion with zero content loss.
 
-**Current spec gaps:**
+**Current status:** DESIGN COMPLETE. Spec refined with 18-section disposition table, 7 design findings, 6 deliverables (up from 4), 3 Rule blocks, README-to-website component mapping, and link audit.
 
-- No section-by-section disposition
-- No current line ranges
-- No website content brief deliverable
+#### Design Session Report (2026-03-05)
 
-#### Design Session Prompt
+**Key findings that changed the plan:**
 
-```
-Design session for ReadmeRationalization (Phase 42).
+| Finding                                                   | Impact                                                   | Resolution                                            |
+| --------------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------- |
+| Website has 9 landing components, not "only Hero"         | No content creation needed — extraction is deletion      | Deliverable #3 becomes mapping doc, not content brief |
+| Metrics.astro has identical "Proven at Scale" claims      | Section 8 (47 lines) is 100% redundant                   | Safe EXTRACT with zero information loss               |
+| Pillars.astro covers FSM, dual-source, relationships      | Sections 9, 11, 12 redundant with website                | Safe EXTRACT                                          |
+| generate-docs flags table duplicates --help output        | CLI section is 68 lines but only command table is unique | Trim flags table, retain command summary only         |
+| INDEX.md line 22 references README as 1-504               | Stale line count after trim                              | Add deliverable #5 for INDEX.md update                |
+| README maps to /getting-started/ via content-manifest.mjs | Trimmed README is a better getting-started page          | No manifest change needed; add Rule 3                 |
+| Line 93 `[Configuration](#configuration)` anchor breaks   | Internal link to deleted section                         | Replace with docs/CONFIGURATION.md link               |
 
-IMPORTANT: This is a DESIGN session. Produce only spec refinements. No code.
+**Deliverables (6, all pending):**
 
-Pre-flight:
-  pnpm process:query -- context ReadmeRationalization --session design
+| #   | Deliverable                                                                         | Status  | Location      |
+| --- | ----------------------------------------------------------------------------------- | ------- | ------------- |
+| 1   | Trim README.md to ~150 lines per section disposition table                          | pending | README.md     |
+| 2   | Remove Configuration section (lines 441-474) duplicating docs/CONFIGURATION.md      | pending | README.md     |
+| 3   | Document README-to-website component mapping for extracted enterprise sections      | pending | spec file     |
+| 4   | Verify all retained links in trimmed README resolve to valid targets                | pending | README.md     |
+| 5   | Update INDEX.md Quick Navigation line count for README (1-504 → ~1-150)             | pending | docs/INDEX.md |
+| 6   | Verify trimmed README serves as effective getting-started page at /getting-started/ | pending | README.md     |
 
-Goals:
-1. FULL SECTION AUDIT: Read README.md (504 lines). Build a disposition table:
-   | Section Header | Line Range | Lines | Action | Rationale |
-   Actions: KEEP, TRIM (with target line count), EXTRACT (to website),
-   REMOVE (redundant with docs/).
-   The kept sections must total ~150 lines.
+**Changes made (1 file):**
 
-2. WEBSITE LANDING PAGE CONTENT: The libar-dev-website landing page
-   (src/pages/index.astro) has only a Hero section. Sections marked EXTRACT
-   become raw material for the website's Pipeline, Capabilities, and
-   Comparison sections. Create a content brief deliverable listing:
-   - Which README sections map to which website sections
-   - Key claims/tables to preserve in website form
+| File                                                    | Change                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `delivery-process/specs/readme-rationalization.feature` | Complete rewrite: 18-section disposition table with line ranges, 7 design findings table, README-to-website component mapping (5 EXTRACT sections → 5 website components), updated deliverables (4→6), expanded Rule 1 with section enumeration, new Rule 3 for getting-started page integrity |
 
-3. GETTING-STARTED IMPACT: The website publishes README.md as
-   /delivery-process/getting-started/. After trimming from 504 to 150 lines,
-   this page changes dramatically. Verify the remaining content serves a
-   first-time visitor (install + quick example + links to guides).
+**Result:**
 
-4. LINK AUDIT: After trimming, verify all remaining links in README.md
-   resolve to valid targets. List any that need updating.
+- 18 sections audited with exact line ranges and KEEP/TRIM/EXTRACT/REMOVE disposition
+- Line count math validated: KEEP (15) + TRIM (121) + separators (6) = ~142 lines
+- 5 EXTRACT sections mapped to existing website components (Metrics, Pillars, DataAPI, Workflows)
+- All retained links verified valid; one broken anchor identified (`#configuration` → deleted section)
+- 123 test files, 7,972 tests all passing
 
-Input files:
-- delivery-process/specs/readme-rationalization.feature
-- README.md (full audit, 504 lines)
-- ~/dev-projects/libar-dev-website/src/pages/index.astro (landing page)
+**CLAUDE.md trim opportunity:** ~50 lines from Project Overview section (replace with `overview` command).
 
-Output: Updated feature file with complete section disposition table and
-website content brief deliverable.
+**Next steps (implementation session):**
+
+1. Trim README.md per disposition table (504 → ~150 lines)
+2. Fix `#configuration` anchor → `docs/CONFIGURATION.md` link
+3. Update INDEX.md line count (line 22: 1-504 → ~1-150)
+4. Verify /getting-started/ page alignment
+
+**Pre-flight:**
+
+```bash
+pnpm process:query -- context ReadmeRationalization --session implement
+pnpm process:query -- files ReadmeRationalization
 ```
 
 ---
