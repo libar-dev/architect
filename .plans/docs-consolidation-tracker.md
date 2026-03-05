@@ -439,24 +439,68 @@ pnpm process:query -- files ReadmeRationalization
 
 ---
 
-### Phase 43 — ProcessApiHybridGeneration | IMPL-READY
+### Phase 43 — ProcessApiHybridGeneration | DESIGN COMPLETE
 
 **Pattern:** ProcessApiHybridGeneration | **Effort:** 1d | **Depends on:** DocsConsolidationStrategy
 
-**What:** Generate the 3 reference tables in `docs/PROCESS-API.md` from CLI parser source. Keep narrative prose manual.
+**What:** Generate the 3 reference tables from a declarative CLI schema. Split Output Reference into separate generated file at `docs-live/reference/PROCESS-API-REFERENCE.md`. Refactor `showHelp()` to consume the same schema, eliminating three-way sync.
 
-**Deliverables (4, all pending):**
+**Current status:** DESIGN COMPLETE. Spec rewritten with 3 Rule blocks, 7 deliverables (up from 4), section audit, design findings table, and architectural decision (standalone generator, not ReferenceDocConfig).
 
-| #   | Deliverable                          | Location                   | Tests       |
-| --- | ------------------------------------ | -------------------------- | ----------- |
-| 1   | CLI schema extraction from parser    | src/cli/parser.ts          | integration |
-| 2   | ProcessApiCodec for table generation | src/renderable/codecs/     | integration |
-| 3   | Hybrid PROCESS-API.md output         | docs/PROCESS-API.md        | integration |
-| 4   | Reference doc config entry           | delivery-process.config.ts | integration |
+#### Design Session Report (2026-03-05)
 
-**Why impl-ready:** The `cli-patterns` convention tag already exists in taxonomy. The preamble capability is complete. The spec identifies exact tables to generate (Global Options, Output Modifiers, List Filters).
+**Key findings that changed the plan:**
 
-**CLAUDE.md trim opportunity:** After this, the "Data API CLI" section (66 lines) could be trimmed since the generated tables are authoritative.
+| Finding                                                          | Impact                                            | Resolution                                                       |
+| ---------------------------------------------------------------- | ------------------------------------------------- | ---------------------------------------------------------------- |
+| Spec referenced `src/cli/parser.ts` — file doesn't exist         | All 4 deliverables had wrong path                 | Fixed to `src/cli/process-api.ts` + `src/cli/output-pipeline.ts` |
+| Orchestrator only does full-file writes (no partial replacement) | Marker-based replacement not supported            | Split Output Reference into separate generated file (Option B)   |
+| `ReferenceDocConfig` is MasterDataset-sourced (ADR-006)          | CLI schema data is not annotation-derived         | Standalone generator, not ReferenceDocConfig                     |
+| `--format` in Output Modifiers table but not in interface        | Generated table would be incomplete               | Schema includes `--format` alongside modifiers                   |
+| `--session` parsed as global option but absent from table        | Intentional — documented in Session Types section | Schema captures in separate `sessionOptions` group               |
+| `showHelp()` lines 271-370 is third copy of same data            | Three-way sync: parser, help text, markdown       | Schema drives both help text and doc generation (deliverable #6) |
+
+**Deliverables (7, all pending):**
+
+| #   | Deliverable                                          | Status  | Location                                                   |
+| --- | ---------------------------------------------------- | ------- | ---------------------------------------------------------- |
+| 1   | Create declarative CLI schema with option groups     | pending | src/cli/cli-schema.ts                                      |
+| 2   | Sync test: schema entries match parseArgs() behavior | pending | tests/features/behavior/cli/                               |
+| 3   | ProcessApiReferenceGenerator: standalone generator   | pending | src/generators/built-in/process-api-reference-generator.ts |
+| 4   | Register generator in orchestrator config            | pending | delivery-process.config.ts                                 |
+| 5   | Trim PROCESS-API.md Output Reference to link         | pending | docs/PROCESS-API.md                                        |
+| 6   | Refactor showHelp() to consume CLI schema            | pending | src/cli/process-api.ts                                     |
+| 7   | Behavior spec with scenarios for all 3 tables        | pending | tests/features/behavior/cli/process-api-reference.feature  |
+
+**Changes made (1 file):**
+
+| File                                                           | Change                                                                                                                                                                                                              |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `delivery-process/specs/process-api-hybrid-generation.feature` | Complete rewrite: fixed file paths, added design findings table, added section audit, expanded to 7 deliverables, added Rule 3 (ADR-006 standalone generator), redesigned Rule 1 (schema as single source of truth) |
+
+**Result:**
+
+- 3 Rule blocks with concrete invariants and acceptance criteria
+- 7 deliverables covering schema, sync test, generator, config, doc trim, help refactor, behavior spec
+- Section audit with exact line ranges for all 15 sections (10 KEEP, 3 EXTRACT, 1 TRIM, 1 link)
+- Architectural decision: standalone generator (not ReferenceDocConfig) per ADR-006
+- 123 test files, 7,972 tests all passing
+
+**CLAUDE.md trim opportunity:** After this, the "Data API CLI" section (66 lines) could trim ~30 lines — the generated reference file is the authoritative source for flag/modifier/filter tables.
+
+**Next steps (implementation session):**
+
+1. Create `src/cli/cli-schema.ts` with 3 option groups (globalOptions, outputModifiers, listFilters)
+2. Write sync test verifying schema matches `parseArgs()` behavior
+3. Create `ProcessApiReferenceGenerator` implementing `DocumentGenerator`
+4. Register in orchestrator, trim PROCESS-API.md, refactor `showHelp()`
+
+**Pre-flight:**
+
+```bash
+pnpm process:query -- context ProcessApiHybridGeneration --session implement
+pnpm process:query -- files ProcessApiHybridGeneration
+```
 
 **Pre-flight:**
 

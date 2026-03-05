@@ -10,60 +10,104 @@
 Feature: PROCESS-API.md Hybrid Generation
 
   **Problem:**
-  `docs/PROCESS-API.md` (507 lines) contains three reference tables that manually
-  mirror CLI schema definitions in source code: the Global Options table (~10 lines,
-  lines 381-391), the Output Modifiers table (~16 lines, lines 393-408), and the
-  List Filters table (~15 lines, lines 411-425). These 41 lines are pure data
-  derived from code constants. When CLI options change — a new flag is added, a
-  default changes, a filter type is extended — these tables require manual updates
-  and risk falling out of sync with the implementation.
+  `docs/PROCESS-API.md` (509 lines) contains three reference tables that manually
+  mirror CLI definitions in source code: Global Options (lines 382-389, 6 rows),
+  Output Modifiers (lines 397-403, 5 rows), and List Filters (lines 415-424, 8 rows).
+  These ~41 lines are pure data derived from code constants in `src/cli/process-api.ts`
+  and `src/cli/output-pipeline.ts`. When CLI options change, these tables require
+  manual updates and risk falling out of sync with the implementation.
+
+  Additionally, the `showHelp()` function (lines 271-370 of `src/cli/process-api.ts`)
+  is a hardcoded third copy of the same information, creating three-way drift risk:
+  parser code, help text, and markdown tables.
 
   **Solution:**
-  Adopt a hybrid approach: generate only the three reference table sections from
-  `src/cli/parser.ts` definitions, keep all narrative sections hand-written. The
-  `preamble` capability (already built) preserves editorial intro sections. A new
-  codec reads CLI arg definitions and emits markdown tables for Global Options,
-  Output Modifiers, and List Filters. The `docs:all` command replaces only those
-  three sections in PROCESS-API.md, leaving all prose untouched.
+  Create a declarative CLI schema (`src/cli/cli-schema.ts`) as the single source of
+  truth. A standalone `ProcessApiReferenceGenerator` reads this schema and produces
+  a complete generated reference file at `docs-live/reference/PROCESS-API-REFERENCE.md`.
+  The "Output Reference" section in `docs/PROCESS-API.md` (lines 376-424) is replaced
+  with a heading and link to the generated file. The `showHelp()` function is refactored
+  to consume the same schema, eliminating three-way sync.
 
   **Why It Matters:**
   | Benefit | How |
-  | Zero drift | Reference tables regenerate automatically from parser definitions |
-  | Pattern consistency | Mirrors Phase 2 (codec listings) and Phase 3 (PROCESS-GUARD tables) |
-  | Safe editorial control | cli-patterns convention tag already exists in src/taxonomy/conventions.ts |
+  | Zero drift | Reference tables regenerate automatically from schema |
+  | Three-way sync eliminated | Schema drives both help text and generated docs |
+  | Consistent with existing pattern | Same OutputFile approach as ARCHITECTURE-CODECS.md |
+
+  **Design Findings (2026-03-05):**
+  | Finding | Impact | Resolution |
+  | Original spec references src/cli/parser.ts | File does not exist | Fix to src/cli/process-api.ts + src/cli/output-pipeline.ts |
+  | Orchestrator only does full-file writes | Marker-based partial replacement not supported | Split Output Reference into separate generated file |
+  | ReferenceDocConfig is MasterDataset-sourced | CLI schema data is not annotation-derived | Standalone generator, not ReferenceDocConfig (ADR-006) |
+  | --format in Output Modifiers table but not in OutputModifiers interface | Would produce incomplete table | Schema includes --format alongside modifiers |
+  | --session parsed as global option but absent from Global Options table | Intentional, documented in Session Types | Schema captures in separate sessionOptions group |
+  | showHelp() lines 271-370 is third copy of same data | Three-way sync risk | Schema drives both help text and doc generation |
+  | Inter-table prose is only ~10 lines total | Must appear in generated file | Encode as description/postNote fields in schema |
+
+  **Section Audit — docs/PROCESS-API.md (509 lines):**
+  | Section | Lines | Action | Rationale |
+  | Intro + Why Use This | 1-30 | KEEP | Editorial context |
+  | Quick Start | 31-62 | KEEP | Examples with output |
+  | Session Types | 65-76 | KEEP | Decision tree |
+  | Session Workflow Commands | 80-204 | KEEP | Narrative descriptions |
+  | Pattern Discovery | 207-301 | KEEP | Narrative descriptions |
+  | Architecture Queries | 305-332 | KEEP | Reference with examples |
+  | Metadata and Inventory | 336-374 | KEEP | Command descriptions |
+  | Output Reference heading | 376-378 | TRIM | Replace with link to generated file |
+  | Global Options table | 380-391 | EXTRACT | Generate from CLI schema |
+  | Output Modifiers table | 393-409 | EXTRACT | Generate from CLI schema |
+  | List Filters table | 411-424 | EXTRACT | Generate from CLI schema |
+  | JSON Envelope | 426-449 | KEEP | Operational reference |
+  | Exit Codes | 451-456 | KEEP | Operational reference |
+  | JSON Piping | 458-465 | KEEP | Operational tip |
+  | Common Recipes | 468-509 | KEEP | Editorial recipes |
 
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Extract CLI option definitions from src/cli/parser.ts | pending | src/cli/parser.ts | Yes | integration |
-      | Generate Global Options, Output Modifiers, List Filters tables | pending | src/renderable/codecs/ | Yes | integration |
-      | Replace 3 manual tables in PROCESS-API.md with generated sections | pending | docs/PROCESS-API.md | Yes | integration |
-      | Configure reference doc output in delivery-process.config.ts | pending | delivery-process.config.ts | Yes | integration |
+      | Create declarative CLI schema with option groups | pending | src/cli/cli-schema.ts | Yes | unit |
+      | Sync test verifying schema entries match parseArgs behavior | pending | tests/features/behavior/cli/ | Yes | integration |
+      | ProcessApiReferenceGenerator producing complete reference file | pending | src/generators/built-in/process-api-reference-generator.ts | Yes | integration |
+      | Register generator in orchestrator config | pending | delivery-process.config.ts | Yes | integration |
+      | Trim PROCESS-API.md Output Reference to link to generated file | pending | docs/PROCESS-API.md | Yes | manual |
+      | Refactor showHelp to consume CLI schema | pending | src/cli/process-api.ts | Yes | integration |
+      | Behavior spec with scenarios for all 3 generated tables | pending | tests/features/behavior/cli/process-api-reference.feature | Yes | integration |
 
-  Rule: CLI reference tables are generated from parser schema
+  Rule: CLI schema is single source of truth for reference tables
 
-    **Invariant:** The three reference tables (Global Options, Output Modifiers,
-    List Filters) in PROCESS-API.md are generated from `src/cli/parser.ts`. All
-    narrative sections (Why Use This, Quick Start, Session Types, Command
-    descriptions, Common Recipes) remain hand-written. The document combines
-    generated tables with preamble-delivered editorial prose.
+    **Invariant:** A declarative CLI schema in `src/cli/cli-schema.ts` defines all
+    global options, output modifiers, and list filters with their flags, descriptions,
+    defaults, and value types. The three reference tables in
+    `docs-live/reference/PROCESS-API-REFERENCE.md` are generated from this schema by
+    a standalone `ProcessApiReferenceGenerator`. The schema also drives `showHelp()`.
 
-    **Rationale:** The `cli-patterns` convention tag already exists in
-    `src/taxonomy/conventions.ts`. CLI options are defined as code constants —
-    maintaining a separate markdown copy creates drift risk. When a new --format
-    option or filter is added to the CLI, the markdown table should update
-    automatically on the next `docs:all` run.
+    **Rationale:** CLI options are defined imperatively in `parseArgs()` (lines 132-265
+    of `src/cli/process-api.ts`) and `OutputModifiers`/`ListFilters` interfaces
+    (lines 43-83 of `src/cli/output-pipeline.ts`). A declarative schema extracts this
+    into a single structured definition that both documentation and help text consume.
+    The existing `ReferenceDocConfig` system cannot be used because it sources from
+    MasterDataset (annotation-derived data), not static constants (ADR-006).
 
-    **Verified by:** Tables match parser definitions, Narrative sections unchanged,
-    pnpm docs:all updates tables
+    **Verified by:** Tables match parser definitions, showHelp output matches schema,
+    sync test catches drift
 
     @acceptance-criteria @happy-path
-    Scenario: Generated tables match CLI parser definitions
-      Given src/cli/parser.ts with defined global options, output modifiers, and list filters
-      When pnpm docs:all runs
-      Then the Global Options table in PROCESS-API.md contains all defined flags with correct types and defaults
-      And the Output Modifiers table contains all defined modifiers with descriptions
-      And the List Filters table contains all defined filter keys with accepted values
+    Scenario: Generated tables match CLI schema definitions
+      Given a CLI schema defining global options, output modifiers, and list filters
+      When the ProcessApiReferenceGenerator runs
+      Then PROCESS-API-REFERENCE.md contains a Global Options table with all defined flags
+      And the table includes flag name, short alias, description, and default columns
+      And PROCESS-API-REFERENCE.md contains an Output Modifiers table with all defined modifiers
+      And PROCESS-API-REFERENCE.md contains a List Filters table with all defined filter keys
+
+    @acceptance-criteria @validation
+    Scenario: CLI schema stays in sync with parser
+      Given a CLI schema entry for each flag recognized by parseArgs
+      When a new flag is added to parseArgs without updating the schema
+      Then the sync test fails with a mismatch report
+      And when the schema is updated to include the new flag
+      Then the sync test passes
 
   Rule: Narrative prose sections remain manual
 
@@ -71,7 +115,7 @@ Feature: PROCESS-API.md Hybrid Generation
     decision tree, workflow recipes, worked examples with expected output, and
     "Common Recipes" are not generated. They require editorial judgment and context
     that cannot be extracted from code annotations. The document's value comes from
-    these sections — the tables are supporting reference only.
+    these sections — the generated reference tables are supporting material only.
 
     **Rationale:** Generated docs without prose context would be a bare options
     table — usable as reference but not as a learning resource. The hybrid approach
@@ -82,8 +126,32 @@ Feature: PROCESS-API.md Hybrid Generation
 
     @acceptance-criteria @validation
     Scenario: Prose sections unchanged after regeneration
-      Given narrative sections in PROCESS-API.md including "Why Use This" and "Common Recipes"
-      When pnpm docs:all runs
-      Then the "Why Use This" section is unchanged
-      And the "Common Recipes" section is unchanged
-      And only the Global Options, Output Modifiers, and List Filters table sections are regenerated
+      Given PROCESS-API.md with narrative sections including "Why Use This" and "Common Recipes"
+      When the ProcessApiReferenceGenerator runs
+      Then PROCESS-API.md is not modified by the generator
+      And only PROCESS-API-REFERENCE.md is created or updated
+      And PROCESS-API.md contains a link to PROCESS-API-REFERENCE.md in the Output Reference section
+
+  Rule: Standalone generator respects ADR-006 single read model
+
+    **Invariant:** The `ProcessApiReferenceGenerator` imports CLI schema data directly
+    from `src/cli/cli-schema.ts`. It does NOT inject CLI data into MasterDataset or
+    consume MasterDataset for table generation. It implements `DocumentGenerator` and
+    returns `OutputFile[]` via the standard orchestrator write path.
+
+    **Rationale:** ADR-006 establishes MasterDataset as the sole read model for
+    annotation-sourced data. CLI schema is a static TypeScript constant, not extracted
+    from annotations. Forcing it through MasterDataset would violate the "no parallel
+    pipeline" anti-pattern. A standalone generator with its own data source is
+    architecturally correct.
+
+    **Verified by:** Generator has no MasterDataset import, output file written by orchestrator
+
+    @acceptance-criteria @integration
+    Scenario: Generator produces complete reference file
+      Given the ProcessApiReferenceGenerator is registered in the orchestrator
+      When docs:all runs
+      Then docs-live/reference/PROCESS-API-REFERENCE.md is created
+      And the file contains three sections: Global Options, Output Modifiers, List Filters
+      And each section includes a markdown table with headers and data rows
+      And inter-table prose (config auto-detection, valid fields, precedence) is included
