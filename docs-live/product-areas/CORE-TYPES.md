@@ -16,6 +16,16 @@
 
 ---
 
+## Contents
+
+- [Key Invariants](#key-invariants)
+- [Core Type System](#core-type-system)
+- [Error Handling Flow](#error-handling-flow)
+- [API Types](#api-types)
+- [Business Rules](#business-rules)
+
+---
+
 ## Core Type System
 
 Scoped architecture diagram showing component relationships:

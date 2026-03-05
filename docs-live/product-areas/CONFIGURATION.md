@@ -16,6 +16,16 @@
 
 ---
 
+## Contents
+
+- [Key Invariants](#key-invariants)
+- [Configuration Loading Boundary](#configuration-loading-boundary)
+- [Configuration Resolution Pipeline](#configuration-resolution-pipeline)
+- [API Types](#api-types)
+- [Business Rules](#business-rules)
+
+---
+
 ## Configuration Loading Boundary
 
 Scoped architecture diagram showing component relationships:

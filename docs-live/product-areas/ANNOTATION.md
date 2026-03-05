@@ -16,6 +16,16 @@
 
 ---
 
+## Contents
+
+- [Key Invariants](#key-invariants)
+- [Scanning & Extraction Boundary](#scanning-extraction-boundary)
+- [Annotation Pipeline](#annotation-pipeline)
+- [API Types](#api-types)
+- [Business Rules](#business-rules)
+
+---
+
 ## Scanning & Extraction Boundary
 
 Scoped architecture diagram showing component relationships:

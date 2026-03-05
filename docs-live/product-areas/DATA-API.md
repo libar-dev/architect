@@ -15,6 +15,18 @@
 
 ---
 
+## Contents
+
+- [Key Invariants](#key-invariants)
+- [Shared Pipeline Factory Responsibilities](#shared-pipeline-factory-responsibilities)
+- [8-Step Dataset Build Flow](#8-step-dataset-build-flow)
+- [Consumer Architecture and PipelineOptions Differentiation](#consumer-architecture-and-pipelineoptions-differentiation)
+- [DataAPI Components](#dataapi-components)
+- [API Types](#api-types)
+- [Business Rules](#business-rules)
+
+---
+
 ## Shared Pipeline Factory Responsibilities
 
 **Invariant:** `buildMasterDataset()` is the shared factory for Steps 1-8 of the architecture pipeline and returns `Result<PipelineResult, PipelineError>` without process-level side effects.

@@ -1,5 +1,20 @@
 ### Architecture Types Reference
 
+#### API Types
+
+| Type                    | Kind      |
+| ----------------------- | --------- |
+| MasterDatasetSchema     | const     |
+| StatusGroupsSchema      | const     |
+| StatusCountsSchema      | const     |
+| PhaseGroupSchema        | const     |
+| SourceViewsSchema       | const     |
+| RelationshipEntrySchema | const     |
+| RuntimeMasterDataset    | interface |
+| RawDataset              | interface |
+| PipelineOptions         | interface |
+| PipelineResult          | interface |
+
 #### Orchestrator Pipeline Responsibilities
 
 **Invariant:** The orchestrator is the integration boundary for full docs generation: it delegates dataset construction to the shared pipeline, then executes codecs and writes files.
@@ -15,18 +30,3 @@
 #### 8-Step Dataset Build Flow
 
 #### Consumer Architecture and PipelineOptions Differentiation
-
-#### API Types
-
-| Type                    | Kind      |
-| ----------------------- | --------- |
-| MasterDatasetSchema     | const     |
-| StatusGroupsSchema      | const     |
-| StatusCountsSchema      | const     |
-| PhaseGroupSchema        | const     |
-| SourceViewsSchema       | const     |
-| RelationshipEntrySchema | const     |
-| RuntimeMasterDataset    | interface |
-| RawDataset              | interface |
-| PipelineOptions         | interface |
-| PipelineResult          | interface |

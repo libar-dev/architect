@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:GeneratedDocQuality
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:38
 @libar-docs-effort:2d
 @libar-docs-product-area:Generation
@@ -34,10 +34,10 @@ Feature: Generated Documentation Quality Improvements
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Fix behavior-specs renderer: no duplicate convention tables | pending | src/renderable/codecs/reference.ts | Yes | unit |
-      | Enrich Generation _claude-md/ compact (target: 5+ KB) | pending | src/generators/built-in/reference-generators.ts | Yes | integration |
-      | Reorder ARCHITECTURE-TYPES.md: types first, convention content second | pending | delivery-process.config.ts, src/renderable/codecs/reference.ts | Yes | integration |
-      | Add generated TOC block to product area doc headers | pending | src/renderable/codecs/ | Yes | integration |
+      | Fix behavior-specs renderer: no duplicate convention tables | in-progress | src/renderable/codecs/reference.ts | Yes | unit |
+      | Enrich Generation _claude-md/ compact (target: 5+ KB) | in-progress | src/renderable/codecs/reference.ts | Yes | integration |
+      | Reorder ARCHITECTURE-TYPES.md: types first, convention content second | in-progress | delivery-process.config.ts, src/renderable/codecs/reference.ts | Yes | integration |
+      | Add generated TOC block to product area doc headers | in-progress | src/renderable/codecs/reference.ts | Yes | integration |
 
   Rule: Behavior-specs renderer does not duplicate convention table content
 

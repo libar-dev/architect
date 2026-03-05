@@ -47,6 +47,7 @@ export default defineConfig({
       shapeSources: [],
       shapeSelectors: [{ group: 'master-dataset' }],
       behaviorCategories: [],
+      shapesFirst: true,
       claudeMdSection: 'architecture',
       docsFilename: 'ARCHITECTURE-TYPES.md',
       claudeMdFilename: 'architecture-types.md',

@@ -170,6 +170,8 @@ const ReferenceDocConfigSchema = z
     includeTags: z.array(z.string().min(1)).readonly().optional(),
     // Product area filter (ADR-001): pre-filters all content sources by product area
     productArea: z.string().min(1).optional(),
+    // DD-4 (GeneratedDocQuality): render shapes section before conventions
+    shapesFirst: z.boolean().optional(),
   })
   .strict();
 

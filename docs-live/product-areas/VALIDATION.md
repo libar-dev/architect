@@ -16,6 +16,16 @@
 
 ---
 
+## Contents
+
+- [Key Invariants](#key-invariants)
+- [Validation & Lint Boundary](#validation-lint-boundary)
+- [Enforcement Pipeline](#enforcement-pipeline)
+- [API Types](#api-types)
+- [Business Rules](#business-rules)
+
+---
+
 ## Validation & Lint Boundary
 
 Scoped architecture diagram showing component relationships:

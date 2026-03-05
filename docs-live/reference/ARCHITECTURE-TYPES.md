@@ -5,86 +5,6 @@
 
 ---
 
-## Orchestrator Pipeline Responsibilities
-
-**Invariant:** The orchestrator is the integration boundary for full docs generation: it delegates dataset construction to the shared pipeline, then executes codecs and writes files.
-
-**Rationale:** Splitting orchestration into dataset construction (shared) and output execution (orchestrator-owned) keeps Data API and validation consumers aligned on one read-model path while preserving generator-specific output handling.
-
----
-
-## Steps 1-8 via buildMasterDataset()
-
-Steps 1-8 (config load, TypeScript/Gherkin scan + extraction, merge, hierarchy
-derivation, workflow load, and `transformToMasterDataset`) are delegated to
-`buildMasterDataset()`.
-
----
-
-## Steps 9-10: Codec Execution and File Writing
-
-After dataset creation, the orchestrator owns Step 9 (codec execution per generator,
-output rendering, additional file fan-out) and Step 10 (path validation, overwrite
-policy, and persisted file writes).
-
-### When to Use
-
-- Running complete documentation generation programmatically
-- Integrating doc generation into build scripts
-- Testing the full pipeline without CLI overhead
-
----
-
-## Shared Pipeline Factory Responsibilities
-
-**Invariant:** `buildMasterDataset()` is the shared factory for Steps 1-8 of the architecture pipeline and returns `Result<PipelineResult, PipelineError>` without process-level side effects.
-
-**Rationale:** Centralizing scan/extract/merge/transform flow prevents divergence between CLI consumers and preserves a single ADR-006 read-model path.
-
----
-
-## 8-Step Dataset Build Flow
-
-The factory owns: configuration load, TypeScript scan + extraction, Gherkin scan +
-extraction, merge conflict handling, hierarchy child derivation, workflow load,
-and `transformToMasterDataset` with validation summary.
-
----
-
-## Consumer Architecture and PipelineOptions Differentiation
-
-Three consumers share this factory: `process-api`, `validate-patterns`, and the
-generation orchestrator. `PipelineOptions` differentiates behavior by
-`mergeConflictStrategy` (`fatal` vs `concatenate`), `includeValidation` toggles,
-and `failOnScanErrors` policy without forking pipeline logic.
-
-### When to Use
-
-- Any consumer needs a MasterDataset without rewriting scan/extract/merge flow
-- CLI consumers require differentiated conflict strategy and validation behavior
-- Orchestrator needs a shared steps 1-8 implementation before codec/file execution
-
----
-
-## MasterDataset View Fan-out
-
-Pre-computed view fan-out from MasterDataset (single-pass transform):
-
-```mermaid
-graph TB
-    MD[MasterDataset]
-    MD --> byStatus["byStatus<br/>(completed / active / planned)"]
-    MD --> byPhase["byPhase<br/>(sorted, with counts)"]
-    MD --> byQuarter["byQuarter<br/>(keyed by Q-YYYY)"]
-    MD --> byCategory["byCategory<br/>(keyed by category name)"]
-    MD --> bySource["bySource<br/>(typescript / gherkin / roadmap / prd)"]
-    MD --> counts["counts<br/>(aggregate statistics)"]
-    MD --> RI["relationshipIndex?<br/>(forward + reverse lookups)"]
-    MD --> AI["archIndex?<br/>(role / context / layer / view)"]
-```
-
----
-
 ## API Types
 
 ### MasterDatasetSchema (const)
@@ -421,6 +341,86 @@ interface PipelineResult {
   readonly warnings: readonly PipelineWarning[];
   readonly scanMetadata: ScanMetadata;
 }
+```
+
+---
+
+## Orchestrator Pipeline Responsibilities
+
+**Invariant:** The orchestrator is the integration boundary for full docs generation: it delegates dataset construction to the shared pipeline, then executes codecs and writes files.
+
+**Rationale:** Splitting orchestration into dataset construction (shared) and output execution (orchestrator-owned) keeps Data API and validation consumers aligned on one read-model path while preserving generator-specific output handling.
+
+---
+
+## Steps 1-8 via buildMasterDataset()
+
+Steps 1-8 (config load, TypeScript/Gherkin scan + extraction, merge, hierarchy
+derivation, workflow load, and `transformToMasterDataset`) are delegated to
+`buildMasterDataset()`.
+
+---
+
+## Steps 9-10: Codec Execution and File Writing
+
+After dataset creation, the orchestrator owns Step 9 (codec execution per generator,
+output rendering, additional file fan-out) and Step 10 (path validation, overwrite
+policy, and persisted file writes).
+
+### When to Use
+
+- Running complete documentation generation programmatically
+- Integrating doc generation into build scripts
+- Testing the full pipeline without CLI overhead
+
+---
+
+## Shared Pipeline Factory Responsibilities
+
+**Invariant:** `buildMasterDataset()` is the shared factory for Steps 1-8 of the architecture pipeline and returns `Result<PipelineResult, PipelineError>` without process-level side effects.
+
+**Rationale:** Centralizing scan/extract/merge/transform flow prevents divergence between CLI consumers and preserves a single ADR-006 read-model path.
+
+---
+
+## 8-Step Dataset Build Flow
+
+The factory owns: configuration load, TypeScript scan + extraction, Gherkin scan +
+extraction, merge conflict handling, hierarchy child derivation, workflow load,
+and `transformToMasterDataset` with validation summary.
+
+---
+
+## Consumer Architecture and PipelineOptions Differentiation
+
+Three consumers share this factory: `process-api`, `validate-patterns`, and the
+generation orchestrator. `PipelineOptions` differentiates behavior by
+`mergeConflictStrategy` (`fatal` vs `concatenate`), `includeValidation` toggles,
+and `failOnScanErrors` policy without forking pipeline logic.
+
+### When to Use
+
+- Any consumer needs a MasterDataset without rewriting scan/extract/merge flow
+- CLI consumers require differentiated conflict strategy and validation behavior
+- Orchestrator needs a shared steps 1-8 implementation before codec/file execution
+
+---
+
+## MasterDataset View Fan-out
+
+Pre-computed view fan-out from MasterDataset (single-pass transform):
+
+```mermaid
+graph TB
+    MD[MasterDataset]
+    MD --> byStatus["byStatus<br/>(completed / active / planned)"]
+    MD --> byPhase["byPhase<br/>(sorted, with counts)"]
+    MD --> byQuarter["byQuarter<br/>(keyed by Q-YYYY)"]
+    MD --> byCategory["byCategory<br/>(keyed by category name)"]
+    MD --> bySource["bySource<br/>(typescript / gherkin / roadmap / prd)"]
+    MD --> counts["counts<br/>(aggregate statistics)"]
+    MD --> RI["relationshipIndex?<br/>(forward + reverse lookups)"]
+    MD --> AI["archIndex?<br/>(role / context / layer / view)"]
 ```
 
 ---
