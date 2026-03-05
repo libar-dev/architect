@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:ReadmeRationalization
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-phase:42
 @libar-docs-effort:0.5d
 @libar-docs-product-area:Generation
@@ -81,12 +81,12 @@ Feature: README Rationalization
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Trim README.md to ~150 lines per section disposition table | pending | README.md | No | n/a |
-      | Remove Configuration section (lines 441-474) duplicating docs/CONFIGURATION.md | pending | README.md | No | n/a |
-      | Document README-to-website component mapping for extracted enterprise sections | pending | delivery-process/specs/readme-rationalization.feature | No | n/a |
-      | Verify all retained links in trimmed README resolve to valid targets | pending | README.md | No | n/a |
-      | Update INDEX.md Quick Navigation line count for README (1-504 to ~1-150) | pending | docs/INDEX.md | No | n/a |
-      | Verify trimmed README serves as effective getting-started page at /getting-started/ | pending | README.md | No | n/a |
+      | Trim README.md to ~150 lines per section disposition table | complete | README.md | No | n/a |
+      | Remove Configuration section (lines 441-474) duplicating docs/CONFIGURATION.md | complete | README.md | No | n/a |
+      | Document README-to-website component mapping for extracted enterprise sections | complete | delivery-process/specs/readme-rationalization.feature | No | n/a |
+      | Verify all retained links in trimmed README resolve to valid targets | complete | README.md | No | n/a |
+      | Update INDEX.md Quick Navigation line count for README (1-504 to ~1-150) | complete | docs/INDEX.md | No | n/a |
+      | Verify trimmed README serves as effective getting-started page at /getting-started/ | complete | README.md | No | n/a |
 
   Rule: README must be an npm package landing page
 
