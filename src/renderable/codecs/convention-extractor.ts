@@ -19,6 +19,7 @@
 import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import type { BusinessRule, ExtractedPattern } from '../../validation-schemas/extracted-pattern.js';
 import type { SectionBlock } from '../schema.js';
+import { table } from '../schema.js';
 import { parseBusinessRuleAnnotations } from './helpers.js';
 
 // ============================================================================
@@ -109,6 +110,21 @@ export function extractTablesFromDescription(description: string): ConventionTab
   }
 
   return tables;
+}
+
+/**
+ * Extract markdown tables from description text and return as SectionBlock tables.
+ *
+ * Adapter that wraps `extractTablesFromDescription` for codecs that need
+ * `SectionBlock[]` output instead of `ConventionTable[]`.
+ */
+export function extractTablesAsSectionBlocks(description: string): SectionBlock[] {
+  const conventionTables = extractTablesFromDescription(description);
+  return conventionTables.map((ct) => {
+    const headers = [...ct.headers];
+    const rows = ct.rows.map((row) => headers.map((h) => row[h] ?? ''));
+    return table(headers, rows);
+  });
 }
 
 /**

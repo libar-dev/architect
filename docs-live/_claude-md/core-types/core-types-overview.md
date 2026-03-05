@@ -10,7 +10,7 @@
 - String transformation consistency: `slugify` produces URL-safe identifiers, `camelCaseToTitleCase` preserves acronyms (e.g., "APIEndpoint" becomes "API Endpoint"), `toKebabCase` handles consecutive uppercase correctly
 
 
-**Components:** Other (StringUtils, ResultMonad, ErrorFactories, KebabCaseSlugs, ErrorHandlingUnification)
+**Components:** Other (ResultMonad, ErrorFactories, StringUtils, KebabCaseSlugs, ErrorHandlingUnification)
 
 #### API Types
 

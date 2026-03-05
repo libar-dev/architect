@@ -51,6 +51,7 @@ import {
 import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
 import { RenderableDocumentOutputSchema } from './shared-schema.js';
 import { parseBusinessRuleAnnotations } from './helpers.js';
+import { extractTablesAsSectionBlocks } from './convention-extractor.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Claude Module Codec Options
@@ -303,77 +304,13 @@ function buildRuleSection(
 
   // Extract and preserve tables from the rule description
   if (options.includeTables) {
-    const tables = extractTablesFromDescription(rule.description);
+    const tables = extractTablesAsSectionBlocks(rule.description);
     for (const t of tables) {
       sections.push(t);
     }
   }
 
   return sections;
-}
-
-/**
- * Extract markdown tables from a rule description string.
- */
-function extractTablesFromDescription(description: string): SectionBlock[] {
-  if (!description) return [];
-
-  const sections: SectionBlock[] = [];
-  const lines = description.split('\n');
-  let tableLines: string[] = [];
-  let inTable = false;
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
-      inTable = true;
-      tableLines.push(trimmed);
-    } else if (inTable) {
-      // End of table — parse and emit
-      const parsed = parseMarkdownTable(tableLines);
-      if (parsed) {
-        sections.push(parsed);
-      }
-      tableLines = [];
-      inTable = false;
-    }
-  }
-
-  // Handle table at end of description
-  if (inTable && tableLines.length > 0) {
-    const parsed = parseMarkdownTable(tableLines);
-    if (parsed) {
-      sections.push(parsed);
-    }
-  }
-
-  return sections;
-}
-
-/**
- * Parse markdown pipe-table lines into a SectionBlock table.
- */
-function parseMarkdownTable(lines: string[]): SectionBlock | undefined {
-  const headerLine = lines[0];
-  const separatorLine = lines[1];
-  if (headerLine === undefined || separatorLine === undefined) return undefined;
-
-  const parseCells = (line: string): string[] =>
-    line
-      .split('|')
-      .slice(1, -1)
-      .map((c) => c.trim());
-
-  const headers = parseCells(headerLine);
-
-  // Skip separator row — must be a proper pipe-delimited row of dashes (e.g., | --- | --- |)
-  const isSeparator = /^\|(\s*:?-+:?\s*\|)+\s*$/.test(separatorLine);
-  const dataStart = isSeparator ? 2 : 1;
-  const rows = lines.slice(dataStart).map(parseCells);
-
-  if (headers.length === 0 || rows.length === 0) return undefined;
-
-  return table(headers, rows);
 }
 
 /**

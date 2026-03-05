@@ -150,6 +150,7 @@ import {
   type BusinessRuleAnnotations,
   extractFirstSentence,
 } from './helpers.js';
+import { extractTablesAsSectionBlocks } from './convention-extractor.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Types
@@ -823,7 +824,7 @@ function renderRuleInline(
 
   // Tables from rule description
   if (options.includeTables && rule.description) {
-    const tableBlocks = extractTables(rule.description);
+    const tableBlocks = extractTablesAsSectionBlocks(rule.description);
     for (const tableBlock of tableBlocks) {
       sections.push(tableBlock);
     }
@@ -864,84 +865,6 @@ function renderRuleInline(
   return sections;
 }
 
-/**
- * Extract markdown tables from content
- */
-function extractTables(content: string): SectionBlock[] {
-  const sections: SectionBlock[] = [];
-  const lines = content.split('\n');
-
-  let inTable = false;
-  let tableLines: string[] = [];
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-
-    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
-      inTable = true;
-      tableLines.push(trimmed);
-    } else if (inTable) {
-      // End of table
-      if (tableLines.length >= 2) {
-        const tableBlock = parseMarkdownTable(tableLines);
-        if (tableBlock) {
-          sections.push(tableBlock);
-        }
-      }
-      inTable = false;
-      tableLines = [];
-    }
-  }
-
-  // Handle table at end of content
-  if (inTable && tableLines.length >= 2) {
-    const tableBlock = parseMarkdownTable(tableLines);
-    if (tableBlock) {
-      sections.push(tableBlock);
-    }
-  }
-
-  return sections;
-}
-
-/**
- * Parse markdown table lines into a table SectionBlock
- */
-function parseMarkdownTable(lines: string[]): SectionBlock | null {
-  if (lines.length < 2) return null;
-
-  // Skip separator row (contains only dashes and pipes)
-  const dataLines = lines.filter((line) => !/^\|[\s-:|]+\|$/.test(line));
-  if (dataLines.length < 1) return null;
-
-  // First row is headers
-  const headerRow = dataLines[0];
-  if (!headerRow) return null;
-
-  const headers = headerRow
-    .split('|')
-    .map((cell) => cell.trim())
-    .filter((cell) => cell.length > 0);
-
-  if (headers.length === 0) return null;
-
-  // Remaining rows are data
-  const rows: string[][] = [];
-  for (let i = 1; i < dataLines.length; i++) {
-    const row = dataLines[i];
-    if (!row) continue;
-
-    const cells = row
-      .split('|')
-      .map((cell) => cell.trim())
-      .filter((cell) => cell.length > 0);
-    if (cells.length > 0) {
-      rows.push(cells);
-    }
-  }
-
-  return table(headers, rows);
-}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Utilities

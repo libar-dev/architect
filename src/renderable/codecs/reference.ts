@@ -120,7 +120,7 @@ import { VALID_TRANSITIONS } from '../../validation/fsm/transitions.js';
 import { PROTECTION_LEVELS, type ProtectionLevel } from '../../validation/fsm/states.js';
 import type { ProcessStatusValue } from '../../taxonomy/index.js';
 import type { ExtractedPattern } from '../../validation-schemas/extracted-pattern.js';
-import { camelCaseToTitleCase } from '../../utils/string-utils.js';
+import { camelCaseToTitleCase, slugify } from '../../utils/string-utils.js';
 import type { ExtractedShape } from '../../validation-schemas/extracted-shape.js';
 
 // ============================================================================
@@ -668,11 +668,11 @@ export function createReferenceCodec(
           config.shapeSources.length > 0
             ? [...extractShapesFromDataset(dataset, config.shapeSources)]
             : ([] as ExtractedShape[]);
+        const seenNames = new Set(allShapes.map((s) => s.name));
 
         // DD-3/DD-6: Fine-grained selector-based filtering
         if (config.shapeSelectors !== undefined && config.shapeSelectors.length > 0) {
           const selectorShapes = filterShapesBySelectors(dataset, config.shapeSelectors);
-          const seenNames = new Set(allShapes.map((s) => s.name));
           for (const shape of selectorShapes) {
             if (!seenNames.has(shape.name)) {
               seenNames.add(shape.name);
@@ -683,7 +683,6 @@ export function createReferenceCodec(
 
         // DD-1: Merge include-tagged shapes (additive)
         if (includeSet !== undefined) {
-          const seenNames = new Set(allShapes.map((s) => s.name));
           for (const pattern of dataset.patterns) {
             if (pattern.extractedShapes === undefined || pattern.extractedShapes.length === 0)
               continue;
@@ -811,12 +810,6 @@ function decodeProductArea(
       ? dataset.patterns.filter((p) => p.archContext !== undefined && contextSet.has(p.archContext))
       : [];
 
-  // Combined set of all relevant patterns (deduplicated)
-  const allRelevantNames = new Set([
-    ...areaPatterns.map((p) => p.name),
-    ...tsPatterns.map((p) => p.name),
-  ]);
-
   // 1. Intro section from ADR-001 metadata with key invariants
   const meta = PRODUCT_AREA_META[area];
   if (meta !== undefined) {
@@ -881,10 +874,12 @@ function decodeProductArea(
   {
     const allShapes: ExtractedShape[] = [];
     const seenNames = new Set<string>();
+    const seenPatternNames = new Set<string>();
 
     // Collect shapes from all patterns associated with this area
-    for (const pattern of dataset.patterns) {
-      if (!allRelevantNames.has(pattern.name)) continue;
+    for (const pattern of [...areaPatterns, ...tsPatterns]) {
+      if (seenPatternNames.has(pattern.name)) continue;
+      seenPatternNames.add(pattern.name);
       if (pattern.extractedShapes === undefined || pattern.extractedShapes.length === 0) continue;
       for (const shape of pattern.extractedShapes) {
         if (!seenNames.has(shape.name)) {
@@ -1217,10 +1212,7 @@ function buildTableOfContents(allSections: readonly SectionBlock[]): SectionBloc
   if (h2Headings.length < 3) return [];
 
   const tocItems = h2Headings.map((h) => {
-    const anchor = h.text
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
+    const anchor = slugify(h.text);
     return `[${h.text}](#${anchor})`;
   });
 
