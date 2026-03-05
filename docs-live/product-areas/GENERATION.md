@@ -59,13 +59,13 @@ graph TB
     SourceMapper -.->|depends on| ShapeExtractor
     SourceMapper -.->|depends on| GherkinASTParser
     Documentation_Generation_Orchestrator -->|uses| Pattern_Scanner
-    PatternsCodec ..->|implements| PatternRelationshipModel
-    CompositeCodec ..->|implements| ReferenceDocShowcase
-    ArchitectureCodec -->|uses| MasterDataset
     TransformDataset -->|uses| MasterDataset
     TransformDataset ..->|implements| PatternRelationshipModel
     DecisionDocGenerator -.->|depends on| DecisionDocCodec
     DecisionDocGenerator -.->|depends on| SourceMapper
+    PatternsCodec ..->|implements| PatternRelationshipModel
+    CompositeCodec ..->|implements| ReferenceDocShowcase
+    ArchitectureCodec -->|uses| MasterDataset
     classDef neighbor stroke-dasharray: 5 5
 ```
 

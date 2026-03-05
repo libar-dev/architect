@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:PublishingRelocation
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-phase:40
 @libar-docs-effort:0.25d
 @libar-docs-product-area:Generation
