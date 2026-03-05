@@ -148,6 +148,12 @@ generatorRegistry.register(createCodecGenerator('taxonomy', 'taxonomy'));
  */
 generatorRegistry.register(createCodecGenerator('validation-rules', 'validation-rules'));
 
+/**
+ * Claude Module Generator
+ * Generates CLAUDE-MODULES.md index + {section}/{module}.md files
+ */
+generatorRegistry.register(createCodecGenerator('claude-modules', 'claude-modules'));
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Decision Document Generator (Pattern-Based, not Codec-Based)
 // ═══════════════════════════════════════════════════════════════════════════

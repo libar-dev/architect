@@ -507,6 +507,17 @@ export const ExtractedPatternSchema = z
      * ```
      */
     extractedShapes: z.array(ExtractedShapeSchema).readonly().optional(),
+
+    // Claude module generation fields (from @libar-docs-claude-* tags)
+
+    /** Module identifier for CLAUDE.md generation (from @libar-docs-claude-module tag) */
+    claudeModule: z.string().optional(),
+
+    /** Target section directory in _claude-md/ (from @libar-docs-claude-section tag) */
+    claudeSection: z.string().optional(),
+
+    /** Variation filtering tags for modular-claude-md (from @libar-docs-claude-tags CSV tag) */
+    claudeTags: z.array(z.string()).readonly().optional(),
   })
   .strict();
 

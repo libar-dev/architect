@@ -199,6 +199,14 @@ export {
   DEFAULT_VALIDATION_RULES_OPTIONS,
 } from './validation-rules.js';
 
+// Claude Module (includes ClaudeModuleCodecOptions)
+export {
+  ClaudeModuleCodec,
+  createClaudeModuleCodec,
+  type ClaudeModuleCodecOptions,
+  DEFAULT_CLAUDE_MODULE_OPTIONS,
+} from './claude-module.js';
+
 // Convention Extractor
 export {
   extractConventions,

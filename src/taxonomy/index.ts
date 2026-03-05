@@ -133,5 +133,8 @@ export {
 // Convention values (reference document generation)
 export { CONVENTION_VALUES, type ConventionValue } from './conventions.js';
 
+// Claude section values (CLAUDE.md module generation)
+export { CLAUDE_SECTION_VALUES, type ClaudeSectionValue } from './claude-section-values.js';
+
 // Registry builder
 export { buildRegistry, type TagRegistry } from './registry-builder.js';

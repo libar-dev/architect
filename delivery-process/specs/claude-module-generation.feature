@@ -1,10 +1,9 @@
 @libar-docs
 @libar-docs-pattern:ClaudeModuleGeneration
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:25
 @libar-docs-effort:1.5d
 @libar-docs-product-area:Generation
-@libar-docs-depends-on:ArchitectureDiagramGeneration
 @libar-docs-business-value:automated-claude-md-modules-from-source
 @libar-docs-priority:high
 @libar-docs-executable-specs:tests/features/behavior/claude-modules
@@ -41,17 +40,17 @@ Feature: CLAUDE.md Module Generation from Source Annotations
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | claude-module tag definition | pending | taxonomy/registry-builder.ts | Yes | unit |
-      | claude-section tag definition | pending | taxonomy/registry-builder.ts | Yes | unit |
-      | claude-tags tag definition | pending | taxonomy/registry-builder.ts | Yes | unit |
-      | DocDirective schema fields | pending | validation-schemas/doc-directive.ts | Yes | unit |
-      | ExtractedPattern schema fields | pending | validation-schemas/extracted-pattern.ts | Yes | unit |
-      | Gherkin parser tag extraction | pending | extractor/gherkin-extractor.ts | Yes | unit |
-      | ClaudeModuleCodec | pending | renderable/codecs/claude-module.ts | Yes | unit |
-      | Claude module generator | pending | generators/built-in/claude-module-generator.ts | Yes | unit |
-      | Generator registry integration | pending | generators/built-in/codec-generators.ts | Yes | unit |
-      | Process Guard annotated example | pending | tests/features/validation/process-guard.feature | No | - |
-      | Example generated module | pending | _example-output/process-guard.md | No | - |
+      | claude-module tag definition | complete | taxonomy/registry-builder.ts | Yes | unit |
+      | claude-section tag definition | complete | taxonomy/registry-builder.ts | Yes | unit |
+      | claude-tags tag definition | complete | taxonomy/registry-builder.ts | Yes | unit |
+      | DocDirective schema fields | complete | validation-schemas/doc-directive.ts | Yes | unit |
+      | ExtractedPattern schema fields | complete | validation-schemas/extracted-pattern.ts | Yes | unit |
+      | Gherkin parser tag extraction | complete | extractor/gherkin-extractor.ts | Yes | unit |
+      | ClaudeModuleCodec | complete | renderable/codecs/claude-module.ts | Yes | unit |
+      | Claude module generator | complete | generators/built-in/codec-generators.ts | Yes | unit |
+      | Generator registry integration | complete | generators/built-in/codec-generators.ts | Yes | unit |
+      | Process Guard annotated example | n/a | tests/features/validation/process-guard.feature | No | - |
+      | Example generated module | n/a | _example-output/process-guard.md | No | - |
 
   # ============================================================================
   # RULE 1: Claude Module Tags in Registry

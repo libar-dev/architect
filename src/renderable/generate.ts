@@ -47,6 +47,7 @@ import {
   ArchitectureDocumentCodec,
   TaxonomyDocumentCodec,
   ValidationRulesCodec,
+  ClaudeModuleCodec,
 } from './codecs/index.js';
 
 // Factory functions for creating codecs with options
@@ -70,6 +71,7 @@ import {
   createArchitectureCodec,
   createTaxonomyCodec,
   createValidationRulesCodec,
+  createClaudeModuleCodec,
 } from './codecs/index.js';
 
 // Codec options types
@@ -93,6 +95,7 @@ import type {
   ArchitectureCodecOptions,
   TaxonomyCodecOptions,
   ValidationRulesCodecOptions,
+  ClaudeModuleCodecOptions,
 } from './codecs/index.js';
 
 // Shared codec types for type-safe factory invocation
@@ -182,6 +185,10 @@ export const DOCUMENT_TYPES = {
     outputPath: 'VALIDATION-RULES.md',
     description: 'Process Guard validation rules reference',
   },
+  'claude-modules': {
+    outputPath: 'CLAUDE-MODULES.md',
+    description: 'CLAUDE.md modules generated from annotated behavior specs',
+  },
 } as const;
 
 export type DocumentType = keyof typeof DOCUMENT_TYPES;
@@ -227,6 +234,7 @@ export interface CodecOptions {
   architecture?: ArchitectureCodecOptions;
   taxonomy?: TaxonomyCodecOptions;
   'validation-rules'?: ValidationRulesCodecOptions;
+  'claude-modules'?: ClaudeModuleCodecOptions;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -365,6 +373,7 @@ CodecRegistry.register('business-rules', BusinessRulesCodec);
 CodecRegistry.register('architecture', ArchitectureDocumentCodec);
 CodecRegistry.register('taxonomy', TaxonomyDocumentCodec);
 CodecRegistry.register('validation-rules', ValidationRulesCodec);
+CodecRegistry.register('claude-modules', ClaudeModuleCodec);
 
 // Register all factory functions (used when codec options are provided)
 CodecRegistry.registerFactory('patterns', createPatternsCodec);
@@ -386,6 +395,7 @@ CodecRegistry.registerFactory('business-rules', createBusinessRulesCodec);
 CodecRegistry.registerFactory('architecture', createArchitectureCodec);
 CodecRegistry.registerFactory('taxonomy', createTaxonomyCodec);
 CodecRegistry.registerFactory('validation-rules', createValidationRulesCodec);
+CodecRegistry.registerFactory('claude-modules', createClaudeModuleCodec);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Error Types

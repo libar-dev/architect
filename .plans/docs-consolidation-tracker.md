@@ -70,7 +70,7 @@ Every PR in this consolidation should identify CLAUDE.md sections that can be re
 
 ---
 
-## Current Branch State (as of 2026-03-05, post Phase 40)
+## Current Branch State (as of 2026-03-05, post Phase 25)
 
 ### Completed Phases
 
@@ -78,14 +78,15 @@ Every PR in this consolidation should identify CLAUDE.md sections that can be re
 - **Phase 37 (DocsLiveConsolidation):** Committed. Reference docs consolidated into `docs-live/reference/`, compacts into `docs-live/_claude-md/architecture/`. `docs-generated/` reduced to intermediates only.
 - **Phase 38 (GeneratedDocQuality):** Implemented. Duplicate tables fixed, Generation compact enriched (4.3 KB), ARCHITECTURE-TYPES reordered (types first), TOC added to all product area docs.
 - **Phase 40 (PublishingRelocation):** Implemented. PUBLISHING.md (144 lines) moved to MAINTAINERS.md at repo root. INDEX.md cleaned (3 references removed). Website manifest updated in separate repo.
+- **Phase 25 (ClaudeModuleGeneration):** Completed. Full pipeline: 3 taxonomy tags, schema fields, parser extraction, ClaudeModuleCodec, generator registration. Unblocks Phase 39 generation deliverables.
 
 ### Active Phases
 
-- **Phase 39 (SessionGuidesModuleSource):** Active (partial). Deliverables #1-#3 complete, #4-#7 deferred pending Phase 25. Pattern stays `active` until ClaudeModuleGeneration ships.
+- **Phase 39 (SessionGuidesModuleSource):** Active (partial). Deliverables #1-#3 complete, #4-#7 now unblocked by Phase 25 completion.
 
 ### Blockers
 
-Phase 39 completion blocked on Phase 25 (ClaudeModuleGeneration).
+None. Phase 25 completion unblocks Phase 39 generation deliverables (#4-#7).
 
 ---
 
@@ -507,6 +508,63 @@ pnpm process:query -- files ProcessApiHybridGeneration
 pnpm process:query -- context ProcessApiHybridGeneration --session implement
 pnpm process:query -- files ProcessApiHybridGeneration
 ```
+
+---
+
+### Phase 25 — ClaudeModuleGeneration | DONE
+
+**Pattern:** ClaudeModuleGeneration | **Effort:** 1.5d | **Depends on:** none (phantom dependency removed)
+
+**What:** Generate CLAUDE.md modules directly from behavior spec feature files using dedicated `claude-*` tags. Full pipeline: taxonomy → parser → schema → codec → generator.
+
+**Current status:** COMPLETED. All 9 implementation deliverables done. 2 prototype deliverables marked n/a (first real consumer is Phase 39 SessionGuidesModuleSource).
+
+#### Implementation Session Report (2026-03-05)
+
+**Deliverables (11, 9 complete, 2 n/a):**
+
+| #   | Deliverable                     | Status   | Location                                |
+| --- | ------------------------------- | -------- | --------------------------------------- |
+| 1   | claude-module tag definition    | complete | taxonomy/registry-builder.ts            |
+| 2   | claude-section tag definition   | complete | taxonomy/registry-builder.ts            |
+| 3   | claude-tags tag definition      | complete | taxonomy/registry-builder.ts            |
+| 4   | DocDirective schema fields      | complete | validation-schemas/doc-directive.ts     |
+| 5   | ExtractedPattern schema fields  | complete | validation-schemas/extracted-pattern.ts |
+| 6   | Gherkin parser tag extraction   | complete | extractor/gherkin-extractor.ts          |
+| 7   | ClaudeModuleCodec               | complete | renderable/codecs/claude-module.ts      |
+| 8   | Claude module generator         | complete | generators/built-in/codec-generators.ts |
+| 9   | Generator registry integration  | complete | renderable/generate.ts                  |
+| 10  | Process Guard annotated example | n/a      | First consumer is Phase 39              |
+| 11  | Example generated module        | n/a      | First consumer is Phase 39              |
+
+**Files created (2):**
+
+| File                                     | Purpose                                         |
+| ---------------------------------------- | ----------------------------------------------- |
+| `src/taxonomy/claude-section-values.ts`  | CLAUDE_SECTION_VALUES enum constant             |
+| `src/renderable/codecs/claude-module.ts` | ClaudeModuleCodec with content extraction logic |
+
+**Files modified (8):**
+
+| File                                                      | Change                                                       |
+| --------------------------------------------------------- | ------------------------------------------------------------ |
+| `delivery-process/specs/claude-module-generation.feature` | FSM: roadmap → active → completed, phantom dep removed       |
+| `src/taxonomy/registry-builder.ts`                        | 3 tag definitions + claude group in METADATA_TAGS_BY_GROUP   |
+| `src/taxonomy/index.ts`                                   | Export CLAUDE_SECTION_VALUES                                 |
+| `src/validation-schemas/doc-directive.ts`                 | 3 claude fields (claudeModule, claudeSection, claudeTags)    |
+| `src/validation-schemas/extracted-pattern.ts`             | 3 claude fields (mirrors doc-directive)                      |
+| `src/scanner/gherkin-ast-parser.ts`                       | Return type annotations for claude fields                    |
+| `src/extractor/gherkin-extractor.ts`                      | assignIfDefined/assignIfNonEmpty for claude fields (2 sites) |
+| `src/renderable/generate.ts`                              | claude-modules document type + codec + factory registration  |
+| `src/renderable/codecs/index.ts`                          | Export ClaudeModuleCodec + factory + options                 |
+| `src/generators/built-in/codec-generators.ts`             | Register claude-modules generator                            |
+
+**Result:**
+
+- Full pipeline operational: `@libar-docs-claude-module` → ClaudeModuleCodec → `_claude-md/{section}/{module}.md`
+- Registry-driven extraction: adding tags to registry auto-handles parsing
+- 123 test files, 7,972 tests all passing
+- Unblocks Phase 39 generation deliverables (#4-#7)
 
 ---
 
