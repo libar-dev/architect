@@ -2,6 +2,7 @@
 @behavior @convention-extractor
 @libar-docs-pattern:ConventionExtractorTesting
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Fix-escaped-pipe-parsing-in-convention-tables
 @libar-docs-implements:ReferenceDocShowcase
 @libar-docs-product-area:Generation
 Feature: Convention Extractor
@@ -169,6 +170,15 @@ Feature: Convention Extractor
       When extracting conventions for tag "fsm-rules"
       Then the first rule has 1 table
       And the table has 2 data rows
+
+    @edge-case
+    Scenario: TypeScript table with escaped union pipes preserves full cell values
+      Given a TypeScript pattern with convention "fsm-rules" and escaped union table description
+      When extracting conventions for tag "fsm-rules"
+      Then the first table row has cell "Option" with value "sortBy"
+      Then the first table row has Type value with escaped unions
+      Then the first table row has Default value with quotes
+      And the first table row has cell "Description" with value "Sort order"
 
     @edge-case
     Scenario: TypeScript description with code examples

@@ -12,10 +12,6 @@
  * Both sources produce the same `ConventionRuleContent` output, enabling
  * Gherkin and TypeScript convention content to merge in the same bundle.
  *
- * TODO: Pipe characters (`|`) inside markdown table cells in JSDoc options tables
- * are not escaped in the _claude-md summary output, producing broken table rendering.
- * Affects codecs with enum-type options (e.g., `"phase" | "priority"`).
- *
  * @see CodecDrivenReferenceGeneration spec
  * @see ReferenceDocShowcase spec
  */
@@ -126,20 +122,14 @@ function parseTableLines(lines: string[]): ConventionTable | null {
   // Need at least header + 1 data row
   if (lines.length < 2) return null;
 
-  const parseRow = (line: string): string[] =>
-    line
-      .split('|')
-      .slice(1, -1) // Remove empty first/last from leading/trailing |
-      .map((cell) => cell.trim());
-
   const headerLine = lines[0];
   if (!headerLine) return null;
-  const headers = parseRow(headerLine);
+  const headers = splitMarkdownTableRow(headerLine);
 
   // Detect whether line 2 is a markdown separator row (| --- | --- |)
   const secondLine = lines[1];
   if (!secondLine) return null;
-  const secondCells = secondLine.split('|').slice(1, -1);
+  const secondCells = splitMarkdownTableRow(secondLine);
   const hasSeparator = secondCells.every((cell) => /^[\s:-]+$/.test(cell));
 
   // Data rows start after separator (markdown) or immediately after header (Gherkin)
@@ -149,7 +139,7 @@ function parseTableLines(lines: string[]): ConventionTable | null {
   for (let i = dataStart; i < lines.length; i++) {
     const dataLine = lines[i];
     if (!dataLine) continue;
-    const cells = parseRow(dataLine);
+    const cells = splitMarkdownTableRow(dataLine);
     const row: Record<string, string> = {};
     for (let j = 0; j < headers.length; j++) {
       const header = headers[j];
@@ -161,6 +151,39 @@ function parseTableLines(lines: string[]): ConventionTable | null {
   }
 
   return { headers, rows };
+}
+
+/**
+ * Split a markdown table row into cells while preserving escaped pipe content.
+ *
+ * Markdown table rows use `|` as delimiters. Content pipes must be escaped
+ * as `\|` and should remain part of the parsed cell value.
+ */
+function splitMarkdownTableRow(line: string): string[] {
+  const cells: string[] = [];
+  let current = '';
+
+  for (let i = 0; i < line.length; i++) {
+    const char: string = line[i] ?? '';
+    const next: string | undefined = line[i + 1];
+
+    if (char === '\\' && next === '|') {
+      current += '|';
+      i++;
+      continue;
+    }
+
+    if (char === '|') {
+      cells.push(current.trim());
+      current = '';
+      continue;
+    }
+
+    current += char;
+  }
+
+  cells.push(current.trim());
+  return cells.slice(1, -1);
 }
 
 // ============================================================================
