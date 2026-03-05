@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ProcessApiReferenceTests
 @libar-docs-implements:ProcessApiHybridGeneration
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-product-area:DataAPI
 @behavior @cli @process-api-reference
 Feature: Process API CLI Reference Generation

@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:ProcessApiHybridGeneration
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-phase:43
 @libar-docs-effort:1d
 @libar-docs-product-area:Generation
@@ -66,13 +66,13 @@ Feature: PROCESS-API.md Hybrid Generation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Create declarative CLI schema with option groups | pending | src/cli/cli-schema.ts | Yes | unit |
-      | Sync test verifying schema entries match parseArgs behavior | pending | tests/features/behavior/cli/ | Yes | integration |
-      | ProcessApiReferenceGenerator producing complete reference file | pending | src/generators/built-in/process-api-reference-generator.ts | Yes | integration |
-      | Register generator in orchestrator config | pending | delivery-process.config.ts | Yes | integration |
-      | Trim PROCESS-API.md Output Reference to link to generated file | pending | docs/PROCESS-API.md | Yes | manual |
-      | Refactor showHelp to consume CLI schema | pending | src/cli/process-api.ts | Yes | integration |
-      | Behavior spec with scenarios for all 3 generated tables | pending | tests/features/behavior/cli/process-api-reference.feature | Yes | integration |
+      | Create declarative CLI schema with option groups | complete | src/cli/cli-schema.ts | Yes | unit |
+      | Sync test verifying schema entries match parseArgs behavior | complete | tests/features/behavior/cli/ | Yes | integration |
+      | ProcessApiReferenceGenerator producing complete reference file | complete | src/generators/built-in/process-api-reference-generator.ts | Yes | integration |
+      | Register generator in orchestrator config | complete | delivery-process.config.ts | Yes | integration |
+      | Trim PROCESS-API.md Output Reference to link to generated file | complete | docs/PROCESS-API.md | Yes | manual |
+      | Refactor showHelp to consume CLI schema | complete | src/cli/process-api.ts | Yes | integration |
+      | Behavior spec with scenarios for all 3 generated tables | complete | tests/features/behavior/cli/process-api-reference.feature | Yes | integration |
 
   Rule: CLI schema is single source of truth for reference tables
 
