@@ -248,26 +248,30 @@ classDiagram
     class Documentation_Generation_Orchestrator {
         <<service>>
     }
-    class DecisionDocGenerator {
-        <<service>>
-    }
     class TransformDataset {
         <<service>>
     }
+    class ProcessApiReferenceGenerator {
+    }
+    class DecisionDocGenerator {
+        <<service>>
+    }
     class MasterDataset
-    class ShapeExtractor
     class Pattern_Scanner
     class GherkinASTParser
+    class ShapeExtractor
     class DecisionDocCodec
+    class ProcessApiHybridGeneration
     class PatternRelationshipModel
     SourceMapper ..> DecisionDocCodec : depends on
     SourceMapper ..> ShapeExtractor : depends on
     SourceMapper ..> GherkinASTParser : depends on
     Documentation_Generation_Orchestrator ..> Pattern_Scanner : uses
-    DecisionDocGenerator ..> DecisionDocCodec : depends on
-    DecisionDocGenerator ..> SourceMapper : depends on
     TransformDataset ..> MasterDataset : uses
     TransformDataset ..|> PatternRelationshipModel : implements
+    ProcessApiReferenceGenerator ..|> ProcessApiHybridGeneration : implements
+    DecisionDocGenerator ..> DecisionDocCodec : depends on
+    DecisionDocGenerator ..> SourceMapper : depends on
 ```
 
 ---
@@ -322,15 +326,15 @@ C4Context
     }
     System_Ext(DocDirectiveSchema, "DocDirectiveSchema")
     System_Ext(GherkinRulesSupport, "GherkinRulesSupport")
+    Rel(GherkinScanner, GherkinASTParser, "uses")
+    Rel(GherkinScanner, GherkinRulesSupport, "implements")
+    Rel(GherkinASTParser, GherkinRulesSupport, "implements")
+    Rel(TypeScript_AST_Parser, DocDirectiveSchema, "uses")
     Rel(GherkinExtractor, GherkinASTParser, "uses")
     Rel(GherkinExtractor, GherkinRulesSupport, "implements")
     Rel(DualSourceExtractor, GherkinExtractor, "uses")
     Rel(DualSourceExtractor, GherkinScanner, "uses")
     Rel(Document_Extractor, Pattern_Scanner, "uses")
-    Rel(GherkinScanner, GherkinASTParser, "uses")
-    Rel(GherkinScanner, GherkinRulesSupport, "implements")
-    Rel(GherkinASTParser, GherkinRulesSupport, "implements")
-    Rel(TypeScript_AST_Parser, DocDirectiveSchema, "uses")
 ```
 
 ---
@@ -345,6 +349,9 @@ graph LR
         MasterDataset[/"MasterDataset"/]
         PatternHelpers["PatternHelpers"]
         ArchQueriesImpl("ArchQueriesImpl")
+    end
+    subgraph cli["Cli"]
+        CLISchema["CLISchema"]
     end
     subgraph config["Config"]
         ConfigurationTypes["ConfigurationTypes"]
@@ -361,6 +368,7 @@ graph LR
     subgraph related["Related"]
         ProcessStateAPI["ProcessStateAPI"]:::neighbor
         TypeScriptTaxonomyImplementation["TypeScriptTaxonomyImplementation"]:::neighbor
+        ProcessApiHybridGeneration["ProcessApiHybridGeneration"]:::neighbor
         PhaseStateMachineValidation["PhaseStateMachineValidation"]:::neighbor
         DataAPIOutputShaping["DataAPIOutputShaping"]:::neighbor
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
@@ -369,6 +377,7 @@ graph LR
     ProjectConfigTypes -->|uses| ConfigurationTypes
     ProjectConfigTypes -->|uses| ConfigurationPresets
     ConfigurationPresets -->|uses| ConfigurationTypes
+    CLISchema ..->|implements| ProcessApiHybridGeneration
     PatternHelpers ..->|implements| DataAPIOutputShaping
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset

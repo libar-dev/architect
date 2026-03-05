@@ -50,6 +50,8 @@ import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 import { createSuccess, createError, QueryApiError } from '../api/types.js';
 import { handleCliError } from './error-handler.js';
 import { printVersionAndExit } from './version.js';
+import { CLI_SCHEMA } from './cli-schema.js';
+import type { CLIOptionGroup } from './cli-schema.js';
 import { fuzzyMatchPatterns } from '../api/fuzzy-match.js';
 import {
   allPatternNames,
@@ -268,7 +270,22 @@ function parseArgs(argv: string[] = process.argv.slice(2)): ProcessAPICLIConfig 
 // Help
 // =============================================================================
 
+function formatHelpOptions(group: CLIOptionGroup): string {
+  return group.options
+    .map((opt) => {
+      const short = opt.short !== undefined ? `${opt.short}, ` : '    ';
+      // Extract bare flag name (without value placeholder) for alignment
+      const flag = opt.flag.padEnd(24);
+      return `  ${short}${flag}${opt.description}`;
+    })
+    .join('\n');
+}
+
 function showHelp(): void {
+  const options = formatHelpOptions(CLI_SCHEMA.globalOptions);
+  const modifiers = formatHelpOptions(CLI_SCHEMA.outputModifiers);
+  const filters = formatHelpOptions(CLI_SCHEMA.listFilters);
+
   console.log(`
 process-api - Query delivery process state from annotated sources
 
@@ -335,32 +352,15 @@ Metadata & Inventory:
 
 Options:
 
-  -i, --input <pattern>     Glob patterns for TypeScript files (repeatable)
-  -f, --features <pattern>  Glob patterns for .feature files (repeatable)
-  -b, --base-dir <dir>      Base directory (default: cwd)
-  -w, --workflow <file>     Workflow config JSON file
-  -h, --help                Show this help message
-  -v, --version             Show version number
+${options}
 
 Output Modifiers (composable with any list/query):
 
-  --names-only              Return array of pattern name strings
-  --count                   Return integer count
-  --fields <f1,f2,...>      Return only specified fields per pattern
-                              Valid: patternName, status, category, phase, file, source
-  --full                    Bypass summarization, return raw patterns
-  --format <json|compact>   Output format (default: pretty-printed json)
+${modifiers}
 
 List Filters (for 'list' subcommand):
 
-  --status <status>         Filter by FSM status (roadmap, active, completed, deferred)
-  --phase <number>          Filter by roadmap phase number
-  --category <name>         Filter by category
-  --source <ts|gherkin>     Filter by source type
-  --arch-context <name>     Filter by architecture context (@libar-docs-arch-context)
-  --product-area <name>     Filter by product area (@libar-docs-product-area)
-  --limit <n>               Maximum results
-  --offset <n>              Skip first n results
+${filters}
 
 Common Recipes:
 

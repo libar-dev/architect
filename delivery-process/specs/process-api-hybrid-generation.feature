@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:ProcessApiHybridGeneration
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:43
 @libar-docs-effort:1d
 @libar-docs-product-area:Generation

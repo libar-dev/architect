@@ -81,6 +81,7 @@ Every PR in this consolidation should identify CLAUDE.md sections that can be re
 - **Phase 25 (ClaudeModuleGeneration):** Completed. Full pipeline: 3 taxonomy tags, schema fields, parser extraction, ClaudeModuleCodec, generator registration.
 - **Phase 39 (SessionGuidesModuleSource):** Completed. First consumer of ClaudeModule pipeline. 3 hand-written files replaced by generated output. CLAUDE.md Session Workflows section now generated.
 - **Phase 42 (ReadmeRationalization):** Completed. README.md trimmed from 504 → 142 lines (72% reduction). 10 enterprise/duplicate sections removed. INDEX.md updated.
+- **Phase 43 (ProcessApiHybridGeneration):** Completed. CLI schema as single source of truth. 3 reference tables generated from schema. showHelp() refactored. Three-way sync eliminated.
 
 ### Active Phases
 
@@ -451,13 +452,13 @@ Trimmed README.md from 504 → 142 lines. Removed 10 enterprise pitch/duplicate 
 
 ---
 
-### Phase 43 — ProcessApiHybridGeneration | DESIGN COMPLETE
+### Phase 43 — ProcessApiHybridGeneration | DONE
 
-**Pattern:** ProcessApiHybridGeneration | **Effort:** 1d | **Depends on:** DocsConsolidationStrategy
+**Pattern:** ProcessApiHybridGeneration (Phase 43)
+**Status:** `completed` — FSM terminal state
+**Completed:** 2026-03-05
 
-**What:** Generate the 3 reference tables from a declarative CLI schema. Split Output Reference into separate generated file at `docs-live/reference/PROCESS-API-REFERENCE.md`. Refactor `showHelp()` to consume the same schema, eliminating three-way sync.
-
-**Current status:** DESIGN COMPLETE. Spec rewritten with 3 Rule blocks, 7 deliverables (up from 4), section audit, design findings table, and architectural decision (standalone generator, not ReferenceDocConfig).
+Created declarative CLI schema as single source of truth for reference tables. Three-way sync (parser, help text, markdown) eliminated. Generated `PROCESS-API-REFERENCE.md` with 3 tables from schema.
 
 #### Design Session Report (2026-03-05)
 
@@ -472,54 +473,56 @@ Trimmed README.md from 504 → 142 lines. Removed 10 enterprise pitch/duplicate 
 | `--session` parsed as global option but absent from table        | Intentional — documented in Session Types section | Schema captures in separate `sessionOptions` group               |
 | `showHelp()` lines 271-370 is third copy of same data            | Three-way sync: parser, help text, markdown       | Schema drives both help text and doc generation (deliverable #6) |
 
-**Deliverables (7, all pending):**
+#### Implementation Session Report (2026-03-05)
 
-| #   | Deliverable                                          | Status  | Location                                                   |
-| --- | ---------------------------------------------------- | ------- | ---------------------------------------------------------- |
-| 1   | Create declarative CLI schema with option groups     | pending | src/cli/cli-schema.ts                                      |
-| 2   | Sync test: schema entries match parseArgs() behavior | pending | tests/features/behavior/cli/                               |
-| 3   | ProcessApiReferenceGenerator: standalone generator   | pending | src/generators/built-in/process-api-reference-generator.ts |
-| 4   | Register generator in orchestrator config            | pending | delivery-process.config.ts                                 |
-| 5   | Trim PROCESS-API.md Output Reference to link         | pending | docs/PROCESS-API.md                                        |
-| 6   | Refactor showHelp() to consume CLI schema            | pending | src/cli/process-api.ts                                     |
-| 7   | Behavior spec with scenarios for all 3 tables        | pending | tests/features/behavior/cli/process-api-reference.feature  |
+**Deliverables (7, all complete):**
 
-**Changes made (1 file):**
+| #   | Deliverable                                          | Status   | Location                                                   |
+| --- | ---------------------------------------------------- | -------- | ---------------------------------------------------------- |
+| 1   | Create declarative CLI schema with option groups     | complete | src/cli/cli-schema.ts                                      |
+| 2   | Sync test: schema entries match parseArgs() behavior | complete | tests/features/behavior/cli/process-api-reference.feature  |
+| 3   | ProcessApiReferenceGenerator: standalone generator   | complete | src/generators/built-in/process-api-reference-generator.ts |
+| 4   | Register generator in orchestrator config            | complete | delivery-process.config.ts                                 |
+| 5   | Trim PROCESS-API.md Output Reference to link         | complete | docs/PROCESS-API.md                                        |
+| 6   | Refactor showHelp() to consume CLI schema            | complete | src/cli/process-api.ts                                     |
+| 7   | Behavior spec with scenarios for all 3 tables        | complete | tests/features/behavior/cli/process-api-reference.feature  |
 
-| File                                                           | Change                                                                                                                                                                                                              |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `delivery-process/specs/process-api-hybrid-generation.feature` | Complete rewrite: fixed file paths, added design findings table, added section audit, expanded to 7 deliverables, added Rule 3 (ADR-006 standalone generator), redesigned Rule 1 (schema as single source of truth) |
+**Files created (4):**
+
+| File                                                         | Purpose                                                    |
+| ------------------------------------------------------------ | ---------------------------------------------------------- |
+| `src/cli/cli-schema.ts`                                      | Declarative CLI schema: 4 option groups, inter-table prose |
+| `src/generators/built-in/process-api-reference-generator.ts` | Standalone DocumentGenerator, ADR-006 compliant            |
+| `tests/features/behavior/cli/process-api-reference.feature`  | 28 tests: table generation, sync test, schema coverage     |
+| `tests/steps/behavior/cli/process-api-reference.steps.ts`    | Step definitions with DataTable patterns                   |
+
+**Files modified (6):**
+
+| File                                                           | Change                                                                        |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `src/cli/process-api.ts`                                       | showHelp() refactored: 3 sections now schema-driven via formatHelpOptions()   |
+| `src/generators/built-in/codec-generators.ts`                  | Import + registration of ProcessApiReferenceGenerator                         |
+| `delivery-process.config.ts`                                   | Added `process-api-reference` generator override with `outputDirectory`       |
+| `package.json`                                                 | Added `docs:process-api-reference` script, appended to `docs:all` chain       |
+| `docs/PROCESS-API.md`                                          | Output Reference section: 3 tables → link to generated file (509 → 466 lines) |
+| `delivery-process/specs/process-api-hybrid-generation.feature` | FSM: roadmap → active → completed, all 7 deliverables marked complete         |
+
+**Generated files (1):**
+
+| File                                           | Content                                                       |
+| ---------------------------------------------- | ------------------------------------------------------------- |
+| `docs-live/reference/PROCESS-API-REFERENCE.md` | 54 lines: 3 tables + inter-table prose, auto-generated header |
 
 **Result:**
 
-- 3 Rule blocks with concrete invariants and acceptance criteria
-- 7 deliverables covering schema, sync test, generator, config, doc trim, help refactor, behavior spec
-- Section audit with exact line ranges for all 15 sections (10 KEEP, 3 EXTRACT, 1 TRIM, 1 link)
-- Architectural decision: standalone generator (not ReferenceDocConfig) per ADR-006
-- 123 test files, 7,972 tests all passing
+- CLI schema defines 4 option groups: globalOptions (6), outputModifiers (5), listFilters (8), sessionOptions (1)
+- PROCESS-API-REFERENCE.md: 54 lines with 3 markdown tables and inter-table prose
+- PROCESS-API.md: 509 → 466 lines (Output Reference section replaced with link)
+- showHelp(): Options, Output Modifiers, List Filters now schema-driven
+- `pnpm docs:process-api-reference` added to `docs:all` chain
+- 124 test files, 8,000 tests all passing
 
-**CLAUDE.md trim opportunity:** After this, the "Data API CLI" section (66 lines) could trim ~30 lines — the generated reference file is the authoritative source for flag/modifier/filter tables.
-
-**Next steps (implementation session):**
-
-1. Create `src/cli/cli-schema.ts` with 3 option groups (globalOptions, outputModifiers, listFilters)
-2. Write sync test verifying schema matches `parseArgs()` behavior
-3. Create `ProcessApiReferenceGenerator` implementing `DocumentGenerator`
-4. Register in orchestrator, trim PROCESS-API.md, refactor `showHelp()`
-
-**Pre-flight:**
-
-```bash
-pnpm process:query -- context ProcessApiHybridGeneration --session implement
-pnpm process:query -- files ProcessApiHybridGeneration
-```
-
-**Pre-flight:**
-
-```bash
-pnpm process:query -- context ProcessApiHybridGeneration --session implement
-pnpm process:query -- files ProcessApiHybridGeneration
-```
+**CLAUDE.md trim opportunity:** The "Data API CLI" section (66 lines) could trim ~30 lines — the generated reference file is the authoritative source for flag/modifier/filter tables.
 
 ---
 

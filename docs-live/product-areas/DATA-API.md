@@ -80,6 +80,7 @@ graph TB
     subgraph cli["Cli"]
         ProcessAPICLIImpl("ProcessAPICLIImpl")
         OutputPipelineImpl("OutputPipelineImpl")
+        CLISchema["CLISchema"]
     end
     subgraph related["Related"]
         Pattern_Scanner["Pattern Scanner"]:::neighbor
@@ -88,6 +89,7 @@ graph TB
         FSMValidator["FSMValidator"]:::neighbor
         PipelineFactory["PipelineFactory"]:::neighbor
         ProcessStateAPICLI["ProcessStateAPICLI"]:::neighbor
+        ProcessApiHybridGeneration["ProcessApiHybridGeneration"]:::neighbor
         PhaseStateMachineValidation["PhaseStateMachineValidation"]:::neighbor
         DataAPIDesignSessionSupport["DataAPIDesignSessionSupport"]:::neighbor
         DataAPIOutputShaping["DataAPIOutputShaping"]:::neighbor
@@ -104,6 +106,7 @@ graph TB
     ProcessAPICLIImpl ..->|implements| ProcessStateAPICLI
     OutputPipelineImpl -->|uses| PatternSummarizerImpl
     OutputPipelineImpl ..->|implements| DataAPIOutputShaping
+    CLISchema ..->|implements| ProcessApiHybridGeneration
     PatternSummarizerImpl -->|uses| ProcessStateAPI
     PatternSummarizerImpl ..->|implements| DataAPIOutputShaping
     ScopeValidatorImpl -->|uses| ProcessStateAPI
@@ -459,7 +462,7 @@ ArchIndexSchema = z.object({
 
 ## Business Rules
 
-32 patterns, 137 rules with invariants (137 total)
+33 patterns, 140 rules with invariants (140 total)
 
 ### Arch Queries Test
 
@@ -692,6 +695,14 @@ ArchIndexSchema = z.object({
 | Domain logic lives in API modules                                 | Query logic that operates on MasterDataset lives in `src/api/` modules. The `rules-query.ts` module provides business rules querying with the same grouping logic that was inline in handleRules: filter by product area and pattern, group by area -> phase -> feature -> rules, parse annotations, compute totals.                       | `handleRules` is 184 lines with 5 Map/Set constructions, codec-layer imports (`parseBusinessRuleAnnotations`, `deduplicateScenarioNames`), and a complex 3-level grouping algorithm. This is the last significant inline domain logic in process-api.ts. Moving it to `src/api/` follows the same pattern as the 12 existing API modules (context-assembler, arch-queries, scope-validator, etc.).            |
 | Pipeline factory returns Result for consumer-owned error handling | The factory returns `Result<PipelineResult, PipelineError>` rather than throwing or calling `process.exit()`. Each consumer maps the error to its own strategy: process-api.ts calls `process.exit(1)`, validate-patterns.ts throws, and orchestrator.ts (future) returns `Result.err()`.                                                  | The current `buildPipeline()` in process-api.ts calls `process.exit(1)` on errors, making it non-reusable. The factory must work across consumers with different error handling models. The Result monad is the project's established pattern for this (see `src/types/result.ts`).                                                                                                                           |
 | End-to-end verification confirms behavioral equivalence           | After extraction, all CLI commands produce identical output to pre-refactor behavior with zero build, test, lint, and validation errors.                                                                                                                                                                                                   | The refactor must not change observable behavior. Full CLI verification confirms the extraction is a pure refactor.                                                                                                                                                                                                                                                                                           |
+
+### Process Api Reference Tests
+
+| Rule                                                       | Invariant                                                                                                                           | Rationale |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| Generated reference file contains all three table sections | PROCESS-API-REFERENCE.md contains Global Options, Output Modifiers, and List Filters tables generated from the CLI schema.          |           |
+| CLI schema stays in sync with parser                       | Every flag recognized by parseArgs() has a corresponding entry in the CLI schema. A missing schema entry means the sync test fails. |           |
+| showHelp output reflects CLI schema                        | The help text rendered by showHelp() includes all options from the CLI schema, formatted for terminal display.                      |           |
 
 ### Process State API CLI
 

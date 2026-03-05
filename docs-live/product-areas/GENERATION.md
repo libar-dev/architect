@@ -39,6 +39,7 @@ graph TB
         SourceMapper[/"SourceMapper"/]
         Documentation_Generation_Orchestrator("Documentation Generation Orchestrator")
         TransformDataset("TransformDataset")
+        ProcessApiReferenceGenerator["ProcessApiReferenceGenerator"]
         DecisionDocGenerator("DecisionDocGenerator")
     end
     subgraph renderer["Renderer"]
@@ -53,19 +54,21 @@ graph TB
         GherkinASTParser["GherkinASTParser"]:::neighbor
         ShapeExtractor["ShapeExtractor"]:::neighbor
         ReferenceDocShowcase["ReferenceDocShowcase"]:::neighbor
+        ProcessApiHybridGeneration["ProcessApiHybridGeneration"]:::neighbor
         PatternRelationshipModel["PatternRelationshipModel"]:::neighbor
     end
     SourceMapper -.->|depends on| DecisionDocCodec
     SourceMapper -.->|depends on| ShapeExtractor
     SourceMapper -.->|depends on| GherkinASTParser
     Documentation_Generation_Orchestrator -->|uses| Pattern_Scanner
-    TransformDataset -->|uses| MasterDataset
-    TransformDataset ..->|implements| PatternRelationshipModel
-    DecisionDocGenerator -.->|depends on| DecisionDocCodec
-    DecisionDocGenerator -.->|depends on| SourceMapper
     PatternsCodec ..->|implements| PatternRelationshipModel
     CompositeCodec ..->|implements| ReferenceDocShowcase
     ArchitectureCodec -->|uses| MasterDataset
+    TransformDataset -->|uses| MasterDataset
+    TransformDataset ..->|implements| PatternRelationshipModel
+    ProcessApiReferenceGenerator ..->|implements| ProcessApiHybridGeneration
+    DecisionDocGenerator -.->|depends on| DecisionDocCodec
+    DecisionDocGenerator -.->|depends on| SourceMapper
     classDef neighbor stroke-dasharray: 5 5
 ```
 

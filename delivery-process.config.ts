@@ -130,5 +130,8 @@ export default defineConfig({
     'claude-modules': {
       outputDirectory: '_claude-md',
     },
+    'process-api-reference': {
+      outputDirectory: 'docs-live',
+    },
   },
 });

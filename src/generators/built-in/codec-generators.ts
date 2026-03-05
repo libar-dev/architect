@@ -28,6 +28,7 @@
 import { generatorRegistry } from '../registry.js';
 import { createCodecGenerator } from '../codec-based.js';
 import { createDecisionDocGenerator } from './decision-doc-generator.js';
+import { createProcessApiReferenceGenerator } from './process-api-reference-generator.js';
 // registerReferenceGenerators is now called from orchestrator.ts with config-provided configs
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -164,6 +165,17 @@ generatorRegistry.register(createCodecGenerator('claude-modules', 'claude-module
  * Produces both compact (_claude-md/) and detailed (docs/) outputs.
  */
 generatorRegistry.register(createDecisionDocGenerator());
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Process API Reference Generator (Schema-Based, not Codec-Based)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Process API CLI Reference Generator
+ * Generates PROCESS-API-REFERENCE.md from declarative CLI schema.
+ * Standalone: does not consume MasterDataset (ADR-006).
+ */
+generatorRegistry.register(createProcessApiReferenceGenerator());
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Reference Document Generators (Convention-Based, Codec-Driven)
