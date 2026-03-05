@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:PublishingRelocation
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:40
 @libar-docs-effort:0.25d
 @libar-docs-product-area:Generation
@@ -65,11 +65,11 @@ Feature: PUBLISHING.md Relocation to MAINTAINERS.md
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Create MAINTAINERS.md at repo root with all PUBLISHING.md content | pending | MAINTAINERS.md | No | n/a |
-      | Delete docs/PUBLISHING.md | pending | docs/PUBLISHING.md | No | n/a |
-      | Remove PUBLISHING.md entries from docs/INDEX.md (lines 32, 260-272, 338) | pending | docs/INDEX.md | No | n/a |
-      | Remove PUBLISHING.md from website content-manifest.mjs guides array | pending | libar-dev-website/scripts/content-manifest.mjs | No | n/a |
-      | Add MAINTAINERS.md link rewrite to content-manifest.mjs | pending | libar-dev-website/scripts/content-manifest.mjs | No | n/a |
+      | Create MAINTAINERS.md at repo root with all PUBLISHING.md content | complete | MAINTAINERS.md | No | n/a |
+      | Delete docs/PUBLISHING.md | complete | docs/PUBLISHING.md | No | n/a |
+      | Remove PUBLISHING.md entries from docs/INDEX.md (lines 32, 260-272, 338) | complete | docs/INDEX.md | No | n/a |
+      | Remove PUBLISHING.md from website content-manifest.mjs guides array | complete | libar-dev-website/scripts/content-manifest.mjs | No | n/a |
+      | Add MAINTAINERS.md link rewrite to content-manifest.mjs | complete | libar-dev-website/scripts/content-manifest.mjs | No | n/a |
 
   Rule: All publishing content moves to MAINTAINERS.md intact
 

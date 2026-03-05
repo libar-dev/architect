@@ -1,4 +1,4 @@
-# Publishing Guide
+# Maintainer Guide
 
 This guide covers how to publish `@libar-dev/delivery-process` to npm.
 

@@ -70,13 +70,14 @@ Every PR in this consolidation should identify CLAUDE.md sections that can be re
 
 ---
 
-## Current Branch State (as of 2026-03-05, post Phase 39)
+## Current Branch State (as of 2026-03-05, post Phase 40)
 
 ### Completed Phases
 
 - **Phase 2+4 (ArchitectureDocRefactoring):** Committed (17 commits). ARCHITECTURE.md 1,287→358 lines. Convention-tag codec registry.
 - **Phase 37 (DocsLiveConsolidation):** Committed. Reference docs consolidated into `docs-live/reference/`, compacts into `docs-live/_claude-md/architecture/`. `docs-generated/` reduced to intermediates only.
-- **Phase 38 (GeneratedDocQuality):** Implemented. Duplicate tables fixed, Generation compact enriched (4.3 KB), ARCHITECTURE-TYPES reordered (types first), TOC added to all product area docs. 123 test files, 7,972 tests passing.
+- **Phase 38 (GeneratedDocQuality):** Implemented. Duplicate tables fixed, Generation compact enriched (4.3 KB), ARCHITECTURE-TYPES reordered (types first), TOC added to all product area docs.
+- **Phase 40 (PublishingRelocation):** Implemented. PUBLISHING.md (144 lines) moved to MAINTAINERS.md at repo root. INDEX.md cleaned (3 references removed). Website manifest updated in separate repo.
 
 ### Active Phases
 
@@ -85,13 +86,6 @@ Every PR in this consolidation should identify CLAUDE.md sections that can be re
 ### Blockers
 
 Phase 39 completion blocked on Phase 25 (ClaudeModuleGeneration).
-
-### To Complete This PR
-
-1. Commit Phase 38 changes + regenerated docs
-2. Commit Phase 39 spec transition (roadmap → active, deliverables #1-#2 complete)
-3. Run final test suite verification (already verified: 123 files, 7972 tests pass)
-4. Identify CLAUDE.md lines to trim (target: remove ~80 lines from Guides section)
 
 ---
 
@@ -262,13 +256,13 @@ pnpm process:query -- files GeneratedDocQuality
 
 ---
 
-### Phase 40 — PublishingRelocation | DESIGN COMPLETE
+### Phase 40 — PublishingRelocation ✓ DONE
 
-**Pattern:** PublishingRelocation | **Effort:** 0.25d | **Depends on:** DocsConsolidationStrategy
+**Pattern:** PublishingRelocation (Phase 40)
+**Status:** `completed` — FSM terminal state
+**Completed:** 2026-03-05
 
-**What:** Move `docs/PUBLISHING.md` (144 lines) to `MAINTAINERS.md` at repo root. Delete original. Update INDEX.md and website manifest.
-
-**Current status:** DESIGN COMPLETE. Spec refined with 3 Rule blocks, 5 deliverables (up from 2), full section audit, and website impact analysis. Fixed stale "Phase 6" reference.
+Moved `docs/PUBLISHING.md` (144 lines) to `MAINTAINERS.md` at repo root. Deleted original. Updated INDEX.md and website manifest.
 
 #### Design Session Report (2026-03-05)
 
@@ -283,42 +277,36 @@ pnpm process:query -- files GeneratedDocQuality
 | INDEX.md has 3 PUBLISHING.md references (lines 32, 260-272, 338) | Broken links and stale navigation                | All 3 removed in deliverable #3                     |
 | MAINTAINERS.md is NOT published on website                       | URL /guides/publishing/ disappears               | Acceptable — maintainer-only content                |
 
-**Deliverables (5, all pending):**
+#### Implementation Session Report (2026-03-05)
 
-| #   | Deliverable                                                         | Status  | Location                                       |
-| --- | ------------------------------------------------------------------- | ------- | ---------------------------------------------- |
-| 1   | Create MAINTAINERS.md at repo root with all PUBLISHING.md content   | pending | MAINTAINERS.md                                 |
-| 2   | Delete docs/PUBLISHING.md                                           | pending | docs/PUBLISHING.md                             |
-| 3   | Remove PUBLISHING.md entries from docs/INDEX.md (3 locations)       | pending | docs/INDEX.md                                  |
-| 4   | Remove PUBLISHING.md from website content-manifest.mjs guides array | pending | libar-dev-website/scripts/content-manifest.mjs |
-| 5   | Add MAINTAINERS.md link rewrite to content-manifest.mjs             | pending | libar-dev-website/scripts/content-manifest.mjs |
+**Deliverables (5, all complete):**
 
-**Changes made (1 file):**
+| #   | Deliverable                                                         | Status   | Location                                       |
+| --- | ------------------------------------------------------------------- | -------- | ---------------------------------------------- |
+| 1   | Create MAINTAINERS.md at repo root with all PUBLISHING.md content   | complete | MAINTAINERS.md                                 |
+| 2   | Delete docs/PUBLISHING.md                                           | complete | docs/PUBLISHING.md                             |
+| 3   | Remove PUBLISHING.md entries from docs/INDEX.md (3 locations)       | complete | docs/INDEX.md                                  |
+| 4   | Remove PUBLISHING.md from website content-manifest.mjs guides array | complete | libar-dev-website/scripts/content-manifest.mjs |
+| 5   | Add MAINTAINERS.md link rewrite to content-manifest.mjs             | complete | libar-dev-website/scripts/content-manifest.mjs |
 
-| File                                                   | Change                                                                                                                                                                                                                 |
-| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `delivery-process/specs/publishing-relocation.feature` | Added 3 new deliverables, full section audit table (8 H2s, 6 H3s), design findings table, new Rule 3 (cross-references and website manifest), fixed "Phase 6" reference, expanded Rule 1 invariant with H2 enumeration |
+**Changes made (5 files across 2 repos):**
+
+| File                                                            | Change                                                                                |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `MAINTAINERS.md`                                                | Created at repo root with all PUBLISHING.md content, H1 renamed to "Maintainer Guide" |
+| `docs/PUBLISHING.md`                                            | Deleted via git rm                                                                    |
+| `docs/INDEX.md`                                                 | Removed 3 PUBLISHING.md references (line 32, lines 260-272, line 338)                 |
+| `delivery-process/specs/publishing-relocation.feature`          | FSM: roadmap → active → completed, all 5 deliverables marked complete                 |
+| `libar-dev-website/scripts/content-manifest.mjs` _(other repo)_ | Removed PUBLISHING.md from guides array, added MAINTAINERS.md link rewrite            |
 
 **Result:**
 
-- 3 Rule blocks with concrete invariants and acceptance criteria
-- 5 deliverables covering file move, deletion, INDEX.md cleanup, manifest removal, and link rewrite
+- MAINTAINERS.md: 144 lines with all 8 H2 sections preserved intact
+- docs/INDEX.md: zero PUBLISHING.md references remaining
+- Website manifest: guides array reduced from 6 to 5 entries, link rewrite added
 - 123 test files, 7,972 tests all passing
 
-**Next steps (implementation session):**
-
-1. Create MAINTAINERS.md (pure copy with H1 rename to "Maintainer Guide")
-2. Delete docs/PUBLISHING.md
-3. Remove 3 references from docs/INDEX.md
-4. Update libar-dev-website content-manifest.mjs (remove entry + add link rewrite)
-5. Regenerate docs: `pnpm build && pnpm docs:all`
-
-**Pre-flight:**
-
-```bash
-pnpm process:query -- context PublishingRelocation --session implement
-pnpm process:query -- files PublishingRelocation
-```
+**Website impact:** URL `/guides/publishing/` will no longer exist. Any remaining cross-references in generated docs that use `./PUBLISHING.md` will resolve to the GitHub-hosted MAINTAINERS.md via the link rewrite. The libar-dev-website repo change needs a separate commit.
 
 ---
 
