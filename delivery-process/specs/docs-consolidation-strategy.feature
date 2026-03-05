@@ -2,10 +2,10 @@
 @libar-docs-pattern:DocsConsolidationStrategy
 @libar-docs-status:roadmap
 @libar-docs-phase:35
-@libar-docs-effort:3w
+@libar-docs-effort:4w
 @libar-docs-product-area:Generation
 @libar-docs-depends-on:CodecDrivenReferenceGeneration
-@libar-docs-business-value:eliminates-1600-lines-of-manually-maintained-docs-via-code-first-generation
+@libar-docs-business-value:right-size-all-14-manual-docs-via-generation-relocation-and-audience-alignment
 @libar-docs-priority:high
 Feature: Documentation Consolidation Strategy
 
@@ -13,41 +13,38 @@ Feature: Documentation Consolidation Strategy
   14 manually-maintained docs (~5,400 lines in `docs/`) duplicate information that
   already exists in annotated source code and generated reference documents. Code
   changes require updating both source annotations and manual docs, creating
-  maintenance burden and inevitable drift. ARCHITECTURE.md alone is 1,287 lines,
-  much of which the codec system already generates from annotations.
+  maintenance burden and inevitable drift.
 
   **Solution:**
   A 6-phase consolidation that replaces manual doc sections with generated equivalents
   using convention tags, reference doc configs, product area absorption, and the
-  preamble capability. Each phase identifies a section of manual documentation,
-  validates that a generated equivalent exists or creates one, then replaces the
-  manual content with a pointer to the generated output.
+  preamble capability. Each phase validates that a generated equivalent exists or
+  creates one, then replaces the manual content with a pointer to the generated output.
 
   **Why It Matters:**
   | Benefit | How |
   | Single source of truth | Manual docs cannot drift from code when generated from annotations |
-  | Reduced maintenance | ~1,600 fewer manual lines to maintain across 6 phases |
+  | Reduced maintenance | ~2,400 fewer manual lines to maintain across 10 phases |
   | Consistent quality | Generated docs always reflect current annotation state |
   | AI context accuracy | Compact claude-md versions stay current automatically |
   | Incremental delivery | Each phase is independently deliverable as a single PR |
 
-  Phase-specific scenarios are added when each phase enters `active` status.
-  Phase 4 scenarios are detailed in ArchitectureDocRefactoring spec (8 Rules, 18 scenarios).
-
   **Scope:**
   | Document | Lines | Disposition |
-  | ARCHITECTURE.md | 1,287 | Phases 2 + 4: codec listings extracted, remaining sections decomposed to ~320 lines (DD-9) |
+  | ARCHITECTURE.md | 1,287 | Phases 2 + 4: codec listings extracted, remaining sections decomposed to ~320 lines |
   | PROCESS-GUARD.md | 341 | Phase 3: enhanced ValidationRulesCodec |
   | TAXONOMY.md | 105 | Phase 1: redirect to generated taxonomy output |
   | ANNOTATION-GUIDE.md | 268 | Phase 5: trim 30 lines of duplicated tag reference |
   | CONFIGURATION.md | 357 | Phase 5: trim 67 lines of duplicated preset detail |
   | INDEX.md | 354 | Phase 6: update navigation for hybrid manual+generated structure |
   | METHODOLOGY.md | 238 | Keep: philosophy and core thesis |
-  | SESSION-GUIDES.md | 389 | Keep: workflow guides and checklists |
-  | GHERKIN-PATTERNS.md | 515 | Keep: tutorial and instructional |
-  | PROCESS-API.md | 507 | Keep: CLI reference |
-  | PUBLISHING.md | 144 | Keep: operational npm publishing |
-  | README.md | ~504 | Keep: landing page |
+  | SESSION-GUIDES.md | 389 | Phase 39: retained as public reference; CLAUDE.md session section generated from annotated behavior specs |
+  | GHERKIN-PATTERNS.md | 515 | Phase 41: trim to ~250 lines, Step Linting moves to VALIDATION.md |
+  | PROCESS-API.md | 507 | Phase 43: keep prose, generate 3 reference tables from CLI schema |
+  | PUBLISHING.md | 144 | Phase 40: relocate to MAINTAINERS.md at repo root |
+  | README.md | ~504 | Phase 42: trim to ~150 lines, move pitch content to website |
+  | docs-generated/ structure | n/a | Phase 37: consolidate to docs-live/ as single output directory |
+  | Generated doc quality | n/a | Phase 38: fix REFERENCE-SAMPLE duplication, enrich Generation compact, add TOC |
 
   Background: Deliverables
     Given the following deliverables:
@@ -59,6 +56,13 @@ Feature: Documentation Consolidation Strategy
       | Phase 4 - Architecture decomposition | complete | docs/ARCHITECTURE.md | Yes | integration |
       | Phase 5 - Guide trimming | pending | docs/ANNOTATION-GUIDE.md, docs/CONFIGURATION.md | No | n/a |
       | Phase 6 - Index navigation update | pending | docs/INDEX.md | No | n/a |
+      | Phase 37 - docs-live/ directory consolidation | pending | delivery-process.config.ts | Yes | integration |
+      | Phase 38 - Generated doc quality improvements | pending | src/renderable/codecs/reference.ts | Yes | integration |
+      | Phase 39 - Session workflow CLAUDE.md module generation | pending | delivery-process/specs/, _claude-md/workflow/ | No | n/a |
+      | Phase 40 - PUBLISHING.md relocation to MAINTAINERS.md | pending | docs/PUBLISHING.md | No | n/a |
+      | Phase 41 - GHERKIN-PATTERNS.md restructure | pending | docs/GHERKIN-PATTERNS.md, docs/VALIDATION.md | No | n/a |
+      | Phase 42 - README.md rationalization | pending | README.md | No | n/a |
+      | Phase 43 - PROCESS-API.md hybrid generation | pending | docs/PROCESS-API.md, src/cli/ | Yes | integration |
 
   Rule: Convention tags are the primary consolidation mechanism
 
@@ -68,10 +72,10 @@ Feature: Documentation Consolidation Strategy
     entry in `delivery-process.config.ts`, and replace the manual doc section with a
     pointer to the generated reference document.
 
-    **Rationale:** Convention-tagged source code annotations are the only sustainable
-    way to keep documentation in sync with implementation. The reference codec
-    (`createReferenceCodec`) already handles the 4-layer composition (conventions,
-    diagrams, shapes, behaviors) so each phase only needs annotation work and config.
+    **Rationale:** Convention-tagged annotations are the only sustainable way to keep
+    docs in sync with implementation. The reference codec (`createReferenceCodec`)
+    already handles the 4-layer composition so each phase only needs annotation work
+    and config — no new codec infrastructure required.
 
     **Verified by:** Convention tag produces generated reference,
     Phase 2 demonstrates the pattern end-to-end
@@ -84,13 +88,6 @@ Feature: Documentation Consolidation Strategy
       Then a detailed docs/ file and a compact _claude-md/ file are produced
       And both contain the convention content extracted from source JSDoc
 
-    @acceptance-criteria @happy-path
-    Scenario: Manual doc section is replaced with pointer to generated doc
-      Given a generated reference document covering a manual doc section
-      When the manual section is consolidated
-      Then the manual section is replaced with a 2-3 line summary and link
-      And no content exists in both the manual doc and the generated doc
-
   Rule: Preamble preserves editorial context in generated docs
 
     **Invariant:** `ReferenceDocConfig.preamble` accepts `readonly SectionBlock[]`
@@ -101,7 +98,7 @@ Feature: Documentation Consolidation Strategy
     **Rationale:** Not all documentation content can be extracted from code annotations.
     Introductory prose, cross-cutting context, and reading guides require human
     authorship. The preamble provides a designated place for this content within the
-    generated document structure, avoiding the need for a separate hand-maintained file.
+    generated document structure, avoiding a separate hand-maintained file.
 
     **Verified by:** Preamble appears in both detail levels,
     Empty preamble produces no artifacts
@@ -112,12 +109,6 @@ Feature: Documentation Consolidation Strategy
       When the reference codec generates at both detail levels
       Then preamble sections appear first in both outputs
       And a separator follows the preamble before generated content
-
-    @acceptance-criteria @edge-case
-    Scenario: Config without preamble produces clean output
-      Given a ReferenceDocConfig with no preamble field
-      When the reference codec generates output
-      Then no extra separator or empty section exists at the start
 
   Rule: Each consolidation phase is independently deliverable
 
@@ -143,12 +134,6 @@ Feature: Documentation Consolidation Strategy
       Then Phase 2 generated output is correct
       And no errors relate to incomplete phases
 
-    @acceptance-criteria @happy-path
-    Scenario: Phases can be implemented in any order
-      Given the 6 consolidation phases
-      Then no phase deliverable depends on another phase deliverable
-      And each phase only depends on the base CodecDrivenReferenceGeneration capability
-
   Rule: Manual docs retain editorial and tutorial content
 
     **Invariant:** Documents containing philosophy (METHODOLOGY.md), workflow guides
@@ -159,9 +144,8 @@ Feature: Documentation Consolidation Strategy
 
     **Rationale:** The consolidation targets sections most likely to drift when code
     changes: reference tables, codec listings, validation rules, API types. Editorial
-    content (the "why", "how to use", and "when to use") changes at a different cadence
-    and requires human judgment to update. Forcing this into annotations would produce
-    worse documentation.
+    content changes at a different cadence and requires human judgment to update.
+    Forcing this into annotations would produce worse documentation.
 
     **Verified by:** Retained docs have no generated equivalent,
     Consolidated docs preserve information completeness
@@ -172,9 +156,25 @@ Feature: Documentation Consolidation Strategy
       Then no ReferenceDocConfig exists targeting their content
       And their sections do not duplicate any generated output
 
-    @acceptance-criteria @validation
-    Scenario: Consolidation preserves information completeness
-      Given a manual doc section being consolidated
-      When compared with the generated reference that replaces it
-      Then every fact in the manual section appears in the generated output
-      And no information is lost in the consolidation
+  Rule: Audience alignment determines document location
+
+    **Invariant:** Each document lives in the location matching its primary audience:
+    `docs/` (deployed to libar.dev) for content that serves package users and developers;
+    repo root for GitHub-visible metadata (CONTRIBUTING.md, SECURITY.md, MAINTAINERS.md);
+    CLAUDE.md for AI session context. A document appearing in docs/ must be useful to
+    a developer or user visiting the website — maintainer-only operational procedures
+    (npm publishing workflow, GitHub Actions setup) belong at the repo root.
+
+    **Rationale:** The audit found PUBLISHING.md (maintainer-only) in docs/ alongside
+    user-facing guides. SESSION-GUIDES.md (AI session procedures) duplicates CLAUDE.md
+    with 95% overlap. Audience mismatches increase website noise for users and
+    create drift risk when the same content lives in two locations.
+
+    **Verified by:** No maintainer-only content in docs/,
+    No AI-session content duplicated between docs/ and CLAUDE.md
+
+    @acceptance-criteria @happy-path
+    Scenario: Maintainer content does not appear in website docs
+      Given the docs/ directory after Phase 40 (PublishingRelocation)
+      Then no file in docs/ contains npm publishing or GitHub Actions workflow instructions
+      And those instructions exist in MAINTAINERS.md at the repo root

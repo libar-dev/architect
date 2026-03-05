@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ArchitectureDocRefactoring
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Implement-test-coverage-and-fix-spec-metadata
 @libar-docs-phase:36
 @libar-docs-effort:2d
 @libar-docs-product-area:Generation
@@ -31,7 +32,7 @@ Feature: Architecture Document Refactoring
   | Dual output | Each generated section gets docs/ detailed + _claude-md/ compact versions |
   | Convention-driven | Adding a new codec only requires adding a convention tag to its JSDoc |
 
-  **Section Disposition (line ranges approximate -- verify before Phase 4):**
+  **Section Disposition (line ranges from original 1,287-line pre-refactoring document):**
   | Section | Lines | Action | Target |
   | Executive Summary | 28-69 | Keep | Editorial narrative |
   | Configuration Architecture | 70-139 | Phase 4: absorb | Configuration product area |
