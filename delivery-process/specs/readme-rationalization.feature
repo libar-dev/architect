@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:ReadmeRationalization
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:42
 @libar-docs-effort:0.5d
 @libar-docs-product-area:Generation

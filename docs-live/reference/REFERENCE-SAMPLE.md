@@ -177,11 +177,11 @@ graph TB
     ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
     ProcessGuardTesting["ProcessGuardTesting"]
     subgraph related["Related"]
+        AntiPatternDetector["AntiPatternDetector"]:::neighbor
         ConfigurationTypes["ConfigurationTypes"]:::neighbor
         RegexBuilders["RegexBuilders"]:::neighbor
         ProjectConfigTypes["ProjectConfigTypes"]:::neighbor
         ConfigurationPresets["ConfigurationPresets"]:::neighbor
-        AntiPatternDetector["AntiPatternDetector"]:::neighbor
         ProcessGuardLinter["ProcessGuardLinter"]:::neighbor
         PhaseStateMachineValidation["PhaseStateMachineValidation"]:::neighbor
         MvpWorkflowImplementation["MvpWorkflowImplementation"]:::neighbor
@@ -248,26 +248,26 @@ classDiagram
     class Documentation_Generation_Orchestrator {
         <<service>>
     }
-    class TransformDataset {
-        <<service>>
-    }
     class DecisionDocGenerator {
         <<service>>
     }
+    class TransformDataset {
+        <<service>>
+    }
     class MasterDataset
+    class ShapeExtractor
     class Pattern_Scanner
     class GherkinASTParser
-    class ShapeExtractor
     class DecisionDocCodec
     class PatternRelationshipModel
     SourceMapper ..> DecisionDocCodec : depends on
     SourceMapper ..> ShapeExtractor : depends on
     SourceMapper ..> GherkinASTParser : depends on
     Documentation_Generation_Orchestrator ..> Pattern_Scanner : uses
-    TransformDataset ..> MasterDataset : uses
-    TransformDataset ..|> PatternRelationshipModel : implements
     DecisionDocGenerator ..> DecisionDocCodec : depends on
     DecisionDocGenerator ..> SourceMapper : depends on
+    TransformDataset ..> MasterDataset : uses
+    TransformDataset ..|> PatternRelationshipModel : implements
 ```
 
 ---
@@ -322,15 +322,15 @@ C4Context
     }
     System_Ext(DocDirectiveSchema, "DocDirectiveSchema")
     System_Ext(GherkinRulesSupport, "GherkinRulesSupport")
-    Rel(GherkinScanner, GherkinASTParser, "uses")
-    Rel(GherkinScanner, GherkinRulesSupport, "implements")
-    Rel(GherkinASTParser, GherkinRulesSupport, "implements")
-    Rel(TypeScript_AST_Parser, DocDirectiveSchema, "uses")
     Rel(GherkinExtractor, GherkinASTParser, "uses")
     Rel(GherkinExtractor, GherkinRulesSupport, "implements")
     Rel(DualSourceExtractor, GherkinExtractor, "uses")
     Rel(DualSourceExtractor, GherkinScanner, "uses")
     Rel(Document_Extractor, Pattern_Scanner, "uses")
+    Rel(GherkinScanner, GherkinASTParser, "uses")
+    Rel(GherkinScanner, GherkinRulesSupport, "implements")
+    Rel(GherkinASTParser, GherkinRulesSupport, "implements")
+    Rel(TypeScript_AST_Parser, DocDirectiveSchema, "uses")
 ```
 
 ---

@@ -45,8 +45,8 @@ C4Context
         System(FSMTransitions, "FSMTransitions")
         System(FSMStates, "FSMStates")
     }
-    System_Ext(CodecUtils, "CodecUtils")
     System_Ext(DoDValidationTypes, "DoDValidationTypes")
+    System_Ext(CodecUtils, "CodecUtils")
     System_Ext(DualSourceExtractor, "DualSourceExtractor")
     System_Ext(DetectChanges, "DetectChanges")
     System_Ext(DeriveProcessState, "DeriveProcessState")
@@ -95,8 +95,8 @@ graph LR
         FSMStates[/"FSMStates"/]
     end
     subgraph related["Related"]
-        CodecUtils["CodecUtils"]:::neighbor
         DoDValidationTypes["DoDValidationTypes"]:::neighbor
+        CodecUtils["CodecUtils"]:::neighbor
         DualSourceExtractor["DualSourceExtractor"]:::neighbor
         DetectChanges["DetectChanges"]:::neighbor
         DeriveProcessState["DeriveProcessState"]:::neighbor

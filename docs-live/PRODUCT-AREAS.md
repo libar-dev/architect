@@ -31,7 +31,7 @@ Configuration is the entry boundary — it transforms a user-authored `delivery-
 
 The generation pipeline transforms annotated source code into markdown documents through a four-stage architecture. **Stage 1 — Scanner** (`src/scanner/`): Discovers TypeScript and Gherkin files, parses AST structure, and detects opt-in via `@libar-docs` markers. **Stage 2 — Extractor** (`src/extractor/`): Extracts patterns from TypeScript JSDoc annotations and Gherkin tags, producing `ExtractedPattern` objects with metadata, relationships, shapes, rules, and deliverables. **Stage 3 — Transformer** (`src/generators/pipeline/`): Builds `MasterDataset` with pre-computed views (`byStatus`, `byCategory`, `byPhase`, `byProductArea`) for O(1) access. All consumers share a single `buildMasterDataset()` factory — no parallel pipelines (ADR-006). **Stage 4 — Codec** (`src/renderable/`): Pure functions that transform MasterDataset into RenderableDocument — an intermediate representation with 9 block types (heading, paragraph, table, list, code, mermaid, collapsible, linkOut, separator). The renderer converts IR to markdown syntax. The codec inventory includes: **ReferenceDocumentCodec** (4-layer composition: conventions, diagrams, shapes, behaviors), **PlanningCodec** (roadmap and remaining work), **SessionCodec** (current work and session findings), **ReportingCodec** (changelog), **TimelineCodec** (timeline and traceability), **RequirementsAdrCodec** (ADR generation), **BusinessRulesCodec** (Gherkin rule extraction), **TaxonomyCodec** (tag registry docs), **CompositeCodec** (composes multiple codecs into a single document). Every codec supports three detail levels — **detailed** (full reference with rationale, code examples, and verified-by lists), **standard** (narrative without rationale), and **summary** (compact tables for `_claude-md/` modules). The Orchestrator (`src/generators/orchestrator.ts`) runs registered generators in order. Each generator creates codec instances from configuration, decodes the shared MasterDataset, renders to markdown, and writes output files to `docs-live/` (reference docs) or `docs-live/_claude-md/` (AI-optimized compacts). Product area docs are a special case — they filter the entire MasterDataset to a single area, compose 5 sections (intro, conventions, diagrams, shapes, business rules), and generate both detailed and summary versions with a progressive disclosure index.
 
-**86 patterns** — 70 completed, 2 active, 14 planned
+**86 patterns** — 70 completed, 3 active, 13 planned
 
 **Key patterns:** ADR005CodecBasedMarkdownRendering, CodecDrivenReferenceGeneration, CrossCuttingDocumentInclusion, ArchitectureDiagramGeneration, ScopedArchitecturalView, CompositeCodec, RenderableDocument, ProductAreaOverview
 
@@ -83,12 +83,12 @@ Process defines the USDP-inspired session workflow that governs how work moves t
 | ----------------------------------------------- | -------- | --------- | ------ | ------- |
 | [Annotation](product-areas/ANNOTATION.md)       | 26       | 23        | 2      | 1       |
 | [Configuration](product-areas/CONFIGURATION.md) | 9        | 8         | 0      | 1       |
-| [Generation](product-areas/GENERATION.md)       | 86       | 70        | 2      | 14      |
+| [Generation](product-areas/GENERATION.md)       | 86       | 70        | 3      | 13      |
 | [Validation](product-areas/VALIDATION.md)       | 22       | 14        | 1      | 7       |
 | [DataAPI](product-areas/DATA-API.md)            | 34       | 20        | 10     | 4       |
 | [CoreTypes](product-areas/CORE-TYPES.md)        | 7        | 6         | 0      | 1       |
 | [Process](product-areas/PROCESS.md)             | 11       | 4         | 0      | 7       |
-| **Total**                                       | **195**  | **145**   | **15** | **35**  |
+| **Total**                                       | **195**  | **145**   | **16** | **34**  |
 
 ---
 
@@ -120,9 +120,9 @@ C4Context
     System(DataAPIContextAssembly, "DataAPIContextAssembly")
     System(CrossCuttingDocumentInclusion, "CrossCuttingDocumentInclusion")
     System(CodecDrivenReferenceGeneration, "CodecDrivenReferenceGeneration")
+    System(StringUtils, "StringUtils")
     System(ResultMonad, "ResultMonad")
     System(ErrorFactories, "ErrorFactories")
-    System(StringUtils, "StringUtils")
     System(ExtractionPipelineEnhancementsTesting, "ExtractionPipelineEnhancementsTesting")
     System(KebabCaseSlugs, "KebabCaseSlugs")
     System(ErrorHandlingUnification, "ErrorHandlingUnification")
@@ -199,9 +199,9 @@ graph LR
     DataAPIContextAssembly["DataAPIContextAssembly"]
     CrossCuttingDocumentInclusion["CrossCuttingDocumentInclusion"]
     CodecDrivenReferenceGeneration["CodecDrivenReferenceGeneration"]
+    StringUtils["StringUtils"]
     ResultMonad["ResultMonad"]
     ErrorFactories["ErrorFactories"]
-    StringUtils["StringUtils"]
     ExtractionPipelineEnhancementsTesting["ExtractionPipelineEnhancementsTesting"]
     KebabCaseSlugs["KebabCaseSlugs"]
     ErrorHandlingUnification["ErrorHandlingUnification"]

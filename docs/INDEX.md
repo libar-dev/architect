@@ -19,7 +19,7 @@
 
 | If you want to...              | Read this                                    | Lines  |
 | ------------------------------ | -------------------------------------------- | ------ |
-| Get started quickly            | [README.md](../README.md)                    | 1-504  |
+| Get started quickly            | [README.md](../README.md)                    | 1-142  |
 | Configure presets and tags     | [CONFIGURATION.md](./CONFIGURATION.md)       | 1-357  |
 | Understand the "why"           | [METHODOLOGY.md](./METHODOLOGY.md)           | 1-238  |
 | Learn the architecture         | [ARCHITECTURE.md](./ARCHITECTURE.md)         | 1-1638 |
@@ -60,27 +60,17 @@
 
 ## Detailed Table of Contents
 
-### README.md (Lines 1-504)
+### README.md (Lines 1-142)
 
-| Section                   | Lines   | Key Topics                                        |
-| ------------------------- | ------- | ------------------------------------------------- |
-| Why This Exists           | 17-31   | AI context failure, code as source of truth       |
-| Built for AI-Assisted Dev | 33-50   | Data API CLI typed queries                        |
-| Quick Start               | 52-109  | Install, annotate, generate, lint                 |
-| How It Works              | 111-165 | Annotation examples, pipeline one-liner           |
-| What Gets Generated       | 167-184 | Content block types, config-driven generation     |
-| CLI Commands              | 186-254 | generate-docs, process-api, generate-tag-taxonomy |
-| Proven at Scale           | 256-303 | Discovery, real results, 3-session MVP            |
-| FSM-Enforced Workflow     | 305-337 | State diagram, protection levels                  |
-| Data API CLI              | 339-365 | CLI example, context cost comparison              |
-| Rich Relationship Model   | 367-390 | Dependency tags, Mermaid graph                    |
-| How It Compares           | 392-414 | Comparison with Backstage, Mintlify, etc.         |
-| Design-First Development  | 416-420 | Stub pattern summary + link                       |
-| Document Durability Model | 422-426 | Durability hierarchy summary + link               |
-| Use Cases                 | 428-439 | Multi-phase roadmaps, AI sessions, validation     |
-| Configuration             | 441-475 | Presets table, custom config                      |
-| Documentation             | 477-500 | Doc links table                                   |
-| License                   | 502-504 | MIT license                                       |
+| Section             | Lines   | Key Topics                                  |
+| ------------------- | ------- | ------------------------------------------- |
+| Why This Exists     | 16-18   | AI context, code as source of truth         |
+| Quick Start         | 22-66   | Install, annotate, generate, enforce        |
+| How It Works        | 70-84   | TS annotation example, pipeline one-liner   |
+| What Gets Generated | 88-101  | Content block table, live product area docs |
+| CLI Commands        | 105-118 | Command table with doc links                |
+| Documentation       | 122-138 | INDEX.md link, unified doc table            |
+| License             | 142     | MIT license                                 |
 
 ---
 

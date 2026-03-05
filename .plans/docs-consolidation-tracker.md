@@ -80,6 +80,7 @@ Every PR in this consolidation should identify CLAUDE.md sections that can be re
 - **Phase 40 (PublishingRelocation):** Implemented. PUBLISHING.md (144 lines) moved to MAINTAINERS.md at repo root. INDEX.md cleaned (3 references removed). Website manifest updated in separate repo.
 - **Phase 25 (ClaudeModuleGeneration):** Completed. Full pipeline: 3 taxonomy tags, schema fields, parser extraction, ClaudeModuleCodec, generator registration.
 - **Phase 39 (SessionGuidesModuleSource):** Completed. First consumer of ClaudeModule pipeline. 3 hand-written files replaced by generated output. CLAUDE.md Session Workflows section now generated.
+- **Phase 42 (ReadmeRationalization):** Completed. README.md trimmed from 504 → 142 lines (72% reduction). 10 enterprise/duplicate sections removed. INDEX.md updated.
 
 ### Active Phases
 
@@ -379,13 +380,13 @@ Moved Step Linting section (148 lines) from `docs/GHERKIN-PATTERNS.md` to `docs/
 
 ---
 
-### Phase 42 — ReadmeRationalization | DESIGN COMPLETE
+### Phase 42 — ReadmeRationalization | DONE
 
-**Pattern:** ReadmeRationalization | **Effort:** 0.5d | **Depends on:** DocsConsolidationStrategy
+**Pattern:** ReadmeRationalization (Phase 42)
+**Status:** `completed` — FSM terminal state
+**Completed:** 2026-03-05
 
-**What:** Trim `README.md` from 504 → ~150 lines. Enterprise pitch content already fully covered by 9 website landing page components — extraction is pure deletion with zero content loss.
-
-**Current status:** DESIGN COMPLETE. Spec refined with 18-section disposition table, 7 design findings, 6 deliverables (up from 4), 3 Rule blocks, README-to-website component mapping, and link audit.
+Trimmed README.md from 504 → 142 lines. Removed 10 enterprise pitch/duplicate sections. All enterprise content already covered by 9 website landing page components — zero information loss.
 
 #### Design Session Report (2026-03-05)
 
@@ -401,46 +402,52 @@ Moved Step Linting section (148 lines) from `docs/GHERKIN-PATTERNS.md` to `docs/
 | README maps to /getting-started/ via content-manifest.mjs | Trimmed README is a better getting-started page          | No manifest change needed; add Rule 3                 |
 | Line 93 `[Configuration](#configuration)` anchor breaks   | Internal link to deleted section                         | Replace with docs/CONFIGURATION.md link               |
 
-**Deliverables (6, all pending):**
+#### Implementation Session Report (2026-03-05)
 
-| #   | Deliverable                                                                         | Status  | Location      |
-| --- | ----------------------------------------------------------------------------------- | ------- | ------------- |
-| 1   | Trim README.md to ~150 lines per section disposition table                          | pending | README.md     |
-| 2   | Remove Configuration section (lines 441-474) duplicating docs/CONFIGURATION.md      | pending | README.md     |
-| 3   | Document README-to-website component mapping for extracted enterprise sections      | pending | spec file     |
-| 4   | Verify all retained links in trimmed README resolve to valid targets                | pending | README.md     |
-| 5   | Update INDEX.md Quick Navigation line count for README (1-504 → ~1-150)             | pending | docs/INDEX.md |
-| 6   | Verify trimmed README serves as effective getting-started page at /getting-started/ | pending | README.md     |
+**Deliverables (6, all complete):**
 
-**Changes made (1 file):**
+| #   | Deliverable                                                                         | Status   | Location      |
+| --- | ----------------------------------------------------------------------------------- | -------- | ------------- |
+| 1   | Trim README.md to ~150 lines per section disposition table                          | complete | README.md     |
+| 2   | Remove Configuration section (lines 441-474) duplicating docs/CONFIGURATION.md      | complete | README.md     |
+| 3   | Document README-to-website component mapping for extracted enterprise sections      | complete | spec file     |
+| 4   | Verify all retained links in trimmed README resolve to valid targets                | complete | README.md     |
+| 5   | Update INDEX.md Quick Navigation line count for README (1-504 → ~1-142)             | complete | docs/INDEX.md |
+| 6   | Verify trimmed README serves as effective getting-started page at /getting-started/ | complete | README.md     |
 
-| File                                                    | Change                                                                                                                                                                                                                                                                                         |
-| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `delivery-process/specs/readme-rationalization.feature` | Complete rewrite: 18-section disposition table with line ranges, 7 design findings table, README-to-website component mapping (5 EXTRACT sections → 5 website components), updated deliverables (4→6), expanded Rule 1 with section enumeration, new Rule 3 for getting-started page integrity |
+**Changes made (3 files):**
+
+| File                                                    | Change                                                                             |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `README.md`                                             | Trimmed from 504 → 142 lines per disposition table; 10 sections removed, 6 trimmed |
+| `docs/INDEX.md`                                         | Updated README line count (1-504 → 1-142) and section table (17 rows → 7 rows)     |
+| `delivery-process/specs/readme-rationalization.feature` | FSM: roadmap → active → completed, all 6 deliverables marked complete              |
+
+**Sections removed (10):**
+
+| Section                   | Lines Removed | Website Coverage                   |
+| ------------------------- | ------------- | ---------------------------------- |
+| Built for AI-Assisted Dev | 17            | DataAPI.astro + CodeExamples.astro |
+| Proven at Scale           | 47            | Metrics.astro (identical content)  |
+| FSM-Enforced Workflow     | 32            | Pillars.astro + Workflows.astro    |
+| Data API CLI              | 26            | DataAPI.astro (richer demo)        |
+| Rich Relationship Model   | 23            | Pillars.astro pillar 04            |
+| How It Compares           | 21            | Pillars.astro (implicit)           |
+| Design-First Development  | 4             | doc index pointer                  |
+| Document Durability Model | 4             | doc index pointer                  |
+| Use Cases                 | 11            | Quick Start + website              |
+| Configuration             | 34            | docs/CONFIGURATION.md (duplicate)  |
 
 **Result:**
 
-- 18 sections audited with exact line ranges and KEEP/TRIM/EXTRACT/REMOVE disposition
-- Line count math validated: KEEP (15) + TRIM (121) + separators (6) = ~142 lines
-- 5 EXTRACT sections mapped to existing website components (Metrics, Pillars, DataAPI, Workflows)
-- All retained links verified valid; one broken anchor identified (`#configuration` → deleted section)
+- README.md: 504 → 142 lines (72% reduction)
+- Install instructions now within first 20 lines (was line 56)
+- All 18 relative links verified valid
+- `#configuration` anchor replaced with `docs/CONFIGURATION.md` link
+- INDEX.md section table updated (17 → 7 rows, line ranges corrected)
 - 123 test files, 7,972 tests all passing
 
-**CLAUDE.md trim opportunity:** ~50 lines from Project Overview section (replace with `overview` command).
-
-**Next steps (implementation session):**
-
-1. Trim README.md per disposition table (504 → ~150 lines)
-2. Fix `#configuration` anchor → `docs/CONFIGURATION.md` link
-3. Update INDEX.md line count (line 22: 1-504 → ~1-150)
-4. Verify /getting-started/ page alignment
-
-**Pre-flight:**
-
-```bash
-pnpm process:query -- context ReadmeRationalization --session implement
-pnpm process:query -- files ReadmeRationalization
-```
+**Website impact:** README maps to /getting-started/ via content-manifest.mjs. The trimmed version is a better getting-started page — install within 20 lines, practical steps immediately after. No manifest changes needed.
 
 ---
 
