@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:ProcessStateAPIRelationshipQueries
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-unlock-reason:Relationships-available-via-getPatternRelationships-superseded-by-DataAPIRelationshipGraph
 @libar-docs-phase:24
 @libar-docs-product-area:DataAPI

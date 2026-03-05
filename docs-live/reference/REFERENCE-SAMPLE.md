@@ -11,15 +11,15 @@
 
 **Rationale:** Without canonical values, organic drift (e.g., Generator vs Generators) produces inconsistent grouping in generated documentation and fragmented product area pages.
 
-| Value         | Reader Question                     | Covers                                          |
-| ------------- | ----------------------------------- | ----------------------------------------------- |
-| Annotation    | How do I annotate code?             | Scanning, extraction, tag parsing, dual-source  |
-| Configuration | How do I configure the tool?        | Config loading, presets, resolution             |
-| Generation    | How does code become docs?          | Codecs, generators, rendering, diagrams         |
-| Validation    | How is the workflow enforced?       | FSM, DoD, anti-patterns, process guard, lint    |
-| DataAPI       | How do I query process state?       | Process state API, stubs, context assembly, CLI |
-| CoreTypes     | What foundational types exist?      | Result monad, error factories, string utils     |
-| Process       | How does the session workflow work? | Session lifecycle, handoffs, conventions        |
+| Value | Reader Question | Covers |
+| --- | --- | --- |
+| Annotation | How do I annotate code? | Scanning, extraction, tag parsing, dual-source |
+| Configuration | How do I configure the tool? | Config loading, presets, resolution |
+| Generation | How does code become docs? | Codecs, generators, rendering, diagrams |
+| Validation | How is the workflow enforced? | FSM, DoD, anti-patterns, process guard, lint |
+| DataAPI | How do I query process state? | Process state API, stubs, context assembly, CLI |
+| CoreTypes | What foundational types exist? | Result monad, error factories, string utils |
+| Process | How does the session workflow work? | Session lifecycle, handoffs, conventions |
 
 **Verified by:** Canonical values are enforced
 
@@ -31,12 +31,12 @@
 
 **Rationale:** Unbounded category values prevent meaningful grouping of architecture decisions and make cross-cutting queries unreliable.
 
-| Value         | Purpose                                       |
-| ------------- | --------------------------------------------- |
-| architecture  | System structure, component design, data flow |
-| process       | Workflow, conventions, annotation rules       |
-| testing       | Test strategy, verification approach          |
-| documentation | Documentation generation, content structure   |
+| Value | Purpose |
+| --- | --- |
+| architecture | System structure, component design, data flow |
+| process | Workflow, conventions, annotation rules |
+| testing | Test strategy, verification approach |
+| documentation | Documentation generation, content structure |
 
 **Verified by:** Canonical values are enforced
 
@@ -48,12 +48,12 @@
 
 **Rationale:** Without protection levels, active specs accumulate scope creep and completed specs get silently modified, undermining delivery process integrity.
 
-| Status    | Protection   | Can Add Deliverables | Allowed Actions                 |
-| --------- | ------------ | -------------------- | ------------------------------- |
-| roadmap   | None         | Yes                  | Full editing                    |
-| active    | Scope-locked | No                   | Edit existing deliverables only |
-| completed | Hard-locked  | No                   | Requires unlock-reason tag      |
-| deferred  | None         | Yes                  | Full editing                    |
+| Status | Protection | Can Add Deliverables | Allowed Actions |
+| --- | --- | --- | --- |
+| roadmap | None | Yes | Full editing |
+| active | Scope-locked | No | Edit existing deliverables only |
+| completed | Hard-locked | No | Requires unlock-reason tag |
+| deferred | None | Yes | Full editing |
 
 **Verified by:** Canonical values are enforced
 
@@ -65,15 +65,16 @@
 
 **Rationale:** Allowing arbitrary transitions (e.g., roadmap to completed) bypasses the active phase where scope-lock and deliverable tracking provide quality assurance.
 
-| From     | To        | Trigger               |
-| -------- | --------- | --------------------- |
-| roadmap  | active    | Start work            |
-| roadmap  | deferred  | Postpone              |
-| active   | completed | All deliverables done |
-| active   | roadmap   | Blocked/regressed     |
-| deferred | roadmap   | Resume planning       |
+| From | To | Trigger |
+| --- | --- | --- |
+| roadmap | active | Start work |
+| roadmap | deferred | Postpone |
+| active | completed | All deliverables done |
+| active | roadmap | Blocked/regressed |
+| deferred | roadmap | Resume planning |
 
 **Verified by:** Canonical values are enforced
+
 
     Completed is a terminal state. Modifications require
     `@libar-docs-unlock-reason` escape hatch.
@@ -86,14 +87,14 @@
 
 **Rationale:** Without explicit format types, parsers must guess value structure, leading to silent data corruption when CSV values are treated as single strings or numbers are treated as text.
 
-| Format       | Parsing                        | Example                        |
-| ------------ | ------------------------------ | ------------------------------ |
-| flag         | Boolean presence, no value     | @libar-docs-core               |
-| value        | Simple string                  | @libar-docs-pattern MyPattern  |
-| enum         | Constrained to predefined list | @libar-docs-status completed   |
-| csv          | Comma-separated values         | @libar-docs-uses A, B, C       |
-| number       | Numeric value                  | @libar-docs-phase 15           |
-| quoted-value | Preserves spaces               | @libar-docs-brief:'Multi word' |
+| Format | Parsing | Example |
+| --- | --- | --- |
+| flag | Boolean presence, no value | @libar-docs-core |
+| value | Simple string | @libar-docs-pattern MyPattern |
+| enum | Constrained to predefined list | @libar-docs-status completed |
+| csv | Comma-separated values | @libar-docs-uses A, B, C |
+| number | Numeric value | @libar-docs-phase 15 |
+| quoted-value | Preserves spaces | @libar-docs-brief:'Multi word' |
 
 **Verified by:** Canonical values are enforced
 
@@ -105,12 +106,12 @@
 
 **Rationale:** Cross-domain tag placement (e.g., runtime dependencies in Gherkin) creates conflicting sources of truth and breaks the dual-source architecture ownership model.
 
-| Tag        | Correct Source | Wrong Source  | Rationale                          |
-| ---------- | -------------- | ------------- | ---------------------------------- |
-| uses       | TypeScript     | Feature files | TS owns runtime dependencies       |
-| depends-on | Feature files  | TypeScript    | Gherkin owns planning dependencies |
-| quarter    | Feature files  | TypeScript    | Gherkin owns timeline metadata     |
-| team       | Feature files  | TypeScript    | Gherkin owns ownership metadata    |
+| Tag | Correct Source | Wrong Source | Rationale |
+| --- | --- | --- | --- |
+| uses | TypeScript | Feature files | TS owns runtime dependencies |
+| depends-on | Feature files | TypeScript | Gherkin owns planning dependencies |
+| quarter | Feature files | TypeScript | Gherkin owns timeline metadata |
+| team | Feature files | TypeScript | Gherkin owns ownership metadata |
 
 **Verified by:** Canonical values are enforced
 
@@ -132,14 +133,14 @@
 
 **Rationale:** Ad-hoc phase names and ordering produce inconsistent roadmap grouping across packages and make cross-package progress tracking impossible.
 
-| Order | Phase         | Purpose                                        |
-| ----- | ------------- | ---------------------------------------------- |
-| 1     | Inception     | Problem framing, scope definition              |
-| 2     | Elaboration   | Design decisions, architecture exploration     |
-| 3     | Session       | Planning and design session work               |
-| 4     | Construction  | Implementation, testing, integration           |
-| 5     | Validation    | Verification, acceptance criteria confirmation |
-| 6     | Retrospective | Review, lessons learned, documentation         |
+| Order | Phase | Purpose |
+| --- | --- | --- |
+| 1 | Inception | Problem framing, scope definition |
+| 2 | Elaboration | Design decisions, architecture exploration |
+| 3 | Session | Planning and design session work |
+| 4 | Construction | Implementation, testing, integration |
+| 5 | Validation | Verification, acceptance criteria confirmation |
+| 6 | Retrospective | Review, lessons learned, documentation |
 
 **Verified by:** Canonical values are enforced
 
@@ -151,14 +152,14 @@
 
 **Rationale:** Freeform status strings bypass Zod validation and break DoD checks, which rely on terminal status classification to determine pattern completeness.
 
-| Value       | Meaning              |
-| ----------- | -------------------- |
-| complete    | Work is done         |
-| in-progress | Work is ongoing      |
-| pending     | Work has not started |
-| deferred    | Work postponed       |
-| superseded  | Replaced by another  |
-| n/a         | Not applicable       |
+| Value | Meaning |
+| --- | --- |
+| complete | Work is done |
+| in-progress | Work is ongoing |
+| pending | Work has not started |
+| deferred | Work postponed |
+| superseded | Replaced by another |
+| n/a | Not applicable |
 
 **Verified by:** Canonical values are enforced
 
@@ -425,9 +426,9 @@ graph LR
 function normalizeStatus(status: string | undefined): NormalizedStatus;
 ```
 
-| Parameter | Type | Description                                |
-| --------- | ---- | ------------------------------------------ |
-| status    |      | Raw status from pattern (case-insensitive) |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| status |  | Raw status from pattern (case-insensitive) |
 
 **Returns:** "completed" | "active" | "planned"
 
@@ -459,7 +460,7 @@ DELIVERABLE_STATUS_VALUES = [
   'deferred',
   'superseded',
   'n/a',
-] as const;
+] as const
 ```
 
 ### CategoryDefinition (interface)
@@ -479,13 +480,13 @@ interface CategoryDefinition {
 }
 ```
 
-| Property    | Description                                                                       |
-| ----------- | --------------------------------------------------------------------------------- |
-| tag         | Category tag name without prefix (e.g., "core", "api", "ddd", "saga")             |
-| domain      | Human-readable domain name for display (e.g., "Strategic DDD", "Event Sourcing")  |
-| priority    | Display order priority - lower values appear first in sorted output               |
-| description | Brief description of the category's purpose and typical patterns                  |
-| aliases     | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
+| Property | Description |
+| --- | --- |
+| tag | Category tag name without prefix (e.g., "core", "api", "ddd", "saga") |
+| domain | Human-readable domain name for display (e.g., "Strategic DDD", "Event Sourcing") |
+| priority | Display order priority - lower values appear first in sorted output |
+| description | Brief description of the category's purpose and typical patterns |
+| aliases | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
 
 ### SectionBlock (type)
 
@@ -542,37 +543,37 @@ Validation happens later at load time via Zod schema in `loadProjectConfig()`.
 [View ADR005CodecBasedMarkdownRendering source](delivery-process/decisions/adr-005-codec-based-markdown-rendering.feature)
 
 **Context:**
-The documentation generator needs to transform structured pattern data
-(MasterDataset) into markdown files. The initial approach used direct
-string concatenation in generator functions, mixing data selection,
-formatting logic, and output assembly in a single pass. This made
-generators hard to test, difficult to compose, and impossible to
-render the same data in different formats (e.g., full docs vs compact
-AI context).
+  The documentation generator needs to transform structured pattern data
+  (MasterDataset) into markdown files. The initial approach used direct
+  string concatenation in generator functions, mixing data selection,
+  formatting logic, and output assembly in a single pass. This made
+  generators hard to test, difficult to compose, and impossible to
+  render the same data in different formats (e.g., full docs vs compact
+  AI context).
 
-**Decision:**
-Adopt a codec architecture inspired by serialization codecs (encode/decode).
-Each document type has a codec that decodes a MasterDataset into a
-RenderableDocument — an intermediate representation of sections, headings,
-tables, paragraphs, and code blocks. A separate renderer transforms the
-RenderableDocument into markdown. This separates data selection (what to
-include) from formatting (how it looks) from serialization (markdown syntax).
+  **Decision:**
+  Adopt a codec architecture inspired by serialization codecs (encode/decode).
+  Each document type has a codec that decodes a MasterDataset into a
+  RenderableDocument — an intermediate representation of sections, headings,
+  tables, paragraphs, and code blocks. A separate renderer transforms the
+  RenderableDocument into markdown. This separates data selection (what to
+  include) from formatting (how it looks) from serialization (markdown syntax).
 
-**Consequences:**
-| Type | Impact |
-| Positive | Codecs are pure functions: dataset in, document out -- trivially testable |
-| Positive | RenderableDocument is an inspectable IR -- tests assert on structure, not strings |
-| Positive | Composable via CompositeCodec -- reference docs assemble from child codecs |
-| Positive | Same dataset can produce different outputs (full doc, compact doc, AI context) |
-| Negative | Extra abstraction layer between data and output |
-| Negative | RenderableDocument vocabulary must cover all needed output patterns |
+  **Consequences:**
+  | Type | Impact |
+  | Positive | Codecs are pure functions: dataset in, document out -- trivially testable |
+  | Positive | RenderableDocument is an inspectable IR -- tests assert on structure, not strings |
+  | Positive | Composable via CompositeCodec -- reference docs assemble from child codecs |
+  | Positive | Same dataset can produce different outputs (full doc, compact doc, AI context) |
+  | Negative | Extra abstraction layer between data and output |
+  | Negative | RenderableDocument vocabulary must cover all needed output patterns |
 
-**Benefits:**
-| Benefit | Before (String Concat) | After (Codec) |
-| Testability | Assert on markdown strings | Assert on typed section blocks |
-| Composability | Copy-paste between generators | CompositeCodec assembles children |
-| Format variants | Duplicate generator logic | Same codec, different renderer |
-| Progressive disclosure | Manual heading management | Heading depth auto-calculated |
+  **Benefits:**
+  | Benefit | Before (String Concat) | After (Codec) |
+  | Testability | Assert on markdown strings | Assert on typed section blocks |
+  | Composability | Copy-paste between generators | CompositeCodec assembles children |
+  | Format variants | Duplicate generator logic | Same codec, different renderer |
+  | Progressive disclosure | Manual heading management | Heading depth auto-calculated |
 
 <details>
 <summary>Codecs implement a decode-only contract (2 scenarios)</summary>
@@ -587,8 +588,8 @@ include) from formatting (how it looks) from serialization (markdown syntax).
 
 ```typescript
 interface DocumentCodec {
-  decode(dataset: MasterDataset): RenderableDocument;
-}
+      decode(dataset: MasterDataset): RenderableDocument;
+    }
 ```
 
 **Verified by:**
@@ -629,14 +630,14 @@ interface DocumentCodec {
 
 ```typescript
 const referenceDoc = CompositeCodec.create({
-  title: 'Architecture Reference',
-  codecs: [
-    behaviorCodec, // patterns with rules
-    conventionCodec, // decision records
-    shapeCodec, // type definitions
-    diagramCodec, // mermaid diagrams
-  ],
-});
+      title: 'Architecture Reference',
+      codecs: [
+        behaviorCodec,    // patterns with rules
+        conventionCodec,  // decision records
+        shapeCodec,       // type definitions
+        diagramCodec,     // mermaid diagrams
+      ],
+    });
 ```
 
 **Verified by:**
@@ -684,22 +685,22 @@ const referenceDoc = CompositeCodec.create({
 [View ADR001TaxonomyCanonicalValues source](delivery-process/decisions/adr-001-taxonomy-canonical-values.feature)
 
 **Context:**
-The annotation system requires well-defined canonical values for taxonomy
-tags, FSM status lifecycle, and source ownership rules. Without canonical
-values, organic growth produces drift (Generator vs Generators, Process
-vs DeliveryProcess) and inconsistent grouping in generated documentation.
+  The annotation system requires well-defined canonical values for taxonomy
+  tags, FSM status lifecycle, and source ownership rules. Without canonical
+  values, organic growth produces drift (Generator vs Generators, Process
+  vs DeliveryProcess) and inconsistent grouping in generated documentation.
 
-**Decision:**
-Define canonical values for all taxonomy enums, FSM states with protection
-levels, valid transitions, tag format types, and source ownership rules.
-These are the durable constants of the delivery process.
+  **Decision:**
+  Define canonical values for all taxonomy enums, FSM states with protection
+  levels, valid transitions, tag format types, and source ownership rules.
+  These are the durable constants of the delivery process.
 
-**Consequences:**
-| Type | Impact |
-| Positive | Generated docs group into coherent sections |
-| Positive | FSM enforcement has clear, auditable state definitions |
-| Positive | Source ownership prevents cross-domain tag confusion |
-| Negative | Migration effort for existing specs with non-canonical values |
+  **Consequences:**
+  | Type | Impact |
+  | Positive | Generated docs group into coherent sections |
+  | Positive | FSM enforcement has clear, auditable state definitions |
+  | Positive | Source ownership prevents cross-domain tag confusion |
+  | Negative | Migration effort for existing specs with non-canonical values |
 
 <details>
 <summary>Product area canonical values</summary>
@@ -759,8 +760,9 @@ These are the durable constants of the delivery process.
 
 - Canonical values are enforced
 
-  Completed is a terminal state. Modifications require
-  `@libar-docs-unlock-reason` escape hatch.
+
+    Completed is a terminal state. Modifications require
+    `@libar-docs-unlock-reason` escape hatch.
 
 </details>
 
@@ -844,41 +846,40 @@ These are the durable constants of the delivery process.
 [View ConfigBasedWorkflowDefinition source](delivery-process/specs/config-based-workflow-definition.feature)
 
 **Problem:**
-Every `pnpm process:query` and `pnpm docs:*` invocation prints:
-`Failed to load default workflow (6-phase-standard): Workflow file not found`
+  Every `pnpm process:query` and `pnpm docs:*` invocation prints:
+  `Failed to load default workflow (6-phase-standard): Workflow file not found`
 
-The `loadDefaultWorkflow()` function resolves to `catalogue/workflows/`
-which does not exist. The directory was deleted during monorepo extraction.
-The system already degrades gracefully (workflow = undefined), but the
-warning is noise for both human CLI use and future hook consumers (HUD).
+  The `loadDefaultWorkflow()` function resolves to `catalogue/workflows/`
+  which does not exist. The directory was deleted during monorepo extraction.
+  The system already degrades gracefully (workflow = undefined), but the
+  warning is noise for both human CLI use and future hook consumers (HUD).
 
-The old `6-phase-standard.json` conflated three concerns:
+  The old `6-phase-standard.json` conflated three concerns:
+  - Taxonomy vocabulary (status names) — already in `src/taxonomy/`
+  - FSM behavior (transitions) — already in `src/validation/fsm/`
+  - Workflow structure (phases) — orphaned, no proper home
 
-- Taxonomy vocabulary (status names) — already in `src/taxonomy/`
-- FSM behavior (transitions) — already in `src/validation/fsm/`
-- Workflow structure (phases) — orphaned, no proper home
+  **Solution:**
+  Inline the default workflow as a constant in `workflow-loader.ts`, built
+  from canonical taxonomy values. Make `loadDefaultWorkflow()` synchronous.
+  Preserve `loadWorkflowFromPath()` for custom `--workflow <file>` overrides.
 
-**Solution:**
-Inline the default workflow as a constant in `workflow-loader.ts`, built
-from canonical taxonomy values. Make `loadDefaultWorkflow()` synchronous.
-Preserve `loadWorkflowFromPath()` for custom `--workflow <file>` overrides.
+  The workflow definition uses only the 4 canonical statuses from ADR-001
+  (roadmap, active, completed, deferred) — not the stale 5-status set from
+  the deleted JSON (which included non-canonical `implemented` and `partial`).
 
-The workflow definition uses only the 4 canonical statuses from ADR-001
-(roadmap, active, completed, deferred) — not the stale 5-status set from
-the deleted JSON (which included non-canonical `implemented` and `partial`).
+  Phase definitions (Inception, Elaboration, Session, Construction,
+  Validation, Retrospective) move from a missing JSON file to an inline
+  constant, making the default workflow always available without file I/O.
 
-Phase definitions (Inception, Elaboration, Session, Construction,
-Validation, Retrospective) move from a missing JSON file to an inline
-constant, making the default workflow always available without file I/O.
+  Design Decisions (DS-1, 2026-02-15):
 
-Design Decisions (DS-1, 2026-02-15):
-
-| ID | Decision | Rationale |
-| DD-1 | Inline constant in workflow-loader.ts, not preset integration | Minimal correct fix, zero type regression risk. Preset integration deferred. |
-| DD-2 | Constant satisfies existing WorkflowConfig type | Reuse createLoadedWorkflow() from workflow-config.ts. No new types needed. |
-| DD-3 | Remove dead code: getCatalogueWorkflowsPath, loadWorkflowConfig, DEFAULT_WORKFLOW_NAME | Dead since monorepo extraction. Public API break is safe (function always threw). |
-| DD-4 | loadDefaultWorkflow() returns LoadedWorkflow synchronously | Infallible constant needs no async or error handling. |
-| DD-5 | Amend ADR-001 with canonical phase definitions | Phase names are canonical values; fits existing governance in ADR-001. |
+  | ID | Decision | Rationale |
+  | DD-1 | Inline constant in workflow-loader.ts, not preset integration | Minimal correct fix, zero type regression risk. Preset integration deferred. |
+  | DD-2 | Constant satisfies existing WorkflowConfig type | Reuse createLoadedWorkflow() from workflow-config.ts. No new types needed. |
+  | DD-3 | Remove dead code: getCatalogueWorkflowsPath, loadWorkflowConfig, DEFAULT_WORKFLOW_NAME | Dead since monorepo extraction. Public API break is safe (function always threw). |
+  | DD-4 | loadDefaultWorkflow() returns LoadedWorkflow synchronously | Infallible constant needs no async or error handling. |
+  | DD-5 | Amend ADR-001 with canonical phase definitions | Phase names are canonical values; fits existing governance in ADR-001. |
 
 <details>
 <summary>Default workflow is built from an inline constant (2 scenarios)</summary>
@@ -895,7 +896,7 @@ Design Decisions (DS-1, 2026-02-15):
 - Workflow constant uses canonical statuses only
 - Workflow constant uses canonical statuses only
 
-  Implementation approach:
+    Implementation approach:
 
 </details>
 
@@ -906,7 +907,7 @@ Design Decisions (DS-1, 2026-02-15):
 
 **Invariant:** `loadWorkflowFromPath()` remains available for projects that need custom workflow definitions. The `--workflow <file>` CLI flag and `workflowPath` config field continue to work.
 
-**Rationale:** The inline default replaces file-based _default_ loading, not file-based _custom_ loading. Projects may define custom phases or additional statuses via JSON files.
+**Rationale:** The inline default replaces file-based *default* loading, not file-based *custom* loading. Projects may define custom phases or additional statuses via JSON files.
 
 **Verified by:**
 
@@ -938,20 +939,19 @@ Design Decisions (DS-1, 2026-02-15):
 
 - N/A - deferred until preset integration
 
-  Adding `workflow` as a field on `DeliveryProcessConfig` (presets) and
-  `DeliveryProcessProjectConfig` (project config) is a natural next step
-  but NOT required for the MVP fix.
+    Adding `workflow` as a field on `DeliveryProcessConfig` (presets) and
+    `DeliveryProcessProjectConfig` (project config) is a natural next step
+    but NOT required for the MVP fix.
 
-  The inline constant in `workflow-loader.ts` resolves the warning. Moving
-  workflow into the preset/config system enables:
-  - Different presets with different default phases (e.g.
-
+    The inline constant in `workflow-loader.ts` resolves the warning. Moving
+    workflow into the preset/config system enables:
+    - Different presets with different default phases (e.g.
 - 3-phase generic)
-  - Per-project phase customization in delivery-process.config.ts
-  - Phase definitions appearing in generated documentation
+    - Per-project phase customization in delivery-process.config.ts
+    - Phase definitions appearing in generated documentation
 
-  See ideation artifact for design options:
-  delivery-process/ideations/2026-02-15-workflow-config-and-fsm-extensibility.feature
+    See ideation artifact for design options:
+    delivery-process/ideations/2026-02-15-workflow-config-and-fsm-extensibility.feature
 
 </details>
 
@@ -960,22 +960,20 @@ Design Decisions (DS-1, 2026-02-15):
 [View ProcessGuardTesting source](tests/features/validation/process-guard.feature)
 
 Pure validation functions for enforcing delivery process rules per PDR-005.
-All validation follows the Decider pattern: (state, changes, options) => result.
+  All validation follows the Decider pattern: (state, changes, options) => result.
 
-**Problem:**
+  **Problem:**
+  - Completed specs modified without explicit unlock reason
+  - Invalid status transitions bypass FSM rules
+  - Active specs expand scope unexpectedly with new deliverables
+  - Changes occur outside session boundaries
 
-- Completed specs modified without explicit unlock reason
-- Invalid status transitions bypass FSM rules
-- Active specs expand scope unexpectedly with new deliverables
-- Changes occur outside session boundaries
-
-**Solution:**
-
-- checkProtectionLevel() enforces unlock-reason for completed (hard) files
-- checkStatusTransitions() validates transitions against FSM matrix
-- checkScopeCreep() prevents deliverable addition to active (scope) specs
-- checkSessionScope() warns about files outside session scope
-- checkSessionExcluded() errors on explicitly excluded files
+  **Solution:**
+  - checkProtectionLevel() enforces unlock-reason for completed (hard) files
+  - checkStatusTransitions() validates transitions against FSM matrix
+  - checkScopeCreep() prevents deliverable addition to active (scope) specs
+  - checkSessionScope() warns about files outside session scope
+  - checkSessionExcluded() errors on explicitly excluded files
 
 <details>
 <summary>Completed files require unlock-reason to modify (4 scenarios)</summary>

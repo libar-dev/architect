@@ -155,13 +155,13 @@ interface DeliveryProcessConfig {
 }
 ````
 
-| Property              | Description                                                                                                                                                                                                                                                                                                                                                                                       |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| tagPrefix             | Tag prefix for directives (e.g., "@docs-" or "@libar-docs-")                                                                                                                                                                                                                                                                                                                                      |
-| fileOptInTag          | File-level opt-in tag (e.g., "@docs" or "@libar-docs")                                                                                                                                                                                                                                                                                                                                            |
-| categories            | Category definitions for pattern classification                                                                                                                                                                                                                                                                                                                                                   |
-| metadataTags          | Optional metadata tag definitions                                                                                                                                                                                                                                                                                                                                                                 |
-| contextInferenceRules | Optional context inference rules for auto-inferring bounded context from file paths. When provided, these rules are merged with the default rules. User-provided rules take precedence over defaults (applied first in the rule list). `typescript contextInferenceRules: [ { pattern: 'packages/orders/**', context: 'orders' }, { pattern: 'packages/inventory/**', context: 'inventory' }, ] ` |
+| Property | Description |
+| --- | --- |
+| tagPrefix | Tag prefix for directives (e.g., "@docs-" or "@libar-docs-") |
+| fileOptInTag | File-level opt-in tag (e.g., "@docs" or "@libar-docs") |
+| categories | Category definitions for pattern classification |
+| metadataTags | Optional metadata tag definitions |
+| contextInferenceRules | Optional context inference rules for auto-inferring bounded context from file paths. When provided, these rules are merged with the default rules. User-provided rules take precedence over defaults (applied first in the rule list). ```typescript contextInferenceRules: [ { pattern: 'packages/orders/**', context: 'orders' }, { pattern: 'packages/inventory/**', context: 'inventory' }, ] ``` |
 
 ### DeliveryProcessInstance (interface)
 
@@ -180,10 +180,10 @@ interface DeliveryProcessInstance {
 }
 ```
 
-| Property      | Description                       |
-| ------------- | --------------------------------- |
-| registry      | The fully configured tag registry |
-| regexBuilders | Regex builders for tag detection  |
+| Property | Description |
+| --- | --- |
+| registry | The fully configured tag registry |
+| regexBuilders | Regex builders for tag detection |
 
 ### RegexBuilders (interface)
 
@@ -211,9 +211,9 @@ interface RegexBuilders {
 }
 ```
 
-| Property         | Description                                                     |
-| ---------------- | --------------------------------------------------------------- |
-| fileOptInPattern | Pattern to match file-level opt-in (e.g., /\*_ @docs _\/)       |
+| Property | Description |
+| --- | --- |
+| fileOptInPattern | Pattern to match file-level opt-in (e.g., /** @docs *\/) |
 | directivePattern | Pattern to match directives (e.g., @docs-pattern, @docs-status) |
 
 ### DeliveryProcessProjectConfig (interface)
@@ -308,20 +308,20 @@ interface DeliveryProcessProjectConfig {
 }
 ```
 
-| Property              | Description                                                                                                                                                                                                                                                                                                                                                           |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| preset                | Use a preset taxonomy configuration                                                                                                                                                                                                                                                                                                                                   |
-| tagPrefix             | Custom tag prefix (overrides preset, e.g., '@docs-')                                                                                                                                                                                                                                                                                                                  |
-| fileOptInTag          | Custom file opt-in tag (overrides preset, e.g., '@docs')                                                                                                                                                                                                                                                                                                              |
-| categories            | Custom categories (replaces preset categories entirely)                                                                                                                                                                                                                                                                                                               |
-| sources               | Source file glob configuration                                                                                                                                                                                                                                                                                                                                        |
-| output                | Output configuration for generated docs                                                                                                                                                                                                                                                                                                                               |
-| generators            | Default generator names to run when CLI doesn't specify --generators                                                                                                                                                                                                                                                                                                  |
-| generatorOverrides    | Per-generator source and output overrides                                                                                                                                                                                                                                                                                                                             |
-| contextInferenceRules | Rules for auto-inferring bounded context from file paths                                                                                                                                                                                                                                                                                                              |
-| workflowPath          | Path to custom workflow config JSON (relative to config file)                                                                                                                                                                                                                                                                                                         |
-| codecOptions          | Per-codec options for fine-tuning document generation. Keys match codec names (e.g., 'business-rules', 'patterns'). Passed through to codec factories at generation time.                                                                                                                                                                                             |
-| referenceDocConfigs   | Reference document configurations for convention-based doc generation. Each config defines one reference document's content composition via convention tags, shape sources, behavior categories, and diagram scopes. When not specified, no reference generators are registered. Import `LIBAR_REFERENCE_CONFIGS` from the generators module to use the built-in set. |
+| Property | Description |
+| --- | --- |
+| preset | Use a preset taxonomy configuration |
+| tagPrefix | Custom tag prefix (overrides preset, e.g., '@docs-') |
+| fileOptInTag | Custom file opt-in tag (overrides preset, e.g., '@docs') |
+| categories | Custom categories (replaces preset categories entirely) |
+| sources | Source file glob configuration |
+| output | Output configuration for generated docs |
+| generators | Default generator names to run when CLI doesn't specify --generators |
+| generatorOverrides | Per-generator source and output overrides |
+| contextInferenceRules | Rules for auto-inferring bounded context from file paths |
+| workflowPath | Path to custom workflow config JSON (relative to config file) |
+| codecOptions | Per-codec options for fine-tuning document generation. Keys match codec names (e.g., 'business-rules', 'patterns'). Passed through to codec factories at generation time. |
+| referenceDocConfigs | Reference document configurations for convention-based doc generation. Each config defines one reference document's content composition via convention tags, shape sources, behavior categories, and diagram scopes. When not specified, no reference generators are registered. Import `LIBAR_REFERENCE_CONFIGS` from the generators module to use the built-in set. |
 
 ### SourcesConfig (interface)
 
@@ -355,12 +355,12 @@ interface SourcesConfig {
 }
 ```
 
-| Property   | Description                                                                                                                                                                    |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| typescript | Glob patterns for TypeScript source files (replaces --input)                                                                                                                   |
-| features   | Glob patterns for Gherkin feature files (replaces --features). Includes both `.feature` and `.feature.md` files.                                                               |
-| stubs      | Glob patterns for design stub files. Stubs are TypeScript files that live outside `src/` (e.g., `delivery-process/stubs/`). Merged into TypeScript sources at resolution time. |
-| exclude    | Glob patterns to exclude from all scanning                                                                                                                                     |
+| Property | Description |
+| --- | --- |
+| typescript | Glob patterns for TypeScript source files (replaces --input) |
+| features | Glob patterns for Gherkin feature files (replaces --features). Includes both `.feature` and `.feature.md` files. |
+| stubs | Glob patterns for design stub files. Stubs are TypeScript files that live outside `src/` (e.g., `delivery-process/stubs/`). Merged into TypeScript sources at resolution time. |
+| exclude | Glob patterns to exclude from all scanning |
 
 ### OutputConfig (interface)
 
@@ -379,10 +379,10 @@ interface OutputConfig {
 }
 ```
 
-| Property  | Description                                                        |
-| --------- | ------------------------------------------------------------------ |
+| Property | Description |
+| --- | --- |
 | directory | Output directory for generated docs (default: 'docs/architecture') |
-| overwrite | Overwrite existing files (default: false)                          |
+| overwrite | Overwrite existing files (default: false) |
 
 ### GeneratorSourceOverride (interface)
 
@@ -430,12 +430,12 @@ interface GeneratorSourceOverride {
 }
 ```
 
-| Property           | Description                                                                                          |
-| ------------------ | ---------------------------------------------------------------------------------------------------- |
-| additionalFeatures | Additional feature file globs appended to base features                                              |
-| additionalInput    | Additional TypeScript globs appended to base TypeScript sources                                      |
-| replaceFeatures    | Feature globs used INSTEAD of base features. Mutually exclusive with non-empty `additionalFeatures`. |
-| outputDirectory    | Override output directory for this generator                                                         |
+| Property | Description |
+| --- | --- |
+| additionalFeatures | Additional feature file globs appended to base features |
+| additionalInput | Additional TypeScript globs appended to base TypeScript sources |
+| replaceFeatures | Feature globs used INSTEAD of base features. Mutually exclusive with non-empty `additionalFeatures`. |
+| outputDirectory | Override output directory for this generator |
 
 ### ResolvedProjectConfig (interface)
 
@@ -466,16 +466,16 @@ interface ResolvedProjectConfig {
 }
 ```
 
-| Property              | Description                                                |
-| --------------------- | ---------------------------------------------------------- |
-| sources               | Resolved source globs (stubs merged, defaults applied)     |
-| output                | Resolved output config with all defaults                   |
-| generators            | Default generator names                                    |
-| generatorOverrides    | Per-generator source overrides                             |
+| Property | Description |
+| --- | --- |
+| sources | Resolved source globs (stubs merged, defaults applied) |
+| output | Resolved output config with all defaults |
+| generators | Default generator names |
+| generatorOverrides | Per-generator source overrides |
 | contextInferenceRules | Context inference rules (user rules prepended to defaults) |
-| workflowPath          | Workflow config path (null if not specified)               |
-| codecOptions          | Per-codec options for document generation (empty if none)  |
-| referenceDocConfigs   | Reference document configurations (empty array if none)    |
+| workflowPath | Workflow config path (null if not specified) |
+| codecOptions | Per-codec options for document generation (empty if none) |
+| referenceDocConfigs | Reference document configurations (empty array if none) |
 
 ### ResolvedSourcesConfig (interface)
 
@@ -496,11 +496,11 @@ interface ResolvedSourcesConfig {
 }
 ```
 
-| Property   | Description                                     |
-| ---------- | ----------------------------------------------- |
+| Property | Description |
+| --- | --- |
 | typescript | TypeScript source globs (includes merged stubs) |
-| features   | Gherkin feature file globs                      |
-| exclude    | Glob patterns to exclude from scanning          |
+| features | Gherkin feature file globs |
+| exclude | Glob patterns to exclude from scanning |
 
 ### CreateDeliveryProcessOptions (interface)
 
@@ -523,12 +523,12 @@ interface CreateDeliveryProcessOptions {
 }
 ```
 
-| Property     | Description                                             |
-| ------------ | ------------------------------------------------------- |
-| preset       | Use a preset configuration                              |
-| tagPrefix    | Custom tag prefix (overrides preset)                    |
-| fileOptInTag | Custom file opt-in tag (overrides preset)               |
-| categories   | Custom categories (replaces preset categories entirely) |
+| Property | Description |
+| --- | --- |
+| preset | Use a preset configuration |
+| tagPrefix | Custom tag prefix (overrides preset) |
+| fileOptInTag | Custom file opt-in tag (overrides preset) |
+| categories | Custom categories (replaces preset categories entirely) |
 
 ### ConfigDiscoveryResult (interface)
 
@@ -551,12 +551,12 @@ interface ConfigDiscoveryResult {
 }
 ```
 
-| Property  | Description                                 |
-| --------- | ------------------------------------------- |
-| found     | Whether a config file was found             |
-| path      | Absolute path to the config file (if found) |
-| instance  | The loaded configuration instance           |
-| isDefault | Whether the default configuration was used  |
+| Property | Description |
+| --- | --- |
+| found | Whether a config file was found |
+| path | Absolute path to the config file (if found) |
+| instance | The loaded configuration instance |
+| isDefault | Whether the default configuration was used |
 
 ### ConfigLoadError (interface)
 
@@ -579,12 +579,12 @@ interface ConfigLoadError {
 }
 ```
 
-| Property | Description                                           |
-| -------- | ----------------------------------------------------- |
-| type     | Discriminant for error type identification            |
-| path     | Absolute path to the config file that failed to load  |
-| message  | Human-readable error description                      |
-| cause    | The underlying error that caused the failure (if any) |
+| Property | Description |
+| --- | --- |
+| type | Discriminant for error type identification |
+| path | Absolute path to the config file that failed to load |
+| message | Human-readable error description |
+| cause | The underlying error that caused the failure (if any) |
 
 ### ResolvedConfig (type)
 
@@ -692,10 +692,10 @@ type ConfigLoadResult =
 function createRegexBuilders(tagPrefix: string, fileOptInTag: string): RegexBuilders;
 ```
 
-| Parameter    | Type | Description                                          |
-| ------------ | ---- | ---------------------------------------------------- |
-| tagPrefix    |      | The tag prefix (e.g., "@docs-" or "@libar-docs-")    |
-| fileOptInTag |      | The file opt-in tag (e.g., "@docs" or "@libar-docs") |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| tagPrefix |  | The tag prefix (e.g., "@docs-" or "@libar-docs-") |
+| fileOptInTag |  | The file opt-in tag (e.g., "@docs" or "@libar-docs") |
 
 **Returns:** RegexBuilders instance with pattern matching methods
 
@@ -743,12 +743,14 @@ function createRegexBuilders(tagPrefix: string, fileOptInTag: string): RegexBuil
 ````
 
 ```typescript
-function createDeliveryProcess(options: CreateDeliveryProcessOptions = {}): DeliveryProcessInstance;
+function createDeliveryProcess(
+  options: CreateDeliveryProcessOptions = {}
+): DeliveryProcessInstance;
 ```
 
-| Parameter | Type | Description           |
-| --------- | ---- | --------------------- |
-| options   |      | Configuration options |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| options |  | Configuration options |
 
 **Returns:** Configured delivery process instance
 
@@ -767,9 +769,9 @@ function createDeliveryProcess(options: CreateDeliveryProcessOptions = {}): Deli
 async function findConfigFile(startDir: string): Promise<string | null>;
 ```
 
-| Parameter | Type | Description                       |
-| --------- | ---- | --------------------------------- |
-| startDir  |      | Directory to start searching from |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| startDir |  | Directory to start searching from |
 
 **Returns:** Path to config file or null if not found
 
@@ -808,9 +810,9 @@ async function findConfigFile(startDir: string): Promise<string | null>;
 async function loadConfig(baseDir: string): Promise<ConfigLoadResult>;
 ```
 
-| Parameter | Type | Description                                                     |
-| --------- | ---- | --------------------------------------------------------------- |
-| baseDir   |      | Directory to start searching from (usually cwd or project root) |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| baseDir |  | Directory to start searching from (usually cwd or project root) |
 
 **Returns:** Result with loaded configuration or error
 
@@ -829,9 +831,9 @@ async function loadConfig(baseDir: string): Promise<ConfigLoadResult>;
 function formatConfigError(error: ConfigLoadError): string;
 ```
 
-| Parameter | Type | Description       |
-| --------- | ---- | ----------------- |
-| error     |      | Config load error |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| error |  | Config load error |
 
 **Returns:** Formatted error message
 
@@ -883,7 +885,7 @@ GENERIC_PRESET = {
       aliases: ['infrastructure'],
     },
   ] as const satisfies readonly CategoryDefinition[],
-} as const satisfies DeliveryProcessConfig;
+} as const satisfies DeliveryProcessConfig
 ```
 
 ### LIBAR_GENERIC_PRESET (const)
@@ -941,7 +943,7 @@ LIBAR_GENERIC_PRESET = {
       aliases: ['infrastructure'],
     },
   ] as const satisfies readonly CategoryDefinition[],
-} as const satisfies DeliveryProcessConfig;
+} as const satisfies DeliveryProcessConfig
 ```
 
 ### DDD_ES_CQRS_PRESET (const)
@@ -971,7 +973,7 @@ DDD_ES_CQRS_PRESET = {
   fileOptInTag: DEFAULT_FILE_OPT_IN_TAG,
   categories: CATEGORIES,
   metadataTags: buildRegistry().metadataTags,
-} as const satisfies DeliveryProcessConfig;
+} as const satisfies DeliveryProcessConfig
 ```
 
 ### PRESETS (const)
@@ -1003,78 +1005,78 @@ const PRESETS: Record<PresetName, DeliveryProcessConfig>;
 
 ### Config Based Workflow Definition
 
-| Rule                                                 | Invariant                                                                                                                                                                                            | Rationale                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Default workflow is built from an inline constant    | `loadDefaultWorkflow()` returns a `LoadedWorkflow` without file system access. It cannot fail. The default workflow constant uses only canonical status values from `src/taxonomy/status-values.ts`. | The file-based loading path (`catalogue/workflows/`) has been dead code since monorepo extraction. Both callers (orchestrator, process-api) already handle the failure gracefully, proving the system works without it. Making the function synchronous and infallible removes the try-catch ceremony and the warning noise.                                                                                                                                                                                     |
-| Custom workflow files still work via --workflow flag | `loadWorkflowFromPath()` remains available for projects that need custom workflow definitions. The `--workflow <file>` CLI flag and `workflowPath` config field continue to work.                    | The inline default replaces file-based _default_ loading, not file-based _custom_ loading. Projects may define custom phases or additional statuses via JSON files.                                                                                                                                                                                                                                                                                                                                              |
-| FSM validation and Process Guard are not affected    | The FSM transition matrix, protection levels, and Process Guard rules remain hardcoded in `src/validation/fsm/` and `src/lint/process-guard/`. They do not read from `LoadedWorkflow`.               | FSM and workflow are separate concerns. FSM enforces status transitions (4-state model from PDR-005). Workflow defines phase structure (6-phase USDP). The workflow JSON declared `transitionsTo` on its statuses, but no code ever read those values — the FSM uses its own `VALID_TRANSITIONS` constant. This separation is correct and intentional. Blast radius analysis confirmed zero workflow imports in: - src/validation/fsm/ (4 files) - src/lint/process-guard/ (5 files) - src/taxonomy/ (all files) |
-| Workflow as a configurable preset field is deferred  | The inline default workflow constant is the only workflow source until preset integration is implemented. No preset or project config field exposes workflow customization.                          | Coupling workflow into the preset/config system before the inline fix ships would widen the blast radius and risk type regressions across all config consumers.                                                                                                                                                                                                                                                                                                                                                  |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Default workflow is built from an inline constant | `loadDefaultWorkflow()` returns a `LoadedWorkflow` without file system access. It cannot fail. The default workflow constant uses only canonical status values from `src/taxonomy/status-values.ts`. | The file-based loading path (`catalogue/workflows/`) has been dead code since monorepo extraction. Both callers (orchestrator, process-api) already handle the failure gracefully, proving the system works without it. Making the function synchronous and infallible removes the try-catch ceremony and the warning noise. |
+| Custom workflow files still work via --workflow flag | `loadWorkflowFromPath()` remains available for projects that need custom workflow definitions. The `--workflow <file>` CLI flag and `workflowPath` config field continue to work. | The inline default replaces file-based *default* loading, not file-based *custom* loading. Projects may define custom phases or additional statuses via JSON files. |
+| FSM validation and Process Guard are not affected | The FSM transition matrix, protection levels, and Process Guard rules remain hardcoded in `src/validation/fsm/` and `src/lint/process-guard/`. They do not read from `LoadedWorkflow`. | FSM and workflow are separate concerns. FSM enforces status transitions (4-state model from PDR-005). Workflow defines phase structure (6-phase USDP). The workflow JSON declared `transitionsTo` on its statuses, but no code ever read those values — the FSM uses its own `VALID_TRANSITIONS` constant. This separation is correct and intentional. Blast radius analysis confirmed zero workflow imports in: - src/validation/fsm/ (4 files) - src/lint/process-guard/ (5 files) - src/taxonomy/ (all files) |
+| Workflow as a configurable preset field is deferred | The inline default workflow constant is the only workflow source until preset integration is implemented. No preset or project config field exposes workflow customization. | Coupling workflow into the preset/config system before the inline fix ships would widen the blast radius and risk type regressions across all config consumers. |
 
 ### Config Loader Testing
 
-| Rule                                                  | Invariant                                                                                                                                                                             | Rationale                                                                                                                                             |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
 | Config files are discovered by walking up directories | The config loader must search for configuration files starting from the current directory and walking up parent directories until a match is found or the filesystem root is reached. | Projects may run CLI commands from subdirectories — upward traversal ensures the nearest config file is always found regardless of working directory. |
-| Config discovery stops at repo root                   | Directory traversal must stop at repository root markers (e.g., .git directory) and not search beyond them.                                                                           | Searching beyond the repo root could find unrelated config files from parent projects, producing confusing cross-project behavior.                    |
-| Config is loaded and validated                        | Loaded config files must have a valid default export matching the expected configuration schema, with appropriate error messages for invalid formats.                                 | Invalid configurations produce cryptic downstream errors — early validation with clear messages prevents debugging wasted on malformed config.        |
-| Config errors are formatted for display               | Configuration loading errors must be formatted as human-readable messages including the file path and specific error description.                                                     | Raw error objects are not actionable — developers need the config file path and a clear description to diagnose and fix configuration issues.         |
+| Config discovery stops at repo root | Directory traversal must stop at repository root markers (e.g., .git directory) and not search beyond them. | Searching beyond the repo root could find unrelated config files from parent projects, producing confusing cross-project behavior. |
+| Config is loaded and validated | Loaded config files must have a valid default export matching the expected configuration schema, with appropriate error messages for invalid formats. | Invalid configurations produce cryptic downstream errors — early validation with clear messages prevents debugging wasted on malformed config. |
+| Config errors are formatted for display | Configuration loading errors must be formatted as human-readable messages including the file path and specific error description. | Raw error objects are not actionable — developers need the config file path and a clear description to diagnose and fix configuration issues. |
 
 ### Config Resolution
 
-| Rule                                       | Invariant                                                                                  | Rationale                                                                                                 |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| Default config provides sensible fallbacks | A config created without user input must have isDefault=true and empty source collections. | Downstream consumers need a safe starting point when no config file exists.                               |
-| Preset creates correct taxonomy instance   | Each preset must produce a taxonomy with the correct number of categories and tag prefix.  | Presets are the primary user-facing configuration — wrong category counts break downstream scanning.      |
-| Stubs are merged into typescript sources   | Stub glob patterns must appear in resolved typescript sources alongside original globs.    | Stubs extend the scanner's source set without requiring users to manually list them.                      |
-| Output defaults are applied                | Missing output configuration must resolve to "docs/architecture" with overwrite=false.     | Consistent defaults prevent accidental overwrites and establish a predictable output location.            |
-| Generator defaults are applied             | A config with no generators specified must default to the "patterns" generator.            | Patterns is the most commonly needed output — defaulting to it reduces boilerplate.                       |
-| Context inference rules are prepended      | User-defined inference rules must appear before built-in defaults in the resolved array.   | Prepending gives user rules priority during context matching without losing defaults.                     |
-| Config path is carried from options        | The configPath from resolution options must be preserved unchanged in resolved config.     | Downstream tools need the original config file location for error reporting and relative path resolution. |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Default config provides sensible fallbacks | A config created without user input must have isDefault=true and empty source collections. | Downstream consumers need a safe starting point when no config file exists. |
+| Preset creates correct taxonomy instance | Each preset must produce a taxonomy with the correct number of categories and tag prefix. | Presets are the primary user-facing configuration — wrong category counts break downstream scanning. |
+| Stubs are merged into typescript sources | Stub glob patterns must appear in resolved typescript sources alongside original globs. | Stubs extend the scanner's source set without requiring users to manually list them. |
+| Output defaults are applied | Missing output configuration must resolve to "docs/architecture" with overwrite=false. | Consistent defaults prevent accidental overwrites and establish a predictable output location. |
+| Generator defaults are applied | A config with no generators specified must default to the "patterns" generator. | Patterns is the most commonly needed output — defaulting to it reduces boilerplate. |
+| Context inference rules are prepended | User-defined inference rules must appear before built-in defaults in the resolved array. | Prepending gives user rules priority during context matching without losing defaults. |
+| Config path is carried from options | The configPath from resolution options must be preserved unchanged in resolved config. | Downstream tools need the original config file location for error reporting and relative path resolution. |
 
 ### Configuration API
 
-| Rule                                                       | Invariant                                                                                                                                                                  | Rationale                                                                                                                                                           |
-| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
 | Factory creates configured instances with correct defaults | The configuration factory must produce a fully initialized instance for any supported preset, with the libar-generic preset as the default when no arguments are provided. | A sensible default preset eliminates boilerplate for the common case while still supporting specialized presets (ddd-es-cqrs) for advanced monorepo configurations. |
-| Custom prefix configuration works correctly                | Custom tag prefix and file opt-in tag overrides must be applied to the configuration instance, replacing the preset defaults.                                              | Consuming projects may use different annotation prefixes — custom prefixes enable the toolkit to work with any tag convention without forking presets.              |
-| Preset categories replace base categories entirely         | When a preset defines its own category set, it must fully replace (not merge with) the base categories.                                                                    | Category sets are curated per-preset — merging would include irrelevant categories (e.g., DDD categories in a generic project) that pollute taxonomy reports.       |
-| Regex builders use configured prefix                       | All regex builders (hasFileOptIn, hasDocDirectives, normalizeTag) must use the configured tag prefix, not a hardcoded one.                                                 | Regex patterns that ignore the configured prefix would miss annotations in projects using custom prefixes, silently skipping source files.                          |
+| Custom prefix configuration works correctly | Custom tag prefix and file opt-in tag overrides must be applied to the configuration instance, replacing the preset defaults. | Consuming projects may use different annotation prefixes — custom prefixes enable the toolkit to work with any tag convention without forking presets. |
+| Preset categories replace base categories entirely | When a preset defines its own category set, it must fully replace (not merge with) the base categories. | Category sets are curated per-preset — merging would include irrelevant categories (e.g., DDD categories in a generic project) that pollute taxonomy reports. |
+| Regex builders use configured prefix | All regex builders (hasFileOptIn, hasDocDirectives, normalizeTag) must use the configured tag prefix, not a hardcoded one. | Regex patterns that ignore the configured prefix would miss annotations in projects using custom prefixes, silently skipping source files. |
 
 ### Define Config Testing
 
-| Rule                                    | Invariant                                                                                                                                                                      | Rationale                                                                                                                                                              |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| defineConfig is an identity function    | The defineConfig helper must return its input unchanged, serving only as a type annotation aid for IDE autocomplete.                                                           | defineConfig exists for TypeScript type inference in config files — any transformation would surprise users who expect their config object to pass through unmodified. |
-| Schema validates correct configurations | Valid configuration objects (both minimal and fully-specified) must pass schema validation without errors.                                                                     | The schema must accept all legitimate configuration shapes — rejecting valid configs would block users from using supported features.                                  |
-| Schema rejects invalid configurations   | The configuration schema must reject invalid values including empty globs, directory traversal patterns, mutually exclusive options, invalid preset names, and unknown fields. | Schema validation is the first line of defense against misconfiguration — permissive validation lets invalid configs produce confusing downstream errors.              |
-| Type guards distinguish config formats  | The isProjectConfig and isLegacyInstance type guards must correctly distinguish between new-style project configs and legacy configuration instances.                          | The codebase supports both config formats during migration — incorrect type detection would apply the wrong loading path and produce runtime errors.                   |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| defineConfig is an identity function | The defineConfig helper must return its input unchanged, serving only as a type annotation aid for IDE autocomplete. | defineConfig exists for TypeScript type inference in config files — any transformation would surprise users who expect their config object to pass through unmodified. |
+| Schema validates correct configurations | Valid configuration objects (both minimal and fully-specified) must pass schema validation without errors. | The schema must accept all legitimate configuration shapes — rejecting valid configs would block users from using supported features. |
+| Schema rejects invalid configurations | The configuration schema must reject invalid values including empty globs, directory traversal patterns, mutually exclusive options, invalid preset names, and unknown fields. | Schema validation is the first line of defense against misconfiguration — permissive validation lets invalid configs produce confusing downstream errors. |
+| Type guards distinguish config formats | The isProjectConfig and isLegacyInstance type guards must correctly distinguish between new-style project configs and legacy configuration instances. | The codebase supports both config formats during migration — incorrect type detection would apply the wrong loading path and produce runtime errors. |
 
 ### Preset System
 
-| Rule                                                             | Invariant                                                                                         | Rationale                                                                                                           |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Generic preset provides minimal taxonomy                         | The generic preset must provide exactly 3 categories (core, api, infra) with @docs- prefix.       | Simple projects need minimal configuration without DDD-specific categories cluttering the taxonomy.                 |
-| Libar generic preset provides minimal taxonomy with libar prefix | The libar-generic preset must provide exactly 3 categories with @libar-docs- prefix.              | This package uses @libar-docs- prefix to avoid collisions with consumer projects' annotations.                      |
-| DDD-ES-CQRS preset provides full taxonomy                        | The DDD preset must provide all 21 categories spanning DDD, ES, CQRS, and infrastructure domains. | DDD architectures require fine-grained categorization to distinguish bounded contexts, aggregates, and projections. |
-| Presets can be accessed by name                                  | All preset instances must be accessible via the PRESETS map using their canonical string key.     | Programmatic access enables config files to reference presets by name instead of importing instances.               |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Generic preset provides minimal taxonomy | The generic preset must provide exactly 3 categories (core, api, infra) with @docs- prefix. | Simple projects need minimal configuration without DDD-specific categories cluttering the taxonomy. |
+| Libar generic preset provides minimal taxonomy with libar prefix | The libar-generic preset must provide exactly 3 categories with @libar-docs- prefix. | This package uses @libar-docs- prefix to avoid collisions with consumer projects' annotations. |
+| DDD-ES-CQRS preset provides full taxonomy | The DDD preset must provide all 21 categories spanning DDD, ES, CQRS, and infrastructure domains. | DDD architectures require fine-grained categorization to distinguish bounded contexts, aggregates, and projections. |
+| Presets can be accessed by name | All preset instances must be accessible via the PRESETS map using their canonical string key. | Programmatic access enables config files to reference presets by name instead of importing instances. |
 
 ### Project Config Loader
 
-| Rule                                                | Invariant                                                                                                | Rationale                                                                                                          |
-| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Missing config returns defaults                     | When no config file exists, loadProjectConfig must return a default resolved config with isDefault=true. | Graceful fallback enables zero-config usage — new projects work without requiring config file creation.            |
-| New-style config is loaded and resolved             | A file exporting defineConfig must be loaded, validated, and resolved with correct preset categories.    | defineConfig is the primary config format — correct loading is the critical path for all documentation generation. |
-| Legacy config is loaded with backward compatibility | A file exporting createDeliveryProcess must be loaded and produce a valid resolved config.               | Backward compatibility prevents breaking existing consumers during migration to the new config format.             |
-| Invalid configs produce clear errors                | Config files without a default export or with invalid data must produce descriptive error messages.      | Actionable error messages reduce debugging time — users need to know what to fix, not just that something failed.  |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Missing config returns defaults | When no config file exists, loadProjectConfig must return a default resolved config with isDefault=true. | Graceful fallback enables zero-config usage — new projects work without requiring config file creation. |
+| New-style config is loaded and resolved | A file exporting defineConfig must be loaded, validated, and resolved with correct preset categories. | defineConfig is the primary config format — correct loading is the critical path for all documentation generation. |
+| Legacy config is loaded with backward compatibility | A file exporting createDeliveryProcess must be loaded and produce a valid resolved config. | Backward compatibility prevents breaking existing consumers during migration to the new config format. |
+| Invalid configs produce clear errors | Config files without a default export or with invalid data must produce descriptive error messages. | Actionable error messages reduce debugging time — users need to know what to fix, not just that something failed. |
 
 ### Source Merging
 
-| Rule                                                | Invariant                                                                                                                                                | Rationale                                                                                                                                                 |
-| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| No override returns base unchanged                  | When no source overrides are provided, the merged result must be identical to the base source configuration.                                             | The merge function must be safe to call unconditionally — returning modified results without overrides would corrupt default source paths.                |
-| Feature overrides control feature source selection  | additionalFeatures must append to base feature sources while replaceFeatures must completely replace them, and these two options are mutually exclusive. | Projects need both additive and replacement strategies — additive for extending (monorepo packages), replacement for narrowing (focused generation runs). |
-| TypeScript source overrides append additional input | additionalInput must append to (not replace) the base TypeScript source paths.                                                                           | TypeScript sources are always additive — the base sources contain core patterns that must always be included alongside project-specific additions.        |
-| Combined overrides apply together                   | Feature overrides and TypeScript overrides must compose independently when both are provided simultaneously.                                             | Real configs often specify both feature and TypeScript overrides — they must not interfere with each other or produce order-dependent results.            |
-| Exclude is always inherited from base               | The exclude patterns must always come from the base configuration, never from overrides.                                                                 | Exclude patterns are a safety mechanism — allowing overrides to modify excludes could accidentally include sensitive or generated files in the scan.      |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| No override returns base unchanged | When no source overrides are provided, the merged result must be identical to the base source configuration. | The merge function must be safe to call unconditionally — returning modified results without overrides would corrupt default source paths. |
+| Feature overrides control feature source selection | additionalFeatures must append to base feature sources while replaceFeatures must completely replace them, and these two options are mutually exclusive. | Projects need both additive and replacement strategies — additive for extending (monorepo packages), replacement for narrowing (focused generation runs). |
+| TypeScript source overrides append additional input | additionalInput must append to (not replace) the base TypeScript source paths. | TypeScript sources are always additive — the base sources contain core patterns that must always be included alongside project-specific additions. |
+| Combined overrides apply together | Feature overrides and TypeScript overrides must compose independently when both are provided simultaneously. | Real configs often specify both feature and TypeScript overrides — they must not interfere with each other or produce order-dependent results. |
+| Exclude is always inherited from base | The exclude patterns must always come from the base configuration, never from overrides. | Exclude patterns are a safety mechanism — allowing overrides to modify excludes could accidentally include sensitive or generated files in the scan. |
 
 ---

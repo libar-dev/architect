@@ -16,7 +16,6 @@ import {
   findParagraphs,
   type DetailLevel,
   type RenderableDocument,
-  type ReferenceDocConfig,
 } from '../../../support/helpers/reference-codec-state.js';
 import { renderToMarkdown } from '../../../../src/renderable/render.js';
 

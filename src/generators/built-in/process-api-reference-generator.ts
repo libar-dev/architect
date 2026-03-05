@@ -66,7 +66,7 @@ function renderSection(group: CLIOptionGroup, tableType: 'global' | 'two-column'
   if (tableType === 'global') {
     parts.push(renderGlobalOptionsTable(group.options));
   } else {
-    parts.push(renderTwoColumnTable(group.title.slice(0, -1), 'Description', group.options));
+    parts.push(renderTwoColumnTable(group.singularTitle ?? group.title, 'Description', group.options));
   }
   parts.push('');
 

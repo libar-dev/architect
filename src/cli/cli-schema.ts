@@ -35,6 +35,8 @@ export interface CLIOptionDef {
 export interface CLIOptionGroup {
   /** Section heading */
   readonly title: string;
+  /** Singular form of title for column headers in two-column tables */
+  readonly singularTitle?: string;
   /** Intro prose rendered above the table */
   readonly description?: string;
   /** Prose rendered below the table */
@@ -99,6 +101,7 @@ export const CLI_SCHEMA: CLISchema = {
 
   outputModifiers: {
     title: 'Output Modifiers',
+    singularTitle: 'Output Modifier',
     description: 'Composable with `list`, `arch context/layer`, and pattern-array `query` methods.',
     postNote: [
       'Valid fields for `--fields`: `patternName`, `status`, `category`, `phase`, `file`, `source`.',
@@ -133,6 +136,7 @@ export const CLI_SCHEMA: CLISchema = {
 
   listFilters: {
     title: 'List Filters',
+    singularTitle: 'List Filter',
     description: 'For the `list` subcommand. All filters are composable.',
     options: [
       {

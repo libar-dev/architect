@@ -13,18 +13,19 @@
 - Shape extraction: TypeScript shapes (`interface`, `type`, `enum`, `function`, `const`) are extracted by declaration-level `@libar-docs-shape` tags. Shapes include source text, JSDoc, type parameters, and property documentation
 - Generator registration: Generators self-register via `registerGenerator()`. The orchestrator runs them in registration order. Each generator owns its output files and codec configuration
 
+
 #### API Types
 
-| Type                     | Kind      |
-| ------------------------ | --------- |
-| RuntimeMasterDataset     | interface |
-| RawDataset               | interface |
-| RenderableDocument       | type      |
-| SectionBlock             | type      |
-| HeadingBlock             | type      |
-| TableBlock               | type      |
-| ListBlock                | type      |
-| CodeBlock                | type      |
-| MermaidBlock             | type      |
-| CollapsibleBlock         | type      |
-| transformToMasterDataset | function  |
+| Type | Kind |
+| --- | --- |
+| RuntimeMasterDataset | interface |
+| RawDataset | interface |
+| RenderableDocument | type |
+| SectionBlock | type |
+| HeadingBlock | type |
+| TableBlock | type |
+| ListBlock | type |
+| CodeBlock | type |
+| MermaidBlock | type |
+| CollapsibleBlock | type |
+| transformToMasterDataset | function |

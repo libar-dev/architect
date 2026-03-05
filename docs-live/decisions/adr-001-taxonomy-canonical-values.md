@@ -6,10 +6,10 @@
 
 ## Overview
 
-| Property | Value    |
-| -------- | -------- |
-| Status   | accepted |
-| Category | process  |
+| Property | Value |
+| --- | --- |
+| Status | accepted |
+| Category | process |
 
 **Context:**
 The annotation system requires well-defined canonical values for taxonomy
@@ -24,11 +24,11 @@ These are the durable constants of the delivery process.
 
 **Consequences:**
 
-| Type     | Impact                                                        |
-| -------- | ------------------------------------------------------------- |
-| Positive | Generated docs group into coherent sections                   |
-| Positive | FSM enforcement has clear, auditable state definitions        |
-| Positive | Source ownership prevents cross-domain tag confusion          |
+| Type | Impact |
+| --- | --- |
+| Positive | Generated docs group into coherent sections |
+| Positive | FSM enforcement has clear, auditable state definitions |
+| Positive | Source ownership prevents cross-domain tag confusion |
 | Negative | Migration effort for existing specs with non-canonical values |
 
 ## Rules
@@ -39,15 +39,15 @@ These are the durable constants of the delivery process.
 
 **Rationale:** Without canonical values, organic drift (e.g., Generator vs Generators) produces inconsistent grouping in generated documentation and fragmented product area pages.
 
-| Value         | Reader Question                     | Covers                                          |
-| ------------- | ----------------------------------- | ----------------------------------------------- |
-| Annotation    | How do I annotate code?             | Scanning, extraction, tag parsing, dual-source  |
-| Configuration | How do I configure the tool?        | Config loading, presets, resolution             |
-| Generation    | How does code become docs?          | Codecs, generators, rendering, diagrams         |
-| Validation    | How is the workflow enforced?       | FSM, DoD, anti-patterns, process guard, lint    |
-| DataAPI       | How do I query process state?       | Process state API, stubs, context assembly, CLI |
-| CoreTypes     | What foundational types exist?      | Result monad, error factories, string utils     |
-| Process       | How does the session workflow work? | Session lifecycle, handoffs, conventions        |
+| Value | Reader Question | Covers |
+| --- | --- | --- |
+| Annotation | How do I annotate code? | Scanning, extraction, tag parsing, dual-source |
+| Configuration | How do I configure the tool? | Config loading, presets, resolution |
+| Generation | How does code become docs? | Codecs, generators, rendering, diagrams |
+| Validation | How is the workflow enforced? | FSM, DoD, anti-patterns, process guard, lint |
+| DataAPI | How do I query process state? | Process state API, stubs, context assembly, CLI |
+| CoreTypes | What foundational types exist? | Result monad, error factories, string utils |
+| Process | How does the session workflow work? | Session lifecycle, handoffs, conventions |
 
 **Verified by:**
 
@@ -59,12 +59,12 @@ These are the durable constants of the delivery process.
 
 **Rationale:** Unbounded category values prevent meaningful grouping of architecture decisions and make cross-cutting queries unreliable.
 
-| Value         | Purpose                                       |
-| ------------- | --------------------------------------------- |
-| architecture  | System structure, component design, data flow |
-| process       | Workflow, conventions, annotation rules       |
-| testing       | Test strategy, verification approach          |
-| documentation | Documentation generation, content structure   |
+| Value | Purpose |
+| --- | --- |
+| architecture | System structure, component design, data flow |
+| process | Workflow, conventions, annotation rules |
+| testing | Test strategy, verification approach |
+| documentation | Documentation generation, content structure |
 
 **Verified by:**
 
@@ -76,12 +76,12 @@ These are the durable constants of the delivery process.
 
 **Rationale:** Without protection levels, active specs accumulate scope creep and completed specs get silently modified, undermining delivery process integrity.
 
-| Status    | Protection   | Can Add Deliverables | Allowed Actions                 |
-| --------- | ------------ | -------------------- | ------------------------------- |
-| roadmap   | None         | Yes                  | Full editing                    |
-| active    | Scope-locked | No                   | Edit existing deliverables only |
-| completed | Hard-locked  | No                   | Requires unlock-reason tag      |
-| deferred  | None         | Yes                  | Full editing                    |
+| Status | Protection | Can Add Deliverables | Allowed Actions |
+| --- | --- | --- | --- |
+| roadmap | None | Yes | Full editing |
+| active | Scope-locked | No | Edit existing deliverables only |
+| completed | Hard-locked | No | Requires unlock-reason tag |
+| deferred | None | Yes | Full editing |
 
 **Verified by:**
 
@@ -93,20 +93,21 @@ These are the durable constants of the delivery process.
 
 **Rationale:** Allowing arbitrary transitions (e.g., roadmap to completed) bypasses the active phase where scope-lock and deliverable tracking provide quality assurance.
 
-| From     | To        | Trigger               |
-| -------- | --------- | --------------------- |
-| roadmap  | active    | Start work            |
-| roadmap  | deferred  | Postpone              |
-| active   | completed | All deliverables done |
-| active   | roadmap   | Blocked/regressed     |
-| deferred | roadmap   | Resume planning       |
+| From | To | Trigger |
+| --- | --- | --- |
+| roadmap | active | Start work |
+| roadmap | deferred | Postpone |
+| active | completed | All deliverables done |
+| active | roadmap | Blocked/regressed |
+| deferred | roadmap | Resume planning |
 
 **Verified by:**
 
 - Canonical values are enforced
 
-  Completed is a terminal state. Modifications require
-  `@libar-docs-unlock-reason` escape hatch.
+
+    Completed is a terminal state. Modifications require
+    `@libar-docs-unlock-reason` escape hatch.
 
 ### Tag format types
 
@@ -114,14 +115,14 @@ These are the durable constants of the delivery process.
 
 **Rationale:** Without explicit format types, parsers must guess value structure, leading to silent data corruption when CSV values are treated as single strings or numbers are treated as text.
 
-| Format       | Parsing                        | Example                        |
-| ------------ | ------------------------------ | ------------------------------ |
-| flag         | Boolean presence, no value     | @libar-docs-core               |
-| value        | Simple string                  | @libar-docs-pattern MyPattern  |
-| enum         | Constrained to predefined list | @libar-docs-status completed   |
-| csv          | Comma-separated values         | @libar-docs-uses A, B, C       |
-| number       | Numeric value                  | @libar-docs-phase 15           |
-| quoted-value | Preserves spaces               | @libar-docs-brief:'Multi word' |
+| Format | Parsing | Example |
+| --- | --- | --- |
+| flag | Boolean presence, no value | @libar-docs-core |
+| value | Simple string | @libar-docs-pattern MyPattern |
+| enum | Constrained to predefined list | @libar-docs-status completed |
+| csv | Comma-separated values | @libar-docs-uses A, B, C |
+| number | Numeric value | @libar-docs-phase 15 |
+| quoted-value | Preserves spaces | @libar-docs-brief:'Multi word' |
 
 **Verified by:**
 
@@ -133,12 +134,12 @@ These are the durable constants of the delivery process.
 
 **Rationale:** Cross-domain tag placement (e.g., runtime dependencies in Gherkin) creates conflicting sources of truth and breaks the dual-source architecture ownership model.
 
-| Tag        | Correct Source | Wrong Source  | Rationale                          |
-| ---------- | -------------- | ------------- | ---------------------------------- |
-| uses       | TypeScript     | Feature files | TS owns runtime dependencies       |
-| depends-on | Feature files  | TypeScript    | Gherkin owns planning dependencies |
-| quarter    | Feature files  | TypeScript    | Gherkin owns timeline metadata     |
-| team       | Feature files  | TypeScript    | Gherkin owns ownership metadata    |
+| Tag | Correct Source | Wrong Source | Rationale |
+| --- | --- | --- | --- |
+| uses | TypeScript | Feature files | TS owns runtime dependencies |
+| depends-on | Feature files | TypeScript | Gherkin owns planning dependencies |
+| quarter | Feature files | TypeScript | Gherkin owns timeline metadata |
+| team | Feature files | TypeScript | Gherkin owns ownership metadata |
 
 **Verified by:**
 
@@ -160,14 +161,14 @@ These are the durable constants of the delivery process.
 
 **Rationale:** Ad-hoc phase names and ordering produce inconsistent roadmap grouping across packages and make cross-package progress tracking impossible.
 
-| Order | Phase         | Purpose                                        |
-| ----- | ------------- | ---------------------------------------------- |
-| 1     | Inception     | Problem framing, scope definition              |
-| 2     | Elaboration   | Design decisions, architecture exploration     |
-| 3     | Session       | Planning and design session work               |
-| 4     | Construction  | Implementation, testing, integration           |
-| 5     | Validation    | Verification, acceptance criteria confirmation |
-| 6     | Retrospective | Review, lessons learned, documentation         |
+| Order | Phase | Purpose |
+| --- | --- | --- |
+| 1 | Inception | Problem framing, scope definition |
+| 2 | Elaboration | Design decisions, architecture exploration |
+| 3 | Session | Planning and design session work |
+| 4 | Construction | Implementation, testing, integration |
+| 5 | Validation | Verification, acceptance criteria confirmation |
+| 6 | Retrospective | Review, lessons learned, documentation |
 
 **Verified by:**
 
@@ -179,14 +180,14 @@ These are the durable constants of the delivery process.
 
 **Rationale:** Freeform status strings bypass Zod validation and break DoD checks, which rely on terminal status classification to determine pattern completeness.
 
-| Value       | Meaning              |
-| ----------- | -------------------- |
-| complete    | Work is done         |
-| in-progress | Work is ongoing      |
-| pending     | Work has not started |
-| deferred    | Work postponed       |
-| superseded  | Replaced by another  |
-| n/a         | Not applicable       |
+| Value | Meaning |
+| --- | --- |
+| complete | Work is done |
+| in-progress | Work is ongoing |
+| pending | Work has not started |
+| deferred | Work postponed |
+| superseded | Replaced by another |
+| n/a | Not applicable |
 
 **Verified by:**
 

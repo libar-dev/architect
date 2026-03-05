@@ -145,8 +145,8 @@ interface AntiPatternDetectionOptions extends WithTagRegistry {
 }
 ```
 
-| Property   | Description                     |
-| ---------- | ------------------------------- |
+| Property | Description |
+| --- | --- |
 | thresholds | Thresholds for warning triggers |
 
 ### LintRule (interface)
@@ -183,12 +183,12 @@ interface LintRule {
 }
 ```
 
-| Property    | Description                                                     |
-| ----------- | --------------------------------------------------------------- |
-| id          | Unique rule ID                                                  |
-| severity    | Default severity level                                          |
-| description | Human-readable rule description                                 |
-| check       | Check function that returns violation(s) or null if rule passes |
+| Property | Description |
+| --- | --- |
+| id | Unique rule ID |
+| severity | Default severity level |
+| description | Human-readable rule description |
+| check | Check function that returns violation(s) or null if rule passes |
 
 ### LintContext (interface)
 
@@ -209,10 +209,10 @@ interface LintContext {
 }
 ```
 
-| Property      | Description                                             |
-| ------------- | ------------------------------------------------------- |
-| knownPatterns | Set of known pattern names for relationship validation  |
-| registry      | Tag registry for prefix-aware error messages (optional) |
+| Property | Description |
+| --- | --- |
+| knownPatterns | Set of known pattern names for relationship validation |
+| registry | Tag registry for prefix-aware error messages (optional) |
 
 ### ProtectionLevel (type)
 
@@ -249,9 +249,9 @@ type ProtectionLevel = 'none' | 'scope' | 'hard';
 function isDeliverableComplete(deliverable: Deliverable): boolean;
 ```
 
-| Parameter   | Type | Description              |
-| ----------- | ---- | ------------------------ |
-| deliverable |      | The deliverable to check |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| deliverable |  | The deliverable to check |
 
 **Returns:** True if the deliverable status is 'complete'
 
@@ -273,9 +273,9 @@ function isDeliverableComplete(deliverable: Deliverable): boolean;
 function hasAcceptanceCriteria(feature: ScannedGherkinFile): boolean;
 ```
 
-| Parameter | Type | Description                       |
-| --------- | ---- | --------------------------------- |
-| feature   |      | The scanned feature file to check |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| feature |  | The scanned feature file to check |
 
 **Returns:** True if at least one @acceptance-criteria scenario exists
 
@@ -294,9 +294,9 @@ function hasAcceptanceCriteria(feature: ScannedGherkinFile): boolean;
 function extractAcceptanceCriteriaScenarios(feature: ScannedGherkinFile): readonly string[];
 ```
 
-| Parameter | Type | Description              |
-| --------- | ---- | ------------------------ |
-| feature   |      | The scanned feature file |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| feature |  | The scanned feature file |
 
 **Returns:** Array of scenario names with @acceptance-criteria tag
 
@@ -325,11 +325,11 @@ function validateDoDForPhase(
 ): DoDValidationResult;
 ```
 
-| Parameter   | Type | Description                                              |
-| ----------- | ---- | -------------------------------------------------------- |
-| patternName |      | Name of the pattern being validated                      |
-| phase       |      | Phase number being validated                             |
-| feature     |      | The scanned feature file with deliverables and scenarios |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| patternName |  | Name of the pattern being validated |
+| phase |  | Phase number being validated |
+| feature |  | The scanned feature file with deliverables and scenarios |
 
 **Returns:** DoD validation result
 
@@ -364,10 +364,10 @@ function validateDoD(
 ): DoDValidationSummary;
 ```
 
-| Parameter   | Type | Description                                                          |
-| ----------- | ---- | -------------------------------------------------------------------- |
-| features    |      | Array of scanned feature files                                       |
-| phaseFilter |      | Optional array of phase numbers to validate (validates all if empty) |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| features |  | Array of scanned feature files |
+| phaseFilter |  | Optional array of phase numbers to validate (validates all if empty) |
 
 **Returns:** Aggregate DoD validation summary
 
@@ -386,9 +386,9 @@ function validateDoD(
 function formatDoDSummary(summary: DoDValidationSummary): string;
 ```
 
-| Parameter | Type | Description                      |
-| --------- | ---- | -------------------------------- |
-| summary   |      | DoD validation summary to format |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| summary |  | DoD validation summary to format |
 
 **Returns:** Multi-line string for pretty printing
 
@@ -430,11 +430,11 @@ function detectAntiPatterns(
 ): AntiPatternViolation[];
 ```
 
-| Parameter    | Type | Description                                              |
-| ------------ | ---- | -------------------------------------------------------- |
-| scannedFiles |      | Array of scanned TypeScript files                        |
-| features     |      | Array of scanned feature files                           |
-| options      |      | Optional configuration (registry for prefix, thresholds) |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| scannedFiles |  | Array of scanned TypeScript files |
+| features |  | Array of scanned feature files |
+| options |  | Optional configuration (registry for prefix, thresholds) |
 
 **Returns:** Array of all detected anti-pattern violations
 
@@ -460,10 +460,10 @@ function detectProcessInCode(
 ): AntiPatternViolation[];
 ```
 
-| Parameter    | Type | Description                                                                 |
-| ------------ | ---- | --------------------------------------------------------------------------- |
-| scannedFiles |      | Array of scanned TypeScript files                                           |
-| registry     |      | Optional tag registry for prefix-aware detection (defaults to @libar-docs-) |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| scannedFiles |  | Array of scanned TypeScript files |
+| registry |  | Optional tag registry for prefix-aware detection (defaults to @libar-docs-) |
 
 **Returns:** Array of anti-pattern violations
 
@@ -489,10 +489,10 @@ function detectMagicComments(
 ): AntiPatternViolation[];
 ```
 
-| Parameter | Type | Description                                        |
-| --------- | ---- | -------------------------------------------------- |
-| features  |      | Array of scanned feature files                     |
-| threshold |      | Maximum magic comments before warning (default: 5) |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| features |  | Array of scanned feature files |
+| threshold |  | Maximum magic comments before warning (default: 5) |
 
 **Returns:** Array of anti-pattern violations
 
@@ -518,10 +518,10 @@ function detectScenarioBloat(
 ): AntiPatternViolation[];
 ```
 
-| Parameter | Type | Description                                    |
-| --------- | ---- | ---------------------------------------------- |
-| features  |      | Array of scanned feature files                 |
-| threshold |      | Maximum scenarios before warning (default: 20) |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| features |  | Array of scanned feature files |
+| threshold |  | Maximum scenarios before warning (default: 20) |
 
 **Returns:** Array of anti-pattern violations
 
@@ -547,10 +547,10 @@ function detectMegaFeature(
 ): AntiPatternViolation[];
 ```
 
-| Parameter | Type | Description                                 |
-| --------- | ---- | ------------------------------------------- |
-| features  |      | Array of scanned feature files              |
-| threshold |      | Maximum lines before warning (default: 500) |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| features |  | Array of scanned feature files |
+| threshold |  | Maximum lines before warning (default: 500) |
 
 **Returns:** Array of anti-pattern violations
 
@@ -569,9 +569,9 @@ function detectMegaFeature(
 function formatAntiPatternReport(violations: AntiPatternViolation[]): string;
 ```
 
-| Parameter  | Type | Description                   |
-| ---------- | ---- | ----------------------------- |
-| violations |      | Array of violations to format |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| violations |  | Array of violations to format |
 
 **Returns:** Multi-line string for pretty printing
 
@@ -608,13 +608,16 @@ function toValidationIssues(violations: readonly AntiPatternViolation[]): Array<
 ```
 
 ```typescript
-function filterRulesBySeverity(rules: readonly LintRule[], minSeverity: LintSeverity): LintRule[];
+function filterRulesBySeverity(
+  rules: readonly LintRule[],
+  minSeverity: LintSeverity
+): LintRule[];
 ```
 
-| Parameter   | Type | Description                 |
-| ----------- | ---- | --------------------------- |
-| rules       |      | Rules to filter             |
-| minSeverity |      | Minimum severity to include |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| rules |  | Rules to filter |
+| minSeverity |  | Minimum severity to include |
 
 **Returns:** Filtered rules
 
@@ -641,10 +644,10 @@ function filterRulesBySeverity(rules: readonly LintRule[], minSeverity: LintSeve
 function isValidTransition(from: ProcessStatusValue, to: ProcessStatusValue): boolean;
 ```
 
-| Parameter | Type | Description    |
-| --------- | ---- | -------------- |
-| from      |      | Current status |
-| to        |      | Target status  |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| from |  | Current status |
+| to |  | Target status |
 
 **Returns:** true if the transition is allowed
 
@@ -669,9 +672,9 @@ function isValidTransition(from: ProcessStatusValue, to: ProcessStatusValue): bo
 function getValidTransitionsFrom(status: ProcessStatusValue): readonly ProcessStatusValue[];
 ```
 
-| Parameter | Type | Description    |
-| --------- | ---- | -------------- |
-| status    |      | Current status |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| status |  | Current status |
 
 **Returns:** Array of valid target states (empty for terminal states)
 
@@ -705,11 +708,11 @@ function getTransitionErrorMessage(
 ): string;
 ```
 
-| Parameter | Type | Description                                       |
-| --------- | ---- | ------------------------------------------------- |
-| from      |      | Current status                                    |
-| to        |      | Attempted target status                           |
-| options   |      | Optional message options with registry for prefix |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| from |  | Current status |
+| to |  | Attempted target status |
+| options |  | Optional message options with registry for prefix |
 
 **Returns:** Error message describing the violation
 
@@ -734,9 +737,9 @@ function getTransitionErrorMessage(
 function getProtectionLevel(status: ProcessStatusValue): ProtectionLevel;
 ```
 
-| Parameter | Type | Description          |
-| --------- | ---- | -------------------- |
-| status    |      | Process status value |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| status |  | Process status value |
 
 **Returns:** Protection level for the status
 
@@ -763,9 +766,9 @@ function getProtectionLevel(status: ProcessStatusValue): ProtectionLevel;
 function isTerminalState(status: ProcessStatusValue): boolean;
 ```
 
-| Parameter | Type | Description          |
-| --------- | ---- | -------------------- |
-| status    |      | Process status value |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| status |  | Process status value |
 
 **Returns:** true if the status is terminal
 
@@ -784,9 +787,9 @@ function isTerminalState(status: ProcessStatusValue): boolean;
 function isFullyEditable(status: ProcessStatusValue): boolean;
 ```
 
-| Parameter | Type | Description          |
-| --------- | ---- | -------------------- |
-| status    |      | Process status value |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| status |  | Process status value |
 
 **Returns:** true if the status has no protection
 
@@ -805,9 +808,9 @@ function isFullyEditable(status: ProcessStatusValue): boolean;
 function isScopeLocked(status: ProcessStatusValue): boolean;
 ```
 
-| Parameter | Type | Description          |
-| --------- | ---- | -------------------- |
-| status    |      | Process status value |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| status |  | Process status value |
 
 **Returns:** true if the status prevents scope changes
 
@@ -844,9 +847,9 @@ function isScopeLocked(status: ProcessStatusValue): boolean;
 function validateChanges(input: DeciderInput): DeciderOutput;
 ```
 
-| Parameter | Type | Description                                          |
-| --------- | ---- | ---------------------------------------------------- |
-| input     |      | Complete input including state, changes, and options |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| input |  | Complete input including state, changes, and options |
 
 **Returns:** DeciderOutput with validation result and events
 
@@ -916,197 +919,197 @@ const missingStatus: LintRule;
 
 ### Anti Pattern Detector Testing
 
-| Rule                                                  | Invariant                                                                                                                                       | Rationale                                                                                                                                                                     |
-| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Process metadata should not appear in TypeScript code | Process metadata tags (@libar-docs-status, @libar-docs-phase, etc.) must only appear in Gherkin feature files, never in TypeScript source code. | TypeScript owns runtime behavior while Gherkin owns delivery process metadata — mixing them creates dual-source conflicts and validation ambiguity.                           |
-| Generator hints should not appear in feature files    | Feature files must not contain generator magic comments beyond a configurable threshold.                                                        | Generator hints are implementation details that belong in TypeScript — excessive magic comments in specs indicate leaking implementation concerns into business requirements. |
-| Feature files should not have excessive scenarios     | A single feature file must not exceed the configured maximum scenario count.                                                                    | Oversized feature files indicate missing decomposition — they become hard to maintain and slow to execute.                                                                    |
-| Feature files should not exceed size thresholds       | A single feature file must not exceed the configured maximum line count.                                                                        | Excessively large files indicate a feature that should be split into focused, independently testable specifications.                                                          |
-| All anti-patterns can be detected in one pass         | The anti-pattern detector must evaluate all registered rules in a single scan pass over the source files.                                       | Single-pass detection ensures consistent results and avoids O(n\*m) performance degradation with multiple file traversals.                                                    |
-| Violations can be formatted for console output        | Anti-pattern violations must be renderable as grouped, human-readable console output.                                                           | Developers need actionable feedback at commit time — ungrouped or unformatted violations are hard to triage and fix.                                                          |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Process metadata should not appear in TypeScript code | Process metadata tags (@libar-docs-status, @libar-docs-phase, etc.) must only appear in Gherkin feature files, never in TypeScript source code. | TypeScript owns runtime behavior while Gherkin owns delivery process metadata — mixing them creates dual-source conflicts and validation ambiguity. |
+| Generator hints should not appear in feature files | Feature files must not contain generator magic comments beyond a configurable threshold. | Generator hints are implementation details that belong in TypeScript — excessive magic comments in specs indicate leaking implementation concerns into business requirements. |
+| Feature files should not have excessive scenarios | A single feature file must not exceed the configured maximum scenario count. | Oversized feature files indicate missing decomposition — they become hard to maintain and slow to execute. |
+| Feature files should not exceed size thresholds | A single feature file must not exceed the configured maximum line count. | Excessively large files indicate a feature that should be split into focused, independently testable specifications. |
+| All anti-patterns can be detected in one pass | The anti-pattern detector must evaluate all registered rules in a single scan pass over the source files. | Single-pass detection ensures consistent results and avoids O(n*m) performance degradation with multiple file traversals. |
+| Violations can be formatted for console output | Anti-pattern violations must be renderable as grouped, human-readable console output. | Developers need actionable feedback at commit time — ungrouped or unformatted violations are hard to triage and fix. |
 
 ### Config Schema Validation
 
-| Rule                                                    | Invariant                                                                                                                                            | Rationale                                                                                                                                                      |
-| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ScannerConfigSchema validates scanner configuration     | Scanner configuration must contain at least one valid glob pattern with no parent directory traversal, and baseDir must resolve to an absolute path. | Malformed or malicious glob patterns could scan outside project boundaries, exposing sensitive files.                                                          |
-| GeneratorConfigSchema validates generator configuration | Generator configuration must use a .json registry file and an output directory that does not escape the project root via parent traversal.           | Non-JSON registry files could introduce parsing vulnerabilities, and unrestricted output paths could overwrite files outside the project.                      |
-| isScannerConfig type guard narrows unknown values       | isScannerConfig returns true only for objects that have a non-empty patterns array and a string baseDir.                                             | Without a reliable type guard, callers cannot safely narrow unknown config objects and risk accessing properties on incompatible types at runtime.             |
-| isGeneratorConfig type guard narrows unknown values     | isGeneratorConfig returns true only for objects that have a string outputDir and a .json registryPath.                                               | Without a reliable type guard, callers cannot safely narrow unknown config objects and risk passing malformed generator configs that bypass schema validation. |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| ScannerConfigSchema validates scanner configuration | Scanner configuration must contain at least one valid glob pattern with no parent directory traversal, and baseDir must resolve to an absolute path. | Malformed or malicious glob patterns could scan outside project boundaries, exposing sensitive files. |
+| GeneratorConfigSchema validates generator configuration | Generator configuration must use a .json registry file and an output directory that does not escape the project root via parent traversal. | Non-JSON registry files could introduce parsing vulnerabilities, and unrestricted output paths could overwrite files outside the project. |
+| isScannerConfig type guard narrows unknown values | isScannerConfig returns true only for objects that have a non-empty patterns array and a string baseDir. | Without a reliable type guard, callers cannot safely narrow unknown config objects and risk accessing properties on incompatible types at runtime. |
+| isGeneratorConfig type guard narrows unknown values | isGeneratorConfig returns true only for objects that have a string outputDir and a .json registryPath. | Without a reliable type guard, callers cannot safely narrow unknown config objects and risk passing malformed generator configs that bypass schema validation. |
 
 ### Detect Changes Testing
 
-| Rule                                                       | Invariant                                                                                                                                       | Rationale                                                                                                                                                              |
-| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
 | Status changes are detected as modifications not additions | When a deliverable's status value changes between versions, the change detector must classify it as a modification, not an addition or removal. | Correct change classification drives scope-creep detection — misclassifying a status change as an addition would trigger false scope-creep violations on active specs. |
-| New deliverables are detected as additions                 | Deliverables present in the new version but absent in the old version must be classified as additions.                                          | Addition detection powers the scope-creep rule — new deliverables added to active specs must be flagged as violations.                                                 |
-| Removed deliverables are detected as removals              | Deliverables present in the old version but absent in the new version must be classified as removals.                                           | Removal detection enables the deliverable-removed warning — silently dropping deliverables could hide incomplete work.                                                 |
-| Mixed changes are correctly categorized                    | When a single diff contains additions, removals, and modifications simultaneously, each change must be independently categorized.               | Real-world commits often contain mixed changes — incorrect categorization of any single change cascades into wrong validation decisions.                               |
-| Non-deliverable tables are ignored                         | Changes to non-deliverable tables (e.g., ScenarioOutline Examples tables) must not be detected as deliverable changes.                          | Feature files contain many table structures — only the Background deliverables table is semantically relevant to process guard validation.                             |
+| New deliverables are detected as additions | Deliverables present in the new version but absent in the old version must be classified as additions. | Addition detection powers the scope-creep rule — new deliverables added to active specs must be flagged as violations. |
+| Removed deliverables are detected as removals | Deliverables present in the old version but absent in the new version must be classified as removals. | Removal detection enables the deliverable-removed warning — silently dropping deliverables could hide incomplete work. |
+| Mixed changes are correctly categorized | When a single diff contains additions, removals, and modifications simultaneously, each change must be independently categorized. | Real-world commits often contain mixed changes — incorrect categorization of any single change cascades into wrong validation decisions. |
+| Non-deliverable tables are ignored | Changes to non-deliverable tables (e.g., ScenarioOutline Examples tables) must not be detected as deliverable changes. | Feature files contain many table structures — only the Background deliverables table is semantically relevant to process guard validation. |
 
 ### DoD Validator Testing
 
-| Rule                                                         | Invariant                                                                                                                                  | Rationale                                                                                                                                |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Deliverable completion uses canonical status taxonomy        | Deliverable completion status must be determined exclusively using the 6 canonical values from the deliverable status taxonomy.            | Freeform status strings bypass schema validation and produce inconsistent completion tracking across the monorepo.                       |
-| Acceptance criteria must be tagged with @acceptance-criteria | Every completed pattern must have at least one scenario tagged with @acceptance-criteria in its feature file.                              | Without explicit acceptance criteria tags, there is no machine-verifiable proof that the delivered work meets its requirements.          |
-| Acceptance criteria scenarios can be extracted by name       | The validator must be able to extract scenario names from @acceptance-criteria-tagged scenarios for reporting.                             | Extracted names appear in traceability reports and DoD summaries, providing an audit trail from requirement to verification.             |
-| DoD requires all deliverables complete and AC present        | A pattern passes Definition of Done only when ALL deliverables have complete status AND at least one @acceptance-criteria scenario exists. | Partial completion or missing acceptance criteria means the pattern is not verified — marking it complete would bypass quality gates.    |
-| DoD can be validated across multiple completed phases        | DoD validation must evaluate all completed phases independently and report per-phase pass/fail results.                                    | Multi-phase patterns need granular validation — a single aggregate result would hide which specific phase failed its Definition of Done. |
-| Summary can be formatted for console output                  | DoD validation results must be renderable as structured console output showing phase-level pass/fail details.                              | Developers need immediate, actionable feedback during pre-commit validation — raw data structures are not human-readable.                |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Deliverable completion uses canonical status taxonomy | Deliverable completion status must be determined exclusively using the 6 canonical values from the deliverable status taxonomy. | Freeform status strings bypass schema validation and produce inconsistent completion tracking across the monorepo. |
+| Acceptance criteria must be tagged with @acceptance-criteria | Every completed pattern must have at least one scenario tagged with @acceptance-criteria in its feature file. | Without explicit acceptance criteria tags, there is no machine-verifiable proof that the delivered work meets its requirements. |
+| Acceptance criteria scenarios can be extracted by name | The validator must be able to extract scenario names from @acceptance-criteria-tagged scenarios for reporting. | Extracted names appear in traceability reports and DoD summaries, providing an audit trail from requirement to verification. |
+| DoD requires all deliverables complete and AC present | A pattern passes Definition of Done only when ALL deliverables have complete status AND at least one @acceptance-criteria scenario exists. | Partial completion or missing acceptance criteria means the pattern is not verified — marking it complete would bypass quality gates. |
+| DoD can be validated across multiple completed phases | DoD validation must evaluate all completed phases independently and report per-phase pass/fail results. | Multi-phase patterns need granular validation — a single aggregate result would hide which specific phase failed its Definition of Done. |
+| Summary can be formatted for console output | DoD validation results must be renderable as structured console output showing phase-level pass/fail details. | Developers need immediate, actionable feedback during pre-commit validation — raw data structures are not human-readable. |
 
 ### FSM Validator Testing
 
-| Rule                                           | Invariant                                                                                                                                                 | Rationale                                                                                                                                       |
-| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Status values must be valid PDR-005 FSM states | Every pattern status value must be one of the states defined in the PDR-005 finite state machine (roadmap, active, completed, deferred).                  | Invalid status values bypass FSM transition validation and produce undefined behavior in process guard enforcement.                             |
-| Status transitions must follow FSM rules       | Every status change must follow a valid edge in the PDR-005 state machine graph — no skipping states or invalid paths.                                    | The FSM encodes the delivery workflow contract — invalid transitions indicate process violations that could corrupt delivery tracking.          |
-| Completed patterns should have proper metadata | Patterns in completed status must carry completion date and actual effort metadata to pass validation without warnings.                                   | Completion metadata enables retrospective analysis and effort estimation — missing metadata degrades project planning accuracy over time.       |
-| Protection levels match FSM state definitions  | Each FSM state must map to exactly one protection level (none, scope-locked, or hard-locked) as defined in PDR-005.                                       | Protection levels enforce edit constraints per state — mismatched protection would allow prohibited modifications to active or completed specs. |
-| Combined validation provides complete results  | The FSM validator must return a combined result including status validity, transition validity, metadata warnings, and protection level in a single call. | Callers need a complete validation picture — requiring multiple separate calls risks partial validation and inconsistent error reporting.       |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Status values must be valid PDR-005 FSM states | Every pattern status value must be one of the states defined in the PDR-005 finite state machine (roadmap, active, completed, deferred). | Invalid status values bypass FSM transition validation and produce undefined behavior in process guard enforcement. |
+| Status transitions must follow FSM rules | Every status change must follow a valid edge in the PDR-005 state machine graph — no skipping states or invalid paths. | The FSM encodes the delivery workflow contract — invalid transitions indicate process violations that could corrupt delivery tracking. |
+| Completed patterns should have proper metadata | Patterns in completed status must carry completion date and actual effort metadata to pass validation without warnings. | Completion metadata enables retrospective analysis and effort estimation — missing metadata degrades project planning accuracy over time. |
+| Protection levels match FSM state definitions | Each FSM state must map to exactly one protection level (none, scope-locked, or hard-locked) as defined in PDR-005. | Protection levels enforce edit constraints per state — mismatched protection would allow prohibited modifications to active or completed specs. |
+| Combined validation provides complete results | The FSM validator must return a combined result including status validity, transition validity, metadata warnings, and protection level in a single call. | Callers need a complete validation picture — requiring multiple separate calls risks partial validation and inconsistent error reporting. |
 
 ### Lint Engine Testing
 
-| Rule                                                                  | Invariant                                                                                                                                                       | Rationale                                                                                                                                                                           |
-| --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Single directive linting validates annotations against rules          | Every directive is checked against all provided rules and violations include source location.                                                                   | Skipping rules or omitting source locations makes violations unactionable, as developers cannot locate or understand the issue.                                                     |
-| Multi-file batch linting aggregates results across files              | All files and directives are scanned, violations are collected per file, and severity counts are accurate.                                                      | Missing files or inaccurate severity counts cause silent rule violations in CI and undermine trust in the linting pipeline.                                                         |
-| Failure detection respects strict mode for severity escalation        | Errors always indicate failure. Warnings only indicate failure in strict mode. Info never indicates failure.                                                    | Without correct severity-to-exit-code mapping, CI pipelines either miss real errors or block on informational messages, eroding developer trust in the linter.                      |
-| Violation sorting orders by severity then by line number              | Sorted output places errors first, then warnings, then info, with stable line-number ordering within each severity. Sorting does not mutate the original array. | Unsorted output forces developers to manually scan for critical errors among lower-severity noise, and mutating the original array would break callers that hold a reference to it. |
-| Pretty formatting produces human-readable output with severity counts | Pretty output includes file paths, line numbers, severity labels, rule IDs, and summary counts. Quiet mode suppresses non-error violations.                     | Incomplete formatting (missing file paths or line numbers) prevents developers from navigating directly to violations, and noisy output in quiet mode defeats its purpose.          |
-| JSON formatting produces machine-readable output with full details    | JSON output is valid, includes all summary fields, and preserves violation details including file, line, severity, rule, and message.                           | Machine consumers (CI pipelines, IDE integrations) depend on valid JSON with complete fields; missing or malformed output breaks automated tooling downstream.                      |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Single directive linting validates annotations against rules | Every directive is checked against all provided rules and violations include source location. | Skipping rules or omitting source locations makes violations unactionable, as developers cannot locate or understand the issue. |
+| Multi-file batch linting aggregates results across files | All files and directives are scanned, violations are collected per file, and severity counts are accurate. | Missing files or inaccurate severity counts cause silent rule violations in CI and undermine trust in the linting pipeline. |
+| Failure detection respects strict mode for severity escalation | Errors always indicate failure. Warnings only indicate failure in strict mode. Info never indicates failure. | Without correct severity-to-exit-code mapping, CI pipelines either miss real errors or block on informational messages, eroding developer trust in the linter. |
+| Violation sorting orders by severity then by line number | Sorted output places errors first, then warnings, then info, with stable line-number ordering within each severity. Sorting does not mutate the original array. | Unsorted output forces developers to manually scan for critical errors among lower-severity noise, and mutating the original array would break callers that hold a reference to it. |
+| Pretty formatting produces human-readable output with severity counts | Pretty output includes file paths, line numbers, severity labels, rule IDs, and summary counts. Quiet mode suppresses non-error violations. | Incomplete formatting (missing file paths or line numbers) prevents developers from navigating directly to violations, and noisy output in quiet mode defeats its purpose. |
+| JSON formatting produces machine-readable output with full details | JSON output is valid, includes all summary fields, and preserves violation details including file, line, severity, rule, and message. | Machine consumers (CI pipelines, IDE integrations) depend on valid JSON with complete fields; missing or malformed output breaks automated tooling downstream. |
 
 ### Linter Validation Testing
 
-| Rule                                                  | Invariant                                                                                                                 | Rationale                                                                                                                                          |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Pattern cannot implement itself (circular reference)  | A pattern's implements tag must reference a different pattern than its own pattern tag.                                   | Self-implementing patterns create circular references that break the sub-pattern hierarchy.                                                        |
-| Relationship targets should exist (strict mode)       | Every relationship target must reference a pattern that exists in the known pattern registry when strict mode is enabled. | Dangling references to non-existent patterns produce broken dependency graphs and misleading documentation.                                        |
-| Bidirectional traceability links should be consistent | Every forward traceability link (executable-specs, roadmap-spec) must have a corresponding back-link in the target file.  | Asymmetric links mean one side of the traceability chain is invisible, defeating the purpose of bidirectional tracing.                             |
-| Parent references must be valid                       | A pattern's parent reference must point to an existing epic pattern in the registry.                                      | Dangling parent references break the epic-to-pattern hierarchy, causing patterns to appear orphaned in roadmap views and losing rollup visibility. |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Pattern cannot implement itself (circular reference) | A pattern's implements tag must reference a different pattern than its own pattern tag. | Self-implementing patterns create circular references that break the sub-pattern hierarchy. |
+| Relationship targets should exist (strict mode) | Every relationship target must reference a pattern that exists in the known pattern registry when strict mode is enabled. | Dangling references to non-existent patterns produce broken dependency graphs and misleading documentation. |
+| Bidirectional traceability links should be consistent | Every forward traceability link (executable-specs, roadmap-spec) must have a corresponding back-link in the target file. | Asymmetric links mean one side of the traceability chain is invisible, defeating the purpose of bidirectional tracing. |
+| Parent references must be valid | A pattern's parent reference must point to an existing epic pattern in the registry. | Dangling parent references break the epic-to-pattern hierarchy, causing patterns to appear orphaned in roadmap views and losing rollup visibility. |
 
 ### Lint Rule Advanced Testing
 
-| Rule                                                  | Invariant                                                                                                        | Rationale                                                                                                        |
-| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Descriptions must not repeat the pattern name         | A description that merely echoes the pattern name adds no value and must be rejected.                            | Tautological descriptions waste reader attention and indicate missing documentation effort.                      |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Descriptions must not repeat the pattern name | A description that merely echoes the pattern name adds no value and must be rejected. | Tautological descriptions waste reader attention and indicate missing documentation effort. |
 | Default rules collection is complete and well-ordered | The default rules collection must contain all defined rules with unique IDs, ordered by severity (errors first). | A complete, ordered collection ensures no rule is silently dropped and severity-based filtering works correctly. |
-| Rules can be filtered by minimum severity             | Filtering by severity must return only rules at or above the specified level.                                    | CI pipelines need to control which violations block merges vs. which are advisory.                               |
+| Rules can be filtered by minimum severity | Filtering by severity must return only rules at or above the specified level. | CI pipelines need to control which violations block merges vs. which are advisory. |
 
 ### Lint Rule Individual Testing
 
-| Rule                                          | Invariant                                                                                                            | Rationale                                                                                               |
-| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Files must declare an explicit pattern name   | Every annotated file must have a non-empty patternName to be identifiable in the registry.                           | Without a pattern name, the file cannot be tracked, linked, or referenced in generated documentation.   |
-| Files should declare a lifecycle status       | Every annotated file should have a status tag to track its position in the delivery lifecycle.                       | Missing status prevents FSM validation and roadmap tracking.                                            |
-| Files should document when to use the pattern | Annotated files should include whenToUse guidance so consumers know when to apply the pattern.                       | Without usage guidance, patterns become undiscoverable despite being documented.                        |
-| Files should declare relationship tags        | Annotated files should declare uses or usedBy relationships to enable dependency tracking and architecture diagrams. | Isolated patterns without relationships produce diagrams with no edges and prevent dependency analysis. |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Files must declare an explicit pattern name | Every annotated file must have a non-empty patternName to be identifiable in the registry. | Without a pattern name, the file cannot be tracked, linked, or referenced in generated documentation. |
+| Files should declare a lifecycle status | Every annotated file should have a status tag to track its position in the delivery lifecycle. | Missing status prevents FSM validation and roadmap tracking. |
+| Files should document when to use the pattern | Annotated files should include whenToUse guidance so consumers know when to apply the pattern. | Without usage guidance, patterns become undiscoverable despite being documented. |
+| Files should declare relationship tags | Annotated files should declare uses or usedBy relationships to enable dependency tracking and architecture diagrams. | Isolated patterns without relationships produce diagrams with no edges and prevent dependency analysis. |
 
 ### Phase Numbering Conventions
 
-| Rule                                          | Invariant                                                                                   | Rationale                                                                                                                                          |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase numbers must be unique within a release | No two specs within the same release version may share the same phase number.               | Duplicate phase numbers create ambiguous ordering, causing unpredictable generation output and incorrect roadmap sequencing.                       |
-| Phase number gaps are detected                | Large gaps in the phase number sequence must produce warnings during validation.            | Undetected gaps signal accidentally skipped or orphaned specs, leading to misleading roadmap progress and hidden incomplete work.                  |
-| CLI suggests next available phase number      | The suggested phase number must not conflict with any existing phase in the target release. | Without automated suggestion, authors manually guess the next number, frequently picking duplicates that are only caught later at validation time. |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Phase numbers must be unique within a release | No two specs within the same release version may share the same phase number. | Duplicate phase numbers create ambiguous ordering, causing unpredictable generation output and incorrect roadmap sequencing. |
+| Phase number gaps are detected | Large gaps in the phase number sequence must produce warnings during validation. | Undetected gaps signal accidentally skipped or orphaned specs, leading to misleading roadmap progress and hidden incomplete work. |
+| CLI suggests next available phase number | The suggested phase number must not conflict with any existing phase in the target release. | Without automated suggestion, authors manually guess the next number, frequently picking duplicates that are only caught later at validation time. |
 
 ### Phase State Machine Validation
 
-| Rule                                          | Invariant                                                                                       | Rationale                                                                                                                               |
-| --------------------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Valid status values are enforced              | Phase status must be one of the four canonical values: roadmap, active, completed, or deferred. | Freeform status strings bypass FSM transition enforcement and produce undefined behavior in downstream generators and validators.       |
-| Status transitions follow state machine rules | Every status transition must follow a permitted edge in the FSM transition matrix.              | Skipping states (e.g., roadmap to completed) breaks scope-lock enforcement and allows incomplete deliverables to reach terminal status. |
-| Terminal states require completion metadata   | Phases reaching completed status must carry a completion date and actual effort tag.            | Without completion metadata, effort variance tracking and timeline reporting produce gaps that undermine delivery process visibility.   |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Valid status values are enforced | Phase status must be one of the four canonical values: roadmap, active, completed, or deferred. | Freeform status strings bypass FSM transition enforcement and produce undefined behavior in downstream generators and validators. |
+| Status transitions follow state machine rules | Every status transition must follow a permitted edge in the FSM transition matrix. | Skipping states (e.g., roadmap to completed) breaks scope-lock enforcement and allows incomplete deliverables to reach terminal status. |
+| Terminal states require completion metadata | Phases reaching completed status must carry a completion date and actual effort tag. | Without completion metadata, effort variance tracking and timeline reporting produce gaps that undermine delivery process visibility. |
 
 ### Process Guard Linter
 
-| Rule                                                  | Invariant                                                                                                                                                            | Rationale                                                                                                                                             |
-| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Protection levels determine modification restrictions | Every file's modification restrictions are determined solely by its `@libar-docs-status` tag, with `completed` requiring an explicit unlock reason for any change.   | Without status-derived protection, completed and approved work can be silently overwritten by bulk edits or accidental modifications.                 |
-| Session definition files scope what can be modified   | When an active session exists, only specs explicitly listed in the session definition may be modified without warning, and excluded specs cannot be modified at all. | Without session scoping, bulk operations and context switches cause unintended modifications to specs outside the current work focus.                 |
-| Status transitions follow PDR-005 FSM                 | Every status change must follow a valid edge in the PDR-005 finite state machine; no transition may skip intermediate states.                                        | Skipping states (e.g., `roadmap` directly to `completed`) bypasses scope-locking and review gates, allowing incomplete work to be marked as done.     |
-| Active specs cannot add new deliverables              | The deliverables table of an `active` spec is immutable with respect to new rows; only existing deliverable statuses may change.                                     | Adding deliverables after work has begun constitutes scope creep, undermining effort estimates and blocking completion.                               |
-| CLI provides flexible validation modes                | The CLI must support both pre-commit (staged-only) and CI (all-files) validation modes with deterministic exit codes reflecting violation severity.                  | Without flexible modes, teams cannot integrate process guard into both local developer workflows and CI pipelines with appropriate strictness levels. |
-| Integrates with existing lint infrastructure          | Process guard output format and exit code semantics must be consistent with the existing `lint-patterns` tool.                                                       | Inconsistent output formats force consumers to maintain separate parsers, and inconsistent exit codes break combined lint pipelines.                  |
-| New tags support process guard functionality          | Session and protection tags must be registered in the TypeScript taxonomy with defined formats before use in feature files.                                          | Unregistered tags bypass schema validation and are silently ignored by the scanner, causing process guard rules to fail without diagnostics.          |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Protection levels determine modification restrictions | Every file's modification restrictions are determined solely by its `@libar-docs-status` tag, with `completed` requiring an explicit unlock reason for any change. | Without status-derived protection, completed and approved work can be silently overwritten by bulk edits or accidental modifications. |
+| Session definition files scope what can be modified | When an active session exists, only specs explicitly listed in the session definition may be modified without warning, and excluded specs cannot be modified at all. | Without session scoping, bulk operations and context switches cause unintended modifications to specs outside the current work focus. |
+| Status transitions follow PDR-005 FSM | Every status change must follow a valid edge in the PDR-005 finite state machine; no transition may skip intermediate states. | Skipping states (e.g., `roadmap` directly to `completed`) bypasses scope-locking and review gates, allowing incomplete work to be marked as done. |
+| Active specs cannot add new deliverables | The deliverables table of an `active` spec is immutable with respect to new rows; only existing deliverable statuses may change. | Adding deliverables after work has begun constitutes scope creep, undermining effort estimates and blocking completion. |
+| CLI provides flexible validation modes | The CLI must support both pre-commit (staged-only) and CI (all-files) validation modes with deterministic exit codes reflecting violation severity. | Without flexible modes, teams cannot integrate process guard into both local developer workflows and CI pipelines with appropriate strictness levels. |
+| Integrates with existing lint infrastructure | Process guard output format and exit code semantics must be consistent with the existing `lint-patterns` tool. | Inconsistent output formats force consumers to maintain separate parsers, and inconsistent exit codes break combined lint pipelines. |
+| New tags support process guard functionality | Session and protection tags must be registered in the TypeScript taxonomy with defined formats before use in feature files. | Unregistered tags bypass schema validation and are silently ignored by the scanner, causing process guard rules to fail without diagnostics. |
 
 ### Process Guard Testing
 
-| Rule                                                | Invariant                                                                                                       | Rationale                                                                                              |
-| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Completed files require unlock-reason to modify     | A completed spec file cannot be modified unless it carries an @libar-docs-unlock-reason tag.                    | Completed work represents validated, shipped functionality — accidental modification risks regression. |
-| Status transitions must follow PDR-005 FSM          | Status changes must follow the directed graph: roadmap->active->completed, roadmap<->deferred, active->roadmap. | The FSM prevents skipping required stages (e.g., roadmap->completed bypasses implementation).          |
-| Active specs cannot add new deliverables            | A spec in active status cannot have deliverables added that were not present when it entered active.            | Scope-locking active work prevents mid-sprint scope creep that derails delivery commitments.           |
-| Files outside active session scope trigger warnings | Files modified outside the active session's declared scope produce a session-scope warning.                     | Session scoping keeps focus on planned work and makes accidental cross-cutting changes visible.        |
-| Explicitly excluded files trigger errors            | Files explicitly excluded from a session cannot be modified, producing a session-excluded error.                | Exclusion is stronger than scope — it marks files that must NOT be touched during this session.        |
-| Multiple rules validate independently               | Each validation rule evaluates independently — a single file can produce violations from multiple rules.        | Independent evaluation ensures no rule masks another, giving complete diagnostic output.               |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Completed files require unlock-reason to modify | A completed spec file cannot be modified unless it carries an @libar-docs-unlock-reason tag. | Completed work represents validated, shipped functionality — accidental modification risks regression. |
+| Status transitions must follow PDR-005 FSM | Status changes must follow the directed graph: roadmap->active->completed, roadmap<->deferred, active->roadmap. | The FSM prevents skipping required stages (e.g., roadmap->completed bypasses implementation). |
+| Active specs cannot add new deliverables | A spec in active status cannot have deliverables added that were not present when it entered active. | Scope-locking active work prevents mid-sprint scope creep that derails delivery commitments. |
+| Files outside active session scope trigger warnings | Files modified outside the active session's declared scope produce a session-scope warning. | Session scoping keeps focus on planned work and makes accidental cross-cutting changes visible. |
+| Explicitly excluded files trigger errors | Files explicitly excluded from a session cannot be modified, producing a session-excluded error. | Exclusion is stronger than scope — it marks files that must NOT be touched during this session. |
+| Multiple rules validate independently | Each validation rule evaluates independently — a single file can produce violations from multiple rules. | Independent evaluation ensures no rule masks another, giving complete diagnostic output. |
 
 ### Release Association Rules
 
-| Rule                                                  | Invariant                                                                                                            | Rationale                                                                                                                                            |
-| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Spec files must not contain release columns           | Spec file DataTables must never include a Release column; release metadata belongs exclusively in phase files.       | Mixing release metadata into specs couples planning artifacts to release timing, violating the separation defined by PDR-003.                        |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Spec files must not contain release columns | Spec file DataTables must never include a Release column; release metadata belongs exclusively in phase files. | Mixing release metadata into specs couples planning artifacts to release timing, violating the separation defined by PDR-003. |
 | TypeScript phase files must have required annotations | Every TypeScript phase file must include @libar-docs-pattern, @libar-docs-phase, and @libar-docs-status annotations. | Missing required annotations cause phase files to be invisible to the scanner, producing incomplete roadmap projections and broken cross-references. |
-| Release version follows semantic versioning           | All release version identifiers must conform to the `vX.Y.Z` semantic versioning format.                             | Non-semver version strings break downstream tooling that relies on version ordering and comparison for release planning.                             |
+| Release version follows semantic versioning | All release version identifiers must conform to the `vX.Y.Z` semantic versioning format. | Non-semver version strings break downstream tooling that relies on version ordering and comparison for release planning. |
 
 ### Status Aware Eslint Suppression
 
-| Rule                                              | Invariant                                                                                                                                                        | Rationale                                                                                                                                                                                                                                   |
-| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| File status determines unused-vars enforcement    | Files with `@libar-docs-status roadmap` or `deferred` have relaxed unused-vars rules. Files with `active`, `completed`, or no status have strict enforcement.    | Design artifacts (roadmap stubs) define API shapes that are intentionally unused until implementation. Relaxing rules for these files prevents false positives while ensuring implemented code (active/completed) remains strictly checked. |
-| Reuses deriveProcessState for status extraction   | Status extraction logic must be shared with Process Guard Linter. No duplicate parsing or status-to-protection mapping.                                          | DRY principle - the Process Guard already has battle-tested status extraction from JSDoc comments. Duplicating this logic creates maintenance burden and potential inconsistencies between tools.                                           |
-| ESLint Processor filters messages based on status | The processor uses ESLint's postprocess hook to filter or downgrade messages. Source code is never modified. No eslint-disable comments are injected.            | ESLint processors can inspect and filter linting messages after rules run. This approach: - Requires no source code modification - Works with any ESLint rule (not just no-unused-vars) - Can be extended to other status-based behaviors   |
-| CLI can generate static ESLint ignore list        | Running `pnpm lint:process --eslint-ignores` outputs a list of files that should have relaxed linting, suitable for inclusion in eslint.config.js.               | For CI environments or users preferring static configuration, a generated list provides an alternative to runtime processing. The list can be regenerated whenever status annotations change.                                               |
-| Replaces directory-based ESLint exclusions        | After implementation, the directory-based exclusions in eslint.config.js (lines 30-57) are removed. All suppression is driven by @libar-docs-status annotations. | Directory-based exclusions are tech debt: - They don't account for file lifecycle (roadmap -> completed) - They require manual updates when new roadmap directories are added - They persist even after files are implemented               |
-| Rule relaxation is configurable                   | The set of rules relaxed for roadmap/deferred files is configurable, defaulting to `@typescript-eslint/no-unused-vars`.                                          | Different projects may want to relax different rules for design artifacts. The default covers the common case (unused exports in API stubs).                                                                                                |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| File status determines unused-vars enforcement | Files with `@libar-docs-status roadmap` or `deferred` have relaxed unused-vars rules. Files with `active`, `completed`, or no status have strict enforcement. | Design artifacts (roadmap stubs) define API shapes that are intentionally unused until implementation. Relaxing rules for these files prevents false positives while ensuring implemented code (active/completed) remains strictly checked. |
+| Reuses deriveProcessState for status extraction | Status extraction logic must be shared with Process Guard Linter. No duplicate parsing or status-to-protection mapping. | DRY principle - the Process Guard already has battle-tested status extraction from JSDoc comments. Duplicating this logic creates maintenance burden and potential inconsistencies between tools. |
+| ESLint Processor filters messages based on status | The processor uses ESLint's postprocess hook to filter or downgrade messages. Source code is never modified. No eslint-disable comments are injected. | ESLint processors can inspect and filter linting messages after rules run. This approach: - Requires no source code modification - Works with any ESLint rule (not just no-unused-vars) - Can be extended to other status-based behaviors |
+| CLI can generate static ESLint ignore list | Running `pnpm lint:process --eslint-ignores` outputs a list of files that should have relaxed linting, suitable for inclusion in eslint.config.js. | For CI environments or users preferring static configuration, a generated list provides an alternative to runtime processing. The list can be regenerated whenever status annotations change. |
+| Replaces directory-based ESLint exclusions | After implementation, the directory-based exclusions in eslint.config.js (lines 30-57) are removed. All suppression is driven by @libar-docs-status annotations. | Directory-based exclusions are tech debt: - They don't account for file lifecycle (roadmap -> completed) - They require manual updates when new roadmap directories are added - They persist even after files are implemented |
+| Rule relaxation is configurable | The set of rules relaxed for roadmap/deferred files is configurable, defaulting to `@typescript-eslint/no-unused-vars`. | Different projects may want to relax different rules for design artifacts. The default covers the common case (unused exports in API stubs). |
 
 ### Status Transition Detection Testing
 
-| Rule                                                 | Invariant                                                                                                                                | Rationale                                                                                                                                       |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Status transitions are detected from file-level tags | Status transitions must be detected by comparing @libar-docs-status tags at the file level between the old and new versions of a file.   | File-level tags are the canonical source of pattern status — detecting transitions from tags ensures consistency with the FSM validator.        |
-| Status tags inside docstrings are ignored            | Status tags appearing inside Gherkin docstring blocks (between triple-quote delimiters) must not be treated as real status declarations. | Docstrings often contain example code or documentation showing status tags — parsing these as real would cause phantom status transitions.      |
-| First valid status tag outside docstrings is used    | When multiple status tags appear outside docstrings, only the first one determines the file's status.                                    | A single canonical status per file prevents ambiguity — using the first tag matches Gherkin convention where file-level tags appear at the top. |
-| Line numbers are tracked from hunk headers           | Detected status transitions must include the line number where the status tag appears, derived from git diff hunk headers.               | Line numbers enable precise error reporting — developers need to know exactly where in the file the transition was detected.                    |
-| Generated documentation directories are excluded     | Files in generated documentation directories (docs-generated/, docs-living/) must be excluded from status transition detection.          | Generated files are projections of source files — detecting transitions in them would produce duplicate violations and false positives.         |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Status transitions are detected from file-level tags | Status transitions must be detected by comparing @libar-docs-status tags at the file level between the old and new versions of a file. | File-level tags are the canonical source of pattern status — detecting transitions from tags ensures consistency with the FSM validator. |
+| Status tags inside docstrings are ignored | Status tags appearing inside Gherkin docstring blocks (between triple-quote delimiters) must not be treated as real status declarations. | Docstrings often contain example code or documentation showing status tags — parsing these as real would cause phantom status transitions. |
+| First valid status tag outside docstrings is used | When multiple status tags appear outside docstrings, only the first one determines the file's status. | A single canonical status per file prevents ambiguity — using the first tag matches Gherkin convention where file-level tags appear at the top. |
+| Line numbers are tracked from hunk headers | Detected status transitions must include the line number where the status tag appears, derived from git diff hunk headers. | Line numbers enable precise error reporting — developers need to know exactly where in the file the transition was detected. |
+| Generated documentation directories are excluded | Files in generated documentation directories (docs-generated/, docs-living/) must be excluded from status transition detection. | Generated files are projections of source files — detecting transitions in them would produce duplicate violations and false positives. |
 
 ### Step Lint Extended Rules
 
-| Rule                                                     | Invariant                                                                                                                                                                                                                                                                                                            | Rationale                                                                                                                                                                                                                                                       |
-| -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Hash in step text is detected                            | A hash character in the middle of a Gherkin step line can be interpreted as a comment by some parsers, silently truncating the step text. This differs from hash-in-description (which catches hash inside description pseudo-code-blocks).                                                                          | We encountered this exact trap while writing the lint-steps test suite. Step text like "Given a file with # inside" was silently truncated to "Given a file with".                                                                                              |
-| Gherkin keywords in description text are detected        | A Feature or Rule description line that starts with Given, When, Then, And, or But breaks the Gherkin parser because it interprets the line as a step definition rather than description text.                                                                                                                       | This is documented in vitest-cucumber quirks but has no static detection. Authors writing natural language descriptions accidentally start sentences with these keywords.                                                                                       |
-| Scenario Outline steps with quoted values are detected   | When a feature file has a Scenario Outline and its steps use quoted values instead of angle-bracket placeholders, this indicates the author may be using the Scenario pattern (function params) instead of the ScenarioOutline pattern (variables object). This is the feature-file side of the Two-Pattern Problem. | The existing scenario-outline-function-params rule catches the step-file side. This rule catches the feature-file side where quoted values in Scenario Outline steps suggest the author expects Cucumber expression matching rather than variable substitution. |
-| Repeated step patterns in the same scenario are detected | Registering the same step pattern twice in one Scenario block causes vitest-cucumber to overwrite the first registration. Only the last callback runs, causing silent test failures where assertions appear to pass but the setup was wrong.                                                                         | This happens when authors copy-paste step definitions within a scenario and forget to change the pattern. The failure is silent — tests pass but with wrong assertions.                                                                                         |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Hash in step text is detected | A hash character in the middle of a Gherkin step line can be interpreted as a comment by some parsers, silently truncating the step text. This differs from hash-in-description (which catches hash inside description pseudo-code-blocks). | We encountered this exact trap while writing the lint-steps test suite. Step text like "Given a file with # inside" was silently truncated to "Given a file with". |
+| Gherkin keywords in description text are detected | A Feature or Rule description line that starts with Given, When, Then, And, or But breaks the Gherkin parser because it interprets the line as a step definition rather than description text. | This is documented in vitest-cucumber quirks but has no static detection. Authors writing natural language descriptions accidentally start sentences with these keywords. |
+| Scenario Outline steps with quoted values are detected | When a feature file has a Scenario Outline and its steps use quoted values instead of angle-bracket placeholders, this indicates the author may be using the Scenario pattern (function params) instead of the ScenarioOutline pattern (variables object). This is the feature-file side of the Two-Pattern Problem. | The existing scenario-outline-function-params rule catches the step-file side. This rule catches the feature-file side where quoted values in Scenario Outline steps suggest the author expects Cucumber expression matching rather than variable substitution. |
+| Repeated step patterns in the same scenario are detected | Registering the same step pattern twice in one Scenario block causes vitest-cucumber to overwrite the first registration. Only the last callback runs, causing silent test failures where assertions appear to pass but the setup was wrong. | This happens when authors copy-paste step definitions within a scenario and forget to change the pattern. The failure is silent — tests pass but with wrong assertions. |
 
 ### Step Lint Vitest Cucumber
 
-| Rule                                                             | Invariant                                                                                                                                                                                                                                                     | Rationale                                                                                                                                                                                                                              |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Hash comments inside description pseudo-code-blocks are detected | A # at the start of a line inside a """ block within a Feature or Rule description terminates the description context, because the Gherkin parser treats # as a comment even inside descriptions. The """ delimiters in descriptions are NOT real DocStrings. | This is the most confusing Gherkin parser trap. Authors embed code examples using """ and expect # comments to be protected. The resulting parse error gives no hint about the actual cause.                                           |
-| Duplicate And steps in the same scenario are detected            | Multiple And steps with identical text in the same scenario cause vitest-cucumber step matching failures. The fix is to consolidate into a single step with a DataTable.                                                                                      | Duplicate step text silently overwrites step registrations, causing the second And to match the first handler and produce wrong or undefined behavior at runtime.                                                                      |
-| Dollar sign in step text is detected                             | The $ character in step text causes matching issues in vitest-cucumber's expression parser.                                                                                                                                                                   | The dollar sign is interpreted as a special character in expression parsing, causing steps to silently fail to match and producing confusing StepAbleUnknowStepError messages.                                                         |
-| Regex step patterns are detected                                 | vitest-cucumber only supports string patterns with {string} and {int}. Regex patterns throw StepAbleStepExpressionError.                                                                                                                                      | Regex patterns are a common Cucumber.js habit that compiles without error but throws at runtime in vitest-cucumber, wasting debugging time.                                                                                            |
-| Unsupported phrase type is detected                              | vitest-cucumber does not support {phrase}. Use {string} with quoted values in the feature file.                                                                                                                                                               | The {phrase} type is valid in standard Cucumber but unsupported in vitest-cucumber, causing silent parameter capture failures that are difficult to trace.                                                                             |
-| ScenarioOutline function params are detected                     | ScenarioOutline step callbacks must use the variables object, not function params. Using (\_ctx, value: string) means value will be undefined at runtime.                                                                                                     | This is the most common vitest-cucumber trap. Function params compile and even type-check, but the values are always undefined at runtime because ScenarioOutline injects data through the variables object, not positional arguments. |
-| Missing And destructuring is detected                            | If a feature file has And steps, the step definition must destructure And from the scenario callback.                                                                                                                                                         | Without destructuring And, vitest-cucumber cannot bind And steps and throws StepAbleUnknowStepError at runtime with no indication that a missing destructure is the cause.                                                             |
-| Missing Rule wrapper is detected                                 | If a feature file has Rule: blocks, the step definition must destructure Rule from describeFeature.                                                                                                                                                           | Without the Rule() wrapper, scenarios inside Rule: blocks are invisible to vitest-cucumber and silently never execute, giving a false green test suite.                                                                                |
-| Feature-to-step pairing resolves both loadFeature patterns       | Step files use two loadFeature patterns: simple string paths and resolve(\_\_dirname, relative) paths. Both must be paired.                                                                                                                                   | Unpaired feature files cannot be cross-checked for compatibility issues, leaving ScenarioOutline param misuse and missing destructures undetected.                                                                                     |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Hash comments inside description pseudo-code-blocks are detected | A # at the start of a line inside a """ block within a Feature or Rule description terminates the description context, because the Gherkin parser treats # as a comment even inside descriptions. The """ delimiters in descriptions are NOT real DocStrings. | This is the most confusing Gherkin parser trap. Authors embed code examples using """ and expect # comments to be protected. The resulting parse error gives no hint about the actual cause. |
+| Duplicate And steps in the same scenario are detected | Multiple And steps with identical text in the same scenario cause vitest-cucumber step matching failures. The fix is to consolidate into a single step with a DataTable. | Duplicate step text silently overwrites step registrations, causing the second And to match the first handler and produce wrong or undefined behavior at runtime. |
+| Dollar sign in step text is detected | The $ character in step text causes matching issues in vitest-cucumber's expression parser. | The dollar sign is interpreted as a special character in expression parsing, causing steps to silently fail to match and producing confusing StepAbleUnknowStepError messages. |
+| Regex step patterns are detected | vitest-cucumber only supports string patterns with {string} and {int}. Regex patterns throw StepAbleStepExpressionError. | Regex patterns are a common Cucumber.js habit that compiles without error but throws at runtime in vitest-cucumber, wasting debugging time. |
+| Unsupported phrase type is detected | vitest-cucumber does not support {phrase}. Use {string} with quoted values in the feature file. | The {phrase} type is valid in standard Cucumber but unsupported in vitest-cucumber, causing silent parameter capture failures that are difficult to trace. |
+| ScenarioOutline function params are detected | ScenarioOutline step callbacks must use the variables object, not function params. Using (_ctx, value: string) means value will be undefined at runtime. | This is the most common vitest-cucumber trap. Function params compile and even type-check, but the values are always undefined at runtime because ScenarioOutline injects data through the variables object, not positional arguments. |
+| Missing And destructuring is detected | If a feature file has And steps, the step definition must destructure And from the scenario callback. | Without destructuring And, vitest-cucumber cannot bind And steps and throws StepAbleUnknowStepError at runtime with no indication that a missing destructure is the cause. |
+| Missing Rule wrapper is detected | If a feature file has Rule: blocks, the step definition must destructure Rule from describeFeature. | Without the Rule() wrapper, scenarios inside Rule: blocks are invisible to vitest-cucumber and silently never execute, giving a false green test suite. |
+| Feature-to-step pairing resolves both loadFeature patterns | Step files use two loadFeature patterns: simple string paths and resolve(__dirname, relative) paths. Both must be paired. | Unpaired feature files cannot be cross-checked for compatibility issues, leaving ScenarioOutline param misuse and missing destructures undetected. |
 
 ### Streaming Git Diff
 
-| Rule                                            | Invariant                                                                                                                                          | Rationale                                                                                                              |
-| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Git commands stream output instead of buffering | Git diff output must be consumed as a stream with constant memory usage, never buffered entirely in memory.                                        | Buffering full diff output causes ENOBUFS crashes on large repositories where diff size exceeds Node.js buffer limits. |
-| Diff content is parsed as it streams            | Status transitions and deliverable changes must be extracted incrementally as each file section completes, not after the entire diff is collected. | Batch-processing the full diff reintroduces the memory bottleneck that streaming is designed to eliminate.             |
-| Streaming errors are handled gracefully         | Stream failures and malformed diff lines must return Result errors or be skipped without throwing exceptions.                                      | Unhandled stream errors crash the CLI process, preventing any validation output from reaching the user.                |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Git commands stream output instead of buffering | Git diff output must be consumed as a stream with constant memory usage, never buffered entirely in memory. | Buffering full diff output causes ENOBUFS crashes on large repositories where diff size exceeds Node.js buffer limits. |
+| Diff content is parsed as it streams | Status transitions and deliverable changes must be extracted incrementally as each file section completes, not after the entire diff is collected. | Batch-processing the full diff reintroduces the memory bottleneck that streaming is designed to eliminate. |
+| Streaming errors are handled gracefully | Stream failures and malformed diff lines must return Result errors or be skipped without throwing exceptions. | Unhandled stream errors crash the CLI process, preventing any validation output from reaching the user. |
 
 ### Validator Read Model Consolidation
 
-| Rule                                                       | Invariant                                                                                                                                                                                         | Rationale                                                                                                                                                                                                                                                                                                                                                     |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Validator queries the read model for cross-source matching | Pattern identity resolution — including implements relationships in both directions — uses `MasterDataset.relationshipIndex` rather than ad-hoc name-equality maps built from raw scanner output. | The MasterDataset computes implementedBy reverse lookups in transform-dataset.ts (second pass, lines 488-546). The validator's current name-equality Map cannot resolve ShapeExtractor -> ShapeExtraction or DecisionDocGeneratorTesting -> DecisionDocGenerator because these are implements relationships, not name matches.                                |
-| No lossy local types in the validator                      | The validator operates on `ExtractedPattern` from the MasterDataset, not a consumer-local DTO that discards fields.                                                                               | GherkinPatternInfo keeps only name, phase, status, file, and deliverables — discarding uses, dependsOn, implementsPatterns, include, productArea, rules, and 20+ other fields. When the validator needs relationship data, it cannot access it through the lossy type.                                                                                        |
-| Utility patterns without specs are not false positives     | Internal utility patterns that have a `@libar-docs-phase` but will never have a Gherkin spec should not carry phase metadata. Phase tags signal roadmap participation.                            | Five utility patterns (ContentDeduplicator, FileCache, WarningCollector, SourceMappingValidator, SourceMapper) have phase tags from the phase when they were built. They are infrastructure, not roadmap features. The validator correctly reports missing Gherkin for patterns with phases — the fix is removing the phase tag, not suppressing the warning. |
+| Rule | Invariant | Rationale |
+| --- | --- | --- |
+| Validator queries the read model for cross-source matching | Pattern identity resolution — including implements relationships in both directions — uses `MasterDataset.relationshipIndex` rather than ad-hoc name-equality maps built from raw scanner output. | The MasterDataset computes implementedBy reverse lookups in transform-dataset.ts (second pass, lines 488-546). The validator's current name-equality Map cannot resolve ShapeExtractor -> ShapeExtraction or DecisionDocGeneratorTesting -> DecisionDocGenerator because these are implements relationships, not name matches. |
+| No lossy local types in the validator | The validator operates on `ExtractedPattern` from the MasterDataset, not a consumer-local DTO that discards fields. | GherkinPatternInfo keeps only name, phase, status, file, and deliverables — discarding uses, dependsOn, implementsPatterns, include, productArea, rules, and 20+ other fields. When the validator needs relationship data, it cannot access it through the lossy type. |
+| Utility patterns without specs are not false positives | Internal utility patterns that have a `@libar-docs-phase` but will never have a Gherkin spec should not carry phase metadata. Phase tags signal roadmap participation. | Five utility patterns (ContentDeduplicator, FileCache, WarningCollector, SourceMappingValidator, SourceMapper) have phase tags from the phase when they were built. They are infrastructure, not roadmap features. The validator correctly reports missing Gherkin for patterns with phases — the fix is removing the phase tag, not suppressing the warning. |
 
 ---

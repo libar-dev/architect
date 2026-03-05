@@ -258,8 +258,13 @@ function extractDescriptionSections(description: string): SectionBlock[] {
 
   for (const line of lines) {
     const trimmed = line.trim();
-    // Skip Background/Deliverable/table rows from Gherkin structure
-    if (trimmed.startsWith('Background:') || trimmed.startsWith('Given ')) {
+    // Stop at Gherkin structural keywords that end the Feature description
+    if (
+      trimmed.startsWith('Background:') ||
+      trimmed.startsWith('Scenario:') ||
+      trimmed.startsWith('Scenario Outline:') ||
+      trimmed.startsWith('Rule:')
+    ) {
       break;
     }
     textBlocks.push(trimmed);
@@ -361,8 +366,9 @@ function parseMarkdownTable(lines: string[]): SectionBlock | undefined {
 
   const headers = parseCells(headerLine);
 
-  // Skip separator row (e.g., | --- | --- |)
-  const dataStart = separatorLine.includes('---') ? 2 : 1;
+  // Skip separator row — must be a proper pipe-delimited row of dashes (e.g., | --- | --- |)
+  const isSeparator = /^\|(\s*:?-+:?\s*\|)+\s*$/.test(separatorLine);
+  const dataStart = isSeparator ? 2 : 1;
   const rows = lines.slice(dataStart).map(parseCells);
 
   if (headers.length === 0 || rows.length === 0) return undefined;

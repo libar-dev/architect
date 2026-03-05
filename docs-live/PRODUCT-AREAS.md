@@ -31,7 +31,7 @@ Configuration is the entry boundary — it transforms a user-authored `delivery-
 
 The generation pipeline transforms annotated source code into markdown documents through a four-stage architecture. **Stage 1 — Scanner** (`src/scanner/`): Discovers TypeScript and Gherkin files, parses AST structure, and detects opt-in via `@libar-docs` markers. **Stage 2 — Extractor** (`src/extractor/`): Extracts patterns from TypeScript JSDoc annotations and Gherkin tags, producing `ExtractedPattern` objects with metadata, relationships, shapes, rules, and deliverables. **Stage 3 — Transformer** (`src/generators/pipeline/`): Builds `MasterDataset` with pre-computed views (`byStatus`, `byCategory`, `byPhase`, `byProductArea`) for O(1) access. All consumers share a single `buildMasterDataset()` factory — no parallel pipelines (ADR-006). **Stage 4 — Codec** (`src/renderable/`): Pure functions that transform MasterDataset into RenderableDocument — an intermediate representation with 9 block types (heading, paragraph, table, list, code, mermaid, collapsible, linkOut, separator). The renderer converts IR to markdown syntax. The codec inventory includes: **ReferenceDocumentCodec** (4-layer composition: conventions, diagrams, shapes, behaviors), **PlanningCodec** (roadmap and remaining work), **SessionCodec** (current work and session findings), **ReportingCodec** (changelog), **TimelineCodec** (timeline and traceability), **RequirementsAdrCodec** (ADR generation), **BusinessRulesCodec** (Gherkin rule extraction), **TaxonomyCodec** (tag registry docs), **CompositeCodec** (composes multiple codecs into a single document). Every codec supports three detail levels — **detailed** (full reference with rationale, code examples, and verified-by lists), **standard** (narrative without rationale), and **summary** (compact tables for `_claude-md/` modules). The Orchestrator (`src/generators/orchestrator.ts`) runs registered generators in order. Each generator creates codec instances from configuration, decodes the shared MasterDataset, renders to markdown, and writes output files to `docs-live/` (reference docs) or `docs-live/_claude-md/` (AI-optimized compacts). Product area docs are a special case — they filter the entire MasterDataset to a single area, compose 5 sections (intro, conventions, diagrams, shapes, business rules), and generate both detailed and summary versions with a progressive disclosure index.
 
-**86 patterns** — 71 completed, 3 active, 12 planned
+**86 patterns** — 73 completed, 1 active, 12 planned
 
 **Key patterns:** ADR005CodecBasedMarkdownRendering, CodecDrivenReferenceGeneration, CrossCuttingDocumentInclusion, ArchitectureDiagramGeneration, ScopedArchitecturalView, CompositeCodec, RenderableDocument, ProductAreaOverview
 
@@ -41,7 +41,7 @@ The generation pipeline transforms annotated source code into markdown documents
 
 Validation is the enforcement boundary — it ensures that every change to annotated source files respects the delivery lifecycle rules defined by the FSM, protection levels, and scope constraints. The system operates in three layers: the FSM validator checks status transitions against a 4-state directed graph, the Process Guard orchestrates commit-time validation using a Decider pattern (state derived from annotations, not stored separately), and the lint engine provides pluggable rule execution with pretty and JSON output. Anti-pattern detection enforces dual-source ownership boundaries — `@libar-docs-uses` belongs on TypeScript, `@libar-docs-depends-on` belongs on Gherkin — preventing cross-domain tag confusion that causes documentation drift. Definition of Done validation ensures completed patterns have all deliverables marked done and at least one acceptance-criteria scenario.
 
-**22 patterns** — 14 completed, 1 active, 7 planned
+**22 patterns** — 15 completed, 0 active, 7 planned
 
 **Key patterns:** ProcessGuardLinter, PhaseStateMachineValidation, DoDValidation, StepLintVitestCucumber, ProgressiveGovernance
 
@@ -51,7 +51,7 @@ Validation is the enforcement boundary — it ensures that every change to annot
 
 The Data API provides direct terminal access to delivery process state. It replaces reading generated markdown or launching explore agents — targeted queries use 5-10x less context. The `context` command assembles curated bundles tailored to session type (planning, design, implement).
 
-**35 patterns** — 21 completed, 10 active, 4 planned
+**35 patterns** — 22 completed, 9 active, 4 planned
 
 **Key patterns:** DataAPIContextAssembly, ProcessStateAPICLI, DataAPIDesignSessionSupport, DataAPIRelationshipGraph, DataAPIOutputShaping
 
@@ -79,16 +79,16 @@ Process defines the USDP-inspired session workflow that governs how work moves t
 
 ## Progress Overview
 
-| Area                                            | Patterns | Completed | Active | Planned |
-| ----------------------------------------------- | -------- | --------- | ------ | ------- |
-| [Annotation](product-areas/ANNOTATION.md)       | 26       | 23        | 2      | 1       |
-| [Configuration](product-areas/CONFIGURATION.md) | 9        | 8         | 0      | 1       |
-| [Generation](product-areas/GENERATION.md)       | 86       | 71        | 3      | 12      |
-| [Validation](product-areas/VALIDATION.md)       | 22       | 14        | 1      | 7       |
-| [DataAPI](product-areas/DATA-API.md)            | 35       | 21        | 10     | 4       |
-| [CoreTypes](product-areas/CORE-TYPES.md)        | 7        | 6         | 0      | 1       |
-| [Process](product-areas/PROCESS.md)             | 11       | 4         | 0      | 7       |
-| **Total**                                       | **196**  | **147**   | **16** | **33**  |
+| Area | Patterns | Completed | Active | Planned |
+| --- | --- | --- | --- | --- |
+| [Annotation](product-areas/ANNOTATION.md) | 26 | 23 | 2 | 1 |
+| [Configuration](product-areas/CONFIGURATION.md) | 9 | 8 | 0 | 1 |
+| [Generation](product-areas/GENERATION.md) | 86 | 73 | 1 | 12 |
+| [Validation](product-areas/VALIDATION.md) | 22 | 15 | 0 | 7 |
+| [DataAPI](product-areas/DATA-API.md) | 35 | 22 | 9 | 4 |
+| [CoreTypes](product-areas/CORE-TYPES.md) | 7 | 6 | 0 | 1 |
+| [Process](product-areas/PROCESS.md) | 11 | 4 | 0 | 7 |
+| **Total** | **196** | **151** | **12** | **33** |
 
 ---
 
