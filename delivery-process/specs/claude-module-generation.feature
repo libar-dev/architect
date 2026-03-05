@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:ClaudeModuleGeneration
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-phase:25
 @libar-docs-effort:1.5d
 @libar-docs-product-area:Generation
