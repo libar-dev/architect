@@ -300,6 +300,7 @@ METADATA_TAGS_BY_GROUP = {
   extraction: ['extract-shapes', 'shape'] as const,
   stub: ['target', 'since'] as const,
   convention: ['convention'] as const,
+  claude: ['claude-module', 'claude-section', 'claude-tags'] as const,
 } as const;
 ```
 

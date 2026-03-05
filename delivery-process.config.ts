@@ -127,5 +127,8 @@ export default defineConfig({
     requirements: {
       outputDirectory: 'docs-live',
     },
+    'claude-modules': {
+      outputDirectory: '_claude-md',
+    },
   },
 });

@@ -23,7 +23,7 @@
 
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import type { RenderableDocument } from './schema.js';
-import { renderDocumentWithFiles, type OutputFile } from './render.js';
+import { renderDocumentWithFiles, renderToClaudeMdModule, type OutputFile } from './render.js';
 import { Result } from '../types/result.js';
 
 // Default codec instances
@@ -192,6 +192,15 @@ export const DOCUMENT_TYPES = {
 } as const;
 
 export type DocumentType = keyof typeof DOCUMENT_TYPES;
+
+/**
+ * Per-document-type renderer overrides.
+ * Document types not listed here use the default `renderToMarkdown`.
+ */
+const DOCUMENT_TYPE_RENDERERS: Partial<Record<DocumentType, (doc: RenderableDocument) => string>> =
+  {
+    'claude-modules': renderToClaudeMdModule,
+  };
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Codec Options Type
@@ -488,7 +497,8 @@ export function generateDocumentSafe(
 
   // Render: RenderableDocument → OutputFile[] (with error handling)
   try {
-    const files = renderDocumentWithFiles(doc, outputPath);
+    const renderer = DOCUMENT_TYPE_RENDERERS[type];
+    const files = renderDocumentWithFiles(doc, outputPath, renderer);
     return Result.ok(files);
   } catch (err) {
     return Result.err({
@@ -554,7 +564,8 @@ export function generateDocument(
   const doc = codec.decode(dataset) as RenderableDocument;
 
   // Render: RenderableDocument → OutputFile[]
-  return renderDocumentWithFiles(doc, outputPath);
+  const renderer = DOCUMENT_TYPE_RENDERERS[type];
+  return renderDocumentWithFiles(doc, outputPath, renderer);
 }
 
 /**

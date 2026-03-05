@@ -117,6 +117,8 @@
 
 #### CompositeCodec
 
+#### ClaudeModuleCodec
+
 #### BusinessRulesCodec
 
 | Option               | Type                                       | Default             | Description                               |

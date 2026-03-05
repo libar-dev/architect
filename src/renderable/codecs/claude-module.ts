@@ -204,9 +204,6 @@ function buildModuleFile(
   const sections: SectionBlock[] = [];
   const featureDescription = pattern.directive.description;
 
-  // H3 title (modules use H3 to nest under CLAUDE.md H2 sections)
-  sections.push(heading(3, pattern.name));
-
   // Extract Problem/Solution from feature description
   const descSections = extractDescriptionSections(featureDescription);
   if (descSections.length > 0) {
@@ -285,8 +282,8 @@ function buildRuleSection(
 ): SectionBlock[] {
   const sections: SectionBlock[] = [];
 
-  // H4 heading from rule name
-  sections.push(heading(4, rule.name));
+  // H2 heading from rule name (renderer offsets to H4 for _claude-md/ modules)
+  sections.push(heading(2, rule.name));
 
   // Parse structured annotations from rule description
   const annotations = parseBusinessRuleAnnotations(rule.description);

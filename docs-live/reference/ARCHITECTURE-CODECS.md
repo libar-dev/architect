@@ -463,6 +463,34 @@ const doc = composeDocuments([docA, docB], { title: 'Combined' });
 
 ---
 
+## ClaudeModuleCodec
+
+Transforms MasterDataset into RenderableDocuments for CLAUDE.md module generation.
+Filters patterns with `claudeModule` tags and generates compact markdown modules
+suitable for the `_claude-md/` directory structure.
+
+**Purpose:** Generate CLAUDE.md modules from annotated behavior specs.
+
+**Output Files:** One file per claude-module-tagged pattern at `{section}/{module}.md`
+
+### Content Extraction
+
+- Feature description → module introduction (Problem/Solution)
+- Rule: blocks → H4 sections with invariant + rationale
+- Scenario Outline Examples → decision tables
+- Tables in Rule descriptions → preserved as-is
+
+### Factory Pattern
+
+Use `createClaudeModuleCodec(options)` for custom options:
+
+```typescript
+const codec = createClaudeModuleCodec({ detailLevel: 'detailed' });
+const doc = codec.decode(dataset);
+```
+
+---
+
 ## BusinessRulesCodec
 
 Transforms MasterDataset into a RenderableDocument for business rules output.

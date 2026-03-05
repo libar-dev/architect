@@ -1,12 +1,15 @@
 @libar-docs
 @libar-docs-pattern:SessionGuidesModuleSource
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-phase:39
 @libar-docs-effort:0.5d
 @libar-docs-product-area:Generation
 @libar-docs-depends-on:ClaudeModuleGeneration,DocsConsolidationStrategy
 @libar-docs-business-value:session-workflow-CLAUDE-md-section-generated-from-annotated-specs
 @libar-docs-priority:medium
+@libar-docs-claude-module:session-workflows
+@libar-docs-claude-section:workflow
+@libar-docs-claude-tags:core
 Feature: Session Guides as Annotated Module Source
 
   **Problem:**
@@ -65,10 +68,10 @@ Feature: Session Guides as Annotated Module Source
       | Session workflow behavior spec with Rule blocks (session types, FSM contracts, escape hatches, handoff) | complete | delivery-process/specs/session-guides-module-source.feature | No | n/a |
       | Verify SESSION-GUIDES.md retained with correct INDEX.md links | complete | docs/SESSION-GUIDES.md | No | n/a |
       | Add workflow to Phase 25 claude-section enum | complete | delivery-process/specs/claude-module-generation.feature | No | n/a |
-      | Add claude-module and claude-section:workflow tags to this spec | deferred | delivery-process/specs/session-guides-module-source.feature | No | n/a |
-      | Generated _claude-md/workflow/session-workflows.md replaces hand-written version | deferred | _claude-md/workflow/session-workflows.md | No | n/a |
-      | Generated _claude-md/workflow/fsm-handoff.md replaces hand-written version | deferred | _claude-md/workflow/fsm-handoff.md | No | n/a |
-      | CLAUDE.md Session Workflows section replaced with modular-claude-md include | deferred | CLAUDE.md | No | n/a |
+      | Add claude-module and claude-section:workflow tags to this spec | complete | delivery-process/specs/session-guides-module-source.feature | No | n/a |
+      | Generated _claude-md/workflow/session-workflows.md replaces hand-written version | complete | _claude-md/workflow/session-workflows.md | No | n/a |
+      | Generated _claude-md/workflow/fsm-handoff.md replaces hand-written version | complete | _claude-md/workflow/session-workflows.md | No | n/a |
+      | CLAUDE.md Session Workflows section replaced with modular-claude-md include | complete | CLAUDE.md | No | n/a |
 
   # ===========================================================================
   # RULE 1: SESSION-GUIDES.MD IS THE PUBLIC HUMAN REFERENCE

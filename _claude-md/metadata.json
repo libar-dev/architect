@@ -77,17 +77,7 @@
         {
           "path": "workflow/session-workflows.md",
           "tags": ["core"],
-          "description": "Session decision tree and session types"
-        },
-        {
-          "path": "workflow/session-details.md",
-          "tags": ["core"],
-          "description": "Planning, Design, and Implementation session details"
-        },
-        {
-          "path": "workflow/fsm-handoff.md",
-          "tags": ["core"],
-          "description": "FSM protection, error messages, escape hatches, and handoff documentation"
+          "description": "Session types, FSM contracts, escape hatches, handoff (generated from SessionGuidesModuleSource spec)"
         }
       ]
     },
