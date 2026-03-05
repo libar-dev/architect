@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:DocsLiveConsolidation
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-phase:37
 @libar-docs-effort:0.5d
 @libar-docs-product-area:Generation
@@ -33,10 +33,10 @@ Feature: Docs Live Directory Consolidation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Reference docs output → docs-live/reference/ | pending | delivery-process.config.ts | Yes | integration |
-      | Architecture _claude-md/ → docs-live/_claude-md/architecture/ | pending | delivery-process.config.ts | Yes | integration |
-      | Remove root-level compact duplicates from docs-generated/ | pending | delivery-process.config.ts | No | n/a |
-      | Update .gitignore: docs-generated/ ignored, docs-live/ committed | pending | .gitignore | No | n/a |
+      | Reference docs output → docs-live/reference/ | complete | delivery-process.config.ts | Yes | integration |
+      | Architecture _claude-md/ → docs-live/_claude-md/architecture/ | complete | delivery-process.config.ts | Yes | integration |
+      | Remove root-level compact duplicates from docs-generated/ | complete | delivery-process.config.ts | No | n/a |
+      | Update .gitignore: docs-generated/ ignored, docs-live/ committed | complete | .gitignore | No | n/a |
 
   Rule: docs-live/ is the single directory for website-published content
 
