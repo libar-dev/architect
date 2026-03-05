@@ -38,8 +38,8 @@ graph TB
     subgraph generator["Generator"]
         SourceMapper[/"SourceMapper"/]
         Documentation_Generation_Orchestrator("Documentation Generation Orchestrator")
-        DecisionDocGenerator("DecisionDocGenerator")
         TransformDataset("TransformDataset")
+        DecisionDocGenerator("DecisionDocGenerator")
     end
     subgraph renderer["Renderer"]
         PatternsCodec[("PatternsCodec")]
@@ -62,10 +62,10 @@ graph TB
     PatternsCodec ..->|implements| PatternRelationshipModel
     CompositeCodec ..->|implements| ReferenceDocShowcase
     ArchitectureCodec -->|uses| MasterDataset
-    DecisionDocGenerator -.->|depends on| DecisionDocCodec
-    DecisionDocGenerator -.->|depends on| SourceMapper
     TransformDataset -->|uses| MasterDataset
     TransformDataset ..->|implements| PatternRelationshipModel
+    DecisionDocGenerator -.->|depends on| DecisionDocCodec
+    DecisionDocGenerator -.->|depends on| SourceMapper
     classDef neighbor stroke-dasharray: 5 5
 ```
 

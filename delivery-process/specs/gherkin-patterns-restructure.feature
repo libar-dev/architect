@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:GherkinPatternsRestructure
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:41
 @libar-docs-effort:0.5d
 @libar-docs-product-area:Generation
@@ -62,12 +62,12 @@ Feature: Gherkin Patterns Guide Restructure
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Move Step Linting section (lines 346-493) to VALIDATION.md, replacing redirect at line 96 | pending | docs/VALIDATION.md | No | n/a |
-      | Remove Step Linting section from GHERKIN-PATTERNS.md (result: ~370 lines) | pending | docs/GHERKIN-PATTERNS.md | No | n/a |
-      | Update cross-references between the two docs | pending | docs/GHERKIN-PATTERNS.md, docs/VALIDATION.md | No | n/a |
-      | Verify related-documentation tables in both files | pending | docs/GHERKIN-PATTERNS.md, docs/VALIDATION.md | No | n/a |
-      | Update INDEX.md section tables and line counts for both docs | pending | docs/INDEX.md | No | n/a |
-      | Add lint-steps cross-reference row in GHERKIN-PATTERNS.md Quick Reference | pending | docs/GHERKIN-PATTERNS.md | No | n/a |
+      | Move Step Linting section (lines 346-493) to VALIDATION.md, replacing redirect at line 96 | complete | docs/VALIDATION.md | No | n/a |
+      | Remove Step Linting section from GHERKIN-PATTERNS.md (result: ~370 lines) | complete | docs/GHERKIN-PATTERNS.md | No | n/a |
+      | Update cross-references between the two docs | complete | docs/GHERKIN-PATTERNS.md, docs/VALIDATION.md | No | n/a |
+      | Verify related-documentation tables in both files | complete | docs/GHERKIN-PATTERNS.md, docs/VALIDATION.md | No | n/a |
+      | Update INDEX.md section tables and line counts for both docs | complete | docs/INDEX.md | No | n/a |
+      | Add lint-steps cross-reference row in GHERKIN-PATTERNS.md Quick Reference | complete | docs/GHERKIN-PATTERNS.md | No | n/a |
 
   Rule: Step Linting content belongs in VALIDATION.md
 

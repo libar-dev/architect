@@ -177,11 +177,11 @@ graph TB
     ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
     ProcessGuardTesting["ProcessGuardTesting"]
     subgraph related["Related"]
-        AntiPatternDetector["AntiPatternDetector"]:::neighbor
         ConfigurationTypes["ConfigurationTypes"]:::neighbor
         RegexBuilders["RegexBuilders"]:::neighbor
         ProjectConfigTypes["ProjectConfigTypes"]:::neighbor
         ConfigurationPresets["ConfigurationPresets"]:::neighbor
+        AntiPatternDetector["AntiPatternDetector"]:::neighbor
         ProcessGuardLinter["ProcessGuardLinter"]:::neighbor
         PhaseStateMachineValidation["PhaseStateMachineValidation"]:::neighbor
         MvpWorkflowImplementation["MvpWorkflowImplementation"]:::neighbor

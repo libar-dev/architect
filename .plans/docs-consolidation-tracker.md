@@ -323,13 +323,13 @@ Moved `docs/PUBLISHING.md` (144 lines) to `MAINTAINERS.md` at repo root. Deleted
 
 ---
 
-### Phase 41 — GherkinPatternsRestructure | DESIGN COMPLETE
+### Phase 41 — GherkinPatternsRestructure | DONE
 
-**Pattern:** GherkinPatternsRestructure | **Effort:** 0.5d | **Depends on:** DocsConsolidationStrategy
+**Pattern:** GherkinPatternsRestructure (Phase 41)
+**Status:** `completed` — FSM terminal state
+**Completed:** 2026-03-05
 
-**What:** Move Step Linting section (148 lines) from `docs/GHERKIN-PATTERNS.md` to `docs/VALIDATION.md`. Trim GHERKIN-PATTERNS.md from 515 → ~370 lines (revised from original ~250 target after section audit).
-
-**Current status:** DESIGN COMPLETE. Spec refined with section disposition table, exact line ranges, VALIDATION.md integration point, and 3 Rule blocks. Line target revised from ~250 to ~370 based on audit findings.
+Moved Step Linting section (148 lines) from `docs/GHERKIN-PATTERNS.md` to `docs/VALIDATION.md`. GHERKIN-PATTERNS.md trimmed from 515 → 366 lines. VALIDATION.md expanded from 281 → 416 lines.
 
 #### Design Session Report (2026-03-05)
 
@@ -343,46 +343,39 @@ Moved `docs/PUBLISHING.md` (144 lines) to `MAINTAINERS.md` at repo root. Deleted
 | 7 cross-reference locations identified                       | INDEX.md needs section table + line count updates for both docs                | Added deliverable #5 for INDEX.md updates                                                                      |
 | Website manifest unaffected                                  | Both files stay at existing URLs, only content moves                           | No manifest changes needed                                                                                     |
 
-**Deliverables (6, all pending):**
+#### Implementation Session Report (2026-03-05)
 
-| #   | Deliverable                                                                               | Status  | Location                                     |
-| --- | ----------------------------------------------------------------------------------------- | ------- | -------------------------------------------- |
-| 1   | Move Step Linting section (lines 346-493) to VALIDATION.md, replacing redirect at line 96 | pending | docs/VALIDATION.md                           |
-| 2   | Remove Step Linting section from GHERKIN-PATTERNS.md (result: ~370 lines)                 | pending | docs/GHERKIN-PATTERNS.md                     |
-| 3   | Update cross-references between the two docs                                              | pending | docs/GHERKIN-PATTERNS.md, docs/VALIDATION.md |
-| 4   | Verify related-documentation tables in both files                                         | pending | docs/GHERKIN-PATTERNS.md, docs/VALIDATION.md |
-| 5   | Update INDEX.md section tables and line counts for both docs                              | pending | docs/INDEX.md                                |
-| 6   | Add lint-steps cross-reference row in GHERKIN-PATTERNS.md Quick Reference                 | pending | docs/GHERKIN-PATTERNS.md                     |
+**Deliverables (6, all complete):**
 
-**Changes made (1 file):**
+| #   | Deliverable                                                                               | Status   | Location                                     |
+| --- | ----------------------------------------------------------------------------------------- | -------- | -------------------------------------------- |
+| 1   | Move Step Linting section (lines 346-493) to VALIDATION.md, replacing redirect at line 96 | complete | docs/VALIDATION.md                           |
+| 2   | Remove Step Linting section from GHERKIN-PATTERNS.md (result: ~370 lines)                 | complete | docs/GHERKIN-PATTERNS.md                     |
+| 3   | Update cross-references between the two docs                                              | complete | docs/GHERKIN-PATTERNS.md, docs/VALIDATION.md |
+| 4   | Verify related-documentation tables in both files                                         | complete | docs/GHERKIN-PATTERNS.md, docs/VALIDATION.md |
+| 5   | Update INDEX.md section tables and line counts for both docs                              | complete | docs/INDEX.md                                |
+| 6   | Add lint-steps cross-reference row in GHERKIN-PATTERNS.md Quick Reference                 | complete | docs/GHERKIN-PATTERNS.md                     |
 
-| File                                                          | Change                                                                                                                                                                                                                               |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `delivery-process/specs/gherkin-patterns-restructure.feature` | Complete rewrite: revised line target (250→370), added section disposition table, added design findings table, added deliverables #5-#6, added Rule block for INDEX.md updates, refined existing deliverables with exact line ranges |
+**Changes made (4 files):**
+
+| File                                                          | Change                                                                                         |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `docs/VALIDATION.md`                                          | Replaced redirect pointer (line 96) with full Step Linting content (281 → 416 lines)           |
+| `docs/GHERKIN-PATTERNS.md`                                    | Removed Step Linting section (515 → 366 lines), lint-steps Quick Reference row → VALIDATION.md |
+| `docs/INDEX.md`                                               | Updated line counts (GP: 1-366, VAL: 1-416), section tables reflect moved content              |
+| `delivery-process/specs/gherkin-patterns-restructure.feature` | FSM: roadmap → active → completed, all 6 deliverables marked complete                          |
 
 **Result:**
 
-- Spec has exact line ranges for every section (keep/move disposition)
-- VALIDATION.md integration point defined: replace lines 76-98 (redirect → inline content)
-- 7 cross-reference locations mapped (4 need updates, 4 confirmed still accurate)
-- CLAUDE.md overlap analyzed — no trim this phase (intentional dual-purpose content)
+- GHERKIN-PATTERNS.md: 515 → 366 lines (authoring guide only, no tooling reference)
+- VALIDATION.md: 281 → 416 lines (all 4 validation tools now have inline documentation)
+- lint-steps section in VALIDATION.md: 4 subsections (Feature File Rules, Step Definition Rules, Cross-File Rules, CLI Reference)
+- VALIDATION.md Related Documentation: updated description from "Step linting rules" to "Gherkin authoring patterns"
+- GHERKIN-PATTERNS.md Quick Reference: lint-steps row now links to VALIDATION.md#lint-steps
+- INDEX.md: line counts and section tables updated for both docs
 - 123 test files, 7,972 tests all passing
 
 **CLAUDE.md trim opportunity:** None from this phase. The ~60 lines estimated in the tracker for Validation section trimming is better addressed by a future phase replacing CLAUDE.md Validation content (lines 521+) with Data API queries.
-
-**Next steps (implementation session):**
-
-1. Move Step Linting content (GHERKIN-PATTERNS.md lines 346-493 → VALIDATION.md replacing lines 76-98)
-2. Update Quick Reference table in GHERKIN-PATTERNS.md
-3. Update all 7 cross-reference locations
-4. Update INDEX.md section tables and line counts
-
-**Pre-flight:**
-
-```bash
-pnpm process:query -- context GherkinPatternsRestructure --session implement
-pnpm process:query -- files GherkinPatternsRestructure
-```
 
 ---
 

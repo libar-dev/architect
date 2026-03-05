@@ -24,9 +24,9 @@
 | Understand the "why"           | [METHODOLOGY.md](./METHODOLOGY.md)           | 1-238  |
 | Learn the architecture         | [ARCHITECTURE.md](./ARCHITECTURE.md)         | 1-1638 |
 | Run AI coding sessions         | [SESSION-GUIDES.md](./SESSION-GUIDES.md)     | 1-389  |
-| Write Gherkin specs            | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | 1-515  |
+| Write Gherkin specs            | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | 1-366  |
 | Enforce delivery process rules | [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | 1-341  |
-| Validate annotation quality    | [VALIDATION.md](./VALIDATION.md)             | 1-281  |
+| Validate annotation quality    | [VALIDATION.md](./VALIDATION.md)             | 1-416  |
 | Query process state via CLI    | [PROCESS-API.md](./PROCESS-API.md)           | 1-507  |
 | Understand the taxonomy        | [TAXONOMY.md](./TAXONOMY.md)                 | 1-105  |
 | Learn annotation patterns      | [ANNOTATION-GUIDE.md](./ANNOTATION-GUIDE.md) | 1-268  |
@@ -174,7 +174,7 @@
 
 ---
 
-### GHERKIN-PATTERNS.md (Lines 1-515)
+### GHERKIN-PATTERNS.md (Lines 1-366)
 
 | Section                     | Lines   | Key Topics                                              |
 | --------------------------- | ------- | ------------------------------------------------------- |
@@ -186,9 +186,8 @@
 | DataTable & DocString Usage | 155-202 | Background vs Scenario tables, code blocks              |
 | Tag Conventions             | 205-243 | Semantic tags, convention tags, combining               |
 | Feature File Rich Content   | 246-344 | Code-first, Rule annotations, syntax notes              |
-| Step Linting                | 346-493 | lint-steps rules, CLI, feature/step/cross-file checks   |
-| Quick Reference             | 495-506 | Element-to-use-case mapping table                       |
-| Related Documentation       | 508-515 | Links to ANNOTATION-GUIDE, TAXONOMY, CONFIG, VALIDATION |
+| Quick Reference             | 346-357 | Element-to-use-case mapping table                       |
+| Related Documentation       | 359-366 | Links to ANNOTATION-GUIDE, TAXONOMY, CONFIG, VALIDATION |
 
 ---
 
@@ -227,20 +226,20 @@
 
 ---
 
-### VALIDATION.md (Lines 1-281)
+### VALIDATION.md (Lines 1-416)
 
-| Section               | Lines   | Key Topics                                        |
-| --------------------- | ------- | ------------------------------------------------- |
-| Which Command?        | 7-24    | Decision tree for validation commands             |
-| Command Summary       | 26-35   | lint-patterns, lint-steps, lint-process, validate |
-| lint-patterns         | 37-74   | 8 rules table, CLI flags                          |
-| lint-steps            | 76-98   | 12 rules, 3 categories, vitest-cucumber traps     |
-| lint-process          | 100-121 | What it validates, reference links                |
-| validate-patterns     | 123-197 | CLI flags, checks, anti-patterns, DoD             |
-| CI/CD Integration     | 199-238 | Consumer scripts, hooks, GitHub Actions           |
-| Exit Codes            | 240-248 | Per-command exit code table                       |
-| Programmatic API      | 250-272 | Import paths for all validators                   |
-| Related Documentation | 274-281 | Links to GHERKIN-PATTERNS, PROCESS-GUARD, CONFIG  |
+| Section               | Lines   | Key Topics                                          |
+| --------------------- | ------- | --------------------------------------------------- |
+| Which Command?        | 7-24    | Decision tree for validation commands               |
+| Command Summary       | 26-35   | lint-patterns, lint-steps, lint-process, validate   |
+| lint-patterns         | 37-74   | 8 rules table, CLI flags                            |
+| lint-steps            | 76-233  | 12 rules with examples, 3 categories, CLI reference |
+| lint-process          | 235-256 | What it validates, reference links                  |
+| validate-patterns     | 258-332 | CLI flags, checks, anti-patterns, DoD               |
+| CI/CD Integration     | 334-373 | Consumer scripts, hooks, GitHub Actions             |
+| Exit Codes            | 375-383 | Per-command exit code table                         |
+| Programmatic API      | 385-407 | Import paths for all validators                     |
+| Related Documentation | 409-416 | Links to GHERKIN-PATTERNS, PROCESS-GUARD, TAXONOMY  |
 
 ---
 
