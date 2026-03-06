@@ -27,7 +27,10 @@ import { renderToMarkdown } from '../../renderable/render.js';
 
 function buildOptionSection(
   group: CLIOptionGroup,
-  buildTable: (group: CLIOptionGroup) => { columns: string[]; mapRow: (opt: CLIOptionDef) => string[] }
+  buildTable: (group: CLIOptionGroup) => {
+    columns: string[];
+    mapRow: (opt: CLIOptionDef) => string[];
+  }
 ): SectionBlock[] {
   const sections: SectionBlock[] = [];
   sections.push(heading(2, group.title));
@@ -64,7 +67,9 @@ function buildReferenceDocument(): string {
       opt.default ?? '---',
     ],
   });
-  const twoCol = (g: CLIOptionGroup): { columns: string[]; mapRow: (opt: CLIOptionDef) => string[] } => ({
+  const twoCol = (
+    g: CLIOptionGroup
+  ): { columns: string[]; mapRow: (opt: CLIOptionDef) => string[] } => ({
     columns: [g.singularTitle ?? g.title, 'Description'],
     mapRow: (opt) => [`\`${opt.flag}\``, opt.description],
   });
