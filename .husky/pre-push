@@ -1,5 +1,8 @@
 set -e
 
+echo "Running format check..."
+pnpm format:check
+
 echo "Running tests..."
 pnpm test
 
