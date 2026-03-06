@@ -39,13 +39,4 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-.plans/breezy-plotting-gizmo.md
-.plans/fuzzy-swinging-frost.md
-.plans/graceful-noodling-pike.md
-.plans/greedy-plotting-harp.md
-.plans/humble-fluttering-clover.md
-.plans/lucky-rolling-puddle.md
-.plans/snappy-greeting-wilkes.md
-.plans/squishy-gathering-porcupine.md
-.plans/toasty-orbiting-ocean.md
-.plans/zippy-gliding-pond.md
+.plans/
