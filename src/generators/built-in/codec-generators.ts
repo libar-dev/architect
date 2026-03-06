@@ -158,6 +158,12 @@ generatorRegistry.register(createCodecGenerator('validation-rules', 'validation-
  */
 generatorRegistry.register(createCodecGenerator('claude-modules', 'claude-modules'));
 
+/**
+ * Index Generator
+ * Generates INDEX.md navigation hub with editorial preamble + MasterDataset statistics
+ */
+generatorRegistry.register(createCodecGenerator('index', 'index'));
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Decision Document Generator (Pattern-Based, not Codec-Based)
 // ═══════════════════════════════════════════════════════════════════════════

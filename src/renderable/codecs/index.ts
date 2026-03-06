@@ -210,6 +210,15 @@ export {
   DEFAULT_CLAUDE_MODULE_OPTIONS,
 } from './claude-module.js';
 
+// Index (navigation hub with MasterDataset statistics + editorial preamble)
+export {
+  IndexCodec,
+  createIndexCodec,
+  type IndexCodecOptions,
+  type DocumentEntry,
+  DEFAULT_INDEX_OPTIONS,
+} from './index-codec.js';
+
 // Convention Extractor
 export {
   extractConventions,

@@ -74,12 +74,12 @@ Feature: Enhanced Index Generation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Create IndexCodec with MasterDataset-driven statistics | pending | src/renderable/codecs/index.ts | Yes | unit |
-      | Register IndexCodec in codec registry and generator config | pending | delivery-process.config.ts | Yes | integration |
-      | Preamble content for audience paths, document roles, quick finder | pending | delivery-process.config.ts | No | n/a |
-      | ReferenceDocConfig entry for enhanced INDEX.md | pending | delivery-process.config.ts | Yes | integration |
-      | Replace docs/INDEX.md with pointer to generated output | pending | docs/INDEX.md | No | n/a |
-      | Behavior spec with scenarios for index generation | pending | tests/features/generation/index-generation.feature | Yes | acceptance |
+      | Create IndexCodec with MasterDataset-driven statistics | complete | src/renderable/codecs/index-codec.ts | Yes | unit |
+      | Register IndexCodec in codec registry and generator config | complete | src/renderable/generate.ts | Yes | integration |
+      | Preamble content for audience paths, document roles, quick finder | complete | docs-sources/index-navigation.md | No | n/a |
+      | CodecOptions entry for enhanced INDEX.md | complete | delivery-process.config.ts | Yes | integration |
+      | Replace docs/INDEX.md with pointer to generated output | complete | docs/INDEX.md | No | n/a |
+      | Behavior spec with scenarios for index generation | superseded | n/a | No | n/a |
 
   Rule: IndexCodec composes generated statistics with editorial navigation
 

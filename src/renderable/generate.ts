@@ -48,6 +48,7 @@ import {
   TaxonomyDocumentCodec,
   ValidationRulesCodec,
   ClaudeModuleCodec,
+  IndexCodec,
 } from './codecs/index.js';
 
 // Factory functions for creating codecs with options
@@ -72,6 +73,7 @@ import {
   createTaxonomyCodec,
   createValidationRulesCodec,
   createClaudeModuleCodec,
+  createIndexCodec,
 } from './codecs/index.js';
 
 // Codec options types
@@ -96,6 +98,7 @@ import type {
   TaxonomyCodecOptions,
   ValidationRulesCodecOptions,
   ClaudeModuleCodecOptions,
+  IndexCodecOptions,
 } from './codecs/index.js';
 
 // Shared codec types for type-safe factory invocation
@@ -189,6 +192,10 @@ export const DOCUMENT_TYPES = {
     outputPath: 'CLAUDE-MODULES.md',
     description: 'CLAUDE.md modules generated from annotated behavior specs',
   },
+  index: {
+    outputPath: 'INDEX.md',
+    description: 'Navigation hub with editorial preamble and MasterDataset statistics',
+  },
 } as const;
 
 export type DocumentType = keyof typeof DOCUMENT_TYPES;
@@ -244,6 +251,7 @@ export interface CodecOptions {
   taxonomy?: TaxonomyCodecOptions;
   'validation-rules'?: ValidationRulesCodecOptions;
   'claude-modules'?: ClaudeModuleCodecOptions;
+  index?: IndexCodecOptions;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -383,6 +391,7 @@ CodecRegistry.register('architecture', ArchitectureDocumentCodec);
 CodecRegistry.register('taxonomy', TaxonomyDocumentCodec);
 CodecRegistry.register('validation-rules', ValidationRulesCodec);
 CodecRegistry.register('claude-modules', ClaudeModuleCodec);
+CodecRegistry.register('index', IndexCodec);
 
 // Register all factory functions (used when codec options are provided)
 CodecRegistry.registerFactory('patterns', createPatternsCodec);
@@ -405,6 +414,7 @@ CodecRegistry.registerFactory('architecture', createArchitectureCodec);
 CodecRegistry.registerFactory('taxonomy', createTaxonomyCodec);
 CodecRegistry.registerFactory('validation-rules', createValidationRulesCodec);
 CodecRegistry.registerFactory('claude-modules', createClaudeModuleCodec);
+CodecRegistry.registerFactory('index', createIndexCodec);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Error Types

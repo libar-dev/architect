@@ -1,6 +1,6 @@
 /**
  * @libar-docs
- * @libar-docs-status roadmap
+ * @libar-docs-status completed
  * @libar-docs-implements EnhancedIndexGeneration
  * @libar-docs-target src/renderable/codecs/index-codec.ts
  *

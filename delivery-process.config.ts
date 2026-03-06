@@ -12,6 +12,7 @@
 import { defineConfig } from './src/config/define-config.js';
 import { createProductAreaConfigs } from './src/generators/built-in/reference-generators.js';
 import { loadPreambleFromMarkdown } from './src/renderable/load-preamble.js';
+import type { DocumentEntry } from './src/renderable/codecs/index-codec.js';
 
 const sessionWorkflowGuidePreamble = loadPreambleFromMarkdown(
   'docs-sources/session-workflow-guide.md'
@@ -20,6 +21,38 @@ const sessionWorkflowGuidePreamble = loadPreambleFromMarkdown(
 const annotationGuidePreamble = loadPreambleFromMarkdown(
   'docs-sources/annotation-guide.md'
 );
+
+const indexNavigationPreamble = loadPreambleFromMarkdown(
+  'docs-sources/index-navigation.md'
+);
+
+// DD-2: Document entries configured statically, not via filesystem discovery.
+const INDEX_DOCUMENT_ENTRIES: readonly DocumentEntry[] = [
+  // --- Getting Started ---
+  { title: 'README', path: 'README.md', description: 'Installation, quick start, value proposition', audience: 'Everyone', topic: 'Getting Started' },
+  { title: 'Configuration', path: 'docs/CONFIGURATION.md', description: 'Presets, tag prefixes, config files', audience: 'Users', topic: 'Getting Started' },
+  { title: 'Methodology', path: 'docs/METHODOLOGY.md', description: 'Core thesis, dual-source architecture principles', audience: 'Everyone', topic: 'Getting Started' },
+  // --- Architecture ---
+  { title: 'Architecture', path: 'docs/ARCHITECTURE.md', description: 'Four-stage pipeline, codecs, MasterDataset, schemas', audience: 'Developers', topic: 'Architecture' },
+  { title: 'Product Areas', path: 'docs-live/PRODUCT-AREAS.md', description: 'Product area overviews with live statistics and diagrams', audience: 'Everyone', topic: 'Architecture' },
+  { title: 'Architecture Decisions', path: 'docs-live/DECISIONS.md', description: 'ADRs extracted from decision specs', audience: 'Developers', topic: 'Architecture' },
+  // --- Development Workflow ---
+  { title: 'Session Guides', path: 'docs/SESSION-GUIDES.md', description: 'Planning, Design, Implementation session workflows', audience: 'AI/Devs', topic: 'Development Workflow' },
+  { title: 'Process API', path: 'docs/PROCESS-API.md', description: 'Data API CLI query interface for session context', audience: 'AI/Devs', topic: 'Development Workflow' },
+  // --- Authoring ---
+  { title: 'Gherkin Patterns', path: 'docs/GHERKIN-PATTERNS.md', description: 'Writing effective Gherkin specs, Rule blocks, DataTables', audience: 'Writers', topic: 'Authoring' },
+  { title: 'Annotation Guide', path: 'docs/ANNOTATION-GUIDE.md', description: 'Annotation mechanics, shape extraction, tag reference', audience: 'Developers', topic: 'Authoring' },
+  { title: 'Taxonomy', path: 'docs/TAXONOMY.md', description: 'Tag taxonomy structure and format types', audience: 'Reference', topic: 'Authoring' },
+  // --- Governance ---
+  { title: 'Process Guard', path: 'docs/PROCESS-GUARD.md', description: 'FSM enforcement, pre-commit hooks, error codes', audience: 'Team Leads', topic: 'Governance' },
+  { title: 'Validation', path: 'docs/VALIDATION.md', description: 'Lint rules, DoD checks, anti-pattern detection', audience: 'CI/CD', topic: 'Governance' },
+  { title: 'Business Rules', path: 'docs-live/BUSINESS-RULES.md', description: 'Business rules and invariants extracted from specs', audience: 'Developers', topic: 'Governance' },
+  // --- Reference ---
+  { title: 'Architecture Codecs', path: 'docs-live/reference/ARCHITECTURE-CODECS.md', description: 'All codecs with factory patterns and options', audience: 'Developers', topic: 'Reference' },
+  { title: 'Architecture Types', path: 'docs-live/reference/ARCHITECTURE-TYPES.md', description: 'MasterDataset interface and type shapes', audience: 'Developers', topic: 'Reference' },
+  { title: 'Process API Reference', path: 'docs-live/reference/PROCESS-API-REFERENCE.md', description: 'CLI command reference with flags and examples', audience: 'AI/Devs', topic: 'Reference' },
+  { title: 'Process API Recipes', path: 'docs-live/reference/PROCESS-API-RECIPES.md', description: 'CLI workflow recipes and session guides', audience: 'AI/Devs', topic: 'Reference' },
+];
 
 export default defineConfig({
   preset: 'libar-generic',
@@ -300,6 +333,15 @@ export default defineConfig({
     },
     'cli-recipe': {
       outputDirectory: 'docs-live',
+    },
+    index: {
+      outputDirectory: 'docs-live',
+    },
+  },
+  codecOptions: {
+    index: {
+      preamble: [...indexNavigationPreamble],
+      documentEntries: [...INDEX_DOCUMENT_ENTRIES],
     },
   },
 });

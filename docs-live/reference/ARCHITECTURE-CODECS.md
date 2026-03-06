@@ -429,6 +429,31 @@ const doc = PatternsDocumentCodec.decode(dataset);
 
 ---
 
+## IndexCodec
+
+**Purpose:** Navigation hub composing editorial preamble with MasterDataset statistics.
+
+**Output Files:** `INDEX.md` (single page, no detail files)
+
+### Design Decisions
+
+- DD-1: New IndexCodec in CodecRegistry (not a ReferenceDocConfig entry)
+- DD-2: Document entries configured statically, not filesystem discovery
+- DD-3: Audience reading paths are full preamble (editorial judgment)
+- DD-4: Key concepts glossary uses preamble
+- DD-5: Standalone codec, not routed through reference codec pipeline
+
+| Option                   | Type            | Default | Description                                                      |
+| ------------------------ | --------------- | ------- | ---------------------------------------------------------------- |
+| preamble                 | SectionBlock[]  | []      | Editorial sections (reading paths, document roles, key concepts) |
+| documentEntries          | DocumentEntry[] | []      | Static document inventory entries                                |
+| includeProductAreaStats  | boolean         | true    | Product area statistics table                                    |
+| includePhaseProgress     | boolean         | true    | Phase progress summary                                           |
+| includeDocumentInventory | boolean         | true    | Unified document inventory                                       |
+| includePackageMetadata   | boolean         | true    | Package metadata header                                          |
+
+---
+
 ## CompositeCodec
 
 Assembles reference documents from multiple codec outputs by concatenating

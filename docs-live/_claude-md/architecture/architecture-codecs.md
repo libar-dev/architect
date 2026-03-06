@@ -116,6 +116,17 @@
 | includeUseCases        | boolean                               | true       | Show use cases section                      |
 | filterCategories       | string[]                              | []         | Filter to specific categories (empty = all) |
 
+#### IndexCodec
+
+| Option                   | Type            | Default | Description                                                      |
+| ------------------------ | --------------- | ------- | ---------------------------------------------------------------- |
+| preamble                 | SectionBlock[]  | []      | Editorial sections (reading paths, document roles, key concepts) |
+| documentEntries          | DocumentEntry[] | []      | Static document inventory entries                                |
+| includeProductAreaStats  | boolean         | true    | Product area statistics table                                    |
+| includePhaseProgress     | boolean         | true    | Phase progress summary                                           |
+| includeDocumentInventory | boolean         | true    | Unified document inventory                                       |
+| includePackageMetadata   | boolean         | true    | Package metadata header                                          |
+
 #### CompositeCodec
 
 #### ClaudeModuleCodec

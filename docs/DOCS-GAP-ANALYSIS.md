@@ -658,33 +658,31 @@ Review all docs-live/ content for website readiness:
 
 ### By Impact and Effort
 
-| Priority | Work Package                 | Impact                                     | Effort   | Blocks             |
-| -------- | ---------------------------- | ------------------------------------------ | -------- | ------------------ |
-| **P0**   | WP-1: Fix sync script        | Unblocks website build                     | Small    | Website deployment |
-| **P1**   | WP-2: Enhanced index         | Better navigation                          | Small    | Nothing            |
-| **P1**   | WP-3: Architecture generator | Fills ARCHITECTURE.md gap                  | Small    | Nothing            |
-| **P1**   | WP-9: Quality polish         | Website-ready content                      | Medium   | Website launch     |
-| **P2**   | WP-4: Changelog generator    | New website content                        | Small    | Nothing            |
-| **P2**   | WP-5: Error guide codec      | Replaces PROCESS-GUARD                     | Medium   | WP-1               |
-| ~~P2~~   | ~~WP-6: CLI recipe codec~~   | **Done**                                   | Complete | N/A                |
-| **P3**   | WP-7: Procedural guide codec | Replaces SESSION-GUIDES + GHERKIN-PATTERNS | Large    | WP-5, WP-6         |
-| **P3**   | WP-8: Methodology decision   | Clarifies hybrid approach                  | Small    | Nothing            |
+| Priority | Work Package                | Impact                    | Effort   | Blocks             |
+| -------- | --------------------------- | ------------------------- | -------- | ------------------ |
+| **P0**   | WP-1: Fix sync script       | Unblocks website build    | Small    | Website deployment |
+| ~~P1~~   | ~~WP-2: Enhanced index~~    | **Done** (IndexCodec)     | Complete | N/A                |
+| ~~P1~~   | ~~WP-3: Architecture gen~~  | **Done**                  | Complete | N/A                |
+| **P1**   | WP-9: Quality polish        | Website-ready content     | Medium   | Website launch     |
+| ~~P2~~   | ~~WP-4: Changelog gen~~     | **Done**                  | Complete | N/A                |
+| ~~P2~~   | ~~WP-5: Error guide codec~~ | **Done**                  | Complete | N/A                |
+| ~~P2~~   | ~~WP-6: CLI recipe codec~~  | **Done**                  | Complete | N/A                |
+| ~~P3~~   | ~~WP-7: Procedural guide~~  | **Done**                  | Complete | N/A                |
+| **P3**   | WP-8: Methodology decision  | Clarifies hybrid approach | Small    | Nothing            |
 
 ### Master Spec Phases NOT Covered by Work Packages
 
-| Phase                                  | Description                               | Why Not Included                                                 |
-| -------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------- |
-| Phase 1 - Taxonomy consolidation       | Redirect docs/TAXONOMY.md to generated    | Trivial -- just delete manual + update INDEX.md. Can do in WP-9. |
-| Phase 39 - Session workflow module gen | Generate CLAUDE.md session section        | Blocked on Phase 25 (ClaudeModuleCodec). Not actionable yet.     |
-| Phase 42 - README.md rationalization   | Trim to ~150 lines, move pitch to website | Separate initiative, not a docs/ vs docs-live/ gap.              |
+| Phase                                  | Description                               | Status                                                                 |
+| -------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------- |
+| Phase 1 - Taxonomy consolidation       | Redirect docs/TAXONOMY.md to generated    | **Done** -- docs/TAXONOMY.md is now a pointer to docs-live/TAXONOMY.md |
+| Phase 39 - Session workflow module gen | Generate CLAUDE.md session section        | Blocked on Phase 25 (ClaudeModuleCodec). Not actionable yet.           |
+| Phase 42 - README.md rationalization   | Trim to ~150 lines, move pitch to website | Separate initiative, not a docs/ vs docs-live/ gap.                    |
 
 ### Recommended Execution Order
 
 ```
-Phase A (immediate):  WP-1 (fix sync) -> WP-9 (quality polish)
-Phase B (short-term): WP-2 (index) + WP-3 (architecture) + WP-4 (changelog)
-Phase C (medium):     WP-5 (error guide) + WP-6 (CLI recipes)
-Phase D (long-term):  WP-7 (procedural guides) + WP-8 (methodology decision)
+Remaining:  WP-1 (fix sync) -> WP-9 (quality polish) -> WP-8 (methodology)
+All other work packages are complete.
 ```
 
 ### Deprecation Roadmap
@@ -718,7 +716,7 @@ Maps each WP to its delivery-process spec, design status, and code stubs.
 | WP   | Pattern                    | Spec Status  | Design Status                                | Stubs   |
 | ---- | -------------------------- | ------------ | -------------------------------------------- | ------- |
 | WP-1 | N/A (website repo)         | Out of scope | N/A                                          | N/A     |
-| WP-2 | EnhancedIndexGeneration    | roadmap      | Design complete (6 findings)                 | 3 stubs |
+| WP-2 | EnhancedIndexGeneration    | completed    | Design + implementation complete             | 3 stubs |
 | WP-3 | (master spec deliverable)  | completed    | Trivial config change done                   | N/A     |
 | WP-4 | (master spec deliverable)  | completed    | Trivial config change done                   | N/A     |
 | WP-5 | ErrorGuideCodec            | completed    | Design complete (6 findings)                 | 3 stubs |
@@ -743,12 +741,10 @@ ProceduralGuideCodec) have completed design sessions with findings and code stub
 - **EnhancedIndexGeneration** creates a new `IndexCodec` registered in `CodecRegistry`,
   composing MasterDataset-driven statistics with editorial preamble navigation content.
 
-**Master spec status:** 11/15 deliverables complete. WP-3 (promote architecture) and
-WP-4 (promote changelog) are now done. WP-6 (CliRecipeCodec) is completed -- PROCESS-API.md
-trimmed from ~509 to ~60 lines with pointers to two generated files. Phase 3 (WP-5,
-ErrorGuideCodec) and Phase 5 (guide trimming, partially addressed by WP-7 DD-7/DD-8)
-have progressed. The 4 pending deliverables map to WP-2 (Phase 6), WP-9 (Phase 38),
-Phase 1 (taxonomy consolidation), and Phase 5 (guide trimming remainder).
+**Master spec status:** 14/15 deliverables complete. This session completed WP-2
+(IndexCodec), Phase 1 (taxonomy consolidation: docs/TAXONOMY.md to pointer), and
+Phase 5 (guide trimming: 60 lines removed from CONFIGURATION.md). The only pending
+deliverable is WP-9 / Phase 38 (generated doc quality improvements).
 
 ---
 

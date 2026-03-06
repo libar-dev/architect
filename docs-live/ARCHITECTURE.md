@@ -7,11 +7,11 @@
 
 ## Overview
 
-This diagram was auto-generated from 154 annotated source files across 11 bounded contexts.
+This diagram was auto-generated from 155 annotated source files across 11 bounded contexts.
 
 | Metric           | Count |
 | ---------------- | ----- |
-| Total Components | 154   |
+| Total Components | 155   |
 | Bounded Contexts | 11    |
 | Component Roles  | 5     |
 
@@ -124,6 +124,7 @@ graph TB
         PlanningCodecs["PlanningCodecs"]
         PatternsCodec["PatternsCodec[projection]"]
         DocumentCodecs["DocumentCodecs"]
+        IndexCodec["IndexCodec"]
         RichContentHelpers["RichContentHelpers"]
         MermaidDiagramUtils["MermaidDiagramUtils"]
         DecisionDocCodec["DecisionDocCodec[projection]"]
@@ -185,8 +186,6 @@ graph TB
         CodecUtils["CodecUtils"]
         DoDValidationTypes["DoDValidationTypes"]
         ValidationModule["ValidationModule"]
-        ResultMonadTypes["ResultMonadTypes"]
-        ErrorFactoryTypes["ErrorFactoryTypes"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
@@ -195,10 +194,12 @@ graph TB
         FormatTypes["FormatTypes"]
         DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
         CategoryDefinition["CategoryDefinition"]
+        ResultMonadTypes["ResultMonadTypes"]
+        ErrorFactoryTypes["ErrorFactoryTypes"]
+        LintModule["LintModule"]
         RenderableUtils["RenderableUtils"]
         SectionBlock["SectionBlock"]
         RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
-        LintModule["LintModule"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
@@ -218,6 +219,10 @@ graph TB
         APIModule["APIModule"]
         Convention_Annotation_Example___DD_3_Decision["Convention Annotation Example — DD-3 Decision[decider]"]
         FSMModule["FSMModule"]
+        ProcessGuardTypes["ProcessGuardTypes"]
+        ProcessGuardModule["ProcessGuardModule"]
+        DetectChanges["DetectChanges"]
+        DeriveProcessState["DeriveProcessState"]
         ValidationRulesCodec["ValidationRulesCodec"]
         TimelineCodec["TimelineCodec"]
         TaxonomyCodec["TaxonomyCodec"]
@@ -228,14 +233,11 @@ graph TB
         PrChangesCodec["PrChangesCodec"]
         PlanningCodecs["PlanningCodecs"]
         DocumentCodecs["DocumentCodecs"]
+        IndexCodec["IndexCodec"]
         RichContentHelpers["RichContentHelpers"]
         ClaudeModuleCodec["ClaudeModuleCodec"]
         BusinessRulesCodec["BusinessRulesCodec"]
         AdrDocumentCodec["AdrDocumentCodec"]
-        ProcessGuardTypes["ProcessGuardTypes"]
-        ProcessGuardModule["ProcessGuardModule"]
-        DetectChanges["DetectChanges"]
-        DeriveProcessState["DeriveProcessState"]
         MergePatterns["MergePatterns"]
         PipelineModule["PipelineModule"]
         PipelineFactory["PipelineFactory"]
@@ -243,6 +245,11 @@ graph TB
         BuiltInGenerators["BuiltInGenerators"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
         CodecBaseOptions["CodecBaseOptions"]
+        ADR006SingleReadModelArchitecture["ADR006SingleReadModelArchitecture"]
+        ADR005CodecBasedMarkdownRendering["ADR005CodecBasedMarkdownRendering"]
+        ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
+        ADR002GherkinOnlyTesting["ADR002GherkinOnlyTesting"]
+        ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
         ValidatorReadModelConsolidation["ValidatorReadModelConsolidation"]
         StepDefinitionCompletion["StepDefinitionCompletion"]
         SessionGuidesModuleSource["SessionGuidesModuleSource"]
@@ -254,19 +261,14 @@ graph TB
         EffortVarianceTracking["EffortVarianceTracking"]
         ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
         CliBehaviorTesting["CliBehaviorTesting"]
-        ADR006SingleReadModelArchitecture["ADR006SingleReadModelArchitecture"]
-        ADR005CodecBasedMarkdownRendering["ADR005CodecBasedMarkdownRendering"]
-        ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
-        ADR002GherkinOnlyTesting["ADR002GherkinOnlyTesting"]
-        ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
         ProcessGuardTesting["ProcessGuardTesting"]
-        StringUtils["StringUtils"]
         ResultMonad["ResultMonad"]
         ErrorFactories["ErrorFactories"]
         SessionHandoffs["SessionHandoffs"]
         SessionFileLifecycle["SessionFileLifecycle"]
         KebabCaseSlugs["KebabCaseSlugs"]
         ErrorHandlingUnification["ErrorHandlingUnification"]
+        StringUtils["StringUtils"]
     end
     ExtractedPatternSchema --> DocDirectiveSchema
     DualSourceSchemas ..-> MvpWorkflowImplementation
@@ -274,16 +276,14 @@ graph TB
     DoDValidator --> DoDValidationTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
+    CategoryDefinition ..-> CategoryDefinitions
     ResultMonadTypes ..-> ResultMonad
     ErrorFactoryTypes ..-> ErrorFactories
-    CategoryDefinition ..-> CategoryDefinitions
-    GherkinScanner --> GherkinASTParser
-    TypeScript_AST_Parser --> DocDirectiveSchema
-    SectionBlock ..-> RenderableDocument
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    SectionBlock ..-> RenderableDocument
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> ShapeExtractor
     SourceMapper -.-> GherkinASTParser
@@ -293,6 +293,24 @@ graph TB
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
     Document_Extractor --> Pattern_Scanner
+    GherkinScanner --> GherkinASTParser
+    TypeScript_AST_Parser --> DocDirectiveSchema
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> GherkinExtractor
+    ValidatePatternsCLI --> MasterDataset
+    ValidatePatternsCLI --> CodecUtils
+    ProcessAPICLIImpl --> ProcessStateAPI
+    ProcessAPICLIImpl --> MasterDataset
+    ProcessAPICLIImpl --> PipelineFactory
+    ProcessAPICLIImpl --> RulesQueryModule
+    ProcessAPICLIImpl --> PatternSummarizerImpl
+    ProcessAPICLIImpl --> FuzzyMatcherImpl
+    ProcessAPICLIImpl --> OutputPipelineImpl
+    OutputPipelineImpl --> PatternSummarizerImpl
+    LintProcessCLI --> ProcessGuardModule
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    TagTaxonomyCLI --> ConfigLoader
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     ConfigResolver --> ProjectConfigTypes
@@ -310,22 +328,6 @@ graph TB
     DefineConfig --> ProjectConfigTypes
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> GherkinExtractor
-    ValidatePatternsCLI --> MasterDataset
-    ValidatePatternsCLI --> CodecUtils
-    ProcessAPICLIImpl --> ProcessStateAPI
-    ProcessAPICLIImpl --> MasterDataset
-    ProcessAPICLIImpl --> PipelineFactory
-    ProcessAPICLIImpl --> RulesQueryModule
-    ProcessAPICLIImpl --> PatternSummarizerImpl
-    ProcessAPICLIImpl --> FuzzyMatcherImpl
-    ProcessAPICLIImpl --> OutputPipelineImpl
-    OutputPipelineImpl --> PatternSummarizerImpl
-    LintProcessCLI --> ProcessGuardModule
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    TagTaxonomyCLI --> ConfigLoader
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
@@ -350,13 +352,13 @@ graph TB
     ArchQueriesImpl --> MasterDataset
     FSMValidator --> FSMTransitions
     FSMValidator --> FSMStates
-    ArchitectureCodec --> MasterDataset
     DetectChanges --> DeriveProcessState
     DeriveProcessState --> GherkinScanner
     DeriveProcessState --> FSMValidator
     ProcessGuardDecider --> FSMValidator
     ProcessGuardDecider --> DeriveProcessState
     ProcessGuardDecider --> DetectChanges
+    ArchitectureCodec --> MasterDataset
     TransformDataset --> MasterDataset
     MergePatterns --> PatternHelpers
     MergePatterns ..-> OrchestratorPipelineFactoryMigration
@@ -369,6 +371,8 @@ graph TB
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
+    ADR006SingleReadModelArchitecture -.-> ADR005CodecBasedMarkdownRendering
+    ADR003SourceFirstPatternArchitecture -.-> ADR001TaxonomyCanonicalValues
     ValidatorReadModelConsolidation -.-> ADR006SingleReadModelArchitecture
     StepDefinitionCompletion -.-> ADR002GherkinOnlyTesting
     SessionFileCleanup -.-> SessionFileLifecycle
@@ -378,8 +382,6 @@ graph TB
     EffortVarianceTracking -.-> MvpWorkflowImplementation
     ConfigBasedWorkflowDefinition -.-> MvpWorkflowImplementation
     CliBehaviorTesting -.-> ADR002GherkinOnlyTesting
-    ADR006SingleReadModelArchitecture -.-> ADR005CodecBasedMarkdownRendering
-    ADR003SourceFirstPatternArchitecture -.-> ADR001TaxonomyCanonicalValues
     ProcessGuardTesting -.-> AntiPatternDetector
     KebabCaseSlugs -.-> StringUtils
     ErrorHandlingUnification -.-> ResultMonad
@@ -504,6 +506,7 @@ All components with architecture annotations:
 | ✅ Generator Registry                                             | -          | -              | -              | src/generators/registry.ts                                                   |
 | ✅ Generator Types                                                | -          | -              | -              | src/generators/types.ts                                                      |
 | ✅ Hierarchy Levels                                               | -          | -              | -              | src/taxonomy/hierarchy-levels.ts                                             |
+| ✅ Index Codec                                                    | -          | -              | -              | src/renderable/codecs/index-codec.ts                                         |
 | 📋 Kebab Case Slugs                                               | -          | -              | -              | tests/features/behavior/kebab-case-slugs.feature                             |
 | ✅ Layer Inference                                                | -          | -              | -              | src/extractor/layer-inference.ts                                             |
 | ✅ Layer Types                                                    | -          | -              | -              | src/taxonomy/layer-types.ts                                                  |

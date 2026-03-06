@@ -31,7 +31,7 @@ Configuration is the entry boundary — it transforms a user-authored `delivery-
 
 The generation pipeline transforms annotated source code into markdown documents through a four-stage architecture: Scanner discovers files, Extractor produces `ExtractedPattern` objects, Transformer builds MasterDataset with pre-computed views, and Codecs render to markdown via RenderableDocument IR. Nine specialized codecs handle reference docs, planning, session, reporting, timeline, ADRs, business rules, taxonomy, and composite output — each supporting three detail levels (detailed, standard, summary). The Orchestrator runs generators in registration order, producing both detailed `docs-live/` references and compact `_claude-md/` summaries.
 
-**91 patterns** — 76 completed, 2 active, 13 planned
+**91 patterns** — 77 completed, 2 active, 12 planned
 
 **Key patterns:** ADR005CodecBasedMarkdownRendering, CodecDrivenReferenceGeneration, CrossCuttingDocumentInclusion, ArchitectureDiagramGeneration, ScopedArchitecturalView, CompositeCodec, RenderableDocument, ProductAreaOverview
 
@@ -83,12 +83,12 @@ Process defines the USDP-inspired session workflow that governs how work moves t
 | ----------------------------------------------- | -------- | --------- | ------ | ------- |
 | [Annotation](product-areas/ANNOTATION.md)       | 26       | 23        | 2      | 1       |
 | [Configuration](product-areas/CONFIGURATION.md) | 9        | 8         | 0      | 1       |
-| [Generation](product-areas/GENERATION.md)       | 91       | 76        | 2      | 13      |
+| [Generation](product-areas/GENERATION.md)       | 91       | 77        | 2      | 12      |
 | [Validation](product-areas/VALIDATION.md)       | 22       | 15        | 0      | 7       |
 | [DataAPI](product-areas/DATA-API.md)            | 35       | 22        | 9      | 4       |
 | [CoreTypes](product-areas/CORE-TYPES.md)        | 7        | 6         | 0      | 1       |
 | [Process](product-areas/PROCESS.md)             | 11       | 4         | 0      | 7       |
-| **Total**                                       | **201**  | **154**   | **13** | **34**  |
+| **Total**                                       | **201**  | **155**   | **13** | **33**  |
 
 ---
 
