@@ -120,11 +120,10 @@ function flushCodeFence(acc: CodeFenceAccumulator): SectionBlock {
   if (acc.language === 'mermaid') {
     return { type: 'mermaid', content };
   }
-  const block: SectionBlock = { type: 'code', content };
   if (acc.language.length > 0) {
     return { type: 'code', language: acc.language, content };
   }
-  return block;
+  return { type: 'code', content };
 }
 
 function flushTable(acc: TableAccumulator): SectionBlock {

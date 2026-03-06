@@ -10,7 +10,7 @@
 | ----------------- | ----------------------------------------------------- |
 | **Package**       | @libar-dev/delivery-process                           |
 | **Purpose**       | Code-first documentation and delivery process toolkit |
-| **Patterns**      | 355 tracked (246 completed, 47 active, 62 planned)    |
+| **Patterns**      | 355 tracked (249 completed, 47 active, 59 planned)    |
 | **Product Areas** | 7                                                     |
 | **License**       | MIT                                                   |
 
@@ -164,13 +164,13 @@
 
 ## Phase Progress
 
-**355** patterns total: **246** completed (69%), **47** active, **62** planned. [██████████████░░░░░░] 246/355
+**355** patterns total: **249** completed (70%), **47** active, **59** planned. [██████████████░░░░░░] 249/355
 
 | Status    | Count | Percentage |
 | --------- | ----- | ---------- |
-| Completed | 246   | 69%        |
+| Completed | 249   | 70%        |
 | Active    | 47    | 13%        |
-| Planned   | 62    | 17%        |
+| Planned   | 59    | 17%        |
 
 ### By Phase
 

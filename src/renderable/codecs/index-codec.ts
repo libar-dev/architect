@@ -88,9 +88,7 @@ export interface IndexCodecOptions extends BaseCodecOptions {
 // Defaults
 // ═══════════════════════════════════════════════════════════════════════════
 
-export const DEFAULT_INDEX_OPTIONS: Required<Omit<IndexCodecOptions, 'limits'>> & {
-  limits: Required<BaseCodecOptions>['limits'];
-} = {
+export const DEFAULT_INDEX_OPTIONS: Required<IndexCodecOptions> = {
   ...DEFAULT_BASE_OPTIONS,
   generateDetailFiles: false,
   preamble: [],

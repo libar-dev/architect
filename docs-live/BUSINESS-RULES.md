@@ -17,7 +17,7 @@
 | [Configuration](business-rules/configuration.md) | 7        | 32    | 32              |
 | [Core Types](business-rules/core-types.md)       | 5        | 22    | 22              |
 | [Data API](business-rules/data-api.md)           | 21       | 89    | 89              |
-| [Generation](business-rules/generation.md)       | 58       | 287   | 280             |
+| [Generation](business-rules/generation.md)       | 58       | 287   | 287             |
 | [Process](business-rules/process.md)             | 2        | 7     | 7               |
 | [Validation](business-rules/validation.md)       | 11       | 54    | 54              |
 

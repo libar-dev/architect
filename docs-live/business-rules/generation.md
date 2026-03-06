@@ -4,7 +4,7 @@
 
 ---
 
-**287 rules** from 58 features. 280 rules have explicit invariants.
+**287 rules** from 58 features. 287 rules have explicit invariants.
 
 ---
 
@@ -308,6 +308,10 @@ _Validates that ARCHITECTURE.md retains its full reference content and that_
 
 #### Product area sections coexist with generated documents
 
+> **Invariant:** Each architecture section in docs/ARCHITECTURE.md has a corresponding generated document in docs-live/product-areas/ covering equivalent content from annotated sources.
+>
+> **Rationale:** Manual and generated docs must coexist during the transition period. Generated docs prove that annotated sources produce equivalent coverage before manual sections are deprecated.
+
 **Verified by:**
 
 - Configuration Architecture section retained and generated doc exists
@@ -318,6 +322,10 @@ _Validates that ARCHITECTURE.md retains its full reference content and that_
 
 #### Four-Stage Pipeline section retains annotation format examples
 
+> **Invariant:** The Four-Stage Pipeline section contains annotation format examples (e.g., @libar-docs-shape, extract-shapes) and appears before the Source Systems section in document order.
+>
+> **Rationale:** Annotation format examples in the pipeline section demonstrate the source-first architecture. Their ordering establishes the conceptual flow: pipeline stages first, then the source systems that feed them.
+
 **Verified by:**
 
 - Annotation format examples appear before Source Systems
@@ -325,6 +333,10 @@ _Validates that ARCHITECTURE.md retains its full reference content and that_
 ---
 
 #### Convention extraction produces ARCHITECTURE-CODECS reference document
+
+> **Invariant:** The ARCHITECTURE-CODECS.md reference document is generated from convention-tagged JSDoc in codec source files and contains structured sections for each codec with output file references.
+>
+> **Rationale:** Codec documentation must stay synchronized with source code. Convention extraction from JSDoc ensures the reference document reflects actual codec implementations rather than manually maintained descriptions that drift.
 
 **Verified by:**
 
@@ -338,6 +350,10 @@ _Validates that ARCHITECTURE.md retains its full reference content and that_
 
 #### Full sections coexist with generated equivalents in docs-live
 
+> **Invariant:** Major sections of ARCHITECTURE.md (Unified Transformation, Data Flow Diagrams, Quick Reference) are retained alongside their generated equivalents in docs-live/reference/.
+>
+> **Rationale:** Generated reference documents (ARCHITECTURE-TYPES.md, ARCHITECTURE-CODECS.md) provide exhaustive type and codec listings, but the manual sections offer architectural narrative and design rationale that generated docs cannot yet replicate.
+
 **Verified by:**
 
 - Unified Transformation Architecture section retained and ARCHITECTURE-TYPES exists
@@ -347,6 +363,10 @@ _Validates that ARCHITECTURE.md retains its full reference content and that_
 ---
 
 #### MasterDataset shapes appear in ARCHITECTURE-TYPES reference
+
+> **Invariant:** The ARCHITECTURE-TYPES.md reference document contains core MasterDataset types (MasterDataset, RuntimeMasterDataset, RawDataset) and pipeline types (PipelineOptions, PipelineResult) extracted from shape annotations.
+>
+> **Rationale:** Type shapes are the structural backbone of the pipeline. Generating their documentation from annotations ensures the reference always matches the actual TypeScript interfaces, eliminating manual drift.
 
 **Verified by:**
 
@@ -358,6 +378,10 @@ _Validates that ARCHITECTURE.md retains its full reference content and that_
 
 #### Pipeline architecture convention appears in generated reference
 
+> **Invariant:** Source files in the pipeline layer (orchestrator.ts, build-pipeline.ts) carry the pipeline-architecture convention tag, enabling convention extraction into the ARCHITECTURE-TYPES reference document.
+>
+> **Rationale:** Convention tags on pipeline source files are the mechanism that feeds content into generated reference docs. Without these tags, the architecture reference would have no source material to extract.
+
 **Verified by:**
 
 - Orchestrator source file has pipeline-architecture convention tag
@@ -366,6 +390,10 @@ _Validates that ARCHITECTURE.md retains its full reference content and that_
 ---
 
 #### Full ARCHITECTURE.md retains all sections with substantial content
+
+> **Invariant:** ARCHITECTURE.md retains all major sections (Programmatic Usage, Extending the System, Key Design Patterns) with substantial content and remains under 1700 lines as a comprehensive reference.
+>
+> **Rationale:** These sections contain editorial content (usage examples, extension guides, design pattern explanations) that cannot be generated from annotations. They remain manual until procedural guide codecs can replicate their depth.
 
 **Verified by:**
 

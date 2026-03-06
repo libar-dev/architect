@@ -84,20 +84,20 @@ graph TB
         PatternRelationshipModel["PatternRelationshipModel"]:::neighbor
         CliRecipeCodec["CliRecipeCodec"]:::neighbor
     end
-    loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
     SourceMapper -.->|depends on| DecisionDocCodec
     SourceMapper -.->|depends on| ShapeExtractor
     SourceMapper -.->|depends on| GherkinASTParser
     Documentation_Generation_Orchestrator -->|uses| Pattern_Scanner
-    PatternsCodec ..->|implements| PatternRelationshipModel
-    CompositeCodec ..->|implements| ReferenceDocShowcase
-    ArchitectureCodec -->|uses| MasterDataset
+    loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
     TransformDataset -->|uses| MasterDataset
     TransformDataset ..->|implements| PatternRelationshipModel
     ProcessApiReferenceGenerator ..->|implements| ProcessApiHybridGeneration
     DecisionDocGenerator -.->|depends on| DecisionDocCodec
     DecisionDocGenerator -.->|depends on| SourceMapper
     CliRecipeGenerator ..->|implements| CliRecipeCodec
+    PatternsCodec ..->|implements| PatternRelationshipModel
+    CompositeCodec ..->|implements| ReferenceDocShowcase
+    ArchitectureCodec -->|uses| MasterDataset
     CliRecipeCodec -.->|depends on| ProcessApiHybridGeneration
     classDef neighbor stroke-dasharray: 5 5
 ```
@@ -280,7 +280,7 @@ function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 
 ## Business Rules
 
-88 patterns, 416 rules with invariants (424 total)
+88 patterns, 423 rules with invariants (424 total)
 
 ### ADR 005 Codec Based Markdown Rendering
 
@@ -352,15 +352,15 @@ function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 
 ### Architecture Doc Refactoring Testing
 
-| Rule                                                                  | Invariant | Rationale |
-| --------------------------------------------------------------------- | --------- | --------- |
-| Product area sections coexist with generated documents                |           |           |
-| Four-Stage Pipeline section retains annotation format examples        |           |           |
-| Convention extraction produces ARCHITECTURE-CODECS reference document |           |           |
-| Full sections coexist with generated equivalents in docs-live         |           |           |
-| MasterDataset shapes appear in ARCHITECTURE-TYPES reference           |           |           |
-| Pipeline architecture convention appears in generated reference       |           |           |
-| Full ARCHITECTURE.md retains all sections with substantial content    |           |           |
+| Rule                                                                  | Invariant                                                                                                                                                                                                               | Rationale                                                                                                                                                                                                                                      |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Product area sections coexist with generated documents                | Each architecture section in docs/ARCHITECTURE.md has a corresponding generated document in docs-live/product-areas/ covering equivalent content from annotated sources.                                                | Manual and generated docs must coexist during the transition period. Generated docs prove that annotated sources produce equivalent coverage before manual sections are deprecated.                                                            |
+| Four-Stage Pipeline section retains annotation format examples        | The Four-Stage Pipeline section contains annotation format examples (e.g., @libar-docs-shape, extract-shapes) and appears before the Source Systems section in document order.                                          | Annotation format examples in the pipeline section demonstrate the source-first architecture. Their ordering establishes the conceptual flow: pipeline stages first, then the source systems that feed them.                                   |
+| Convention extraction produces ARCHITECTURE-CODECS reference document | The ARCHITECTURE-CODECS.md reference document is generated from convention-tagged JSDoc in codec source files and contains structured sections for each codec with output file references.                              | Codec documentation must stay synchronized with source code. Convention extraction from JSDoc ensures the reference document reflects actual codec implementations rather than manually maintained descriptions that drift.                    |
+| Full sections coexist with generated equivalents in docs-live         | Major sections of ARCHITECTURE.md (Unified Transformation, Data Flow Diagrams, Quick Reference) are retained alongside their generated equivalents in docs-live/reference/.                                             | Generated reference documents (ARCHITECTURE-TYPES.md, ARCHITECTURE-CODECS.md) provide exhaustive type and codec listings, but the manual sections offer architectural narrative and design rationale that generated docs cannot yet replicate. |
+| MasterDataset shapes appear in ARCHITECTURE-TYPES reference           | The ARCHITECTURE-TYPES.md reference document contains core MasterDataset types (MasterDataset, RuntimeMasterDataset, RawDataset) and pipeline types (PipelineOptions, PipelineResult) extracted from shape annotations. | Type shapes are the structural backbone of the pipeline. Generating their documentation from annotations ensures the reference always matches the actual TypeScript interfaces, eliminating manual drift.                                      |
+| Pipeline architecture convention appears in generated reference       | Source files in the pipeline layer (orchestrator.ts, build-pipeline.ts) carry the pipeline-architecture convention tag, enabling convention extraction into the ARCHITECTURE-TYPES reference document.                  | Convention tags on pipeline source files are the mechanism that feeds content into generated reference docs. Without these tags, the architecture reference would have no source material to extract.                                          |
+| Full ARCHITECTURE.md retains all sections with substantial content    | ARCHITECTURE.md retains all major sections (Programmatic Usage, Extending the System, Key Design Patterns) with substantial content and remains under 1700 lines as a comprehensive reference.                          | These sections contain editorial content (usage examples, extension guides, design pattern explanations) that cannot be generated from annotations. They remain manual until procedural guide codecs can replicate their depth.                |
 
 ### Arch Tag Extraction
 

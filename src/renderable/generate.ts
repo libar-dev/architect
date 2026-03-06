@@ -438,6 +438,24 @@ export interface GenerationError {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Codec Resolution
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Resolve the codec for a document type, using a factory if options are provided.
+ */
+function resolveCodec(type: DocumentType, options?: CodecOptions): DocumentCodec | undefined {
+  const typeOptions = options?.[type];
+  if (typeOptions !== undefined) {
+    const factory = CodecRegistry.getFactory(type);
+    if (factory !== undefined) {
+      return factory(typeOptions);
+    }
+  }
+  return CodecRegistry.get(type);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Generation Functions
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -472,18 +490,7 @@ export function generateDocumentSafe(
 ): Result<OutputFile[], GenerationError> {
   const outputPath = DOCUMENT_TYPES[type].outputPath;
 
-  // Get options for this specific document type
-  const typeOptions = options?.[type];
-
-  // Use factory function if options provided, otherwise use default codec
-  let codec: DocumentCodec | undefined;
-  if (typeOptions !== undefined) {
-    const factory = CodecRegistry.getFactory(type);
-    if (factory !== undefined) {
-      codec = factory(typeOptions);
-    }
-  }
-  codec ??= CodecRegistry.get(type);
+  const codec = resolveCodec(type, options);
   if (codec === undefined) {
     return Result.err({
       documentType: type,
@@ -554,18 +561,7 @@ export function generateDocument(
 ): OutputFile[] {
   const outputPath = DOCUMENT_TYPES[type].outputPath;
 
-  // Get options for this specific document type
-  const typeOptions = options?.[type];
-
-  // Use factory function if options provided, otherwise use default codec
-  let codec: DocumentCodec | undefined;
-  if (typeOptions !== undefined) {
-    const factory = CodecRegistry.getFactory(type);
-    if (factory !== undefined) {
-      codec = factory(typeOptions);
-    }
-  }
-  codec ??= CodecRegistry.get(type);
+  const codec = resolveCodec(type, options);
   if (codec === undefined) {
     throw new Error(`No codec registered for document type: ${type}`);
   }

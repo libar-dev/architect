@@ -158,6 +158,10 @@ graph TB
         ErrorFactoryTypes["ErrorFactoryTypes"]
     end
     subgraph validation["Validation BC"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
+        DoDValidator["DoDValidator[service]"]
+        AntiPatternDetector["AntiPatternDetector[service]"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -166,16 +170,15 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
-        DoDValidator["DoDValidator[service]"]
-        AntiPatternDetector["AntiPatternDetector[service]"]
         FSMValidator["FSMValidator[decider]"]
         FSMTransitions["FSMTransitions[read-model]"]
         FSMStates["FSMStates[read-model]"]
         FSMModule["FSMModule"]
     end
     subgraph shared["Shared Infrastructure"]
+        Convention_Annotation_Example___DD_3_Decision["Convention Annotation Example — DD-3 Decision[decider]"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -184,8 +187,8 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
+        ResultMonadTypes["ResultMonadTypes"]
+        ErrorFactoryTypes["ErrorFactoryTypes"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
@@ -194,12 +197,10 @@ graph TB
         FormatTypes["FormatTypes"]
         DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
         CategoryDefinition["CategoryDefinition"]
-        ResultMonadTypes["ResultMonadTypes"]
-        ErrorFactoryTypes["ErrorFactoryTypes"]
-        LintModule["LintModule"]
         RenderableUtils["RenderableUtils"]
         SectionBlock["SectionBlock"]
         RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
+        LintModule["LintModule"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
@@ -217,12 +218,7 @@ graph TB
         StubResolverImpl["StubResolverImpl"]
         RulesQueryModule["RulesQueryModule"]
         APIModule["APIModule"]
-        Convention_Annotation_Example___DD_3_Decision["Convention Annotation Example — DD-3 Decision[decider]"]
         FSMModule["FSMModule"]
-        ProcessGuardTypes["ProcessGuardTypes"]
-        ProcessGuardModule["ProcessGuardModule"]
-        DetectChanges["DetectChanges"]
-        DeriveProcessState["DeriveProcessState"]
         ValidationRulesCodec["ValidationRulesCodec"]
         TimelineCodec["TimelineCodec"]
         TaxonomyCodec["TaxonomyCodec"]
@@ -238,6 +234,10 @@ graph TB
         ClaudeModuleCodec["ClaudeModuleCodec"]
         BusinessRulesCodec["BusinessRulesCodec"]
         AdrDocumentCodec["AdrDocumentCodec"]
+        ProcessGuardTypes["ProcessGuardTypes"]
+        ProcessGuardModule["ProcessGuardModule"]
+        DetectChanges["DetectChanges"]
+        DeriveProcessState["DeriveProcessState"]
         MergePatterns["MergePatterns"]
         PipelineModule["PipelineModule"]
         PipelineFactory["PipelineFactory"]
@@ -262,28 +262,28 @@ graph TB
         ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
         CliBehaviorTesting["CliBehaviorTesting"]
         ProcessGuardTesting["ProcessGuardTesting"]
+        StringUtils["StringUtils"]
         ResultMonad["ResultMonad"]
         ErrorFactories["ErrorFactories"]
         SessionHandoffs["SessionHandoffs"]
         SessionFileLifecycle["SessionFileLifecycle"]
         KebabCaseSlugs["KebabCaseSlugs"]
         ErrorHandlingUnification["ErrorHandlingUnification"]
-        StringUtils["StringUtils"]
     end
-    ExtractedPatternSchema --> DocDirectiveSchema
-    DualSourceSchemas ..-> MvpWorkflowImplementation
-    DocDirectiveSchema ..-> MvpWorkflowImplementation
     DoDValidator --> DoDValidationTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
-    CategoryDefinition ..-> CategoryDefinitions
+    ExtractedPatternSchema --> DocDirectiveSchema
+    DualSourceSchemas ..-> MvpWorkflowImplementation
+    DocDirectiveSchema ..-> MvpWorkflowImplementation
     ResultMonadTypes ..-> ResultMonad
     ErrorFactoryTypes ..-> ErrorFactories
+    CategoryDefinition ..-> CategoryDefinitions
+    SectionBlock ..-> RenderableDocument
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
-    SectionBlock ..-> RenderableDocument
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> ShapeExtractor
     SourceMapper -.-> GherkinASTParser
@@ -352,13 +352,13 @@ graph TB
     ArchQueriesImpl --> MasterDataset
     FSMValidator --> FSMTransitions
     FSMValidator --> FSMStates
+    ArchitectureCodec --> MasterDataset
     DetectChanges --> DeriveProcessState
     DeriveProcessState --> GherkinScanner
     DeriveProcessState --> FSMValidator
     ProcessGuardDecider --> FSMValidator
     ProcessGuardDecider --> DeriveProcessState
     ProcessGuardDecider --> DetectChanges
-    ArchitectureCodec --> MasterDataset
     TransformDataset --> MasterDataset
     MergePatterns --> PatternHelpers
     MergePatterns ..-> OrchestratorPipelineFactoryMigration

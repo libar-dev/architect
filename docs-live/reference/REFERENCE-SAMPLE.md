@@ -248,15 +248,15 @@ classDiagram
     class Documentation_Generation_Orchestrator {
         <<service>>
     }
+    class TransformDataset {
+        <<service>>
+    }
     class ProcessApiReferenceGenerator {
     }
     class DecisionDocGenerator {
         <<service>>
     }
     class CliRecipeGenerator {
-    }
-    class TransformDataset {
-        <<service>>
     }
     class MasterDataset
     class Pattern_Scanner
@@ -270,12 +270,12 @@ classDiagram
     SourceMapper ..> ShapeExtractor : depends on
     SourceMapper ..> GherkinASTParser : depends on
     Documentation_Generation_Orchestrator ..> Pattern_Scanner : uses
+    TransformDataset ..> MasterDataset : uses
+    TransformDataset ..|> PatternRelationshipModel : implements
     ProcessApiReferenceGenerator ..|> ProcessApiHybridGeneration : implements
     DecisionDocGenerator ..> DecisionDocCodec : depends on
     DecisionDocGenerator ..> SourceMapper : depends on
     CliRecipeGenerator ..|> CliRecipeCodec : implements
-    TransformDataset ..> MasterDataset : uses
-    TransformDataset ..|> PatternRelationshipModel : implements
     CliRecipeCodec ..> ProcessApiHybridGeneration : depends on
 ```
 
@@ -384,6 +384,7 @@ graph LR
     end
     TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
     loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
+    CLISchema ..->|implements| ProcessApiHybridGeneration
     ProjectConfigTypes -->|uses| ConfigurationTypes
     ProjectConfigTypes -->|uses| ConfigurationPresets
     ConfigurationPresets -->|uses| ConfigurationTypes
@@ -391,7 +392,6 @@ graph LR
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
-    CLISchema ..->|implements| ProcessApiHybridGeneration
     FSMTransitions ..->|implements| PhaseStateMachineValidation
     FSMStates ..->|implements| PhaseStateMachineValidation
     ProcessStateAPI -->|uses| MasterDataset
