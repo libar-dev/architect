@@ -27,31 +27,33 @@ const indexNavigationPreamble = loadPreambleFromMarkdown(
 );
 
 // DD-2: Document entries configured statically, not via filesystem discovery.
+// All paths are relative to docs-live/ (where INDEX.md is generated).
 const INDEX_DOCUMENT_ENTRIES: readonly DocumentEntry[] = [
-  // --- Getting Started ---
-  { title: 'README', path: 'README.md', description: 'Installation, quick start, value proposition', audience: 'Everyone', topic: 'Getting Started' },
-  { title: 'Configuration', path: 'docs/CONFIGURATION.md', description: 'Presets, tag prefixes, config files', audience: 'Users', topic: 'Getting Started' },
-  { title: 'Methodology', path: 'docs/METHODOLOGY.md', description: 'Core thesis, dual-source architecture principles', audience: 'Everyone', topic: 'Getting Started' },
-  // --- Architecture ---
-  { title: 'Architecture', path: 'docs/ARCHITECTURE.md', description: 'Four-stage pipeline, codecs, MasterDataset, schemas', audience: 'Developers', topic: 'Architecture' },
-  { title: 'Product Areas', path: 'docs-live/PRODUCT-AREAS.md', description: 'Product area overviews with live statistics and diagrams', audience: 'Everyone', topic: 'Architecture' },
-  { title: 'Architecture Decisions', path: 'docs-live/DECISIONS.md', description: 'ADRs extracted from decision specs', audience: 'Developers', topic: 'Architecture' },
-  // --- Development Workflow ---
-  { title: 'Session Guides', path: 'docs/SESSION-GUIDES.md', description: 'Planning, Design, Implementation session workflows', audience: 'AI/Devs', topic: 'Development Workflow' },
-  { title: 'Process API', path: 'docs/PROCESS-API.md', description: 'Data API CLI query interface for session context', audience: 'AI/Devs', topic: 'Development Workflow' },
-  // --- Authoring ---
-  { title: 'Gherkin Patterns', path: 'docs/GHERKIN-PATTERNS.md', description: 'Writing effective Gherkin specs, Rule blocks, DataTables', audience: 'Writers', topic: 'Authoring' },
-  { title: 'Annotation Guide', path: 'docs/ANNOTATION-GUIDE.md', description: 'Annotation mechanics, shape extraction, tag reference', audience: 'Developers', topic: 'Authoring' },
-  { title: 'Taxonomy', path: 'docs/TAXONOMY.md', description: 'Tag taxonomy structure and format types', audience: 'Reference', topic: 'Authoring' },
+  // --- Overview ---
+  { title: 'Architecture', path: 'ARCHITECTURE.md', description: 'Architecture diagram from source annotations', audience: 'Developers', topic: 'Overview' },
+  { title: 'Product Areas', path: 'PRODUCT-AREAS.md', description: 'Product area overviews with live statistics and diagrams', audience: 'Everyone', topic: 'Overview' },
+  { title: 'Taxonomy', path: 'TAXONOMY.md', description: 'Tag taxonomy configuration and format types', audience: 'Reference', topic: 'Overview' },
+  { title: 'Changelog', path: 'CHANGELOG-GENERATED.md', description: 'Project changelog from release specs', audience: 'Everyone', topic: 'Overview' },
   // --- Governance ---
-  { title: 'Process Guard', path: 'docs/PROCESS-GUARD.md', description: 'FSM enforcement, pre-commit hooks, error codes', audience: 'Team Leads', topic: 'Governance' },
-  { title: 'Validation', path: 'docs/VALIDATION.md', description: 'Lint rules, DoD checks, anti-pattern detection', audience: 'CI/CD', topic: 'Governance' },
-  { title: 'Business Rules', path: 'docs-live/BUSINESS-RULES.md', description: 'Business rules and invariants extracted from specs', audience: 'Developers', topic: 'Governance' },
-  // --- Reference ---
-  { title: 'Architecture Codecs', path: 'docs-live/reference/ARCHITECTURE-CODECS.md', description: 'All codecs with factory patterns and options', audience: 'Developers', topic: 'Reference' },
-  { title: 'Architecture Types', path: 'docs-live/reference/ARCHITECTURE-TYPES.md', description: 'MasterDataset interface and type shapes', audience: 'Developers', topic: 'Reference' },
-  { title: 'Process API Reference', path: 'docs-live/reference/PROCESS-API-REFERENCE.md', description: 'CLI command reference with flags and examples', audience: 'AI/Devs', topic: 'Reference' },
-  { title: 'Process API Recipes', path: 'docs-live/reference/PROCESS-API-RECIPES.md', description: 'CLI workflow recipes and session guides', audience: 'AI/Devs', topic: 'Reference' },
+  { title: 'Decisions', path: 'DECISIONS.md', description: 'Architecture Decision Records extracted from specs', audience: 'Developers', topic: 'Governance' },
+  { title: 'Business Rules', path: 'BUSINESS-RULES.md', description: 'Domain constraints and invariants from feature files', audience: 'Developers', topic: 'Governance' },
+  { title: 'Validation Rules', path: 'VALIDATION-RULES.md', description: 'Process Guard validation rules and FSM reference', audience: 'CI/CD', topic: 'Governance' },
+  // --- Reference Guides ---
+  { title: 'Annotation Reference', path: 'reference/ANNOTATION-REFERENCE.md', description: 'Annotation mechanics, shape extraction, tag reference', audience: 'Developers', topic: 'Reference Guides' },
+  { title: 'Session Workflow Guide', path: 'reference/SESSION-WORKFLOW-GUIDE.md', description: 'Planning, Design, Implementation session workflows', audience: 'AI/Devs', topic: 'Reference Guides' },
+  { title: 'Process API Reference', path: 'reference/PROCESS-API-REFERENCE.md', description: 'CLI command reference with flags and examples', audience: 'AI/Devs', topic: 'Reference Guides' },
+  { title: 'Process API Recipes', path: 'reference/PROCESS-API-RECIPES.md', description: 'CLI workflow recipes and session guides', audience: 'AI/Devs', topic: 'Reference Guides' },
+  { title: 'Process Guard Reference', path: 'reference/PROCESS-GUARD-REFERENCE.md', description: 'Pre-commit hooks, error codes, programmatic API', audience: 'Team Leads', topic: 'Reference Guides' },
+  { title: 'Architecture Codecs', path: 'reference/ARCHITECTURE-CODECS.md', description: 'All codecs with factory patterns and options', audience: 'Developers', topic: 'Reference Guides' },
+  { title: 'Architecture Types', path: 'reference/ARCHITECTURE-TYPES.md', description: 'MasterDataset interface and type shapes', audience: 'Developers', topic: 'Reference Guides' },
+  // --- Product Area Details ---
+  { title: 'Annotation', path: 'product-areas/ANNOTATION.md', description: 'Annotation product area patterns and statistics', audience: 'Developers', topic: 'Product Area Details' },
+  { title: 'Configuration', path: 'product-areas/CONFIGURATION.md', description: 'Configuration product area patterns and statistics', audience: 'Users', topic: 'Product Area Details' },
+  { title: 'Core Types', path: 'product-areas/CORE-TYPES.md', description: 'Core types product area patterns and statistics', audience: 'Developers', topic: 'Product Area Details' },
+  { title: 'Data API', path: 'product-areas/DATA-API.md', description: 'Data API product area patterns and statistics', audience: 'AI/Devs', topic: 'Product Area Details' },
+  { title: 'Generation', path: 'product-areas/GENERATION.md', description: 'Generation product area patterns and statistics', audience: 'Developers', topic: 'Product Area Details' },
+  { title: 'Process', path: 'product-areas/PROCESS.md', description: 'Process product area patterns and statistics', audience: 'Team Leads', topic: 'Product Area Details' },
+  { title: 'Validation', path: 'product-areas/VALIDATION.md', description: 'Validation product area patterns and statistics', audience: 'CI/CD', topic: 'Product Area Details' },
 ];
 
 export default defineConfig({

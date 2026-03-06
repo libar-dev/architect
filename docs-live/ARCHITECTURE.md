@@ -74,6 +74,7 @@ graph TB
         Document_Extractor["Document Extractor[service]"]
     end
     subgraph generator["Generator BC"]
+        FileCache["FileCache[infrastructure]"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
@@ -82,7 +83,6 @@ graph TB
         Documentation_Generation_Orchestrator["Documentation Generation Orchestrator[service]"]
         ContentDeduplicator["ContentDeduplicator[infrastructure]"]
         CodecBasedGenerator["CodecBasedGenerator[service]"]
-        FileCache["FileCache[infrastructure]"]
         TransformDataset["TransformDataset[service]"]
         MergePatterns["MergePatterns"]
         PipelineModule["PipelineModule"]
@@ -158,10 +158,6 @@ graph TB
         ErrorFactoryTypes["ErrorFactoryTypes"]
     end
     subgraph validation["Validation BC"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
-        DoDValidator["DoDValidator[service]"]
-        AntiPatternDetector["AntiPatternDetector[service]"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -170,15 +166,16 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
+        DoDValidator["DoDValidator[service]"]
+        AntiPatternDetector["AntiPatternDetector[service]"]
         FSMValidator["FSMValidator[decider]"]
         FSMTransitions["FSMTransitions[read-model]"]
         FSMStates["FSMStates[read-model]"]
         FSMModule["FSMModule"]
     end
     subgraph shared["Shared Infrastructure"]
-        Convention_Annotation_Example___DD_3_Decision["Convention Annotation Example — DD-3 Decision[decider]"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -197,14 +194,11 @@ graph TB
         FormatTypes["FormatTypes"]
         DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
         CategoryDefinition["CategoryDefinition"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
         RenderableUtils["RenderableUtils"]
         SectionBlock["SectionBlock"]
         RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
-        LintModule["LintModule"]
-        WarningCollector["WarningCollector"]
-        GeneratorTypes["GeneratorTypes"]
-        SourceMappingValidator["SourceMappingValidator"]
-        GeneratorRegistry["GeneratorRegistry"]
         ShapeExtractor["ShapeExtractor"]
         LayerInference["LayerInference"]
         CLIVersionHelper["CLIVersionHelper"]
@@ -214,10 +208,16 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
+        WarningCollector["WarningCollector"]
+        GeneratorTypes["GeneratorTypes"]
+        SourceMappingValidator["SourceMappingValidator"]
+        GeneratorRegistry["GeneratorRegistry"]
         ProcessStateTypes["ProcessStateTypes"]
         StubResolverImpl["StubResolverImpl"]
         RulesQueryModule["RulesQueryModule"]
         APIModule["APIModule"]
+        LintModule["LintModule"]
+        Convention_Annotation_Example___DD_3_Decision["Convention Annotation Example — DD-3 Decision[decider]"]
         FSMModule["FSMModule"]
         ValidationRulesCodec["ValidationRulesCodec"]
         TimelineCodec["TimelineCodec"]
@@ -234,22 +234,17 @@ graph TB
         ClaudeModuleCodec["ClaudeModuleCodec"]
         BusinessRulesCodec["BusinessRulesCodec"]
         AdrDocumentCodec["AdrDocumentCodec"]
-        ProcessGuardTypes["ProcessGuardTypes"]
-        ProcessGuardModule["ProcessGuardModule"]
-        DetectChanges["DetectChanges"]
-        DeriveProcessState["DeriveProcessState"]
         MergePatterns["MergePatterns"]
         PipelineModule["PipelineModule"]
         PipelineFactory["PipelineFactory"]
         ReferenceGeneratorRegistration["ReferenceGeneratorRegistration"]
         BuiltInGenerators["BuiltInGenerators"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
+        ProcessGuardTypes["ProcessGuardTypes"]
+        ProcessGuardModule["ProcessGuardModule"]
+        DetectChanges["DetectChanges"]
+        DeriveProcessState["DeriveProcessState"]
         CodecBaseOptions["CodecBaseOptions"]
-        ADR006SingleReadModelArchitecture["ADR006SingleReadModelArchitecture"]
-        ADR005CodecBasedMarkdownRendering["ADR005CodecBasedMarkdownRendering"]
-        ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
-        ADR002GherkinOnlyTesting["ADR002GherkinOnlyTesting"]
-        ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
         ValidatorReadModelConsolidation["ValidatorReadModelConsolidation"]
         StepDefinitionCompletion["StepDefinitionCompletion"]
         SessionGuidesModuleSource["SessionGuidesModuleSource"]
@@ -261,56 +256,32 @@ graph TB
         EffortVarianceTracking["EffortVarianceTracking"]
         ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
         CliBehaviorTesting["CliBehaviorTesting"]
-        ProcessGuardTesting["ProcessGuardTesting"]
+        ADR006SingleReadModelArchitecture["ADR006SingleReadModelArchitecture"]
+        ADR005CodecBasedMarkdownRendering["ADR005CodecBasedMarkdownRendering"]
+        ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
+        ADR002GherkinOnlyTesting["ADR002GherkinOnlyTesting"]
+        ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
         StringUtils["StringUtils"]
-        ResultMonad["ResultMonad"]
-        ErrorFactories["ErrorFactories"]
+        ProcessGuardTesting["ProcessGuardTesting"]
         SessionHandoffs["SessionHandoffs"]
         SessionFileLifecycle["SessionFileLifecycle"]
         KebabCaseSlugs["KebabCaseSlugs"]
         ErrorHandlingUnification["ErrorHandlingUnification"]
+        ResultMonad["ResultMonad"]
+        ErrorFactories["ErrorFactories"]
     end
-    DoDValidator --> DoDValidationTypes
-    DoDValidator --> DualSourceExtractor
-    AntiPatternDetector --> DoDValidationTypes
     ExtractedPatternSchema --> DocDirectiveSchema
     DualSourceSchemas ..-> MvpWorkflowImplementation
     DocDirectiveSchema ..-> MvpWorkflowImplementation
     ResultMonadTypes ..-> ResultMonad
     ErrorFactoryTypes ..-> ErrorFactories
     CategoryDefinition ..-> CategoryDefinitions
-    SectionBlock ..-> RenderableDocument
-    LintModule --> LintRules
-    LintModule --> LintEngine
-    LintEngine --> LintRules
-    LintEngine --> CodecUtils
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
     GherkinScanner --> GherkinASTParser
     TypeScript_AST_Parser --> DocDirectiveSchema
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> GherkinExtractor
-    ValidatePatternsCLI --> MasterDataset
-    ValidatePatternsCLI --> CodecUtils
-    ProcessAPICLIImpl --> ProcessStateAPI
-    ProcessAPICLIImpl --> MasterDataset
-    ProcessAPICLIImpl --> PipelineFactory
-    ProcessAPICLIImpl --> RulesQueryModule
-    ProcessAPICLIImpl --> PatternSummarizerImpl
-    ProcessAPICLIImpl --> FuzzyMatcherImpl
-    ProcessAPICLIImpl --> OutputPipelineImpl
-    OutputPipelineImpl --> PatternSummarizerImpl
-    LintProcessCLI --> ProcessGuardModule
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    TagTaxonomyCLI --> ConfigLoader
+    DoDValidator --> DoDValidationTypes
+    DoDValidator --> DualSourceExtractor
+    AntiPatternDetector --> DoDValidationTypes
+    SectionBlock ..-> RenderableDocument
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     ConfigResolver --> ProjectConfigTypes
@@ -328,6 +299,31 @@ graph TB
     DefineConfig --> ProjectConfigTypes
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> GherkinExtractor
+    ValidatePatternsCLI --> MasterDataset
+    ValidatePatternsCLI --> CodecUtils
+    ProcessAPICLIImpl --> ProcessStateAPI
+    ProcessAPICLIImpl --> MasterDataset
+    ProcessAPICLIImpl --> PipelineFactory
+    ProcessAPICLIImpl --> RulesQueryModule
+    ProcessAPICLIImpl --> PatternSummarizerImpl
+    ProcessAPICLIImpl --> FuzzyMatcherImpl
+    ProcessAPICLIImpl --> OutputPipelineImpl
+    OutputPipelineImpl --> PatternSummarizerImpl
+    LintProcessCLI --> ProcessGuardModule
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    TagTaxonomyCLI --> ConfigLoader
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
@@ -350,15 +346,13 @@ graph TB
     ContextAssemblerImpl --> StubResolverImpl
     ArchQueriesImpl --> ProcessStateAPI
     ArchQueriesImpl --> MasterDataset
+    LintModule --> LintRules
+    LintModule --> LintEngine
+    LintEngine --> LintRules
+    LintEngine --> CodecUtils
     FSMValidator --> FSMTransitions
     FSMValidator --> FSMStates
     ArchitectureCodec --> MasterDataset
-    DetectChanges --> DeriveProcessState
-    DeriveProcessState --> GherkinScanner
-    DeriveProcessState --> FSMValidator
-    ProcessGuardDecider --> FSMValidator
-    ProcessGuardDecider --> DeriveProcessState
-    ProcessGuardDecider --> DetectChanges
     TransformDataset --> MasterDataset
     MergePatterns --> PatternHelpers
     MergePatterns ..-> OrchestratorPipelineFactoryMigration
@@ -371,8 +365,12 @@ graph TB
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
-    ADR006SingleReadModelArchitecture -.-> ADR005CodecBasedMarkdownRendering
-    ADR003SourceFirstPatternArchitecture -.-> ADR001TaxonomyCanonicalValues
+    DetectChanges --> DeriveProcessState
+    DeriveProcessState --> GherkinScanner
+    DeriveProcessState --> FSMValidator
+    ProcessGuardDecider --> FSMValidator
+    ProcessGuardDecider --> DeriveProcessState
+    ProcessGuardDecider --> DetectChanges
     ValidatorReadModelConsolidation -.-> ADR006SingleReadModelArchitecture
     StepDefinitionCompletion -.-> ADR002GherkinOnlyTesting
     SessionFileCleanup -.-> SessionFileLifecycle
@@ -382,6 +380,8 @@ graph TB
     EffortVarianceTracking -.-> MvpWorkflowImplementation
     ConfigBasedWorkflowDefinition -.-> MvpWorkflowImplementation
     CliBehaviorTesting -.-> ADR002GherkinOnlyTesting
+    ADR006SingleReadModelArchitecture -.-> ADR005CodecBasedMarkdownRendering
+    ADR003SourceFirstPatternArchitecture -.-> ADR001TaxonomyCanonicalValues
     ProcessGuardTesting -.-> AntiPatternDetector
     KebabCaseSlugs -.-> StringUtils
     ErrorHandlingUnification -.-> ResultMonad

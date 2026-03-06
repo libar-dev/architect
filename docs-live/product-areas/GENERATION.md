@@ -84,20 +84,20 @@ graph TB
         PatternRelationshipModel["PatternRelationshipModel"]:::neighbor
         CliRecipeCodec["CliRecipeCodec"]:::neighbor
     end
+    loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
     SourceMapper -.->|depends on| DecisionDocCodec
     SourceMapper -.->|depends on| ShapeExtractor
     SourceMapper -.->|depends on| GherkinASTParser
     Documentation_Generation_Orchestrator -->|uses| Pattern_Scanner
-    loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
+    PatternsCodec ..->|implements| PatternRelationshipModel
+    CompositeCodec ..->|implements| ReferenceDocShowcase
+    ArchitectureCodec -->|uses| MasterDataset
     TransformDataset -->|uses| MasterDataset
     TransformDataset ..->|implements| PatternRelationshipModel
     ProcessApiReferenceGenerator ..->|implements| ProcessApiHybridGeneration
     DecisionDocGenerator -.->|depends on| DecisionDocCodec
     DecisionDocGenerator -.->|depends on| SourceMapper
     CliRecipeGenerator ..->|implements| CliRecipeCodec
-    PatternsCodec ..->|implements| PatternRelationshipModel
-    CompositeCodec ..->|implements| ReferenceDocShowcase
-    ArchitectureCodec -->|uses| MasterDataset
     CliRecipeCodec -.->|depends on| ProcessApiHybridGeneration
     classDef neighbor stroke-dasharray: 5 5
 ```

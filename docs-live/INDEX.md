@@ -18,64 +18,66 @@
 
 ## Quick Navigation
 
-| If you want to...              | Read this                                        |
-| ------------------------------ | ------------------------------------------------ |
-| Get started quickly            | [README.md](../README.md)                        |
-| Configure presets and tags     | [CONFIGURATION.md](docs/CONFIGURATION.md)        |
-| Understand the "why"           | [METHODOLOGY.md](docs/METHODOLOGY.md)            |
-| Learn the architecture         | [ARCHITECTURE.md](docs/ARCHITECTURE.md)          |
-| Run AI coding sessions         | [SESSION-GUIDES.md](docs/SESSION-GUIDES.md)      |
-| Write Gherkin specs            | [GHERKIN-PATTERNS.md](docs/GHERKIN-PATTERNS.md)  |
-| Enforce delivery process rules | [PROCESS-GUARD.md](docs/PROCESS-GUARD.md)        |
-| Validate annotation quality    | [VALIDATION.md](docs/VALIDATION.md)              |
-| Query process state via CLI    | [PROCESS-API.md](docs/PROCESS-API.md)            |
-| Browse product area overviews  | [PRODUCT-AREAS.md](docs-live/PRODUCT-AREAS.md)   |
-| Review architecture decisions  | [DECISIONS.md](docs-live/DECISIONS.md)           |
-| Check business rules           | [BUSINESS-RULES.md](docs-live/BUSINESS-RULES.md) |
+| If you want to...              | Read this                                                       |
+| ------------------------------ | --------------------------------------------------------------- |
+| Learn the architecture         | [ARCHITECTURE.md](ARCHITECTURE.md)                              |
+| Browse product area overviews  | [PRODUCT-AREAS.md](PRODUCT-AREAS.md)                            |
+| Review architecture decisions  | [DECISIONS.md](DECISIONS.md)                                    |
+| Check business rules           | [BUSINESS-RULES.md](BUSINESS-RULES.md)                          |
+| Understand the tag taxonomy    | [TAXONOMY.md](TAXONOMY.md)                                      |
+| Check validation rules         | [VALIDATION-RULES.md](VALIDATION-RULES.md)                      |
+| Browse the changelog           | [CHANGELOG-GENERATED.md](CHANGELOG-GENERATED.md)                |
+| Query process state via CLI    | [Process API Reference](reference/PROCESS-API-REFERENCE.md)     |
+| Find CLI workflow recipes      | [Process API Recipes](reference/PROCESS-API-RECIPES.md)         |
+| Run AI coding sessions         | [Session Workflow Guide](reference/SESSION-WORKFLOW-GUIDE.md)   |
+| Enforce delivery process rules | [Process Guard Reference](reference/PROCESS-GUARD-REFERENCE.md) |
+| Learn annotation mechanics     | [Annotation Reference](reference/ANNOTATION-REFERENCE.md)       |
+| See codec patterns and options | [Architecture Codecs](reference/ARCHITECTURE-CODECS.md)         |
+| Understand MasterDataset types | [Architecture Types](reference/ARCHITECTURE-TYPES.md)           |
 
 ---
 
 ## Reading Order
 
-### For New Users
+### Overview
 
-1. **[README.md](../README.md)** -- Installation, quick start, Data API CLI overview
-2. **[CONFIGURATION.md](docs/CONFIGURATION.md)** -- Presets, tag prefixes, config files
-3. **[METHODOLOGY.md](docs/METHODOLOGY.md)** -- Core thesis, dual-source architecture
+1. **[ARCHITECTURE.md](ARCHITECTURE.md)** -- Architecture diagram from source annotations
+2. **[PRODUCT-AREAS.md](PRODUCT-AREAS.md)** -- Product area overviews with live statistics and diagrams
+3. **[TAXONOMY.md](TAXONOMY.md)** -- Tag taxonomy configuration and format types
 
-### For Developers / AI
+### Deep Dive
 
-1. **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** -- Four-stage pipeline, codecs, MasterDataset
-2. **[PROCESS-API.md](docs/PROCESS-API.md)** -- Data API CLI query interface
-3. **[SESSION-GUIDES.md](docs/SESSION-GUIDES.md)** -- Planning/Design/Implementation workflows
-4. **[GHERKIN-PATTERNS.md](docs/GHERKIN-PATTERNS.md)** -- Writing effective Gherkin specs
-5. **[ANNOTATION-GUIDE.md](docs/ANNOTATION-GUIDE.md)** -- Annotation mechanics, shape extraction
+1. **[DECISIONS.md](DECISIONS.md)** -- Architecture Decision Records extracted from specs
+2. **[BUSINESS-RULES.md](BUSINESS-RULES.md)** -- Domain constraints and invariants from feature files
+3. **[VALIDATION-RULES.md](VALIDATION-RULES.md)** -- Process Guard validation rules and FSM reference
 
-### For Team Leads / CI
+### Reference Guides
 
-1. **[PROCESS-GUARD.md](docs/PROCESS-GUARD.md)** -- FSM enforcement, pre-commit hooks
-2. **[VALIDATION.md](docs/VALIDATION.md)** -- Lint rules, DoD checks, anti-patterns
+1. **[Annotation Reference](reference/ANNOTATION-REFERENCE.md)** -- Annotation mechanics and tag reference
+2. **[Session Workflow Guide](reference/SESSION-WORKFLOW-GUIDE.md)** -- Planning, Design, Implementation workflows
+3. **[Process API Reference](reference/PROCESS-API-REFERENCE.md)** -- CLI command reference with flags and examples
+4. **[Process Guard Reference](reference/PROCESS-GUARD-REFERENCE.md)** -- Pre-commit hooks, error codes, programmatic API
 
 ---
 
 ## Document Roles
 
-| Document            | Audience   | Focus                                      |
-| ------------------- | ---------- | ------------------------------------------ |
-| README.md           | Everyone   | Quick start, value proposition             |
-| METHODOLOGY.md      | Everyone   | Why -- core thesis, principles             |
-| CONFIGURATION.md    | Users      | Setup -- presets, tags, config             |
-| ARCHITECTURE.md     | Developers | How -- pipeline, codecs, schemas           |
-| PROCESS-API.md      | AI/Devs    | Data API CLI query interface               |
-| SESSION-GUIDES.md   | AI/Devs    | Workflow -- day-to-day usage               |
-| GHERKIN-PATTERNS.md | Writers    | Specs -- writing effective Gherkin         |
-| PROCESS-GUARD.md    | Team Leads | Governance -- enforcement rules            |
-| VALIDATION.md       | CI/CD      | Quality -- automated checks                |
-| TAXONOMY.md         | Reference  | Lookup -- tag taxonomy and API             |
-| ANNOTATION-GUIDE.md | Developers | Reference -- annotation mechanics          |
-| PRODUCT-AREAS.md    | Everyone   | Generated -- product area overviews        |
-| DECISIONS.md        | Developers | Generated -- architecture decisions        |
-| BUSINESS-RULES.md   | Developers | Generated -- business rules and invariants |
+| Document                | Audience   | Focus                                            |
+| ----------------------- | ---------- | ------------------------------------------------ |
+| ARCHITECTURE.md         | Developers | Architecture diagram from source annotations     |
+| PRODUCT-AREAS.md        | Everyone   | Product area overviews with live statistics      |
+| DECISIONS.md            | Developers | Architecture Decision Records                    |
+| BUSINESS-RULES.md       | Developers | Domain constraints and invariants                |
+| TAXONOMY.md             | Reference  | Tag taxonomy structure and format types          |
+| VALIDATION-RULES.md     | CI/CD      | Process Guard validation rules and FSM reference |
+| CHANGELOG-GENERATED.md  | Everyone   | Project changelog from release specs             |
+| Annotation Reference    | Developers | Annotation mechanics, shape extraction           |
+| Session Workflow Guide  | AI/Devs    | Session decision trees and workflow checklists   |
+| Process API Reference   | AI/Devs    | CLI command reference with flags and examples    |
+| Process API Recipes     | AI/Devs    | CLI workflow recipes and session guides          |
+| Process Guard Reference | Team Leads | Pre-commit hooks, error codes, programmatic API  |
+| Architecture Codecs     | Developers | All codecs with factory patterns and options     |
+| Architecture Types      | Developers | MasterDataset interface and type shapes          |
 
 ---
 
@@ -97,53 +99,46 @@
 
 ## Document Inventory
 
-### Getting Started
+### Overview
 
-| Document                               | Description                                      | Audience |
-| -------------------------------------- | ------------------------------------------------ | -------- |
-| [README](README.md)                    | Installation, quick start, value proposition     | Everyone |
-| [Configuration](docs/CONFIGURATION.md) | Presets, tag prefixes, config files              | Users    |
-| [Methodology](docs/METHODOLOGY.md)     | Core thesis, dual-source architecture principles | Everyone |
-
-### Architecture
-
-| Document                                         | Description                                              | Audience   |
-| ------------------------------------------------ | -------------------------------------------------------- | ---------- |
-| [Architecture](docs/ARCHITECTURE.md)             | Four-stage pipeline, codecs, MasterDataset, schemas      | Developers |
-| [Product Areas](docs-live/PRODUCT-AREAS.md)      | Product area overviews with live statistics and diagrams | Everyone   |
-| [Architecture Decisions](docs-live/DECISIONS.md) | ADRs extracted from decision specs                       | Developers |
-
-### Development Workflow
-
-| Document                                 | Description                                        | Audience |
-| ---------------------------------------- | -------------------------------------------------- | -------- |
-| [Session Guides](docs/SESSION-GUIDES.md) | Planning, Design, Implementation session workflows | AI/Devs  |
-| [Process API](docs/PROCESS-API.md)       | Data API CLI query interface for session context   | AI/Devs  |
-
-### Authoring
-
-| Document                                     | Description                                              | Audience   |
-| -------------------------------------------- | -------------------------------------------------------- | ---------- |
-| [Gherkin Patterns](docs/GHERKIN-PATTERNS.md) | Writing effective Gherkin specs, Rule blocks, DataTables | Writers    |
-| [Annotation Guide](docs/ANNOTATION-GUIDE.md) | Annotation mechanics, shape extraction, tag reference    | Developers |
-| [Taxonomy](docs/TAXONOMY.md)                 | Tag taxonomy structure and format types                  | Reference  |
+| Document                            | Description                                              | Audience   |
+| ----------------------------------- | -------------------------------------------------------- | ---------- |
+| [Architecture](ARCHITECTURE.md)     | Architecture diagram from source annotations             | Developers |
+| [Product Areas](PRODUCT-AREAS.md)   | Product area overviews with live statistics and diagrams | Everyone   |
+| [Taxonomy](TAXONOMY.md)             | Tag taxonomy configuration and format types              | Reference  |
+| [Changelog](CHANGELOG-GENERATED.md) | Project changelog from release specs                     | Everyone   |
 
 ### Governance
 
-| Document                                      | Description                                        | Audience   |
-| --------------------------------------------- | -------------------------------------------------- | ---------- |
-| [Process Guard](docs/PROCESS-GUARD.md)        | FSM enforcement, pre-commit hooks, error codes     | Team Leads |
-| [Validation](docs/VALIDATION.md)              | Lint rules, DoD checks, anti-pattern detection     | CI/CD      |
-| [Business Rules](docs-live/BUSINESS-RULES.md) | Business rules and invariants extracted from specs | Developers |
+| Document                                | Description                                          | Audience   |
+| --------------------------------------- | ---------------------------------------------------- | ---------- |
+| [Decisions](DECISIONS.md)               | Architecture Decision Records extracted from specs   | Developers |
+| [Business Rules](BUSINESS-RULES.md)     | Domain constraints and invariants from feature files | Developers |
+| [Validation Rules](VALIDATION-RULES.md) | Process Guard validation rules and FSM reference     | CI/CD      |
 
-### Reference
+### Reference Guides
 
-| Document                                                              | Description                                   | Audience   |
-| --------------------------------------------------------------------- | --------------------------------------------- | ---------- |
-| [Architecture Codecs](docs-live/reference/ARCHITECTURE-CODECS.md)     | All codecs with factory patterns and options  | Developers |
-| [Architecture Types](docs-live/reference/ARCHITECTURE-TYPES.md)       | MasterDataset interface and type shapes       | Developers |
-| [Process API Reference](docs-live/reference/PROCESS-API-REFERENCE.md) | CLI command reference with flags and examples | AI/Devs    |
-| [Process API Recipes](docs-live/reference/PROCESS-API-RECIPES.md)     | CLI workflow recipes and session guides       | AI/Devs    |
+| Document                                                        | Description                                           | Audience   |
+| --------------------------------------------------------------- | ----------------------------------------------------- | ---------- |
+| [Annotation Reference](reference/ANNOTATION-REFERENCE.md)       | Annotation mechanics, shape extraction, tag reference | Developers |
+| [Session Workflow Guide](reference/SESSION-WORKFLOW-GUIDE.md)   | Planning, Design, Implementation session workflows    | AI/Devs    |
+| [Process API Reference](reference/PROCESS-API-REFERENCE.md)     | CLI command reference with flags and examples         | AI/Devs    |
+| [Process API Recipes](reference/PROCESS-API-RECIPES.md)         | CLI workflow recipes and session guides               | AI/Devs    |
+| [Process Guard Reference](reference/PROCESS-GUARD-REFERENCE.md) | Pre-commit hooks, error codes, programmatic API       | Team Leads |
+| [Architecture Codecs](reference/ARCHITECTURE-CODECS.md)         | All codecs with factory patterns and options          | Developers |
+| [Architecture Types](reference/ARCHITECTURE-TYPES.md)           | MasterDataset interface and type shapes               | Developers |
+
+### Product Area Details
+
+| Document                                        | Description                                        | Audience   |
+| ----------------------------------------------- | -------------------------------------------------- | ---------- |
+| [Annotation](product-areas/ANNOTATION.md)       | Annotation product area patterns and statistics    | Developers |
+| [Configuration](product-areas/CONFIGURATION.md) | Configuration product area patterns and statistics | Users      |
+| [Core Types](product-areas/CORE-TYPES.md)       | Core types product area patterns and statistics    | Developers |
+| [Data API](product-areas/DATA-API.md)           | Data API product area patterns and statistics      | AI/Devs    |
+| [Generation](product-areas/GENERATION.md)       | Generation product area patterns and statistics    | Developers |
+| [Process](product-areas/PROCESS.md)             | Process product area patterns and statistics       | Team Leads |
+| [Validation](product-areas/VALIDATION.md)       | Validation product area patterns and statistics    | CI/CD      |
 
 ---
 
