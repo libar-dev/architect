@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:EnhancedIndexGeneration
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:35
 @libar-docs-effort:2w
 @libar-docs-product-area:Generation
