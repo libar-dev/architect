@@ -70,7 +70,7 @@ Feature: Session Guides as Annotated Module Source
       | Add workflow to Phase 25 claude-section enum | complete | delivery-process/specs/claude-module-generation.feature | No | n/a |
       | Add claude-module and claude-section:workflow tags to this spec | complete | delivery-process/specs/session-guides-module-source.feature | No | n/a |
       | Generated _claude-md/workflow/session-workflows.md replaces hand-written version | complete | _claude-md/workflow/session-workflows.md | No | n/a |
-      | Generated _claude-md/workflow/fsm-handoff.md replaces hand-written version | complete | _claude-md/workflow/session-workflows.md | No | n/a |
+      | Generated _claude-md/workflow/fsm-handoff.md replaces hand-written version | complete | _claude-md/workflow/fsm-handoff.md | No | n/a |
       | CLAUDE.md Session Workflows section replaced with modular-claude-md include | complete | CLAUDE.md | No | n/a |
 
   # ===========================================================================

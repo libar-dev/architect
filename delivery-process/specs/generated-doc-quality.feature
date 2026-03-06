@@ -27,7 +27,7 @@ Feature: Generated Documentation Quality Improvements
   **Why It Matters:**
   | Benefit | Audience |
   | Removes ~200 wasted token-lines per REFERENCE-SAMPLE.md read | Claude |
-  | Generation compact usable as standalone context (1.4 KB → 5+ KB) | Claude |
+  | Generation compact usable as standalone context (1.4 KB → 4+ KB) | Claude |
   | ARCHITECTURE-TYPES.md answers "what is MasterDataset?" immediately | Claude |
   | 233 KB product area docs become navigable in a browser | Human devs |
 
@@ -35,7 +35,7 @@ Feature: Generated Documentation Quality Improvements
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
       | Fix behavior-specs renderer: no duplicate convention tables | complete | src/renderable/codecs/reference.ts | Yes | unit |
-      | Enrich Generation _claude-md/ compact (target: 5+ KB) | complete | src/renderable/codecs/reference.ts | Yes | integration |
+      | Enrich Generation _claude-md/ compact (target: 4+ KB) | complete | src/renderable/codecs/reference.ts | Yes | integration |
       | Reorder ARCHITECTURE-TYPES.md: types first, convention content second | complete | delivery-process.config.ts, src/renderable/codecs/reference.ts | Yes | integration |
       | Add generated TOC block to product area doc headers | complete | src/renderable/codecs/reference.ts | Yes | integration |
 

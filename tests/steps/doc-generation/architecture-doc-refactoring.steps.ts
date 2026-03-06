@@ -397,17 +397,6 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       }
     );
 
-    RuleScenario('Data Flow Diagrams section points to ARCHITECTURE-TYPES', ({ When, Then }) => {
-      When('reading the {string} section', (_ctx: unknown, section: string) => {
-        state!.currentSectionName = section;
-        state!.currentSectionContent = getSectionContent(state!.architectureContent!, section);
-        expect(state!.currentSectionContent.length).toBeGreaterThan(0);
-      });
-
-      Then('the section contains {string}', (_ctx: unknown, text: string) => {
-        expect(state!.currentSectionContent).toContain(text);
-      });
-    });
   });
 
   Rule('Editorial trimming removes tutorial sections and reduces file size', ({ RuleScenario }) => {

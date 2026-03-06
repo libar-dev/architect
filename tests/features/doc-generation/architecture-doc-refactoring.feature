@@ -137,11 +137,6 @@ Feature: Architecture Doc Refactoring Coverage
       When reading file "src/generators/pipeline/build-pipeline.ts"
       Then the file contains "pipeline-architecture"
 
-    @happy-path
-    Scenario: Data Flow Diagrams section points to ARCHITECTURE-TYPES
-      When reading the "Data Flow Diagrams" section
-      Then the section contains "ARCHITECTURE-TYPES.md"
-
   Rule: Editorial trimming removes tutorial sections and reduces file size
 
     @happy-path

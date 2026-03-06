@@ -6,7 +6,7 @@ Quick reference for choosing and running the right validation command.
 
 ## Which Command Do I Run?
 
-```
+```text
 Need to check annotation quality?
 ├─ Yes → lint-patterns
 │
@@ -91,7 +91,7 @@ pnpm lint:steps --strict
 - Step definition anti-patterns (regex patterns, `{phrase}` usage, repeated registrations)
 - Cross-file mismatches (ScenarioOutline param pattern, missing And/Rule destructuring)
 
-12 rules across 3 categories (8 error, 4 warning). For the full validation tool suite overview, see [Which Command Do I Run?](#which-command-do-i-run) above.
+12 rules across 3 categories (9 error, 3 warning). For the full validation tool suite overview, see [Which Command Do I Run?](#which-command-do-i-run) above.
 
 ### Feature File Rules
 

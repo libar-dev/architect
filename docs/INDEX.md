@@ -30,7 +30,7 @@
 | Query process state via CLI    | [PROCESS-API.md](./PROCESS-API.md)           | 1-464  |
 | Understand the taxonomy        | [TAXONOMY.md](./TAXONOMY.md)                 | 1-105  |
 | Learn annotation patterns      | [ANNOTATION-GUIDE.md](./ANNOTATION-GUIDE.md) | 1-268  |
-| Review the changelog           | [CHANGELOG.md](../CHANGELOG.md)              | 1-26   |
+| Review the changelog           | [CHANGELOG.md](../CHANGELOG.md)              | 1-31   |
 | Security policy                | [SECURITY.md](../SECURITY.md)                | 1-21   |
 
 ---

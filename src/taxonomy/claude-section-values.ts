@@ -4,6 +4,7 @@
  * Each value maps to a subdirectory under `_claude-md/` where
  * generated modules are written.
  *
+ * @libar-docs
  * @see ClaudeModuleGeneration spec (Phase 25)
  */
 

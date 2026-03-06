@@ -431,7 +431,7 @@ const CONTENT_HEADER_PATTERNS = [
   /\*\*Context:\*\*\s*/,
 ] as const;
 
-const NEXT_HEADER_PATTERN = /\n\s*(\*\*[A-Z]|^\|)/m;
+const NEXT_HEADER_PATTERN = /\n\s*(?:\*\*[A-Z]|\|)/m;
 
 /**
  * Extract a compact description from the feature
