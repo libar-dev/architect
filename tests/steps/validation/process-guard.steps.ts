@@ -359,7 +359,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // invalid-status-transition Rule
   // ===========================================================================
 
-  Rule('Status transitions must follow PDR-005 FSM', ({ RuleScenarioOutline }) => {
+  Rule('Status transitions must follow PDR-005 FSM', ({ RuleScenario, RuleScenarioOutline }) => {
     RuleScenarioOutline(
       'Valid transitions pass validation',
       ({ Given, When, And, Then }, variables: { from: string; to: string }) => {
@@ -432,6 +432,54 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('the suggestion contains valid transitions', () => {
           const violation = getViolationForRule('invalid-status-transition');
           expect(violation!.suggestion).toBeDefined();
+        });
+      }
+    );
+
+    RuleScenario(
+      'Existing file with unlock-reason bypasses FSM check',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a file "specs/feature.feature" with status {string}',
+          (_ctx: unknown, status: string) => {
+            const fileState = createFileState(
+              'specs/feature.feature',
+              status as ProcessStatusValue
+            );
+            state!.files.set('specs/feature.feature', fileState);
+            state!.currentFile = 'specs/feature.feature';
+          }
+        );
+
+        And('the file has unlock-reason {string}', (_ctx: unknown, reason: string) => {
+          const existing = state!.files.get(state!.currentFile)!;
+          const updated = createFileState(existing.relativePath, existing.status, {
+            deliverables: existing.deliverables,
+            hasUnlockReason: true,
+            unlockReason: reason,
+          });
+          state!.files.set(state!.currentFile, updated);
+        });
+
+        When(
+          'the status changes to {string} with unlock-reason',
+          (_ctx: unknown, toStatus: string) => {
+            state!.modifiedFiles.push(state!.currentFile);
+            state!.statusTransitions.set(state!.currentFile, {
+              from: 'roadmap' as ProcessStatusValue,
+              to: toStatus as ProcessStatusValue,
+              hasUnlockReason: true,
+            });
+          }
+        );
+
+        And('validating changes', () => {
+          executeValidation();
+        });
+
+        Then('no "invalid-status-transition" violation is reported', () => {
+          const violation = getViolationForRule('invalid-status-transition');
+          expect(violation).toBeUndefined();
         });
       }
     );

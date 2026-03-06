@@ -122,6 +122,14 @@ Feature: Process Guard Linter
         | completed | roadmap   |
         | completed | deferred  |
 
+    @rule:invalid-status-transition
+    Scenario: Existing file with unlock-reason bypasses FSM check
+      Given a file "specs/feature.feature" with status "roadmap"
+      And the file has unlock-reason "Retroactive-completion"
+      When the status changes to "completed" with unlock-reason
+      And validating changes
+      Then no "invalid-status-transition" violation is reported
+
   # ==========================================================================
   # scope-creep Rule
   # ==========================================================================
