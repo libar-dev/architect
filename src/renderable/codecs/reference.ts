@@ -104,7 +104,6 @@ import {
   extractConventionsFromPatterns,
   type ConventionBundle,
 } from './convention-extractor.js';
-import type { BusinessRuleAnnotations } from './helpers.js';
 import { parseBusinessRuleAnnotations, truncateText } from './helpers.js';
 import { extractShapesFromDataset, filterShapesBySelectors } from './shape-matcher.js';
 import type { ShapeSelector } from './shape-matcher.js';
