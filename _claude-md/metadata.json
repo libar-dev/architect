@@ -17,6 +17,17 @@
       ]
     },
     {
+      "title": "Context Gathering Protocol",
+      "tags": ["core"],
+      "subsections": [
+        {
+          "path": "core/context-protocol.md",
+          "tags": ["core"],
+          "description": "Mandatory API-first context gathering rules and PR preparation recipes"
+        }
+      ]
+    },
+    {
       "title": "Common Commands",
       "tags": ["core"],
       "subsections": [
@@ -141,11 +152,11 @@
     },
     {
       "title": "Guides",
-      "tags": ["core"],
+      "tags": ["api-reference"],
       "subsections": [
         {
           "path": "guides/product-area-enrichment.md",
-          "tags": ["core"],
+          "tags": ["api-reference"],
           "description": "Workflow for adding live diagrams and enriched intros to product area docs"
         }
       ]

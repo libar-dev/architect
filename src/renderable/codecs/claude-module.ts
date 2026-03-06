@@ -17,7 +17,7 @@
  *
  * ### Content Extraction
  *
- * - Feature description → module introduction (Problem/Solution)
+ * - Feature description → skipped (meta-documentation, not operational content)
  * - Rule: blocks → H4 sections with invariant + rationale
  * - Scenario Outline Examples → decision tables
  * - Tables in Rule descriptions → preserved as-is
@@ -206,13 +206,10 @@ function buildModuleFile(
   options: Required<ClaudeModuleCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
-  const featureDescription = pattern.directive.description;
 
-  // Extract Problem/Solution from feature description
-  const descSections = extractDescriptionSections(featureDescription);
-  if (descSections.length > 0) {
-    sections.push(...descSections);
-  }
+  // Skip Feature description (Problem/Solution preamble) — it is meta-documentation
+  // about why the spec exists, not operational content. Only Rule blocks contain
+  // the actual invariants and guidance needed in _claude-md/ modules.
 
   // Rule blocks → H4 sections
   if (pattern.rules && pattern.rules.length > 0) {
@@ -247,40 +244,6 @@ function buildModuleFile(
 // ═══════════════════════════════════════════════════════════════════════════
 // Content Extractors
 // ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * Extract Problem/Solution and tables from feature description.
- */
-function extractDescriptionSections(description: string): SectionBlock[] {
-  if (!description || description.trim().length === 0) {
-    return [];
-  }
-
-  const sections: SectionBlock[] = [];
-  const lines = description.trim().split('\n');
-  const textBlocks: string[] = [];
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    // Stop at Gherkin structural keywords that end the Feature description
-    if (
-      trimmed.startsWith('Background:') ||
-      trimmed.startsWith('Scenario:') ||
-      trimmed.startsWith('Scenario Outline:') ||
-      trimmed.startsWith('Rule:')
-    ) {
-      break;
-    }
-    textBlocks.push(trimmed);
-  }
-
-  const text = textBlocks.join('\n').trim();
-  if (text.length > 0) {
-    sections.push(paragraph(text));
-  }
-
-  return sections;
-}
 
 /**
  * Build a Rule section (H4 heading + invariant + rationale + tables).

@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ClaudeModuleGeneration
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Skip-Feature-description-in-module-output
 @libar-docs-phase:25
 @libar-docs-effort:1.5d
 @libar-docs-product-area:Generation
@@ -152,17 +153,20 @@ Feature: CLAUDE.md Module Generation from Source Annotations
 
   Rule: Module content is extracted from feature file structure
 
-    **Invariant:** The codec must extract content from standard feature file elements:
-    Feature description (Problem/Solution), Rule blocks, and Scenario Outline Examples.
+    **Invariant:** The codec extracts content from Rule blocks and Scenario Outline
+    Examples only. Feature descriptions (Problem/Solution preamble) are skipped because
+    they contain meta-documentation about why the spec exists, not operational content
+    for AI sessions.
 
-    **Rationale:** Behavior specs already contain well-structured, prescriptive content.
-    The extraction preserves structure rather than flattening to prose.
+    **Rationale:** Behavior specs contain well-structured, prescriptive content in Rule
+    blocks. Feature descriptions waste context in compact AI modules — the invariants
+    and rationale in Rule blocks are the actionable content.
 
-    **Verified by:** Feature description becomes intro, Rule names become section headers,
+    **Verified by:** Feature description is excluded, Rule names become section headers,
     Rule descriptions become content, Scenario Outline Examples become tables
 
     @acceptance-criteria @happy-path
-    Scenario: Feature description becomes module introduction
+    Scenario: Feature description is excluded from module output
       Given a feature file with description:
         """gherkin
         Feature: Process Guard
@@ -178,8 +182,8 @@ Feature: CLAUDE.md Module Generation from Source Annotations
         """
       When generating the claude module
       Then the module should start with "### Process Guard"
-      And the module should contain the Problem section
-      And the module should contain the Solution section
+      And the module should not contain the Problem section
+      And the module should not contain the Solution section
 
     @acceptance-criteria @happy-path
     Scenario: Rule blocks become module sections

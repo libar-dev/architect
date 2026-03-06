@@ -41,52 +41,52 @@ This package uses itself as the primary test case:
 - `_claude-md/validation/process-guard.md` → compact AI context
 - `docs/PROCESS-GUARD.md` → detailed human reference
 
-Both generated from the SAME annotated sources. When the POC succeeds here, the pattern applies to the entire monorepo.
-
-#### Session Planning Principle
-
-Features are planned for **reusability across the monorepo**, not for minimal output in this package.
+Both generated from the SAME annotated sources. Features are planned for **reusability across the monorepo**, not for minimal output in this package.
 
 ---
 
-### Target Monorepo
+## Context Gathering Protocol
 
-**Location:** `~/dev-projects/convex-event-sourcing/libar-platform`
+### Context Gathering Protocol (MANDATORY)
 
-The package is actively used as a dev dependency. The monorepo contains:
+**Rule: Always query the Process Data API BEFORE using grep, explore agents, or reading files.**
 
-| Component                 | Purpose                                                                    |
-| ------------------------- | -------------------------------------------------------------------------- |
-| `packages/platform-*`     | 6 platform packages with annotated TypeScript sources                      |
-| `delivery-process/specs/` | Tier 1 roadmap specifications                                              |
-| `docs-living/`            | Generated documentation output (patterns, phases, requirements, decisions) |
+The API returns structured, current data using 5-10x less context than file reads. Annotations and relationships in source files feed the API — invest in annotations, not manual notes.
 
-**Manual docs being replaced:** `~/dev-projects/convex-event-sourcing/docs/` contains 150+ manually maintained files including architecture decisions, pattern theory, roadmap phases, and project management docs—all candidates for code-first generation.
+#### PR / Session Start (run these FIRST)
 
-#### What Gets Generated
+| Step | Command                                                    | What You Get                                |
+| ---- | ---------------------------------------------------------- | ------------------------------------------- |
+| 1    | `pnpm process:query -- overview`                           | Project health, active phases, blockers     |
+| 2    | `pnpm process:query -- scope-validate <pattern> <session>` | Pre-flight: FSM violations, missing deps    |
+| 3    | `pnpm process:query -- context <pattern> --session <type>` | Curated context bundle for the session      |
+| 4    | `pnpm process:query -- files <pattern> --related`          | File reading list with implementation paths |
 
-| Output Type                  | Purpose                                    |
-| ---------------------------- | ------------------------------------------ |
-| `PATTERNS.md` + detail pages | Pattern registry from annotated TypeScript |
-| `ROADMAP.md` + phase files   | Roadmap from Tier 1 feature specs          |
-| `REMAINING-WORK.md`          | Outstanding work summary                   |
-| `CURRENT-WORK.md`            | Active work tracking                       |
-| `DECISIONS.md` + ADRs        | Architecture decision records              |
-| `BUSINESS-RULES.md`          | Business rules from Gherkin                |
+Session types: `planning` (minimal), `design` (full: stubs + deps + deliverables), `implement` (focused: deliverables + FSM + tests).
 
----
+#### When You Need More Context
 
-### Why No Shortcuts
+| Need                    | Command (NOT grep)                          | Why                                         |
+| ----------------------- | ------------------------------------------- | ------------------------------------------- |
+| Find code structure     | `arch context [name]` / `arch layer [name]` | Structured by annotations, not file paths   |
+| Find dependencies       | `dep-tree <pattern>`                        | Shows status of each dependency             |
+| Find business rules     | `rules --pattern <name>`                    | Extracted from Gherkin Rule: blocks         |
+| Find unannotated files  | `unannotated --path <dir>`                  | Catches missing @libar-docs markers         |
+| Check FSM state         | `query getProtectionInfo <status>`          | Protection level + allowed actions          |
+| Check valid transitions | `query getValidTransitionsFrom <status>`    | Valid next states from current status       |
+| Tag inventory           | `tags`                                      | Counts per tag and value across all sources |
+| Annotation coverage     | `arch coverage`                             | Files with/without @libar-docs annotations  |
 
-Every shortcut in this package ripples across:
+#### Why Annotations Beat Grep
 
-- Multiple platform packages with annotated sources
-- Many Gherkin feature specifications
-- All generated documentation files
+- **Structured**: `arch context` groups by bounded context; grep returns unstructured matches
+- **Queryable**: `rules --only-invariants` extracts 140+ business rules; grep can't parse Rule: blocks
+- **Feed generation**: Annotations produce generated docs; grep results are ephemeral
+- **Discoverable**: `unannotated --path` finds gaps; grep doesn't know what's missing
 
-**Test rigor matches mission-critical status.** A bug in the codec system means many files generate incorrectly. A gap in the extractor means patterns are missed across source files.
+**When adding new code:** Add `@libar-docs` annotations and relationship tags (`@libar-docs-depends-on`, `@libar-docs-uses`) so future sessions can discover the code via API queries instead of grep.
 
-The validation in this repo is a **proof of concept**. When it succeeds here, the same validation applies to the entire monorepo's delivery workflow.
+Full CLI reference: `pnpm process:query -- --help`
 
 ---
 
@@ -107,18 +107,12 @@ pnpm test <pattern>     # Run tests matching pattern (e.g., pnpm test scanner)
 # Linting
 pnpm lint               # ESLint on src and tests
 pnpm lint:fix           # Auto-fix lint issues
-pnpm lint-patterns      # Lint pattern annotations in src/**/*.ts
 
-# Validation
-pnpm validate:patterns  # Cross-source pattern validation
-pnpm validate:dod       # Definition of Done validation
-pnpm validate:all       # All validations including anti-patterns
+# Validation + Documentation
+pnpm validate:all       # All validations including anti-patterns and DoD
+pnpm docs:all           # Generate all doc types
 
-# Documentation generation
-pnpm docs:patterns      # Generate pattern docs
-pnpm docs:all           # Generate all doc types (patterns, roadmap, remaining, changelog)
-
-# Data API (see "Data API CLI" section for full reference)
+# Data API (see Context Gathering Protocol above)
 pnpm process:query -- --help                              # All subcommands and options
 pnpm process:query -- context <pattern> --session design  # Session context bundle
 pnpm process:query -- overview                            # Project health summary
@@ -134,54 +128,7 @@ Query delivery process state directly from the terminal. **Use this instead of r
 
 **Run `pnpm process:query -- --help` for the full command reference**, including workflow recipes, session types, architecture queries, output modifiers, and available API methods.
 
-#### Session Start Recipe
-
-1. `pnpm process:query -- overview` — project health (progress, active phases, blockers)
-2. `pnpm process:query -- scope-validate <pattern> <session-type>` — pre-flight check (FSM, deps, prereqs)
-3. `pnpm process:query -- context <pattern> --session <type>` — curated context bundle
-
-Session types: `planning` (minimal), `design` (full: stubs + deps + deliverables), `implement` (focused: deliverables + FSM + tests).
-
-#### Key Commands
-
-| Command                 | When to Use                                                                           |
-| ----------------------- | ------------------------------------------------------------------------------------- |
-| `scope-validate`        | **Highest impact** — prevents wasted sessions by catching violations before you start |
-| `context --session`     | Primary context gathering — replaces manual file reads                                |
-| `dep-tree <pattern>`    | Understand dependency chains before implementation                                    |
-| `list --status roadmap` | Find available patterns to work on                                                    |
-| `arch blocking`         | Find patterns stuck on incomplete dependencies                                        |
-| `stubs --unresolved`    | Find design stubs missing implementations                                             |
-| `rules`                 | Business rules and invariants from Gherkin `Rule:` blocks                             |
-| `files <pattern>`       | File reading list with implementation paths — replaces manual path discovery          |
-| `decisions <pattern>`   | Design decisions (AD-N) from stub descriptions                                        |
-| `pdr <number>`          | Cross-reference patterns mentioning a PDR number                                      |
-| `handoff --pattern`     | Capture session-end state for multi-session work                                      |
-
-#### Annotation Exploration
-
-Run these **before** making annotation changes — they prevent debugging cycles:
-
-| Command                    | When to Use                                                                   |
-| -------------------------- | ----------------------------------------------------------------------------- |
-| `unannotated --path <dir>` | Find TS files missing `@libar-docs` — **run first** in any enrichment session |
-| `tags`                     | Tag usage inventory (counts per tag and value)                                |
-| `sources`                  | File inventory by type (TS, Gherkin, Stubs)                                   |
-| `query getPattern <name>`  | Full pattern JSON including `extractedShapes` and `productArea`               |
-
-**Lesson learned:** `unannotated --path src/types` would have immediately caught missing `@libar-docs` annotations on `result.ts` and `errors.ts` — saving ~30 minutes of debugging why shapes weren't appearing in generated docs.
-
-#### Architecture Queries
-
-Query architectural structure directly — avoids explore agents for structural questions:
-
-| Command               | When to Use                                          |
-| --------------------- | ---------------------------------------------------- |
-| `arch coverage`       | Annotation completeness across the project           |
-| `arch context [name]` | Patterns in bounded context (list all if no name)    |
-| `arch layer [name]`   | Patterns in architecture layer (list all if no name) |
-| `arch dangling`       | Broken references — pattern names that don't resolve |
-| `arch orphans`        | Isolated patterns with no relationships              |
+See the **Context Gathering Protocol** section above for mandatory session start commands and query recipes.
 
 #### Tips
 
@@ -215,31 +162,22 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 - **Pipeline Factory**: Shared `buildMasterDataset()` in `src/generators/pipeline/build-pipeline.ts` — all consumers (orchestrator, process-api, validate-patterns) call this instead of wiring inline pipelines. Per-consumer behavior via `PipelineOptions`.
 - **Single Read Model** (ADR-006): MasterDataset is the sole read model. No consumer re-derives data from raw scanner/extractor output. Anti-patterns: Parallel Pipeline, Lossy Local Type, Re-derived Relationship.
 
-### Module Structure
+**Live module inventory:** `pnpm process:query -- arch context` and `pnpm process:query -- arch layer`
 
-| Module                     | Purpose                                                              |
-| -------------------------- | -------------------------------------------------------------------- |
-| `src/config/`              | Configuration factory, presets (generic, ddd-es-cqrs)                |
-| `src/taxonomy/`            | Tag definitions - categories, status values, format types            |
-| `src/scanner/`             | TypeScript and Gherkin file scanning                                 |
-| `src/extractor/`           | Pattern extraction from AST/Gherkin                                  |
-| `src/generators/`          | Document generators, orchestrator, and pipeline factory              |
-| `src/generators/pipeline/` | `buildMasterDataset()` factory, `mergePatterns()`, dataset transform |
-| `src/renderable/`          | Markdown codec system                                                |
-| `src/validation/`          | FSM validation, DoD checks, anti-patterns                            |
-| `src/lint/`                | Pattern linting and process guard                                    |
-| `src/api/`                 | Query layer: Data API CLI, business rules query (`rules-query.ts`)   |
-| `delivery-process/stubs/`  | Design session code stubs (outside src/ for TS/ESLint isolation)     |
+### Decision Specs
 
-**Live inventory:** `pnpm process:query -- arch context` and `pnpm process:query -- arch layer` reflect the actual annotated codebase structure.
+Architecture and process decisions are recorded as annotated Gherkin specs in `delivery-process/decisions/`:
 
-### Three Presets
+| Spec    | Key Decision                                                               |
+| ------- | -------------------------------------------------------------------------- |
+| ADR-001 | Taxonomy canonical values — tag registry is the single source of truth     |
+| ADR-002 | Gherkin-only testing — no `.test.ts` files, all tests are `.feature`       |
+| ADR-003 | Source-first pattern architecture — code drives docs, not the reverse      |
+| ADR-005 | Codec-based markdown rendering — Zod codecs transform data to markdown     |
+| ADR-006 | Single read model — MasterDataset is the sole read model for all consumers |
+| PDR-001 | Session workflow commands — Process Data API CLI design decisions          |
 
-| Preset                    | Tag Prefix     | Categories | Use Case                           |
-| ------------------------- | -------------- | ---------- | ---------------------------------- |
-| `libar-generic` (default) | `@libar-docs-` | 3          | Simple projects (this package)     |
-| `ddd-es-cqrs`             | `@libar-docs-` | 21         | DDD/Event Sourcing architectures   |
-| `generic`                 | `@docs-`       | 3          | Simple projects with @docs- prefix |
+Query decisions: `pnpm process:query -- decisions <pattern>`
 
 ---
 
@@ -371,30 +309,16 @@ describeFeature(feature, ({ Background, Rule }) => {
 });
 ```
 
-### Docstring Pattern for Pipes
-
-Use docstrings when Gherkin content contains pipe characters:
-
-```typescript
-Then('the output contains the table:', (_ctx: unknown, docString: string) => {
-  for (const line of docString.trim().split('\n')) {
-    expect(state!.markdown).toContain(line.trim());
-  }
-});
-```
-
 ### vitest-cucumber Quirks & Constraints
 
 The library behaves differently than standard Cucumber.js.
 
-| Issue                    | Description                                                                                    | Fix                                                                                                     |
-| ------------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Repeated Step Patterns   | Using exact same step pattern twice in one scenario fails to match or overwrites registrations | Avoid generic regex steps if reused. Use strict string matching. Consolidate assertions into DataTables |
-| `{phrase}` not supported | vitest-cucumber does not support `{phrase}` type                                               | Use `{string}` and wrap value in quotes in Feature file                                                 |
-| Docstring stripping      | Markdown headers (`## Header`) inside docstrings may be stripped or parsed incorrectly         | Hardcode complex multi-line strings in step definition TS file                                          |
-| Feature descriptions     | Starting a description line with `Given`, `When`, or `Then` breaks the parser                  | Ensure free-text descriptions do not start with reserved Gherkin keywords                               |
-| Multiple And same text   | Multiple `And` steps with identical text (different values) fail                               | Consolidate into single step with DataTable                                                             |
-| No regex step patterns   | `Then(/pattern/, ...)` throws `StepAbleStepExpressionError`                                    | Use only string patterns with `{string}`, `{int}` placeholders                                          |
+| Issue                  | Description                                                                            | Fix                                                                       |
+| ---------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Docstring stripping    | Markdown headers (`## Header`) inside docstrings may be stripped or parsed incorrectly | Hardcode complex multi-line strings in step definition TS file            |
+| Feature descriptions   | Starting a description line with `Given`, `When`, or `Then` breaks the parser          | Ensure free-text descriptions do not start with reserved Gherkin keywords |
+| Multiple And same text | Multiple `And` steps with identical text (different values) fail                       | Consolidate into single step with DataTable                               |
+| No regex step patterns | `Then(/pattern/, ...)` throws `StepAbleStepExpressionError`                            | Use only string patterns with `{string}`, `{int}` placeholders            |
 
 ### Gherkin Parser: Hash Comments in Descriptions (CRITICAL)
 
@@ -455,15 +379,6 @@ Issues discovered during step definition implementation:
 | `behaviorFileVerified` undefined  | Patterns created without explicit verification status        | Add `behaviorFileVerified: true/false` to `createTestPattern()` when testing traceability         |
 | Discovery tags missing            | SessionFindingsCodec shows "No Findings"                     | Pass `discoveredGaps`, `discoveredImprovements`, `discoveredLearnings` to factory                 |
 
-### Codec vs. Spec Reality Gap
-
-Tier 1 specs are often idealistic drafts. The code is the reality.
-
-| Issue                     | Description                                                                                                   | Fix                                                                                                                       |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Output Structure Mismatch | Spec expects "Phase 1" but Codec outputs derived name, or Spec expects table that Codec suppresses when empty | Run debug script to dump actual `RenderableDocument` JSON structure. Align Feature file to Codec's actual behavior        |
-| Data Normalization        | Feature files use plain language (`planned`, `p1`) vs. Schema requirements (`roadmap`, `pattern-00...`)       | Implement helper functions: `normalizeStatus(str)` maps 'planned' → 'roadmap'. `generatePatternId(n)` generates valid IDs |
-
 ### Coding & Linting Standards
 
 The project has strict linting rules. Save time by coding defensively.
@@ -473,22 +388,7 @@ The project has strict linting rules. Save time by coding defensively.
 | Unused variables: `(_ctx, count, text)` throws lint errors if `count` isn't used | Prefix **immediately**: `(_ctx, _count, text)`                                    |
 | Type safety: `ListItem` is an object, not a string. `item + '\n'` throws errors  | Check types before concatenation: `(typeof item === 'string' ? item : item.text)` |
 
-### Deliverable Status Taxonomy (CRITICAL)
-
-Deliverable status is enforced by `z.enum()` at schema level. The 6 canonical values are defined in `src/taxonomy/deliverable-status.ts`:
-
-| Value         | Meaning             | Helper                            |
-| ------------- | ------------------- | --------------------------------- |
-| `complete`    | Work is done        | `isDeliverableStatusComplete()`   |
-| `in-progress` | Work is ongoing     | `isDeliverableStatusInProgress()` |
-| `pending`     | Work hasn't started | `isDeliverableStatusPending()`    |
-| `deferred`    | Work postponed      |                                   |
-| `superseded`  | Replaced by another |                                   |
-| `n/a`         | Not applicable      |                                   |
-
-**NEVER** use freeform status strings. The Zod schema rejects non-canonical values at parse time.
-
-**Terminal statuses:** `complete`, `n/a`, and `superseded` are terminal per `isDeliverableStatusTerminal()`. Used by DoD validation — `deferred` is NOT terminal.
+**Deliverable statuses:** 6 values enforced by `z.enum()`: `complete`, `in-progress`, `pending`, `deferred`, `superseded`, `n/a`. Terminal: `complete`, `n/a`, `superseded` (NOT `deferred`). NEVER use freeform strings.
 
 ### Efficient Debugging Strategy
 
@@ -507,70 +407,11 @@ console.log(JSON.stringify(doc.sections, null, 2));
 
 - **Do** use `pnpm test remaining-work` (or specific filename) to run focused tests.
 
-### Implementation Workflow Checklist
-
-1. [ ] **Read Feature File:** identify Scenario counts and data types
-2. [ ] **Check Factories:** Ensure `pattern-factories.ts` supports the fields needed (e.g., `phase`, `priority`)
-3. [ ] **Prototype:** Run a `tsx` script to see what the Codec actually outputs for given inputs
-4. [ ] **Adjust Spec:** Update Feature file to match Codec reality (e.g., quotes for lists, valid status names)
-5. [ ] **Write Steps:** Implement steps with `_` prefixes for unused args
-6. [ ] **Verify:** Run specific test file → Run related group → Run full suite
-
 ---
 
 ## Session Workflows
 
 ### SessionGuidesModuleSource
-
-**Problem:**
-CLAUDE.md contains a "Session Workflows" section (~160 lines) that is hand-maintained
-with no link to any annotated source. Three hand-written files in `_claude-md/workflow/`
-(session-workflows.md, session-details.md, fsm-handoff.md) are equally opaque: no
-machine-readable origin, no regeneration from source annotations.
-
-The prior plan proposed tagging ADR-001, ADR-003, and PDR-001 with `@libar-docs-claude-module`
-to make them the source for generated workflow modules. Design analysis revealed this is
-fundamentally flawed: `claude-module` is a file-level tag that pulls ALL Rules from a file,
-but most Rules in those decision specs are irrelevant to session workflows (ADR-001 has 9
-Rules, only 2-3 are workflow-relevant; PDR-001 has 7 Rules about CLI implementation
-decisions, not workflow guidance).
-
-**Solution:**
-This spec file itself becomes the annotated source for session workflow content.
-Session workflow invariants are captured as Rule: blocks here, covering session type
-contracts, FSM protection, execution order, error recovery, and handoff patterns.
-
-Once ClaudeModuleGeneration (Phase 25) ships, adding `@libar-docs-claude-module` and
-`@libar-docs-claude-section:workflow` tags to this spec will cause the codec to produce
-`_claude-md/workflow/` modules automatically. The hand-written files are then deleted
-and the CLAUDE.md section becomes a generated include.
-
-Retain `docs/SESSION-GUIDES.md` (389 lines) as the authoritative public human reference
-deployed to libar.dev. It serves developers with comprehensive checklists and full CLI
-examples — content that cannot be expressed as compact invariants.
-
-Three-layer architecture after Phase 39:
-
-| Layer | Location | Content | Maintenance |
-| Public human reference | docs/SESSION-GUIDES.md | Full checklists, CLI examples, decision trees | Manual (editorial) |
-| Compact AI context | \_claude-md/workflow/ | Invariants, session contracts, FSM reference | Generated from this spec |
-| Machine-queryable source | Process Data API | Rules from this spec via `rules` command | Derived from annotations |
-
-**Why It Matters:**
-| Benefit | How |
-| No CLAUDE.md drift | Session workflow section generated, not hand-authored |
-| Single annotated source | This spec owns all session workflow invariants |
-| Correct audience alignment | Public guide stays in docs/, AI context in \_claude-md/ |
-| Process API coverage | Session workflow content queryable via `pnpm process:query -- rules` |
-| Immediately useful | Rule: blocks are queryable today, generation follows when Phase 25 ships |
-
-**Design Session Findings (2026-03-05):**
-| Finding | Impact |
-| claude-module is file-level, not Rule-level | Cannot selectively tag individual Rules in ADR/PDR files |
-| ADR-001 has 9 Rules, only 2-3 workflow-relevant | Tagging ADR-001 would create noisy, diluted context |
-| PDR-001 Rules are CLI implementation decisions | Not session workflow guidance, wrong audience |
-| Phase 25 claude-section enum lacks workflow value | Must add workflow to enum before annotation |
-| Self-referential spec is correct source | This spec captures invariants, SESSION-GUIDES.md has editorial content |
 
 #### SESSION-GUIDES.md is the authoritative public human reference
 
@@ -676,25 +517,8 @@ Three-layer architecture after Phase 39:
 
 Process Guard validates delivery workflow changes at commit time using a Decider pattern.
 
-#### 6 Validation Rules
-
-| Rule ID                     | Severity | Description                                         |
-| --------------------------- | -------- | --------------------------------------------------- |
-| `completed-protection`      | error    | Completed specs require `@libar-docs-unlock-reason` |
-| `invalid-status-transition` | error    | Must follow FSM path                                |
-| `scope-creep`               | error    | Active specs cannot add new deliverables            |
-| `session-excluded`          | error    | Cannot modify explicitly excluded files             |
-| `session-scope`             | warning  | File outside session scope                          |
-| `deliverable-removed`       | warning  | Deliverable was removed                             |
-
-#### Protection Levels
-
-| Status      | Protection   | Allowed Actions                | Blocked Actions               |
-| ----------- | ------------ | ------------------------------ | ----------------------------- |
-| `roadmap`   | None         | Full editing, add deliverables | -                             |
-| `deferred`  | None         | Full editing, add deliverables | -                             |
-| `active`    | Scope-locked | Edit existing deliverables     | Adding new deliverables       |
-| `completed` | Hard-locked  | Nothing                        | Any change without unlock tag |
+Query validation rules: `pnpm process:query -- rules --pattern ProcessGuard`
+Query protection levels: `pnpm process:query -- query getProtectionInfo <status>`
 
 #### CLI Usage
 
@@ -711,17 +535,6 @@ lint-process --staged --show-state
 # Override session scope checking
 lint-process --staged --ignore-session
 ```
-
-#### CLI Options
-
-| Flag               | Description                             |
-| ------------------ | --------------------------------------- |
-| `--staged`         | Validate staged files only (pre-commit) |
-| `--all`            | Validate all tracked files (CI)         |
-| `--strict`         | Treat warnings as errors (exit 1)       |
-| `--ignore-session` | Skip session scope validation           |
-| `--show-state`     | Debug: show derived process state       |
-| `--format json`    | Machine-readable JSON output            |
 
 #### Exit Codes
 
@@ -743,16 +556,6 @@ Enforces dual-source architecture ownership between TypeScript and Gherkin files
 | `@libar-docs-quarter`    | Feature files    | TypeScript     | Gherkin owns timeline metadata     |
 | `@libar-docs-team`       | Feature files    | TypeScript     | Gherkin owns ownership metadata    |
 
-#### Single Read Model Anti-Patterns (ADR-006)
-
-| Anti-Pattern            | Signal                                                                              |
-| ----------------------- | ----------------------------------------------------------------------------------- |
-| Parallel Pipeline       | Consumer imports from `scanner/` or `extractor/` instead of consuming MasterDataset |
-| Lossy Local Type        | Local interface with subset of `ExtractedPattern` fields                            |
-| Re-derived Relationship | Building `Map`/`Set` from raw `implements`/`uses` arrays in consumer code           |
-
-**Exception:** `lint-patterns.ts` is a stage-1 consumer (validates annotation syntax, no cross-source resolution).
-
 #### DoD Validation
 
 For patterns with `completed` status, validates:
@@ -760,22 +563,7 @@ For patterns with `completed` status, validates:
 - All deliverables have terminal status (`complete`, `n/a`, or `superseded`) per `isDeliverableStatusTerminal()` — `deferred` is NOT terminal
 - At least one `@acceptance-criteria` scenario exists in the spec
 
-#### Running Validation
-
-```bash
-# Anti-pattern check only
-npx validate-patterns \
-  -i "src/**/*.ts" \
-  -F "specs/**/*.feature" \
-  --anti-patterns
-
-# Full validation with DoD
-npx validate-patterns \
-  -i "src/**/*.ts" \
-  -F "specs/**/*.feature" \
-  --anti-patterns \
-  --dod
-```
+Run: `pnpm validate:all` for full validation including anti-patterns and DoD.
 
 ---
 
@@ -812,16 +600,7 @@ Feature: Process Guard Linter
 | Value-First      | `**Business Value:**`, `**How It Works:**` | TDD-style specs    |
 | Context/Approach | `**Context:**`, `**Approach:**`            | Technical patterns |
 
-#### Tag Conventions
-
-| Tag                    | Purpose                     |
-| ---------------------- | --------------------------- |
-| `@happy-path`          | Primary success scenario    |
-| `@edge-case`           | Boundary conditions         |
-| `@error-handling`      | Error recovery scenarios    |
-| `@validation`          | Input validation rules      |
-| `@acceptance-criteria` | Required for DoD validation |
-| `@integration`         | Cross-component behavior    |
+Tag inventory: `pnpm process:query -- tags` (counts per tag and value across all sources).
 
 #### Rule Block Structure (Mandatory)
 
@@ -871,59 +650,6 @@ Rule: Reservations use atomic claim
 
 Code stubs live in `delivery-process/stubs/{pattern-name}/` — annotated TypeScript with `throw new Error("not yet implemented")`.
 
-#### Rule Block Structure (Mandatory)
-
-Every feature file MUST use `Rule:` blocks with structured descriptions:
-
-```gherkin
-Rule: Reservations prevent race conditions
-
-  **Invariant:** Only one reservation can exist for a given key at a time.
-
-  **Rationale:** Check-then-create patterns have TOCTOU vulnerabilities.
-
-  **Verified by:** Concurrent reservations, Expired reservation cleanup
-
-  @acceptance-criteria @happy-path
-  Scenario: Concurrent reservations
-    ...
-```
-
-| Element            | Purpose                                 | Extracted By             |
-| ------------------ | --------------------------------------- | ------------------------ |
-| `**Invariant:**`   | Business constraint (what must be true) | Business Rules generator |
-| `**Rationale:**`   | Business justification (why it exists)  | Business Rules generator |
-| `**Verified by:**` | Comma-separated scenario names          | Traceability generator   |
-
-#### Feature Description Structure
-
-Choose headers that fit your pattern (flexible, not rigid):
-
-| Structure        | Headers                                    | Best For                  |
-| ---------------- | ------------------------------------------ | ------------------------- |
-| Problem/Solution | `**Problem:**`, `**Solution:**`            | Pain point to fix         |
-| Value-First      | `**Business Value:**`, `**How It Works:**` | TDD-style, Gherkin spirit |
-| Context/Approach | `**Context:**`, `**Approach:**`            | Technical patterns        |
-
-Always include a benefits table:
-
-```gherkin
-**Business Value:**
-| Benefit | Impact |
-| ... | ... |
-```
-
-#### Valid Rich Content
-
-| Content Type  | Syntax                  | Appears in Docs  |
-| ------------- | ----------------------- | ---------------- |
-| Plain text    | Regular paragraphs      | Yes              |
-| Bold/emphasis | `**bold**`, `*italic*`  | Yes              |
-| Tables        | Markdown pipe tables    | Yes              |
-| Lists         | `- item` or `1. item`   | Yes              |
-| DocStrings    | `"""typescript`...`"""` | Yes (code block) |
-| Comments      | `# comment`             | No (ignored)     |
-
 #### Forbidden in Feature Descriptions
 
 | Forbidden           | Why                             | Alternative                      |
@@ -933,41 +659,6 @@ Always include a benefits table:
 | Nested DocStrings   | Gherkin parser error            | Reference code stub file         |
 | `#` at line start   | Gherkin comment — kills parsing | Remove, use `//`, or step DocStr |
 
-#### Description `"""` Blocks vs Step DocStrings (CRITICAL)
-
-**`"""` inside Feature/Rule descriptions is plain text, NOT a DocString.** Only `"""` as step arguments (Given/When/Then) creates real DocStrings. This means description content between `"""` is subject to Gherkin parser rules — including `#` = comment.
-
-**Symptom:** `expected: #EOF, #BackgroundLine... got 'some-content'`
-
-```gherkin
-Rule: My Rule
-
-    """bash
-    # This breaks! Parser sees Gherkin comment, terminates description
-    generate-docs --output docs
-    """
-```
-
-**Workarounds:**
-
-| Approach                    | When to Use                        |
-| --------------------------- | ---------------------------------- |
-| Remove `#` lines            | Simple cases                       |
-| Use `//` for comments       | When comment syntax doesn't matter |
-| Move to step DocString      | When you need code with `#`        |
-| Reference stub file instead | Complex examples (preferred)       |
-
-**Safe pattern — step DocString (content is real DocString, `#` is safe):**
-
-```gherkin
-  Scenario: Example usage
-    Given the following script:
-      """bash
-      # This is safe — real DocString, not description text
-      generate-docs --output docs
-      """
-```
-
 #### Tag Value Constraints
 
 **Tag values cannot contain spaces.** Use hyphens instead:
@@ -976,110 +667,5 @@ Rule: My Rule
 | -------------------------------- | ------------------------------- |
 | `@unlock-reason:Fix for issue`   | `@unlock-reason:Fix-for-issue`  |
 | `@libar-docs-pattern:My Pattern` | `@libar-docs-pattern:MyPattern` |
-
----
-
-## Guides
-
-### Product Area Enrichment Guide
-
-Workflow for adding live Mermaid diagrams, enriched intros, and API Types sections to product area documents in `docs-live/product-areas/`.
-
-**Completed:** Annotation, Configuration, CoreTypes
-**Remaining:** Generation, Validation, DataAPI, Process
-
-#### Pre-Flight (Run First)
-
-```bash
-# 1. Find unannotated TS files in the product area's source directory
-pnpm process:query -- unannotated --path src/<area-dir>
-
-# 2. Check if product area has arch-context mappings
-#    Empty [] means use @libar-docs-include tags instead
-grep -A5 '<AreaName>:' src/renderable/codecs/reference.ts | head -10
-
-# 3. List patterns in the product area
-pnpm process:query -- list --product-area <AreaName> --names-only
-```
-
-#### Step-by-Step Workflow
-
-| Step | Action                                                                   | Why                                          |
-| ---- | ------------------------------------------------------------------------ | -------------------------------------------- |
-| 1    | Add `@libar-docs` to unannotated TS files                                | Scanner ignores files without opt-in marker  |
-| 2    | Add `@libar-docs-include:<scope>` to all feature files                   | Enables diagram scoping via `include` filter |
-| 3    | Add `@libar-docs-depends-on` to feature files                            | Creates relationship edges in diagrams       |
-| 4    | Add `@libar-docs-shape` + `@libar-docs-include` to key type declarations | Populates API Types section                  |
-| 5    | Add `@libar-docs-product-area:<Area>` to TS file annotations             | Routes TS patterns to product area           |
-| 6    | Update `PRODUCT_AREA_META` in `reference.ts` (~line 237)                 | Enriched intro, invariants, `diagramScopes`  |
-| 7    | `pnpm build && pnpm test && pnpm docs:product-areas`                     | Verify end-to-end                            |
-
-#### PRODUCT_AREA_META Entry Structure
-
-```typescript
-AreaName: {
-  question: 'What does this area do?',           // Shown as bold question before intro
-  covers: 'capability1, capability2, capability3', // Comma-separated coverage summary
-  intro: 'Full paragraph describing the area...',  // Rich prose, can use backticks
-  diagramScopes: [
-    { include: ['scope'], diagramType: 'C4Context', title: 'System Overview' },
-    { include: ['scope'], direction: 'LR', title: 'Data Flow' },
-  ],
-  keyInvariants: [
-    'Invariant name: Description with detail',
-  ],
-  keyPatterns: ['Pattern1', 'Pattern2'],
-},
-```
-
-#### DiagramScope Filter Options
-
-Filters are OR'd — a pattern matching ANY filter appears in the diagram:
-
-| Filter                 | Source Tag                      | Best For                                         |
-| ---------------------- | ------------------------------- | ------------------------------------------------ |
-| `include: ['scope']`   | `@libar-docs-include:scope`     | Areas with empty `PRODUCT_AREA_ARCH_CONTEXT_MAP` |
-| `archContext: ['ctx']` | `@libar-docs-arch-context:ctx`  | Areas with existing arch-context mappings        |
-| `patterns: ['Name']`   | Direct pattern name list        | Small, curated diagrams                          |
-| `archLayer: 'domain'`  | `@libar-docs-arch-layer:domain` | Layer-filtered views                             |
-
-#### Common Pitfalls
-
-| Pitfall                                    | Symptom                                            | Fix                                                   |
-| ------------------------------------------ | -------------------------------------------------- | ----------------------------------------------------- |
-| TS file missing `@libar-docs` marker       | Shapes not extracted, pattern absent from registry | Add file-level `@libar-docs` annotation block         |
-| Empty `PRODUCT_AREA_ARCH_CONTEXT_MAP`      | No diagrams render                                 | Use `include` filter in `diagramScopes`               |
-| No relationship tags on patterns           | Diagrams show isolated nodes (no edges)            | Add `@libar-docs-depends-on` to feature files         |
-| TS pattern name collides with Gherkin      | Duplicate pattern error                            | Use different name + `@libar-docs-implements` to link |
-| Declaration merging (`type X` + `const X`) | Shape for type alias not extracted                 | Fixed — `findDeclarations` returns arrays per name    |
-| Generic arrows in `.ts` with `jsx: true`   | Parse error on `<T>(val: T) =>`                    | Fixed — `jsx` flag now based on file extension        |
-
-#### Shape Extraction Prerequisites
-
-For a shape to appear in the API Types section:
-
-1. **File must have `@libar-docs`** opt-in marker (file-level JSDoc)
-2. **File must have `@libar-docs-product-area:<Area>`** to route to product area
-3. **Declaration must have `@libar-docs-shape`** in its JSDoc (declaration-level)
-4. **Declaration must have `@libar-docs-include:<scope>`** matching the `diagramScopes` filter
-5. **File must be `.ts`** (shape extraction uses typescript-estree parser)
-
-Shape extraction works on both exported and non-exported declarations.
-
-#### Verification Checklist
-
-After regenerating docs, verify `docs-live/product-areas/<AREA>.md` has:
-
-- [ ] Enriched intro paragraph (not just 1-2 sentences)
-- [ ] Key Invariants section (3-4 invariants)
-- [ ] Mermaid diagram(s) with nodes AND edges (not isolated nodes)
-- [ ] API Types section with extracted shapes (if TS source declarations were tagged)
-- [ ] Behavior Specifications listing all patterns with invariants and scenarios
-
-```bash
-# Quick verification
-grep -c "mermaid" docs-live/product-areas/<AREA>.md    # Should be >= 2
-grep -c "API Types" docs-live/product-areas/<AREA>.md  # Should be 1
-```
 
 ---
