@@ -217,7 +217,7 @@ Feature: Procedural Guide Codec
       And the other entry targets annotation guide output
       When the codec generates both documents
       Then docs-live/reference/SESSION-WORKFLOW-GUIDE.md is created
-      And docs-live/reference/ANNOTATION-GUIDE.md is created
+      And docs-live/reference/ANNOTATION-REFERENCE.md is created
       And the two files have no duplicated sections
 
     @acceptance-criteria @validation

@@ -87,7 +87,7 @@
 // import { heading, paragraph, code, separator, document } from '../../renderable/schema.js';
 // import { renderToMarkdown } from '../../renderable/render.js';
 
-import type { RecipeGroup, RecipeExample, CommandNarrativeGroup } from './recipe-schema.js';
+import type { RecipeGroup, CommandNarrativeGroup } from './recipe-schema.js';
 
 // =============================================================================
 // Section Building — Recipes
@@ -229,7 +229,7 @@ export interface CliRecipeGeneratorConfig {
    * Contains "Why Use This", Quick Start example, and session decision tree.
    * Configured in delivery-process.config.ts.
    */
-  readonly preamble: readonly unknown[]; // SectionBlock[] at implementation time
+  readonly preamble: readonly unknown[]; // SectionBlock[] — see src/renderable/schema.ts
 }
 
 // =============================================================================
@@ -286,7 +286,7 @@ class CliRecipeGeneratorImpl {
 export function createCliRecipeGenerator(
   _config: CliRecipeGeneratorConfig
 ): unknown {
-  // DocumentGenerator
+  // Returns DocumentGenerator from src/generators/types.ts
   throw new Error('CliRecipeCodec not yet implemented - roadmap pattern');
 }
 
@@ -295,21 +295,15 @@ export function createCliRecipeGenerator(
 // =============================================================================
 
 /**
- * The generator is registered in delivery-process.config.ts alongside
- * ProcessApiReferenceGenerator. Both share the same outputDirectory override.
+ * Registration follows the programmatic pattern from codec-generators.ts.
+ * The generator is registered similarly to createProcessApiReferenceGenerator().
  *
+ * Output directory override is set in delivery-process.config.ts:
  * ```typescript
- * // In delivery-process.config.ts:
  * generatorOverrides: {
- *   'process-api-reference': { outputDirectory: 'docs-live' },
  *   'cli-recipe': { outputDirectory: 'docs-live' },
  * }
  * ```
- *
- * The preamble content is passed via a custom generator registration
- * mechanism (not ReferenceDocConfig). Implementation will follow the
- * pattern established by createProcessApiReferenceGenerator() which is
- * registered programmatically, not via JSON config.
  */
 
 // Exported only for design stub documentation purposes

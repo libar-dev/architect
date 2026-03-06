@@ -16,7 +16,7 @@ Feature: Documentation Consolidation Strategy
   maintenance burden and inevitable drift.
 
   **Solution:**
-  A 6-phase consolidation that replaces manual doc sections with generated equivalents
+  A 13-phase consolidation that replaces manual doc sections with generated equivalents
   using convention tags, reference doc configs, product area absorption, and the
   preamble capability. Each phase validates that a generated equivalent exists or
   creates one, then replaces the manual content with a pointer to the generated output.
@@ -24,7 +24,7 @@ Feature: Documentation Consolidation Strategy
   **Why It Matters:**
   | Benefit | How |
   | Single source of truth | Manual docs cannot drift from code when generated from annotations |
-  | Reduced maintenance | ~2,400 fewer manual lines to maintain across 10 phases |
+  | Reduced maintenance | ~2,400 fewer manual lines to maintain across 13 phases |
   | Consistent quality | Generated docs always reflect current annotation state |
   | AI context accuracy | Compact claude-md versions stay current automatically |
   | Incremental delivery | Each phase is independently deliverable as a single PR |
@@ -87,7 +87,7 @@ Feature: Documentation Consolidation Strategy
       Given source files annotated with a convention tag value
       And a ReferenceDocConfig entry matching that convention tag
       When the reference codec generates output
-      Then a detailed docs/ file and a compact _claude-md/ file are produced
+      Then a detailed docs-live/ file and a compact _claude-md/ file are produced
       And both contain the convention content extracted from source JSDoc
 
   Rule: Preamble preserves editorial context in generated docs
@@ -138,25 +138,28 @@ Feature: Documentation Consolidation Strategy
 
   Rule: Manual docs retain editorial and tutorial content
 
-    **Invariant:** Documents containing philosophy (METHODOLOGY.md), workflow guides
-    (SESSION-GUIDES.md), tutorials (GHERKIN-PATTERNS.md), CLI reference (PROCESS-API.md),
-    and operational procedures (PUBLISHING.md) remain fully manual. These docs are
-    ~2,300 lines total and contain instructional content that cannot be expressed as
-    source annotations.
+    **Invariant:** Documents containing philosophy (METHODOLOGY.md) remain fully manual
+    with no generated equivalent (~238 lines). Documents that were originally manual but
+    now have generated equivalents or have been restructured (SESSION-GUIDES.md,
+    GHERKIN-PATTERNS.md, PROCESS-API.md) retain their editorial content as preamble
+    within generated outputs. PUBLISHING.md was relocated to MAINTAINERS.md at the
+    repository root.
 
     **Rationale:** The consolidation targets sections most likely to drift when code
     changes: reference tables, codec listings, validation rules, API types. Editorial
     content changes at a different cadence and requires human judgment to update.
-    Forcing this into annotations would produce worse documentation.
+    Forcing this into annotations would produce worse documentation. Documents that
+    transitioned to hybrid generation preserve their editorial voice via preamble
+    while keeping reference content in sync with source annotations.
 
-    **Verified by:** Retained docs have no generated equivalent,
+    **Verified by:** METHODOLOGY.md has no generated equivalent,
     Consolidated docs preserve information completeness
 
     @acceptance-criteria @happy-path
-    Scenario: Retained documents have no generated equivalent
-      Given the 6 retained manual documents
-      Then no ReferenceDocConfig exists targeting their content
-      And their sections do not duplicate any generated output
+    Scenario: Fully manual documents have no generated equivalent
+      Given METHODOLOGY.md as the retained fully-manual document
+      Then no ReferenceDocConfig exists targeting its content
+      And its sections do not duplicate any generated output
 
   Rule: Audience alignment determines document location
 

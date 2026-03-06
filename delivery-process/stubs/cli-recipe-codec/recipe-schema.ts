@@ -209,39 +209,10 @@ export interface CommandNarrativeGroup {
 // =============================================================================
 
 /**
- * Extended CLISchema with recipe and narrative fields.
- *
- * This extends the existing `CLISchema` interface from `src/cli/cli-schema.ts`.
- * The extension is additive — existing fields (`globalOptions`, `outputModifiers`,
- * `listFilters`, `sessionOptions`) are unchanged. Both new fields are optional
- * so existing consumers (ProcessApiReferenceGenerator, showHelp) continue to
- * work without modification.
- *
- * During implementation, these fields are added directly to the existing
- * `CLISchema` interface rather than creating a separate extended interface,
- * to avoid dual-type maintenance.
+ * CLISchema already includes `recipes` and `commandNarratives` fields
+ * (added during Phase 43 implementation). See `src/cli/cli-schema.ts`
+ * for the canonical interface. No separate extended type needed.
  */
-export interface CLISchemaExtended {
-  // -- Existing fields (unchanged) --
-  readonly globalOptions: unknown; // CLIOptionGroup
-  readonly outputModifiers: unknown; // CLIOptionGroup
-  readonly listFilters: unknown; // CLIOptionGroup
-  readonly sessionOptions: unknown; // CLIOptionGroup
-
-  // -- New fields (DD-1, DD-4) --
-
-  /**
-   * Multi-command recipe sequences grouped by task intent.
-   * Optional — existing consumers ignore this field.
-   */
-  readonly recipes?: readonly RecipeGroup[];
-
-  /**
-   * Per-command narrative descriptions grouped by section.
-   * Optional — existing consumers ignore this field.
-   */
-  readonly commandNarratives?: readonly CommandNarrativeGroup[];
-}
 
 export function _recipeSchemaPlaceholder(): never {
   throw new Error('CliRecipeCodec not yet implemented - roadmap pattern');

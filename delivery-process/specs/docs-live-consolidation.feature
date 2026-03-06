@@ -61,15 +61,15 @@ Feature: Docs Live Directory Consolidation
       When pnpm docs:all runs successfully
       Then docs-live/reference/ARCHITECTURE-CODECS.md exists
       And docs-live/reference/ARCHITECTURE-TYPES.md exists
-      And docs-generated/docs/ directory does not exist
+      And docs-generated/ contains no reference document .md files
 
-  Rule: All _claude-md/ compact files consolidate under docs-live/
+  Rule: Architecture reference compacts generate under docs-live/_claude-md/
 
-    **Invariant:** All `_claude-md/` compact context files live under
-    `docs-live/_claude-md/`. Architecture-scoped compacts (architecture-codecs,
+    **Invariant:** Architecture reference summary files live under
+    `docs-live/_claude-md/architecture/`. Architecture-scoped compacts (architecture-codecs,
     architecture-types) move from `docs-generated/_claude-md/architecture/` to
-    `docs-live/_claude-md/architecture/`. Product-area compacts remain at
-    `docs-live/_claude-md/` unchanged.
+    `docs-live/_claude-md/architecture/`. This consolidation does not affect the
+    separate claude-modules output at the repository root `_claude-md/`.
 
     **Rationale:** DD-2: `_claude-md/` compact versions are the Claude consumption
     contract — agents read compacts, not full product area docs. Having compacts
@@ -88,7 +88,7 @@ Feature: Docs Live Directory Consolidation
       And docs-generated/_claude-md/ directory does not exist
 
     @acceptance-criteria @validation
-    Scenario: docs-generated/ is empty after standard generation
+    Scenario: docs-generated/ contains no Markdown artifacts after standard generation
       Given consolidation config changes applied
       When pnpm docs:all runs
       Then docs-generated/ contains no .md files

@@ -201,7 +201,7 @@ export const ERROR_GUIDE_REFERENCE_CONFIG = {
       content: [
         'graph LR',
         '    A[deriveProcessState] --> C[validateChanges]',
-        '    B[detectChanges] --> C',
+        '    B[detectStagedChanges / detectBranchChanges] --> C',
         '    C --> D[ValidationResult]',
       ].join('\n'),
     },
@@ -213,27 +213,9 @@ export const ERROR_GUIDE_REFERENCE_CONFIG = {
 // ---------------------------------------------------------------------------
 
 /**
- * DD-2: The following value is added to `CONVENTION_VALUES` in
- * `src/taxonomy/conventions.ts`:
- *
- * ```typescript
- * export const CONVENTION_VALUES = [
- *   'testing-policy',
- *   'fsm-rules',
- *   'cli-patterns',
- *   'output-format',
- *   'pattern-naming',
- *   'session-workflow',
- *   'config-presets',
- *   'annotation-system',
- *   'pipeline-architecture',
- *   'publishing',
- *   'doc-generation',
- *   'taxonomy-rules',
- *   'codec-registry',
- *   'process-guard-errors',  // <-- NEW: Error diagnosis content
- * ] as const;
- * ```
+ * DD-2: 'process-guard-errors' is already registered in
+ * `src/taxonomy/conventions.ts` CONVENTION_VALUES.
+ * No additional registration needed.
  */
 export function _conventionTagRegistrationPlaceholder(): never {
   throw new Error('ErrorGuideCodec not yet implemented - roadmap pattern');

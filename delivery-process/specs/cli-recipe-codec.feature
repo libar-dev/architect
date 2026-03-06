@@ -116,7 +116,7 @@ Feature: CLI Recipe Codec
     **Invariant:** `CLI_SCHEMA` is extended with a `recipes` field containing
     `RecipeGroup[]`. Each `RecipeGroup` has a title, optional description, and an
     array of `RecipeExample` objects. Each `RecipeExample` has a title, a purpose
-    description, an array of command strings, and an optional expected output block.
+    description, an array of RecipeStep entries (each with a command string and optional comment), and an optional expected output block.
     The schema extension is additive -- existing `CLIOptionGroup` types are unchanged.
 
     **Rationale:** Recipes are multi-command sequences ("run these 3 commands in

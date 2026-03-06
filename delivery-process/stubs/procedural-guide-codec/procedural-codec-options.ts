@@ -62,13 +62,13 @@
  *
  * | Field | Session Workflow Guide | Annotation Guide |
  * |-------|----------------------|------------------|
- * | title | "Session Workflow Guide" | "Annotation Guide" |
+ * | title | "Session Workflow Guide" | "Annotation Reference Guide" |
  * | preamble | Checklists, Mermaid decision tree, Do-NOT tables | Getting-started, shape modes, troubleshooting |
- * | behaviorCategories | [] (empty -- uses includeTags instead) | [] (empty -- uses includeTags instead) |
- * | includeTags | ['session-workflows'] | ['annotation-guide'] |
- * | conventionTags | [] | [] |
+ * | behaviorCategories | [] (empty -- uses includeTags instead) | [] |
+ * | includeTags | ['session-workflows'] | [] |
+ * | conventionTags | [] | ['annotation-system'] |
  * | shapeSources | [] | [] |
- * | claudeMdSection | 'workflow' | 'workflow' |
+ * | claudeMdSection | 'workflow' | 'annotation' |
  * | docsFilename | 'SESSION-WORKFLOW-GUIDE.md' | 'ANNOTATION-REFERENCE.md' |
  * | claudeMdFilename | 'session-workflow-guide.md' | 'annotation-reference.md' |
  *
@@ -79,7 +79,7 @@
  * content to each guide document.
  */
 
-import type { SectionBlock } from '../../src/renderable/schema.js';
+import type { SectionBlock } from '../../../src/renderable/schema.js';
 
 // ---------------------------------------------------------------------------
 // No new options type needed -- ProceduralGuideCodec uses ReferenceDocConfig

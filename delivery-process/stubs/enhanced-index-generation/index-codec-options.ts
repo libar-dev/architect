@@ -109,8 +109,8 @@ export interface IndexCodecOptions extends BaseCodecOptions {
    * Document entries for the unified inventory.
    *
    * Each entry describes a document from either docs/ or docs-live/.
-   * The codec merges these with any auto-discovered generated documents
-   * from MasterDataset to produce a single unified listing.
+   * The codec renders this static inventory and combines it with
+   * statistics derived from MasterDataset views.
    *
    * Documents are organized by topic, NOT by source directory.
    * The reader should not need to know whether a document is manual

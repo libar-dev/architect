@@ -37,7 +37,7 @@
  * - `RULE_DEFINITIONS` entries without rationale fall back to `description`
  */
 
-import type { BaseCodecOptions } from '../../src/renderable/codecs/types/base.js';
+import type { BaseCodecOptions } from '../../../src/renderable/codecs/types/base.js';
 
 // ---------------------------------------------------------------------------
 // DD-1: Extended RuleDefinition interface
@@ -115,7 +115,7 @@ export interface EnhancedValidationRulesCodecOptions extends BaseCodecOptions {
 /**
  * Default options with error guide enabled.
  */
-export const ENHANCED_DEFAULT_OPTIONS: Required<EnhancedValidationRulesCodecOptions> = {
+export const ENHANCED_DEFAULT_OPTIONS: EnhancedValidationRulesCodecOptions = {
   detailLevel: 'detailed',
   generateDetailFiles: true,
   includeFSMDiagram: true,

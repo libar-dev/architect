@@ -38,7 +38,7 @@ Feature: Enhanced Index Generation
 
   **Scope:**
   | Content Type | Auto-generatable? | Source |
-  | Product area and generated doc listing | Yes | File system scan plus MasterDataset |
+  | Product area and generated doc listing | Yes | Static documentEntries config plus MasterDataset views |
   | Pattern statistics per area | Yes | dataset.byProductArea view |
   | Phase progress summary | Yes | dataset.byStatus plus dataset.byPhase |
   | Audience reading paths (New User, Developer, Team Lead) | No | Preamble SectionBlock[] |

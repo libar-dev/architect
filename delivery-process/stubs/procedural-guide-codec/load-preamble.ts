@@ -108,7 +108,7 @@
  * ```
  */
 
-import type { SectionBlock } from '../../src/renderable/schema.js';
+import type { SectionBlock } from '../../../src/renderable/schema.js';
 
 /**
  * Reads a markdown file and parses it into a `readonly SectionBlock[]` array.

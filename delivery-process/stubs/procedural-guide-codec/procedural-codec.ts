@@ -125,7 +125,7 @@
 // Example ReferenceDocConfig entries for delivery-process.config.ts
 // ---------------------------------------------------------------------------
 
-import type { SectionBlock } from '../../src/renderable/schema.js';
+import type { SectionBlock } from '../../../src/renderable/schema.js';
 
 /**
  * Placeholder interface showing the shape of a ReferenceDocConfig entry.

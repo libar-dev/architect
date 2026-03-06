@@ -106,7 +106,7 @@ const findingWorkRecipe: RecipeExample = {
  * 4. Design Session Prep
  * 5. Ending a Session
  */
-export const COMMON_RECIPES: RecipeGroup = {
+const COMMON_RECIPES: RecipeGroup = {
   title: 'Common Recipes',
   description: 'Frequently-used command sequences for daily workflow.',
   recipes: [startingASessionRecipe, findingWorkRecipe],
@@ -180,7 +180,7 @@ const scopeValidateNarrative: CommandNarrative = {
  * - Architecture Queries (arch roles, context, layer, neighborhood, compare, coverage, dangling, orphans, blocking)
  * - Metadata and Inventory (tags, sources, unannotated, query)
  */
-export const SESSION_WORKFLOW_NARRATIVES: CommandNarrativeGroup = {
+const SESSION_WORKFLOW_NARRATIVES: CommandNarrativeGroup = {
   title: 'Session Workflow Commands',
   description:
     'These 6 commands output structured text (not JSON). They are designed for terminal reading and AI context consumption.',
@@ -207,7 +207,7 @@ export const SESSION_WORKFLOW_NARRATIVES: CommandNarrativeGroup = {
  * CLI_SCHEMA. This keeps editorial prose separate from structured command
  * metadata and follows the proven pattern from ReferenceDocConfig.preamble.
  */
-export const EXAMPLE_PREAMBLE = [
+const EXAMPLE_PREAMBLE = [
   // --- Why Use This ---
   {
     type: 'heading' as const,

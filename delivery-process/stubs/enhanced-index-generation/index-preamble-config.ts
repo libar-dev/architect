@@ -103,7 +103,7 @@ export const QUICK_NAVIGATION_SECTIONS: readonly SectionBlock[] = [
   },
   {
     type: 'table' as const,
-    headers: ['If you want to...', 'Read this'],
+    columns: ['If you want to...', 'Read this'],
     rows: [
       ['Get started quickly', '[README.md](../README.md)'],
       ['Configure presets and tags', '[CONFIGURATION.md](docs/CONFIGURATION.md)'],
@@ -195,7 +195,7 @@ export const DOCUMENT_ROLES_SECTIONS: readonly SectionBlock[] = [
   },
   {
     type: 'table' as const,
-    headers: ['Document', 'Audience', 'Focus'],
+    columns: ['Document', 'Audience', 'Focus'],
     rows: [
       ['README.md', 'Everyone', 'Quick start, value proposition'],
       ['METHODOLOGY.md', 'Everyone', 'Why -- core thesis, principles'],
@@ -208,7 +208,7 @@ export const DOCUMENT_ROLES_SECTIONS: readonly SectionBlock[] = [
       ['VALIDATION.md', 'CI/CD', 'Quality -- automated checks'],
       ['TAXONOMY.md', 'Reference', 'Lookup -- tag taxonomy and API'],
       ['ANNOTATION-GUIDE.md', 'Developers', 'Reference -- annotation mechanics'],
-      ['PUBLISHING.md', 'Maintainers', 'Release -- npm publishing'],
+      ['MAINTAINERS.md', 'Maintainers', 'Project maintenance and release workflow'],
       ['PRODUCT-AREAS.md', 'Everyone', 'Generated -- product area overviews'],
       ['DECISIONS.md', 'Developers', 'Generated -- architecture decisions'],
       ['BUSINESS-RULES.md', 'Developers', 'Generated -- business rules and invariants'],
@@ -390,9 +390,9 @@ export const INDEX_DOCUMENT_ENTRIES: readonly DocumentEntry[] = [
 
   // --- Operations ---
   {
-    title: 'Publishing',
-    path: 'docs/PUBLISHING.md',
-    description: 'npm publishing workflow, versioning, CI setup',
+    title: 'Maintainers',
+    path: 'MAINTAINERS.md',
+    description: 'Project maintenance, release workflow, versioning, CI setup',
     audience: 'Maintainers',
     topic: 'Operations',
   },

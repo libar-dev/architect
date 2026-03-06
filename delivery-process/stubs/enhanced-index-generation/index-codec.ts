@@ -92,13 +92,9 @@ export function createIndexCodec(
   throw new Error('EnhancedIndexGeneration not yet implemented - roadmap pattern');
 }
 
-/**
- * Default IndexCodec instance (no preamble, all sections enabled).
- *
- * In practice, the delivery-process.config.ts will provide preamble content
- * via CodecOptions, causing the factory function to be used instead.
- */
-export const IndexCodec = createIndexCodec();
+// The real implementation exports: export const IndexCodec = createIndexCodec();
+// See src/renderable/codecs/index-codec.ts for the actual codec.
+// IndexCodec is created via createIndexCodec() — not eagerly instantiated in stubs
 
 // ---------------------------------------------------------------------------
 // Document Builder (internal)
