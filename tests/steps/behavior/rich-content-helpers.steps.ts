@@ -57,7 +57,13 @@ function initState(): RichContentTestState {
 
 const feature = await loadFeature('tests/features/behavior/rich-content-helpers.feature');
 
-describeFeature(feature, ({ Rule, AfterEachScenario }) => {
+describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
+  Background(({ Given }) => {
+    Given('the following deliverables:', () => {
+      // Background deliverables table is for spec documentation only
+    });
+  });
+
   AfterEachScenario(() => {
     state = null;
   });

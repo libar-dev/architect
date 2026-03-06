@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:DataAPIPlatformIntegration
-@libar-docs-status:roadmap
+@libar-docs-status:completed
+@libar-docs-unlock-reason:Split-into-dedicated-specs
 @libar-docs-phase:25d
 @libar-docs-product-area:DataAPI
 @libar-docs-effort:3d
@@ -31,17 +32,23 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
   | Cross-package views | Understand monorepo-wide dependencies |
   | Package-scoped queries | Focus on specific packages |
 
+  **Superseded:** This spec has been split into focused specs:
+  - MCPServerIntegration (Phase 46) -- MCP server mode (Rule 1)
+  - MonorepoSupport (Phase 100) -- Cross-package queries (Rule 3)
+  - Rule 2 (CLAUDE.md context layer) absorbed into existing ClaudeModuleGeneration
+  - Rule 4 (git hooks/watch) partially exists in lint-process, watch mode deferred
+
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | MCP server entry point | pending | src/mcp/server.ts | Yes | integration |
-      | MCP tool definitions | pending | src/mcp/tools.ts | Yes | unit |
-      | MCP session state management | pending | src/mcp/session.ts | Yes | unit |
-      | CLAUDE.md context layer generator | pending | src/generators/claude-md-generator.ts | Yes | unit |
-      | Cross-package dependency analyzer | pending | src/api/cross-package.ts | Yes | unit |
-      | Package-scoped filter flag | pending | src/cli/process-api.ts | Yes | integration |
-      | Multi-package config support | pending | src/config/multi-package.ts | Yes | unit |
-      | Per-package coverage report | pending | src/api/coverage-analyzer.ts | Yes | unit |
+      | MCP server entry point | superseded | src/mcp/server.ts | Yes | integration |
+      | MCP tool definitions | superseded | src/mcp/tools.ts | Yes | unit |
+      | MCP session state management | superseded | src/mcp/session.ts | Yes | unit |
+      | CLAUDE.md context layer generator | superseded | src/generators/claude-md-generator.ts | Yes | unit |
+      | Cross-package dependency analyzer | superseded | src/api/cross-package.ts | Yes | unit |
+      | Package-scoped filter flag | superseded | src/cli/process-api.ts | Yes | integration |
+      | Multi-package config support | superseded | src/config/multi-package.ts | Yes | unit |
+      | Per-package coverage report | superseded | src/api/coverage-analyzer.ts | Yes | unit |
 
   # ============================================================================
   # RULE 1: MCP Server Mode

@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:StepLintExtendedRules
-@libar-docs-status:roadmap
+@libar-docs-status:completed
+@libar-docs-unlock-reason:Retroactive-completion
 @libar-docs-phase:51
 @libar-docs-effort:1d
 @libar-docs-depends-on:StepLintVitestCucumber
@@ -35,12 +36,12 @@ Feature: Step Lint Extended Rules - Additional vitest-cucumber Traps
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | Hash-in-step-text check | pending | Yes | src/lint/steps/feature-checks.ts |
-      | Keyword-in-description check | pending | Yes | src/lint/steps/feature-checks.ts |
-      | Outline-quoted-values check | pending | Yes | src/lint/steps/cross-checks.ts |
-      | Repeated-step-pattern check | pending | Yes | src/lint/steps/step-checks.ts |
-      | Rule definitions for 4 new rules | pending | No | src/lint/steps/types.ts |
-      | Gherkin executable specs | pending | Yes | tests/features/lint/step-lint-extended.feature |
+      | Hash-in-step-text check | complete | Yes | src/lint/steps/feature-checks.ts |
+      | Keyword-in-description check | complete | Yes | src/lint/steps/feature-checks.ts |
+      | Outline-quoted-values check | complete | Yes | src/lint/steps/cross-checks.ts |
+      | Repeated-step-pattern check | complete | Yes | src/lint/steps/step-checks.ts |
+      | Rule definitions for 4 new rules | complete | No | src/lint/steps/types.ts |
+      | Gherkin executable specs | complete | Yes | tests/features/lint/step-lint-extended.feature |
 
   Rule: Hash in step text is detected
 

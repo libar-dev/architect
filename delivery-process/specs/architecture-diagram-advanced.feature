@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ArchitectureDiagramAdvanced
-@libar-docs-status:roadmap
+@libar-docs-status:completed
+@libar-docs-unlock-reason:Retroactive-completion
 @libar-docs-phase:23
 @libar-docs-effort:1w
 @libar-docs-product-area:Generation
@@ -29,9 +30,9 @@ Feature: Architecture Diagram Generation - Advanced
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
       | ArchitectureCodec (layered) | complete | renderable/codecs/architecture.ts | Yes | unit |
-      | Architecture generator | pending | generators/built-in/architecture.ts | Yes | unit |
-      | Example app annotations | pending | examples/sample-project/src/ | No | - |
-      | Sequence diagram support | pending | renderable/codecs/architecture.ts | Yes | unit |
+      | Architecture generator | complete | generators/built-in/codec-generators.ts | Yes | unit |
+      | Example app annotations | n/a | examples/sample-project/src/ | No | - |
+      | Sequence diagram support | superseded | renderable/codecs/architecture.ts | Yes | unit |
 
   # ============================================================================
   # RULE 5: Layered Diagram Generation
@@ -43,9 +44,9 @@ Feature: Architecture Diagram Generation - Advanced
     layer (domain, application, infrastructure) with top-to-bottom flow.
 
     **Rationale:** Layered architecture visualization shows dependency direction -
-    infrastructure at top, domain at bottom - following conventional layer ordering.
+    domain at top, infrastructure at bottom - following conventional layer ordering.
 
-    **Verified by:** Generate subgraphs per layer, Layer order is infrastructure-application-domain,
+    **Verified by:** Generate subgraphs per layer, Layer order is domain-application-infrastructure,
     Include context label in node names
 
     @acceptance-criteria @happy-path
@@ -61,11 +62,11 @@ Feature: Architecture Diagram Generation - Advanced
       And output contains subgraph "Infrastructure Layer"
 
     @acceptance-criteria @happy-path
-    Scenario: Layer order is infrastructure-application-domain
+    Scenario: Layer order is domain-application-infrastructure
       Given patterns with all three layers
       When the layered diagram codec runs
-      Then Infrastructure Layer appears before Application Layer in output
-      And Application Layer appears before Domain Layer in output
+      Then Domain Layer appears before Application Layer in output
+      And Application Layer appears before Infrastructure Layer in output
 
     @acceptance-criteria @happy-path
     Scenario: Include context label in node names
@@ -118,7 +119,7 @@ Feature: Architecture Diagram Generation - Advanced
     Scenario: Generator option for layered diagram
       When running generate-docs with --generators architecture --diagram-type layered
       Then output contains layer subgraphs
-      And output follows infrastructure-application-domain order
+      And output follows domain-application-infrastructure order
 
     @acceptance-criteria @happy-path
     Scenario: Generator option for context filtering
