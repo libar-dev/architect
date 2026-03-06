@@ -298,8 +298,13 @@ function checkStatusTransitions(state: ProcessState, changes: ChangeDetection): 
   const violations: ProcessViolation[] = [];
 
   for (const [file, transition] of changes.statusTransitions) {
-    // Files with unlock-reason bypass FSM check (supports retroactive completions and file splits)
-    if (transition.hasUnlockReason === true) {
+    // Only validated unlock reasons bypass FSM, and only for retroactive completion paths
+    const fileState = state.files.get(file);
+    if (
+      transition.to === 'completed' &&
+      transition.hasUnlockReason === true &&
+      fileState?.hasUnlockReason === true
+    ) {
       continue;
     }
 

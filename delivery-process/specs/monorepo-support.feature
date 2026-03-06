@@ -40,7 +40,8 @@ Feature: Monorepo Cross-Package Support
 
     **Invariant:** When a packages field is present in the config, each entry maps
     a package name to its source globs. The top-level sources field becomes optional.
-    Packages without their own features or stubs inherit from top-level sources.
+    Packages without their own feature or stub globs inherit those values from the
+    corresponding top-level feature and stub settings.
     Repos without packages work exactly as before (backward compatible).
 
     **Rationale:** The consumer monorepo has no config file because the system only
@@ -74,7 +75,8 @@ Feature: Monorepo Cross-Package Support
     not from manual annotation. This ensures zero additional developer effort.
 
     **Verified by:** Package derived from glob match,
-    No package when config lacks packages field
+    No package when config lacks packages field,
+    First matching package wins when globs overlap
 
     @acceptance-criteria @happy-path
     Scenario: Package field is set from matching glob
@@ -88,6 +90,13 @@ Feature: Monorepo Cross-Package Support
       Given a single-package config with no packages field
       When a source file is scanned
       Then the resulting pattern has no package field
+
+    @acceptance-criteria @edge-case
+    Scenario: First matching package wins when globs overlap
+      Given a multi-package config where "platform-core" and "platform-shared" both match the same source file
+      And "platform-core" is defined before "platform-shared"
+      When the file is scanned and extracted
+      Then the resulting pattern has package "platform-core"
 
   Rule: CLI commands accept a package filter that composes with existing filters
 

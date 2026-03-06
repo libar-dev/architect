@@ -53,6 +53,7 @@ import { printVersionAndExit } from './version.js';
 import { CLI_SCHEMA } from './cli-schema.js';
 import type { CLIOptionGroup } from './cli-schema.js';
 import {
+  VALID_TRANSITIONS,
   isValidTransition as fsmIsValidTransition,
   getValidTransitionsFrom as fsmGetValidTransitionsFrom,
 } from '../validation/fsm/transitions.js';
@@ -517,6 +518,28 @@ const FSM_SHORT_CIRCUIT_METHODS: ReadonlySet<string> = new Set([
 ]);
 
 /**
+ * Validate and parse a CLI string as a ProcessStatusValue.
+ * Rejects unknown status values with a helpful error message.
+ */
+function parseProcessStatus(
+  value: string | undefined,
+  usage: string,
+  label: string
+): ProcessStatusValue {
+  if (value === undefined) {
+    throw new QueryApiError('INVALID_ARGUMENT', usage);
+  }
+  if (!(value in VALID_TRANSITIONS)) {
+    const valid = Object.keys(VALID_TRANSITIONS).join(', ');
+    throw new QueryApiError(
+      'INVALID_ARGUMENT',
+      `Unknown ${label}: "${value}". Expected one of: ${valid}`
+    );
+  }
+  return value as ProcessStatusValue;
+}
+
+/**
  * Attempt to handle an FSM query without building the pipeline.
  *
  * @returns The FSM result data if this is a short-circuit candidate, or
@@ -534,15 +557,10 @@ function tryFsmShortCircuit(subcommand: string, subArgs: readonly string[]): unk
 
   switch (methodName) {
     case 'isValidTransition': {
-      const from = fsmArgs[0];
-      const to = fsmArgs[1];
-      if (from === undefined || to === undefined) {
-        throw new QueryApiError(
-          'INVALID_ARGUMENT',
-          'Usage: process-api query isValidTransition <fromStatus> <toStatus>'
-        );
-      }
-      return fsmIsValidTransition(from as ProcessStatusValue, to as ProcessStatusValue);
+      const usage = 'Usage: process-api query isValidTransition <fromStatus> <toStatus>';
+      const from = parseProcessStatus(fsmArgs[0], usage, 'fromStatus');
+      const to = parseProcessStatus(fsmArgs[1], usage, 'toStatus');
+      return fsmIsValidTransition(from, to);
     }
 
     case 'checkTransition': {
@@ -565,25 +583,21 @@ function tryFsmShortCircuit(subcommand: string, subArgs: readonly string[]): unk
     }
 
     case 'getValidTransitionsFrom': {
-      const status = fsmArgs[0];
-      if (status === undefined) {
-        throw new QueryApiError(
-          'INVALID_ARGUMENT',
-          'Usage: process-api query getValidTransitionsFrom <status>'
-        );
-      }
-      return fsmGetValidTransitionsFrom(status as ProcessStatusValue);
+      const status = parseProcessStatus(
+        fsmArgs[0],
+        'Usage: process-api query getValidTransitionsFrom <status>',
+        'status'
+      );
+      return fsmGetValidTransitionsFrom(status);
     }
 
     case 'getProtectionInfo': {
-      const status = fsmArgs[0];
-      if (status === undefined) {
-        throw new QueryApiError(
-          'INVALID_ARGUMENT',
-          'Usage: process-api query getProtectionInfo <status>'
-        );
-      }
-      const summary = fsmGetProtectionSummary(status as ProcessStatusValue);
+      const status = parseProcessStatus(
+        fsmArgs[0],
+        'Usage: process-api query getProtectionInfo <status>',
+        'status'
+      );
+      const summary = fsmGetProtectionSummary(status);
       return {
         status,
         level: summary.level,

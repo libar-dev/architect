@@ -47,7 +47,7 @@ Feature: Interactive Setup Command
   Rule: Init detects existing project context before making changes
 
     **Invariant:** The init command reads the target directory for package.json,
-    tsconfig.json, delivery-process.config.ts, and monorepo markers before prompting
+    tsconfig.json, delivery-process.config.ts (or .js), and monorepo markers before prompting
     or generating any files. Detection results determine which steps are skipped.
 
     **Rationale:** Blindly generating files overwrites user configuration and breaks
@@ -78,7 +78,9 @@ Feature: Interactive Setup Command
     **Invariant:** The init command prompts for preset selection from the three
     available presets (generic, libar-generic, ddd-es-cqrs) with descriptions, and
     for source glob paths with defaults inferred from project structure. The --yes
-    flag skips all prompts and uses defaults.
+    flag skips non-destructive selection prompts and uses defaults. Destructive
+    overwrites require an explicit --force flag; otherwise init exits without
+    modifying existing files.
 
     **Rationale:** New users do not know which preset to choose or what glob patterns
     to use. Smart defaults reduce decisions to confirmations. The --yes flag enables
@@ -106,11 +108,19 @@ Feature: Interactive Setup Command
       And preset defaults to "libar-generic"
       And source globs use sensible defaults
 
+    @acceptance-criteria @validation
+    Scenario: Non-interactive mode refuses to overwrite existing config
+      Given a directory with an existing delivery-process config file
+      When running the init command with --yes flag
+      Then the command prints a message requiring --force to overwrite
+      And exits with code 1
+
   Rule: Generated config file uses defineConfig with correct imports
 
-    **Invariant:** The generated delivery-process.config.ts imports defineConfig
-    from the correct path, uses the selected preset, and includes configured source
-    globs. An existing config file is never overwritten without confirmation.
+    **Invariant:** The generated delivery-process.config.ts (or .js) imports
+    defineConfig from the correct path, uses the selected preset, and includes
+    configured source globs. An existing config file is never overwritten without
+    confirmation.
 
     **Rationale:** The config file is the most important artifact. An incorrect
     import path or malformed glob causes every subsequent command to fail. The
@@ -130,7 +140,7 @@ Feature: Interactive Setup Command
 
     @acceptance-criteria @validation
     Scenario: Existing config file is not overwritten without confirmation
-      Given a directory with an existing delivery-process.config.ts
+      Given a directory with an existing delivery-process config file
       When running the init command
       Then the command prompts for overwrite confirmation
       And answering "no" preserves the existing file
@@ -139,7 +149,8 @@ Feature: Interactive Setup Command
 
     **Invariant:** Injected scripts reference bin names (process-api, generate-docs)
     resolved via node_modules/.bin, not dist paths. Existing scripts are preserved.
-    The package.json "type" field is set to "module" if not already present.
+    The package.json "type" field is preserved. ESM migration is an explicit
+    opt-in via --esm flag.
 
     **Rationale:** The tutorial uses long fragile dist paths. Bin commands are the
     stable public API. Setting type:module ensures ESM imports work for the config.
@@ -153,7 +164,7 @@ Feature: Interactive Setup Command
       When the init command injects scripts
       Then package.json contains process:query using "process-api"
       And contains docs:all using "generate-docs"
-      And contains "type" set to "module"
+      And preserves the existing "type" field
 
     @acceptance-criteria @validation
     Scenario: Existing scripts in package.json are preserved
