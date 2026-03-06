@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:SessionGuidesModuleSource
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Add-include-tag-for-ProceduralGuideCodec
 @libar-docs-phase:39
 @libar-docs-effort:0.5d
 @libar-docs-product-area:Generation
@@ -10,6 +11,7 @@
 @libar-docs-claude-module:session-workflows
 @libar-docs-claude-section:workflow
 @libar-docs-claude-tags:core
+@libar-docs-include:session-workflows
 Feature: Session Guides as Annotated Module Source
 
   **Problem:**

@@ -126,3 +126,9 @@ export {
   formatBusinessValue,
 } from './utils.js';
 export { groupBy } from '../utils/index.js';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Preamble Loader
+// ═══════════════════════════════════════════════════════════════════════════
+
+export { loadPreambleFromMarkdown, parseMarkdownToBlocks } from './load-preamble.js';

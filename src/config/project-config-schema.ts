@@ -29,6 +29,7 @@ import { z } from 'zod';
 import type { DeliveryProcessProjectConfig } from './project-config.js';
 import type { DeliveryProcessInstance } from './types.js';
 import { DIAGRAM_SOURCE_VALUES } from '../renderable/codecs/reference.js';
+import { SectionBlockSchema } from '../renderable/schema.js';
 
 /**
  * Glob pattern validation — replicates the security rules from
@@ -172,6 +173,10 @@ const ReferenceDocConfigSchema = z
     productArea: z.string().min(1).optional(),
     // DD-4 (GeneratedDocQuality): render shapes section before conventions
     shapesFirst: z.boolean().optional(),
+    // Exclude patterns by source path prefix (e.g., ephemeral planning specs)
+    excludeSourcePaths: z.array(z.string().min(1)).readonly().optional(),
+    // Static preamble sections prepended before all generated content
+    preamble: z.array(SectionBlockSchema).readonly().optional(),
   })
   .strict();
 

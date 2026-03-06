@@ -23,6 +23,7 @@ export const CONVENTION_VALUES = [
   'doc-generation',
   'taxonomy-rules',
   'codec-registry',
+  'process-guard-errors',
 ] as const;
 
 export type ConventionValue = (typeof CONVENTION_VALUES)[number];

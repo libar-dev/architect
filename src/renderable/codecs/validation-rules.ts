@@ -21,6 +21,7 @@
  * | includeCLIUsage | boolean | true | Include CLI usage section |
  * | includeEscapeHatches | boolean | true | Include escape hatches section |
  * | includeProtectionMatrix | boolean | true | Include protection levels matrix |
+ * | includeErrorGuide | boolean | true | Include error guide with rationale and alternatives |
  *
  * ### When to Use
  *
@@ -88,6 +89,9 @@ export interface ValidationRulesCodecOptions extends BaseCodecOptions {
 
   /** Include protection levels matrix (default: true) */
   includeProtectionMatrix?: boolean;
+
+  /** Include error guide with rationale and alternatives (default: true) */
+  includeErrorGuide?: boolean;
 }
 
 /**
@@ -99,6 +103,7 @@ export const DEFAULT_VALIDATION_RULES_OPTIONS: Required<ValidationRulesCodecOpti
   includeCLIUsage: true,
   includeEscapeHatches: true,
   includeProtectionMatrix: true,
+  includeErrorGuide: true,
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -108,12 +113,16 @@ export const DEFAULT_VALIDATION_RULES_OPTIONS: Required<ValidationRulesCodecOpti
 /**
  * Rule definition for documentation
  */
-interface RuleDefinition {
+export interface RuleDefinition {
   id: ProcessGuardRule;
   severity: 'error' | 'warning';
   description: string;
   cause: string;
   fix: string;
+  /** Why this rule exists - populated from convention annotations at generation time */
+  rationale?: string;
+  /** Alternative approaches / escape hatches for this rule */
+  alternatives?: readonly string[];
 }
 
 /**
@@ -122,7 +131,7 @@ interface RuleDefinition {
  * Centralized definitions ensure consistency between code and docs.
  * These match the implementations in src/lint/process-guard/decider.ts
  */
-const RULE_DEFINITIONS: readonly RuleDefinition[] = [
+export const RULE_DEFINITIONS: readonly RuleDefinition[] = [
   {
     id: 'completed-protection',
     severity: 'error',
@@ -166,6 +175,37 @@ const RULE_DEFINITIONS: readonly RuleDefinition[] = [
     fix: 'Document reason for removal (completed or descoped)',
   },
 ] as const;
+
+/**
+ * Compose rationale from convention-extracted content into rule definitions.
+ *
+ * Convention bundles extracted from `@libar-docs-convention process-guard-errors`
+ * annotations contain per-rule sections with **Invariant:** and **Rationale:**
+ * markers plus situation/solution tables.
+ *
+ * @param rules - Static RULE_DEFINITIONS array
+ * @param conventionContent - Map of rule ID to extracted content
+ * @returns Enhanced rules with rationale and alternatives populated
+ */
+export function composeRationaleIntoRules(
+  rules: readonly RuleDefinition[],
+  conventionContent: ReadonlyMap<string, { rationale: string; alternatives: readonly string[] }>
+): RuleDefinition[] {
+  return rules.map((rule) => {
+    const content = conventionContent.get(rule.id);
+    if (content) {
+      const enriched: RuleDefinition = {
+        ...rule,
+        rationale: content.rationale,
+      };
+      if (content.alternatives.length > 0) {
+        enriched.alternatives = content.alternatives;
+      }
+      return enriched;
+    }
+    return { ...rule, rationale: rule.description };
+  });
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ValidationRules Document Codec
@@ -258,7 +298,7 @@ function buildValidationRulesDocument(
   }
 
   // Build additional files for progressive disclosure (if enabled)
-  const additionalFiles = options.generateDetailFiles ? buildDetailFiles() : {};
+  const additionalFiles = options.generateDetailFiles ? buildDetailFiles(options) : {};
 
   const docOpts: {
     purpose: string;
@@ -474,14 +514,16 @@ function buildEscapeHatchesSection(): SectionBlock[] {
 /**
  * Build additional validation detail files
  */
-function buildDetailFiles(): Record<string, RenderableDocument> {
+function buildDetailFiles(
+  options: Required<ValidationRulesCodecOptions>
+): Record<string, RenderableDocument> {
   const files: Record<string, RenderableDocument> = {};
 
   // validation/fsm-transitions.md - Full transition matrix with descriptions
   files['validation/fsm-transitions.md'] = buildFSMTransitionsDetailDocument();
 
   // validation/error-catalog.md - Full error messages with causes/fixes
-  files['validation/error-catalog.md'] = buildErrorCatalogDetailDocument();
+  files['validation/error-catalog.md'] = buildErrorCatalogDetailDocument(RULE_DEFINITIONS, options);
 
   // validation/protection-levels.md - Detailed protection explanations
   files['validation/protection-levels.md'] = buildProtectionLevelsDetailDocument();
@@ -562,28 +604,27 @@ function buildFSMTransitionsDetailDocument(): RenderableDocument {
 /**
  * Build error catalog detail document
  */
-function buildErrorCatalogDetailDocument(): RenderableDocument {
+function buildErrorCatalogDetailDocument(
+  rules: readonly RuleDefinition[],
+  options: Required<ValidationRulesCodecOptions>
+): RenderableDocument {
   const sections: SectionBlock[] = [];
 
   sections.push(
     heading(2, 'Error Catalog'),
     paragraph(
-      `Complete error messages and fix instructions for all ${RULE_DEFINITIONS.length} validation rules.`
+      `Complete error messages and fix instructions for all ${rules.length} validation rules.`
     )
   );
 
   // Summary table
-  const summaryRows = RULE_DEFINITIONS.map((rule) => [
-    `\`${rule.id}\``,
-    rule.severity,
-    rule.description,
-  ]);
+  const summaryRows = rules.map((rule) => [`\`${rule.id}\``, rule.severity, rule.description]);
   sections.push(table(['Rule ID', 'Severity', 'Description'], summaryRows));
 
   // Detailed breakdown per rule
   sections.push(heading(2, 'Rule Details'));
 
-  for (const rule of RULE_DEFINITIONS) {
+  for (const rule of rules) {
     sections.push(
       heading(3, `\`${rule.id}\``),
       table(
@@ -596,6 +637,18 @@ function buildErrorCatalogDetailDocument(): RenderableDocument {
         ]
       )
     );
+
+    // Error guide content (if enabled and rationale exists)
+    if (options.includeErrorGuide && rule.rationale) {
+      sections.push(heading(4, 'Why This Rule Exists'), paragraph(rule.rationale));
+
+      if (rule.alternatives && rule.alternatives.length > 0) {
+        sections.push(
+          heading(4, 'Alternative Approaches'),
+          ...rule.alternatives.map((alt) => paragraph(`- ${alt}`))
+        );
+      }
+    }
   }
 
   // Back link

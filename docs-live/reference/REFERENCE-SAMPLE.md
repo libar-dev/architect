@@ -256,13 +256,16 @@ classDiagram
     class DecisionDocGenerator {
         <<service>>
     }
+    class CliRecipeGenerator {
+    }
+    class MasterDataset
     class Pattern_Scanner
     class GherkinASTParser
     class ShapeExtractor
-    class MasterDataset
     class DecisionDocCodec
     class ProcessApiHybridGeneration
     class PatternRelationshipModel
+    class CliRecipeCodec
     SourceMapper ..> DecisionDocCodec : depends on
     SourceMapper ..> ShapeExtractor : depends on
     SourceMapper ..> GherkinASTParser : depends on
@@ -272,6 +275,8 @@ classDiagram
     ProcessApiReferenceGenerator ..|> ProcessApiHybridGeneration : implements
     DecisionDocGenerator ..> DecisionDocCodec : depends on
     DecisionDocGenerator ..> SourceMapper : depends on
+    CliRecipeGenerator ..|> CliRecipeCodec : implements
+    CliRecipeCodec ..> ProcessApiHybridGeneration : depends on
 ```
 
 ---
@@ -358,6 +363,9 @@ graph LR
         ProjectConfigTypes["ProjectConfigTypes"]
         ConfigurationPresets["ConfigurationPresets"]
     end
+    subgraph renderer["Renderer"]
+        loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser["loadPreambleFromMarkdown — Shared Markdown-to-SectionBlock Parser"]
+    end
     subgraph taxonomy["Taxonomy"]
         TagRegistryBuilder("TagRegistryBuilder")
     end
@@ -369,19 +377,21 @@ graph LR
         ProcessStateAPI["ProcessStateAPI"]:::neighbor
         TypeScriptTaxonomyImplementation["TypeScriptTaxonomyImplementation"]:::neighbor
         ProcessApiHybridGeneration["ProcessApiHybridGeneration"]:::neighbor
+        ProceduralGuideCodec["ProceduralGuideCodec"]:::neighbor
         PhaseStateMachineValidation["PhaseStateMachineValidation"]:::neighbor
         DataAPIOutputShaping["DataAPIOutputShaping"]:::neighbor
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
     end
-    CLISchema ..->|implements| ProcessApiHybridGeneration
     TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
+    loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
+    ProjectConfigTypes -->|uses| ConfigurationTypes
+    ProjectConfigTypes -->|uses| ConfigurationPresets
+    ConfigurationPresets -->|uses| ConfigurationTypes
+    CLISchema ..->|implements| ProcessApiHybridGeneration
     PatternHelpers ..->|implements| DataAPIOutputShaping
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
-    ProjectConfigTypes -->|uses| ConfigurationTypes
-    ProjectConfigTypes -->|uses| ConfigurationPresets
-    ConfigurationPresets -->|uses| ConfigurationTypes
     FSMTransitions ..->|implements| PhaseStateMachineValidation
     FSMStates ..->|implements| PhaseStateMachineValidation
     ProcessStateAPI -->|uses| MasterDataset
@@ -393,21 +403,6 @@ graph LR
 ---
 
 ## API Types
-
-### SectionBlock (type)
-
-```typescript
-type SectionBlock =
-  | HeadingBlock
-  | ParagraphBlock
-  | SeparatorBlock
-  | TableBlock
-  | ListBlock
-  | CodeBlock
-  | MermaidBlock
-  | CollapsibleBlock
-  | LinkOutBlock;
-```
 
 ### normalizeStatus (function)
 
@@ -501,6 +496,21 @@ interface CategoryDefinition {
 | priority    | Display order priority - lower values appear first in sorted output               |
 | description | Brief description of the category's purpose and typical patterns                  |
 | aliases     | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
+
+### SectionBlock (type)
+
+```typescript
+type SectionBlock =
+  | HeadingBlock
+  | ParagraphBlock
+  | SeparatorBlock
+  | TableBlock
+  | ListBlock
+  | CodeBlock
+  | MermaidBlock
+  | CollapsibleBlock
+  | LinkOutBlock;
+```
 
 ---
 

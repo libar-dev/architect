@@ -29,6 +29,9 @@ import { generatorRegistry } from '../registry.js';
 import { createCodecGenerator } from '../codec-based.js';
 import { createDecisionDocGenerator } from './decision-doc-generator.js';
 import { createProcessApiReferenceGenerator } from './process-api-reference-generator.js';
+import { createCliRecipeGenerator } from './cli-recipe-generator.js';
+import { loadPreambleFromMarkdown } from '../../renderable/load-preamble.js';
+import type { SectionBlock } from '../../renderable/schema.js';
 // registerReferenceGenerators is now called from orchestrator.ts with config-provided configs
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -176,6 +179,24 @@ generatorRegistry.register(createDecisionDocGenerator());
  * Standalone: does not consume MasterDataset (ADR-006).
  */
 generatorRegistry.register(createProcessApiReferenceGenerator());
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CLI Recipe Generator (Schema-Based, not Codec-Based)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * CLI Recipe & Workflow Guide Generator
+ * Generates PROCESS-API-RECIPES.md from declarative CLI schema.
+ * Standalone: does not consume MasterDataset (ADR-006).
+ */
+let cliRecipePreamble: readonly SectionBlock[] = [];
+try {
+  cliRecipePreamble = loadPreambleFromMarkdown('docs-sources/process-api-recipes.md');
+} catch {
+  // Preamble file may not exist in test environments (e.g., CLI integration tests
+  // that run generate-docs in a temp directory). Fall back to empty preamble.
+}
+generatorRegistry.register(createCliRecipeGenerator(cliRecipePreamble));
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Reference Document Generators (Convention-Based, Codec-Driven)

@@ -196,7 +196,10 @@ export {
   ValidationRulesCodec,
   createValidationRulesCodec,
   type ValidationRulesCodecOptions,
+  type RuleDefinition,
   DEFAULT_VALIDATION_RULES_OPTIONS,
+  RULE_DEFINITIONS,
+  composeRationaleIntoRules,
 } from './validation-rules.js';
 
 // Claude Module (includes ClaudeModuleCodecOptions)

@@ -4,7 +4,7 @@
 
 ---
 
-**277 rules** from 57 features. 270 rules have explicit invariants.
+**287 rules** from 58 features. 280 rules have explicit invariants.
 
 ---
 
@@ -1752,6 +1752,136 @@ _As a documentation generator_
   specific to layered architecture visualization.
 
 _layered-diagram.feature_
+
+### Load Preamble Parser
+
+_Preamble content authored as inline TypeScript SectionBlock[] literals is_
+
+---
+
+#### Headings are parsed into HeadingBlock
+
+> **Invariant:** Lines starting with 1-6 hash characters followed by a space produce HeadingBlock with the correct level and text.
+>
+> **Rationale:** Headings are the primary structural element in preamble markdown and must map exactly to HeadingBlock level values.
+
+**Verified by:**
+
+- Single heading is parsed
+- All heading levels are parsed correctly
+
+---
+
+#### Paragraphs are parsed into ParagraphBlock
+
+> **Invariant:** Consecutive non-empty, non-construct lines produce a single ParagraphBlock with lines joined by spaces.
+>
+> **Rationale:** Multi-line paragraphs in markdown are a single logical block separated by blank lines.
+
+**Verified by:**
+
+- Single line paragraph
+- Multi-line paragraph joined with space
+
+---
+
+#### Separators are parsed into SeparatorBlock
+
+> **Invariant:** Lines matching exactly three or more dashes, asterisks, or underscores produce SeparatorBlock.
+>
+> **Rationale:** Horizontal rules serve as visual separators in preamble content and must be faithfully represented.
+
+**Verified by:**
+
+- Triple dash separator
+
+---
+
+#### Tables are parsed into TableBlock
+
+> **Invariant:** A line starting with pipe followed by a separator row produces TableBlock with columns from the header and rows from subsequent pipe-delimited lines.
+>
+> **Rationale:** Tables are heavily used in preamble content for structured reference data and must preserve column names and cell values exactly.
+
+**Verified by:**
+
+- Simple table with header and rows
+
+---
+
+#### Unordered lists are parsed into ListBlock
+
+> **Invariant:** Lines starting with dash-space or asterisk-space produce ListBlock with ordered=false and string items.
+>
+> **Rationale:** Unordered lists are common in preamble content for enumerating capabilities or constraints.
+
+**Verified by:**
+
+- Dash list items
+- GFM checkbox list items
+
+---
+
+#### Ordered lists are parsed into ListBlock
+
+> **Invariant:** Lines starting with a digit followed by period-space produce ListBlock with ordered=true.
+>
+> **Rationale:** Ordered lists represent sequential steps in procedural guides and must preserve ordering semantics.
+
+**Verified by:**
+
+- Numbered list items
+
+---
+
+#### Code blocks are parsed into CodeBlock
+
+> **Invariant:** Fenced code blocks with a language info string produce CodeBlock with the language and content fields.
+>
+> **Rationale:** Code examples in preamble content must preserve the language annotation for syntax highlighting in generated docs.
+
+**Verified by:**
+
+- Code block with language
+- Empty code block
+
+---
+
+#### Mermaid blocks are parsed into MermaidBlock
+
+> **Invariant:** Code fences with the info string "mermaid" produce MermaidBlock instead of CodeBlock.
+>
+> **Rationale:** Mermaid diagrams have a dedicated SectionBlock type for specialized rendering in generated docs.
+
+**Verified by:**
+
+- Mermaid diagram block
+
+---
+
+#### Mixed content produces correct block sequence
+
+> **Invariant:** A markdown document with multiple construct types produces blocks in document order with correct types.
+>
+> **Rationale:** Preamble files combine headings, paragraphs, code blocks, and tables in sequence. The parser must handle transitions between all state machine states correctly.
+
+**Verified by:**
+
+- Mixed content in sequence
+
+---
+
+#### Bold and inline formatting is preserved in paragraphs
+
+> **Invariant:** Inline markdown formatting such as bold, italic, and code spans are preserved as-is in ParagraphBlock text.
+>
+> **Rationale:** The parser produces structural blocks. Inline formatting is the responsibility of the markdown renderer, not the block parser.
+
+**Verified by:**
+
+- Bold text preserved in paragraph
+
+_load-preamble.feature_
 
 ### Mermaid Relationship Rendering
 

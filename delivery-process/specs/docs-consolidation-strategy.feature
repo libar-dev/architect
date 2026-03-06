@@ -52,17 +52,19 @@ Feature: Documentation Consolidation Strategy
       | Preamble capability on ReferenceDocConfig | complete | src/renderable/codecs/reference.ts | Yes | unit |
       | Phase 1 - Taxonomy consolidation | pending | delivery-process.config.ts | Yes | integration |
       | Phase 2 - Codec listings extraction | complete | delivery-process.config.ts, src/renderable/codecs/*.ts | Yes | integration |
-      | Phase 3 - Process Guard consolidation | pending | src/renderable/codecs/validation-rules.ts | Yes | integration |
+      | Phase 3 - Process Guard consolidation | complete | src/renderable/codecs/validation-rules.ts | Yes | integration |
       | Phase 4 - Architecture decomposition | complete | docs/ARCHITECTURE.md | Yes | integration |
       | Phase 5 - Guide trimming | pending | docs/ANNOTATION-GUIDE.md, docs/CONFIGURATION.md | No | n/a |
       | Phase 6 - Index navigation update | pending | docs/INDEX.md | No | n/a |
-      | Phase 37 - docs-live/ directory consolidation | pending | delivery-process.config.ts | Yes | integration |
+      | Phase 37 - docs-live/ directory consolidation | complete | delivery-process.config.ts | Yes | integration |
       | Phase 38 - Generated doc quality improvements | pending | src/renderable/codecs/reference.ts | Yes | integration |
-      | Phase 39 - Session workflow CLAUDE.md module generation | pending | delivery-process/specs/, _claude-md/workflow/ | No | n/a |
-      | Phase 40 - PUBLISHING.md relocation to MAINTAINERS.md | pending | docs/PUBLISHING.md | No | n/a |
-      | Phase 41 - GHERKIN-PATTERNS.md restructure | pending | docs/GHERKIN-PATTERNS.md, docs/VALIDATION.md | No | n/a |
-      | Phase 42 - README.md rationalization | pending | README.md | No | n/a |
-      | Phase 43 - PROCESS-API.md hybrid generation | pending | docs/PROCESS-API.md, src/cli/ | Yes | integration |
+      | Phase 39 - Session workflow CLAUDE.md module generation | complete | delivery-process/specs/, _claude-md/workflow/ | No | n/a |
+      | Phase 40 - PUBLISHING.md relocation to MAINTAINERS.md | complete | docs/PUBLISHING.md | No | n/a |
+      | Phase 41 - GHERKIN-PATTERNS.md restructure | complete | docs/GHERKIN-PATTERNS.md, docs/VALIDATION.md | No | n/a |
+      | Phase 42 - README.md rationalization | complete | README.md | No | n/a |
+      | Phase 43 - PROCESS-API.md hybrid generation | complete | docs/PROCESS-API.md, src/cli/ | Yes | integration |
+      | Promote architecture generator from preview to docs:all | complete | package.json, delivery-process.config.ts | No | n/a |
+      | Promote changelog generator from preview to docs:all | complete | package.json, delivery-process.config.ts | No | n/a |
 
   Rule: Convention tags are the primary consolidation mechanism
 

@@ -229,6 +229,10 @@ Scoped architecture diagram showing component relationships:
 
 ```mermaid
 graph LR
+    ADR006SingleReadModelArchitecture["ADR006SingleReadModelArchitecture"]
+    ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
+    ADR002GherkinOnlyTesting["ADR002GherkinOnlyTesting"]
+    ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
     ValidatorReadModelConsolidation["ValidatorReadModelConsolidation"]
     StepDefinitionCompletion["StepDefinitionCompletion"]
     SessionFileCleanup["SessionFileCleanup"]
@@ -239,14 +243,12 @@ graph LR
     EffortVarianceTracking["EffortVarianceTracking"]
     ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
     CliBehaviorTesting["CliBehaviorTesting"]
-    ADR006SingleReadModelArchitecture["ADR006SingleReadModelArchitecture"]
-    ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
-    ADR002GherkinOnlyTesting["ADR002GherkinOnlyTesting"]
-    ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
     SessionFileLifecycle["SessionFileLifecycle"]
     subgraph related["Related"]
         ADR005CodecBasedMarkdownRendering["ADR005CodecBasedMarkdownRendering"]:::neighbor
     end
+    ADR006SingleReadModelArchitecture -.->|depends on| ADR005CodecBasedMarkdownRendering
+    ADR003SourceFirstPatternArchitecture -.->|depends on| ADR001TaxonomyCanonicalValues
     ValidatorReadModelConsolidation -.->|depends on| ADR006SingleReadModelArchitecture
     StepDefinitionCompletion -.->|depends on| ADR002GherkinOnlyTesting
     SessionFileCleanup -.->|depends on| SessionFileLifecycle
@@ -256,8 +258,6 @@ graph LR
     EffortVarianceTracking -.->|depends on| MvpWorkflowImplementation
     ConfigBasedWorkflowDefinition -.->|depends on| MvpWorkflowImplementation
     CliBehaviorTesting -.->|depends on| ADR002GherkinOnlyTesting
-    ADR006SingleReadModelArchitecture -.->|depends on| ADR005CodecBasedMarkdownRendering
-    ADR003SourceFirstPatternArchitecture -.->|depends on| ADR001TaxonomyCanonicalValues
     classDef neighbor stroke-dasharray: 5 5
 ```
 

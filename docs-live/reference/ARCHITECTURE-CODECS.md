@@ -26,12 +26,13 @@ Use `createValidationRulesCodec(options)` to create a configured codec:
 
 Or use the default export for standard behavior:
 
-| Option                  | Type    | Default | Description                      |
-| ----------------------- | ------- | ------- | -------------------------------- |
-| includeFSMDiagram       | boolean | true    | Include FSM state diagram        |
-| includeCLIUsage         | boolean | true    | Include CLI usage section        |
-| includeEscapeHatches    | boolean | true    | Include escape hatches section   |
-| includeProtectionMatrix | boolean | true    | Include protection levels matrix |
+| Option                  | Type    | Default | Description                                         |
+| ----------------------- | ------- | ------- | --------------------------------------------------- |
+| includeFSMDiagram       | boolean | true    | Include FSM state diagram                           |
+| includeCLIUsage         | boolean | true    | Include CLI usage section                           |
+| includeEscapeHatches    | boolean | true    | Include escape hatches section                      |
+| includeProtectionMatrix | boolean | true    | Include protection levels matrix                    |
+| includeErrorGuide       | boolean | true    | Include error guide with rationale and alternatives |
 
 ```typescript
 const codec = createValidationRulesCodec({ includeFSMDiagram: false });

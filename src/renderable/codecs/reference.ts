@@ -746,6 +746,12 @@ export function createReferenceCodec(
           ? buildBehaviorSectionsFromPatterns(behaviorPatterns, opts.detailLevel)
           : [];
 
+      // Static preamble: editorial sections before generated content
+      if (config.preamble !== undefined && config.preamble.length > 0) {
+        sections.push(...config.preamble);
+        sections.push(separator());
+      }
+
       // DD-4 (GeneratedDocQuality): Assemble in configured order
       if (config.shapesFirst === true) {
         sections.push(...shapeBlocks, ...conventionBlocks, ...diagramBlocks, ...behaviorBlocks);
