@@ -1,5 +1,7 @@
 # Tag Taxonomy
 
+> **Complete Reference:** The auto-generated [Taxonomy Reference](../docs-live/TAXONOMY.md) contains the full 56-tag catalog with all values and examples. This document explains taxonomy concepts; the generated version is the authoritative lookup.
+
 The taxonomy defines the vocabulary for pattern annotations: what tags exist, their valid values, and how they're parsed. It's 100% TypeScript-defined in `src/taxonomy/`, providing type safety and IDE autocomplete.
 
 ---

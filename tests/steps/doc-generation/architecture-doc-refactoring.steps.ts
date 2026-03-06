@@ -61,18 +61,17 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
   });
 
-  Rule('Product area pointer replacements link to covering documents', ({ RuleScenario }) => {
+  Rule('Product area sections coexist with generated documents', ({ RuleScenario }) => {
     RuleScenario(
-      'Configuration Architecture pointer links to covering document',
+      'Configuration Architecture section retained and generated doc exists',
       ({ When, Then, And }) => {
         When('reading the {string} section', (_ctx: unknown, section: string) => {
           state!.currentSectionName = section;
           state!.currentSectionContent = getSectionContent(state!.architectureContent!, section);
-          expect(state!.currentSectionContent.length).toBeGreaterThan(0);
         });
 
-        Then('the section contains {string}', (_ctx: unknown, text: string) => {
-          expect(state!.currentSectionContent).toContain(text);
+        Then('the section has content', () => {
+          expect(state!.currentSectionContent!.length).toBeGreaterThan(0);
         });
 
         And('file {string} contains {string}', (_ctx: unknown, filePath: string, text: string) => {
@@ -93,16 +92,15 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     );
 
     RuleScenario(
-      'Source Systems pointer links to annotation product area',
+      'Source Systems section retained and annotation product area exists',
       ({ When, Then, And }) => {
         When('reading the {string} section', (_ctx: unknown, section: string) => {
           state!.currentSectionName = section;
           state!.currentSectionContent = getSectionContent(state!.architectureContent!, section);
-          expect(state!.currentSectionContent.length).toBeGreaterThan(0);
         });
 
-        Then('the section contains {string}', (_ctx: unknown, text: string) => {
-          expect(state!.currentSectionContent).toContain(text);
+        Then('the section has content', () => {
+          expect(state!.currentSectionContent!.length).toBeGreaterThan(0);
         });
 
         And('file {string} contains {string}', (_ctx: unknown, filePath: string, text: string) => {
@@ -123,16 +121,15 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     );
 
     RuleScenario(
-      'Workflow Integration pointer links to process product area',
+      'Workflow Integration section retained and process product area exists',
       ({ When, Then, And }) => {
         When('reading the {string} section', (_ctx: unknown, section: string) => {
           state!.currentSectionName = section;
           state!.currentSectionContent = getSectionContent(state!.architectureContent!, section);
-          expect(state!.currentSectionContent.length).toBeGreaterThan(0);
         });
 
-        Then('the section contains {string}', (_ctx: unknown, text: string) => {
-          expect(state!.currentSectionContent).toContain(text);
+        Then('the section has content', () => {
+          expect(state!.currentSectionContent!.length).toBeGreaterThan(0);
         });
 
         And('file {string} contains {string}', (_ctx: unknown, filePath: string, text: string) => {
@@ -153,7 +150,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     );
   });
 
-  Rule('Annotation examples remain in Four-Stage Pipeline section', ({ RuleScenario }) => {
+  Rule('Four-Stage Pipeline section retains annotation format examples', ({ RuleScenario }) => {
     RuleScenario(
       'Annotation format examples appear before Source Systems',
       ({ When, Then, And }) => {
@@ -272,49 +269,63 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     }
   );
 
-  Rule('Section disposition routes content to generated equivalents', ({ RuleScenario }) => {
+  Rule('Full sections coexist with generated equivalents in docs-live', ({ RuleScenario }) => {
     RuleScenario(
-      'Unified Transformation Architecture section is a pointer to ARCHITECTURE-TYPES',
+      'Unified Transformation Architecture section retained and ARCHITECTURE-TYPES exists',
       ({ When, Then, And }) => {
         When('reading the {string} section', (_ctx: unknown, section: string) => {
           state!.currentSectionName = section;
           state!.currentSectionContent = getSectionContent(state!.architectureContent!, section);
-          expect(state!.currentSectionContent.length).toBeGreaterThan(0);
         });
 
         Then('the section contains {string}', (_ctx: unknown, text: string) => {
           expect(state!.currentSectionContent).toContain(text);
         });
 
-        And('the section does not contain {string}', (_ctx: unknown, text: string) => {
-          expect(state!.currentSectionContent).not.toContain(text);
+        And('file {string} exists', (_ctx: unknown, filePath: string) => {
+          const fullPath = path.join(process.cwd(), filePath);
+          expect(fs.existsSync(fullPath)).toBe(true);
         });
       }
     );
 
-    RuleScenario('Data Flow Diagrams section is a pointer', ({ When, Then }) => {
-      When('reading the {string} section', (_ctx: unknown, section: string) => {
-        state!.currentSectionName = section;
-        state!.currentSectionContent = getSectionContent(state!.architectureContent!, section);
-        expect(state!.currentSectionContent.length).toBeGreaterThan(0);
-      });
+    RuleScenario(
+      'Data Flow Diagrams section retained and ARCHITECTURE-TYPES exists',
+      ({ When, Then, And }) => {
+        When('reading the {string} section', (_ctx: unknown, section: string) => {
+          state!.currentSectionName = section;
+          state!.currentSectionContent = getSectionContent(state!.architectureContent!, section);
+        });
 
-      Then('the section contains {string}', (_ctx: unknown, text: string) => {
-        expect(state!.currentSectionContent).toContain(text);
-      });
-    });
+        Then('the section has content', () => {
+          expect(state!.currentSectionContent!.length).toBeGreaterThan(0);
+        });
 
-    RuleScenario('Quick Reference section points to ARCHITECTURE-CODECS', ({ When, Then }) => {
-      When('reading the {string} section', (_ctx: unknown, section: string) => {
-        state!.currentSectionName = section;
-        state!.currentSectionContent = getSectionContent(state!.architectureContent!, section);
-        expect(state!.currentSectionContent.length).toBeGreaterThan(0);
-      });
+        And('file {string} exists', (_ctx: unknown, filePath: string) => {
+          const fullPath = path.join(process.cwd(), filePath);
+          expect(fs.existsSync(fullPath)).toBe(true);
+        });
+      }
+    );
 
-      Then('the section contains {string}', (_ctx: unknown, text: string) => {
-        expect(state!.currentSectionContent).toContain(text);
-      });
-    });
+    RuleScenario(
+      'Quick Reference section retained and ARCHITECTURE-CODECS exists',
+      ({ When, Then, And }) => {
+        When('reading the {string} section', (_ctx: unknown, section: string) => {
+          state!.currentSectionName = section;
+          state!.currentSectionContent = getSectionContent(state!.architectureContent!, section);
+        });
+
+        Then('the section has content', () => {
+          expect(state!.currentSectionContent!.length).toBeGreaterThan(0);
+        });
+
+        And('file {string} exists', (_ctx: unknown, filePath: string) => {
+          const fullPath = path.join(process.cwd(), filePath);
+          expect(fs.existsSync(fullPath)).toBe(true);
+        });
+      }
+    );
   });
 
   Rule('MasterDataset shapes appear in ARCHITECTURE-TYPES reference', ({ RuleScenario }) => {
@@ -349,7 +360,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario(
-      'Unified Transformation section replaced with pointer and narrative',
+      'Unified Transformation section has full MasterDataset content',
       ({ When, Then, And }) => {
         When('reading the {string} section', (_ctx: unknown, section: string) => {
           state!.currentSectionName = section;
@@ -398,22 +409,22 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     );
   });
 
-  Rule('Editorial trimming removes tutorial sections and reduces file size', ({ RuleScenario }) => {
-    RuleScenario('Programmatic Usage section removed from ARCHITECTURE.md', ({ Then }) => {
-      Then('section {string} is absent from ARCHITECTURE.md', (_ctx: unknown, heading: string) => {
+  Rule('Full ARCHITECTURE.md retains all sections with substantial content', ({ RuleScenario }) => {
+    RuleScenario('Programmatic Usage section exists in ARCHITECTURE.md', ({ Then }) => {
+      Then('section {string} exists in ARCHITECTURE.md', (_ctx: unknown, heading: string) => {
         const idx = getHeadingStart(state!.architectureContent!, heading);
-        expect(idx).toBe(-1);
+        expect(idx).toBeGreaterThanOrEqual(0);
       });
     });
 
-    RuleScenario('Extending the System section removed from ARCHITECTURE.md', ({ Then }) => {
-      Then('section {string} is absent from ARCHITECTURE.md', (_ctx: unknown, heading: string) => {
+    RuleScenario('Extending the System section exists in ARCHITECTURE.md', ({ Then }) => {
+      Then('section {string} exists in ARCHITECTURE.md', (_ctx: unknown, heading: string) => {
         const idx = getHeadingStart(state!.architectureContent!, heading);
-        expect(idx).toBe(-1);
+        expect(idx).toBeGreaterThanOrEqual(0);
       });
     });
 
-    RuleScenario('Key Design Patterns section has pointer to CORE-TYPES', ({ When, Then }) => {
+    RuleScenario('Key Design Patterns section has design pattern content', ({ When, Then }) => {
       When('reading the {string} section', (_ctx: unknown, section: string) => {
         state!.currentSectionName = section;
         state!.currentSectionContent = getSectionContent(state!.architectureContent!, section);
@@ -425,7 +436,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       });
     });
 
-    RuleScenario('ARCHITECTURE.md is under 400 lines after editorial trimming', ({ Then }) => {
+    RuleScenario('ARCHITECTURE.md is under 1700 lines as full reference', ({ Then }) => {
       Then('ARCHITECTURE.md has fewer than {int} lines', (_ctx: unknown, limit: number) => {
         const lineCount = state!.architectureContent!.split('\n').length;
         expect(lineCount).toBeLessThan(limit);

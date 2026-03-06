@@ -192,6 +192,8 @@ Feature: Process Guard Linter
 
 ## Tag Groups Quick Reference
 
+> For the complete tag reference with all values, see the [generated Taxonomy Reference](../docs-live/TAXONOMY.md).
+
 Tags are organized into 12 functional groups. This table shows representative tags per group — for the **complete reference** with all formats, values, and examples, run `npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f`.
 
 | Group            | Tags (representative)                                | Format Types              |

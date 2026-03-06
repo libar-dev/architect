@@ -107,6 +107,7 @@ export default defineConfig({
   generatorOverrides: {
     'business-rules': {
       replaceFeatures: ['tests/features/**/*.feature'],
+      outputDirectory: 'docs-live',
     },
     changelog: {
       additionalFeatures: ['delivery-process/decisions/*.feature'],
@@ -122,6 +123,12 @@ export default defineConfig({
       outputDirectory: 'docs-live',
     },
     adrs: {
+      outputDirectory: 'docs-live',
+    },
+    taxonomy: {
+      outputDirectory: 'docs-live',
+    },
+    'validation-rules': {
       outputDirectory: 'docs-live',
     },
     requirements: {

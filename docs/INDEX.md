@@ -19,18 +19,19 @@
 
 | If you want to...              | Read this                                    | Lines  |
 | ------------------------------ | -------------------------------------------- | ------ |
-| Get started quickly            | [README.md](../README.md)                    | 1-142  |
+| Get started quickly            | [README.md](../README.md)                    | 1-504  |
 | Configure presets and tags     | [CONFIGURATION.md](./CONFIGURATION.md)       | 1-357  |
 | Understand the "why"           | [METHODOLOGY.md](./METHODOLOGY.md)           | 1-238  |
-| Learn the architecture         | [ARCHITECTURE.md](./ARCHITECTURE.md)         | 1-358  |
+| Learn the architecture         | [ARCHITECTURE.md](./ARCHITECTURE.md)         | 1-1638 |
 | Run AI coding sessions         | [SESSION-GUIDES.md](./SESSION-GUIDES.md)     | 1-389  |
-| Write Gherkin specs            | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | 1-366  |
+| Write Gherkin specs            | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | 1-515  |
 | Enforce delivery process rules | [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | 1-341  |
-| Validate annotation quality    | [VALIDATION.md](./VALIDATION.md)             | 1-416  |
-| Query process state via CLI    | [PROCESS-API.md](./PROCESS-API.md)           | 1-464  |
+| Validate annotation quality    | [VALIDATION.md](./VALIDATION.md)             | 1-281  |
+| Query process state via CLI    | [PROCESS-API.md](./PROCESS-API.md)           | 1-507  |
 | Understand the taxonomy        | [TAXONOMY.md](./TAXONOMY.md)                 | 1-105  |
+| Publish to npm                 | [PUBLISHING.md](./PUBLISHING.md)             | 1-144  |
 | Learn annotation patterns      | [ANNOTATION-GUIDE.md](./ANNOTATION-GUIDE.md) | 1-268  |
-| Review the changelog           | [CHANGELOG.md](../CHANGELOG.md)              | 1-31   |
+| Review the changelog           | [CHANGELOG.md](../CHANGELOG.md)              | 1-26   |
 | Security policy                | [SECURITY.md](../SECURITY.md)                | 1-21   |
 
 ---
@@ -60,17 +61,27 @@
 
 ## Detailed Table of Contents
 
-### README.md (Lines 1-142)
+### README.md (Lines 1-504)
 
-| Section             | Lines   | Key Topics                                  |
-| ------------------- | ------- | ------------------------------------------- |
-| Why This Exists     | 16-18   | AI context, code as source of truth         |
-| Quick Start         | 22-66   | Install, annotate, generate, enforce        |
-| How It Works        | 70-84   | TS annotation example, pipeline one-liner   |
-| What Gets Generated | 88-101  | Content block table, live product area docs |
-| CLI Commands        | 105-118 | Command table with doc links                |
-| Documentation       | 122-138 | INDEX.md link, unified doc table            |
-| License             | 142     | MIT license                                 |
+| Section                   | Lines   | Key Topics                                        |
+| ------------------------- | ------- | ------------------------------------------------- |
+| Why This Exists           | 17-31   | AI context failure, code as source of truth       |
+| Built for AI-Assisted Dev | 33-50   | Data API CLI typed queries                        |
+| Quick Start               | 52-109  | Install, annotate, generate, lint                 |
+| How It Works              | 111-165 | Annotation examples, pipeline one-liner           |
+| What Gets Generated       | 167-184 | Content block types, config-driven generation     |
+| CLI Commands              | 186-254 | generate-docs, process-api, generate-tag-taxonomy |
+| Proven at Scale           | 256-303 | Discovery, real results, 3-session MVP            |
+| FSM-Enforced Workflow     | 305-337 | State diagram, protection levels                  |
+| Data API CLI              | 339-365 | CLI example, context cost comparison              |
+| Rich Relationship Model   | 367-390 | Dependency tags, Mermaid graph                    |
+| How It Compares           | 392-414 | Comparison with Backstage, Mintlify, etc.         |
+| Design-First Development  | 416-420 | Stub pattern summary + link                       |
+| Document Durability Model | 422-426 | Durability hierarchy summary + link               |
+| Use Cases                 | 428-439 | Multi-phase roadmaps, AI sessions, validation     |
+| Configuration             | 441-475 | Presets table, custom config                      |
+| Documentation             | 477-500 | Doc links table                                   |
+| License                   | 502-504 | MIT license                                       |
 
 ---
 
@@ -164,7 +175,7 @@
 
 ---
 
-### GHERKIN-PATTERNS.md (Lines 1-366)
+### GHERKIN-PATTERNS.md (Lines 1-515)
 
 | Section                     | Lines   | Key Topics                                              |
 | --------------------------- | ------- | ------------------------------------------------------- |
@@ -176,8 +187,9 @@
 | DataTable & DocString Usage | 155-202 | Background vs Scenario tables, code blocks              |
 | Tag Conventions             | 205-243 | Semantic tags, convention tags, combining               |
 | Feature File Rich Content   | 246-344 | Code-first, Rule annotations, syntax notes              |
-| Quick Reference             | 346-357 | Element-to-use-case mapping table                       |
-| Related Documentation       | 359-366 | Links to ANNOTATION-GUIDE, TAXONOMY, CONFIG, VALIDATION |
+| Step Linting                | 346-493 | lint-steps rules, CLI, feature/step/cross-file checks   |
+| Quick Reference             | 495-506 | Element-to-use-case mapping table                       |
+| Related Documentation       | 508-515 | Links to ANNOTATION-GUIDE, TAXONOMY, CONFIG, VALIDATION |
 
 ---
 
@@ -216,20 +228,20 @@
 
 ---
 
-### VALIDATION.md (Lines 1-416)
+### VALIDATION.md (Lines 1-281)
 
-| Section               | Lines   | Key Topics                                          |
-| --------------------- | ------- | --------------------------------------------------- |
-| Which Command?        | 7-24    | Decision tree for validation commands               |
-| Command Summary       | 26-35   | lint-patterns, lint-steps, lint-process, validate   |
-| lint-patterns         | 37-74   | 8 rules table, CLI flags                            |
-| lint-steps            | 76-233  | 12 rules with examples, 3 categories, CLI reference |
-| lint-process          | 235-256 | What it validates, reference links                  |
-| validate-patterns     | 258-332 | CLI flags, checks, anti-patterns, DoD               |
-| CI/CD Integration     | 334-373 | Consumer scripts, hooks, GitHub Actions             |
-| Exit Codes            | 375-383 | Per-command exit code table                         |
-| Programmatic API      | 385-407 | Import paths for all validators                     |
-| Related Documentation | 409-416 | Links to GHERKIN-PATTERNS, PROCESS-GUARD, TAXONOMY  |
+| Section               | Lines   | Key Topics                                        |
+| --------------------- | ------- | ------------------------------------------------- |
+| Which Command?        | 7-24    | Decision tree for validation commands             |
+| Command Summary       | 26-35   | lint-patterns, lint-steps, lint-process, validate |
+| lint-patterns         | 37-74   | 8 rules table, CLI flags                          |
+| lint-steps            | 76-98   | 12 rules, 3 categories, vitest-cucumber traps     |
+| lint-process          | 100-121 | What it validates, reference links                |
+| validate-patterns     | 123-197 | CLI flags, checks, anti-patterns, DoD             |
+| CI/CD Integration     | 199-238 | Consumer scripts, hooks, GitHub Actions           |
+| Exit Codes            | 240-248 | Per-command exit code table                       |
+| Programmatic API      | 250-272 | Import paths for all validators                   |
+| Related Documentation | 274-281 | Links to GHERKIN-PATTERNS, PROCESS-GUARD, CONFIG  |
 
 ---
 
@@ -242,6 +254,21 @@
 | Format Types          | 69-80   | flag, value, enum, csv, number, quoted-value |
 | Generating Reference  | 84-96   | generate-docs (preferred), deprecated CLI    |
 | Related Documentation | 100-105 | Links to CONFIGURATION, METHODOLOGY          |
+
+---
+
+### PUBLISHING.md (Lines 1-144)
+
+| Section                       | Lines   | Key Topics                           |
+| ----------------------------- | ------- | ------------------------------------ |
+| Prerequisites                 | 5-9     | npm account, login, tests            |
+| Version Strategy              | 11-18   | Semantic versioning, pre/latest tags |
+| Publishing Workflow           | 20-67   | Pre-releases, subsequent, stable     |
+| Automated Publishing          | 69-85   | GitHub Actions, provenance           |
+| Pre-commit and Pre-push Hooks | 87-99   | Husky hooks, lint-staged, typecheck  |
+| Dry Run                       | 101-109 | Test before publishing               |
+| Verifying a Published Package | 111-126 | npm view, test install               |
+| Troubleshooting               | 128-144 | Auth errors, package not found       |
 
 ---
 
@@ -295,21 +322,22 @@ pnpm process:query -- handoff --pattern MyPattern              # Capture session
 
 ## Document Roles Summary
 
-| Document            | Audience   | Focus                             |
-| ------------------- | ---------- | --------------------------------- |
-| README.md           | Everyone   | Quick start, value proposition    |
-| METHODOLOGY.md      | Everyone   | Why — core thesis, principles     |
-| CONFIGURATION.md    | Users      | Setup — presets, tags, config     |
-| ARCHITECTURE.md     | Developers | How — pipeline, codecs, schemas   |
-| PROCESS-API.md      | AI/Devs    | Data API CLI query interface      |
-| SESSION-GUIDES.md   | AI/Devs    | Workflow — day-to-day usage       |
-| GHERKIN-PATTERNS.md | Writers    | Specs — writing effective Gherkin |
-| PROCESS-GUARD.md    | Team Leads | Governance — enforcement rules    |
-| VALIDATION.md       | CI/CD      | Quality — automated checks        |
-| TAXONOMY.md         | Reference  | Lookup — tag taxonomy and API     |
-| ANNOTATION-GUIDE.md | Developers | Reference — annotation mechanics  |
-| CHANGELOG.md        | Everyone   | Version history and changes       |
-| SECURITY.md         | Everyone   | Security policy and reporting     |
+| Document            | Audience    | Focus                             |
+| ------------------- | ----------- | --------------------------------- |
+| README.md           | Everyone    | Quick start, value proposition    |
+| METHODOLOGY.md      | Everyone    | Why — core thesis, principles     |
+| CONFIGURATION.md    | Users       | Setup — presets, tags, config     |
+| ARCHITECTURE.md     | Developers  | How — pipeline, codecs, schemas   |
+| PROCESS-API.md      | AI/Devs     | Data API CLI query interface      |
+| SESSION-GUIDES.md   | AI/Devs     | Workflow — day-to-day usage       |
+| GHERKIN-PATTERNS.md | Writers     | Specs — writing effective Gherkin |
+| PROCESS-GUARD.md    | Team Leads  | Governance — enforcement rules    |
+| VALIDATION.md       | CI/CD       | Quality — automated checks        |
+| TAXONOMY.md         | Reference   | Lookup — tag taxonomy and API     |
+| ANNOTATION-GUIDE.md | Developers  | Reference — annotation mechanics  |
+| PUBLISHING.md       | Maintainers | Release — npm publishing          |
+| CHANGELOG.md        | Everyone    | Version history and changes       |
+| SECURITY.md         | Everyone    | Security policy and reporting     |
 
 ---
 

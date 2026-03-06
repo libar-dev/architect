@@ -7,6 +7,7 @@
 @libar-docs-depends-on:DocsConsolidationStrategy
 @libar-docs-business-value:single-output-directory-for-all-website-published-and-claude-readable-content
 @libar-docs-priority:high
+@libar-docs-unlock-reason:Move-business-rules-taxonomy-to-docs-live
 Feature: Docs Live Directory Consolidation
 
   **Problem:**
@@ -21,12 +22,12 @@ Feature: Docs Live Directory Consolidation
   Establish `docs-live/` as the single output directory for all website-published
   and Claude-readable content. Move reference docs to `docs-live/reference/` and
   architecture compact files to `docs-live/_claude-md/architecture/` by updating
-  output directory configs in `delivery-process.config.ts`. Restrict
-  `docs-generated/` to intermediate artifacts: business-rules/ and taxonomy/.
+  output directory configs in `delivery-process.config.ts`.
+  After consolidation, `docs-generated/` contains no production artifacts — all generated reference content lives in `docs-live/`.
 
   **Why It Matters:**
   | Benefit | How |
-  | Clear contract | One directory for website and Claude; one for build artifacts |
+  | Clear contract | One directory (docs-live/) for all generated reference content |
   | No missed content | Claude sessions directed to docs-live/ find all compacts |
   | Simpler gitignore | docs-generated/ can be fully ignored; docs-live/ is committed |
 
@@ -42,8 +43,9 @@ Feature: Docs Live Directory Consolidation
 
     **Invariant:** Every file appearing on `libar.dev` or referenced by CLAUDE.md
     comes from `docs-live/`. No production reference document is published from
-    `docs-generated/`. The `docs-generated/` directory contains only intermediate
-    artifacts: business-rules/, taxonomy/, TAXONOMY.md, and BUSINESS-RULES.md.
+    `docs-generated/`. The `docs-generated/` directory contains no production reference
+    content after `docs:all` runs. Business-rules, taxonomy, and
+    validation-rules output to `docs-live/` alongside other reference docs.
 
     **Rationale:** DD-1: Splitting production output across two directories creates
     ambiguity about where authoritative content lives. Website configuration, CLAUDE.md
@@ -86,8 +88,8 @@ Feature: Docs Live Directory Consolidation
       And docs-generated/_claude-md/ directory does not exist
 
     @acceptance-criteria @validation
-    Scenario: docs-generated/ contains only intermediate artifacts after consolidation
+    Scenario: docs-generated/ is empty after standard generation
       Given consolidation config changes applied
       When pnpm docs:all runs
-      Then docs-generated/ contains only business-rules/, taxonomy/, TAXONOMY.md, BUSINESS-RULES.md
-      And docs-generated/ contains no .md files that appear in docs-live/
+      Then docs-generated/ contains no .md files
+      And all business-rules, taxonomy, and validation-rules output is in docs-live/

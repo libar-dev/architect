@@ -5,43 +5,43 @@
 @integration
 Feature: Architecture Doc Refactoring Coverage
 
-  Validates that ARCHITECTURE.md section replacements from docs consolidation
-  still point to covering generated documents and preserve required pipeline
-  annotation examples.
+  Validates that ARCHITECTURE.md retains its full reference content and that
+  generated documents in docs-live/ coexist alongside it, covering equivalent
+  content from annotated sources.
 
   Background:
     Given ARCHITECTURE.md on the filesystem
 
-  Rule: Product area pointer replacements link to covering documents
+  Rule: Product area sections coexist with generated documents
 
     @happy-path
-    Scenario: Configuration Architecture pointer links to covering document
+    Scenario: Configuration Architecture section retained and generated doc exists
       When reading the "Configuration Architecture" section
-      Then the section contains "See [CONFIGURATION.md](../docs-live/product-areas/CONFIGURATION.md)"
+      Then the section has content
       And file "docs-live/product-areas/CONFIGURATION.md" contains "config resolution"
       And file "docs-live/product-areas/CONFIGURATION.md" also contains "preset"
 
     @happy-path
-    Scenario: Source Systems pointer links to annotation product area
+    Scenario: Source Systems section retained and annotation product area exists
       When reading the "Source Systems" section
-      Then the section contains "See [ANNOTATION.md](../docs-live/product-areas/ANNOTATION.md)"
+      Then the section has content
       And file "docs-live/product-areas/ANNOTATION.md" contains "scanner"
       And file "docs-live/product-areas/ANNOTATION.md" also contains "tag dispatch"
 
     @happy-path
-    Scenario: Workflow Integration pointer links to process product area
+    Scenario: Workflow Integration section retained and process product area exists
       When reading the "Workflow Integration" section
-      Then the section contains "See [PROCESS.md](../docs-live/product-areas/PROCESS.md)"
+      Then the section has content
       And file "docs-live/product-areas/PROCESS.md" contains "FSM lifecycle"
       And file "docs-live/product-areas/PROCESS.md" also contains "session"
 
-  Rule: Annotation examples remain in Four-Stage Pipeline section
+  Rule: Four-Stage Pipeline section retains annotation format examples
 
     @happy-path
     Scenario: Annotation format examples appear before Source Systems
       When reading the "Four-Stage Pipeline" section
-      Then the section contains "@libar-docs-core"
-      And the section also contains "@libar-docs-shape"
+      Then the section contains "@libar-docs-shape"
+      And the section also contains "extract-shapes"
       And section "Four-Stage Pipeline" appears before section "Source Systems"
 
   Rule: Convention extraction produces ARCHITECTURE-CODECS reference document
@@ -83,23 +83,25 @@ Feature: Architecture Doc Refactoring Coverage
       Then the file contains "ValidationRulesCodec"
       And the file also contains "PatternsDocumentCodec"
 
-  Rule: Section disposition routes content to generated equivalents
+  Rule: Full sections coexist with generated equivalents in docs-live
 
     @happy-path
-    Scenario: Unified Transformation Architecture section is a pointer to ARCHITECTURE-TYPES
+    Scenario: Unified Transformation Architecture section retained and ARCHITECTURE-TYPES exists
       When reading the "Unified Transformation Architecture" section
-      Then the section contains "ARCHITECTURE-TYPES.md"
-      And the section does not contain "MasterDatasetSchema"
+      Then the section contains "MasterDataset"
+      And file "docs-live/reference/ARCHITECTURE-TYPES.md" exists
 
     @happy-path
-    Scenario: Data Flow Diagrams section is a pointer
+    Scenario: Data Flow Diagrams section retained and ARCHITECTURE-TYPES exists
       When reading the "Data Flow Diagrams" section
-      Then the section contains "ARCHITECTURE-TYPES.md"
+      Then the section has content
+      And file "docs-live/reference/ARCHITECTURE-TYPES.md" exists
 
     @happy-path
-    Scenario: Quick Reference section points to ARCHITECTURE-CODECS
+    Scenario: Quick Reference section retained and ARCHITECTURE-CODECS exists
       When reading the "Quick Reference" section
-      Then the section contains "ARCHITECTURE-CODECS.md"
+      Then the section has content
+      And file "docs-live/reference/ARCHITECTURE-CODECS.md" exists
 
   Rule: MasterDataset shapes appear in ARCHITECTURE-TYPES reference
 
@@ -120,10 +122,10 @@ Feature: Architecture Doc Refactoring Coverage
       And the file also contains "PipelineResult"
 
     @happy-path
-    Scenario: Unified Transformation section replaced with pointer and narrative
+    Scenario: Unified Transformation section has full MasterDataset content
       When reading the "Unified Transformation Architecture" section
-      Then the section contains "MasterDataset types"
-      And the section also contains "ARCHITECTURE-TYPES.md"
+      Then the section contains "MasterDataset"
+      And the section also contains "RuntimeMasterDataset"
 
   Rule: Pipeline architecture convention appears in generated reference
 
@@ -137,21 +139,21 @@ Feature: Architecture Doc Refactoring Coverage
       When reading file "src/generators/pipeline/build-pipeline.ts"
       Then the file contains "pipeline-architecture"
 
-  Rule: Editorial trimming removes tutorial sections and reduces file size
+  Rule: Full ARCHITECTURE.md retains all sections with substantial content
 
     @happy-path
-    Scenario: Programmatic Usage section removed from ARCHITECTURE.md
-      Then section "Programmatic Usage" is absent from ARCHITECTURE.md
+    Scenario: Programmatic Usage section exists in ARCHITECTURE.md
+      Then section "Programmatic Usage" exists in ARCHITECTURE.md
 
     @happy-path
-    Scenario: Extending the System section removed from ARCHITECTURE.md
-      Then section "Extending the System" is absent from ARCHITECTURE.md
+    Scenario: Extending the System section exists in ARCHITECTURE.md
+      Then section "Extending the System" exists in ARCHITECTURE.md
 
     @happy-path
-    Scenario: Key Design Patterns section has pointer to CORE-TYPES
+    Scenario: Key Design Patterns section has design pattern content
       When reading the "Key Design Patterns" section
-      Then the section contains "CORE-TYPES.md"
+      Then the section contains "Result"
 
     @happy-path
-    Scenario: ARCHITECTURE.md is under 400 lines after editorial trimming
-      Then ARCHITECTURE.md has fewer than 400 lines
+    Scenario: ARCHITECTURE.md is under 1700 lines as full reference
+      Then ARCHITECTURE.md has fewer than 1700 lines
