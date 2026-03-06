@@ -16,7 +16,7 @@
 
 import type { DocumentGenerator, GeneratorContext, GeneratorOutput } from '../types.js';
 import { CLI_SCHEMA } from '../../cli/cli-schema.js';
-import type { CLIOptionGroup } from '../../cli/cli-schema.js';
+import type { CLIOptionDef, CLIOptionGroup } from '../../cli/cli-schema.js';
 import { heading, paragraph, table, separator, document } from '../../renderable/schema.js';
 import type { SectionBlock } from '../../renderable/schema.js';
 import { renderToMarkdown } from '../../renderable/render.js';
@@ -25,50 +25,20 @@ import { renderToMarkdown } from '../../renderable/render.js';
 // Section Building
 // =============================================================================
 
-function buildGlobalOptionsSection(group: CLIOptionGroup): SectionBlock[] {
+function buildOptionSection(
+  group: CLIOptionGroup,
+  buildTable: (group: CLIOptionGroup) => { columns: string[]; mapRow: (opt: CLIOptionDef) => string[] }
+): SectionBlock[] {
   const sections: SectionBlock[] = [];
-
   sections.push(heading(2, group.title));
-
   if (group.description !== undefined) {
     sections.push(paragraph(group.description));
   }
-
-  const columns = ['Flag', 'Short', 'Description', 'Default'];
-  const rows = group.options.map((opt) => [
-    `\`${opt.flag}\``,
-    opt.short !== undefined ? `\`${opt.short}\`` : '---',
-    opt.description,
-    opt.default ?? '---',
-  ]);
-
-  sections.push(table(columns, rows));
-
+  const { columns, mapRow } = buildTable(group);
+  sections.push(table(columns, group.options.map(mapRow)));
   if (group.postNote !== undefined) {
     sections.push(paragraph(group.postNote));
   }
-
-  return sections;
-}
-
-function buildTwoColumnSection(group: CLIOptionGroup): SectionBlock[] {
-  const sections: SectionBlock[] = [];
-
-  sections.push(heading(2, group.title));
-
-  if (group.description !== undefined) {
-    sections.push(paragraph(group.description));
-  }
-
-  const columns = [group.singularTitle ?? group.title, 'Description'];
-  const rows = group.options.map((opt) => [`\`${opt.flag}\``, opt.description]);
-
-  sections.push(table(columns, rows));
-
-  if (group.postNote !== undefined) {
-    sections.push(paragraph(group.postNote));
-  }
-
   return sections;
 }
 
@@ -85,13 +55,27 @@ function buildReferenceDocument(): string {
     )
   );
 
-  sections.push(...buildGlobalOptionsSection(CLI_SCHEMA.globalOptions));
+  const fourCol = (): { columns: string[]; mapRow: (opt: CLIOptionDef) => string[] } => ({
+    columns: ['Flag', 'Short', 'Description', 'Default'],
+    mapRow: (opt) => [
+      `\`${opt.flag}\``,
+      opt.short !== undefined ? `\`${opt.short}\`` : '---',
+      opt.description,
+      opt.default ?? '---',
+    ],
+  });
+  const twoCol = (g: CLIOptionGroup): { columns: string[]; mapRow: (opt: CLIOptionDef) => string[] } => ({
+    columns: [g.singularTitle ?? g.title, 'Description'],
+    mapRow: (opt) => [`\`${opt.flag}\``, opt.description],
+  });
+
+  sections.push(...buildOptionSection(CLI_SCHEMA.globalOptions, fourCol));
   sections.push(separator());
-  sections.push(...buildTwoColumnSection(CLI_SCHEMA.outputModifiers));
+  sections.push(...buildOptionSection(CLI_SCHEMA.outputModifiers, twoCol));
   sections.push(separator());
-  sections.push(...buildTwoColumnSection(CLI_SCHEMA.listFilters));
+  sections.push(...buildOptionSection(CLI_SCHEMA.listFilters, twoCol));
   sections.push(separator());
-  sections.push(...buildTwoColumnSection(CLI_SCHEMA.sessionOptions));
+  sections.push(...buildOptionSection(CLI_SCHEMA.sessionOptions, twoCol));
 
   const doc = document('Process API CLI Reference', sections);
   return renderToMarkdown(doc);
