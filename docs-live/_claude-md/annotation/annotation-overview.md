@@ -9,18 +9,19 @@
 - Pipeline data preservation: Gherkin `Rule:` blocks, deliverables, scenarios, and all metadata flow through scanner → extractor → `ExtractedPattern` → generators without data loss
 - Dual-source merge with conflict detection: Same pattern name in both TypeScript and Gherkin produces a merge conflict error. Phase mismatches between sources produce validation errors
 
+
 **Components:** Extractor (GherkinExtractor, DualSourceExtractor, Document Extractor), Scanner (Pattern Scanner, GherkinScanner, GherkinASTParser, TypeScript AST Parser)
 
 #### API Types
 
-| Type                             | Kind      |
-| -------------------------------- | --------- |
-| TagRegistry                      | interface |
+| Type | Kind |
+| --- | --- |
+| TagRegistry | interface |
 | MetadataTagDefinitionForRegistry | interface |
-| CategoryDefinition               | interface |
-| TagDefinition                    | type      |
-| CategoryTag                      | type      |
-| buildRegistry                    | function  |
-| METADATA_TAGS_BY_GROUP           | const     |
-| CATEGORIES                       | const     |
-| CATEGORY_TAGS                    | const     |
+| CategoryDefinition | interface |
+| TagDefinition | type |
+| CategoryTag | type |
+| buildRegistry | function |
+| METADATA_TAGS_BY_GROUP | const |
+| CATEGORIES | const |
+| CATEGORY_TAGS | const |

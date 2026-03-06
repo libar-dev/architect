@@ -27,8 +27,9 @@ import {
   type ReferenceDocConfig,
   type DiagramScope,
 } from '../../renderable/codecs/reference.js';
-import { toKebabCase } from '../../utils/string-utils.js';
-import { normalizeStatus } from '../../taxonomy/normalized-status.js';
+import { slugify, toKebabCase } from '../../utils/string-utils.js';
+import { computeStatusCounts } from '../../renderable/utils.js';
+import type { StatusCounts } from '../../validation-schemas/index.js';
 
 // ============================================================================
 // Reference Document Configurations
@@ -109,26 +110,15 @@ class ReferenceDocGenerator implements DocumentGenerator {
     _patterns: readonly ExtractedPattern[],
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
-    if (!context.masterDataset) {
-      return Promise.resolve({
-        files: [],
-        errors: [
-          {
-            type: 'generator' as const,
-            message: `Generator "${this.name}" requires MasterDataset but none was provided.`,
-          },
-        ],
-      });
-    }
+    const dataset = context.masterDataset;
+    if (!dataset) return Promise.resolve({ files: [] });
 
     const codec = createReferenceCodec(this.config, {
       detailLevel: this.detailLevel,
       generateDetailFiles: false,
     });
 
-    // Cast needed: Zod codec infers optional props as `T | undefined`,
-    // but RenderableDocument uses exactOptionalPropertyTypes
-    const doc = codec.decode(context.masterDataset) as RenderableDocument;
+    const doc = codec.decode(dataset) as RenderableDocument;
     // Summary-level output (for _claude-md/) uses modular-claude-md compatible renderer
     const render = this.detailLevel === 'summary' ? renderToClaudeMdModule : renderToMarkdown;
     const content = render(doc);
@@ -143,14 +133,45 @@ class ReferenceDocGenerator implements DocumentGenerator {
 // Registration
 // ============================================================================
 
-/**
- * Derive a kebab-case name from a title like "Process Guard Reference".
- */
 function toGeneratorName(title: string): string {
-  return title
-    .replace(/ Reference$/, '')
-    .toLowerCase()
-    .replace(/\s+/g, '-');
+  return slugify(title.replace(/ Reference$/, ''));
+}
+
+/**
+ * Shared loop for generating detailed + summary file pairs from reference configs.
+ */
+function generateDualOutputFiles(
+  configs: readonly ReferenceDocConfig[],
+  dataset: MasterDataset,
+  pathPrefix: string
+): Array<{ path: string; content: string }> {
+  const files: Array<{ path: string; content: string }> = [];
+
+  for (const config of configs) {
+    // Detailed output -> {pathPrefix}/{docsFilename}
+    const detailedCodec = createReferenceCodec(config, {
+      detailLevel: 'detailed',
+      generateDetailFiles: false,
+    });
+    const detailedDoc = detailedCodec.decode(dataset) as RenderableDocument;
+    files.push({
+      path: `${pathPrefix}/${config.docsFilename}`,
+      content: renderToMarkdown(detailedDoc),
+    });
+
+    // Summary output -> _claude-md/{section}/{filename}
+    const summaryCodec = createReferenceCodec(config, {
+      detailLevel: 'summary',
+      generateDetailFiles: false,
+    });
+    const summaryDoc = summaryCodec.decode(dataset) as RenderableDocument;
+    files.push({
+      path: `_claude-md/${config.claudeMdSection}/${config.claudeMdFilename}`,
+      content: renderToClaudeMdModule(summaryDoc),
+    });
+  }
+
+  return files;
 }
 
 /**
@@ -172,41 +193,10 @@ class ReferenceDocsGenerator implements DocumentGenerator {
     _patterns: readonly ExtractedPattern[],
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
-    if (!context.masterDataset) {
-      return Promise.resolve({
-        files: [],
-        errors: [
-          {
-            type: 'generator' as const,
-            message: `Generator "${this.name}" requires MasterDataset but none was provided.`,
-          },
-        ],
-      });
-    }
+    const dataset = context.masterDataset;
+    if (!dataset) return Promise.resolve({ files: [] });
 
-    const files: Array<{ path: string; content: string }> = [];
-
-    for (const config of this.configs) {
-      // Detailed output -> docs/{docsFilename}
-      const detailedCodec = createReferenceCodec(config, {
-        detailLevel: 'detailed',
-        generateDetailFiles: false,
-      });
-      const detailedDoc = detailedCodec.decode(context.masterDataset) as RenderableDocument;
-      files.push({ path: `docs/${config.docsFilename}`, content: renderToMarkdown(detailedDoc) });
-
-      // Summary output -> _claude-md/{section}/{filename}
-      const summaryCodec = createReferenceCodec(config, {
-        detailLevel: 'summary',
-        generateDetailFiles: false,
-      });
-      const summaryDoc = summaryCodec.decode(context.masterDataset) as RenderableDocument;
-      files.push({
-        path: `_claude-md/${config.claudeMdSection}/${config.claudeMdFilename}`,
-        content: renderToClaudeMdModule(summaryDoc),
-      });
-    }
-
+    const files = generateDualOutputFiles(this.configs, dataset, 'reference');
     return Promise.resolve({ files });
   }
 }
@@ -230,48 +220,15 @@ class ProductAreaDocsGenerator implements DocumentGenerator {
     _patterns: readonly ExtractedPattern[],
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
-    if (!context.masterDataset) {
-      return Promise.resolve({
-        files: [],
-        errors: [
-          {
-            type: 'generator' as const,
-            message: `Generator "${this.name}" requires MasterDataset but none was provided.`,
-          },
-        ],
-      });
-    }
+    const dataset = context.masterDataset;
+    if (!dataset) return Promise.resolve({ files: [] });
 
-    const files: Array<{ path: string; content: string }> = [];
-
-    for (const config of this.configs) {
-      // Detailed output -> product-areas/{docsFilename}
-      const detailedCodec = createReferenceCodec(config, {
-        detailLevel: 'detailed',
-        generateDetailFiles: false,
-      });
-      const detailedDoc = detailedCodec.decode(context.masterDataset) as RenderableDocument;
-      files.push({
-        path: `product-areas/${config.docsFilename}`,
-        content: renderToMarkdown(detailedDoc),
-      });
-
-      // Summary output -> _claude-md/{section}/{filename}
-      const summaryCodec = createReferenceCodec(config, {
-        detailLevel: 'summary',
-        generateDetailFiles: false,
-      });
-      const summaryDoc = summaryCodec.decode(context.masterDataset) as RenderableDocument;
-      files.push({
-        path: `_claude-md/${config.claudeMdSection}/${config.claudeMdFilename}`,
-        content: renderToClaudeMdModule(summaryDoc),
-      });
-    }
+    const files = generateDualOutputFiles(this.configs, dataset, 'product-areas');
 
     // Progressive disclosure index
     files.push({
       path: 'PRODUCT-AREAS.md',
-      content: buildProductAreaIndex(this.configs, context.masterDataset),
+      content: buildProductAreaIndex(this.configs, dataset),
     });
 
     return Promise.resolve({ files });
@@ -291,6 +248,12 @@ function buildProductAreaIndex(
 ): string {
   const sections: SectionBlock[] = [];
 
+  // Use pre-computed byProductArea view (ADR-006: no re-derivation from raw patterns)
+  const areaStats = new Map<string, StatusCounts>();
+  for (const [area, patterns] of Object.entries(dataset.byProductArea)) {
+    areaStats.set(area, computeStatusCounts(patterns));
+  }
+
   // Per-area sections with intro prose and live statistics
   for (const config of configs) {
     const area = config.productArea;
@@ -302,18 +265,12 @@ function buildProductAreaIndex(
     sections.push(paragraph(`> **${meta.question}**`));
     sections.push(paragraph(meta.intro));
 
-    // Live per-area statistics
-    const areaPatterns = dataset.patterns.filter((p) => p.productArea === area);
-    if (areaPatterns.length > 0) {
-      const completed = areaPatterns.filter(
-        (p) => normalizeStatus(p.status) === 'completed'
-      ).length;
-      const active = areaPatterns.filter((p) => normalizeStatus(p.status) === 'active').length;
-      const planned = areaPatterns.filter((p) => normalizeStatus(p.status) === 'planned').length;
-
+    // Live per-area statistics from pre-computed stats
+    const stats = areaStats.get(area);
+    if (stats !== undefined && stats.total > 0) {
       sections.push(
         paragraph(
-          `**${areaPatterns.length} patterns** — ${completed} completed, ${active} active, ${planned} planned`
+          `**${stats.total} patterns** — ${stats.completed} completed, ${stats.active} active, ${stats.planned} planned`
         )
       );
     }
@@ -326,7 +283,7 @@ function buildProductAreaIndex(
 
   sections.push(separator());
 
-  // Cross-area progress summary table
+  // Cross-area progress summary table (reuses pre-computed stats)
   const tableHeaders = ['Area', 'Patterns', 'Completed', 'Active', 'Planned'];
   const tableRows: string[][] = [];
   let totalPatterns = 0;
@@ -338,23 +295,20 @@ function buildProductAreaIndex(
     const area = config.productArea;
     if (area === undefined) continue;
 
-    const areaPatterns = dataset.patterns.filter((p) => p.productArea === area);
-    const completed = areaPatterns.filter((p) => normalizeStatus(p.status) === 'completed').length;
-    const active = areaPatterns.filter((p) => normalizeStatus(p.status) === 'active').length;
-    const planned = areaPatterns.filter((p) => normalizeStatus(p.status) === 'planned').length;
+    const stats = areaStats.get(area) ?? { total: 0, completed: 0, active: 0, planned: 0 };
 
     tableRows.push([
       `[${area}](product-areas/${config.docsFilename})`,
-      String(areaPatterns.length),
-      String(completed),
-      String(active),
-      String(planned),
+      String(stats.total),
+      String(stats.completed),
+      String(stats.active),
+      String(stats.planned),
     ]);
 
-    totalPatterns += areaPatterns.length;
-    totalCompleted += completed;
-    totalActive += active;
-    totalPlanned += planned;
+    totalPatterns += stats.total;
+    totalCompleted += stats.completed;
+    totalActive += stats.active;
+    totalPlanned += stats.planned;
   }
 
   tableRows.push([
@@ -437,7 +391,7 @@ export function registerReferenceGenerators(
   // Individual generators: selective invocation per document
   for (const config of configs) {
     const kebabName = toGeneratorName(config.title);
-    const docsPrefix = config.productArea !== undefined ? 'product-areas' : 'docs';
+    const docsPrefix = config.productArea !== undefined ? 'product-areas' : 'reference';
 
     registry.register(
       new ReferenceDocGenerator(

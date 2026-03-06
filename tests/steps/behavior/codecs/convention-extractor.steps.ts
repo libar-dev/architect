@@ -645,6 +645,64 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       }
     );
 
+    RuleScenario(
+      'TypeScript table with escaped union pipes preserves full cell values',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a TypeScript pattern with convention {string} and escaped union table description',
+          (_ctx: unknown, tag: string) => {
+            const description = [
+              '## Remaining Work Options',
+              '',
+              '| Option | Type | Default | Description |',
+              '| --- | --- | --- | --- |',
+              '| sortBy | "phase" \\| "priority" \\| "effort" \\| "quarter" | "phase" | Sort order |',
+            ].join('\n');
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'TsEscapedUnionPattern',
+                  convention: [tag],
+                  description,
+                  filePath: 'src/conventions/escaped-union.ts',
+                }),
+              ],
+            });
+          }
+        );
+
+        When('extracting conventions for tag {string}', (_ctx: unknown, tag: string) => {
+          state!.result = extractConventions(state!.dataset!, [tag]);
+        });
+
+        Then(
+          'the first table row has cell {string} with value {string}',
+          (_ctx: unknown, header: string, expected: string) => {
+            const firstRow = state!.result[0]!.rules[0]!.tables[0]!.rows[0];
+            expect(firstRow?.[header]).toBe(expected);
+          }
+        );
+
+        And(
+          'the first table row has cell {string} with value {string}',
+          (_ctx: unknown, header: string, expected: string) => {
+            const firstRow = state!.result[0]!.rules[0]!.tables[0]!.rows[0];
+            expect(firstRow?.[header]).toBe(expected);
+          }
+        );
+
+        Then('the first table row has Type value with escaped unions', () => {
+          const firstRow = state!.result[0]!.rules[0]!.tables[0]!.rows[0];
+          expect(firstRow?.Type).toBe('"phase" | "priority" | "effort" | "quarter"');
+        });
+
+        Then('the first table row has Default value with quotes', () => {
+          const firstRow = state!.result[0]!.rules[0]!.tables[0]!.rows[0];
+          expect(firstRow?.Default).toBe('"phase"');
+        });
+      }
+    );
+
     RuleScenario('TypeScript description with code examples', ({ Given, When, Then, And }) => {
       Given(
         'a TypeScript pattern with convention {string} and mermaid description',

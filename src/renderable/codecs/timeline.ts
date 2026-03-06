@@ -3,26 +3,46 @@
  * @libar-docs-core
  * @libar-docs-pattern TimelineCodec
  * @libar-docs-status completed
+ * @libar-docs-convention codec-registry
+ * @libar-docs-product-area:Generation
  *
- * ## Timeline Document Codec
+ * ## RoadmapDocumentCodec
  *
- * Transforms MasterDataset into RenderableDocuments for timeline outputs:
- * - ROADMAP.md (phase breakdown with progress)
- * - COMPLETED-MILESTONES.md (historical completed phases)
+ * **Purpose:** Development roadmap organized by phase with progress tracking.
+ *
+ * **Output Files:** `ROADMAP.md` (main roadmap), `phases/phase-<N>-<name>.md` (phase details)
+ *
+ * | Option | Type | Default | Description |
+ * | --- | --- | --- | --- |
+ * | generateDetailFiles | boolean | true | Create phase detail files |
+ * | filterStatus | NormalizedStatusFilter[] | [] | Filter by status |
+ * | includeProcess | boolean | true | Show quarter, effort, team metadata |
+ * | includeDeliverables | boolean | true | List deliverables per phase |
+ * | filterPhases | number[] | [] | Filter to specific phases |
+ *
+ * ## CompletedMilestonesCodec
+ *
+ * **Purpose:** Historical record of completed work organized by quarter.
+ *
+ * **Output Files:** `COMPLETED-MILESTONES.md` (summary), `milestones/<quarter>.md` (quarter details)
  *
  * ### When to Use
  *
- * - When generating roadmap documentation by phase
- * - When tracking completed milestones and historical progress
- * - When building timeline-based project views
+ * - When documenting project history and completed phases
+ * - When generating quarterly achievement summaries
+ * - When tracking velocity by quarter
  *
- * ### Factory Pattern
+ * ## CurrentWorkCodec
  *
- * Use factory functions for custom options:
- * ```typescript
- * const codec = createRoadmapCodec({ generateDetailFiles: false });
- * const doc = codec.decode(dataset);
- * ```
+ * **Purpose:** Active development work currently in progress.
+ *
+ * **Output Files:** `CURRENT-WORK.md` (summary), `current/phase-<N>-<name>.md` (active phase details)
+ *
+ * ### When to Use
+ *
+ * - When monitoring active development across all in-progress phases
+ * - When generating sprint/session status dashboards
+ * - When checking which patterns are currently being worked on
  */
 
 import { z } from 'zod';

@@ -319,7 +319,7 @@ function escapeRegex(str: string): string {
  * These directories contain embedded status examples that look like transitions.
  */
 function isGeneratedDocsPath(filePath: string): boolean {
-  const patterns = ['docs-living/', 'docs-generated/', 'docs/generated/'];
+  const patterns = ['docs-living/', 'docs-generated/', 'docs/generated/', 'docs-live/'];
   return patterns.some((p) => filePath.startsWith(p) || filePath.includes(`/${p}`));
 }
 

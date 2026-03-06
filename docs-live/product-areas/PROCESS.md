@@ -16,6 +16,24 @@
 
 ---
 
+## Contents
+
+- [Key Invariants](#key-invariants)
+- [Product area canonical values](#product-area-canonical-values)
+- [ADR category canonical values](#adr-category-canonical-values)
+- [FSM status values and protection levels](#fsm-status-values-and-protection-levels)
+- [Valid FSM transitions](#valid-fsm-transitions)
+- [Tag format types](#tag-format-types)
+- [Source ownership](#source-ownership)
+- [Quarter format convention](#quarter-format-convention)
+- [Canonical phase definitions (6-phase USDP standard)](#canonical-phase-definitions-6-phase-usdp-standard)
+- [Deliverable status canonical values](#deliverable-status-canonical-values)
+- [Delivery Lifecycle FSM](#delivery-lifecycle-fsm)
+- [Process Pattern Relationships](#process-pattern-relationships)
+- [Business Rules](#business-rules)
+
+---
+
 ## Product area canonical values
 
 **Invariant:** The product-area tag uses one of 7 canonical values. Each value represents a reader-facing documentation section, not a source module.
@@ -32,6 +50,8 @@
 | CoreTypes     | What foundational types exist?      | Result monad, error factories, string utils     |
 | Process       | How does the session workflow work? | Session lifecycle, handoffs, conventions        |
 
+**Verified by:** Canonical values are enforced
+
 ---
 
 ## ADR category canonical values
@@ -46,6 +66,8 @@
 | process       | Workflow, conventions, annotation rules       |
 | testing       | Test strategy, verification approach          |
 | documentation | Documentation generation, content structure   |
+
+**Verified by:** Canonical values are enforced
 
 ---
 
@@ -62,13 +84,15 @@
 | completed | Hard-locked  | No                   | Requires unlock-reason tag      |
 | deferred  | None         | Yes                  | Full editing                    |
 
+**Verified by:** Canonical values are enforced
+
 ---
 
 ## Valid FSM transitions
 
 **Invariant:** Only these transitions are valid. All others are rejected by Process Guard.
 
-**Rationale:** Allowing arbitrary transitions (e.g., roadmap to completed) bypasses the active phase where scope-lock and deliverable tracking provide quality assurance. Completed is a terminal state. Modifications require `@libar-docs-unlock-reason` escape hatch.
+**Rationale:** Allowing arbitrary transitions (e.g., roadmap to completed) bypasses the active phase where scope-lock and deliverable tracking provide quality assurance.
 
 | From     | To        | Trigger               |
 | -------- | --------- | --------------------- |
@@ -77,6 +101,11 @@
 | active   | completed | All deliverables done |
 | active   | roadmap   | Blocked/regressed     |
 | deferred | roadmap   | Resume planning       |
+
+**Verified by:** Canonical values are enforced
+
+    Completed is a terminal state. Modifications require
+    `@libar-docs-unlock-reason` escape hatch.
 
 ---
 
@@ -95,6 +124,8 @@
 | number       | Numeric value                  | @libar-docs-phase 15           |
 | quoted-value | Preserves spaces               | @libar-docs-brief:'Multi word' |
 
+**Verified by:** Canonical values are enforced
+
 ---
 
 ## Source ownership
@@ -110,6 +141,8 @@
 | quarter    | Feature files  | TypeScript    | Gherkin owns timeline metadata     |
 | team       | Feature files  | TypeScript    | Gherkin owns ownership metadata    |
 
+**Verified by:** Canonical values are enforced
+
 ---
 
 ## Quarter format convention
@@ -117,6 +150,8 @@
 **Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`). ISO-year-first sorting works lexicographically.
 
 **Rationale:** Non-standard formats (e.g., Q1-2026) break lexicographic sorting, which roadmap generation and timeline queries depend on for correct ordering.
+
+**Verified by:** Canonical values are enforced
 
 ---
 
@@ -135,6 +170,8 @@
 | 5     | Validation    | Verification, acceptance criteria confirmation |
 | 6     | Retrospective | Review, lessons learned, documentation         |
 
+**Verified by:** Canonical values are enforced
+
 ---
 
 ## Deliverable status canonical values
@@ -151,6 +188,8 @@
 | deferred    | Work postponed       |
 | superseded  | Replaced by another  |
 | n/a         | Not applicable       |
+
+**Verified by:** Canonical values are enforced
 
 ---
 
@@ -190,6 +229,10 @@ Scoped architecture diagram showing component relationships:
 
 ```mermaid
 graph LR
+    ADR006SingleReadModelArchitecture["ADR006SingleReadModelArchitecture"]
+    ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
+    ADR002GherkinOnlyTesting["ADR002GherkinOnlyTesting"]
+    ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
     ValidatorReadModelConsolidation["ValidatorReadModelConsolidation"]
     StepDefinitionCompletion["StepDefinitionCompletion"]
     SessionFileCleanup["SessionFileCleanup"]
@@ -200,14 +243,12 @@ graph LR
     EffortVarianceTracking["EffortVarianceTracking"]
     ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
     CliBehaviorTesting["CliBehaviorTesting"]
-    ADR006SingleReadModelArchitecture["ADR006SingleReadModelArchitecture"]
-    ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
-    ADR002GherkinOnlyTesting["ADR002GherkinOnlyTesting"]
-    ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
     SessionFileLifecycle["SessionFileLifecycle"]
     subgraph related["Related"]
         ADR005CodecBasedMarkdownRendering["ADR005CodecBasedMarkdownRendering"]:::neighbor
     end
+    ADR006SingleReadModelArchitecture -.->|depends on| ADR005CodecBasedMarkdownRendering
+    ADR003SourceFirstPatternArchitecture -.->|depends on| ADR001TaxonomyCanonicalValues
     ValidatorReadModelConsolidation -.->|depends on| ADR006SingleReadModelArchitecture
     StepDefinitionCompletion -.->|depends on| ADR002GherkinOnlyTesting
     SessionFileCleanup -.->|depends on| SessionFileLifecycle
@@ -217,8 +258,6 @@ graph LR
     EffortVarianceTracking -.->|depends on| MvpWorkflowImplementation
     ConfigBasedWorkflowDefinition -.->|depends on| MvpWorkflowImplementation
     CliBehaviorTesting -.->|depends on| ADR002GherkinOnlyTesting
-    ADR006SingleReadModelArchitecture -.->|depends on| ADR005CodecBasedMarkdownRendering
-    ADR003SourceFirstPatternArchitecture -.->|depends on| ADR001TaxonomyCanonicalValues
     classDef neighbor stroke-dasharray: 5 5
 ```
 
@@ -230,17 +269,17 @@ graph LR
 
 ### ADR 001 Taxonomy Canonical Values
 
-| Rule                                                | Invariant                                                                                                                                           | Rationale                                                                                                                                                                                                                                                 |
-| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Product area canonical values                       | The product-area tag uses one of 7 canonical values. Each value represents a reader-facing documentation section, not a source module.              | Without canonical values, organic drift (e.g., Generator vs Generators) produces inconsistent grouping in generated documentation and fragmented product area pages.                                                                                      |
-| ADR category canonical values                       | The adr-category tag uses one of 4 values.                                                                                                          | Unbounded category values prevent meaningful grouping of architecture decisions and make cross-cutting queries unreliable.                                                                                                                                |
-| FSM status values and protection levels             | Pattern status uses exactly 4 values with defined protection levels. These are enforced by Process Guard at commit time.                            | Without protection levels, active specs accumulate scope creep and completed specs get silently modified, undermining delivery process integrity.                                                                                                         |
-| Valid FSM transitions                               | Only these transitions are valid. All others are rejected by Process Guard.                                                                         | Allowing arbitrary transitions (e.g., roadmap to completed) bypasses the active phase where scope-lock and deliverable tracking provide quality assurance. Completed is a terminal state. Modifications require `@libar-docs-unlock-reason` escape hatch. |
-| Tag format types                                    | Every tag has one of 6 format types that determines how its value is parsed.                                                                        | Without explicit format types, parsers must guess value structure, leading to silent data corruption when CSV values are treated as single strings or numbers are treated as text.                                                                        |
-| Source ownership                                    | Relationship tags have defined ownership by source type. Anti-pattern detection enforces these boundaries.                                          | Cross-domain tag placement (e.g., runtime dependencies in Gherkin) creates conflicting sources of truth and breaks the dual-source architecture ownership model.                                                                                          |
-| Quarter format convention                           | The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`). ISO-year-first sorting works lexicographically.                                            | Non-standard formats (e.g., Q1-2026) break lexicographic sorting, which roadmap generation and timeline queries depend on for correct ordering.                                                                                                           |
-| Canonical phase definitions (6-phase USDP standard) | The default workflow defines exactly 6 phases in fixed order. These are the canonical phase names and ordinals used by all generated documentation. | Ad-hoc phase names and ordering produce inconsistent roadmap grouping across packages and make cross-package progress tracking impossible.                                                                                                                |
-| Deliverable status canonical values                 | Deliverable status (distinct from pattern FSM status) uses exactly 6 values, enforced by Zod schema at parse time.                                  | Freeform status strings bypass Zod validation and break DoD checks, which rely on terminal status classification to determine pattern completeness.                                                                                                       |
+| Rule                                                | Invariant                                                                                                                                           | Rationale                                                                                                                                                                          |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Product area canonical values                       | The product-area tag uses one of 7 canonical values. Each value represents a reader-facing documentation section, not a source module.              | Without canonical values, organic drift (e.g., Generator vs Generators) produces inconsistent grouping in generated documentation and fragmented product area pages.               |
+| ADR category canonical values                       | The adr-category tag uses one of 4 values.                                                                                                          | Unbounded category values prevent meaningful grouping of architecture decisions and make cross-cutting queries unreliable.                                                         |
+| FSM status values and protection levels             | Pattern status uses exactly 4 values with defined protection levels. These are enforced by Process Guard at commit time.                            | Without protection levels, active specs accumulate scope creep and completed specs get silently modified, undermining delivery process integrity.                                  |
+| Valid FSM transitions                               | Only these transitions are valid. All others are rejected by Process Guard.                                                                         | Allowing arbitrary transitions (e.g., roadmap to completed) bypasses the active phase where scope-lock and deliverable tracking provide quality assurance.                         |
+| Tag format types                                    | Every tag has one of 6 format types that determines how its value is parsed.                                                                        | Without explicit format types, parsers must guess value structure, leading to silent data corruption when CSV values are treated as single strings or numbers are treated as text. |
+| Source ownership                                    | Relationship tags have defined ownership by source type. Anti-pattern detection enforces these boundaries.                                          | Cross-domain tag placement (e.g., runtime dependencies in Gherkin) creates conflicting sources of truth and breaks the dual-source architecture ownership model.                   |
+| Quarter format convention                           | The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`). ISO-year-first sorting works lexicographically.                                            | Non-standard formats (e.g., Q1-2026) break lexicographic sorting, which roadmap generation and timeline queries depend on for correct ordering.                                    |
+| Canonical phase definitions (6-phase USDP standard) | The default workflow defines exactly 6 phases in fixed order. These are the canonical phase names and ordinals used by all generated documentation. | Ad-hoc phase names and ordering produce inconsistent roadmap grouping across packages and make cross-package progress tracking impossible.                                         |
+| Deliverable status canonical values                 | Deliverable status (distinct from pattern FSM status) uses exactly 6 values, enforced by Zod schema at parse time.                                  | Freeform status strings bypass Zod validation and break DoD checks, which rely on terminal status classification to determine pattern completeness.                                |
 
 ### ADR 002 Gherkin Only Testing
 
@@ -270,10 +309,10 @@ graph LR
 
 ### Mvp Workflow Implementation
 
-| Rule                                 | Invariant                                                                                                                                       | Rationale                                                                                                                                                     |
-| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PDR-005 status values are recognized | The scanner and validation schemas must accept exactly the four PDR-005 status values: roadmap, active, completed, deferred.                    | Unrecognized status values silently drop patterns from generated documents, causing missing documentation across the entire monorepo.                         |
-| Generators map statuses to documents | Each status value must route to exactly one target document: roadmap/deferred to ROADMAP.md, active to CURRENT-WORK.md, completed to CHANGELOG. | Incorrect status-to-document mapping causes patterns to appear in the wrong document or be omitted entirely, breaking the project overview for all consumers. |
+| Rule                                 | Invariant                                                                                                                                                    | Rationale                                                                                                                                                     |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PDR-005 status values are recognized | The scanner and validation schemas must accept exactly the four PDR-005 status values: roadmap, active, completed, deferred.                                 | Unrecognized status values silently drop patterns from generated documents, causing missing documentation across the entire monorepo.                         |
+| Generators map statuses to documents | Each status value must route to exactly one target document: roadmap/deferred to ROADMAP.md, active to CURRENT-WORK.md, completed to CHANGELOG-GENERATED.md. | Incorrect status-to-document mapping causes patterns to appear in the wrong document or be omitted entirely, breaking the project overview for all consumers. |
 
 ### Session File Cleanup
 

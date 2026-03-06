@@ -196,8 +196,28 @@ export {
   ValidationRulesCodec,
   createValidationRulesCodec,
   type ValidationRulesCodecOptions,
+  type RuleDefinition,
   DEFAULT_VALIDATION_RULES_OPTIONS,
+  RULE_DEFINITIONS,
+  composeRationaleIntoRules,
 } from './validation-rules.js';
+
+// Claude Module (includes ClaudeModuleCodecOptions)
+export {
+  ClaudeModuleCodec,
+  createClaudeModuleCodec,
+  type ClaudeModuleCodecOptions,
+  DEFAULT_CLAUDE_MODULE_OPTIONS,
+} from './claude-module.js';
+
+// Index (navigation hub with MasterDataset statistics + editorial preamble)
+export {
+  IndexCodec,
+  createIndexCodec,
+  type IndexCodecOptions,
+  type DocumentEntry,
+  DEFAULT_INDEX_OPTIONS,
+} from './index-codec.js';
 
 // Convention Extractor
 export {

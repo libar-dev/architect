@@ -264,6 +264,10 @@ export function extractPatternsFromGherkin(
     assignIfDefined(directive, 'workflow', metadata.workflow);
     assignIfDefined(directive, 'risk', metadata.risk);
     assignIfDefined(directive, 'priority', metadata.priority);
+    // Claude module generation fields
+    assignIfDefined(directive, 'claudeModule', metadata.claudeModule);
+    assignIfDefined(directive, 'claudeSection', metadata.claudeSection);
+    assignIfNonEmpty(directive, 'claudeTags', metadata.claudeTags);
 
     const rawPattern: Record<string, unknown> = {
       id: patternId,
@@ -330,6 +334,10 @@ export function extractPatternsFromGherkin(
     assignIfNonEmpty(rawPattern, 'convention', metadata.convention);
     // Cross-cutting document inclusion tags
     assignIfNonEmpty(rawPattern, 'include', metadata.include);
+    // Claude module generation fields
+    assignIfDefined(rawPattern, 'claudeModule', metadata.claudeModule);
+    assignIfDefined(rawPattern, 'claudeSection', metadata.claudeSection);
+    assignIfNonEmpty(rawPattern, 'claudeTags', metadata.claudeTags);
     // NOTE: ADR content is now derived from Gherkin Rule: keywords
     // (Context, Decision, Consequences) instead of parsed markdown.
     // The rules array is populated below and rendered by the ADR codec.

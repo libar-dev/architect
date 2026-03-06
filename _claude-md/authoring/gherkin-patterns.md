@@ -29,16 +29,7 @@ Feature: Process Guard Linter
 | Value-First      | `**Business Value:**`, `**How It Works:**` | TDD-style specs    |
 | Context/Approach | `**Context:**`, `**Approach:**`            | Technical patterns |
 
-#### Tag Conventions
-
-| Tag                    | Purpose                     |
-| ---------------------- | --------------------------- |
-| `@happy-path`          | Primary success scenario    |
-| `@edge-case`           | Boundary conditions         |
-| `@error-handling`      | Error recovery scenarios    |
-| `@validation`          | Input validation rules      |
-| `@acceptance-criteria` | Required for DoD validation |
-| `@integration`         | Cross-component behavior    |
+Tag inventory: `pnpm process:query -- tags` (counts per tag and value across all sources).
 
 #### Rule Block Structure (Mandatory)
 

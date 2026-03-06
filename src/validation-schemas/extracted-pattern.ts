@@ -26,6 +26,7 @@ import { DeliverableSchema, HierarchyLevelSchema } from './dual-source.js';
 import { ExtractedShapeSchema } from './extracted-shape.js';
 import { slugify } from '../utils/string-utils.js';
 import { ADR_STATUS_VALUES } from '../taxonomy/index.js';
+import { CLAUDE_SECTION_VALUES } from '../taxonomy/claude-section-values.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Business Rule Schema (Shared Type)
@@ -507,6 +508,17 @@ export const ExtractedPatternSchema = z
      * ```
      */
     extractedShapes: z.array(ExtractedShapeSchema).readonly().optional(),
+
+    // Claude module generation fields (from @libar-docs-claude-* tags)
+
+    /** Module identifier for CLAUDE.md generation (from @libar-docs-claude-module tag) */
+    claudeModule: z.string().optional(),
+
+    /** Target section directory in _claude-md/ (from @libar-docs-claude-section tag) */
+    claudeSection: z.enum(CLAUDE_SECTION_VALUES).optional(),
+
+    /** Variation filtering tags for modular-claude-md (from @libar-docs-claude-tags CSV tag) */
+    claudeTags: z.array(z.string()).readonly().optional(),
   })
   .strict();
 

@@ -23,7 +23,7 @@
 
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import type { RenderableDocument } from './schema.js';
-import { renderDocumentWithFiles, type OutputFile } from './render.js';
+import { renderDocumentWithFiles, renderToClaudeMdModule, type OutputFile } from './render.js';
 import { Result } from '../types/result.js';
 
 // Default codec instances
@@ -47,6 +47,8 @@ import {
   ArchitectureDocumentCodec,
   TaxonomyDocumentCodec,
   ValidationRulesCodec,
+  ClaudeModuleCodec,
+  IndexCodec,
 } from './codecs/index.js';
 
 // Factory functions for creating codecs with options
@@ -70,6 +72,8 @@ import {
   createArchitectureCodec,
   createTaxonomyCodec,
   createValidationRulesCodec,
+  createClaudeModuleCodec,
+  createIndexCodec,
 } from './codecs/index.js';
 
 // Codec options types
@@ -93,6 +97,8 @@ import type {
   ArchitectureCodecOptions,
   TaxonomyCodecOptions,
   ValidationRulesCodecOptions,
+  ClaudeModuleCodecOptions,
+  IndexCodecOptions,
 } from './codecs/index.js';
 
 // Shared codec types for type-safe factory invocation
@@ -182,9 +188,26 @@ export const DOCUMENT_TYPES = {
     outputPath: 'VALIDATION-RULES.md',
     description: 'Process Guard validation rules reference',
   },
+  'claude-modules': {
+    outputPath: 'CLAUDE-MODULES.md',
+    description: 'CLAUDE.md modules generated from annotated behavior specs',
+  },
+  index: {
+    outputPath: 'INDEX.md',
+    description: 'Navigation hub with editorial preamble and MasterDataset statistics',
+  },
 } as const;
 
 export type DocumentType = keyof typeof DOCUMENT_TYPES;
+
+/**
+ * Per-document-type renderer overrides.
+ * Document types not listed here use the default `renderToMarkdown`.
+ */
+const DOCUMENT_TYPE_RENDERERS: Partial<Record<DocumentType, (doc: RenderableDocument) => string>> =
+  {
+    'claude-modules': renderToClaudeMdModule,
+  };
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Codec Options Type
@@ -227,6 +250,8 @@ export interface CodecOptions {
   architecture?: ArchitectureCodecOptions;
   taxonomy?: TaxonomyCodecOptions;
   'validation-rules'?: ValidationRulesCodecOptions;
+  'claude-modules'?: ClaudeModuleCodecOptions;
+  index?: IndexCodecOptions;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -365,6 +390,8 @@ CodecRegistry.register('business-rules', BusinessRulesCodec);
 CodecRegistry.register('architecture', ArchitectureDocumentCodec);
 CodecRegistry.register('taxonomy', TaxonomyDocumentCodec);
 CodecRegistry.register('validation-rules', ValidationRulesCodec);
+CodecRegistry.register('claude-modules', ClaudeModuleCodec);
+CodecRegistry.register('index', IndexCodec);
 
 // Register all factory functions (used when codec options are provided)
 CodecRegistry.registerFactory('patterns', createPatternsCodec);
@@ -386,6 +413,8 @@ CodecRegistry.registerFactory('business-rules', createBusinessRulesCodec);
 CodecRegistry.registerFactory('architecture', createArchitectureCodec);
 CodecRegistry.registerFactory('taxonomy', createTaxonomyCodec);
 CodecRegistry.registerFactory('validation-rules', createValidationRulesCodec);
+CodecRegistry.registerFactory('claude-modules', createClaudeModuleCodec);
+CodecRegistry.registerFactory('index', createIndexCodec);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Error Types
@@ -406,6 +435,24 @@ export interface GenerationError {
   cause?: Error | undefined;
   /** Phase where the error occurred */
   phase: 'decode' | 'render';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Codec Resolution
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Resolve the codec for a document type, using a factory if options are provided.
+ */
+function resolveCodec(type: DocumentType, options?: CodecOptions): DocumentCodec | undefined {
+  const typeOptions = options?.[type];
+  if (typeOptions !== undefined) {
+    const factory = CodecRegistry.getFactory(type);
+    if (factory !== undefined) {
+      return factory(typeOptions);
+    }
+  }
+  return CodecRegistry.get(type);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -443,18 +490,7 @@ export function generateDocumentSafe(
 ): Result<OutputFile[], GenerationError> {
   const outputPath = DOCUMENT_TYPES[type].outputPath;
 
-  // Get options for this specific document type
-  const typeOptions = options?.[type];
-
-  // Use factory function if options provided, otherwise use default codec
-  let codec: DocumentCodec | undefined;
-  if (typeOptions !== undefined) {
-    const factory = CodecRegistry.getFactory(type);
-    if (factory !== undefined) {
-      codec = factory(typeOptions);
-    }
-  }
-  codec ??= CodecRegistry.get(type);
+  const codec = resolveCodec(type, options);
   if (codec === undefined) {
     return Result.err({
       documentType: type,
@@ -478,7 +514,8 @@ export function generateDocumentSafe(
 
   // Render: RenderableDocument → OutputFile[] (with error handling)
   try {
-    const files = renderDocumentWithFiles(doc, outputPath);
+    const renderer = DOCUMENT_TYPE_RENDERERS[type];
+    const files = renderDocumentWithFiles(doc, outputPath, renderer);
     return Result.ok(files);
   } catch (err) {
     return Result.err({
@@ -524,18 +561,7 @@ export function generateDocument(
 ): OutputFile[] {
   const outputPath = DOCUMENT_TYPES[type].outputPath;
 
-  // Get options for this specific document type
-  const typeOptions = options?.[type];
-
-  // Use factory function if options provided, otherwise use default codec
-  let codec: DocumentCodec | undefined;
-  if (typeOptions !== undefined) {
-    const factory = CodecRegistry.getFactory(type);
-    if (factory !== undefined) {
-      codec = factory(typeOptions);
-    }
-  }
-  codec ??= CodecRegistry.get(type);
+  const codec = resolveCodec(type, options);
   if (codec === undefined) {
     throw new Error(`No codec registered for document type: ${type}`);
   }
@@ -544,7 +570,8 @@ export function generateDocument(
   const doc = codec.decode(dataset) as RenderableDocument;
 
   // Render: RenderableDocument → OutputFile[]
-  return renderDocumentWithFiles(doc, outputPath);
+  const renderer = DOCUMENT_TYPE_RENDERERS[type];
+  return renderDocumentWithFiles(doc, outputPath, renderer);
 }
 
 /**

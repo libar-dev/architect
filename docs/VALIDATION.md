@@ -1,12 +1,14 @@
 # Validation Tools
 
+> **Generated Reference:** See [VALIDATION-RULES.md](../docs-live/VALIDATION-RULES.md) for auto-generated Process Guard rules extracted from annotated source code.
+
 Quick reference for choosing and running the right validation command.
 
 ---
 
 ## Which Command Do I Run?
 
-```
+```text
 Need to check annotation quality?
 ├─ Yes → lint-patterns
 │
@@ -91,9 +93,144 @@ pnpm lint:steps --strict
 - Step definition anti-patterns (regex patterns, `{phrase}` usage, repeated registrations)
 - Cross-file mismatches (ScenarioOutline param pattern, missing And/Rule destructuring)
 
-12 rules across 3 categories (8 error, 4 warning).
+12 rules across 3 categories (9 error, 3 warning). For the full validation tool suite overview, see [Which Command Do I Run?](#which-command-do-i-run) above.
 
-**Detailed rules and examples:** See [GHERKIN-PATTERNS.md — Step Linting](./GHERKIN-PATTERNS.md#step-linting)
+### Feature File Rules
+
+These rules scan `.feature` files without needing a Gherkin parser:
+
+| Rule ID                  | Severity | What It Catches                                                          |
+| ------------------------ | -------- | ------------------------------------------------------------------------ |
+| `hash-in-description`    | error    | `#` at line start inside `"""` block in description — terminates parsing |
+| `keyword-in-description` | error    | Description line starting with Given/When/Then/And/But — breaks parser   |
+| `duplicate-and-step`     | error    | Multiple `And` steps with identical text in same scenario                |
+| `dollar-in-step-text`    | warning  | `$` in step text (outside quotes) causes matching issues                 |
+| `hash-in-step-text`      | warning  | Mid-line `#` in step text (outside quotes) silently truncates the step   |
+
+**`hash-in-description` — the most surprising trap:**
+
+```gherkin
+# BAD — # inside """ block in description terminates parsing
+Rule: My Rule
+    """bash
+    # This breaks the parser — Gherkin sees a comment, not code
+    generate-docs --output docs
+    """
+
+# GOOD — move code to a step DocString (safe context)
+Scenario: Example usage
+  Given the following script:
+    """bash
+    # Safe inside a real DocString
+    generate-docs --output docs
+    """
+```
+
+**`keyword-in-description`:**
+
+```gherkin
+# BAD — starts with "Given", parser interprets as a step
+Rule: Authentication
+  Given a valid session, the system should...
+
+# GOOD — rephrase to avoid reserved keywords at line start
+Rule: Authentication
+  A valid session enables the system to...
+```
+
+### Step Definition Rules
+
+These rules scan `.steps.ts` files:
+
+| Rule ID                   | Severity | What It Catches                                            |
+| ------------------------- | -------- | ---------------------------------------------------------- |
+| `regex-step-pattern`      | error    | Regex pattern in step registration — use string patterns   |
+| `unsupported-phrase-type` | error    | `{phrase}` in step string — use `{string}` instead         |
+| `repeated-step-pattern`   | error    | Same pattern registered twice — second silently overwrites |
+
+**`regex-step-pattern`:**
+
+```typescript
+// BAD — regex pattern throws StepAbleStepExpressionError
+Given(/a user with id (\d+)/, (_ctx, id) => { ... });
+
+// GOOD — string pattern with Cucumber expression
+Given('a user with id {int}', (_ctx, id: number) => { ... });
+```
+
+### Cross-File Rules
+
+These rules pair `.feature` and `.steps.ts` files and cross-check them:
+
+| Rule ID                            | Severity | What It Catches                                                      |
+| ---------------------------------- | -------- | -------------------------------------------------------------------- |
+| `scenario-outline-function-params` | error    | Function params in ScenarioOutline callback (should use variables)   |
+| `missing-and-destructuring`        | error    | Feature has `And` steps but step file does not destructure `And`     |
+| `missing-rule-wrapper`             | error    | Feature has `Rule:` blocks but step file does not destructure `Rule` |
+| `outline-quoted-values`            | warning  | Quoted values in Outline steps instead of `<placeholder>` syntax     |
+
+**The Two-Pattern Problem** — `scenario-outline-function-params` + `outline-quoted-values` form a pair:
+
+```gherkin
+# Feature file — BAD (outline-quoted-values)
+Scenario Outline: Validate quantity
+  When I set quantity to "<quantity>"
+  # Should be: When I set quantity to <quantity>
+
+  Examples:
+    | quantity |
+    | 5        |
+```
+
+```typescript
+// Step file — BAD (scenario-outline-function-params)
+ScenarioOutline('Validate quantity', ({ When }) => {
+  When('I set quantity to {string}', (_ctx, qty: string) => {
+    // qty is undefined at runtime — {string} does NOT work in ScenarioOutline
+  });
+});
+
+// GOOD — use variables object
+ScenarioOutline('Validate quantity', ({ When }, variables: { quantity: string }) => {
+  When('I set quantity to <quantity>', () => {
+    const qty = variables.quantity;
+  });
+});
+```
+
+**`missing-and-destructuring`:**
+
+```typescript
+// BAD — And not destructured, causes StepAbleUnknowStepError
+describeFeature(feature, ({ Given, When, Then }) => { ... });
+
+// GOOD — And is available for feature And steps
+describeFeature(feature, ({ Given, When, Then, And }) => { ... });
+```
+
+### CLI Reference
+
+| Flag               | Short | Description                | Default  |
+| ------------------ | ----- | -------------------------- | -------- |
+| `--strict`         |       | Treat warnings as errors   | false    |
+| `--format <type>`  |       | Output: `pretty` or `json` | `pretty` |
+| `--base-dir <dir>` | `-b`  | Base directory for paths   | cwd      |
+
+**Scan scope** (hardcoded defaults):
+
+```
+Feature files:  tests/features/**/*.feature
+                delivery-process/specs/**/*.feature
+                delivery-process/decisions/**/*.feature
+Step files:     tests/steps/**/*.steps.ts
+```
+
+**Exit codes:**
+
+| Code | Meaning                                        |
+| ---- | ---------------------------------------------- |
+| `0`  | No errors (warnings allowed unless `--strict`) |
+| `1`  | Errors found (or warnings with `--strict`)     |
 
 ---
 
@@ -273,9 +410,9 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed API documentation.
 
 ## Related Documentation
 
-| Document                                     | Content                               |
-| -------------------------------------------- | ------------------------------------- |
-| [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | Step linting rules, examples, and CLI |
-| [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | FSM rules, error fixes, escapes       |
-| [TAXONOMY.md](./TAXONOMY.md)                 | Tag taxonomy concepts and API         |
-| [ARCHITECTURE.md](./ARCHITECTURE.md)         | Programmatic API details              |
+| Document                                     | Content                                      |
+| -------------------------------------------- | -------------------------------------------- |
+| [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | Gherkin authoring patterns and writing guide |
+| [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | FSM rules, error fixes, escapes              |
+| [TAXONOMY.md](./TAXONOMY.md)                 | Tag taxonomy concepts and API                |
+| [ARCHITECTURE.md](./ARCHITECTURE.md)         | Programmatic API details                     |

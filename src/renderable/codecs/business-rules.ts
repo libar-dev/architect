@@ -4,22 +4,37 @@
  * @libar-docs-pattern BusinessRulesCodec
  * @libar-docs-status completed
  * @libar-docs-unlock-reason:Progressive-disclosure-by-product-area
+ * @libar-docs-convention codec-registry
+ * @libar-docs-product-area:Generation
  *
- * ## Business Rules Document Codec
+ * ## BusinessRulesCodec
  *
  * Transforms MasterDataset into a RenderableDocument for business rules output.
  * Generates BUSINESS-RULES.md organized by product area, phase, and feature.
+ *
+ * **Purpose:** Business rules documentation organized by product area, phase, and feature. Extracts domain constraints from Gherkin Rule: blocks.
+ *
+ * **Output Files:** `BUSINESS-RULES.md` (main index), `business-rules/<area-slug>.md` (area details)
+ *
+ * | Option | Type | Default | Description |
+ * | --- | --- | --- | --- |
+ * | groupBy | "domain" \| "phase" \| "domain-then-phase" | "domain-then-phase" | Primary grouping strategy |
+ * | includeCodeExamples | boolean | false | Include code examples from DocStrings |
+ * | includeTables | boolean | true | Include markdown tables from descriptions |
+ * | includeRationale | boolean | true | Include rationale section per rule |
+ * | filterDomains | string[] | [] | Filter by domain categories (empty = all) |
+ * | filterPhases | number[] | [] | Filter by phases (empty = all) |
+ * | onlyWithInvariants | boolean | false | Show only rules with explicit invariants |
+ * | includeSource | boolean | true | Include source feature file link |
+ * | includeVerifiedBy | boolean | true | Include Verified by scenario links |
+ * | maxDescriptionLength | number | 150 | Max description length in standard mode |
+ * | excludeSourcePaths | string[] | [] | Exclude patterns by source path prefix |
  *
  * ### When to Use
  *
  * - When generating business rules documentation for stakeholders
  * - When extracting domain constraints without implementation details
  * - When creating compliance or audit documentation from feature specs
- *
- * ### Purpose
- *
- * Enable stakeholders to understand domain constraints without reading
- * implementation details or full feature files.
  *
  * ### Information Architecture
  *
@@ -63,7 +78,7 @@ import {
   document,
 } from '../schema.js';
 import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
-import { toKebabCase } from '../../utils/index.js';
+import { toKebabCase, camelCaseToTitleCase } from '../../utils/index.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Business Rules Codec Options (co-located with codec)
@@ -135,6 +150,13 @@ import {
   type BusinessRuleAnnotations,
   extractFirstSentence,
 } from './helpers.js';
+import { extractTablesAsSectionBlocks } from './convention-extractor.js';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Constants
+// ═══════════════════════════════════════════════════════════════════════════
+
+const DEFAULT_PRODUCT_AREA = 'Platform';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Types
@@ -326,8 +348,7 @@ function collectRulesByProductArea(
       continue;
     }
 
-    // Determine product area (default to "Platform" if not specified)
-    const productArea = pattern.productArea ?? 'Platform';
+    const productArea = pattern.productArea ?? DEFAULT_PRODUCT_AREA;
     const productAreaDisplay = formatProductAreaName(productArea);
 
     // Determine phase key (use release for DeliveryProcess items without phase)
@@ -403,6 +424,15 @@ function getPhaseKey(pattern: ExtractedPattern): string {
   return 'Uncategorized';
 }
 
+const CONTENT_HEADER_PATTERNS = [
+  /\*\*Problem:\*\*\s*/,
+  /\*\*Business Value:\*\*\s*/,
+  /\*\*Solution:\*\*\s*/,
+  /\*\*Context:\*\*\s*/,
+] as const;
+
+const NEXT_HEADER_PATTERN = /\n\s*(?:\*\*[A-Z]|\|)/m;
+
 /**
  * Extract a compact description from the feature
  *
@@ -412,23 +442,14 @@ function getPhaseKey(pattern: ExtractedPattern): string {
 function extractFeatureDescription(pattern: ExtractedPattern): string {
   const desc = pattern.directive.description;
 
-  // Headers that indicate content follows
-  const contentHeaders = [
-    /\*\*Problem:\*\*\s*/,
-    /\*\*Business Value:\*\*\s*/,
-    /\*\*Solution:\*\*\s*/,
-    /\*\*Context:\*\*\s*/,
-  ];
-
   // Try to find content after a header
-  for (const headerPattern of contentHeaders) {
+  for (const headerPattern of CONTENT_HEADER_PATTERNS) {
     const match = headerPattern.exec(desc);
     if (match) {
       // Get text after the header
       const afterHeader = desc.slice(match.index + match[0].length);
       // Get content up to the next header or table
-      const nextHeaderPattern = /\n\s*(\*\*[A-Z]|^\|)/m;
-      const nextHeaderMatch = nextHeaderPattern.exec(afterHeader);
+      const nextHeaderMatch = NEXT_HEADER_PATTERN.exec(afterHeader);
       const content = nextHeaderMatch ? afterHeader.slice(0, nextHeaderMatch.index) : afterHeader;
 
       // Clean up and extract first sentence
@@ -808,7 +829,7 @@ function renderRuleInline(
 
   // Tables from rule description
   if (options.includeTables && rule.description) {
-    const tableBlocks = extractTables(rule.description);
+    const tableBlocks = extractTablesAsSectionBlocks(rule.description);
     for (const tableBlock of tableBlocks) {
       sections.push(tableBlock);
     }
@@ -849,85 +870,6 @@ function renderRuleInline(
   return sections;
 }
 
-/**
- * Extract markdown tables from content
- */
-function extractTables(content: string): SectionBlock[] {
-  const sections: SectionBlock[] = [];
-  const lines = content.split('\n');
-
-  let inTable = false;
-  let tableLines: string[] = [];
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-
-    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
-      inTable = true;
-      tableLines.push(trimmed);
-    } else if (inTable) {
-      // End of table
-      if (tableLines.length >= 2) {
-        const tableBlock = parseMarkdownTable(tableLines);
-        if (tableBlock) {
-          sections.push(tableBlock);
-        }
-      }
-      inTable = false;
-      tableLines = [];
-    }
-  }
-
-  // Handle table at end of content
-  if (inTable && tableLines.length >= 2) {
-    const tableBlock = parseMarkdownTable(tableLines);
-    if (tableBlock) {
-      sections.push(tableBlock);
-    }
-  }
-
-  return sections;
-}
-
-/**
- * Parse markdown table lines into a table SectionBlock
- */
-function parseMarkdownTable(lines: string[]): SectionBlock | null {
-  if (lines.length < 2) return null;
-
-  // Skip separator row (contains only dashes and pipes)
-  const dataLines = lines.filter((line) => !/^\|[\s-:|]+\|$/.test(line));
-  if (dataLines.length < 1) return null;
-
-  // First row is headers
-  const headerRow = dataLines[0];
-  if (!headerRow) return null;
-
-  const headers = headerRow
-    .split('|')
-    .map((cell) => cell.trim())
-    .filter((cell) => cell.length > 0);
-
-  if (headers.length === 0) return null;
-
-  // Remaining rows are data
-  const rows: string[][] = [];
-  for (let i = 1; i < dataLines.length; i++) {
-    const row = dataLines[i];
-    if (!row) continue;
-
-    const cells = row
-      .split('|')
-      .map((cell) => cell.trim())
-      .filter((cell) => cell.length > 0);
-    if (cells.length > 0) {
-      rows.push(cells);
-    }
-  }
-
-  return table(headers, rows);
-}
-
 // ═══════════════════════════════════════════════════════════════════════════
 // Utilities
 // ═══════════════════════════════════════════════════════════════════════════
@@ -945,13 +887,7 @@ function parseMarkdownTable(lines: string[]): SectionBlock | null {
  * - ContextInference → Context Inference
  */
 function humanizeFeatureName(name: string): string {
-  // Insert spaces before uppercase letters that follow lowercase
-  let humanized = name.replace(/([a-z])([A-Z])/g, '$1 $2');
-  // Insert spaces before sequences like "API" followed by lowercase
-  humanized = humanized.replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
-  // Strip common test suffixes
-  humanized = humanized.replace(/\s*Testing$/i, '');
-  return humanized.trim();
+  return camelCaseToTitleCase(name).replace(/\s*Testing$/i, '');
 }
 
 /**
@@ -982,24 +918,8 @@ export function deduplicateScenarioNames(
   return [...seen.values()];
 }
 
-/**
- * Format product area name for display
- */
 function formatProductAreaName(productArea: string): string {
-  // Handle common product areas
-  switch (productArea.toLowerCase()) {
-    case 'platform':
-      return 'Platform';
-    case 'deliveryprocess':
-      return 'Delivery Process';
-    case 'exampleapp':
-      return 'Example App';
-    case 'taxonomy':
-      return 'Taxonomy';
-    default:
-      // Title case for unknown product areas
-      return productArea.charAt(0).toUpperCase() + productArea.slice(1);
-  }
+  return camelCaseToTitleCase(productArea);
 }
 
 /**

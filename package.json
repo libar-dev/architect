@@ -1,6 +1,6 @@
 {
   "name": "@libar-dev/delivery-process",
-  "version": "1.0.0-pre.1",
+  "version": "1.0.0-pre.2",
   "description": "Context engineering toolkit: extract patterns from TypeScript and Gherkin into a queryable delivery state with living docs, architecture graphs, and FSM-enforced workflows.",
   "type": "module",
   "sideEffects": false,
@@ -98,7 +98,11 @@
     "docs:business-rules": "tsx src/cli/generate-docs.ts -g business-rules",
     "docs:reference": "tsx src/cli/generate-docs.ts -g reference-docs",
     "docs:product-areas": "tsx src/cli/generate-docs.ts -g product-area-docs",
-    "docs:all": "pnpm docs:decisions && pnpm docs:product-areas && pnpm docs:taxonomy && pnpm docs:business-rules && pnpm docs:reference",
+    "docs:claude-modules": "tsx src/cli/generate-docs.ts -g claude-modules",
+    "docs:process-api-reference": "tsx src/cli/generate-docs.ts -g process-api-reference",
+    "docs:cli-recipe": "tsx src/cli/generate-docs.ts -g cli-recipe",
+    "docs:index": "tsx src/cli/generate-docs.ts -g index",
+    "docs:all": "pnpm docs:decisions && pnpm docs:product-areas && pnpm docs:taxonomy && pnpm docs:business-rules && pnpm docs:validation && pnpm docs:reference && pnpm docs:claude-modules && pnpm docs:process-api-reference && pnpm docs:cli-recipe && pnpm docs:architecture && pnpm docs:changelog && pnpm docs:index",
     "docs:all-preview": "pnpm docs:patterns && pnpm docs:roadmap && pnpm docs:remaining && pnpm docs:changelog && pnpm docs:architecture && pnpm docs:decisions && pnpm docs:reference && pnpm docs:product-areas && pnpm docs:taxonomy && pnpm docs:validation && pnpm docs:requirements && pnpm docs:current && pnpm docs:milestones && pnpm docs:business-rules",
     "process:query": "tsx src/cli/process-api.ts",
     "process:q": "tsx src/cli/process-api.ts",
@@ -199,7 +203,6 @@
     "dist",
     "docs",
     "docs-live",
-    "docs-generated",
     "README.md",
     "LICENSE",
     "CHANGELOG.md"

@@ -3,11 +3,26 @@
  * @libar-docs-core
  * @libar-docs-pattern RequirementsCodec
  * @libar-docs-status completed
+ * @libar-docs-convention codec-registry
+ * @libar-docs-product-area:Generation
  *
- * ## Requirements Document Codec
+ * ## RequirementsDocumentCodec
  *
  * Transforms MasterDataset into RenderableDocument for PRD/requirements output.
  * Generates PRODUCT-REQUIREMENTS.md and detail files (requirements/*.md).
+ *
+ * **Purpose:** Product requirements documentation grouped by product area or user role.
+ *
+ * **Output Files:** `PRODUCT-REQUIREMENTS.md` (main index), `requirements/<area-slug>.md` (area details)
+ *
+ * | Option | Type | Default | Description |
+ * | --- | --- | --- | --- |
+ * | generateDetailFiles | boolean | true | Create product area detail files |
+ * | groupBy | "product-area" \| "user-role" \| "phase" | "product-area" | Primary grouping |
+ * | filterStatus | NormalizedStatusFilter[] | [] | Filter by status (empty = all) |
+ * | includeScenarioSteps | boolean | true | Show Given/When/Then steps |
+ * | includeBusinessValue | boolean | true | Display business value metadata |
+ * | includeBusinessRules | boolean | true | Show Gherkin Rule: sections |
  *
  * ### When to Use
  *

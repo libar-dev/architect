@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:StepLintVitestCucumber
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-phase:50
 @libar-docs-effort:1d
 @libar-docs-product-area:Validation

@@ -5,6 +5,9 @@ node_modules/
 dist/
 *.tsbuildinfo
 
+# Generated intermediate artifacts (not website-published)
+docs-generated/
+
 # IDE
 .idea/
 .vscode/
@@ -36,3 +39,4 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+.plans/

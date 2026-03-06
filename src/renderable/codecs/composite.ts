@@ -7,12 +7,18 @@
  * @libar-docs-arch-role projection
  * @libar-docs-arch-context renderer
  * @libar-docs-arch-layer application
+ * @libar-docs-convention codec-registry
+ * @libar-docs-product-area:Generation
  *
- * ## Composite Document Codec
+ * ## CompositeCodec
  *
  * Assembles reference documents from multiple codec outputs by concatenating
  * RenderableDocument sections. Enables building documents composed from any
  * combination of existing codecs.
+ *
+ * **Purpose:** Assembles documents from multiple child codecs into a single RenderableDocument.
+ *
+ * **Output Files:** Configured per-instance (composes child codec outputs)
  *
  * ### When to Use
  *

@@ -19,28 +19,19 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 - **Pipeline Factory**: Shared `buildMasterDataset()` in `src/generators/pipeline/build-pipeline.ts` — all consumers (orchestrator, process-api, validate-patterns) call this instead of wiring inline pipelines. Per-consumer behavior via `PipelineOptions`.
 - **Single Read Model** (ADR-006): MasterDataset is the sole read model. No consumer re-derives data from raw scanner/extractor output. Anti-patterns: Parallel Pipeline, Lossy Local Type, Re-derived Relationship.
 
-### Module Structure
+**Live module inventory:** `pnpm process:query -- arch context` and `pnpm process:query -- arch layer`
 
-| Module                     | Purpose                                                              |
-| -------------------------- | -------------------------------------------------------------------- |
-| `src/config/`              | Configuration factory, presets (generic, ddd-es-cqrs)                |
-| `src/taxonomy/`            | Tag definitions - categories, status values, format types            |
-| `src/scanner/`             | TypeScript and Gherkin file scanning                                 |
-| `src/extractor/`           | Pattern extraction from AST/Gherkin                                  |
-| `src/generators/`          | Document generators, orchestrator, and pipeline factory              |
-| `src/generators/pipeline/` | `buildMasterDataset()` factory, `mergePatterns()`, dataset transform |
-| `src/renderable/`          | Markdown codec system                                                |
-| `src/validation/`          | FSM validation, DoD checks, anti-patterns                            |
-| `src/lint/`                | Pattern linting and process guard                                    |
-| `src/api/`                 | Query layer: Data API CLI, business rules query (`rules-query.ts`)   |
-| `delivery-process/stubs/`  | Design session code stubs (outside src/ for TS/ESLint isolation)     |
+### Decision Specs
 
-**Live inventory:** `pnpm process:query -- arch context` and `pnpm process:query -- arch layer` reflect the actual annotated codebase structure.
+Architecture and process decisions are recorded as annotated Gherkin specs in `delivery-process/decisions/`:
 
-### Three Presets
+| Spec    | Key Decision                                                               |
+| ------- | -------------------------------------------------------------------------- |
+| ADR-001 | Taxonomy canonical values — tag registry is the single source of truth     |
+| ADR-002 | Gherkin-only testing — no `.test.ts` files, all tests are `.feature`       |
+| ADR-003 | Source-first pattern architecture — code drives docs, not the reverse      |
+| ADR-005 | Codec-based markdown rendering — Zod codecs transform data to markdown     |
+| ADR-006 | Single read model — MasterDataset is the sole read model for all consumers |
+| PDR-001 | Session workflow commands — Process Data API CLI design decisions          |
 
-| Preset                    | Tag Prefix     | Categories | Use Case                           |
-| ------------------------- | -------------- | ---------- | ---------------------------------- |
-| `libar-generic` (default) | `@libar-docs-` | 3          | Simple projects (this package)     |
-| `ddd-es-cqrs`             | `@libar-docs-` | 21         | DDD/Event Sourcing architectures   |
-| `generic`                 | `@docs-`       | 3          | Simple projects with @docs- prefix |
+Query decisions: `pnpm process:query -- decisions <pattern>`

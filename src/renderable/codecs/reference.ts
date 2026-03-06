@@ -3,17 +3,65 @@
  * @libar-docs-pattern ReferenceDocumentCodec
  * @libar-docs-status active
  * @libar-docs-implements CodecDrivenReferenceGeneration
+ * @libar-docs-convention codec-registry
+ * @libar-docs-product-area:Generation
  *
- * ## Parameterized Reference Document Codec
+ * ## ReferenceDocumentCodec
  *
  * A single codec factory that creates reference document codecs from
  * configuration objects. Convention content is sourced from
  * decision records tagged with @libar-docs-convention.
  *
+ * **Purpose:** Scoped reference documentation assembling four content layers (conventions, diagrams, shapes, behaviors) into a single document.
+ *
+ * **Output Files:** Configured per-instance (e.g., `docs/REFERENCE-SAMPLE.md`, `_claude-md/architecture/reference-sample.md`)
+ *
+ * ### 4-Layer Composition (in order)
+ *
+ * 1. **Convention content** -- Extracted from `@libar-docs-convention`-tagged patterns (rules, invariants, tables)
+ * 2. **Scoped diagrams** -- Mermaid diagrams filtered by `archContext`, `archLayer`, `patterns`, or `include` tags
+ * 3. **TypeScript shapes** -- API surfaces from `shapeSources` globs or `shapeSelectors` (declaration-level filtering)
+ * 4. **Behavior content** -- Gherkin-sourced patterns from `behaviorCategories`
+ *
+ * ### Key Options (ReferenceDocConfig)
+ *
+ * | Option | Type | Description |
+ * | --- | --- | --- |
+ * | conventionTags | string[] | Convention tag values to extract from decision records |
+ * | diagramScope | DiagramScope | Single diagram configuration |
+ * | diagramScopes | DiagramScope[] | Multiple diagrams (takes precedence over diagramScope) |
+ * | shapeSources | string[] | Glob patterns for TypeScript shape extraction |
+ * | shapeSelectors | ShapeSelector[] | Fine-grained declaration-level shape filtering |
+ * | behaviorCategories | string[] | Category tags for behavior pattern content |
+ * | includeTags | string[] | Cross-cutting content routing via include tags |
+ * | preamble | SectionBlock[] | Static editorial sections prepended before generated content |
+ * | productArea | string | Pre-filter all content sources to matching product area |
+ * | excludeSourcePaths | string[] | Exclude patterns by source path prefix |
+ *
+ * ### DiagramScope.diagramType Values
+ *
+ * | Type | Description |
+ * | --- | --- |
+ * | graph (default) | Flowchart with subgraphs by archContext, custom node shapes |
+ * | sequenceDiagram | Sequence diagram with typed messages between participants |
+ * | stateDiagram-v2 | State diagram with transitions from dependsOn relationships |
+ * | C4Context | C4 context diagram with boundaries, systems, and relationships |
+ * | classDiagram | Class diagram with archRole stereotypes and typed arrows |
+ *
+ * ### ShapeSelector Variants
+ *
+ * | Variant | Example | Behavior |
+ * | --- | --- | --- |
+ * | group only | `{ group: "api-types" }` | Match shapes by group tag |
+ * | source + names | `{ source: "src/types.ts", names: ["Config"] }` | Named shapes from file |
+ * | source only | `{ source: "src/path/*.ts" }` | All tagged shapes from glob |
+ *
  * ### When to Use
  *
  * - When generating reference documentation from convention-tagged decisions
+ * - When creating scoped product area documents with live diagrams
  * - When creating both detailed (docs/) and summary (_claude-md/) outputs
+ * - When assembling multi-layer documents that combine conventions, diagrams, shapes, and behaviors
  *
  * ### Factory Pattern
  *
@@ -31,6 +79,7 @@ import {
 import {
   type RenderableDocument,
   type SectionBlock,
+  type HeadingBlock,
   heading,
   paragraph,
   separator,
@@ -53,10 +102,8 @@ import { RenderableDocumentOutputSchema } from './shared-schema.js';
 import {
   extractConventions,
   extractConventionsFromPatterns,
-  extractTablesFromDescription,
   type ConventionBundle,
 } from './convention-extractor.js';
-import type { BusinessRuleAnnotations } from './helpers.js';
 import { parseBusinessRuleAnnotations, truncateText } from './helpers.js';
 import { extractShapesFromDataset, filterShapesBySelectors } from './shape-matcher.js';
 import type { ShapeSelector } from './shape-matcher.js';
@@ -72,7 +119,7 @@ import { VALID_TRANSITIONS } from '../../validation/fsm/transitions.js';
 import { PROTECTION_LEVELS, type ProtectionLevel } from '../../validation/fsm/states.js';
 import type { ProcessStatusValue } from '../../taxonomy/index.js';
 import type { ExtractedPattern } from '../../validation-schemas/extracted-pattern.js';
-import { camelCaseToTitleCase } from '../../utils/string-utils.js';
+import { camelCaseToTitleCase, slugify } from '../../utils/string-utils.js';
 import type { ExtractedShape } from '../../validation-schemas/extracted-shape.js';
 
 // ============================================================================
@@ -80,7 +127,11 @@ import type { ExtractedShape } from '../../validation-schemas/extracted-shape.js
 // ============================================================================
 
 /** Content source identifiers for hardcoded domain diagrams */
-export const DIAGRAM_SOURCE_VALUES = ['fsm-lifecycle', 'generation-pipeline'] as const;
+export const DIAGRAM_SOURCE_VALUES = [
+  'fsm-lifecycle',
+  'generation-pipeline',
+  'master-dataset-views',
+] as const;
 
 /** Discriminated source type for DiagramScope.source */
 export type DiagramSource = (typeof DIAGRAM_SOURCE_VALUES)[number];
@@ -129,6 +180,7 @@ export interface DiagramScope {
    * instead of computing from pattern relationships.
    * - 'fsm-lifecycle': FSM state transitions with protection levels
    * - 'generation-pipeline': 4-stage generation pipeline temporal flow
+   * - 'master-dataset-views': MasterDataset pre-computed view fan-out
    */
   readonly source?: DiagramSource;
 }
@@ -190,6 +242,16 @@ export interface ReferenceDocConfig {
    * @example ['delivery-process/specs/']
    */
   readonly excludeSourcePaths?: readonly string[];
+
+  /**
+   * Static preamble sections prepended before all generated content.
+   * Use for editorial intro prose that cannot be expressed as annotations.
+   * Appears in both detailed and summary outputs.
+   */
+  readonly preamble?: readonly SectionBlock[];
+
+  /** When true, shapes section renders before conventions (default: false) */
+  readonly shapesFirst?: boolean;
 }
 
 // ============================================================================
@@ -225,6 +287,8 @@ export interface ProductAreaMeta {
   readonly covers: string;
   /** 2-4 sentence intro explaining what this area does and why it matters */
   readonly intro: string;
+  /** Additional structured content rendered after intro at 'detailed' level only */
+  readonly introSections?: readonly SectionBlock[];
   /** Live diagram scopes generated from annotation data (overrides auto-generated diagram) */
   readonly diagramScopes?: readonly DiagramScope[];
   /** Key invariants to surface prominently (curated from executable specs) */
@@ -318,16 +382,67 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
   },
   Generation: {
     question: 'How does code become docs?',
-    covers: 'Codecs, generators, rendering, diagrams',
+    covers:
+      'Codecs, generators, orchestrator, rendering, diagrams, progressive disclosure, product areas, RenderableDocument IR',
     intro:
-      'The generation pipeline transforms annotated source code into markdown documents. ' +
-      'It follows a four-stage architecture: Scanner → Extractor → Transformer → Codec. ' +
-      'Codecs are pure functions — given a MasterDataset, they produce a RenderableDocument ' +
-      'without side effects. CompositeCodec composes multiple codecs into a single document.',
+      'The generation pipeline transforms annotated source code into markdown documents through a ' +
+      'four-stage architecture: Scanner discovers files, Extractor produces `ExtractedPattern` objects, ' +
+      'Transformer builds MasterDataset with pre-computed views, and Codecs render to markdown via ' +
+      'RenderableDocument IR. Nine specialized codecs handle reference docs, planning, session, reporting, ' +
+      'timeline, ADRs, business rules, taxonomy, and composite output — each supporting three detail levels ' +
+      '(detailed, standard, summary). The Orchestrator runs generators in registration order, producing both ' +
+      'detailed `docs-live/` references and compact `_claude-md/` summaries.',
+    introSections: [
+      heading(3, 'Pipeline Stages'),
+      table(
+        ['Stage', 'Module', 'Responsibility'],
+        [
+          ['Scanner', '`src/scanner/`', 'File discovery, AST parsing, opt-in via `@libar-docs`'],
+          [
+            'Extractor',
+            '`src/extractor/`',
+            'Pattern extraction from TypeScript JSDoc and Gherkin tags',
+          ],
+          [
+            'Transformer',
+            '`src/generators/pipeline/`',
+            'MasterDataset with pre-computed views for O(1) access (ADR-006)',
+          ],
+          [
+            'Codec',
+            '`src/renderable/`',
+            'Pure functions: MasterDataset → RenderableDocument → Markdown',
+          ],
+        ]
+      ),
+      heading(3, 'Codec Inventory'),
+      table(
+        ['Codec', 'Purpose'],
+        [
+          [
+            'ReferenceDocumentCodec',
+            'Conventions, diagrams, shapes, behaviors (4-layer composition)',
+          ],
+          ['PlanningCodec', 'Roadmap and remaining work'],
+          ['SessionCodec', 'Current work and session findings'],
+          ['ReportingCodec', 'Changelog'],
+          ['TimelineCodec', 'Timeline and traceability'],
+          ['RequirementsAdrCodec', 'ADR generation'],
+          ['BusinessRulesCodec', 'Gherkin rule extraction'],
+          ['TaxonomyCodec', 'Tag registry docs'],
+          ['CompositeCodec', 'Composes multiple codecs into a single document'],
+        ]
+      ),
+    ],
     keyInvariants: [
       'Codec purity: Every codec is a pure function (dataset in, document out). No side effects, no filesystem access. Same input always produces same output',
+      'Single read model (ADR-006): All codecs consume MasterDataset. No codec reads raw scanner/extractor output. Anti-patterns: Parallel Pipeline, Lossy Local Type, Re-derived Relationship',
+      'Progressive disclosure: Every document renders at three detail levels (detailed, standard, summary) from the same codec. Summary feeds `_claude-md/` modules; detailed feeds `docs-live/reference/`',
       'Config-driven generation: A single `ReferenceDocConfig` produces a complete document. Content sources compose in fixed order: conventions, diagrams, shapes, behaviors',
       'RenderableDocument IR: Codecs express intent ("this is a table"), the renderer handles syntax ("pipe-delimited markdown"). Switching output format requires only a new renderer',
+      'Composition order: Reference docs compose four content layers in fixed order. Product area docs compose five layers: intro, conventions, diagrams, shapes, business rules',
+      'Shape extraction: TypeScript shapes (`interface`, `type`, `enum`, `function`, `const`) are extracted by declaration-level `@libar-docs-shape` tags. Shapes include source text, JSDoc, type parameters, and property documentation',
+      'Generator registration: Generators self-register via `registerGenerator()`. The orchestrator runs them in registration order. Each generator owns its output files and codec configuration',
     ],
     keyPatterns: [
       'ADR005CodecBasedMarkdownRendering',
@@ -335,6 +450,9 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
       'CrossCuttingDocumentInclusion',
       'ArchitectureDiagramGeneration',
       'ScopedArchitecturalView',
+      'CompositeCodec',
+      'RenderableDocument',
+      'ProductAreaOverview',
     ],
   },
   Validation: {
@@ -515,6 +633,7 @@ export function createReferenceCodec(
       const sections: SectionBlock[] = [];
 
       // Product area filtering: when set, pre-filter and auto-derive content sources
+      // Preamble is applied inside decodeProductArea() — not here, to avoid dead code
       if (config.productArea !== undefined) {
         return decodeProductArea(dataset, config, opts);
       }
@@ -545,11 +664,11 @@ export function createReferenceCodec(
         }
       }
 
-      if (conventions.length > 0) {
-        sections.push(...buildConventionSections(conventions, opts.detailLevel));
-      }
+      const conventionBlocks =
+        conventions.length > 0 ? buildConventionSections(conventions, opts.detailLevel) : [];
 
       // 2. Scoped relationship diagrams (normalize singular to array)
+      const diagramBlocks: SectionBlock[] = [];
       if (opts.detailLevel !== 'summary') {
         const scopes: readonly DiagramScope[] =
           config.diagramScopes ?? (config.diagramScope !== undefined ? [config.diagramScope] : []);
@@ -557,22 +676,23 @@ export function createReferenceCodec(
         for (const scope of scopes) {
           const diagramSections = buildScopedDiagram(dataset, scope);
           if (diagramSections.length > 0) {
-            sections.push(...diagramSections);
+            diagramBlocks.push(...diagramSections);
           }
         }
       }
 
       // 3. Shape extraction: combine shapeSources (coarse) + shapeSelectors (fine)
+      const shapeBlocks: SectionBlock[] = [];
       {
         const allShapes =
           config.shapeSources.length > 0
             ? [...extractShapesFromDataset(dataset, config.shapeSources)]
             : ([] as ExtractedShape[]);
+        const seenNames = new Set(allShapes.map((s) => s.name));
 
         // DD-3/DD-6: Fine-grained selector-based filtering
         if (config.shapeSelectors !== undefined && config.shapeSelectors.length > 0) {
           const selectorShapes = filterShapesBySelectors(dataset, config.shapeSelectors);
-          const seenNames = new Set(allShapes.map((s) => s.name));
           for (const shape of selectorShapes) {
             if (!seenNames.has(shape.name)) {
               seenNames.add(shape.name);
@@ -583,7 +703,6 @@ export function createReferenceCodec(
 
         // DD-1: Merge include-tagged shapes (additive)
         if (includeSet !== undefined) {
-          const seenNames = new Set(allShapes.map((s) => s.name));
           for (const pattern of dataset.patterns) {
             if (pattern.extractedShapes === undefined || pattern.extractedShapes.length === 0)
               continue;
@@ -600,7 +719,7 @@ export function createReferenceCodec(
         }
 
         if (allShapes.length > 0) {
-          sections.push(...buildShapeSections(allShapes, opts.detailLevel));
+          shapeBlocks.push(...buildShapeSections(allShapes, opts.detailLevel));
         }
       }
 
@@ -622,8 +741,22 @@ export function createReferenceCodec(
         behaviorPatterns.push(...includedBehaviors);
       }
 
-      if (behaviorPatterns.length > 0) {
-        sections.push(...buildBehaviorSectionsFromPatterns(behaviorPatterns, opts.detailLevel));
+      const behaviorBlocks =
+        behaviorPatterns.length > 0
+          ? buildBehaviorSectionsFromPatterns(behaviorPatterns, opts.detailLevel)
+          : [];
+
+      // Static preamble: editorial sections before generated content
+      if (config.preamble !== undefined && config.preamble.length > 0) {
+        sections.push(...config.preamble);
+        sections.push(separator());
+      }
+
+      // DD-4 (GeneratedDocQuality): Assemble in configured order
+      if (config.shapesFirst === true) {
+        sections.push(...shapeBlocks, ...conventionBlocks, ...diagramBlocks, ...behaviorBlocks);
+      } else {
+        sections.push(...conventionBlocks, ...diagramBlocks, ...shapeBlocks, ...behaviorBlocks);
       }
 
       if (sections.length === 0) {
@@ -686,10 +819,17 @@ function decodeProductArea(
   }
   const sections: SectionBlock[] = [];
 
-  // Pre-filter patterns by product area
-  const areaPatterns = dataset.patterns.filter((p) => p.productArea === area);
+  // Static preamble: editorial sections before generated content
+  if (config.preamble !== undefined && config.preamble.length > 0) {
+    sections.push(...config.preamble);
+    sections.push(separator());
+  }
 
-  // Also collect TypeScript patterns by archContext mapping (for shapes + diagrams)
+  // Pre-computed view: O(1) lookup instead of linear filter
+  const areaPatterns = dataset.byProductArea[area] ?? [];
+
+  // Collect TypeScript patterns by explicit archContext tag (for shapes + diagrams)
+  // Note: archIndex.byContext includes inferred contexts — use explicit filter to match only tagged patterns
   const archContexts = PRODUCT_AREA_ARCH_CONTEXT_MAP[area] ?? [];
   const contextSet = new Set(archContexts);
   const tsPatterns =
@@ -697,16 +837,14 @@ function decodeProductArea(
       ? dataset.patterns.filter((p) => p.archContext !== undefined && contextSet.has(p.archContext))
       : [];
 
-  // Combined set of all relevant patterns (deduplicated)
-  const allRelevantNames = new Set([
-    ...areaPatterns.map((p) => p.name),
-    ...tsPatterns.map((p) => p.name),
-  ]);
-
   // 1. Intro section from ADR-001 metadata with key invariants
   const meta = PRODUCT_AREA_META[area];
   if (meta !== undefined) {
     sections.push(paragraph(`**${meta.question}** ${meta.intro}`));
+
+    if (meta.introSections !== undefined && opts.detailLevel === 'detailed') {
+      sections.push(...meta.introSections);
+    }
 
     if (meta.keyInvariants.length > 0) {
       sections.push(heading(2, 'Key Invariants'));
@@ -742,7 +880,7 @@ function decodeProductArea(
           sections.push(...diagramSections);
         }
       }
-    } else if (contextSet.size > 0) {
+    } else if (archContexts.length > 0) {
       // Auto-generate fallback — only when archContext mappings exist
       const autoScope: DiagramScope = {
         archContext: archContexts,
@@ -767,10 +905,12 @@ function decodeProductArea(
   {
     const allShapes: ExtractedShape[] = [];
     const seenNames = new Set<string>();
+    const seenPatternNames = new Set<string>();
 
     // Collect shapes from all patterns associated with this area
-    for (const pattern of dataset.patterns) {
-      if (!allRelevantNames.has(pattern.name)) continue;
+    for (const pattern of [...areaPatterns, ...tsPatterns]) {
+      if (seenPatternNames.has(pattern.name)) continue;
+      seenPatternNames.add(pattern.name);
       if (pattern.extractedShapes === undefined || pattern.extractedShapes.length === 0) continue;
       for (const shape of pattern.extractedShapes) {
         if (!seenNames.has(shape.name)) {
@@ -829,6 +969,15 @@ function decodeProductArea(
   );
   if (rulesPatterns.length > 0) {
     sections.push(...buildBusinessRulesCompactSection(rulesPatterns, opts.detailLevel));
+  }
+
+  // DD-4 (GeneratedDocQuality): Insert TOC after intro for large product area docs
+  const tocBlocks = buildTableOfContents(sections);
+  if (tocBlocks.length > 0) {
+    const firstSepIdx = sections.findIndex((s) => s.type === 'separator');
+    if (firstSepIdx >= 0) {
+      sections.splice(firstSepIdx + 1, 0, ...tocBlocks);
+    }
   }
 
   if (sections.length === 0) {
@@ -962,13 +1111,6 @@ function buildBehaviorSectionsFromPatterns(
             ruleBlocks.push(paragraph(annotations.remainingContent));
           }
 
-          // Extract and render tables from Rule descriptions (Gherkin or markdown)
-          const ruleTables = extractTablesFromDescription(rule.description);
-          for (const tbl of ruleTables) {
-            const rows = tbl.rows.map((row) => tbl.headers.map((h) => row[h] ?? ''));
-            ruleBlocks.push(table([...tbl.headers], rows));
-          }
-
           if (annotations.codeExamples && detailLevel === 'detailed') {
             for (const example of annotations.codeExamples) {
               ruleBlocks.push(example);
@@ -1024,18 +1166,15 @@ function buildBusinessRulesCompactSection(
 
   const sections: SectionBlock[] = [];
 
-  // Count totals for header
+  // Count totals for header (lightweight pass — no annotation parsing)
   let totalRules = 0;
   let totalInvariants = 0;
-  const annotationsCache = new Map<string, BusinessRuleAnnotations>();
 
   for (const p of patterns) {
     if (p.rules === undefined) continue;
     for (const r of p.rules) {
       totalRules++;
-      const ann = parseBusinessRuleAnnotations(r.description);
-      annotationsCache.set(`${p.name}::${r.name}`, ann);
-      if (ann.invariant !== undefined) totalInvariants++;
+      if (r.description.includes('**Invariant:**')) totalInvariants++;
     }
   }
 
@@ -1061,7 +1200,7 @@ function buildBusinessRulesCompactSection(
 
     const rows: string[][] = [];
     for (const rule of pattern.rules) {
-      const ann = annotationsCache.get(`${pattern.name}::${rule.name}`) ?? {};
+      const ann = parseBusinessRuleAnnotations(rule.description);
 
       // At standard level, skip rules without invariant
       if (!isDetailed && ann.invariant === undefined) continue;
@@ -1084,6 +1223,28 @@ function buildBusinessRulesCompactSection(
 
   sections.push(separator());
   return sections;
+}
+
+/**
+ * Build a table of contents from H2 headings in a sections array.
+ *
+ * DD-4 (GeneratedDocQuality): Product area docs can be 100+ KB with many
+ * sections. A TOC at the top makes browser navigation practical. Only
+ * generated when there are 3 or more H2 headings (below that, a TOC adds
+ * noise without navigation value).
+ */
+function buildTableOfContents(allSections: readonly SectionBlock[]): SectionBlock[] {
+  const h2Headings = allSections.filter(
+    (s): s is HeadingBlock => s.type === 'heading' && s.level === 2
+  );
+  if (h2Headings.length < 3) return [];
+
+  const tocItems = h2Headings.map((h) => {
+    const anchor = slugify(h.text);
+    return `[${h.text}](#${anchor})`;
+  });
+
+  return [heading(2, 'Contents'), list(tocItems), separator()];
 }
 
 /**
@@ -1663,6 +1824,22 @@ function buildGenerationPipelineSequenceDiagram(): string[] {
   ];
 }
 
+/** Build MasterDataset fan-out diagram from hardcoded domain knowledge */
+function buildMasterDatasetViewsDiagram(): string[] {
+  return [
+    'graph TB',
+    '    MD[MasterDataset]',
+    '    MD --> byStatus["byStatus<br/>(completed / active / planned)"]',
+    '    MD --> byPhase["byPhase<br/>(sorted, with counts)"]',
+    '    MD --> byQuarter["byQuarter<br/>(keyed by Q-YYYY)"]',
+    '    MD --> byCategory["byCategory<br/>(keyed by category name)"]',
+    '    MD --> bySource["bySource<br/>(typescript / gherkin / roadmap / prd)"]',
+    '    MD --> counts["counts<br/>(aggregate statistics)"]',
+    '    MD --> RI["relationshipIndex?<br/>(forward + reverse lookups)"]',
+    '    MD --> AI["archIndex?<br/>(role / context / layer / view)"]',
+  ];
+}
+
 /** Build a Mermaid C4 context diagram with system boundaries */
 function buildC4Diagram(ctx: DiagramContext, scope: DiagramScope): string[] {
   const showLabels = scope.showEdgeLabels !== false;
@@ -1837,6 +2014,14 @@ export function buildScopedDiagram(dataset: MasterDataset, scope: DiagramScope):
       heading(2, title),
       paragraph('Temporal flow of the documentation generation pipeline:'),
       mermaid(buildGenerationPipelineSequenceDiagram().join('\n')),
+      separator(),
+    ];
+  }
+  if (scope.source === 'master-dataset-views') {
+    return [
+      heading(2, title),
+      paragraph('Pre-computed view fan-out from MasterDataset (single-pass transform):'),
+      mermaid(buildMasterDatasetViewsDiagram().join('\n')),
       separator(),
     ];
   }

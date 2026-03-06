@@ -3,19 +3,51 @@
  * @libar-docs-core
  * @libar-docs-pattern PlanningCodecs
  * @libar-docs-status completed
+ * @libar-docs-convention codec-registry
+ * @libar-docs-product-area:Generation
  *
- * ## Planning Document Codecs
+ * ## PlanningChecklistCodec
  *
- * Transforms MasterDataset into RenderableDocuments for planning outputs:
- * - PLANNING-CHECKLIST.md (pre-planning questions and DoD)
- * - SESSION-PLAN.md (implementation plans for phases)
- * - SESSION-FINDINGS.md (retrospective discoveries)
+ * **Purpose:** Pre-planning questions and Definition of Done validation.
+ *
+ * **Output Files:** `PLANNING-CHECKLIST.md`
  *
  * ### When to Use
  *
- * - When generating planning documentation for implementation sessions
- * - When creating pre-planning checklists with Definition of Done
- * - When documenting session findings and retrospective discoveries
+ * - When starting a new implementation session and need pre-flight validation
+ * - When generating Definition of Done checklists for active phases
+ * - When checking readiness criteria before transitioning patterns to active
+ *
+ * ## SessionPlanCodec
+ *
+ * **Purpose:** Implementation plans for coding sessions.
+ *
+ * **Output Files:** `SESSION-PLAN.md`
+ *
+ * ### When to Use
+ *
+ * - When generating a structured implementation plan for an active coding session
+ * - When documenting planned deliverables and their execution order
+ * - When creating session-scoped plans aligned with FSM transitions
+ *
+ * ## SessionFindingsCodec
+ *
+ * **Purpose:** Retrospective discoveries for roadmap refinement.
+ *
+ * **Output Files:** `SESSION-FINDINGS.md`
+ *
+ * ### When to Use
+ *
+ * - When capturing session retrospective findings across all patterns
+ * - When surfacing discovered gaps, improvements, risks, and learnings
+ * - When refining roadmap priorities based on implementation discoveries
+ *
+ * ### Finding Sources
+ *
+ * - `pattern.discoveredGaps` -- Gap findings
+ * - `pattern.discoveredImprovements` -- Improvement suggestions
+ * - `pattern.discoveredRisks` / `pattern.risk` -- Risk findings
+ * - `pattern.discoveredLearnings` -- Learned insights
  */
 
 import { z } from 'zod';

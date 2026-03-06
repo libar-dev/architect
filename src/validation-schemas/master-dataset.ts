@@ -50,6 +50,8 @@ import { TagRegistrySchema } from './tag-registry.js';
  * - completed: implemented, completed
  * - active: active, partial, in-progress
  * - planned: roadmap, planned, undefined
+ *
+ * @libar-docs-shape master-dataset
  */
 export const StatusGroupsSchema = z.object({
   /** Patterns with status 'completed' or 'implemented' */
@@ -64,6 +66,8 @@ export const StatusGroupsSchema = z.object({
 
 /**
  * Status counts for aggregate statistics
+ *
+ * @libar-docs-shape master-dataset
  */
 export const StatusCountsSchema = z.object({
   /** Number of completed patterns */
@@ -84,6 +88,8 @@ export const StatusCountsSchema = z.object({
  *
  * Groups patterns by their phase number, with pre-computed
  * status counts for each phase.
+ *
+ * @libar-docs-shape master-dataset
  */
 export const PhaseGroupSchema = z.object({
   /** Phase number (e.g., 1, 2, 3, 14, 39) */
@@ -101,6 +107,8 @@ export const PhaseGroupSchema = z.object({
 
 /**
  * Source-based views for different data origins
+ *
+ * @libar-docs-shape master-dataset
  */
 export const SourceViewsSchema = z.object({
   /** Patterns from TypeScript files (.ts) */
@@ -137,6 +145,8 @@ export const ImplementationRefSchema = z.object({
  * Relationship index for dependency tracking
  *
  * Maps pattern names to their relationship metadata.
+ *
+ * @libar-docs-shape master-dataset
  */
 export const RelationshipEntrySchema = z.object({
   /** Patterns this pattern uses (from @libar-docs-uses) */
@@ -202,6 +212,8 @@ export const ArchIndexSchema = z.object({
  *
  * Contains raw patterns plus pre-computed views and statistics.
  * This is the primary data structure passed to generators and sections.
+ *
+ * @libar-docs-shape master-dataset
  */
 export const MasterDatasetSchema = z.object({
   // ─────────────────────────────────────────────────────────────────────────
@@ -236,6 +248,9 @@ export const MasterDatasetSchema = z.object({
 
   /** Patterns grouped by source type */
   bySource: SourceViewsSchema,
+
+  /** Patterns grouped by product area (for O(1) product area lookups) */
+  byProductArea: z.record(z.string(), z.array(ExtractedPatternSchema)),
 
   // ─────────────────────────────────────────────────────────────────────────
   // Aggregate Statistics

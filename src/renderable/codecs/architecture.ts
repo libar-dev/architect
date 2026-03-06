@@ -8,11 +8,24 @@
  * @libar-docs-arch-layer application
  * @libar-docs-include codec-transformation
  * @libar-docs-uses MasterDataset, ArchIndex
+ * @libar-docs-convention codec-registry
+ * @libar-docs-product-area:Generation
  *
- * ## Architecture Diagram Codec
+ * ## ArchitectureDocumentCodec
  *
  * Transforms MasterDataset into a RenderableDocument containing
  * architecture diagrams (Mermaid) generated from source annotations.
+ *
+ * **Purpose:** Architecture diagrams (Mermaid) generated from source annotations. Supports component and layered views.
+ *
+ * **Output Files:** `ARCHITECTURE.md` (generated architecture diagrams with component inventory)
+ *
+ * | Option | Type | Default | Description |
+ * | --- | --- | --- | --- |
+ * | diagramType | "component" \| "layered" | "component" | Type of diagram to generate |
+ * | includeInventory | boolean | true | Include component inventory table |
+ * | includeLegend | boolean | true | Include legend for arrow styles |
+ * | filterContexts | string[] | [] | Filter to specific contexts (empty = all) |
  *
  * ### When to Use
  *

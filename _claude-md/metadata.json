@@ -17,6 +17,17 @@
       ]
     },
     {
+      "title": "Context Gathering Protocol",
+      "tags": ["core"],
+      "subsections": [
+        {
+          "path": "core/context-protocol.md",
+          "tags": ["core"],
+          "description": "Mandatory API-first context gathering rules and PR preparation recipes"
+        }
+      ]
+    },
+    {
       "title": "Common Commands",
       "tags": ["core"],
       "subsections": [
@@ -77,17 +88,7 @@
         {
           "path": "workflow/session-workflows.md",
           "tags": ["core"],
-          "description": "Session decision tree and session types"
-        },
-        {
-          "path": "workflow/session-details.md",
-          "tags": ["core"],
-          "description": "Planning, Design, and Implementation session details"
-        },
-        {
-          "path": "workflow/fsm-handoff.md",
-          "tags": ["core"],
-          "description": "FSM protection, error messages, escape hatches, and handoff documentation"
+          "description": "Session types, FSM contracts, escape hatches, handoff (generated from SessionGuidesModuleSource spec)"
         }
       ]
     },
@@ -151,11 +152,11 @@
     },
     {
       "title": "Guides",
-      "tags": ["core"],
+      "tags": ["api-reference"],
       "subsections": [
         {
           "path": "guides/product-area-enrichment.md",
-          "tags": ["core"],
+          "tags": ["api-reference"],
           "description": "Workflow for adding live diagrams and enriched intros to product area docs"
         }
       ]

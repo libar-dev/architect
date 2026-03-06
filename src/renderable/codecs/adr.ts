@@ -3,11 +3,17 @@
  * @libar-docs-core
  * @libar-docs-pattern AdrDocumentCodec
  * @libar-docs-status completed
+ * @libar-docs-convention codec-registry
+ * @libar-docs-product-area:Generation
  *
- * ## ADR Document Codec
+ * ## AdrDocumentCodec
  *
  * Transforms MasterDataset into RenderableDocument for Architecture Decision Records.
  * Extracts ADRs from patterns with `@libar-docs-adr` tags.
+ *
+ * **Purpose:** Architecture Decision Records extracted from patterns with @libar-docs-adr tags.
+ *
+ * **Output Files:** `DECISIONS.md` (ADR index), `decisions/<category-slug>.md` (category details)
  *
  * ### When to Use
  *

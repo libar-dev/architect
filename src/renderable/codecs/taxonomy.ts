@@ -3,11 +3,24 @@
  * @libar-docs-core
  * @libar-docs-pattern TaxonomyCodec
  * @libar-docs-status completed
+ * @libar-docs-convention codec-registry
+ * @libar-docs-product-area:Generation
  *
- * ## Taxonomy Document Codec
+ * ## TaxonomyDocumentCodec
  *
  * Transforms MasterDataset into a RenderableDocument for taxonomy reference output.
  * Generates TAXONOMY.md and detail files (taxonomy/*.md).
+ *
+ * **Purpose:** Taxonomy reference documentation with tag definitions, preset comparison, and format type reference.
+ *
+ * **Output Files:** `TAXONOMY.md` (main reference), `taxonomy/<domain>.md` (domain details)
+ *
+ * | Option | Type | Default | Description |
+ * | --- | --- | --- | --- |
+ * | includePresets | boolean | true | Include preset comparison table |
+ * | includeFormatTypes | boolean | true | Include format type reference |
+ * | includeArchDiagram | boolean | true | Include architecture diagram |
+ * | groupByDomain | boolean | true | Group metadata tags by domain |
  *
  * ### When to Use
  *

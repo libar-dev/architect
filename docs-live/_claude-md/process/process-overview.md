@@ -9,6 +9,19 @@
 - Two distinct status domains: Pattern FSM status (4 values) vs. deliverable status (6 values). Never cross domains
 - Session types define capabilities: planning creates specs, design creates stubs, implementation writes code. Each session type has a fixed input/output contract enforced by convention
 
+#### Contents
+
+- [Key Invariants](#key-invariants)
+- [Product area canonical values](#product-area-canonical-values)
+- [ADR category canonical values](#adr-category-canonical-values)
+- [FSM status values and protection levels](#fsm-status-values-and-protection-levels)
+- [Valid FSM transitions](#valid-fsm-transitions)
+- [Tag format types](#tag-format-types)
+- [Source ownership](#source-ownership)
+- [Quarter format convention](#quarter-format-convention)
+- [Canonical phase definitions (6-phase USDP standard)](#canonical-phase-definitions-6-phase-usdp-standard)
+- [Deliverable status canonical values](#deliverable-status-canonical-values)
+
 #### Product area canonical values
 
 **Invariant:** The product-area tag uses one of 7 canonical values. Each value represents a reader-facing documentation section, not a source module.
@@ -111,4 +124,4 @@
 | superseded  | Replaced by another  |
 | n/a         | Not applicable       |
 
-**Components:** Other (ValidatorReadModelConsolidation, StepDefinitionCompletion, SessionFileCleanup, ProcessAPILayeredExtraction, OrchestratorPipelineFactoryMigration, MvpWorkflowImplementation, LivingRoadmapCLI, EffortVarianceTracking, ConfigBasedWorkflowDefinition, CliBehaviorTesting, ADR006SingleReadModelArchitecture, ADR003SourceFirstPatternArchitecture, ADR002GherkinOnlyTesting, ADR001TaxonomyCanonicalValues, SessionHandoffs, SessionFileLifecycle)
+**Components:** Other (ADR006SingleReadModelArchitecture, ADR003SourceFirstPatternArchitecture, ADR002GherkinOnlyTesting, ADR001TaxonomyCanonicalValues, ValidatorReadModelConsolidation, StepDefinitionCompletion, SessionFileCleanup, ProcessAPILayeredExtraction, OrchestratorPipelineFactoryMigration, MvpWorkflowImplementation, LivingRoadmapCLI, EffortVarianceTracking, ConfigBasedWorkflowDefinition, CliBehaviorTesting, SessionHandoffs, SessionFileLifecycle)

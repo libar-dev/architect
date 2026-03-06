@@ -3,11 +3,17 @@
  * @libar-docs-core
  * @libar-docs-pattern PrChangesCodec
  * @libar-docs-status completed
+ * @libar-docs-convention codec-registry
+ * @libar-docs-product-area:Generation
  *
- * ## PR Changes Document Codec
+ * ## PrChangesCodec
  *
  * Transforms MasterDataset into RenderableDocument for PR-scoped output.
  * Filters patterns by changed files and/or release version tags.
+ *
+ * **Purpose:** PR-scoped view filtered by changed files or release version.
+ *
+ * **Output Files:** `working/PR-CHANGES.md`
  *
  * ### When to Use
  *

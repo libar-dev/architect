@@ -5,6 +5,7 @@
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import type { MasterDataset } from '../../../../src/validation-schemas/master-dataset.js';
+import type { ExtractedShape } from '../../../../src/validation-schemas/extracted-shape.js';
 import type { GeneratorOutput, GeneratorContext } from '../../../../src/generators/types.js';
 import { GeneratorRegistry } from '../../../../src/generators/registry.js';
 import {
@@ -21,11 +22,22 @@ import { buildRegistry } from '../../../../src/taxonomy/registry-builder.js';
 // ============================================================================
 
 /**
- * Test configs: 7 product area configs + 1 manual reference config.
+ * Test configs: 7 product area configs + 2 manual reference configs.
  * Mirrors the shape of delivery-process.config.ts.
  */
 const TEST_CONFIGS: readonly ReferenceDocConfig[] = [
   ...createProductAreaConfigs(),
+  {
+    title: 'Architecture Types Reference',
+    conventionTags: ['pipeline-architecture'],
+    shapeSources: [],
+    shapeSelectors: [{ group: 'master-dataset' }],
+    behaviorCategories: [],
+    claudeMdSection: 'architecture',
+    docsFilename: 'ARCHITECTURE-TYPES.md',
+    claudeMdFilename: 'architecture-types.md',
+    diagramScopes: [{ title: 'MasterDataset View Fan-out', source: 'master-dataset-views' }],
+  },
   {
     title: 'Reference Generation Sample',
     conventionTags: ['taxonomy-rules'],
@@ -66,6 +78,17 @@ function makeMinimalContext(dataset: MasterDataset): GeneratorContext {
     outputDir: '/tmp/test/output',
     registry: buildRegistry(),
     masterDataset: dataset as GeneratorContext['masterDataset'],
+  };
+}
+
+function createShape(name: string, group?: string): ExtractedShape {
+  return {
+    name,
+    kind: 'interface',
+    sourceText: `export interface ${name} {}`,
+    lineNumber: 1,
+    exported: true,
+    ...(group !== undefined ? { group } : {}),
   };
 }
 
@@ -160,6 +183,20 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         });
       }
     );
+
+    RuleScenario('Architecture-types generators are registered', ({ When, Then, And }) => {
+      When('registering reference generators', () => {
+        registerReferenceGenerators(state!.registry, TEST_CONFIGS);
+      });
+
+      Then('a generator named {string} exists', (_ctx: unknown, name: string) => {
+        expect(state!.registry.has(name)).toBe(true);
+      });
+
+      And('a generator named {string} exists', (_ctx: unknown, name: string) => {
+        expect(state!.registry.has(name)).toBe(true);
+      });
+    });
   });
 
   // ──────────────────────────────────────────────────────────────────────
@@ -236,6 +273,68 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         And('the output file content contains {string}', (_ctx: unknown, text: string) => {
           expect(state!.output!.files[0]!.content).toContain(text);
         });
+      }
+    );
+
+    RuleScenario(
+      'ARCHITECTURE-TYPES generator produces shapes and convention content',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a MasterDataset with pipeline architecture conventions and master dataset shapes',
+          () => {
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'Documentation Generation Orchestrator',
+                  category: 'core',
+                  convention: ['pipeline-architecture'],
+                  description: `## Orchestrator Pipeline Responsibilities
+
+**Invariant:** Orchestrator owns final generation wiring.
+
+## Steps 9-10: Codec Execution and File Writing
+
+Codec decode and file write happen after shared dataset build.`,
+                }),
+                createTestPattern({
+                  name: 'MasterDataset',
+                  category: 'core',
+                  extractedShapes: [
+                    createShape('MasterDatasetSchema', 'master-dataset'),
+                    createShape('PipelineOptions', 'master-dataset'),
+                  ],
+                }),
+              ],
+            });
+          }
+        );
+
+        When('running the {string} generator', async (_ctx: unknown, generatorName: string) => {
+          registerReferenceGenerators(state!.registry, TEST_CONFIGS);
+          const generator = state!.registry.get(generatorName);
+          expect(generator).toBeDefined();
+          const context = makeMinimalContext(state!.dataset!);
+          state!.output = await generator!.generate([], context);
+        });
+
+        Then('the output has {int} file', (_ctx: unknown, count: number) => {
+          expect(state!.output!.files).toHaveLength(count);
+        });
+
+        And('the output file path starts with {string}', (_ctx: unknown, prefix: string) => {
+          expect(state!.output!.files[0]!.path.startsWith(prefix)).toBe(true);
+        });
+
+        And(
+          'the output file content contains all of {string}, {string}, {string}, and {string}',
+          (_ctx: unknown, text1: string, text2: string, text3: string, text4: string) => {
+            const content = state!.output!.files[0]!.content;
+            expect(content).toContain(text1);
+            expect(content).toContain(text2);
+            expect(content).toContain(text3);
+            expect(content).toContain(text4);
+          }
+        );
       }
     );
   });

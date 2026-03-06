@@ -19,6 +19,7 @@
 import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import type { BusinessRule, ExtractedPattern } from '../../validation-schemas/extracted-pattern.js';
 import type { SectionBlock } from '../schema.js';
+import { table } from '../schema.js';
 import { parseBusinessRuleAnnotations } from './helpers.js';
 
 // ============================================================================
@@ -112,6 +113,21 @@ export function extractTablesFromDescription(description: string): ConventionTab
 }
 
 /**
+ * Extract markdown tables from description text and return as SectionBlock tables.
+ *
+ * Adapter that wraps `extractTablesFromDescription` for codecs that need
+ * `SectionBlock[]` output instead of `ConventionTable[]`.
+ */
+export function extractTablesAsSectionBlocks(description: string): SectionBlock[] {
+  const conventionTables = extractTablesFromDescription(description);
+  return conventionTables.map((ct) => {
+    const headers = [...ct.headers];
+    const rows = ct.rows.map((row) => headers.map((h) => row[h] ?? ''));
+    return table(headers, rows);
+  });
+}
+
+/**
  * Parse a group of table lines into structured data.
  *
  * Supports both markdown tables (header + separator + data rows) and
@@ -122,20 +138,14 @@ function parseTableLines(lines: string[]): ConventionTable | null {
   // Need at least header + 1 data row
   if (lines.length < 2) return null;
 
-  const parseRow = (line: string): string[] =>
-    line
-      .split('|')
-      .slice(1, -1) // Remove empty first/last from leading/trailing |
-      .map((cell) => cell.trim());
-
   const headerLine = lines[0];
   if (!headerLine) return null;
-  const headers = parseRow(headerLine);
+  const headers = splitMarkdownTableRow(headerLine);
 
   // Detect whether line 2 is a markdown separator row (| --- | --- |)
   const secondLine = lines[1];
   if (!secondLine) return null;
-  const secondCells = secondLine.split('|').slice(1, -1);
+  const secondCells = splitMarkdownTableRow(secondLine);
   const hasSeparator = secondCells.every((cell) => /^[\s:-]+$/.test(cell));
 
   // Data rows start after separator (markdown) or immediately after header (Gherkin)
@@ -145,7 +155,7 @@ function parseTableLines(lines: string[]): ConventionTable | null {
   for (let i = dataStart; i < lines.length; i++) {
     const dataLine = lines[i];
     if (!dataLine) continue;
-    const cells = parseRow(dataLine);
+    const cells = splitMarkdownTableRow(dataLine);
     const row: Record<string, string> = {};
     for (let j = 0; j < headers.length; j++) {
       const header = headers[j];
@@ -157,6 +167,39 @@ function parseTableLines(lines: string[]): ConventionTable | null {
   }
 
   return { headers, rows };
+}
+
+/**
+ * Split a markdown table row into cells while preserving escaped pipe content.
+ *
+ * Markdown table rows use `|` as delimiters. Content pipes must be escaped
+ * as `\|` and should remain part of the parsed cell value.
+ */
+function splitMarkdownTableRow(line: string): string[] {
+  const cells: string[] = [];
+  let current = '';
+
+  for (let i = 0; i < line.length; i++) {
+    const char: string = line[i] ?? '';
+    const next: string | undefined = line[i + 1];
+
+    if (char === '\\' && next === '|') {
+      current += '|';
+      i++;
+      continue;
+    }
+
+    if (char === '|') {
+      cells.push(current.trim());
+      current = '';
+      continue;
+    }
+
+    current += char;
+  }
+
+  cells.push(current.trim());
+  return cells.slice(1, -1);
 }
 
 // ============================================================================
@@ -222,13 +265,17 @@ function extractConventionRulesFromDescription(
   // Split by ## headings (level 2 only, not ### or deeper)
   // Allow optional leading whitespace for DocString content
   const headingPattern = /^\s*## (?!#)(.+)$/gm;
-  const headings: Array<{ name: string; index: number }> = [];
+  const headings: Array<{ name: string; index: number; matchEnd: number }> = [];
   let match;
 
   while ((match = headingPattern.exec(description)) !== null) {
     const captured = match[1];
     if (captured) {
-      headings.push({ name: captured.trim(), index: match.index });
+      headings.push({
+        name: captured.trim(),
+        index: match.index,
+        matchEnd: match.index + match[0].length,
+      });
     }
   }
 
@@ -244,9 +291,11 @@ function extractConventionRulesFromDescription(
     if (!heading) continue;
     const nextIndex =
       i + 1 < headings.length ? (headings[i + 1]?.index ?? description.length) : description.length;
-    // Content starts after the heading line
-    const headingLineEnd = description.indexOf('\n', heading.index);
-    const contentStart = headingLineEnd >= 0 ? headingLineEnd + 1 : description.length;
+    // Content starts after the heading match (match includes the full "## Name" line)
+    // Use matchEnd instead of indexOf('\n', heading.index) because \s* in the regex
+    // can consume leading newlines, making heading.index point to those newlines
+    const contentStart =
+      heading.matchEnd < description.length ? heading.matchEnd + 1 : description.length;
     const content = description.slice(contentStart, nextIndex).trim();
 
     if (content.length > 0) {
@@ -287,6 +336,8 @@ export function extractConventions(
 ): ConventionBundle[] {
   if (conventionTags.length === 0) return [];
 
+  const tagSet = new Set(conventionTags);
+
   // Build a map of conventionTag -> { sourceDecisions, rules }
   const bundles = new Map<string, { sourceDecisions: string[]; rules: ConventionRuleContent[] }>();
 
@@ -300,7 +351,7 @@ export function extractConventions(
     if (!pattern.convention || pattern.convention.length === 0) continue;
 
     // Check if this pattern has any of the requested convention tags
-    const matchingTags = pattern.convention.filter((t) => conventionTags.includes(t));
+    const matchingTags = pattern.convention.filter((t) => tagSet.has(t));
     if (matchingTags.length === 0) continue;
 
     // Extract rule content from Gherkin Rule: blocks or TypeScript JSDoc description

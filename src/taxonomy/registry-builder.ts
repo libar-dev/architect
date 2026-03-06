@@ -34,6 +34,7 @@ import { DEFAULT_HIERARCHY_LEVEL, HIERARCHY_LEVELS } from './hierarchy-levels.js
 import { RISK_LEVELS } from './risk-levels.js';
 import { ACCEPTED_STATUS_VALUES, DEFAULT_STATUS } from './status-values.js';
 import { CONVENTION_VALUES } from './conventions.js';
+import { CLAUDE_SECTION_VALUES } from './claude-section-values.js';
 import { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG } from '../config/defaults.js';
 
 /**
@@ -167,6 +168,7 @@ export const METADATA_TAGS_BY_GROUP = {
   extraction: ['extract-shapes', 'shape'] as const,
   stub: ['target', 'since'] as const,
   convention: ['convention'] as const,
+  claude: ['claude-module', 'claude-section', 'claude-tags'] as const,
 } as const;
 
 // Transform helpers for data-driven Gherkin tag extraction
@@ -562,6 +564,26 @@ export function buildRegistry(): TagRegistry {
         purpose: 'Convention domains for reference document generation from decision records',
         values: [...CONVENTION_VALUES],
         example: '@libar-docs-convention fsm-rules, testing-policy',
+      },
+      // Claude module generation tags (ClaudeModuleGeneration Phase 25)
+      {
+        tag: 'claude-module',
+        format: 'value',
+        purpose: 'Module identifier for CLAUDE.md module generation (becomes filename)',
+        example: '@libar-docs-claude-module process-guard',
+      },
+      {
+        tag: 'claude-section',
+        format: 'enum',
+        purpose: 'Target section directory in _claude-md/ for module output',
+        values: [...CLAUDE_SECTION_VALUES],
+        example: '@libar-docs-claude-section delivery-process',
+      },
+      {
+        tag: 'claude-tags',
+        format: 'csv',
+        purpose: 'Variation filtering tags for modular-claude-md inclusion',
+        example: '@libar-docs-claude-tags core-mandatory, delivery-process',
       },
     ],
 

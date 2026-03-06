@@ -144,6 +144,8 @@ export interface ContextInferenceRule {
  * Extends the Zod-compatible MasterDataset with workflow reference.
  * LoadedWorkflow contains Maps which aren't JSON-serializable,
  * so it's kept separate from the Zod schema.
+ *
+ * @libar-docs-shape master-dataset
  */
 export interface RuntimeMasterDataset extends MasterDataset {
   /** Optional workflow configuration (not serializable) */
@@ -152,6 +154,8 @@ export interface RuntimeMasterDataset extends MasterDataset {
 
 /**
  * Raw input data for transformation
+ *
+ * @libar-docs-shape master-dataset
  */
 export interface RawDataset {
   /** Extracted patterns from TypeScript and/or Gherkin sources */
@@ -312,7 +316,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
   // ─────────────────────────────────────────────────────────────────────────
 
   const malformedPatterns: MalformedPattern[] = [];
-  const unknownStatuses: string[] = [];
+  const unknownStatusSet = new Set<string>();
   const danglingReferences: DanglingReference[] = [];
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -339,9 +343,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
 
     // Check for unknown status values
     if (pattern.status && !isKnownStatus(pattern.status)) {
-      if (!unknownStatuses.includes(pattern.status)) {
-        unknownStatuses.push(pattern.status);
-      }
+      unknownStatusSet.add(pattern.status);
     }
   }
 
@@ -365,6 +367,8 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
     roadmap: [],
     prd: [],
   };
+
+  const byProductAreaMap: Record<string, ExtractedPattern[]> = {};
 
   const relationshipIndex: Record<string, RelationshipEntry> = {};
 
@@ -422,6 +426,12 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
     // ─── PRD grouping (has productArea, userRole, or businessValue) ────────
     if (pattern.productArea || pattern.userRole || pattern.businessValue) {
       bySource.prd.push(p);
+    }
+
+    // ─── Product area grouping ──────────────────────────────────────────
+    if (pattern.productArea) {
+      const areaPatterns = (byProductAreaMap[pattern.productArea] ??= []);
+      areaPatterns.push(p);
     }
 
     // ─── Relationship index ────────────────────────────────────────────────
@@ -641,6 +651,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
   // Build validation summary
   // ─────────────────────────────────────────────────────────────────────────
 
+  const unknownStatuses = [...unknownStatusSet];
   const validation: ValidationSummary = {
     totalPatterns: patterns.length,
     malformedPatterns,
@@ -661,6 +672,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
     byQuarter,
     byCategory,
     bySource,
+    byProductArea: byProductAreaMap,
     counts,
     phaseCount: byPhaseMap.size,
     categoryCount: byCategoryMap.size,

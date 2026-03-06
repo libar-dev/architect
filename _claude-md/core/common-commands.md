@@ -13,18 +13,12 @@ pnpm test <pattern>     # Run tests matching pattern (e.g., pnpm test scanner)
 # Linting
 pnpm lint               # ESLint on src and tests
 pnpm lint:fix           # Auto-fix lint issues
-pnpm lint-patterns      # Lint pattern annotations in src/**/*.ts
 
-# Validation
-pnpm validate:patterns  # Cross-source pattern validation
-pnpm validate:dod       # Definition of Done validation
-pnpm validate:all       # All validations including anti-patterns
+# Validation + Documentation
+pnpm validate:all       # All validations including anti-patterns and DoD
+pnpm docs:all           # Generate all doc types
 
-# Documentation generation
-pnpm docs:patterns      # Generate pattern docs
-pnpm docs:all           # Generate all doc types (patterns, roadmap, remaining, changelog)
-
-# Data API (see "Data API CLI" section for full reference)
+# Data API (see Context Gathering Protocol above)
 pnpm process:query -- --help                              # All subcommands and options
 pnpm process:query -- context <pattern> --session design  # Session context bundle
 pnpm process:query -- overview                            # Project health summary

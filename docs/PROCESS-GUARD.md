@@ -1,5 +1,9 @@
 # Process Guard
 
+> **Generated Reference Available:** Comprehensive error guide with rationale,
+> alternatives, and integration recipes is generated at
+> `docs-live/reference/PROCESS-GUARD-REFERENCE.md`. Run `pnpm docs:all` to regenerate.
+
 > **Quick reference for `lint-process` validation rules, error fixes, and escape hatches.**
 
 Process Guard validates delivery workflow changes at commit time. For FSM concepts and state definitions, see [METHODOLOGY.md](./METHODOLOGY.md#fsm-enforced-workflow).

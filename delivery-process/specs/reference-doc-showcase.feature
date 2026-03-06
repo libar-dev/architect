@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:ReferenceDocShowcase
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-phase:30
 @libar-docs-effort:13d
 @libar-docs-product-area:Generation
