@@ -672,11 +672,11 @@ Review all docs-live/ content for website readiness:
 
 ### Master Spec Phases NOT Covered by Work Packages
 
-| Phase                                  | Description                               | Status                                                                 |
-| -------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------- |
-| Phase 1 - Taxonomy consolidation       | Redirect docs/TAXONOMY.md to generated    | **Done** -- docs/TAXONOMY.md is now a pointer to docs-live/TAXONOMY.md |
-| Phase 39 - Session workflow module gen | Generate CLAUDE.md session section        | Blocked on Phase 25 (ClaudeModuleCodec). Not actionable yet.           |
-| Phase 42 - README.md rationalization   | Trim to ~150 lines, move pitch to website | Separate initiative, not a docs/ vs docs-live/ gap.                    |
+| Phase                                  | Description                               | Status                                                              |
+| -------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------- |
+| Phase 1 - Taxonomy consolidation       | Redirect docs/TAXONOMY.md to generated    | Pending -- manual docs/ preserved as reference until quality parity |
+| Phase 39 - Session workflow module gen | Generate CLAUDE.md session section        | Blocked on Phase 25 (ClaudeModuleCodec). Not actionable yet.        |
+| Phase 42 - README.md rationalization   | Trim to ~150 lines, move pitch to website | Separate initiative, not a docs/ vs docs-live/ gap.                 |
 
 ### Recommended Execution Order
 
@@ -741,10 +741,11 @@ ProceduralGuideCodec) have completed design sessions with findings and code stub
 - **EnhancedIndexGeneration** creates a new `IndexCodec` registered in `CodecRegistry`,
   composing MasterDataset-driven statistics with editorial preamble navigation content.
 
-**Master spec status:** 14/15 deliverables complete. This session completed WP-2
-(IndexCodec), Phase 1 (taxonomy consolidation: docs/TAXONOMY.md to pointer), and
-Phase 5 (guide trimming: 60 lines removed from CONFIGURATION.md). The only pending
-deliverable is WP-9 / Phase 38 (generated doc quality improvements).
+**Master spec status:** 11/15 deliverables complete. WP-2 (IndexCodec) implementation
+is complete but manual docs/ files are preserved as reference — Phase 1 (taxonomy
+consolidation), Phase 5 (guide trimming), and Phase 6 (index navigation) remain
+pending until generated docs reach quality parity for manual doc archival. Phase 38
+(generated doc quality improvements) is also pending.
 
 ---
 

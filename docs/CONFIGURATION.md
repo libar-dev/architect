@@ -83,15 +83,71 @@ All entry points use the same default:
 
 ## Presets
 
-Each preset selects a tag prefix and category set. See the [Quick Reference](#quick-reference) table above for the comparison. For the full tag catalog, see the [generated taxonomy reference](../docs-live/TAXONOMY.md).
+### Libar-Generic Preset (Default)
 
-**When to use each preset:**
+The default preset used by this package. Same 3 categories as `generic` but with `@libar-docs-` prefix.
 
-| Situation            | Preset                    | Why                                                          |
-| -------------------- | ------------------------- | ------------------------------------------------------------ |
-| Most projects        | `libar-generic` (default) | 3 categories cover typical codebases                         |
-| Prefer shorter tags  | `generic`                 | Same categories, `@docs-` prefix instead of `@libar-docs-`   |
-| DDD / Event Sourcing | `ddd-es-cqrs`             | 21 categories for bounded contexts, sagas, projections, etc. |
+| Property        | Value                |
+| --------------- | -------------------- |
+| **Tag Prefix**  | `@libar-docs-`       |
+| **File Opt-In** | `@libar-docs`        |
+| **Categories**  | 3 (core, api, infra) |
+
+```typescript
+/**
+ * @libar-docs
+ * @libar-docs-pattern PatternScanner
+ * @libar-docs-status completed
+ * @libar-docs-core
+ * @libar-docs-uses FileDiscovery, ASTParser
+ */
+export function scanPatterns(config: ScanConfig): Promise<ScanResult> { ... }
+```
+
+### Generic Preset
+
+Same 3 categories as `libar-generic` but with `@docs-` prefix. Use when you prefer shorter tag names.
+
+| Property        | Value                |
+| --------------- | -------------------- |
+| **Tag Prefix**  | `@docs-`             |
+| **File Opt-In** | `@docs`              |
+| **Categories**  | 3 (core, api, infra) |
+
+```typescript
+/**
+ * @docs
+ * @docs-pattern PatternScanner
+ * @docs-status completed
+ * @docs-core
+ * @docs-uses FileDiscovery, ASTParser
+ */
+export function scanPatterns(config: ScanConfig): Promise<ScanResult> { ... }
+```
+
+### DDD-ES-CQRS Preset
+
+Full taxonomy for domain-driven architectures with 21 categories.
+
+| Property        | Value                                                                  |
+| --------------- | ---------------------------------------------------------------------- |
+| **Tag Prefix**  | `@libar-docs-`                                                         |
+| **File Opt-In** | `@libar-docs`                                                          |
+| **Categories**  | 21 (domain, ddd, bounded-context, event-sourcing, decider, cqrs, etc.) |
+
+```typescript
+/**
+ * @libar-docs
+ * @libar-docs-pattern TransformDataset
+ * @libar-docs-status completed
+ * @libar-docs-core
+ * @libar-docs-uses MasterDataset, ExtractedPattern
+ * @libar-docs-used-by Orchestrator
+ */
+export function transformToMasterDataset(input: TransformInput): MasterDataset { ... }
+```
+
+> **Category Reference:** Run `npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f` for the complete list. See [TAXONOMY.md](./TAXONOMY.md) for concepts.
 
 ---
 
