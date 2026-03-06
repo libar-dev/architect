@@ -256,10 +256,10 @@ classDiagram
     class DecisionDocGenerator {
         <<service>>
     }
-    class MasterDataset
     class Pattern_Scanner
     class GherkinASTParser
     class ShapeExtractor
+    class MasterDataset
     class DecisionDocCodec
     class ProcessApiHybridGeneration
     class PatternRelationshipModel
@@ -373,15 +373,15 @@ graph LR
         DataAPIOutputShaping["DataAPIOutputShaping"]:::neighbor
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
     end
+    CLISchema ..->|implements| ProcessApiHybridGeneration
     TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
-    ProjectConfigTypes -->|uses| ConfigurationTypes
-    ProjectConfigTypes -->|uses| ConfigurationPresets
-    ConfigurationPresets -->|uses| ConfigurationTypes
     PatternHelpers ..->|implements| DataAPIOutputShaping
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
-    CLISchema ..->|implements| ProcessApiHybridGeneration
+    ProjectConfigTypes -->|uses| ConfigurationTypes
+    ProjectConfigTypes -->|uses| ConfigurationPresets
+    ConfigurationPresets -->|uses| ConfigurationTypes
     FSMTransitions ..->|implements| PhaseStateMachineValidation
     FSMStates ..->|implements| PhaseStateMachineValidation
     ProcessStateAPI -->|uses| MasterDataset
@@ -393,6 +393,21 @@ graph LR
 ---
 
 ## API Types
+
+### SectionBlock (type)
+
+```typescript
+type SectionBlock =
+  | HeadingBlock
+  | ParagraphBlock
+  | SeparatorBlock
+  | TableBlock
+  | ListBlock
+  | CodeBlock
+  | MermaidBlock
+  | CollapsibleBlock
+  | LinkOutBlock;
+```
 
 ### normalizeStatus (function)
 
@@ -486,21 +501,6 @@ interface CategoryDefinition {
 | priority    | Display order priority - lower values appear first in sorted output               |
 | description | Brief description of the category's purpose and typical patterns                  |
 | aliases     | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
-
-### SectionBlock (type)
-
-```typescript
-type SectionBlock =
-  | HeadingBlock
-  | ParagraphBlock
-  | SeparatorBlock
-  | TableBlock
-  | ListBlock
-  | CodeBlock
-  | MermaidBlock
-  | CollapsibleBlock
-  | LinkOutBlock;
-```
 
 ---
 
