@@ -802,7 +802,8 @@ function decodeProductArea(
   // Pre-computed view: O(1) lookup instead of linear filter
   const areaPatterns = dataset.byProductArea[area] ?? [];
 
-  // Also collect TypeScript patterns by archContext mapping (for shapes + diagrams)
+  // Collect TypeScript patterns by explicit archContext tag (for shapes + diagrams)
+  // Note: archIndex.byContext includes inferred contexts — use explicit filter to match only tagged patterns
   const archContexts = PRODUCT_AREA_ARCH_CONTEXT_MAP[area] ?? [];
   const contextSet = new Set(archContexts);
   const tsPatterns =
@@ -849,7 +850,7 @@ function decodeProductArea(
           sections.push(...diagramSections);
         }
       }
-    } else if (contextSet.size > 0) {
+    } else if (archContexts.length > 0) {
       // Auto-generate fallback — only when archContext mappings exist
       const autoScope: DiagramScope = {
         archContext: archContexts,
@@ -1135,18 +1136,15 @@ function buildBusinessRulesCompactSection(
 
   const sections: SectionBlock[] = [];
 
-  // Count totals for header
+  // Count totals for header (lightweight pass — no annotation parsing)
   let totalRules = 0;
   let totalInvariants = 0;
-  const annotationsCache = new Map<string, BusinessRuleAnnotations>();
 
   for (const p of patterns) {
     if (p.rules === undefined) continue;
     for (const r of p.rules) {
       totalRules++;
-      const ann = parseBusinessRuleAnnotations(r.description);
-      annotationsCache.set(`${p.name}::${r.name}`, ann);
-      if (ann.invariant !== undefined) totalInvariants++;
+      if (r.description.includes('**Invariant:**')) totalInvariants++;
     }
   }
 
@@ -1172,7 +1170,7 @@ function buildBusinessRulesCompactSection(
 
     const rows: string[][] = [];
     for (const rule of pattern.rules) {
-      const ann = annotationsCache.get(`${pattern.name}::${rule.name}`) ?? {};
+      const ann = parseBusinessRuleAnnotations(rule.description);
 
       // At standard level, skip rules without invariant
       if (!isDetailed && ann.invariant === undefined) continue;

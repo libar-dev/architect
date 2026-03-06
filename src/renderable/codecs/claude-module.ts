@@ -52,6 +52,9 @@ import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './typ
 import { RenderableDocumentOutputSchema } from './shared-schema.js';
 import { parseBusinessRuleAnnotations } from './helpers.js';
 import { extractTablesAsSectionBlocks } from './convention-extractor.js';
+import type { ClaudeSectionValue } from '../../taxonomy/claude-section-values.js';
+
+const DEFAULT_CLAUDE_SECTION: ClaudeSectionValue = 'core';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Claude Module Codec Options
@@ -160,7 +163,7 @@ function buildClaudeModuleDocument(
   // Summary table
   const rows = modulePatterns.map((p) => [
     p.claudeModule ?? '',
-    p.claudeSection ?? 'core',
+    p.claudeSection ?? DEFAULT_CLAUDE_SECTION,
     p.name,
     `${p.rules?.length ?? 0} rules`,
   ]);
@@ -169,7 +172,7 @@ function buildClaudeModuleDocument(
   // Build each module as an additional file
   const additionalFiles: Record<string, RenderableDocument> = {};
   for (const pattern of modulePatterns) {
-    const section = pattern.claudeSection ?? 'core';
+    const section = pattern.claudeSection ?? DEFAULT_CLAUDE_SECTION;
     const module = pattern.claudeModule ?? pattern.name;
     const filePath = `${section}/${module}.md`;
     additionalFiles[filePath] = buildModuleFile(pattern, options);

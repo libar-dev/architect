@@ -316,7 +316,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
   // ─────────────────────────────────────────────────────────────────────────
 
   const malformedPatterns: MalformedPattern[] = [];
-  const unknownStatuses: string[] = [];
+  const unknownStatusSet = new Set<string>();
   const danglingReferences: DanglingReference[] = [];
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -343,9 +343,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
 
     // Check for unknown status values
     if (pattern.status && !isKnownStatus(pattern.status)) {
-      if (!unknownStatuses.includes(pattern.status)) {
-        unknownStatuses.push(pattern.status);
-      }
+      unknownStatusSet.add(pattern.status);
     }
   }
 
@@ -653,6 +651,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
   // Build validation summary
   // ─────────────────────────────────────────────────────────────────────────
 
+  const unknownStatuses = [...unknownStatusSet];
   const validation: ValidationSummary = {
     totalPatterns: patterns.length,
     malformedPatterns,

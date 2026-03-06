@@ -336,6 +336,8 @@ export function extractConventions(
 ): ConventionBundle[] {
   if (conventionTags.length === 0) return [];
 
+  const tagSet = new Set(conventionTags);
+
   // Build a map of conventionTag -> { sourceDecisions, rules }
   const bundles = new Map<string, { sourceDecisions: string[]; rules: ConventionRuleContent[] }>();
 
@@ -349,7 +351,7 @@ export function extractConventions(
     if (!pattern.convention || pattern.convention.length === 0) continue;
 
     // Check if this pattern has any of the requested convention tags
-    const matchingTags = pattern.convention.filter((t) => conventionTags.includes(t));
+    const matchingTags = pattern.convention.filter((t) => tagSet.has(t));
     if (matchingTags.length === 0) continue;
 
     // Extract rule content from Gherkin Rule: blocks or TypeScript JSDoc description
