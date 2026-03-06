@@ -396,7 +396,6 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         });
       }
     );
-
   });
 
   Rule('Editorial trimming removes tutorial sections and reduces file size', ({ RuleScenario }) => {
