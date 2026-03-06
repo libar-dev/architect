@@ -92,48 +92,53 @@ export function transformToMasterDataset(input: TransformInput): MasterDataset {
 
 ## What Gets Generated
 
-| Content Block                     | Source                                         |
-| --------------------------------- | ---------------------------------------------- |
-| **Convention tables**             | Gherkin `Rule:` Invariant/Rationale            |
-| **Live Mermaid diagrams**         | `@docs-uses`, `@docs-depends-on` relationships |
-| **API Types**                     | `@docs-shape` on TypeScript declarations       |
-| **Behavior specifications**       | Feature descriptions + `Rule:` blocks          |
-| **Architecture decision records** | Decision feature files                         |
-| **Roadmap & status tracking**     | `@docs-status`, `@docs-phase` tags             |
+All output goes to [`docs-live/`](docs-live/INDEX.md) — 57+ auto-generated files from annotated source code:
 
-**See it live:** [docs-live/product-areas/](docs-live/product-areas/) contains 7 generated product area documents with live Mermaid diagrams and extracted API types.
+| Output                            | Files | Source                                          |
+| --------------------------------- | ----: | ----------------------------------------------- |
+| **Product area docs**             |     7 | `@docs-uses`, `@docs-status`, relationship tags |
+| **Business rules**                |     7 | Gherkin `Rule:` Invariant/Rationale blocks      |
+| **Architecture decisions (ADRs)** |     7 | Decision feature files                          |
+| **Reference guides**              |     8 | CLI schema, codec patterns, annotations         |
+| **Live Mermaid diagrams**         |     — | `@docs-uses`, `@docs-depends-on` relationships  |
+| **API type shapes**               |     — | `@docs-shape` on TypeScript declarations        |
+| **Validation rules**              |     3 | Process Guard FSM specs                         |
+| **Taxonomy reference**            |     3 | Tag registry                                    |
+| **AI context modules**            |    13 | `@docs-claude-module` tagged specs              |
+| **Changelog**                     |     1 | Release specs                                   |
+
+**Browse it:** [`docs-live/INDEX.md`](docs-live/INDEX.md) is the navigation hub with reading order, document roles, and product area statistics.
 
 ---
 
 ## CLI Commands
 
-| Command             | Purpose                                                | Docs                                      |
-| ------------------- | ------------------------------------------------------ | ----------------------------------------- |
-| `generate-docs`     | Generate documentation from annotated sources          | `generate-docs --help`                    |
-| `process-api`       | Query delivery state for AI coding sessions            | [PROCESS-API.md](docs/PROCESS-API.md)     |
-| `lint-patterns`     | Validate annotation quality (missing tags, etc.)       | [VALIDATION.md](docs/VALIDATION.md)       |
-| `lint-process`      | Validate delivery workflow FSM transitions             | [PROCESS-GUARD.md](docs/PROCESS-GUARD.md) |
-| `lint-steps`        | Validate vitest-cucumber feature/step compatibility    | [VALIDATION.md](docs/VALIDATION.md)       |
-| `validate-patterns` | Cross-source validation with Definition of Done checks | [VALIDATION.md](docs/VALIDATION.md)       |
+| Command             | Purpose                                                | Docs                                                                      |
+| ------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------- |
+| `generate-docs`     | Generate documentation from annotated sources          | `generate-docs --help`                                                    |
+| `process-api`       | Query delivery state for AI coding sessions            | [Process API Reference](docs-live/reference/PROCESS-API-REFERENCE.md)     |
+| `lint-patterns`     | Validate annotation quality (missing tags, etc.)       | [Validation Rules](docs-live/VALIDATION-RULES.md)                         |
+| `lint-process`      | Validate delivery workflow FSM transitions             | [Process Guard Reference](docs-live/reference/PROCESS-GUARD-REFERENCE.md) |
+| `lint-steps`        | Validate vitest-cucumber feature/step compatibility    | [Validation Rules](docs-live/VALIDATION-RULES.md)                         |
+| `validate-patterns` | Cross-source validation with Definition of Done checks | [Validation Rules](docs-live/VALIDATION-RULES.md)                         |
 
 ---
 
 ## Documentation
 
-**[docs/INDEX.md](docs/INDEX.md)** provides a complete table of contents with section links, line numbers, and reading paths by role.
+### Generated Docs (auto-maintained)
 
-| Document                                        | Focus                           |
-| ----------------------------------------------- | ------------------------------- |
-| [CONFIGURATION.md](docs/CONFIGURATION.md)       | Presets, tags, config files     |
-| [METHODOLOGY.md](docs/METHODOLOGY.md)           | Core thesis, dual-source "why"  |
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md)         | Pipeline, codecs, MasterDataset |
-| [SESSION-GUIDES.md](docs/SESSION-GUIDES.md)     | Day-to-day AI/dev workflows     |
-| [GHERKIN-PATTERNS.md](docs/GHERKIN-PATTERNS.md) | Writing effective specs         |
-| [PROCESS-GUARD.md](docs/PROCESS-GUARD.md)       | FSM enforcement rules           |
-| [PROCESS-API.md](docs/PROCESS-API.md)           | Data API CLI query interface    |
-| [VALIDATION.md](docs/VALIDATION.md)             | Automated quality checks        |
-| [TAXONOMY.md](docs/TAXONOMY.md)                 | Tag taxonomy and API            |
-| [ANNOTATION-GUIDE.md](docs/ANNOTATION-GUIDE.md) | Annotation mechanics, shapes    |
+**[`docs-live/INDEX.md`](docs-live/INDEX.md)** is the navigation hub — 57+ files generated from annotated source code, organized into product areas, reference guides, business rules, ADRs, taxonomy, and validation rules.
+
+### Editorial Docs (hand-maintained)
+
+| Document                                        | Focus                          |
+| ----------------------------------------------- | ------------------------------ |
+| [CONFIGURATION.md](docs/CONFIGURATION.md)       | Presets, tags, config files    |
+| [METHODOLOGY.md](docs/METHODOLOGY.md)           | Core thesis, dual-source "why" |
+| [GHERKIN-PATTERNS.md](docs/GHERKIN-PATTERNS.md) | Writing effective specs        |
+| [SESSION-GUIDES.md](docs/SESSION-GUIDES.md)     | Day-to-day AI/dev workflows    |
+| [VALIDATION.md](docs/VALIDATION.md)             | Automated quality checks       |
 
 ---
 
