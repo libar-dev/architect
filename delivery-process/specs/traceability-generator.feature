@@ -4,135 +4,128 @@
 @libar-docs-phase:18
 @libar-docs-effort:2d
 @libar-docs-product-area:Generation
-Feature: Traceability Generator - Map Rules to Scenarios
+Feature: Traceability Generator - Rule-to-Scenario Coverage via Codec
 
-  **Business Value:** Provide audit-ready traceability matrices that demonstrate
-  test coverage for business rules without manual documentation.
+  **Problem:**
+  The existing TraceabilityCodec in `src/renderable/codecs/reporting.ts` only checks
+  timeline-to-behavior file coverage (does a pattern have an associated .feature file?).
+  It does NOT cross-reference `**Verified by:**` annotations against actual scenario names.
+  This means rules can claim verification by scenarios that do not exist, and orphan
+  scenarios (not referenced by any rule) go undetected.
 
-  **How It Works:**
-  - Parse `**Verified by:**` annotations in Rule descriptions
-  - Match scenario names to actual scenarios in feature files
-  - Generate traceability matrix showing Rule → Scenario mappings
-  - Report coverage gaps (rules without scenarios, orphan scenarios)
+  **Solution:**
+  Extend the existing TraceabilityCodec (ADR-005 codec architecture) to add
+  Rule-to-Scenario traceability. The `parseBusinessRuleAnnotations()` helper in
+  `src/renderable/codecs/helpers.ts` already extracts `verifiedBy` strings from Rule
+  descriptions. The remaining work is:
+  1. Cross-reference those strings against actual scenario names in MasterDataset
+  2. Build a traceability matrix section showing Rule-to-Scenario mappings
+  3. Detect coverage gaps (unverified rules, orphan scenarios, dangling references)
+  4. Wire the codec output into `docs:all` via config and npm script
 
-  **Why It Matters:**
-  | Benefit | How |
-  | Audit compliance | Demonstrates which tests verify which business rules |
-  | Coverage visibility | Identifies rules without verification scenarios |
-  | Orphan detection | Finds scenarios not linked to any rule |
-  | Impact analysis | Shows which scenarios to run when a rule changes |
+  **Architecture:**
+  | Component | Location | Status |
+  | Annotation parser | `src/renderable/codecs/helpers.ts` parseBusinessRuleAnnotations() | Exists |
+  | TraceabilityCodec | `src/renderable/codecs/reporting.ts` | Exists (timeline coverage only) |
+  | Codec registry | `src/renderable/generate.ts` | Registered as 'traceability' |
+  | Config wiring | `delivery-process.config.ts` | NOT wired |
+  | npm script | `package.json` docs:traceability | NOT wired |
 
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Traceability extractor | pending | @libar-dev/delivery-process/src/generators/traceability/ | Yes | unit |
-      | Traceability matrix renderer | pending | @libar-dev/delivery-process/src/generators/traceability/ | Yes | unit |
-      | CLI integration | pending | @libar-dev/delivery-process/src/cli/generate-docs.ts | Yes | unit |
-      | docs:traceability script | pending | package.json | No | - |
+      | Traceability extractor | superseded | src/renderable/codecs/helpers.ts | Yes | unit |
+      | CLI integration | complete | src/renderable/generate.ts | Yes | unit |
+      | Rule-to-Scenario cross-reference | pending | src/renderable/codecs/reporting.ts | Yes | unit |
+      | Coverage gap detection | pending | src/renderable/codecs/reporting.ts | Yes | unit |
+      | Config pipeline wiring | pending | delivery-process.config.ts | No | - |
+      | docs:traceability npm script | pending | package.json | No | - |
 
   # ===========================================================================
-  # RULE 1: Parse Verified by annotations
+  # RULE 1: Rule-to-Scenario traceability matrix
   # ===========================================================================
 
-  Rule: Parses Verified by annotations to extract scenario references
+  Rule: Cross-references Verified by annotations against actual scenarios
 
-    **Invariant:** Scenario names in `**Verified by:**` are matched against actual
-    scenarios in feature files. Unmatched references are reported as warnings.
+    **Invariant:** Every `verifiedBy` string extracted from a Rule description is
+    matched against scenario names in the MasterDataset. The traceability matrix
+    shows each Rule with its verification status: verified (all references resolve),
+    partially verified (some resolve), or unverified (none resolve or no annotation).
 
-    **Rationale:** Verified by annotations create explicit traceability. Validating
-    references ensures the traceability matrix reflects actual test coverage.
+    **Rationale:** `parseBusinessRuleAnnotations()` already extracts `verifiedBy`
+    arrays from Rule descriptions. Without cross-referencing against actual scenario
+    names, the traceability report cannot distinguish between claimed and actual
+    test coverage. A dangling reference (scenario name that does not exist) is worse
+    than no annotation because it creates false confidence.
 
-    **Verified by:** Parses comma-separated scenarios, Reports unmatched references
+    **Verified by:** Cross-references verified-by against scenarios, Reports dangling references, Shows verification status per rule
 
     @acceptance-criteria @happy-path
-    Scenario: Parses comma-separated scenario list
+    Scenario: Cross-references verified-by against scenarios
       Given a Rule with Verified by annotation:
         """gherkin
         Rule: Reservations prevent race conditions
-          **Verified by:** Concurrent reservations, Expired reservation cleanup, User cancels
+          **Verified by:** Concurrent reservations, Expired reservation cleanup
         """
-      When the traceability generator parses the Rule
-      Then it should extract 3 scenario references:
-        | Scenario Reference |
+      And the MasterDataset contains scenarios:
+        | Scenario Name |
         | Concurrent reservations |
         | Expired reservation cleanup |
-        | User cancels |
+      When the TraceabilityCodec decodes the dataset
+      Then the matrix should show the Rule as "verified" with 2 matched scenarios
 
     @acceptance-criteria @validation
-    Scenario: Reports unmatched scenario references
-      Given a Rule references scenario "Non-existent test"
-      And no scenario with that name exists in any feature file
-      When the traceability generator runs
-      Then a warning should be generated for "Non-existent test"
-      And the matrix should mark it as "unverified"
-
-  # ===========================================================================
-  # RULE 2: Generate traceability matrix
-  # ===========================================================================
-
-  Rule: Generates Rule-to-Scenario traceability matrix
-
-    **Invariant:** Every Rule appears in the matrix with its verification status.
-    Scenarios are linked by name and file location.
-
-    **Rationale:** A matrix format enables quick scanning of coverage status and
-    supports audit requirements for bidirectional traceability.
-
-    **Verified by:** Matrix includes all rules, Matrix shows verification status
+    Scenario: Reports dangling references
+      Given a Rule references scenario "Non-existent test" in Verified by
+      And no scenario with that name exists in the MasterDataset
+      When the TraceabilityCodec decodes the dataset
+      Then a "Dangling References" section should list "Non-existent test"
+      And the Rule should show status "partially verified" or "unverified"
 
     @acceptance-criteria @happy-path
-    Scenario: Matrix includes all rules from feature files
-      Given feature files with Rules:
-        | Feature | Rule |
-        | reservation-pattern.feature | Reservations prevent race conditions |
-        | reservation-pattern.feature | TTL enables auto-cleanup |
-        | event-store.feature | Events are immutable |
-      When the traceability generator runs
-      Then the matrix should include 3 rows for each Rule
-
-    @acceptance-criteria @happy-path
-    Scenario: Matrix shows verification status with scenario count
-      Given a Rule "Reservations prevent race conditions" with Verified by:
-        | Scenario |
-        | Concurrent reservations |
-        | Expired reservation cleanup |
-      When the traceability generator generates the matrix
-      Then the Rule row should show "2 scenarios"
-      And the Rule row should show status "verified"
-
-    @acceptance-criteria @validation
-    Scenario: Matrix marks unverified rules
-      Given a Rule without Verified by annotation
-      When the traceability generator generates the matrix
-      Then the Rule row should show "0 scenarios"
-      And the Rule row should show status "unverified"
+    Scenario: Shows verification status per rule
+      Given Rules with varying coverage:
+        | Rule | Verified by scenarios | Matched |
+        | Rule A | Scenario X, Scenario Y | both exist |
+        | Rule B | Scenario Z | does not exist |
+        | Rule C | (none) | no annotation |
+      When the TraceabilityCodec decodes the dataset
+      Then the matrix should show:
+        | Rule | Status |
+        | Rule A | verified |
+        | Rule B | unverified |
+        | Rule C | unverified |
 
   # ===========================================================================
-  # RULE 3: Detect coverage gaps
+  # RULE 2: Coverage gap detection
   # ===========================================================================
 
-  Rule: Detects and reports coverage gaps
+  Rule: Detects orphan scenarios and unverified rules
 
-    **Invariant:** Orphan scenarios (not referenced by any Rule) and unverified
-    rules are listed in dedicated sections.
+    **Invariant:** Orphan scenarios (acceptance-criteria scenarios not referenced by
+    any Rule's Verified by annotation) and unverified rules (Rules without a Verified
+    by annotation or with zero matched scenarios) are listed in dedicated sections of
+    the traceability output.
 
-    **Rationale:** Coverage gaps indicate either missing traceability annotations
-    or actual missing test coverage. Surfacing them enables remediation.
+    **Rationale:** Coverage gaps indicate either missing traceability annotations or
+    actual missing test coverage. Orphan scenarios may be valuable tests that lack
+    traceability links, or dead tests that should be removed. Unverified rules are
+    business constraints with no demonstrated test coverage.
 
     **Verified by:** Reports orphan scenarios, Reports unverified rules
 
     @acceptance-criteria @happy-path
     Scenario: Reports orphan scenarios not linked to any rule
-      Given scenarios exist:
-        | Scenario | Referenced by Rule |
+      Given acceptance-criteria scenarios exist:
+        | Scenario | Referenced by any Rule |
         | Concurrent reservations | Yes |
         | Random utility test | No |
         | Internal helper scenario | No |
-      When the traceability generator runs
-      Then output should include "Orphan Scenarios" section
-      And section should list "Random utility test"
-      And section should list "Internal helper scenario"
-      And section should NOT list "Concurrent reservations"
+      When the TraceabilityCodec decodes the dataset
+      Then output should include an "Orphan Scenarios" section
+      And the section should list "Random utility test"
+      And the section should list "Internal helper scenario"
+      And the section should NOT list "Concurrent reservations"
 
     @acceptance-criteria @happy-path
     Scenario: Reports unverified rules
@@ -140,32 +133,40 @@ Feature: Traceability Generator - Map Rules to Scenarios
         | Rule | Has Verified by |
         | Reservations prevent race conditions | Yes |
         | Legacy rule without annotation | No |
-      When the traceability generator runs
-      Then output should include "Unverified Rules" section
-      And section should list "Legacy rule without annotation"
+      When the TraceabilityCodec decodes the dataset
+      Then output should include an "Unverified Rules" section
+      And the section should list "Legacy rule without annotation"
+      And the section should NOT list "Reservations prevent race conditions"
 
   # ===========================================================================
-  # RULE 4: Support filtering and output formats
+  # RULE 3: Traceability output wired into production pipeline
   # ===========================================================================
 
-  Rule: Supports filtering by phase and domain
+  Rule: Traceability output is wired into the docs pipeline
 
-    **Invariant:** CLI flags allow filtering the matrix by phase number or domain
-    category to generate focused traceability reports.
+    **Invariant:** The TraceabilityCodec output is generated as part of `pnpm docs:all`
+    via a `docs:traceability` npm script backed by a ReferenceDocConfig entry in
+    `delivery-process.config.ts`. The output file lands in `docs-live/TRACEABILITY.md`.
 
-    **Rationale:** Large codebases have many rules. Filtering enables relevant
-    subset extraction for specific audits or reviews.
+    **Rationale:** The TraceabilityCodec is registered in the CodecRegistry but not
+    wired into `delivery-process.config.ts` or `package.json`. Without config wiring,
+    the codec is only usable programmatically or via tests. Adding it to the docs
+    pipeline makes traceability output a first-class generated artifact alongside
+    CHANGELOG.md, OVERVIEW.md, and other reporting codecs.
 
-    **Verified by:** Filters by phase, Filters by domain
-
-    @acceptance-criteria @happy-path
-    Scenario: Filters matrix by phase
-      Given Rules from phases 15, 16, and 20
-      When running `pnpm docs:traceability --phase 16`
-      Then matrix should only include Phase 16 rules
+    **Verified by:** Config entry generates traceability output, npm script runs codec
 
     @acceptance-criteria @happy-path
-    Scenario: Filters matrix by domain category
-      Given Rules with domain tags @libar-docs-ddd and @libar-docs-cqrs
-      When running `pnpm docs:traceability --domain ddd`
-      Then matrix should only include rules from DDD-tagged features
+    Scenario: Config entry generates traceability output
+      Given a ReferenceDocConfig entry for traceability in delivery-process.config.ts
+      When running `pnpm docs:traceability`
+      Then `docs-live/TRACEABILITY.md` should be generated
+      And it should contain a "Coverage Statistics" section
+      And it should contain a "Rule-to-Scenario Traceability" section
+
+    @acceptance-criteria @happy-path
+    Scenario: npm script runs codec via generate-docs CLI
+      Given `package.json` has script `docs:traceability`
+      And `docs:all` includes `pnpm docs:traceability`
+      When running `pnpm docs:all`
+      Then traceability output is generated alongside other docs

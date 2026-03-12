@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ArchitectureDiagramCore
-@libar-docs-status:roadmap
+@libar-docs-status:completed
+@libar-docs-unlock-reason:Retroactive-completion
 @libar-docs-phase:23
 @libar-docs-effort:1w
 @libar-docs-product-area:Generation

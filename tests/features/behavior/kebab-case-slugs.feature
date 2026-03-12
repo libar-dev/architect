@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:KebabCaseSlugs
-@libar-docs-status:roadmap
+@libar-docs-status:completed
+@libar-docs-unlock-reason:Retroactive-completion
 @libar-docs-phase:44
 @libar-docs-product-area:CoreTypes
 @libar-docs-include:core-types
@@ -18,12 +19,20 @@ Feature: Slug Generation for Progressive Disclosure
   - Special characters removal
   - Proper phase prefixing for requirements
 
+  Background: Deliverables
+    Given the following deliverables:
+      | Deliverable | Status | Location |
+      | toKebabCase utility | complete | src/utils/string-utils.ts |
+      | requirementToSlug function | complete | src/renderable/codecs/requirements.ts |
+      | getPhaseSlug function | complete | src/renderable/codecs/timeline.ts |
+
   Rule: CamelCase names convert to kebab-case
 
     **Invariant:** CamelCase pattern names must be split at word boundaries and joined with hyphens in lowercase.
     **Rationale:** Generated file names and URL fragments must be human-readable and URL-safe; unsplit CamelCase produces opaque slugs that are difficult to scan in directory listings.
     **Verified by:** Convert pattern names to readable slugs
 
+    @acceptance-criteria
     Scenario Outline: Convert pattern names to readable slugs
       Given pattern name "<input>"
       When converting to kebab-case slug
@@ -48,6 +57,7 @@ Feature: Slug Generation for Progressive Disclosure
     **Rationale:** Unhandled edge cases produce malformed file names (double hyphens, leading dashes) that break cross-platform path resolution and make generated links inconsistent.
     **Verified by:** Handle edge cases in slug generation
 
+    @acceptance-criteria
     Scenario Outline: Handle edge cases in slug generation
       Given pattern name "<input>"
       When converting to kebab-case slug
@@ -67,6 +77,7 @@ Feature: Slug Generation for Progressive Disclosure
     **Rationale:** Phase prefixes enable lexicographic sorting of requirement files by delivery order, so directory listings naturally reflect the roadmap sequence.
     **Verified by:** Requirement slugs include phase number, Requirement without phase uses phase 00
 
+    @acceptance-criteria
     Scenario Outline: Requirement slugs include phase number
       Given pattern "<pattern>" with phase "<phase>"
       When generating requirement slug
@@ -90,6 +101,7 @@ Feature: Slug Generation for Progressive Disclosure
     **Rationale:** A consistent "phase-NN-name" format ensures phase files sort numerically and remain identifiable even when the phase number alone would be ambiguous across roadmap versions.
     **Verified by:** Phase slugs combine number and kebab-case name, Phase without name uses "unnamed"
 
+    @acceptance-criteria
     Scenario Outline: Phase slugs combine number and kebab-case name
       Given phase number "<number>" with name "<name>"
       When generating phase slug

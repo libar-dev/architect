@@ -48,9 +48,15 @@ function initState(): SlugTestState {
 
 const feature = await loadFeature('tests/features/behavior/kebab-case-slugs.feature');
 
-describeFeature(feature, ({ Rule, AfterEachScenario }) => {
+describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
   AfterEachScenario(() => {
     state = null;
+  });
+
+  Background(({ Given }) => {
+    Given('the following deliverables:', () => {
+      // Background deliverables table is for spec documentation only
+    });
   });
 
   // ===========================================================================

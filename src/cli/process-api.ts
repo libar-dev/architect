@@ -52,6 +52,16 @@ import { handleCliError } from './error-handler.js';
 import { printVersionAndExit } from './version.js';
 import { CLI_SCHEMA } from './cli-schema.js';
 import type { CLIOptionGroup } from './cli-schema.js';
+import {
+  VALID_TRANSITIONS,
+  isValidTransition as fsmIsValidTransition,
+  getValidTransitionsFrom as fsmGetValidTransitionsFrom,
+} from '../validation/fsm/transitions.js';
+import {
+  validateTransition as fsmValidateTransition,
+  getProtectionSummary as fsmGetProtectionSummary,
+} from '../validation/fsm/validator.js';
+import type { ProcessStatusValue } from '../taxonomy/index.js';
 import { fuzzyMatchPatterns } from '../api/fuzzy-match.js';
 import {
   allPatternNames,
@@ -489,6 +499,117 @@ async function buildPipeline(config: ProcessAPICLIConfig): Promise<PipelineResul
     console.warn(`⚠️  ${w.message}`);
   }
   return result.value;
+}
+
+// =============================================================================
+// FSM Short-Circuit (bypass pipeline for static FSM queries)
+// =============================================================================
+
+/**
+ * FSM methods that operate on static const data and do not need the pipeline.
+ * When `query <method>` matches one of these, we dispatch directly to the FSM
+ * module, saving the 2-5 second pipeline build.
+ */
+const FSM_SHORT_CIRCUIT_METHODS: ReadonlySet<string> = new Set([
+  'isValidTransition',
+  'checkTransition',
+  'getValidTransitionsFrom',
+  'getProtectionInfo',
+]);
+
+/**
+ * Validate and parse a CLI string as a ProcessStatusValue.
+ * Rejects unknown status values with a helpful error message.
+ */
+function parseProcessStatus(
+  value: string | undefined,
+  usage: string,
+  label: string
+): ProcessStatusValue {
+  if (value === undefined) {
+    throw new QueryApiError('INVALID_ARGUMENT', usage);
+  }
+  if (!(value in VALID_TRANSITIONS)) {
+    const valid = Object.keys(VALID_TRANSITIONS).join(', ');
+    throw new QueryApiError(
+      'INVALID_ARGUMENT',
+      `Unknown ${label}: "${value}". Expected one of: ${valid}`
+    );
+  }
+  return value as ProcessStatusValue;
+}
+
+/**
+ * Attempt to handle an FSM query without building the pipeline.
+ *
+ * @returns The FSM result data if this is a short-circuit candidate, or
+ *          `undefined` if the query should go through the normal pipeline path.
+ */
+function tryFsmShortCircuit(subcommand: string, subArgs: readonly string[]): unknown {
+  if (subcommand !== 'query') return undefined;
+
+  const methodName = subArgs[0];
+  if (methodName === undefined || !FSM_SHORT_CIRCUIT_METHODS.has(methodName)) {
+    return undefined;
+  }
+
+  const fsmArgs = subArgs.slice(1);
+
+  switch (methodName) {
+    case 'isValidTransition': {
+      const usage = 'Usage: process-api query isValidTransition <fromStatus> <toStatus>';
+      const from = parseProcessStatus(fsmArgs[0], usage, 'fromStatus');
+      const to = parseProcessStatus(fsmArgs[1], usage, 'toStatus');
+      return fsmIsValidTransition(from, to);
+    }
+
+    case 'checkTransition': {
+      const from = fsmArgs[0];
+      const to = fsmArgs[1];
+      if (from === undefined || to === undefined) {
+        throw new QueryApiError(
+          'INVALID_ARGUMENT',
+          'Usage: process-api query checkTransition <fromStatus> <toStatus>'
+        );
+      }
+      const result = fsmValidateTransition(from, to);
+      return {
+        from: result.from,
+        to: result.to,
+        valid: result.valid,
+        error: result.error,
+        validAlternatives: result.validAlternatives,
+      };
+    }
+
+    case 'getValidTransitionsFrom': {
+      const status = parseProcessStatus(
+        fsmArgs[0],
+        'Usage: process-api query getValidTransitionsFrom <status>',
+        'status'
+      );
+      return fsmGetValidTransitionsFrom(status);
+    }
+
+    case 'getProtectionInfo': {
+      const status = parseProcessStatus(
+        fsmArgs[0],
+        'Usage: process-api query getProtectionInfo <status>',
+        'status'
+      );
+      const summary = fsmGetProtectionSummary(status);
+      return {
+        status,
+        level: summary.level,
+        description: summary.description,
+        canAddDeliverables: summary.canAddDeliverables,
+        requiresUnlock: summary.requiresUnlock,
+      };
+    }
+
+    default:
+      return undefined;
+  }
 }
 
 // =============================================================================
@@ -1407,6 +1528,17 @@ async function main(): Promise<void> {
 
   // Validate output modifiers before any expensive work
   validateModifiers(opts.modifiers);
+
+  // FSM short-circuit: bypass pipeline for static FSM queries (2-5s saving)
+  if (opts.subcommand === 'query') {
+    const fsmResult = tryFsmShortCircuit(opts.subcommand, opts.subArgs);
+    if (fsmResult !== undefined) {
+      const envelope = createSuccess(fsmResult, 0);
+      const output = formatOutput(envelope, opts.format);
+      console.log(output);
+      return;
+    }
+  }
 
   // Resolve config file defaults if --input and --features not provided
   await applyConfigDefaults(opts);

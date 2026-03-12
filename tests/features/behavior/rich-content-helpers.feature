@@ -1,9 +1,11 @@
 @libar-docs
 @libar-docs-pattern:RichContentHelpersTesting
 @libar-docs-implements:RichContentHelpers
-@libar-docs-status:roadmap
+@libar-docs-status:completed
+@libar-docs-unlock-reason:Retroactive-completion
 @libar-docs-phase:44
 @libar-docs-product-area:Generation
+@behavior
 
 Feature: Rich Content Rendering Helpers
   As a document codec author
@@ -15,6 +17,13 @@ Feature: Rich Content Rendering Helpers
   - Windows CRLF line endings (normalized to LF)
   - Empty inputs (graceful handling)
   - Missing table cells (empty string fallback)
+
+  Background: Deliverables
+    Given the following deliverables:
+      | Deliverable | Status | Location |
+      | parseDescriptionWithDocStrings helper | complete | src/renderable/codecs/helpers.ts |
+      | renderDataTable helper | complete | src/renderable/codecs/helpers.ts |
+      | renderScenarioContent helper | complete | src/renderable/codecs/helpers.ts |
 
   Rule: DocString parsing handles edge cases
 
@@ -33,6 +42,7 @@ Feature: Rich Content Rendering Helpers
       Then the result contains 1 block
       And block 1 is a paragraph with text "This is plain text without any code blocks."
 
+    @acceptance-criteria
     Scenario: Single DocString parses correctly
       Given a description with embedded DocString containing typescript code
       When parsing for DocStrings
@@ -70,6 +80,7 @@ Feature: Rich Content Rendering Helpers
       When rendering the DataTable
       Then the output is a table block with 1 row
 
+    @acceptance-criteria
     Scenario: Multi-row DataTable renders correctly
       Given a DataTable with headers "A" and "B" and "C"
       And rows:
@@ -91,6 +102,7 @@ Feature: Rich Content Rendering Helpers
     **Rationale:** Ignoring the includeSteps option would bloat summary views with unwanted detail, and dropping embedded DataTables would lose structured test data.
     **Verified by:** Render scenario with steps, Skip steps when includeSteps is false, Render scenario with DataTable in step
 
+    @acceptance-criteria
     Scenario: Render scenario with steps
       Given a scenario "Test Scenario" with steps:
         | keyword | text          |
@@ -118,6 +130,7 @@ Feature: Rich Content Rendering Helpers
     **Rationale:** Omitting the rule name makes rendered output unnavigable, and skipping DocString parsing would output raw delimiter syntax instead of formatted code blocks.
     **Verified by:** Rule with simple description, Rule with no description, Rule with embedded DocString in description
 
+    @acceptance-criteria
     Scenario: Rule with simple description
       Given a business rule "Must validate input" with description "Ensures all input is validated."
       When rendering the business rule
@@ -146,6 +159,7 @@ Feature: Rich Content Rendering Helpers
     **Rationale:** Without dedentation, code blocks inherit the Gherkin indentation level, rendering as deeply indented and unreadable in generated markdown.
     **Verified by:** Code block preserves internal relative indentation, Empty lines in code block are preserved, Trailing whitespace is trimmed from each line, Code with mixed indentation is preserved
 
+    @acceptance-criteria
     Scenario: Code block preserves internal relative indentation
       Given a description with DocString containing nested code
       When parsing for DocStrings

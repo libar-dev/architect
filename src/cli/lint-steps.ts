@@ -131,6 +131,10 @@ Rules:
   error    scenario-outline-function-params      Function params in ScenarioOutline
   error    missing-and-destructuring             And steps but no And destructured
   error    missing-rule-wrapper                  Rule: blocks but no Rule() wrapper
+  warning  hash-in-step-text                    Mid-line # in step text silently truncates
+  error    keyword-in-description               Description line starts with Given/When/Then/And/But
+  warning  outline-quoted-values                 Quoted values in Outline suggest wrong pattern
+  error    repeated-step-pattern                 Same step pattern registered twice in scenario
 
 Examples:
   # Standard check

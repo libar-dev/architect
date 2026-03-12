@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:DocsConsolidationStrategy
-@libar-docs-status:roadmap
+@libar-docs-status:completed
+@libar-docs-unlock-reason:Retroactive-completion
 @libar-docs-phase:35
 @libar-docs-effort:4w
 @libar-docs-product-area:Generation
@@ -50,14 +51,14 @@ Feature: Documentation Consolidation Strategy
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
       | Preamble capability on ReferenceDocConfig | complete | src/renderable/codecs/reference.ts | Yes | unit |
-      | Phase 1 - Taxonomy consolidation | pending | docs/TAXONOMY.md | No | n/a |
+      | Phase 1 - Taxonomy consolidation | complete | docs/TAXONOMY.md | No | n/a |
       | Phase 2 - Codec listings extraction | complete | delivery-process.config.ts, src/renderable/codecs/*.ts | Yes | integration |
       | Phase 3 - Process Guard consolidation | complete | src/renderable/codecs/validation-rules.ts | Yes | integration |
       | Phase 4 - Architecture decomposition | complete | docs/ARCHITECTURE.md | Yes | integration |
-      | Phase 5 - Guide trimming | pending | docs/ANNOTATION-GUIDE.md, docs/CONFIGURATION.md | No | n/a |
-      | Phase 6 - Index navigation update | pending | docs-live/INDEX.md, docs/INDEX.md | No | n/a |
+      | Phase 5 - Guide trimming | complete | docs/ANNOTATION-GUIDE.md, docs/CONFIGURATION.md | No | n/a |
+      | Phase 6 - Index navigation update | complete | docs-live/INDEX.md, docs/INDEX.md | No | n/a |
       | Phase 37 - docs-live/ directory consolidation | complete | delivery-process.config.ts | Yes | integration |
-      | Phase 38 - Generated doc quality improvements | pending | src/renderable/codecs/reference.ts | Yes | integration |
+      | Phase 38 - Generated doc quality improvements | complete | src/renderable/codecs/reference.ts | Yes | integration |
       | Phase 39 - Session workflow CLAUDE.md module generation | complete | delivery-process/specs/, _claude-md/workflow/ | No | n/a |
       | Phase 40 - PUBLISHING.md relocation to MAINTAINERS.md | complete | docs/PUBLISHING.md | No | n/a |
       | Phase 41 - GHERKIN-PATTERNS.md restructure | complete | docs/GHERKIN-PATTERNS.md, docs/VALIDATION.md | No | n/a |

@@ -29,7 +29,7 @@
 | Validate annotation quality    | [VALIDATION.md](./VALIDATION.md)             | 1-281  |
 | Query process state via CLI    | [PROCESS-API.md](./PROCESS-API.md)           | 1-507  |
 | Understand the taxonomy        | [TAXONOMY.md](./TAXONOMY.md)                 | 1-105  |
-| Publish to npm                 | [PUBLISHING.md](./PUBLISHING.md)             | 1-144  |
+| Publish to npm                 | [MAINTAINERS.md](../MAINTAINERS.md)          | —      |
 | Learn annotation patterns      | [ANNOTATION-GUIDE.md](./ANNOTATION-GUIDE.md) | 1-268  |
 | Review the changelog           | [CHANGELOG.md](../CHANGELOG.md)              | 1-26   |
 | Security policy                | [SECURITY.md](../SECURITY.md)                | 1-21   |
@@ -257,18 +257,9 @@
 
 ---
 
-### PUBLISHING.md (Lines 1-144)
+### MAINTAINERS.md (repo root)
 
-| Section                       | Lines   | Key Topics                           |
-| ----------------------------- | ------- | ------------------------------------ |
-| Prerequisites                 | 5-9     | npm account, login, tests            |
-| Version Strategy              | 11-18   | Semantic versioning, pre/latest tags |
-| Publishing Workflow           | 20-67   | Pre-releases, subsequent, stable     |
-| Automated Publishing          | 69-85   | GitHub Actions, provenance           |
-| Pre-commit and Pre-push Hooks | 87-99   | Husky hooks, lint-staged, typecheck  |
-| Dry Run                       | 101-109 | Test before publishing               |
-| Verifying a Published Package | 111-126 | npm view, test install               |
-| Troubleshooting               | 128-144 | Auth errors, package not found       |
+Publishing and maintainer workflows have moved to [MAINTAINERS.md](../MAINTAINERS.md) at the repository root.
 
 ---
 
@@ -335,7 +326,7 @@ pnpm process:query -- handoff --pattern MyPattern              # Capture session
 | VALIDATION.md       | CI/CD       | Quality — automated checks        |
 | TAXONOMY.md         | Reference   | Lookup — tag taxonomy and API     |
 | ANNOTATION-GUIDE.md | Developers  | Reference — annotation mechanics  |
-| PUBLISHING.md       | Maintainers | Release — npm publishing          |
+| MAINTAINERS.md      | Maintainers | Release — npm publishing          |
 | CHANGELOG.md        | Everyone    | Version history and changes       |
 | SECURITY.md         | Everyone    | Security policy and reporting     |
 

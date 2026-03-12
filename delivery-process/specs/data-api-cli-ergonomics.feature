@@ -37,7 +37,7 @@ Feature: Data API CLI Ergonomics - Performance and Interactive Mode
       | Deliverable | Status | Location | Tests | Test Type |
       | MasterDataset cache with mtime invalidation | pending | src/cli/dataset-cache.ts | Yes | unit |
       | REPL mode handler | pending | src/cli/repl.ts | Yes | integration |
-      | FSM short-circuit for static queries | pending | src/cli/process-api.ts | Yes | unit |
+      | FSM short-circuit for static queries | complete | src/cli/process-api.ts | Yes | unit |
       | Per-subcommand help system | pending | src/cli/process-api.ts | Yes | integration |
       | Dry-run mode | pending | src/cli/process-api.ts | Yes | integration |
       | Validation summary in metadata | pending | src/cli/process-api.ts | Yes | unit |

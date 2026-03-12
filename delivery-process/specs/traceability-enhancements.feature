@@ -7,6 +7,7 @@
 @libar-docs-product-area:Generation
 @libar-docs-business-value:detect-coverage-gaps-and-requirements-drift
 @libar-docs-priority:medium
+@libar-docs-depends-on:TraceabilityGenerator
 Feature: Traceability Enhancements - Requirements ↔ Tests Loop
 
   **Problem:**
