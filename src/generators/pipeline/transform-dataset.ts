@@ -499,10 +499,26 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
     }
 
     // ─── Sequence index (for design review diagram generation) ────────────
-    if (pattern.sequenceOrchestrator && pattern.rules && pattern.rules.length > 0) {
-      const entry = buildSequenceIndexEntry(pattern.sequenceOrchestrator, pattern.rules);
-      if (entry !== undefined) {
-        sequenceIndex[patternKey] = entry;
+    if (pattern.sequenceOrchestrator) {
+      if (pattern.rules && pattern.rules.length > 0) {
+        const entry = buildSequenceIndexEntry(pattern.sequenceOrchestrator, pattern.rules);
+        if (entry !== undefined) {
+          sequenceIndex[patternKey] = entry;
+        } else {
+          malformedPatterns.push({
+            patternId: patternKey,
+            issues: [
+              'Has @libar-docs-sequence-orchestrator but no rules with @libar-docs-sequence-step tags',
+            ],
+          });
+        }
+      } else {
+        malformedPatterns.push({
+          patternId: patternKey,
+          issues: [
+            'Has @libar-docs-sequence-orchestrator but no Rule: blocks to extract sequence steps from',
+          ],
+        });
       }
     }
   }

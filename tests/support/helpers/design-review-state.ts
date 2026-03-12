@@ -144,10 +144,8 @@ export function generateDesignReview(state: DesignReviewState): void {
     status: 'active',
     filePath: 'delivery-process/specs/test-pattern.feature',
     rules: state.rules,
+    sequenceOrchestrator: state.orchestrator,
   });
-
-  // Manually set sequenceOrchestrator (not exposed in createTestPattern options)
-  (pattern as Record<string, unknown>).sequenceOrchestrator = state.orchestrator;
 
   // Build the dataset with this pattern
   const dataset = createTestMasterDataset({ patterns: [pattern] });

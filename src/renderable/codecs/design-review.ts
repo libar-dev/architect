@@ -270,14 +270,16 @@ function generateSequenceDiagram(entry: SequenceIndexEntry, pattern: ExtractedPa
   // Steps
   for (const step of entry.steps) {
     // Note block for rule
-    lines.push(`    Note over ${orchId}: Rule ${String(step.stepNumber)} — ${step.ruleName}`);
+    lines.push(
+      `    Note over ${orchId}: Rule ${String(step.stepNumber)} — ${sanitizeMermaidLabel(step.ruleName)}`
+    );
     lines.push('');
 
     // Call from orchestrator to each module
     for (const mod of step.modules) {
       const modId = sanitizeNodeId(mod);
-      const inputLabel = extractTypeName(step.input);
-      const outputLabel = extractTypeName(step.output);
+      const inputLabel = sanitizeMermaidLabel(extractTypeName(step.input) || step.ruleName);
+      const outputLabel = sanitizeMermaidLabel(extractTypeName(step.output) || 'result');
 
       lines.push(`    ${orchId}->>+${modId}: ${inputLabel}`);
       lines.push(`    ${modId}-->>-${orchId}: ${outputLabel}`);
@@ -287,7 +289,7 @@ function generateSequenceDiagram(entry: SequenceIndexEntry, pattern: ExtractedPa
     if (step.errorScenarios.length > 0) {
       for (const errScenario of step.errorScenarios) {
         lines.push('');
-        lines.push(`    alt ${errScenario}`);
+        lines.push(`    alt ${sanitizeMermaidLabel(errScenario)}`);
         lines.push(`        ${orchId}-->>User: error`);
         lines.push(`        ${orchId}->>${orchId}: exit(1)`);
         lines.push('    end');
@@ -506,6 +508,19 @@ function buildSummarySection(entry: SequenceIndexEntry, displayName: string): Se
 // ═══════════════════════════════════════════════════════════════════════════
 // Shared Helpers
 // ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Sanitize text for use in Mermaid diagram labels, notes, and alt conditions.
+ * Strips or escapes characters that break Mermaid syntax when used in text positions.
+ */
+function sanitizeMermaidLabel(text: string): string {
+  return text
+    .replace(/\n/g, ' ')
+    .replace(/%%/g, '')
+    .replace(/>>/g, '> >')
+    .replace(/--/g, '\u2014')
+    .trim();
+}
 
 /**
  * Extract the type name from an Input or Output annotation string.

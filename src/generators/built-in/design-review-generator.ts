@@ -39,6 +39,7 @@ class DesignReviewGeneratorImpl implements DocumentGenerator {
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
     const files: OutputFile[] = [];
+    const warnings: string[] = [];
     const dataset = context.masterDataset;
 
     if (!dataset?.sequenceIndex) {
@@ -48,18 +49,28 @@ class DesignReviewGeneratorImpl implements DocumentGenerator {
     const sequenceIndex = dataset.sequenceIndex;
 
     for (const patternName of Object.keys(sequenceIndex)) {
-      const codec = createDesignReviewCodec({ patternName });
-      const doc = codec.decode(dataset) as RenderableDocument;
-      const markdown = renderToMarkdown(doc);
+      try {
+        const codec = createDesignReviewCodec({ patternName });
+        // Cast needed: RenderableDocumentOutputSchema uses z.string().optional() for purpose/detailLevel
+        // which under exactOptionalPropertyTypes produces `string | undefined`, not compatible with
+        // RenderableDocument's `purpose?: string` (absent-or-string, not present-as-undefined).
+        // The codec always provides these values, so the cast is safe at runtime.
+        const doc = codec.decode(dataset) as RenderableDocument;
+        const markdown = renderToMarkdown(doc);
 
-      const filename = `design-reviews/${toKebabCase(patternName)}.md`;
-      files.push({ path: filename, content: markdown });
+        const filename = `design-reviews/${toKebabCase(patternName)}.md`;
+        files.push({ path: filename, content: markdown });
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        warnings.push(`${patternName}: ${message}`);
+      }
     }
 
     return Promise.resolve({
       files,
       metadata: {
         patternsProcessed: Object.keys(sequenceIndex).length,
+        ...(warnings.length > 0 ? { warnings } : {}),
       },
     });
   }
