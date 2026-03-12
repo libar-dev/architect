@@ -610,6 +610,10 @@ export interface BusinessRuleAnnotations {
   codeExamples?: SectionBlock[];
   /** API implementation references extracted from **API:** See `path` patterns */
   apiRefs?: readonly string[];
+  /** Input type annotation for sequence diagram steps (from **Input:** marker) */
+  input?: string;
+  /** Output type annotation for sequence diagram steps (from **Output:** marker) */
+  output?: string;
   /** Remaining description content after annotation extraction */
   remainingContent?: string;
 }
@@ -807,6 +811,32 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
     result.apiRefs = apiRefs;
   }
 
+  // Extract **Input:** - sequence step input type annotation
+  const inputPattern = /\*\*Input:\*\*\s*([\s\S]*?)(?=\*\*[A-Z]|\*\*$|$)/i;
+  const inputMatch = inputPattern.exec(protectedText);
+  if (inputMatch?.[1]) {
+    const inputText = inputMatch[1].trim();
+    result.input = restore(
+      inputText
+        .replace(/\n\s*\n/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+    );
+  }
+
+  // Extract **Output:** - sequence step output type annotation
+  const outputPattern = /\*\*Output:\*\*\s*([\s\S]*?)(?=\*\*[A-Z]|\*\*$|$)/i;
+  const outputMatch = outputPattern.exec(protectedText);
+  if (outputMatch?.[1]) {
+    const outputText = outputMatch[1].trim();
+    result.output = restore(
+      outputText
+        .replace(/\n\s*\n/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+    );
+  }
+
   // Step 4: Calculate remaining content (after removing annotations from protected text)
   // Use protectedText to ensure regexes don't stop at `**X` inside backticks
   let remaining = protectedText;
@@ -819,6 +849,12 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
 
   // Remove **Verified by:** block
   remaining = remaining.replace(/\*\*Verified by:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
+
+  // Remove **Input:** block
+  remaining = remaining.replace(/\*\*Input:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
+
+  // Remove **Output:** block
+  remaining = remaining.replace(/\*\*Output:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
 
   // Remove **API:** See `path` references (use original pattern for protected text)
   // Pattern matches both bold and non-bold, case-insensitive

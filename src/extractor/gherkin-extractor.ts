@@ -338,6 +338,8 @@ export function extractPatternsFromGherkin(
     assignIfDefined(rawPattern, 'claudeModule', metadata.claudeModule);
     assignIfDefined(rawPattern, 'claudeSection', metadata.claudeSection);
     assignIfNonEmpty(rawPattern, 'claudeTags', metadata.claudeTags);
+    // Sequence diagram annotation fields
+    assignIfDefined(rawPattern, 'sequenceOrchestrator', metadata.sequenceOrchestrator);
     // NOTE: ADR content is now derived from Gherkin Rule: keywords
     // (Context, Decision, Consequences) instead of parsed markdown.
     // The rules array is populated below and rendered by the ADR codec.
@@ -392,6 +394,7 @@ export function extractPatternsFromGherkin(
         description: rule.description,
         scenarioCount: rule.scenarios.length,
         scenarioNames: rule.scenarios.map((s) => s.name),
+        ...(rule.tags.length > 0 && { tags: rule.tags }),
       }));
     }
 
@@ -630,6 +633,8 @@ export async function extractPatternsFromGherkinAsync(
     assignIfNonEmpty(rawPattern, 'convention', metadata.convention);
     // Cross-cutting document inclusion tags
     assignIfNonEmpty(rawPattern, 'include', metadata.include);
+    // Sequence diagram annotation fields
+    assignIfDefined(rawPattern, 'sequenceOrchestrator', metadata.sequenceOrchestrator);
     // NOTE: ADR content derived from Gherkin Rule: keywords, not parsed markdown
     assignIfNonEmpty(rawPattern, 'whenToUse', whenToUse);
 
@@ -668,6 +673,7 @@ export async function extractPatternsFromGherkinAsync(
         description: rule.description,
         scenarioCount: rule.scenarios.length,
         scenarioNames: rule.scenarios.map((s) => s.name),
+        ...(rule.tags.length > 0 && { tags: rule.tags }),
       }));
     }
 
