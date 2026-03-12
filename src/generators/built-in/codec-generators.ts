@@ -28,6 +28,7 @@
 import { generatorRegistry } from '../registry.js';
 import { createCodecGenerator } from '../codec-based.js';
 import { createDecisionDocGenerator } from './decision-doc-generator.js';
+import { createDesignReviewGenerator } from './design-review-generator.js';
 import { createProcessApiReferenceGenerator } from './process-api-reference-generator.js';
 import { createCliRecipeGenerator } from './cli-recipe-generator.js';
 import { loadPreambleFromMarkdown } from '../../renderable/load-preamble.js';
@@ -174,6 +175,17 @@ generatorRegistry.register(createCodecGenerator('index', 'index'));
  * Produces both compact (_claude-md/) and detailed (docs/) outputs.
  */
 generatorRegistry.register(createDecisionDocGenerator());
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Design Review Generator (Sequence + Component Diagrams)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Design Review Generator
+ * Generates design review documents with sequence and component diagrams
+ * from @libar-docs-sequence-* annotations on feature specs.
+ */
+generatorRegistry.register(createDesignReviewGenerator());
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Process API Reference Generator (Schema-Based, not Codec-Based)
