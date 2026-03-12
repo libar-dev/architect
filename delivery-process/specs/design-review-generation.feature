@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:DesignReviewGeneration
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:46
 @libar-docs-product-area:Generation
 @libar-docs-effort:2d
@@ -25,15 +25,15 @@ Feature: Design Review Diagram Generation
 
   Background: Deliverables
     Given the following deliverables:
-      | Deliverable                     | Status  | Location                                          |
-      | SequenceIndex schema            | pending | src/validation-schemas/master-dataset.ts           |
-      | Sequence transform utilities    | pending | src/generators/pipeline/sequence-utils.ts          |
-      | Transform dataset integration   | pending | src/generators/pipeline/transform-dataset.ts       |
-      | BusinessRule errorScenarioNames | pending | src/validation-schemas/extracted-pattern.ts        |
-      | DesignReviewCodec               | pending | src/renderable/codecs/design-review.ts             |
-      | Design review generator         | pending | src/generators/built-in/design-review-generator.ts |
-      | Process API sequence subcommand | pending | src/cli/process-api.ts                             |
-      | Config wiring                   | pending | delivery-process.config.ts                         |
+      | Deliverable                     | Status   | Location                                          |
+      | SequenceIndex schema            | complete | src/validation-schemas/master-dataset.ts           |
+      | Sequence transform utilities    | complete | src/generators/pipeline/sequence-utils.ts          |
+      | Transform dataset integration   | complete | src/generators/pipeline/transform-dataset.ts       |
+      | BusinessRule errorScenarioNames | complete | src/validation-schemas/extracted-pattern.ts        |
+      | DesignReviewCodec               | complete | src/renderable/codecs/design-review.ts             |
+      | Design review generator         | complete | src/generators/built-in/design-review-generator.ts |
+      | Process API sequence subcommand | complete | src/cli/process-api.ts                             |
+      | Config wiring                   | complete | delivery-process.config.ts                         |
 
   Rule: SequenceIndex pre-computes ordered steps from rule-level tags
 
