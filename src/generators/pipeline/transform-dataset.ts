@@ -45,10 +45,12 @@ import type {
   RelationshipEntry,
   ImplementationRef,
   ArchIndex,
+  SequenceIndexEntry,
 } from '../../validation-schemas/master-dataset.js';
 
 import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import { normalizeStatus, ACCEPTED_STATUS_VALUES } from '../../taxonomy/index.js';
+import { buildSequenceIndexEntry } from './sequence-utils.js';
 
 // =============================================================================
 // Validation Summary Types
@@ -372,6 +374,9 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
 
   const relationshipIndex: Record<string, RelationshipEntry> = {};
 
+  // Sequence index for design review diagram generation
+  const sequenceIndex: Record<string, SequenceIndexEntry> = {};
+
   // Architecture index for diagram generation
   const archIndex: ArchIndex = {
     byRole: {},
@@ -490,6 +495,14 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
           const viewPatterns = (archIndex.byView[view] ??= []);
           viewPatterns.push(p);
         }
+      }
+    }
+
+    // ─── Sequence index (for design review diagram generation) ────────────
+    if (pattern.sequenceOrchestrator && pattern.rules && pattern.rules.length > 0) {
+      const entry = buildSequenceIndexEntry(pattern.sequenceOrchestrator, pattern.rules);
+      if (entry !== undefined) {
+        sequenceIndex[patternKey] = entry;
       }
     }
   }
@@ -679,6 +692,8 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
     relationshipIndex,
     // Only include archIndex if it has content
     ...(archIndex.all.length > 0 && { archIndex }),
+    // Only include sequenceIndex if it has content
+    ...(Object.keys(sequenceIndex).length > 0 && { sequenceIndex }),
   };
 
   // Only include workflow if defined (exactOptionalPropertyTypes compliance)

@@ -54,6 +54,8 @@ export const BusinessRuleSchema = z.object({
   scenarioNames: z.array(z.string()).readonly(),
   /** Tags applied to this rule (from @libar-docs-* tags on Rule: keyword) */
   tags: z.array(z.string()).readonly().optional(),
+  /** Scenario names tagged with @libar-docs-sequence-error (for design review diagrams) */
+  errorScenarioNames: z.array(z.string()).readonly().optional(),
 });
 
 /**

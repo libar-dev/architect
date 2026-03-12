@@ -389,13 +389,19 @@ export function extractPatternsFromGherkin(
 
     // Add rules if present (Gherkin v6+ business rule groupings)
     if (rules && rules.length > 0) {
-      rawPattern['rules'] = rules.map((rule) => ({
-        name: rule.name,
-        description: rule.description,
-        scenarioCount: rule.scenarios.length,
-        scenarioNames: rule.scenarios.map((s) => s.name),
-        ...(rule.tags.length > 0 && { tags: rule.tags }),
-      }));
+      rawPattern['rules'] = rules.map((rule) => {
+        const errorNames = rule.scenarios
+          .filter((s) => s.tags.some((t) => t === 'sequence-error'))
+          .map((s) => s.name);
+        return {
+          name: rule.name,
+          description: rule.description,
+          scenarioCount: rule.scenarios.length,
+          scenarioNames: rule.scenarios.map((s) => s.name),
+          ...(rule.tags.length > 0 && { tags: rule.tags }),
+          ...(errorNames.length > 0 && { errorScenarioNames: errorNames }),
+        };
+      });
     }
 
     // Validate against schema (schema-first enforcement)
@@ -668,13 +674,19 @@ export async function extractPatternsFromGherkinAsync(
     assignIfDefined(rawPattern, 'behaviorFile', behaviorFile);
 
     if (rules && rules.length > 0) {
-      rawPattern['rules'] = rules.map((rule) => ({
-        name: rule.name,
-        description: rule.description,
-        scenarioCount: rule.scenarios.length,
-        scenarioNames: rule.scenarios.map((s) => s.name),
-        ...(rule.tags.length > 0 && { tags: rule.tags }),
-      }));
+      rawPattern['rules'] = rules.map((rule) => {
+        const errorNames = rule.scenarios
+          .filter((s) => s.tags.some((t) => t === 'sequence-error'))
+          .map((s) => s.name);
+        return {
+          name: rule.name,
+          description: rule.description,
+          scenarioCount: rule.scenarios.length,
+          scenarioNames: rule.scenarios.map((s) => s.name),
+          ...(rule.tags.length > 0 && { tags: rule.tags }),
+          ...(errorNames.length > 0 && { errorScenarioNames: errorNames }),
+        };
+      });
     }
 
     const validation = ExtractedPatternSchema.safeParse(rawPattern);

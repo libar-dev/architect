@@ -204,6 +204,53 @@ export const ArchIndexSchema = z.object({
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Sequence Index Schema (for design review diagram generation)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * A single step in a sequence diagram, derived from a Rule with sequence annotations
+ */
+export const SequenceStepSchema = z.object({
+  /** Step execution order (from @libar-docs-sequence-step tag) */
+  stepNumber: z.number().int().positive(),
+  /** Business rule name (the Rule: keyword text) */
+  ruleName: z.string(),
+  /** Module identifiers for this step (from @libar-docs-sequence-module CSV tag) */
+  modules: z.array(z.string()).readonly(),
+  /** Input type annotation (from **Input:** marker in rule description) */
+  input: z.string().optional(),
+  /** Output type annotation (from **Output:** marker in rule description) */
+  output: z.string().optional(),
+  /** Invariant text (for Note blocks in sequence diagram) */
+  invariant: z.string().optional(),
+  /** Scenario names tagged with @libar-docs-sequence-error */
+  errorScenarios: z.array(z.string()).readonly(),
+});
+
+/**
+ * Pre-computed sequence data for a single pattern, keyed by pattern name
+ */
+export const SequenceIndexEntrySchema = z.object({
+  /** Orchestrator module identifier (from @libar-docs-sequence-orchestrator tag) */
+  orchestrator: z.string(),
+  /** Ordered sequence steps (sorted by stepNumber) */
+  steps: z.array(SequenceStepSchema).readonly(),
+  /** Deduplicated participant module names (in step order, orchestrator first) */
+  participants: z.array(z.string()).readonly(),
+  /** All error scenario names across all steps */
+  errorPaths: z.array(z.string()).readonly(),
+  /** Distinct data flow type names from Input/Output annotations */
+  dataFlowTypes: z.array(z.string()).readonly(),
+});
+
+/**
+ * Sequence index: pattern name → pre-computed sequence data
+ *
+ * Supports multiple annotated patterns simultaneously.
+ */
+export const SequenceIndexSchema = z.record(z.string(), SequenceIndexEntrySchema);
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Master Dataset Schema
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -278,6 +325,13 @@ export const MasterDatasetSchema = z.object({
 
   /** Optional architecture index for diagram generation */
   archIndex: ArchIndexSchema.optional(),
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Sequence Data (optional)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /** Optional sequence index for design review diagram generation */
+  sequenceIndex: SequenceIndexSchema.optional(),
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -292,3 +346,6 @@ export type SourceViews = z.infer<typeof SourceViewsSchema>;
 export type ImplementationRef = z.infer<typeof ImplementationRefSchema>;
 export type RelationshipEntry = z.infer<typeof RelationshipEntrySchema>;
 export type ArchIndex = z.infer<typeof ArchIndexSchema>;
+export type SequenceStep = z.infer<typeof SequenceStepSchema>;
+export type SequenceIndexEntry = z.infer<typeof SequenceIndexEntrySchema>;
+export type SequenceIndex = z.infer<typeof SequenceIndexSchema>;
