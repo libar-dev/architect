@@ -65,6 +65,7 @@ import type { ProcessStatusValue } from '../taxonomy/index.js';
 import { fuzzyMatchPatterns } from '../api/fuzzy-match.js';
 import {
   allPatternNames,
+  getSequenceEntry,
   suggestPattern,
   firstImplements,
   getPatternName,
@@ -1015,7 +1016,7 @@ function handleSequence(dataset: RuntimeMasterDataset, subArgs: string[]): unkno
   }
 
   const patternName = subArgs[0] ?? '';
-  const entry = index[patternName];
+  const entry = getSequenceEntry(dataset, patternName);
   if (!entry) {
     const available = Object.keys(index);
     const hint = suggestPattern(patternName, available);

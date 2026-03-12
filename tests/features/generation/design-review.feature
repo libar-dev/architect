@@ -57,13 +57,20 @@ Feature: Design Review Generation Pipeline
 
     **Invariant:** The dataFlowTypes array contains distinct type names parsed from Input and Output annotation strings using the "TypeName -- fields" format.
     **Rationale:** Data flow types are used by the component diagram to render hexagon nodes and by the type definitions table to show producers and consumers.
-    **Verified by:** Data flow types collected from annotations
+    **Verified by:** Data flow types collected from annotations, Prose outputs are excluded from data flow types
 
     @acceptance-criteria @happy-path
     Scenario: Data flow types collected from annotations
       Given a rule with Input "ProjectContext -- packageJson, tsconfigExists" and Output "InitConfig -- preset, sources"
       When building the sequence index entry
       Then data flow types include "ProjectContext" and "InitConfig"
+
+    @acceptance-criteria @validation
+    Scenario: Prose outputs are excluded from data flow types
+      Given a rule with Input "ProjectContext" and Output "package.json updated with process and docs scripts"
+      When building the sequence index entry
+      Then data flow types include "ProjectContext"
+      And data flow types do not include "package.json updated with process and docs scripts"
 
   Rule: DesignReviewCodec produces sequence diagram with correct participant count
 
@@ -114,6 +121,21 @@ Feature: Design Review Generation Pipeline
       When generating the design review document
       Then the component diagram contains a hexagon for "SetupResult" with fields
 
+  Rule: Mermaid-sensitive text is escaped across rendered labels
+
+    **Invariant:** Participant aliases, subgraph labels, type hexagon text, and edge labels escape Mermaid-sensitive characters such as quotes, pipes, and comment markers before rendering.
+    **Rationale:** Design review diagrams are generated directly from annotations. Valid annotation text must not break Mermaid parsing when rendered into different label positions.
+    **Verified by:** Mermaid-sensitive text is escaped in rendered markdown
+
+    @acceptance-criteria @validation
+    Scenario: Mermaid-sensitive text is escaped in rendered markdown
+      Given a rule with Mermaid-sensitive annotations
+      When generating the design review document
+      Then the rendered markdown contains "module&#124;&quot;alpha.ts"
+      And the rendered markdown contains "Config &quot;Draft&quot; &#124; Preview % % comment"
+      And the rendered markdown also contains "SetupResult&#124;&quot;Quoted&quot;"
+      And the rendered markdown does not contain "%% comment"
+
   Rule: Design questions table includes auto-computed metrics
 
     **Invariant:** The Design Questions section contains a table with auto-computed step count, type count, and error path count drawn from the SequenceIndexEntry data.
@@ -125,3 +147,16 @@ Feature: Design Review Generation Pipeline
       Given a dataset with 3 steps and 2 types and 1 error path
       When generating the design review document
       Then the design questions mention "3 steps" and "2 distinct types" and "1 error paths"
+
+  Rule: Process API sequence lookup resolves pattern names case-insensitively
+
+    **Invariant:** The sequence subcommand resolves pattern names with the same case-insensitive matching behavior as other pattern-oriented process-api queries.
+    **Rationale:** Design review consumers should not need exact display-name casing when querying sequence data from the CLI.
+    **Verified by:** Sequence lookup accepts lowercase pattern name
+
+    @acceptance-criteria @happy-path
+    Scenario: Sequence lookup accepts lowercase pattern name
+      Given a dataset with sequence data for pattern "SetupCommand"
+      When resolving sequence data for pattern name "setupcommand"
+      Then the resolved sequence entry exists
+      And the resolved sequence entry has orchestrator "init-cli"

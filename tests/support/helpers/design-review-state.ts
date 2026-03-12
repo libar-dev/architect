@@ -13,6 +13,7 @@ import type {
   MasterDataset,
 } from '../../../src/validation-schemas/master-dataset.js';
 import type { RenderableDocument } from '../../../src/renderable/schema.js';
+import { getSequenceEntry } from '../../../src/api/pattern-helpers.js';
 import { buildSequenceIndexEntry } from '../../../src/generators/pipeline/sequence-utils.js';
 import { createDesignReviewCodec } from '../../../src/renderable/codecs/design-review.js';
 import { renderToMarkdown } from '../../../src/renderable/render.js';
@@ -157,6 +158,26 @@ export function generateDesignReview(state: DesignReviewState): void {
   const codec = createDesignReviewCodec({ patternName: state.patternName || 'TestPattern' });
   state.doc = codec.decode(dataset);
   state.markdown = renderToMarkdown(state.doc);
+}
+
+/**
+ * Resolve a sequence entry using the same case-insensitive lookup helper as process-api.
+ */
+export function resolveSequenceEntry(
+  state: DesignReviewState,
+  queryName: string
+): SequenceIndexEntry | undefined {
+  const pattern = createTestPattern({
+    name: state.patternName || 'TestPattern',
+    status: 'active',
+    filePath: 'delivery-process/specs/test-pattern.feature',
+    rules: state.rules,
+    sequenceOrchestrator: state.orchestrator,
+  });
+
+  state.dataset = createTestMasterDataset({ patterns: [pattern] });
+  state.entry = getSequenceEntry(state.dataset, queryName);
+  return state.entry;
 }
 
 // =============================================================================

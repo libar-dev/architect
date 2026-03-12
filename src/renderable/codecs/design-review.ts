@@ -252,13 +252,13 @@ function generateSequenceDiagram(entry: SequenceIndexEntry, pattern: ExtractedPa
   lines.push('    participant User');
   const orchId = sanitizeNodeId(entry.orchestrator);
   const orchLabel = resolveModuleLabel(entry.orchestrator, pattern);
-  lines.push(`    participant ${orchId} as ${orchLabel}`);
+  lines.push(`    participant ${orchId} as ${quoteMermaidText(orchLabel)}`);
 
   for (const mod of entry.participants) {
     if (mod === entry.orchestrator) continue;
     const modId = sanitizeNodeId(mod);
     const modLabel = resolveModuleLabel(mod, pattern);
-    lines.push(`    participant ${modId} as ${modLabel}`);
+    lines.push(`    participant ${modId} as ${quoteMermaidText(modLabel)}`);
   }
 
   lines.push('');
@@ -271,15 +271,15 @@ function generateSequenceDiagram(entry: SequenceIndexEntry, pattern: ExtractedPa
   for (const step of entry.steps) {
     // Note block for rule
     lines.push(
-      `    Note over ${orchId}: Rule ${String(step.stepNumber)} — ${sanitizeMermaidLabel(step.ruleName)}`
+      `    Note over ${orchId}: Rule ${String(step.stepNumber)} — ${sanitizeMermaidRawText(step.ruleName)}`
     );
     lines.push('');
 
     // Call from orchestrator to each module
     for (const mod of step.modules) {
       const modId = sanitizeNodeId(mod);
-      const inputLabel = sanitizeMermaidLabel(extractTypeName(step.input) || step.ruleName);
-      const outputLabel = sanitizeMermaidLabel(extractTypeName(step.output) || 'result');
+      const inputLabel = sanitizeMermaidRawText(extractTypeName(step.input) || step.ruleName);
+      const outputLabel = sanitizeMermaidRawText(extractTypeName(step.output) || 'result');
 
       lines.push(`    ${orchId}->>+${modId}: ${inputLabel}`);
       lines.push(`    ${modId}-->>-${orchId}: ${outputLabel}`);
@@ -289,7 +289,7 @@ function generateSequenceDiagram(entry: SequenceIndexEntry, pattern: ExtractedPa
     if (step.errorScenarios.length > 0) {
       for (const errScenario of step.errorScenarios) {
         lines.push('');
-        lines.push(`    alt ${sanitizeMermaidLabel(errScenario)}`);
+        lines.push(`    alt ${sanitizeMermaidRawText(errScenario)}`);
         lines.push(`        ${orchId}-->>User: error`);
         lines.push(`        ${orchId}->>${orchId}: exit(1)`);
         lines.push('    end');
@@ -332,11 +332,13 @@ function generateComponentDiagram(entry: SequenceIndexEntry, pattern: ExtractedP
     const phase = phases[i];
     if (!phase) continue;
     const phaseId = `phase_${String(i + 1)}`;
-    lines.push(`    subgraph ${phaseId}["Phase ${String(i + 1)}: ${phase.label}"]`);
+    lines.push(
+      `    subgraph ${phaseId}[${quoteMermaidText(`Phase ${String(i + 1)}: ${phase.label}`)}]`
+    );
     for (const mod of phase.modules) {
       const modId = sanitizeNodeId(mod);
       const modLabel = resolveModuleLabel(mod, pattern);
-      lines.push(`        ${modId}["${modLabel}"]`);
+      lines.push(`        ${modId}[${quoteMermaidText(modLabel)}]`);
     }
     lines.push('    end');
     lines.push('');
@@ -345,15 +347,15 @@ function generateComponentDiagram(entry: SequenceIndexEntry, pattern: ExtractedP
   // Orchestrator subgraph
   const orchId = sanitizeNodeId(entry.orchestrator);
   const orchLabel = resolveModuleLabel(entry.orchestrator, pattern);
-  lines.push(`    subgraph orchestrator["Orchestrator"]`);
-  lines.push(`        ${orchId}["${orchLabel}"]`);
+  lines.push(`    subgraph orchestrator[${quoteMermaidText('Orchestrator')}]`);
+  lines.push(`        ${orchId}[${quoteMermaidText(orchLabel)}]`);
   lines.push('    end');
   lines.push('');
 
   // Type nodes (hexagon shape) for types with field definitions
   const typeDefs = collectTypeDefs(entry.steps);
   if (typeDefs.length > 0) {
-    lines.push(`    subgraph types["Key Types"]`);
+    lines.push(`    subgraph types[${quoteMermaidText('Key Types')}]`);
     for (const typeDef of typeDefs) {
       const typeId = sanitizeNodeId(typeDef.name);
       if (typeDef.fields) {
@@ -362,10 +364,14 @@ function generateComponentDiagram(entry: SequenceIndexEntry, pattern: ExtractedP
           .split(',')
           .map((f) => f.trim())
           .filter(Boolean)
-          .join('\\n');
-        lines.push(`        ${typeId}{{"${typeDef.name}\\n-----------\\n${hexFields}"}}`);
+          .join('\n');
+        lines.push(
+          `        ${typeId}{{${quoteMermaidText(`${typeDef.name}\n-----------\n${hexFields}`, {
+            preserveLineBreaks: true,
+          })}}}`
+        );
       } else {
-        lines.push(`        ${typeId}{{"${typeDef.name}"}}`);
+        lines.push(`        ${typeId}{{${quoteMermaidText(typeDef.name)}}}`);
       }
     }
     lines.push('    end');
@@ -378,7 +384,7 @@ function generateComponentDiagram(entry: SequenceIndexEntry, pattern: ExtractedP
     const outputType = extractTypeName(step.output);
     for (const mod of step.modules) {
       const modId = sanitizeNodeId(mod);
-      lines.push(`    ${modId} -->|"${outputType}"| ${orchId}`);
+      lines.push(`    ${modId} -->|${quoteMermaidText(outputType)}| ${orchId}`);
     }
   }
 
@@ -388,7 +394,7 @@ function generateComponentDiagram(entry: SequenceIndexEntry, pattern: ExtractedP
     if (!inputType) continue;
     for (const mod of step.modules) {
       const modId = sanitizeNodeId(mod);
-      lines.push(`    ${orchId} -->|"${inputType}"| ${modId}`);
+      lines.push(`    ${orchId} -->|${quoteMermaidText(inputType)}| ${modId}`);
     }
   }
 
@@ -510,16 +516,39 @@ function buildSummarySection(entry: SequenceIndexEntry, displayName: string): Se
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Sanitize text for use in Mermaid diagram labels, notes, and alt conditions.
- * Strips or escapes characters that break Mermaid syntax when used in text positions.
+ * Sanitize Mermaid text in raw positions such as notes, alt conditions, and
+ * sequence message labels where the text is not wrapped in quotes.
  */
-function sanitizeMermaidLabel(text: string): string {
+function sanitizeMermaidRawText(text: string): string {
   return text
-    .replace(/\n/g, ' ')
-    .replace(/%%/g, '')
+    .replace(/\r?\n/g, ' ')
+    .replace(/%%/g, '% %')
+    .replace(/\|/g, '&#124;')
+    .replace(/"/g, '&quot;')
     .replace(/>>/g, '> >')
     .replace(/--/g, '\u2014')
     .trim();
+}
+
+interface MermaidTextOptions {
+  readonly preserveLineBreaks?: boolean;
+}
+
+/**
+ * Quote Mermaid text for label positions that already use Mermaid string syntax.
+ */
+function quoteMermaidText(text: string, options: MermaidTextOptions = {}): string {
+  const { preserveLineBreaks = false } = options;
+  const escapedBackslashes = text.replace(/\\/g, '\\\\');
+  const normalized = preserveLineBreaks
+    ? escapedBackslashes.replace(/\r?\n/g, '\\n')
+    : escapedBackslashes.replace(/\r?\n/g, ' ');
+
+  return `"${normalized
+    .replace(/%%/g, '% %')
+    .replace(/\|/g, '&#124;')
+    .replace(/"/g, '&quot;')
+    .trim()}"`;
 }
 
 /**

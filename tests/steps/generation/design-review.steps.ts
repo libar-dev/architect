@@ -11,6 +11,8 @@
  * - Component diagram module grouping
  * - Type hexagon rendering with fields
  * - Design questions auto-computed metrics
+ * - Case-insensitive process-api sequence lookup
+ * - Mermaid-safe escaping across rendered label positions
  *
  * @libar-docs
  */
@@ -25,6 +27,7 @@ import {
   createPlainRule,
   buildEntry,
   generateDesignReview,
+  resolveSequenceEntry,
 } from '../../support/helpers/design-review-state.js';
 
 // =============================================================================
@@ -229,6 +232,42 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       );
     });
+
+    RuleScenario(
+      'Prose outputs are excluded from data flow types',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a rule with Input {string} and Output {string}',
+          (_ctx: unknown, input: string, output: string) => {
+            const s = requireState(state);
+            s.orchestrator = 'orchestrator';
+            s.rules = [
+              createSequenceRule({
+                name: 'Filtered data flow step',
+                step: 1,
+                modules: ['mod-a'],
+                input,
+                output,
+              }),
+            ];
+          }
+        );
+
+        When('building the sequence index entry', () => {
+          buildEntry(requireState(state));
+        });
+
+        Then('data flow types include {string}', (_ctx: unknown, expected: string) => {
+          const s = requireState(state);
+          expect(s.entry?.dataFlowTypes).toContain(expected);
+        });
+
+        And('data flow types do not include {string}', (_ctx: unknown, expected: string) => {
+          const s = requireState(state);
+          expect(s.entry?.dataFlowTypes).not.toContain(expected);
+        });
+      }
+    );
   });
 
   // ---------------------------------------------------------------------------
@@ -396,6 +435,59 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   });
 
   // ---------------------------------------------------------------------------
+  // Rule: Mermaid-sensitive text is escaped across rendered labels
+  // ---------------------------------------------------------------------------
+
+  Rule('Mermaid-sensitive text is escaped across rendered labels', ({ RuleScenario }) => {
+    RuleScenario(
+      'Mermaid-sensitive text is escaped in rendered markdown',
+      ({ Given, When, Then, And }) => {
+        Given('a rule with Mermaid-sensitive annotations', () => {
+          const s = requireState(state);
+          s.orchestrator = 'orch';
+          s.patternName = 'TestPattern';
+          s.rules = [
+            createSequenceRule({
+              name: 'Config "Draft" | Preview',
+              step: 1,
+              modules: ['module|"alpha'],
+              input: 'Config "Draft" | Preview %% comment',
+              output: 'SetupResult|"Quoted" -- field|"one", "two"',
+            }),
+          ];
+        });
+
+        When('generating the design review document', () => {
+          generateDesignReview(requireState(state));
+        });
+
+        Then('the rendered markdown contains {string}', (_ctx: unknown, expected: string) => {
+          const s = requireState(state);
+          expect(s.markdown).toContain(expected);
+        });
+
+        And('the rendered markdown contains {string}', (_ctx: unknown, expected: string) => {
+          const s = requireState(state);
+          expect(s.markdown).toContain(expected);
+        });
+
+        And('the rendered markdown also contains {string}', (_ctx: unknown, expected: string) => {
+          const s = requireState(state);
+          expect(s.markdown).toContain(expected);
+        });
+
+        And(
+          'the rendered markdown does not contain {string}',
+          (_ctx: unknown, unexpected: string) => {
+            const s = requireState(state);
+            expect(s.markdown).not.toContain(unexpected);
+          }
+        );
+      }
+    );
+  });
+
+  // ---------------------------------------------------------------------------
   // Rule: Design questions table includes auto-computed metrics
   // ---------------------------------------------------------------------------
 
@@ -446,4 +538,56 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       );
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // Rule: Process API sequence lookup resolves pattern names case-insensitively
+  // ---------------------------------------------------------------------------
+
+  Rule(
+    'Process API sequence lookup resolves pattern names case-insensitively',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'Sequence lookup accepts lowercase pattern name',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'a dataset with sequence data for pattern {string}',
+            (_ctx: unknown, patternName: string) => {
+              const s = requireState(state);
+              s.orchestrator = 'init-cli';
+              s.patternName = patternName;
+              s.rules = [
+                createSequenceRule({
+                  name: 'Lookup step',
+                  step: 1,
+                  modules: ['lookup-module'],
+                  input: 'LookupInput',
+                  output: 'LookupOutput',
+                }),
+              ];
+            }
+          );
+
+          When(
+            'resolving sequence data for pattern name {string}',
+            (_ctx: unknown, patternName: string) => {
+              resolveSequenceEntry(requireState(state), patternName);
+            }
+          );
+
+          Then('the resolved sequence entry exists', () => {
+            const s = requireState(state);
+            expect(s.entry).toBeDefined();
+          });
+
+          And(
+            'the resolved sequence entry has orchestrator {string}',
+            (_ctx: unknown, expected: string) => {
+              const s = requireState(state);
+              expect(s.entry?.orchestrator).toBe(expected);
+            }
+          );
+        }
+      );
+    }
+  );
 });

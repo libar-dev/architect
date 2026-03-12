@@ -133,6 +133,28 @@ function extractTypeName(annotation: string): string {
   return annotation.trim();
 }
 
+/**
+ * Decide whether an annotation should contribute to dataFlowTypes.
+ *
+ * Keeps structured type declarations (`TypeName -- fields`), bare identifiers,
+ * and type-ish parameter signatures such as `targetDir: string`, while excluding
+ * prose outputs like "package.json updated with process and docs scripts".
+ */
+function extractDataFlowTypeName(annotation: string): string | undefined {
+  const trimmed = annotation.trim();
+  if (trimmed.length === 0) return undefined;
+
+  if (trimmed.includes('--')) {
+    return extractTypeName(trimmed);
+  }
+
+  if (!/\s/.test(trimmed)) {
+    return trimmed;
+  }
+
+  return /[:<>{}\[\]|&()]/.test(trimmed) ? trimmed : undefined;
+}
+
 // =============================================================================
 // Index Builder
 // =============================================================================
@@ -192,10 +214,16 @@ export function buildSequenceIndexEntry(
   const typeNames = new Set<string>();
   for (const step of steps) {
     if (step.input) {
-      typeNames.add(extractTypeName(step.input));
+      const inputType = extractDataFlowTypeName(step.input);
+      if (inputType) {
+        typeNames.add(inputType);
+      }
     }
     if (step.output) {
-      typeNames.add(extractTypeName(step.output));
+      const outputType = extractDataFlowTypeName(step.output);
+      if (outputType) {
+        typeNames.add(outputType);
+      }
     }
   }
   const dataFlowTypes = [...typeNames];

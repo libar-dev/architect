@@ -33,14 +33,14 @@ Generated from: `@libar-docs-sequence-step`, `@libar-docs-sequence-module`, `@li
 ```mermaid
 sequenceDiagram
     participant User
-    participant init_cli as init-cli.ts
-    participant detect_context as detect-context.ts
-    participant prompts as prompts.ts
-    participant generate_config as generate-config.ts
-    participant augment_package_json as augment-package-json.ts
-    participant scaffold_dirs as scaffold-dirs.ts
-    participant generate_example as generate-example.ts
-    participant validate_setup as validate-setup.ts
+    participant init_cli as "init-cli.ts"
+    participant detect_context as "detect-context.ts"
+    participant prompts as "prompts.ts"
+    participant generate_config as "generate-config.ts"
+    participant augment_package_json as "augment-package-json.ts"
+    participant scaffold_dirs as "scaffold-dirs.ts"
+    participant generate_example as "generate-example.ts"
+    participant validate_setup as "validate-setup.ts"
 
     User->>init_cli: invoke
 

@@ -39,7 +39,6 @@ class DesignReviewGeneratorImpl implements DocumentGenerator {
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
     const files: OutputFile[] = [];
-    const warnings: string[] = [];
     const dataset = context.masterDataset;
 
     if (!dataset?.sequenceIndex) {
@@ -60,19 +59,12 @@ class DesignReviewGeneratorImpl implements DocumentGenerator {
 
         const filename = `design-reviews/${toKebabCase(patternName)}.md`;
         files.push({ path: filename, content: markdown });
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err);
-        warnings.push(`${patternName}: ${message}`);
+      } catch {
+        // Keep generating remaining design reviews even if one annotated pattern is invalid.
       }
     }
 
-    return Promise.resolve({
-      files,
-      metadata: {
-        patternsProcessed: Object.keys(sequenceIndex).length,
-        ...(warnings.length > 0 ? { warnings } : {}),
-      },
-    });
+    return Promise.resolve({ files });
   }
 }
 
