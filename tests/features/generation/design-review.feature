@@ -109,6 +109,27 @@ Feature: Design Review Generation Pipeline
       When generating the design review document
       Then the component diagram contains a subgraph labeled "InitConfig"
 
+  Rule: Component diagram module nodes are scoped per phase
+
+    **Invariant:** Repeated modules in non-contiguous phases render with distinct Mermaid node IDs, while repeated use of the same module inside one phase reuses a single declaration.
+    **Rationale:** Mermaid node IDs are global across the diagram. Reusing raw module IDs causes later phases to collapse into earlier declarations and misrepresent the orchestration flow.
+    **Verified by:** Repeated module in non-contiguous phases gets distinct node ids, Repeated module in one phase is declared once
+
+    @acceptance-criteria @happy-path
+    Scenario: Repeated module in non-contiguous phases gets distinct node ids
+      Given a pattern with the same module in non-contiguous phases
+      When generating the design review document
+      Then the rendered markdown contains phase-scoped node id "phase_1_shared_mod"
+      And the rendered markdown contains phase-scoped node id "phase_3_shared_mod"
+      And the rendered markdown routes first phase input "InputA" to phase node "phase_1_shared_mod"
+      And the rendered markdown routes later phase input "InputC" to phase node "phase_3_shared_mod"
+
+    @acceptance-criteria @validation
+    Scenario: Repeated module in one phase is declared once
+      Given 2 contiguous steps in the same phase using the same module
+      When generating the design review document
+      Then phase node "phase_1_shared_mod" is declared 1 time in the rendered markdown
+
   Rule: Type hexagons show field definitions from Output annotations
 
     **Invariant:** Output annotations with the "TypeName -- field1, field2" format produce hexagon nodes in the component diagram containing the type name and field names separated by newlines.
@@ -147,6 +168,26 @@ Feature: Design Review Generation Pipeline
       Given a dataset with 3 steps and 2 types and 1 error path
       When generating the design review document
       Then the design questions mention "3 steps" and "2 distinct types" and "1 error paths"
+
+  Rule: Invalid sequence annotations are skipped with validation warnings
+
+    **Invariant:** Patterns with ambiguous sequence-step numbering or empty sequence-module tags are excluded from sequenceIndex and reported through malformedPatterns.
+    **Rationale:** Design reviews should never render misleading diagrams from malformed annotations. The transform pass is the correct place to validate and suppress bad sequence entries.
+    **Verified by:** Duplicate step numbers are reported as malformed, Sequence step without modules is reported as malformed
+
+    @acceptance-criteria @validation
+    Scenario: Duplicate step numbers are reported as malformed
+      Given a pattern with duplicate sequence-step values
+      When transforming the pattern with validation
+      Then validation issues contain "Duplicate @libar-docs-sequence-step:1"
+      And sequenceIndex does not contain the pattern
+
+    @acceptance-criteria @validation
+    Scenario: Sequence step without modules is reported as malformed
+      Given a pattern with a sequence step but no sequence modules
+      When transforming the pattern with validation
+      Then validation issues contain "has @libar-docs-sequence-step:1 but no @libar-docs-sequence-module values"
+      And sequenceIndex does not contain the pattern
 
   Rule: Process API sequence lookup resolves pattern names case-insensitively
 

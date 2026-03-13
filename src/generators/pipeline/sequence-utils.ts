@@ -74,6 +74,19 @@ interface SequenceAnnotations {
   readonly invariant: string | undefined;
 }
 
+interface ParsedSequenceRule {
+  readonly stepNumber: number;
+  readonly ruleName: string;
+  readonly modules: readonly string[];
+  readonly annotations: SequenceAnnotations;
+  readonly errorScenarios: readonly string[];
+}
+
+export interface SequenceIndexBuildResult {
+  readonly entry: SequenceIndexEntry | undefined;
+  readonly issues: readonly string[];
+}
+
 /**
  * Extract Input, Output, and Invariant from a rule description.
  *
@@ -169,7 +182,25 @@ export function buildSequenceIndexEntry(
   orchestrator: string,
   rules: readonly BusinessRule[]
 ): SequenceIndexEntry | undefined {
+  return buildSequenceIndexEntryWithValidation(orchestrator, rules).entry;
+}
+
+/**
+ * Build a SequenceIndexEntry and collect validation issues for malformed annotations.
+ *
+ * Returns:
+ * - `entry` when the sequence annotations are valid
+ * - `issues` when step-tagged rules are ambiguous or incomplete
+ * - no entry and no issues when no rules have sequence-step tags
+ */
+export function buildSequenceIndexEntryWithValidation(
+  orchestrator: string,
+  rules: readonly BusinessRule[]
+): SequenceIndexBuildResult {
   const steps: SequenceStep[] = [];
+  const parsedRules: ParsedSequenceRule[] = [];
+  const stepNumbers = new Map<number, string[]>();
+  const issues: string[] = [];
 
   for (const rule of rules) {
     if (!rule.tags || rule.tags.length === 0) continue;
@@ -177,20 +208,54 @@ export function buildSequenceIndexEntry(
     const { step, modules } = parseRuleSequenceTags(rule.tags);
     if (step === undefined) continue;
 
-    const annotations = parseSequenceAnnotations(rule.description);
+    if (modules.length === 0) {
+      issues.push(
+        `Rule "${rule.name}" has @libar-docs-sequence-step:${String(step)} but no @libar-docs-sequence-module values`
+      );
+      continue;
+    }
 
-    steps.push({
+    const annotations = parseSequenceAnnotations(rule.description);
+    const rulesForStep = stepNumbers.get(step) ?? [];
+    rulesForStep.push(rule.name);
+    stepNumbers.set(step, rulesForStep);
+
+    parsedRules.push({
       stepNumber: step,
       ruleName: rule.name,
       modules,
-      input: annotations.input,
-      output: annotations.output,
-      invariant: annotations.invariant,
+      annotations,
       errorScenarios: rule.errorScenarioNames ?? [],
     });
   }
 
-  if (steps.length === 0) return undefined;
+  for (const [stepNumber, ruleNames] of stepNumbers.entries()) {
+    if (ruleNames.length > 1) {
+      issues.push(
+        `Duplicate @libar-docs-sequence-step:${String(stepNumber)} used by rules: ${ruleNames.join(', ')}`
+      );
+    }
+  }
+
+  if (issues.length > 0) {
+    return { entry: undefined, issues };
+  }
+
+  if (parsedRules.length === 0) {
+    return { entry: undefined, issues: [] };
+  }
+
+  for (const parsedRule of parsedRules) {
+    steps.push({
+      stepNumber: parsedRule.stepNumber,
+      ruleName: parsedRule.ruleName,
+      modules: [...parsedRule.modules],
+      input: parsedRule.annotations.input,
+      output: parsedRule.annotations.output,
+      invariant: parsedRule.annotations.invariant,
+      errorScenarios: [...parsedRule.errorScenarios],
+    });
+  }
 
   // Sort by step number
   steps.sort((a, b) => a.stepNumber - b.stepNumber);
@@ -229,10 +294,13 @@ export function buildSequenceIndexEntry(
   const dataFlowTypes = [...typeNames];
 
   return {
-    orchestrator,
-    steps,
-    participants,
-    errorPaths,
-    dataFlowTypes,
+    entry: {
+      orchestrator,
+      steps,
+      participants,
+      errorPaths,
+      dataFlowTypes,
+    },
+    issues: [],
   };
 }

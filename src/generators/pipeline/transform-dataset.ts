@@ -50,7 +50,7 @@ import type {
 
 import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import { normalizeStatus, ACCEPTED_STATUS_VALUES } from '../../taxonomy/index.js';
-import { buildSequenceIndexEntry } from './sequence-utils.js';
+import { buildSequenceIndexEntryWithValidation } from './sequence-utils.js';
 
 // =============================================================================
 // Validation Summary Types
@@ -501,9 +501,17 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
     // ─── Sequence index (for design review diagram generation) ────────────
     if (pattern.sequenceOrchestrator) {
       if (pattern.rules && pattern.rules.length > 0) {
-        const entry = buildSequenceIndexEntry(pattern.sequenceOrchestrator, pattern.rules);
-        if (entry !== undefined) {
-          sequenceIndex[patternKey] = entry;
+        const result = buildSequenceIndexEntryWithValidation(
+          pattern.sequenceOrchestrator,
+          pattern.rules
+        );
+        if (result.entry !== undefined) {
+          sequenceIndex[patternKey] = result.entry;
+        } else if (result.issues.length > 0) {
+          malformedPatterns.push({
+            patternId: patternKey,
+            issues: [...result.issues],
+          });
         } else {
           malformedPatterns.push({
             patternId: patternKey,

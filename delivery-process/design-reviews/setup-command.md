@@ -107,22 +107,22 @@ Generated from: `@libar-docs-sequence-module` (nodes), `**Input:**`/`**Output:**
 ```mermaid
 graph LR
     subgraph phase_1["Phase 1: targetDir: string"]
-        detect_context["detect-context.ts"]
+        phase_1_detect_context["detect-context.ts"]
     end
 
     subgraph phase_2["Phase 2: ProjectContext"]
-        prompts["prompts.ts"]
+        phase_2_prompts["prompts.ts"]
     end
 
     subgraph phase_3["Phase 3: InitConfig"]
-        generate_config["generate-config.ts"]
-        augment_package_json["augment-package-json.ts"]
-        scaffold_dirs["scaffold-dirs.ts"]
-        generate_example["generate-example.ts"]
+        phase_3_generate_config["generate-config.ts"]
+        phase_3_augment_package_json["augment-package-json.ts"]
+        phase_3_scaffold_dirs["scaffold-dirs.ts"]
+        phase_3_generate_example["generate-example.ts"]
     end
 
     subgraph phase_4["Phase 4: targetDir: string"]
-        validate_setup["validate-setup.ts"]
+        phase_4_validate_setup["validate-setup.ts"]
     end
 
     subgraph orchestrator["Orchestrator"]
@@ -135,16 +135,16 @@ graph LR
         SetupResult{{"SetupResult\n-----------\nsuccess\npatternCount\ndiagnostics"}}
     end
 
-    detect_context -->|"ProjectContext"| init_cli
-    prompts -->|"InitConfig"| init_cli
-    validate_setup -->|"SetupResult"| init_cli
-    init_cli -->|"targetDir: string"| detect_context
-    init_cli -->|"ProjectContext"| prompts
-    init_cli -->|"InitConfig"| generate_config
-    init_cli -->|"InitConfig"| augment_package_json
-    init_cli -->|"InitConfig"| scaffold_dirs
-    init_cli -->|"InitConfig"| generate_example
-    init_cli -->|"targetDir: string"| validate_setup
+    phase_1_detect_context -->|"ProjectContext"| init_cli
+    phase_2_prompts -->|"InitConfig"| init_cli
+    phase_4_validate_setup -->|"SetupResult"| init_cli
+    init_cli -->|"targetDir: string"| phase_1_detect_context
+    init_cli -->|"ProjectContext"| phase_2_prompts
+    init_cli -->|"InitConfig"| phase_3_generate_config
+    init_cli -->|"InitConfig"| phase_3_augment_package_json
+    init_cli -->|"InitConfig"| phase_3_scaffold_dirs
+    init_cli -->|"InitConfig"| phase_3_generate_example
+    init_cli -->|"targetDir: string"| phase_4_validate_setup
 ```
 
 ---

@@ -28,6 +28,7 @@ import {
   buildEntry,
   generateDesignReview,
   resolveSequenceEntry,
+  transformWithValidation,
 } from '../../support/helpers/design-review-state.js';
 
 // =============================================================================
@@ -398,6 +399,119 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   });
 
   // ---------------------------------------------------------------------------
+  // Rule: Component diagram module nodes are scoped per phase
+  // ---------------------------------------------------------------------------
+
+  Rule('Component diagram module nodes are scoped per phase', ({ RuleScenario }) => {
+    RuleScenario(
+      'Repeated module in non-contiguous phases gets distinct node ids',
+      ({ Given, When, Then, And }) => {
+        Given('a pattern with the same module in non-contiguous phases', () => {
+          const s = requireState(state);
+          s.orchestrator = 'orch';
+          s.patternName = 'TestPattern';
+          s.rules = [
+            createSequenceRule({
+              name: 'Phase A',
+              step: 1,
+              modules: ['shared-mod'],
+              input: 'InputA',
+              output: 'OutputA -- fieldA',
+            }),
+            createSequenceRule({
+              name: 'Phase B',
+              step: 2,
+              modules: ['other-mod'],
+              input: 'InputB',
+              output: 'OutputB -- fieldB',
+            }),
+            createSequenceRule({
+              name: 'Phase C',
+              step: 3,
+              modules: ['shared-mod'],
+              input: 'InputC',
+              output: 'OutputC -- fieldC',
+            }),
+          ];
+        });
+
+        When('generating the design review document', () => {
+          generateDesignReview(requireState(state));
+        });
+
+        Then(
+          'the rendered markdown contains phase-scoped node id {string}',
+          (_ctx: unknown, expected: string) => {
+            const s = requireState(state);
+            expect(s.markdown).toContain(expected);
+          }
+        );
+
+        And(
+          'the rendered markdown contains phase-scoped node id {string}',
+          (_ctx: unknown, expected: string) => {
+            const s = requireState(state);
+            expect(s.markdown).toContain(expected);
+          }
+        );
+
+        And(
+          'the rendered markdown routes first phase input {string} to phase node {string}',
+          (_ctx: unknown, input: string, phaseNode: string) => {
+            const s = requireState(state);
+            expect(s.markdown).toContain(`orch -->|"${input}"| ${phaseNode}`);
+          }
+        );
+
+        And(
+          'the rendered markdown routes later phase input {string} to phase node {string}',
+          (_ctx: unknown, input: string, phaseNode: string) => {
+            const s = requireState(state);
+            expect(s.markdown).toContain(`orch -->|"${input}"| ${phaseNode}`);
+          }
+        );
+      }
+    );
+
+    RuleScenario('Repeated module in one phase is declared once', ({ Given, When, Then }) => {
+      Given('2 contiguous steps in the same phase using the same module', () => {
+        const s = requireState(state);
+        s.orchestrator = 'orch';
+        s.patternName = 'TestPattern';
+        s.rules = [
+          createSequenceRule({
+            name: 'Shared step A',
+            step: 1,
+            modules: ['shared-mod'],
+            input: 'SharedInput',
+            output: 'OutputA -- fieldA',
+          }),
+          createSequenceRule({
+            name: 'Shared step B',
+            step: 2,
+            modules: ['shared-mod'],
+            input: 'SharedInput',
+            output: 'OutputB -- fieldB',
+          }),
+        ];
+      });
+
+      When('generating the design review document', () => {
+        generateDesignReview(requireState(state));
+      });
+
+      Then(
+        'phase node {string} is declared {int} time in the rendered markdown',
+        (_ctx: unknown, nodeId: string, count: number) => {
+          const s = requireState(state);
+          const matches = s.markdown.match(new RegExp(`${nodeId}\\[`, 'g'));
+          expect(matches ?? []).toHaveLength(count);
+        }
+      );
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // Rule: Type hexagons show field definitions from Output annotations
   // ---------------------------------------------------------------------------
 
@@ -537,6 +651,91 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       );
     });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Rule: Invalid sequence annotations are skipped with validation warnings
+  // ---------------------------------------------------------------------------
+
+  Rule('Invalid sequence annotations are skipped with validation warnings', ({ RuleScenario }) => {
+    RuleScenario(
+      'Duplicate step numbers are reported as malformed',
+      ({ Given, When, Then, And }) => {
+        Given('a pattern with duplicate sequence-step values', () => {
+          const s = requireState(state);
+          s.orchestrator = 'orch';
+          s.patternName = 'InvalidSequencePattern';
+          s.rules = [
+            createSequenceRule({
+              name: 'Duplicate Step A',
+              step: 1,
+              modules: ['mod-a'],
+              input: 'InputA',
+              output: 'OutputA -- fieldA',
+            }),
+            createSequenceRule({
+              name: 'Duplicate Step B',
+              step: 1,
+              modules: ['mod-b'],
+              input: 'InputB',
+              output: 'OutputB -- fieldB',
+            }),
+          ];
+        });
+
+        When('transforming the pattern with validation', () => {
+          transformWithValidation(requireState(state));
+        });
+
+        Then('validation issues contain {string}', (_ctx: unknown, expected: string) => {
+          const s = requireState(state);
+          const issues = s.validation?.malformedPatterns.flatMap((pattern) => pattern.issues) ?? [];
+          expect(issues.some((issue) => issue.includes(expected))).toBe(true);
+        });
+
+        And('sequenceIndex does not contain the pattern', () => {
+          const s = requireState(state);
+          expect(s.entry).toBeUndefined();
+          expect(s.dataset?.sequenceIndex?.[s.patternName]).toBeUndefined();
+        });
+      }
+    );
+
+    RuleScenario(
+      'Sequence step without modules is reported as malformed',
+      ({ Given, When, Then, And }) => {
+        Given('a pattern with a sequence step but no sequence modules', () => {
+          const s = requireState(state);
+          s.orchestrator = 'orch';
+          s.patternName = 'InvalidSequencePattern';
+          s.rules = [
+            createSequenceRule({
+              name: 'Module-less Step',
+              step: 1,
+              modules: [],
+              input: 'InputA',
+              output: 'OutputA -- fieldA',
+            }),
+          ];
+        });
+
+        When('transforming the pattern with validation', () => {
+          transformWithValidation(requireState(state));
+        });
+
+        Then('validation issues contain {string}', (_ctx: unknown, expected: string) => {
+          const s = requireState(state);
+          const issues = s.validation?.malformedPatterns.flatMap((pattern) => pattern.issues) ?? [];
+          expect(issues.some((issue) => issue.includes(expected))).toBe(true);
+        });
+
+        And('sequenceIndex does not contain the pattern', () => {
+          const s = requireState(state);
+          expect(s.entry).toBeUndefined();
+          expect(s.dataset?.sequenceIndex?.[s.patternName]).toBeUndefined();
+        });
+      }
+    );
   });
 
   // ---------------------------------------------------------------------------

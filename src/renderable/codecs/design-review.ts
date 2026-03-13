@@ -335,8 +335,11 @@ function generateComponentDiagram(entry: SequenceIndexEntry, pattern: ExtractedP
     lines.push(
       `    subgraph ${phaseId}[${quoteMermaidText(`Phase ${String(i + 1)}: ${phase.label}`)}]`
     );
+    const declaredModules = new Set<string>();
     for (const mod of phase.modules) {
-      const modId = sanitizeNodeId(mod);
+      const modId = getPhaseModuleNodeId(i, mod);
+      if (declaredModules.has(modId)) continue;
+      declaredModules.add(modId);
       const modLabel = resolveModuleLabel(mod, pattern);
       lines.push(`        ${modId}[${quoteMermaidText(modLabel)}]`);
     }
@@ -379,22 +382,30 @@ function generateComponentDiagram(entry: SequenceIndexEntry, pattern: ExtractedP
   }
 
   // Edges: module outputs → orchestrator (only for proper types with -- field separator)
-  for (const step of entry.steps) {
-    if (step.output?.includes('--') !== true) continue;
-    const outputType = extractTypeName(step.output);
-    for (const mod of step.modules) {
-      const modId = sanitizeNodeId(mod);
-      lines.push(`    ${modId} -->|${quoteMermaidText(outputType)}| ${orchId}`);
+  for (let i = 0; i < phases.length; i++) {
+    const phase = phases[i];
+    if (!phase) continue;
+    for (const step of phase.steps) {
+      if (step.output?.includes('--') !== true) continue;
+      const outputType = extractTypeName(step.output);
+      for (const mod of step.modules) {
+        const modId = getPhaseModuleNodeId(i, mod);
+        lines.push(`    ${modId} -->|${quoteMermaidText(outputType)}| ${orchId}`);
+      }
     }
   }
 
   // Orchestrator dispatches to steps that take an input
-  for (const step of entry.steps) {
-    const inputType = extractTypeName(step.input);
-    if (!inputType) continue;
-    for (const mod of step.modules) {
-      const modId = sanitizeNodeId(mod);
-      lines.push(`    ${orchId} -->|${quoteMermaidText(inputType)}| ${modId}`);
+  for (let i = 0; i < phases.length; i++) {
+    const phase = phases[i];
+    if (!phase) continue;
+    for (const step of phase.steps) {
+      const inputType = extractTypeName(step.input);
+      if (!inputType) continue;
+      for (const mod of step.modules) {
+        const modId = getPhaseModuleNodeId(i, mod);
+        lines.push(`    ${orchId} -->|${quoteMermaidText(inputType)}| ${modId}`);
+      }
     }
   }
 
@@ -645,6 +656,7 @@ function findConsumers(steps: readonly SequenceStep[], typeName: string): string
 interface PhaseGroup {
   readonly label: string;
   readonly modules: string[];
+  readonly steps: SequenceStep[];
 }
 
 /**
@@ -662,10 +674,15 @@ function groupStepsByInputType(steps: readonly SequenceStep[]): PhaseGroup[] {
     // Only merge into the previous phase if it has the same input type (contiguous grouping)
     if (lastPhase?.label === inputType) {
       lastPhase.modules.push(...step.modules);
+      lastPhase.steps.push(step);
     } else {
-      phases.push({ label: inputType, modules: [...step.modules] });
+      phases.push({ label: inputType, modules: [...step.modules], steps: [step] });
     }
   }
 
   return phases;
+}
+
+function getPhaseModuleNodeId(phaseIndex: number, moduleId: string): string {
+  return `phase_${String(phaseIndex + 1)}_${sanitizeNodeId(moduleId)}`;
 }

@@ -15,8 +15,13 @@ import type {
 import type { RenderableDocument } from '../../../src/renderable/schema.js';
 import { getSequenceEntry } from '../../../src/api/pattern-helpers.js';
 import { buildSequenceIndexEntry } from '../../../src/generators/pipeline/sequence-utils.js';
+import {
+  transformToMasterDatasetWithValidation,
+  type ValidationSummary,
+} from '../../../src/generators/pipeline/transform-dataset.js';
 import { createDesignReviewCodec } from '../../../src/renderable/codecs/design-review.js';
 import { renderToMarkdown } from '../../../src/renderable/render.js';
+import { createDefaultTagRegistry } from '../../../src/validation-schemas/tag-registry.js';
 import { createTestMasterDataset, createTestPattern } from '../../fixtures/dataset-factories.js';
 
 // =============================================================================
@@ -35,6 +40,9 @@ export interface DesignReviewState {
 
   /** MasterDataset for codec tests */
   dataset: MasterDataset | null;
+
+  /** Validation summary from transformToMasterDatasetWithValidation */
+  validation: ValidationSummary | null;
 
   /** Pattern name for codec lookup */
   patternName: string;
@@ -56,6 +64,7 @@ export function initState(): DesignReviewState {
     rules: [],
     entry: undefined,
     dataset: null,
+    validation: null,
     patternName: '',
     doc: null,
     markdown: '',
@@ -158,6 +167,29 @@ export function generateDesignReview(state: DesignReviewState): void {
   const codec = createDesignReviewCodec({ patternName: state.patternName || 'TestPattern' });
   state.doc = codec.decode(dataset);
   state.markdown = renderToMarkdown(state.doc);
+}
+
+/**
+ * Transform a pattern through the dataset pipeline and keep validation output.
+ */
+export function transformWithValidation(state: DesignReviewState): void {
+  const pattern = createTestPattern({
+    name: state.patternName || 'TestPattern',
+    status: 'active',
+    filePath: 'delivery-process/specs/test-pattern.feature',
+    rules: state.rules,
+    sequenceOrchestrator: state.orchestrator,
+  });
+
+  const result = transformToMasterDatasetWithValidation({
+    patterns: [pattern],
+    tagRegistry: createDefaultTagRegistry(),
+    workflow: undefined,
+  });
+
+  state.dataset = result.dataset;
+  state.validation = result.validation;
+  state.entry = getSequenceEntry(result.dataset, state.patternName || 'TestPattern');
 }
 
 /**
