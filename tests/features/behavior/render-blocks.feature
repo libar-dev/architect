@@ -119,9 +119,9 @@ Feature: Universal Markdown Renderer - Block Types
       Then the output contains the table:
         """
         | Column1 | Column2 |
-        | --- | --- |
-        | a | b |
-        | c | d |
+        | ------- | ------- |
+        | a       | b       |
+        | c       | d       |
         """
 
     Scenario: Render table with alignment
@@ -131,7 +131,7 @@ Feature: Universal Markdown Renderer - Block Types
         | Center   | center    |
         | Right    | right     |
       When rendering to markdown
-      Then the output contains "| --- | :---: | ---: |"
+      Then the output contains "| ---- | :----: | ----: |"
 
     Scenario: Render empty table (no columns)
       Given a document with a table with no columns

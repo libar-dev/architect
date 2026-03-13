@@ -102,10 +102,11 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         'the output contains a table with columns {string}, {string}, {string}, {string}',
         (_ctx: unknown, c1: string, c2: string, c3: string, c4: string) => {
           const content = getContent();
-          expect(content).toContain(`| ${c1} |`);
-          expect(content).toContain(`| ${c2} |`);
-          expect(content).toContain(`| ${c3} |`);
-          expect(content).toContain(`| ${c4} |`);
+          // Check column names exist in header (padding-tolerant — no trailing ` |`)
+          expect(content).toContain(`| ${c1}`);
+          expect(content).toContain(`| ${c2}`);
+          expect(content).toContain(`| ${c3}`);
+          expect(content).toContain(`| ${c4}`);
         }
       );
 
@@ -139,8 +140,8 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         'the output contains a table with columns {string}, {string}',
         (_ctx: unknown, c1: string, c2: string) => {
           const content = getContent();
-          expect(content).toContain(`| ${c1} |`);
-          expect(content).toContain(`| ${c2} |`);
+          expect(content).toContain(`| ${c1}`);
+          expect(content).toContain(`| ${c2}`);
         }
       );
 
@@ -177,8 +178,8 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         'the output contains a table with columns {string}, {string}',
         (_ctx: unknown, c1: string, c2: string) => {
           const content = getContent();
-          expect(content).toContain(`| ${c1} |`);
-          expect(content).toContain(`| ${c2} |`);
+          expect(content).toContain(`| ${c1}`);
+          expect(content).toContain(`| ${c2}`);
         }
       );
 
