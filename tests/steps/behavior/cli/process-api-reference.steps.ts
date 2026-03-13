@@ -4,7 +4,7 @@
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
-import { CLI_SCHEMA } from '../../../../src/cli/cli-schema.js';
+import { CLI_SCHEMA, type CLIOptionGroup, type CLISchema } from '../../../../src/cli/cli-schema.js';
 import { createProcessApiReferenceGenerator } from '../../../../src/generators/built-in/process-api-reference-generator.js';
 import type { GeneratorContext } from '../../../../src/generators/types.js';
 
@@ -301,8 +301,9 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         'all schema groups contain at least one option:',
         (_ctx: unknown, table: Array<{ group: string }>) => {
           for (const row of table) {
-            const group = row.group as keyof typeof CLI_SCHEMA;
-            expect(CLI_SCHEMA[group].options.length).toBeGreaterThan(0);
+            const group = row.group as keyof CLISchema;
+            const section = CLI_SCHEMA[group] as CLIOptionGroup;
+            expect(section.options.length).toBeGreaterThan(0);
           }
         }
       );
