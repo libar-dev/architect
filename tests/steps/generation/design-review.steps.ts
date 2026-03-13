@@ -15,6 +15,7 @@
  * - Mermaid-safe escaping across rendered label positions
  *
  * @libar-docs
+ * @libar-docs-uses DesignReviewCodec, SequenceIndex, renderToMarkdown
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
@@ -320,7 +321,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   Rule('Error scenarios produce alt blocks in sequence diagrams', ({ RuleScenario }) => {
-    RuleScenario('Error scenarios produce alt blocks in output', ({ Given, When, Then, And }) => {
+    RuleScenario('Error scenarios produce alt blocks in output', ({ Given, When, Then }) => {
       Given(
         'a step with error scenarios {string} and {string}',
         (_ctx: unknown, err1: string, err2: string) => {
@@ -344,14 +345,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         generateDesignReview(requireState(state));
       });
 
-      Then('the rendered markdown contains {string}', (_ctx: unknown, expected: string) => {
+      Then('the rendered markdown contains:', (_ctx: unknown, expectedBlock: string) => {
         const s = requireState(state);
-        expect(s.markdown).toContain(expected);
-      });
-
-      And('the rendered markdown contains {string}', (_ctx: unknown, expected: string) => {
-        const s = requireState(state);
-        expect(s.markdown).toContain(expected);
+        for (const expected of expectedBlock
+          .split('\n')
+          .map((line) => line.trim())
+          .filter(Boolean)) {
+          expect(s.markdown).toContain(expected);
+        }
       });
     });
   });

@@ -3,6 +3,7 @@
  * @libar-docs-core
  * @libar-docs-pattern CodecGeneratorRegistration
  * @libar-docs-status completed
+ * @libar-docs-uses DesignReviewGenerator, DecisionDocGenerator, ProcessApiReferenceGenerator, CliRecipeGenerator
  *
  * ## Codec-Based Generator Registration
  *

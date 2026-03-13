@@ -1001,18 +1001,22 @@ async function handleArch(ctx: RouteContext): Promise<unknown> {
 // Stub Integration Handlers
 // =============================================================================
 
-function handleSequence(dataset: RuntimeMasterDataset, subArgs: string[]): unknown {
+function handleSequence(
+  dataset: RuntimeMasterDataset,
+  subArgs: string[],
+  modifiers: OutputModifiers
+): unknown {
   const index = dataset.sequenceIndex;
 
   if (!index || Object.keys(index).length === 0) {
-    return { message: 'No patterns with sequence annotations found', patterns: [] };
+    return { message: 'No patterns with sequence annotations found', patterns: [], count: 0 };
   }
 
   if (subArgs.length === 0) {
-    return {
-      patterns: Object.keys(index),
-      count: Object.keys(index).length,
-    };
+    const patterns = Object.keys(index);
+    if (modifiers.count) return { count: patterns.length };
+    if (modifiers.namesOnly) return patterns;
+    return { patterns, count: patterns.length };
   }
 
   const patternName = subArgs[0] ?? '';
@@ -1517,7 +1521,7 @@ async function routeSubcommand(ctx: RouteContext): Promise<unknown> {
       return buildSourceInventory(ctx.dataset);
 
     case 'sequence':
-      return handleSequence(ctx.dataset, ctx.subArgs);
+      return handleSequence(ctx.dataset, ctx.subArgs, ctx.modifiers);
 
     case 'unannotated': {
       let pathFilter: string | undefined;

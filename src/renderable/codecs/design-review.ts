@@ -271,7 +271,7 @@ function generateSequenceDiagram(entry: SequenceIndexEntry, pattern: ExtractedPa
   for (const step of entry.steps) {
     // Note block for rule
     lines.push(
-      `    Note over ${orchId}: Rule ${String(step.stepNumber)} — ${sanitizeMermaidRawText(step.ruleName)}`
+      `    Note over ${orchId}: Rule ${String(step.stepNumber)} — ${sanitizeMermaidRawText(step.invariant ?? step.ruleName)}`
     );
     lines.push('');
 

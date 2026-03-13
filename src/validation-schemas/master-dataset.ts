@@ -214,9 +214,9 @@ export const SequenceStepSchema = z.object({
   /** Step execution order (from @libar-docs-sequence-step tag) */
   stepNumber: z.number().int().positive(),
   /** Business rule name (the Rule: keyword text) */
-  ruleName: z.string(),
+  ruleName: z.string().trim().min(1),
   /** Module identifiers for this step (from @libar-docs-sequence-module CSV tag) */
-  modules: z.array(z.string()).readonly(),
+  modules: z.array(z.string().trim().min(1)).min(1).readonly(),
   /** Input type annotation (from **Input:** marker in rule description) */
   input: z.string().optional(),
   /** Output type annotation (from **Output:** marker in rule description) */
@@ -224,7 +224,7 @@ export const SequenceStepSchema = z.object({
   /** Invariant text (for Note blocks in sequence diagram) */
   invariant: z.string().optional(),
   /** Scenario names tagged with @libar-docs-sequence-error */
-  errorScenarios: z.array(z.string()).readonly(),
+  errorScenarios: z.array(z.string().trim().min(1)).readonly(),
 });
 
 /**
@@ -232,15 +232,15 @@ export const SequenceStepSchema = z.object({
  */
 export const SequenceIndexEntrySchema = z.object({
   /** Orchestrator module identifier (from @libar-docs-sequence-orchestrator tag) */
-  orchestrator: z.string(),
+  orchestrator: z.string().trim().min(1),
   /** Ordered sequence steps (sorted by stepNumber) */
-  steps: z.array(SequenceStepSchema).readonly(),
+  steps: z.array(SequenceStepSchema).min(1).readonly(),
   /** Deduplicated participant module names (in step order, orchestrator first) */
-  participants: z.array(z.string()).readonly(),
+  participants: z.array(z.string().trim().min(1)).min(1).readonly(),
   /** All error scenario names across all steps */
-  errorPaths: z.array(z.string()).readonly(),
+  errorPaths: z.array(z.string().trim().min(1)).readonly(),
   /** Distinct data flow type names from Input/Output annotations */
-  dataFlowTypes: z.array(z.string()).readonly(),
+  dataFlowTypes: z.array(z.string().trim().min(1)).readonly(),
 });
 
 /**
@@ -248,7 +248,7 @@ export const SequenceIndexEntrySchema = z.object({
  *
  * Supports multiple annotated patterns simultaneously.
  */
-export const SequenceIndexSchema = z.record(z.string(), SequenceIndexEntrySchema);
+export const SequenceIndexSchema = z.record(z.string().trim().min(1), SequenceIndexEntrySchema);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Master Dataset Schema

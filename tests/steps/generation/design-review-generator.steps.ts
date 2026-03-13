@@ -4,6 +4,7 @@
  * Covers orphan cleanup for stale design-review markdown files.
  *
  * @libar-docs
+ * @libar-docs-uses DesignReviewGenerator
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

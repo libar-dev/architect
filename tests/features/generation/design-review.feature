@@ -94,8 +94,11 @@ Feature: Design Review Generation Pipeline
     Scenario: Error scenarios produce alt blocks in output
       Given a step with error scenarios "Config not found" and "Invalid preset"
       When generating the design review document
-      Then the rendered markdown contains "alt Config not found"
-      And the rendered markdown contains "alt Invalid preset"
+      Then the rendered markdown contains:
+        """
+        alt Config not found
+        alt Invalid preset
+        """
 
   Rule: Component diagram groups modules by shared input type
 

@@ -5,6 +5,7 @@
  * the SequenceIndex builder and DesignReviewCodec pipeline.
  *
  * @libar-docs
+ * @libar-docs-uses SequenceIndex, DesignReviewCodec, MasterDataset
  */
 
 import type { BusinessRule } from '../../../src/validation-schemas/extracted-pattern.js';
@@ -128,6 +129,7 @@ export function createPlainRule(name: string): BusinessRule {
     scenarioCount: 1,
     scenarioNames: [`Test for ${name}`],
     tags: [],
+    errorScenarioNames: [],
   };
 }
 
