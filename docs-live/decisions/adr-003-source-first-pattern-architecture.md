@@ -6,10 +6,10 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | accepted |
-| Category | process |
+| Property | Value    |
+| -------- | -------- |
+| Status   | accepted |
+| Category | process  |
 
 **Context:**
 The original annotation architecture assumed pattern definitions live
@@ -26,14 +26,14 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 **Consequences:**
 
-| Type | Impact |
-| --- | --- |
-| Positive | Pattern identity travels with code from stub through production |
-| Positive | Eliminates stale tier 1 spec maintenance burden |
+| Type     | Impact                                                              |
+| -------- | ------------------------------------------------------------------- |
+| Positive | Pattern identity travels with code from stub through production     |
+| Positive | Eliminates stale tier 1 spec maintenance burden                     |
 | Positive | Executable specs become the living specification (richer, verified) |
-| Positive | Retroactive annotation works without merge conflicts |
-| Negative | Migration effort for existing tier 1 specs |
-| Negative | Requires updating CLAUDE.md annotation ownership guidance |
+| Positive | Retroactive annotation works without merge conflicts                |
+| Negative | Migration effort for existing tier 1 specs                          |
+| Negative | Requires updating CLAUDE.md annotation ownership guidance           |
 
 ## Rules
 
@@ -43,14 +43,13 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 **Rationale:** If pattern identity lives in tier 1 specs, it becomes stale after implementation and diverges from the code that actually realizes the pattern.
 
-| Phase | Location | Status |
-| --- | --- | --- |
-| Design | `delivery-process/stubs/pattern-name/` | roadmap |
-| Implementation | `src/path/to/module.ts` | active |
-| Completed | `src/path/to/module.ts` | completed |
+| Phase          | Location                               | Status    |
+| -------------- | -------------------------------------- | --------- |
+| Design         | `delivery-process/stubs/pattern-name/` | roadmap   |
+| Implementation | `src/path/to/module.ts`                | active    |
+| Completed      | `src/path/to/module.ts`                | completed |
 
 **Pattern Definition Lifecycle:**
-
 
     Exception: Patterns with no TypeScript implementation (pure process or
     workflow concerns) may be defined in decision specs. The constraint is:
@@ -66,11 +65,11 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 **Rationale:** Treating tier 1 specs as durable creates a maintenance burden — at scale only 39% maintain traceability, and duplicated Rules/Scenarios average 200-400 stale lines.
 
-| Phase | Planning Value | Documentation Value |
-| --- | --- | --- |
-| roadmap | High | None (not yet built) |
-| active | Medium (deliverable tracking) | Low (stale snapshot) |
-| completed | None | None (executable specs are better) |
+| Phase     | Planning Value                | Documentation Value                |
+| --------- | ----------------------------- | ---------------------------------- |
+| roadmap   | High                          | None (not yet built)               |
+| active    | Medium (deliverable tracking) | Low (stale snapshot)               |
+| completed | None                          | None (executable specs are better) |
 
 **Value by lifecycle phase:**
 
@@ -84,11 +83,11 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 **Rationale:** Without a clear boundary between durable and ephemeral artifacts, teams maintain redundant documents that inevitably drift from the source of truth.
 
-| Artifact | Purpose | Owns |
-| --- | --- | --- |
-| Annotated TypeScript | Pattern identity, architecture graph | Name, status, uses, categories |
-| Executable specs | Behavior verification, invariants | Rules, rationale, acceptance criteria |
-| Decision specs (ADR/PDR) | Architectural choices, rationale | Why decisions were made |
+| Artifact                 | Purpose                              | Owns                                  |
+| ------------------------ | ------------------------------------ | ------------------------------------- |
+| Annotated TypeScript     | Pattern identity, architecture graph | Name, status, uses, categories        |
+| Executable specs         | Behavior verification, invariants    | Rules, rationale, acceptance criteria |
+| Decision specs (ADR/PDR) | Architectural choices, rationale     | Why decisions were made               |
 
 **Verified by:**
 
@@ -100,10 +99,10 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 **Rationale:** Without many-to-one realization, cross-cutting patterns that span multiple files cannot be traced back to a single canonical definition.
 
-| Relationship | Tag | Cardinality |
-| --- | --- | --- |
-| Definition | `@libar-docs-pattern` | Exactly one per pattern |
-| Realization | `@libar-docs-implements` | Many-to-one |
+| Relationship | Tag                      | Cardinality             |
+| ------------ | ------------------------ | ----------------------- |
+| Definition   | `@libar-docs-pattern`    | Exactly one per pattern |
+| Realization  | `@libar-docs-implements` | Many-to-one             |
 
 **Verified by:**
 
@@ -115,12 +114,12 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 **Rationale:** Duplicate pattern definitions cause merge conflicts in the MasterDataset and produce ambiguous ownership in generated documentation.
 
-| Current State | Resolution |
-| --- | --- |
-| Pattern in both TS and feature | Keep TS definition, feature uses `@implements` |
-| Pattern only in tier 1 spec | Move definition to TS stub, archive tier 1 spec |
-| Pattern only in TS | Already correct |
-| Pattern only in executable spec | Valid if no TS implementation exists |
+| Current State                   | Resolution                                      |
+| ------------------------------- | ----------------------------------------------- |
+| Pattern in both TS and feature  | Keep TS definition, feature uses `@implements`  |
+| Pattern only in tier 1 spec     | Move definition to TS stub, archive tier 1 spec |
+| Pattern only in TS              | Already correct                                 |
+| Pattern only in executable spec | Valid if no TS implementation exists            |
 
 **Migration path for existing conflicts:**
 
@@ -134,10 +133,10 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 **Rationale:** Forward links in tier 1 specs go stale when specs are archived, while reverse links in test files are self-maintaining because the test cannot run without the implementation.
 
-| Mechanism | Usage | Reliability |
-| --- | --- | --- |
-| `@implements` (reverse) | 14 patterns (32%) | Self-maintaining, lives in test |
-| `@executable-specs` (forward) | 9 patterns (20%) | Requires tier 1 spec maintenance |
+| Mechanism                     | Usage             | Reliability                      |
+| ----------------------------- | ----------------- | -------------------------------- |
+| `@implements` (reverse)       | 14 patterns (32%) | Self-maintaining, lives in test  |
+| `@executable-specs` (forward) | 9 patterns (20%)  | Requires tier 1 spec maintenance |
 
 **Verified by:**
 

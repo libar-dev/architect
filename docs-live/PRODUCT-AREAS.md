@@ -21,7 +21,7 @@ The annotation system is the ingestion boundary — it transforms annotated Type
 
 Configuration is the entry boundary — it transforms a user-authored `delivery-process.config.ts` file into a fully resolved `DeliveryProcessInstance` that powers the entire pipeline. The flow is: `defineConfig()` provides type-safe authoring (Vite convention, zero validation), `ConfigLoader` discovers and loads the file, `ProjectConfigSchema` validates via Zod, `ConfigResolver` applies defaults and merges stubs into sources, and `DeliveryProcessFactory` builds the final instance with `TagRegistry` and `RegexBuilders`. Three presets define escalating taxonomy complexity — from 3 categories (`generic`, `libar-generic`) to 21 (`ddd-es-cqrs`). `SourceMerger` computes per-generator source overrides, enabling generators like changelog to pull from different feature sets than the base config.
 
-**9 patterns** — 8 completed, 0 active, 1 planned
+**11 patterns** — 8 completed, 0 active, 3 planned
 
 **Key patterns:** DeliveryProcessFactory, ConfigLoader, ConfigResolver, DefineConfig, ConfigurationPresets, SourceMerger
 
@@ -31,7 +31,7 @@ Configuration is the entry boundary — it transforms a user-authored `delivery-
 
 The generation pipeline transforms annotated source code into markdown documents through a four-stage architecture: Scanner discovers files, Extractor produces `ExtractedPattern` objects, Transformer builds MasterDataset with pre-computed views, and Codecs render to markdown via RenderableDocument IR. Nine specialized codecs handle reference docs, planning, session, reporting, timeline, ADRs, business rules, taxonomy, and composite output — each supporting three detail levels (detailed, standard, summary). The Orchestrator runs generators in registration order, producing both detailed `docs-live/` references and compact `_claude-md/` summaries.
 
-**91 patterns** — 77 completed, 2 active, 12 planned
+**94 patterns** — 81 completed, 5 active, 8 planned
 
 **Key patterns:** ADR005CodecBasedMarkdownRendering, CodecDrivenReferenceGeneration, CrossCuttingDocumentInclusion, ArchitectureDiagramGeneration, ScopedArchitecturalView, CompositeCodec, RenderableDocument, ProductAreaOverview
 
@@ -41,7 +41,7 @@ The generation pipeline transforms annotated source code into markdown documents
 
 Validation is the enforcement boundary — it ensures that every change to annotated source files respects the delivery lifecycle rules defined by the FSM, protection levels, and scope constraints. The system operates in three layers: the FSM validator checks status transitions against a 4-state directed graph, the Process Guard orchestrates commit-time validation using a Decider pattern (state derived from annotations, not stored separately), and the lint engine provides pluggable rule execution with pretty and JSON output. Anti-pattern detection enforces dual-source ownership boundaries — `@libar-docs-uses` belongs on TypeScript, `@libar-docs-depends-on` belongs on Gherkin — preventing cross-domain tag confusion that causes documentation drift. Definition of Done validation ensures completed patterns have all deliverables marked done and at least one acceptance-criteria scenario.
 
-**22 patterns** — 15 completed, 0 active, 7 planned
+**22 patterns** — 16 completed, 0 active, 6 planned
 
 **Key patterns:** ProcessGuardLinter, PhaseStateMachineValidation, DoDValidation, StepLintVitestCucumber, ProgressiveGovernance
 
@@ -51,7 +51,7 @@ Validation is the enforcement boundary — it ensures that every change to annot
 
 The Data API provides direct terminal access to delivery process state. It replaces reading generated markdown or launching explore agents — targeted queries use 5-10x less context. The `context` command assembles curated bundles tailored to session type (planning, design, implement).
 
-**35 patterns** — 22 completed, 9 active, 4 planned
+**36 patterns** — 23 completed, 9 active, 4 planned
 
 **Key patterns:** DataAPIContextAssembly, ProcessStateAPICLI, DataAPIDesignSessionSupport, DataAPIRelationshipGraph, DataAPIOutputShaping
 
@@ -61,7 +61,7 @@ The Data API provides direct terminal access to delivery process state. It repla
 
 CoreTypes provides the foundational type system used across all other areas. Three pillars enforce discipline at compile time: the Result monad replaces try/catch with explicit error handling — functions return `Result.ok(value)` or `Result.err(error)` instead of throwing. The DocError discriminated union provides structured error context with type, file, line, and reason fields, enabling exhaustive pattern matching in error handlers. Branded types create nominal typing from structural TypeScript — `PatternId`, `CategoryName`, and `SourceFilePath` are compile-time distinct despite all being strings. String utilities handle slugification and case conversion with acronym-aware title casing.
 
-**7 patterns** — 6 completed, 0 active, 1 planned
+**7 patterns** — 7 completed, 0 active, 0 planned
 
 **Key patterns:** ResultMonad, ErrorHandlingUnification, ErrorFactories, StringUtils, KebabCaseSlugs
 
@@ -82,13 +82,13 @@ Process defines the USDP-inspired session workflow that governs how work moves t
 | Area                                            | Patterns | Completed | Active | Planned |
 | ----------------------------------------------- | -------- | --------- | ------ | ------- |
 | [Annotation](product-areas/ANNOTATION.md)       | 26       | 23        | 2      | 1       |
-| [Configuration](product-areas/CONFIGURATION.md) | 9        | 8         | 0      | 1       |
-| [Generation](product-areas/GENERATION.md)       | 91       | 77        | 2      | 12      |
-| [Validation](product-areas/VALIDATION.md)       | 22       | 15        | 0      | 7       |
-| [DataAPI](product-areas/DATA-API.md)            | 35       | 22        | 9      | 4       |
-| [CoreTypes](product-areas/CORE-TYPES.md)        | 7        | 6         | 0      | 1       |
+| [Configuration](product-areas/CONFIGURATION.md) | 11       | 8         | 0      | 3       |
+| [Generation](product-areas/GENERATION.md)       | 94       | 81        | 5      | 8       |
+| [Validation](product-areas/VALIDATION.md)       | 22       | 16        | 0      | 6       |
+| [DataAPI](product-areas/DATA-API.md)            | 36       | 23        | 9      | 4       |
+| [CoreTypes](product-areas/CORE-TYPES.md)        | 7        | 7         | 0      | 0       |
 | [Process](product-areas/PROCESS.md)             | 11       | 4         | 0      | 7       |
-| **Total**                                       | **201**  | **155**   | **13** | **33**  |
+| **Total**                                       | **207**  | **162**   | **16** | **29**  |
 
 ---
 

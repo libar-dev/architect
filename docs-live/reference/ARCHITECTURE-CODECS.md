@@ -454,6 +454,26 @@ const doc = PatternsDocumentCodec.decode(dataset);
 
 ---
 
+## DesignReviewCodec
+
+Transforms MasterDataset into a RenderableDocument containing design review
+artifacts: sequence diagrams, component diagrams, type definition tables,
+and design question templates.
+
+**Purpose:** Auto-generate design review documents from sequence annotations
+on Gherkin specs. Diagrams stay synchronized with spec changes.
+
+**Output Files:** `delivery-process/design-reviews/{pattern-name}.md`
+
+### Factory Pattern
+
+```typescript
+const codec = createDesignReviewCodec({ patternName: 'SetupCommand' });
+const doc = codec.decode(dataset);
+```
+
+---
+
 ## CompositeCodec
 
 Assembles reference documents from multiple codec outputs by concatenating

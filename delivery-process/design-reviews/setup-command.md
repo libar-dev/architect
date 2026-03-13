@@ -44,7 +44,7 @@ sequenceDiagram
 
     User->>init_cli: invoke
 
-    Note over init_cli: Rule 1 — Init detects existing project context before making changes
+    Note over init_cli: Rule 1 — The init command reads the target directory for package.json, tsconfig.json, delivery-process.config.ts (or .js), and monorepo markers before prompting or generating any files. Detection results determine which steps are skipped.
 
     init_cli->>+detect_context: targetDir: string
     detect_context-->>-init_cli: ProjectContext
@@ -54,7 +54,7 @@ sequenceDiagram
         init_cli->>init_cli: exit(1)
     end
 
-    Note over init_cli: Rule 2 — Interactive prompts configure preset and source paths with smart defaults
+    Note over init_cli: Rule 2 — The init command prompts for preset selection from the three available presets (generic, libar-generic, ddd-es-cqrs) with descriptions, and for source glob paths with defaults inferred from project structure. The —yes flag skips non-destructive selection prompts and uses defaults. Destructive overwrites require an explicit —force flag; otherwise init exits without modifying existing files.
 
     init_cli->>+prompts: ProjectContext
     prompts-->>-init_cli: InitConfig
@@ -64,7 +64,7 @@ sequenceDiagram
         init_cli->>init_cli: exit(1)
     end
 
-    Note over init_cli: Rule 3 — Generated config file uses defineConfig with correct imports
+    Note over init_cli: Rule 3 — The generated delivery-process.config.ts (or .js) imports defineConfig from the correct path, uses the selected preset, and includes configured source globs. An existing config file is never overwritten without confirmation.
 
     init_cli->>+generate_config: InitConfig
     generate_config-->>-init_cli: delivery-process.config.ts written to targetDir
@@ -74,19 +74,19 @@ sequenceDiagram
         init_cli->>init_cli: exit(1)
     end
 
-    Note over init_cli: Rule 4 — Npm scripts are injected using bin command names
+    Note over init_cli: Rule 4 — Injected scripts reference bin names (process-api, generate-docs) resolved via node_modules/.bin, not dist paths. Existing scripts are preserved. The package.json &quot;type&quot; field is preserved. ESM migration is an explicit opt-in via —esm flag.
 
     init_cli->>+augment_package_json: InitConfig
     augment_package_json-->>-init_cli: package.json updated with process and docs scripts
 
-    Note over init_cli: Rule 5 — Directory structure and example annotation enable immediate first run
+    Note over init_cli: Rule 5 — The init command creates directories for configured source globs and generates one example annotated TypeScript file with the minimum annotation set (opt-in marker, pattern tag, status, category, description).
 
     init_cli->>+scaffold_dirs: InitConfig
     scaffold_dirs-->>-init_cli: directories created for source globs, example annotated .ts file
     init_cli->>+generate_example: InitConfig
     generate_example-->>-init_cli: directories created for source globs, example annotated .ts file
 
-    Note over init_cli: Rule 6 — Init validates the complete setup by running the pipeline
+    Note over init_cli: Rule 6 — After all files are generated, init runs process-api overview and reports whether the pipeline detected the example pattern. Success prints a summary and next steps. Failure prints diagnostic information.
 
     init_cli->>+validate_setup: targetDir: string
     validate_setup-->>-init_cli: SetupResult
