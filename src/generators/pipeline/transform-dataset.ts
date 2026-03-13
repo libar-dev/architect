@@ -45,12 +45,10 @@ import type {
   RelationshipEntry,
   ImplementationRef,
   ArchIndex,
-  SequenceIndexEntry,
 } from '../../validation-schemas/master-dataset.js';
 
 import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import { normalizeStatus, ACCEPTED_STATUS_VALUES } from '../../taxonomy/index.js';
-import { buildSequenceIndexEntryWithValidation } from './sequence-utils.js';
 
 // =============================================================================
 // Validation Summary Types
@@ -374,9 +372,6 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
 
   const relationshipIndex: Record<string, RelationshipEntry> = {};
 
-  // Sequence index for design review diagram generation
-  const sequenceIndex: Record<string, SequenceIndexEntry> = {};
-
   // Architecture index for diagram generation
   const archIndex: ArchIndex = {
     byRole: {},
@@ -495,38 +490,6 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
           const viewPatterns = (archIndex.byView[view] ??= []);
           viewPatterns.push(p);
         }
-      }
-    }
-
-    // ─── Sequence index (for design review diagram generation) ────────────
-    if (pattern.sequenceOrchestrator) {
-      if (pattern.rules && pattern.rules.length > 0) {
-        const result = buildSequenceIndexEntryWithValidation(
-          pattern.sequenceOrchestrator,
-          pattern.rules
-        );
-        if (result.entry !== undefined) {
-          sequenceIndex[patternKey] = result.entry;
-        } else if (result.issues.length > 0) {
-          malformedPatterns.push({
-            patternId: patternKey,
-            issues: [...result.issues],
-          });
-        } else {
-          malformedPatterns.push({
-            patternId: patternKey,
-            issues: [
-              'Has @libar-docs-sequence-orchestrator but no rules with @libar-docs-sequence-step tags',
-            ],
-          });
-        }
-      } else {
-        malformedPatterns.push({
-          patternId: patternKey,
-          issues: [
-            'Has @libar-docs-sequence-orchestrator but no Rule: blocks to extract sequence steps from',
-          ],
-        });
       }
     }
   }
@@ -716,8 +679,6 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
     relationshipIndex,
     // Only include archIndex if it has content
     ...(archIndex.all.length > 0 && { archIndex }),
-    // Only include sequenceIndex if it has content
-    ...(Object.keys(sequenceIndex).length > 0 && { sequenceIndex }),
   };
 
   // Only include workflow if defined (exactOptionalPropertyTypes compliance)

@@ -9,29 +9,30 @@
 - Stubs merged at resolution time: Stub directory globs are appended to typescript sources, making stubs transparent to the downstream pipeline
 - Source override composition: SourceMerger applies per-generator overrides (`replaceFeatures`, `additionalFeatures`, `additionalInput`) to base sources. Exclude is always inherited from base
 
+
 **Components:** Config (WorkflowLoader, ConfigurationTypes, ConfigResolver, RegexBuilders, ProjectConfigTypes, ProjectConfigSchema, ConfigurationPresets, SourceMerger, DeliveryProcessFactory, DefineConfig, ConfigurationDefaults, ConfigLoader)
 
 #### API Types
 
-| Type                         | Kind      |
-| ---------------------------- | --------- |
-| DeliveryProcessConfig        | interface |
-| DeliveryProcessInstance      | interface |
-| RegexBuilders                | interface |
+| Type | Kind |
+| --- | --- |
+| DeliveryProcessConfig | interface |
+| DeliveryProcessInstance | interface |
+| RegexBuilders | interface |
 | DeliveryProcessProjectConfig | interface |
-| SourcesConfig                | interface |
-| OutputConfig                 | interface |
-| GeneratorSourceOverride      | interface |
-| ResolvedProjectConfig        | interface |
-| ResolvedSourcesConfig        | interface |
+| SourcesConfig | interface |
+| OutputConfig | interface |
+| GeneratorSourceOverride | interface |
+| ResolvedProjectConfig | interface |
+| ResolvedSourcesConfig | interface |
 | CreateDeliveryProcessOptions | interface |
-| ConfigDiscoveryResult        | interface |
-| ConfigLoadError              | interface |
-| ResolvedConfig               | type      |
-| PresetName                   | type      |
-| ConfigLoadResult             | type      |
-| createRegexBuilders          | function  |
-| createDeliveryProcess        | function  |
-| findConfigFile               | function  |
-| loadConfig                   | function  |
-| formatConfigError            | function  |
+| ConfigDiscoveryResult | interface |
+| ConfigLoadError | interface |
+| ResolvedConfig | type |
+| PresetName | type |
+| ConfigLoadResult | type |
+| createRegexBuilders | function |
+| createDeliveryProcess | function |
+| findConfigFile | function |
+| loadConfig | function |
+| formatConfigError | function |

@@ -10,7 +10,7 @@
 | ----------------- | ----------------------------------------------------- |
 | **Package**       | @libar-dev/delivery-process                           |
 | **Purpose**       | Code-first documentation and delivery process toolkit |
-| **Patterns**      | 364 tracked (256 completed, 53 active, 55 planned)    |
+| **Patterns**      | 355 tracked (249 completed, 47 active, 59 planned)    |
 | **Product Areas** | 7                                                     |
 | **License**       | MIT                                                   |
 
@@ -147,41 +147,41 @@
 | Area          | Patterns | Completed | Active | Planned | Progress                   |
 | ------------- | -------- | --------- | ------ | ------- | -------------------------- |
 | Annotation    | 26       | 23        | 2      | 1       | [███████░] 23/26 88%       |
-| Configuration | 11       | 8         | 0      | 3       | [██████░░] 8/11 73%        |
-| CoreTypes     | 7        | 7         | 0      | 0       | [████████] 7/7 100%        |
-| DataAPI       | 36       | 23        | 9      | 4       | [█████░░░] 23/36 64%       |
-| Generation    | 94       | 81        | 5      | 8       | [███████░] 81/94 86%       |
+| Configuration | 9        | 8         | 0      | 1       | [███████░] 8/9 89%         |
+| CoreTypes     | 7        | 6         | 0      | 1       | [███████░] 6/7 86%         |
+| DataAPI       | 35       | 22        | 9      | 4       | [█████░░░] 22/35 63%       |
+| Generation    | 91       | 77        | 2      | 12      | [███████░] 77/91 85%       |
 | Process       | 11       | 4         | 0      | 7       | [███░░░░░] 4/11 36%        |
-| Validation    | 22       | 16        | 0      | 6       | [██████░░] 16/22 73%       |
-| **Total**     | **207**  | **162**   | **16** | **29**  | **[██████░░] 162/207 78%** |
+| Validation    | 22       | 15        | 0      | 7       | [█████░░░] 15/22 68%       |
+| **Total**     | **201**  | **155**   | **13** | **33**  | **[██████░░] 155/201 77%** |
 
 ---
 
 ## Phase Progress
 
-**364** patterns total: **256** completed (70%), **53** active, **55** planned. [██████████████░░░░░░] 256/364
+**355** patterns total: **249** completed (70%), **47** active, **59** planned. [██████████████░░░░░░] 249/355
 
 | Status    | Count | Percentage |
 | --------- | ----- | ---------- |
-| Completed | 256   | 70%        |
-| Active    | 53    | 15%        |
-| Planned   | 55    | 15%        |
+| Completed | 249   | 70%        |
+| Active    | 47    | 13%        |
+| Planned   | 59    | 17%        |
 
 ### By Phase
 
 | Phase     | Patterns | Completed | Progress |
 | --------- | -------- | --------- | -------- |
 | Phase 18  | 1        | 0         | 0%       |
-| Phase 23  | 2        | 2         | 100%     |
+| Phase 23  | 2        | 0         | 0%       |
 | Phase 24  | 2        | 2         | 100%     |
-| Phase 25  | 10       | 7         | 70%      |
+| Phase 25  | 10       | 6         | 60%      |
 | Phase 26  | 2        | 2         | 100%     |
 | Phase 27  | 3        | 3         | 100%     |
 | Phase 28  | 2        | 2         | 100%     |
 | Phase 30  | 1        | 1         | 100%     |
 | Phase 31  | 1        | 1         | 100%     |
 | Phase 32  | 1        | 1         | 100%     |
-| Phase 35  | 5        | 5         | 100%     |
+| Phase 35  | 5        | 4         | 80%      |
 | Phase 36  | 1        | 1         | 100%     |
 | Phase 37  | 1        | 1         | 100%     |
 | Phase 38  | 1        | 1         | 100%     |
@@ -190,13 +190,11 @@
 | Phase 41  | 1        | 1         | 100%     |
 | Phase 42  | 1        | 1         | 100%     |
 | Phase 43  | 1        | 1         | 100%     |
-| Phase 44  | 2        | 2         | 100%     |
-| Phase 45  | 1        | 0         | 0%       |
-| Phase 46  | 2        | 0         | 0%       |
+| Phase 44  | 2        | 0         | 0%       |
 | Phase 50  | 1        | 1         | 100%     |
-| Phase 51  | 1        | 1         | 100%     |
+| Phase 51  | 1        | 0         | 0%       |
 | Phase 99  | 9        | 5         | 56%      |
-| Phase 100 | 16       | 4         | 25%      |
+| Phase 100 | 15       | 4         | 27%      |
 | Phase 101 | 2        | 1         | 50%      |
 | Phase 102 | 1        | 0         | 0%       |
 | Phase 103 | 1        | 0         | 0%       |

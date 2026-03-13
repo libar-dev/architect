@@ -6,9 +6,9 @@
 
 ## Overview
 
-| Property | Value        |
-| -------- | ------------ |
-| Status   | accepted     |
+| Property | Value |
+| --- | --- |
+| Status | accepted |
 | Category | architecture |
 
 **Context:**
@@ -30,23 +30,23 @@ include) from formatting (how it looks) from serialization (markdown syntax).
 
 **Consequences:**
 
-| Type     | Impact                                                                            |
-| -------- | --------------------------------------------------------------------------------- |
-| Positive | Codecs are pure functions: dataset in, document out -- trivially testable         |
+| Type | Impact |
+| --- | --- |
+| Positive | Codecs are pure functions: dataset in, document out -- trivially testable |
 | Positive | RenderableDocument is an inspectable IR -- tests assert on structure, not strings |
-| Positive | Composable via CompositeCodec -- reference docs assemble from child codecs        |
-| Positive | Same dataset can produce different outputs (full doc, compact doc, AI context)    |
-| Negative | Extra abstraction layer between data and output                                   |
-| Negative | RenderableDocument vocabulary must cover all needed output patterns               |
+| Positive | Composable via CompositeCodec -- reference docs assemble from child codecs |
+| Positive | Same dataset can produce different outputs (full doc, compact doc, AI context) |
+| Negative | Extra abstraction layer between data and output |
+| Negative | RenderableDocument vocabulary must cover all needed output patterns |
 
 **Benefits:**
 
-| Benefit                | Before (String Concat)        | After (Codec)                     |
-| ---------------------- | ----------------------------- | --------------------------------- |
-| Testability            | Assert on markdown strings    | Assert on typed section blocks    |
-| Composability          | Copy-paste between generators | CompositeCodec assembles children |
-| Format variants        | Duplicate generator logic     | Same codec, different renderer    |
-| Progressive disclosure | Manual heading management     | Heading depth auto-calculated     |
+| Benefit | Before (String Concat) | After (Codec) |
+| --- | --- | --- |
+| Testability | Assert on markdown strings | Assert on typed section blocks |
+| Composability | Copy-paste between generators | CompositeCodec assembles children |
+| Format variants | Duplicate generator logic | Same codec, different renderer |
+| Progressive disclosure | Manual heading management | Heading depth auto-calculated |
 
 ## Rules
 
@@ -60,8 +60,8 @@ include) from formatting (how it looks) from serialization (markdown syntax).
 
 ```typescript
 interface DocumentCodec {
-  decode(dataset: MasterDataset): RenderableDocument;
-}
+      decode(dataset: MasterDataset): RenderableDocument;
+    }
 ```
 
 **Verified by:**
@@ -75,15 +75,15 @@ interface DocumentCodec {
 
 **Rationale:** A typed IR decouples codecs from rendering. Codecs express intent ("this is a table with these rows") and the renderer handles syntax ("pipe-delimited markdown with separator row"). This means switching output format (e.g., HTML instead of markdown) requires only a new renderer, not changes to every codec.
 
-| Block Type | Purpose                       | Markdown Output             |
-| ---------- | ----------------------------- | --------------------------- |
-| heading    | Section title with depth      | ## Title (depth-adjusted)   |
-| paragraph  | Prose text                    | Plain text with blank lines |
-| table      | Structured data               | Pipe-delimited table        |
-| code       | Code sample with language     | Fenced code block           |
-| list       | Ordered or unordered items    | - item or 1. item           |
-| separator  | Visual break between sections | ---                         |
-| metaRow    | Key-value metadata            | **Key:** Value              |
+| Block Type | Purpose | Markdown Output |
+| --- | --- | --- |
+| heading | Section title with depth | ## Title (depth-adjusted) |
+| paragraph | Prose text | Plain text with blank lines |
+| table | Structured data | Pipe-delimited table |
+| code | Code sample with language | Fenced code block |
+| list | Ordered or unordered items | - item or 1. item |
+| separator | Visual break between sections | --- |
+| metaRow | Key-value metadata | **Key:** Value |
 
 **Section block types:**
 
@@ -102,14 +102,14 @@ interface DocumentCodec {
 
 ```typescript
 const referenceDoc = CompositeCodec.create({
-  title: 'Architecture Reference',
-  codecs: [
-    behaviorCodec, // patterns with rules
-    conventionCodec, // decision records
-    shapeCodec, // type definitions
-    diagramCodec, // mermaid diagrams
-  ],
-});
+      title: 'Architecture Reference',
+      codecs: [
+        behaviorCodec,    // patterns with rules
+        conventionCodec,  // decision records
+        shapeCodec,       // type definitions
+        diagramCodec,     // mermaid diagrams
+      ],
+    });
 ```
 
 **Verified by:**
@@ -123,9 +123,9 @@ const referenceDoc = CompositeCodec.create({
 
 **Rationale:** Early ADRs used name prefixes like "Context - ..." and "Decision - ..." on Rule blocks to structure content. Later ADRs placed Context, Decision, and Consequences as bold-annotated prose in the Feature description, reserving Rule: blocks for invariants and design rules. Both conventions are valid. The ADR codec must handle both because the codebase contains ADRs authored in each style. The Feature description lives in pattern.directive.description. If the codec only renders Rules (via partitionRulesByPrefix), then Feature description content is silently dropped -- no error, no warning. This caused confusion across two repos where ADR content appeared in the feature file but was missing from generated docs. The fix renders pattern.directive.description in buildSingleAdrDocument between the Overview metadata table and the partitioned Rules section, using renderFeatureDescription() which walks content linearly and handles prose, tables, and DocStrings with correct interleaving.
 
-| Source              | Location                            | Example                   | Rendered Via               |
-| ------------------- | ----------------------------------- | ------------------------- | -------------------------- |
-| Rule prefix         | Rule: Context - ...                 | ADR-001 (taxonomy)        | partitionRulesByPrefix()   |
+| Source | Location | Example | Rendered Via |
+| --- | --- | --- | --- |
+| Rule prefix | Rule: Context - ... | ADR-001 (taxonomy) | partitionRulesByPrefix() |
 | Feature description | **Context:** prose in Feature block | ADR-005 (codec rendering) | renderFeatureDescription() |
 
 **Verified by:**

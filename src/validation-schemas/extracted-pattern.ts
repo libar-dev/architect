@@ -52,10 +52,6 @@ export const BusinessRuleSchema = z.object({
   scenarioCount: z.number().int().nonnegative(),
   /** Scenario names under this rule */
   scenarioNames: z.array(z.string()).readonly(),
-  /** Tags applied to this rule (from @libar-docs-* tags on Rule: keyword) */
-  tags: z.array(z.string()).readonly().optional(),
-  /** Scenario names tagged with @libar-docs-sequence-error (for design review diagrams) */
-  errorScenarioNames: z.array(z.string()).readonly().optional(),
 });
 
 /**
@@ -523,11 +519,6 @@ export const ExtractedPatternSchema = z
 
     /** Variation filtering tags for modular-claude-md (from @libar-docs-claude-tags CSV tag) */
     claudeTags: z.array(z.string()).readonly().optional(),
-
-    // Sequence diagram annotation fields (from @libar-docs-sequence-* tags)
-
-    /** Sequence diagram orchestrator module identifier (from @libar-docs-sequence-orchestrator tag) */
-    sequenceOrchestrator: z.string().optional(),
   })
   .strict();
 

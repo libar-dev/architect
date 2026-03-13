@@ -6,9 +6,9 @@
 
 ## Overview
 
-| Property | Value        |
-| -------- | ------------ |
-| Status   | proposed     |
+| Property | Value |
+| --- | --- |
+| Status | proposed |
 | Category | architecture |
 
 **Context:**
@@ -38,14 +38,14 @@ consume the same pre-computed read model.
 
 **Consequences:**
 
-| Type     | Impact                                                                                         |
-| -------- | ---------------------------------------------------------------------------------------------- |
-| Positive | Relationship resolution happens once — no consumer re-derives implements, uses, or dependsOn   |
-| Positive | Eliminates lossy local types that discard fields from canonical ExtractedPattern               |
-| Positive | Validation rules automatically benefit from new MasterDataset views and indices                |
+| Type | Impact |
+| --- | --- |
+| Positive | Relationship resolution happens once — no consumer re-derives implements, uses, or dependsOn |
+| Positive | Eliminates lossy local types that discard fields from canonical ExtractedPattern |
+| Positive | Validation rules automatically benefit from new MasterDataset views and indices |
 | Positive | Aligns with the monorepo's own ADR-006: projections for all reads, never query aggregate state |
-| Negative | Validators that today only need stage 1-2 data will import the transformer                     |
-| Negative | MasterDataset schema changes affect more consumers                                             |
+| Negative | Validators that today only need stage 1-2 data will import the transformer |
+| Negative | MasterDataset schema changes affect more consumers |
 
 ## Rules
 
@@ -55,20 +55,20 @@ consume the same pre-computed read model.
 
 **Rationale:** Bypassing the read model forces consumers to re-derive data that the MasterDataset already computes, creating duplicate logic and divergent behavior when the pipeline evolves.
 
-| Layer                  | May Import                       | Examples                                            |
-| ---------------------- | -------------------------------- | --------------------------------------------------- |
-| Pipeline Orchestration | scanner/, extractor/, pipeline/  | orchestrator.ts, process-api.ts pipeline setup      |
-| Feature Consumption    | MasterDataset, relationshipIndex | codecs, ProcessStateAPI, validators, query handlers |
+| Layer | May Import | Examples |
+| --- | --- | --- |
+| Pipeline Orchestration | scanner/, extractor/, pipeline/ | orchestrator.ts, process-api.ts pipeline setup |
+| Feature Consumption | MasterDataset, relationshipIndex | codecs, ProcessStateAPI, validators, query handlers |
 
 **Verified by:**
 
 - Feature consumers import from MasterDataset not from raw pipeline stages
 
-  Exception: `lint-patterns.ts` is a pure stage-1 consumer. It validates
-  annotation syntax on scanned files. No relationships
 
+    Exception: `lint-patterns.ts` is a pure stage-1 consumer. It validates
+    annotation syntax on scanned files. No relationships
 - no cross-source
-  resolution. Direct scanner consumption is correct for that use case.
+    resolution. Direct scanner consumption is correct for that use case.
 
 ### No lossy local types
 
@@ -96,10 +96,10 @@ consume the same pre-computed read model.
 
 **Rationale:** Without named anti-patterns, violations appear as one-off style issues rather than systematic architectural drift, making them harder to detect and communicate in code review.
 
-| Anti-Pattern            | Detection Signal                                                                         |
-| ----------------------- | ---------------------------------------------------------------------------------------- |
-| Parallel Pipeline       | Feature consumer imports from scanner/ or extractor/                                     |
-| Lossy Local Type        | Local interface with subset of ExtractedPattern fields + dedicated extraction function   |
+| Anti-Pattern | Detection Signal |
+| --- | --- |
+| Parallel Pipeline | Feature consumer imports from scanner/ or extractor/ |
+| Lossy Local Type | Local interface with subset of ExtractedPattern fields + dedicated extraction function |
 | Re-derived Relationship | Building Map or Set from pattern.implementsPatterns, uses, or dependsOn in consumer code |
 
 **Good vs Bad**
@@ -128,8 +128,9 @@ consume the same pre-computed read model.
 
 - Feature consumers import from MasterDataset not from raw pipeline stages
 
-  Naming them makes them visible in code review — including AI-assisted
-  sessions where the default proposal is often "add a helper function."
+
+    Naming them makes them visible in code review — including AI-assisted
+    sessions where the default proposal is often "add a helper function."
 
 ---
 

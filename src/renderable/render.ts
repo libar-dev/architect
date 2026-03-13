@@ -354,25 +354,20 @@ function renderCollapsibleClaudeMdModule(block: CollapsibleBlock): string[] {
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Render a table block to markdown with column-width padding.
- * Produces prettier-compatible aligned tables.
+ * Render a table block to markdown.
  */
 function renderTable(block: TableBlock): string[] {
   if (block.columns.length === 0) {
     return [];
   }
 
-  // Escape all cells first
-  const escapedColumns = block.columns.map(escapeTableCell);
-  const escapedRows = block.rows.map((row) => {
-    const paddedRow = [...row];
-    while (paddedRow.length < block.columns.length) {
-      paddedRow.push('');
-    }
-    return paddedRow.map(escapeTableCell);
-  });
+  const lines: string[] = [];
 
-  // Build separators
+  // Header row - escape pipes and newlines in column names
+  const escapedColumns = block.columns.map(escapeTableCell);
+  lines.push(`| ${escapedColumns.join(' | ')} |`);
+
+  // Separator row with alignment
   const separators = block.columns.map((_, i) => {
     const align = block.alignment?.[i] ?? 'left';
     switch (align) {
@@ -384,45 +379,18 @@ function renderTable(block: TableBlock): string[] {
         return '---';
     }
   });
-
-  // Compute max width per column (header, separator, and all data rows)
-  const colWidths = block.columns.map((_, i) => {
-    const headerWidth = escapedColumns[i]?.length ?? 0;
-    const sepWidth = separators[i]?.length ?? 3;
-    const dataWidth = Math.max(0, ...escapedRows.map((row) => row[i]?.length ?? 0));
-    return Math.max(headerWidth, sepWidth, dataWidth);
-  });
-
-  // Pad and join
-  const padCell = (cell: string, width: number): string => cell.padEnd(width);
-  const padSep = (sep: string, width: number, colIndex: number): string => {
-    const align = block.alignment?.[colIndex] ?? 'left';
-    const fill = width - sep.length;
-    if (fill <= 0) return sep;
-    switch (align) {
-      case 'center':
-        return `:${'-'.repeat(width - 2)}:`;
-      case 'right':
-        return `${'-'.repeat(width - 1)}:`;
-      default:
-        return sep + '-'.repeat(fill);
-    }
-  };
-
-  const lines: string[] = [];
-
-  // Header row
-  const headerCells = escapedColumns.map((col, i) => padCell(col, colWidths[i] ?? 0));
-  lines.push(`| ${headerCells.join(' | ')} |`);
-
-  // Separator row
-  const sepCells = separators.map((sep, i) => padSep(sep, colWidths[i] ?? 0, i));
-  lines.push(`| ${sepCells.join(' | ')} |`);
+  lines.push(`| ${separators.join(' | ')} |`);
 
   // Data rows
-  for (const row of escapedRows) {
-    const dataCells = row.map((cell, i) => padCell(cell, colWidths[i] ?? 0));
-    lines.push(`| ${dataCells.join(' | ')} |`);
+  for (const row of block.rows) {
+    // Pad row to match columns if needed
+    const paddedRow = [...row];
+    while (paddedRow.length < block.columns.length) {
+      paddedRow.push('');
+    }
+    // Escape pipe characters and newlines in cell content
+    const escapedRow = paddedRow.map(escapeTableCell);
+    lines.push(`| ${escapedRow.join(' | ')} |`);
   }
 
   lines.push('');

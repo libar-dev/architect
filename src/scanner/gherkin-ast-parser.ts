@@ -570,10 +570,6 @@ export function extractPatternTags(tags: readonly string[]): {
   readonly claudeModule?: string;
   readonly claudeSection?: string;
   readonly claudeTags?: readonly string[];
-  readonly sequenceOrchestrator?: string;
-  readonly sequenceStep?: number;
-  readonly sequenceModule?: readonly string[];
-  readonly sequenceError?: boolean;
   // Index signature enables registry-driven extensibility: new tags in
   // buildRegistry() work without updating this return type.
   readonly [key: string]: unknown;

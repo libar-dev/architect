@@ -339,9 +339,6 @@ export default defineConfig({
     index: {
       outputDirectory: 'docs-live',
     },
-    'design-review': {
-      outputDirectory: 'delivery-process',
-    },
   },
   codecOptions: {
     index: {

@@ -251,13 +251,7 @@ classDiagram
     class TransformDataset {
         <<service>>
     }
-    class SequenceTransformUtils {
-        <<service>>
-    }
     class ProcessApiReferenceGenerator {
-    }
-    class DesignReviewGenerator {
-        <<service>>
     }
     class DecisionDocGenerator {
         <<service>>
@@ -268,11 +262,9 @@ classDiagram
     class Pattern_Scanner
     class GherkinASTParser
     class ShapeExtractor
-    class DesignReviewCodec
     class DecisionDocCodec
     class ProcessApiHybridGeneration
     class PatternRelationshipModel
-    class DesignReviewGeneration
     class CliRecipeCodec
     SourceMapper ..> DecisionDocCodec : depends on
     SourceMapper ..> ShapeExtractor : depends on
@@ -280,17 +272,10 @@ classDiagram
     Documentation_Generation_Orchestrator ..> Pattern_Scanner : uses
     TransformDataset ..> MasterDataset : uses
     TransformDataset ..|> PatternRelationshipModel : implements
-    SequenceTransformUtils ..> MasterDataset : uses
-    SequenceTransformUtils ..|> DesignReviewGeneration : implements
     ProcessApiReferenceGenerator ..|> ProcessApiHybridGeneration : implements
-    DesignReviewGenerator ..> DesignReviewCodec : uses
-    DesignReviewGenerator ..> MasterDataset : uses
-    DesignReviewGenerator ..|> DesignReviewGeneration : implements
     DecisionDocGenerator ..> DecisionDocCodec : depends on
     DecisionDocGenerator ..> SourceMapper : depends on
     CliRecipeGenerator ..|> CliRecipeCodec : implements
-    DesignReviewCodec ..> MasterDataset : uses
-    DesignReviewCodec ..|> DesignReviewGeneration : implements
     CliRecipeCodec ..> ProcessApiHybridGeneration : depends on
 ```
 
@@ -399,10 +384,10 @@ graph LR
     end
     TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
     loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
+    CLISchema ..->|implements| ProcessApiHybridGeneration
     ProjectConfigTypes -->|uses| ConfigurationTypes
     ProjectConfigTypes -->|uses| ConfigurationPresets
     ConfigurationPresets -->|uses| ConfigurationTypes
-    CLISchema ..->|implements| ProcessApiHybridGeneration
     PatternHelpers ..->|implements| DataAPIOutputShaping
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset
@@ -561,6 +546,122 @@ Validation happens later at load time via Zod schema in `loadProjectConfig()`.
 ### When to Use
 
 - In `delivery-process.config.ts` at project root to get type-safe configuration with autocompletion.
+
+### ConfigBasedWorkflowDefinition
+
+[View ConfigBasedWorkflowDefinition source](delivery-process/specs/config-based-workflow-definition.feature)
+
+**Problem:**
+Every `pnpm process:query` and `pnpm docs:*` invocation prints:
+`Failed to load default workflow (6-phase-standard): Workflow file not found`
+
+The `loadDefaultWorkflow()` function resolves to `catalogue/workflows/`
+which does not exist. The directory was deleted during monorepo extraction.
+The system already degrades gracefully (workflow = undefined), but the
+warning is noise for both human CLI use and future hook consumers (HUD).
+
+The old `6-phase-standard.json` conflated three concerns:
+
+- Taxonomy vocabulary (status names) — already in `src/taxonomy/`
+- FSM behavior (transitions) — already in `src/validation/fsm/`
+- Workflow structure (phases) — orphaned, no proper home
+
+**Solution:**
+Inline the default workflow as a constant in `workflow-loader.ts`, built
+from canonical taxonomy values. Make `loadDefaultWorkflow()` synchronous.
+Preserve `loadWorkflowFromPath()` for custom `--workflow <file>` overrides.
+
+The workflow definition uses only the 4 canonical statuses from ADR-001
+(roadmap, active, completed, deferred) — not the stale 5-status set from
+the deleted JSON (which included non-canonical `implemented` and `partial`).
+
+Phase definitions (Inception, Elaboration, Session, Construction,
+Validation, Retrospective) move from a missing JSON file to an inline
+constant, making the default workflow always available without file I/O.
+
+Design Decisions (DS-1, 2026-02-15):
+
+| ID | Decision | Rationale |
+| DD-1 | Inline constant in workflow-loader.ts, not preset integration | Minimal correct fix, zero type regression risk. Preset integration deferred. |
+| DD-2 | Constant satisfies existing WorkflowConfig type | Reuse createLoadedWorkflow() from workflow-config.ts. No new types needed. |
+| DD-3 | Remove dead code: getCatalogueWorkflowsPath, loadWorkflowConfig, DEFAULT_WORKFLOW_NAME | Dead since monorepo extraction. Public API break is safe (function always threw). |
+| DD-4 | loadDefaultWorkflow() returns LoadedWorkflow synchronously | Infallible constant needs no async or error handling. |
+| DD-5 | Amend ADR-001 with canonical phase definitions | Phase names are canonical values; fits existing governance in ADR-001. |
+
+<details>
+<summary>Default workflow is built from an inline constant (2 scenarios)</summary>
+
+#### Default workflow is built from an inline constant
+
+**Invariant:** `loadDefaultWorkflow()` returns a `LoadedWorkflow` without file system access. It cannot fail. The default workflow constant uses only canonical status values from `src/taxonomy/status-values.ts`.
+
+**Rationale:** The file-based loading path (`catalogue/workflows/`) has been dead code since monorepo extraction. Both callers (orchestrator, process-api) already handle the failure gracefully, proving the system works without it. Making the function synchronous and infallible removes the try-catch ceremony and the warning noise.
+
+**Verified by:**
+
+- Default workflow loads without warning
+- Workflow constant uses canonical statuses only
+- Workflow constant uses canonical statuses only
+
+  Implementation approach:
+
+</details>
+
+<details>
+<summary>Custom workflow files still work via --workflow flag (1 scenarios)</summary>
+
+#### Custom workflow files still work via --workflow flag
+
+**Invariant:** `loadWorkflowFromPath()` remains available for projects that need custom workflow definitions. The `--workflow <file>` CLI flag and `workflowPath` config field continue to work.
+
+**Rationale:** The inline default replaces file-based _default_ loading, not file-based _custom_ loading. Projects may define custom phases or additional statuses via JSON files.
+
+**Verified by:**
+
+- Custom workflow file overrides default
+
+</details>
+
+<details>
+<summary>FSM validation and Process Guard are not affected</summary>
+
+#### FSM validation and Process Guard are not affected
+
+**Invariant:** The FSM transition matrix, protection levels, and Process Guard rules remain hardcoded in `src/validation/fsm/` and `src/lint/process-guard/`. They do not read from `LoadedWorkflow`.
+
+**Rationale:** FSM and workflow are separate concerns. FSM enforces status transitions (4-state model from PDR-005). Workflow defines phase structure (6-phase USDP). The workflow JSON declared `transitionsTo` on its statuses, but no code ever read those values — the FSM uses its own `VALID_TRANSITIONS` constant. This separation is correct and intentional. Blast radius analysis confirmed zero workflow imports in: - src/validation/fsm/ (4 files) - src/lint/process-guard/ (5 files) - src/taxonomy/ (all files)
+
+</details>
+
+<details>
+<summary>Workflow as a configurable preset field is deferred</summary>
+
+#### Workflow as a configurable preset field is deferred
+
+**Invariant:** The inline default workflow constant is the only workflow source until preset integration is implemented. No preset or project config field exposes workflow customization.
+
+**Rationale:** Coupling workflow into the preset/config system before the inline fix ships would widen the blast radius and risk type regressions across all config consumers.
+
+**Verified by:**
+
+- N/A - deferred until preset integration
+
+  Adding `workflow` as a field on `DeliveryProcessConfig` (presets) and
+  `DeliveryProcessProjectConfig` (project config) is a natural next step
+  but NOT required for the MVP fix.
+
+  The inline constant in `workflow-loader.ts` resolves the warning. Moving
+  workflow into the preset/config system enables:
+  - Different presets with different default phases (e.g.
+
+- 3-phase generic)
+  - Per-project phase customization in delivery-process.config.ts
+  - Phase definitions appearing in generated documentation
+
+  See ideation artifact for design options:
+  delivery-process/ideations/2026-02-15-workflow-config-and-fsm-extensibility.feature
+
+</details>
 
 ### ADR005CodecBasedMarkdownRendering
 
@@ -864,122 +965,6 @@ These are the durable constants of the delivery process.
 
 </details>
 
-### ConfigBasedWorkflowDefinition
-
-[View ConfigBasedWorkflowDefinition source](delivery-process/specs/config-based-workflow-definition.feature)
-
-**Problem:**
-Every `pnpm process:query` and `pnpm docs:*` invocation prints:
-`Failed to load default workflow (6-phase-standard): Workflow file not found`
-
-The `loadDefaultWorkflow()` function resolves to `catalogue/workflows/`
-which does not exist. The directory was deleted during monorepo extraction.
-The system already degrades gracefully (workflow = undefined), but the
-warning is noise for both human CLI use and future hook consumers (HUD).
-
-The old `6-phase-standard.json` conflated three concerns:
-
-- Taxonomy vocabulary (status names) — already in `src/taxonomy/`
-- FSM behavior (transitions) — already in `src/validation/fsm/`
-- Workflow structure (phases) — orphaned, no proper home
-
-**Solution:**
-Inline the default workflow as a constant in `workflow-loader.ts`, built
-from canonical taxonomy values. Make `loadDefaultWorkflow()` synchronous.
-Preserve `loadWorkflowFromPath()` for custom `--workflow <file>` overrides.
-
-The workflow definition uses only the 4 canonical statuses from ADR-001
-(roadmap, active, completed, deferred) — not the stale 5-status set from
-the deleted JSON (which included non-canonical `implemented` and `partial`).
-
-Phase definitions (Inception, Elaboration, Session, Construction,
-Validation, Retrospective) move from a missing JSON file to an inline
-constant, making the default workflow always available without file I/O.
-
-Design Decisions (DS-1, 2026-02-15):
-
-| ID | Decision | Rationale |
-| DD-1 | Inline constant in workflow-loader.ts, not preset integration | Minimal correct fix, zero type regression risk. Preset integration deferred. |
-| DD-2 | Constant satisfies existing WorkflowConfig type | Reuse createLoadedWorkflow() from workflow-config.ts. No new types needed. |
-| DD-3 | Remove dead code: getCatalogueWorkflowsPath, loadWorkflowConfig, DEFAULT_WORKFLOW_NAME | Dead since monorepo extraction. Public API break is safe (function always threw). |
-| DD-4 | loadDefaultWorkflow() returns LoadedWorkflow synchronously | Infallible constant needs no async or error handling. |
-| DD-5 | Amend ADR-001 with canonical phase definitions | Phase names are canonical values; fits existing governance in ADR-001. |
-
-<details>
-<summary>Default workflow is built from an inline constant (2 scenarios)</summary>
-
-#### Default workflow is built from an inline constant
-
-**Invariant:** `loadDefaultWorkflow()` returns a `LoadedWorkflow` without file system access. It cannot fail. The default workflow constant uses only canonical status values from `src/taxonomy/status-values.ts`.
-
-**Rationale:** The file-based loading path (`catalogue/workflows/`) has been dead code since monorepo extraction. Both callers (orchestrator, process-api) already handle the failure gracefully, proving the system works without it. Making the function synchronous and infallible removes the try-catch ceremony and the warning noise.
-
-**Verified by:**
-
-- Default workflow loads without warning
-- Workflow constant uses canonical statuses only
-- Workflow constant uses canonical statuses only
-
-  Implementation approach:
-
-</details>
-
-<details>
-<summary>Custom workflow files still work via --workflow flag (1 scenarios)</summary>
-
-#### Custom workflow files still work via --workflow flag
-
-**Invariant:** `loadWorkflowFromPath()` remains available for projects that need custom workflow definitions. The `--workflow <file>` CLI flag and `workflowPath` config field continue to work.
-
-**Rationale:** The inline default replaces file-based _default_ loading, not file-based _custom_ loading. Projects may define custom phases or additional statuses via JSON files.
-
-**Verified by:**
-
-- Custom workflow file overrides default
-
-</details>
-
-<details>
-<summary>FSM validation and Process Guard are not affected</summary>
-
-#### FSM validation and Process Guard are not affected
-
-**Invariant:** The FSM transition matrix, protection levels, and Process Guard rules remain hardcoded in `src/validation/fsm/` and `src/lint/process-guard/`. They do not read from `LoadedWorkflow`.
-
-**Rationale:** FSM and workflow are separate concerns. FSM enforces status transitions (4-state model from PDR-005). Workflow defines phase structure (6-phase USDP). The workflow JSON declared `transitionsTo` on its statuses, but no code ever read those values — the FSM uses its own `VALID_TRANSITIONS` constant. This separation is correct and intentional. Blast radius analysis confirmed zero workflow imports in: - src/validation/fsm/ (4 files) - src/lint/process-guard/ (5 files) - src/taxonomy/ (all files)
-
-</details>
-
-<details>
-<summary>Workflow as a configurable preset field is deferred</summary>
-
-#### Workflow as a configurable preset field is deferred
-
-**Invariant:** The inline default workflow constant is the only workflow source until preset integration is implemented. No preset or project config field exposes workflow customization.
-
-**Rationale:** Coupling workflow into the preset/config system before the inline fix ships would widen the blast radius and risk type regressions across all config consumers.
-
-**Verified by:**
-
-- N/A - deferred until preset integration
-
-  Adding `workflow` as a field on `DeliveryProcessConfig` (presets) and
-  `DeliveryProcessProjectConfig` (project config) is a natural next step
-  but NOT required for the MVP fix.
-
-  The inline constant in `workflow-loader.ts` resolves the warning. Moving
-  workflow into the preset/config system enables:
-  - Different presets with different default phases (e.g.
-
-- 3-phase generic)
-  - Per-project phase customization in delivery-process.config.ts
-  - Phase definitions appearing in generated documentation
-
-  See ideation artifact for design options:
-  delivery-process/ideations/2026-02-15-workflow-config-and-fsm-extensibility.feature
-
-</details>
-
 ### ProcessGuardTesting
 
 [View ProcessGuardTesting source](tests/features/validation/process-guard.feature)
@@ -1021,7 +1006,7 @@ All validation follows the Decider pattern: (state, changes, options) => result.
 </details>
 
 <details>
-<summary>Status transitions must follow PDR-005 FSM (3 scenarios)</summary>
+<summary>Status transitions must follow PDR-005 FSM (2 scenarios)</summary>
 
 #### Status transitions must follow PDR-005 FSM
 
@@ -1033,7 +1018,6 @@ All validation follows the Decider pattern: (state, changes, options) => result.
 
 - Valid transitions pass validation
 - Invalid transitions fail validation
-- Existing file with unlock-reason bypasses FSM check
 
 </details>
 

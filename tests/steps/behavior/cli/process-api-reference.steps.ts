@@ -4,7 +4,7 @@
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
-import { CLI_SCHEMA, type CLIOptionGroup, type CLISchema } from '../../../../src/cli/cli-schema.js';
+import { CLI_SCHEMA } from '../../../../src/cli/cli-schema.js';
 import { createProcessApiReferenceGenerator } from '../../../../src/generators/built-in/process-api-reference-generator.js';
 import type { GeneratorContext } from '../../../../src/generators/types.js';
 
@@ -102,11 +102,10 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         'the output contains a table with columns {string}, {string}, {string}, {string}',
         (_ctx: unknown, c1: string, c2: string, c3: string, c4: string) => {
           const content = getContent();
-          // Check column names exist in header (padding-tolerant — no trailing ` |`)
-          expect(content).toContain(`| ${c1}`);
-          expect(content).toContain(`| ${c2}`);
-          expect(content).toContain(`| ${c3}`);
-          expect(content).toContain(`| ${c4}`);
+          expect(content).toContain(`| ${c1} |`);
+          expect(content).toContain(`| ${c2} |`);
+          expect(content).toContain(`| ${c3} |`);
+          expect(content).toContain(`| ${c4} |`);
         }
       );
 
@@ -140,8 +139,8 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         'the output contains a table with columns {string}, {string}',
         (_ctx: unknown, c1: string, c2: string) => {
           const content = getContent();
-          expect(content).toContain(`| ${c1}`);
-          expect(content).toContain(`| ${c2}`);
+          expect(content).toContain(`| ${c1} |`);
+          expect(content).toContain(`| ${c2} |`);
         }
       );
 
@@ -178,8 +177,8 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         'the output contains a table with columns {string}, {string}',
         (_ctx: unknown, c1: string, c2: string) => {
           const content = getContent();
-          expect(content).toContain(`| ${c1}`);
-          expect(content).toContain(`| ${c2}`);
+          expect(content).toContain(`| ${c1} |`);
+          expect(content).toContain(`| ${c2} |`);
         }
       );
 
@@ -301,9 +300,8 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         'all schema groups contain at least one option:',
         (_ctx: unknown, table: Array<{ group: string }>) => {
           for (const row of table) {
-            const group = row.group as keyof CLISchema;
-            const section = CLI_SCHEMA[group] as CLIOptionGroup;
-            expect(section.options.length).toBeGreaterThan(0);
+            const group = row.group as keyof typeof CLI_SCHEMA;
+            expect(CLI_SCHEMA[group].options.length).toBeGreaterThan(0);
           }
         }
       );

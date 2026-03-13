@@ -6,7 +6,7 @@
 
 ## Metadata Tag Definitions
 
-60 metadata tags with full details.
+56 metadata tags with full details.
 
 | Tag                      | Format       | Purpose                                                                    | Required | Repeatable | Values                                                                                                                                                                                                                               | Default  |
 | ------------------------ | ------------ | -------------------------------------------------------------------------- | -------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
@@ -66,10 +66,6 @@
 | `claude-module`          | value        | Module identifier for CLAUDE.md module generation (becomes filename)       | No       | No         | -                                                                                                                                                                                                                                    | -        |
 | `claude-section`         | enum         | Target section directory in \_claude-md/ for module output                 | No       | No         | core, delivery-process, testing, infrastructure, workflow                                                                                                                                                                            | -        |
 | `claude-tags`            | csv          | Variation filtering tags for modular-claude-md inclusion                   | No       | No         | -                                                                                                                                                                                                                                    | -        |
-| `sequence-orchestrator`  | value        | Identifies the coordinator module for sequence diagram generation          | No       | No         | -                                                                                                                                                                                                                                    | -        |
-| `sequence-step`          | number       | Explicit execution ordering number for sequence diagram steps              | No       | No         | -                                                                                                                                                                                                                                    | -        |
-| `sequence-module`        | csv          | Maps Rule to deliverable module(s) for sequence diagram participants       | No       | No         | -                                                                                                                                                                                                                                    | -        |
-| `sequence-error`         | flag         | Marks scenario as error/alternative path in sequence diagram               | No       | No         | -                                                                                                                                                                                                                                    | -        |
 
 ## Tag Details
 
@@ -647,46 +643,6 @@
 | Required   | No                                                         |
 | Repeatable | No                                                         |
 | Example    | `@libar-docs-claude-tags core-mandatory, delivery-process` |
-
-### `sequence-orchestrator`
-
-| Property   | Value                                                             |
-| ---------- | ----------------------------------------------------------------- |
-| Format     | value                                                             |
-| Purpose    | Identifies the coordinator module for sequence diagram generation |
-| Required   | No                                                                |
-| Repeatable | No                                                                |
-| Example    | `@libar-docs-sequence-orchestrator:init-cli`                      |
-
-### `sequence-step`
-
-| Property   | Value                                                         |
-| ---------- | ------------------------------------------------------------- |
-| Format     | number                                                        |
-| Purpose    | Explicit execution ordering number for sequence diagram steps |
-| Required   | No                                                            |
-| Repeatable | No                                                            |
-| Example    | `@libar-docs-sequence-step:1`                                 |
-
-### `sequence-module`
-
-| Property   | Value                                                                |
-| ---------- | -------------------------------------------------------------------- |
-| Format     | csv                                                                  |
-| Purpose    | Maps Rule to deliverable module(s) for sequence diagram participants |
-| Required   | No                                                                   |
-| Repeatable | No                                                                   |
-| Example    | `@libar-docs-sequence-module:detect-context`                         |
-
-### `sequence-error`
-
-| Property   | Value                                                        |
-| ---------- | ------------------------------------------------------------ |
-| Format     | flag                                                         |
-| Purpose    | Marks scenario as error/alternative path in sequence diagram |
-| Required   | No                                                           |
-| Repeatable | No                                                           |
-| Example    | `@libar-docs-sequence-error`                                 |
 
 ---
 

@@ -127,8 +127,6 @@
 | includeDocumentInventory | boolean         | true    | Unified document inventory                                       |
 | includePackageMetadata   | boolean         | true    | Package metadata header                                          |
 
-#### DesignReviewCodec
-
 #### CompositeCodec
 
 #### ClaudeModuleCodec

@@ -169,12 +169,6 @@ export const METADATA_TAGS_BY_GROUP = {
   stub: ['target', 'since'] as const,
   convention: ['convention'] as const,
   claude: ['claude-module', 'claude-section', 'claude-tags'] as const,
-  sequence: [
-    'sequence-orchestrator',
-    'sequence-step',
-    'sequence-module',
-    'sequence-error',
-  ] as const,
 } as const;
 
 // Transform helpers for data-driven Gherkin tag extraction
@@ -590,32 +584,6 @@ export function buildRegistry(): TagRegistry {
         format: 'csv',
         purpose: 'Variation filtering tags for modular-claude-md inclusion',
         example: '@libar-docs-claude-tags core-mandatory, delivery-process',
-      },
-
-      // ── Sequence diagram annotation tags (DesignReviewCodec) ──────────
-      {
-        tag: 'sequence-orchestrator',
-        format: 'value',
-        purpose: 'Identifies the coordinator module for sequence diagram generation',
-        example: '@libar-docs-sequence-orchestrator:init-cli',
-      },
-      {
-        tag: 'sequence-step',
-        format: 'number',
-        purpose: 'Explicit execution ordering number for sequence diagram steps',
-        example: '@libar-docs-sequence-step:1',
-      },
-      {
-        tag: 'sequence-module',
-        format: 'csv',
-        purpose: 'Maps Rule to deliverable module(s) for sequence diagram participants',
-        example: '@libar-docs-sequence-module:detect-context',
-      },
-      {
-        tag: 'sequence-error',
-        format: 'flag',
-        purpose: 'Marks scenario as error/alternative path in sequence diagram',
-        example: '@libar-docs-sequence-error',
       },
     ],
 

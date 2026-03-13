@@ -6,9 +6,9 @@
 
 ## Overview
 
-| Property | Value        |
-| -------- | ------------ |
-| Status   | accepted     |
+| Property | Value |
+| --- | --- |
+| Status | accepted |
 | Category | architecture |
 
 **Context:**
@@ -31,11 +31,10 @@ Seven design decisions (DD-1 through DD-7) captured as Rules below.
 
 - scope-validate outputs structured text
 
-  Both scope-validate and handoff return string from the router
-
+    Both scope-validate and handoff return string from the router
 - using
-  === SECTION === markers. Follows the dual output path where text
-  commands bypass JSON.stringify.
+    === SECTION === markers. Follows the dual output path where text
+    commands bypass JSON.stringify.
 
 ### DD-2 - Git integration is opt-in via --git flag
 
@@ -47,9 +46,9 @@ Seven design decisions (DD-1 through DD-7) captured as Rules below.
 
 - N/A — no-shell constraint verified by code review (no exec/spawn calls in domain logic)
 
-  The handoff command accepts an optional --git flag. The CLI handler
-  calls git diff and passes file list to the pure generator function.
-  No shell dependency in domain logic.
+    The handoff command accepts an optional --git flag. The CLI handler
+    calls git diff and passes file list to the pure generator function.
+    No shell dependency in domain logic.
 
 ### DD-3 - Session type inferred from FSM status
 
@@ -57,19 +56,19 @@ Seven design decisions (DD-1 through DD-7) captured as Rules below.
 
 **Rationale:** Ambiguous or missing inference forces users to always specify --session manually, defeating the ergonomic benefit of status-based defaults.
 
-| Status    | Inferred Session |
-| --------- | ---------------- |
-| roadmap   | design           |
-| active    | implement        |
-| completed | review           |
-| deferred  | design           |
+| Status | Inferred Session |
+| --- | --- |
+| roadmap | design |
+| active | implement |
+| completed | review |
+| deferred | design |
 
 **Verified by:**
 
 - N/A — full mapping table (4 statuses) verified by code review; active→implement example in "Active pattern infers implement session"
 
-  Handoff infers session type from pattern's current FSM status.
-  An explicit --session flag overrides inference.
+    Handoff infers session type from pattern's current FSM status.
+    An explicit --session flag overrides inference.
 
 ### DD-4 - Severity levels match Process Guard model
 
@@ -77,19 +76,20 @@ Seven design decisions (DD-1 through DD-7) captured as Rules below.
 
 **Rationale:** Divergent severity models cause confusion when the same violation appears in both systems with different severity classifications.
 
-| Severity | Meaning                   |
-| -------- | ------------------------- |
-| PASS     | Check passed              |
-| BLOCKED  | Hard prerequisite missing |
-| WARN     | Recommendation not met    |
+| Severity | Meaning |
+| --- | --- |
+| PASS | Check passed |
+| BLOCKED | Hard prerequisite missing |
+| WARN | Recommendation not met |
 
 **Verified by:**
 
 - N/A — three severity levels defined as type-system enum; verified by code review
 
-  Scope validation uses three severity levels:
+    Scope validation uses three severity levels:
 
-  The --strict flag promotes WARN to BLOCKED.
+
+    The --strict flag promotes WARN to BLOCKED.
 
 ### DD-5 - Current date only for handoff
 
@@ -101,7 +101,7 @@ Seven design decisions (DD-1 through DD-7) captured as Rules below.
 
 - N/A — no --date flag by design; verified by code review and CLI arg inventory
 
-  Handoff always uses the current date. No --date flag.
+    Handoff always uses the current date. No --date flag.
 
 ### DD-6 - Both positional and flag forms for scope type
 
@@ -113,8 +113,8 @@ Seven design decisions (DD-1 through DD-7) captured as Rules below.
 
 - N/A — dual-form acceptance verified by code review (both positional and --type flag parsed in CLI handler)
 
-  scope-validate accepts scope type as both positional argument
-  and --type flag.
+    scope-validate accepts scope type as both positional argument
+    and --type flag.
 
 ### DD-7 - Co-located formatter functions
 
@@ -126,11 +126,10 @@ Seven design decisions (DD-1 through DD-7) captured as Rules below.
 
 - N/A — co-location is a module structure decision; verified by code review of scope-validator.ts and handoff-generator.ts exports
 
-  Each module (scope-validator.ts
-
+    Each module (scope-validator.ts
 - handoff-generator.ts) exports
-  both the data builder and the text formatter. Simpler than the
-  context-assembler/context-formatter split.
+    both the data builder and the text formatter. Simpler than the
+    context-assembler/context-formatter split.
 
 ---
 

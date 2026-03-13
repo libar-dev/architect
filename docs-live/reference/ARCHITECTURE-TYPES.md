@@ -83,14 +83,7 @@ MasterDatasetSchema = z.object({
 
   /** Optional architecture index for diagram generation */
   archIndex: ArchIndexSchema.optional(),
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Sequence Data (optional)
-  // ─────────────────────────────────────────────────────────────────────────
-
-  /** Optional sequence index for design review diagram generation */
-  sequenceIndex: SequenceIndexSchema.optional(),
-});
+})
 ```
 
 ### StatusGroupsSchema (const)
@@ -117,7 +110,7 @@ StatusGroupsSchema = z.object({
 
   /** Patterns with status 'roadmap', 'planned', or undefined */
   planned: z.array(ExtractedPatternSchema),
-});
+})
 ```
 
 ### StatusCountsSchema (const)
@@ -142,7 +135,7 @@ StatusCountsSchema = z.object({
 
   /** Total number of patterns */
   total: z.number().int().nonnegative(),
-});
+})
 ```
 
 ### PhaseGroupSchema (const)
@@ -170,7 +163,7 @@ PhaseGroupSchema = z.object({
 
   /** Pre-computed status counts for this phase */
   counts: StatusCountsSchema,
-});
+})
 ```
 
 ### SourceViewsSchema (const)
@@ -195,7 +188,7 @@ SourceViewsSchema = z.object({
 
   /** Patterns with PRD metadata (productArea, userRole, businessValue) */
   prd: z.array(ExtractedPatternSchema),
-});
+})
 ```
 
 ### RelationshipEntrySchema (const)
@@ -241,7 +234,7 @@ RelationshipEntrySchema = z.object({
 
   /** File paths to implementation APIs (from @libar-docs-api-ref tag) */
   apiRef: z.array(z.string()),
-});
+})
 ```
 
 ### RuntimeMasterDataset (interface)
@@ -264,8 +257,8 @@ interface RuntimeMasterDataset extends MasterDataset {
 }
 ```
 
-| Property | Description                                        |
-| -------- | -------------------------------------------------- |
+| Property | Description |
+| --- | --- |
 | workflow | Optional workflow configuration (not serializable) |
 
 ### RawDataset (interface)
@@ -293,12 +286,12 @@ interface RawDataset {
 }
 ```
 
-| Property              | Description                                                        |
-| --------------------- | ------------------------------------------------------------------ |
-| patterns              | Extracted patterns from TypeScript and/or Gherkin sources          |
-| tagRegistry           | Tag registry for category lookups                                  |
-| workflow              | Optional workflow configuration for phase names (can be undefined) |
-| contextInferenceRules | Optional rules for inferring bounded context from file paths       |
+| Property | Description |
+| --- | --- |
+| patterns | Extracted patterns from TypeScript and/or Gherkin sources |
+| tagRegistry | Tag registry for category lookups |
+| workflow | Optional workflow configuration for phase names (can be undefined) |
+| contextInferenceRules | Optional rules for inferring bounded context from file paths |
 
 ### PipelineOptions (interface)
 
@@ -330,10 +323,10 @@ interface PipelineOptions {
 }
 ```
 
-| Property          | Description                                                                |
-| ----------------- | -------------------------------------------------------------------------- |
-| includeValidation | DD-3: When false, skip validation pass (default true).                     |
-| failOnScanErrors  | DD-5: When true, return error on individual scan failures (default false). |
+| Property | Description |
+| --- | --- |
+| includeValidation | DD-3: When false, skip validation pass (default true). |
+| failOnScanErrors | DD-5: When true, return error on individual scan failures (default false). |
 
 ### PipelineResult (interface)
 
