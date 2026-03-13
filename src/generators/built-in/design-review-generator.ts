@@ -59,8 +59,10 @@ class DesignReviewGeneratorImpl implements DocumentGenerator {
 
         const filename = `design-reviews/${toKebabCase(patternName)}.md`;
         files.push({ path: filename, content: markdown });
-      } catch {
+      } catch (error: unknown) {
         // Keep generating remaining design reviews even if one annotated pattern is invalid.
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn(`[design-review] Skipping ${patternName}: ${message}`);
       }
     }
 

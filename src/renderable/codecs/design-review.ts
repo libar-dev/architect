@@ -520,14 +520,17 @@ function buildSummarySection(entry: SequenceIndexEntry, displayName: string): Se
  * sequence message labels where the text is not wrapped in quotes.
  */
 function sanitizeMermaidRawText(text: string): string {
-  return text
-    .replace(/\r?\n/g, ' ')
-    .replace(/%%/g, '% %')
-    .replace(/\|/g, '&#124;')
-    .replace(/"/g, '&quot;')
-    .replace(/>>/g, '> >')
-    .replace(/--/g, '\u2014')
-    .trim();
+  return (
+    text
+      .replace(/\r?\n/g, ' ')
+      .replace(/%%/g, '% %')
+      .replace(/\|/g, '&#124;')
+      .replace(/"/g, '&quot;')
+      .replace(/>>/g, '> >')
+      // In raw (unquoted) Mermaid positions, `--` is edge syntax; em-dash renders visually equivalent
+      .replace(/--/g, '\u2014')
+      .trim()
+  );
 }
 
 interface MermaidTextOptions {
