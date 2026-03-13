@@ -7,14 +7,14 @@
 
 ## Overview
 
-**3 categories** | **56 metadata tags** | **3 aggregation tags**
+**3 categories** | **60 metadata tags** | **3 aggregation tags**
 
 Current configuration uses `@libar-docs-` prefix with `@libar-docs` file opt-in.
 
 | Component        | Count | Description                          |
 | ---------------- | ----- | ------------------------------------ |
 | Categories       | 3     | Pattern classification by domain     |
-| Metadata Tags    | 56    | Pattern enrichment and relationships |
+| Metadata Tags    | 60    | Pattern enrichment and relationships |
 | Aggregation Tags | 3     | Document routing                     |
 
 ---
@@ -122,6 +122,10 @@ Tags for enriching patterns with additional metadata.
 | `claude-module`          | value        | Module identifier for CLAUDE.md module generation (becomes filename)       | No       | `@libar-docs-claude-module process-guard`                                     |
 | `claude-section`         | enum         | Target section directory in \_claude-md/ for module output                 | No       | `@libar-docs-claude-section delivery-process`                                 |
 | `claude-tags`            | csv          | Variation filtering tags for modular-claude-md inclusion                   | No       | `@libar-docs-claude-tags core-mandatory, delivery-process`                    |
+| `sequence-orchestrator`  | value        | Identifies the coordinator module for sequence diagram generation          | No       | `@libar-docs-sequence-orchestrator:init-cli`                                  |
+| `sequence-step`          | number       | Explicit execution ordering number for sequence diagram steps              | No       | `@libar-docs-sequence-step:1`                                                 |
+| `sequence-module`        | csv          | Maps Rule to deliverable module(s) for sequence diagram participants       | No       | `@libar-docs-sequence-module:detect-context`                                  |
+| `sequence-error`         | flag         | Marks scenario as error/alternative path in sequence diagram               | No       | `@libar-docs-sequence-error`                                                  |
 
 [Full metadata tag reference](taxonomy/metadata-tags.md)
 

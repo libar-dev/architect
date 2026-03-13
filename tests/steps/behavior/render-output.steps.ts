@@ -174,7 +174,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
       And('the output contains a table between details tags', () => {
         const detailsStart = state!.markdown.indexOf('<details>');
         const detailsEnd = state!.markdown.indexOf('</details>');
-        const tableMarker = state!.markdown.indexOf('| A | B |');
+        const tableMarker = state!.markdown.indexOf('| A   | B   |');
 
         expect(tableMarker).toBeGreaterThan(detailsStart);
         expect(tableMarker).toBeLessThan(detailsEnd);

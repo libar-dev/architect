@@ -7,6 +7,7 @@
 @libar-docs-priority:high
 @libar-docs-depends-on:ConfigLoader
 @libar-docs-business-value:reduce-first-project-setup-from-55-minutes-to-under-2-minutes
+@libar-docs-sequence-orchestrator:init-cli
 Feature: Interactive Setup Command
 
   **Problem:**
@@ -44,6 +45,8 @@ Feature: Interactive Setup Command
       | Init CLI entry point | pending | src/cli/init.ts |
       | Bin entry registration | pending | package.json |
 
+  @libar-docs-sequence-step:1
+  @libar-docs-sequence-module:detect-context
   Rule: Init detects existing project context before making changes
 
     **Invariant:** The init command reads the target directory for package.json,
@@ -53,6 +56,11 @@ Feature: Interactive Setup Command
     **Rationale:** Blindly generating files overwrites user configuration and breaks
     working setups. Context detection enables safe adoption into existing projects by
     skipping steps that are already complete.
+
+    **Input:** targetDir: string
+
+    **Output:** ProjectContext -- packageJsonPath, packageJson, tsconfigExists,
+    tsconfigModuleResolution, existingConfigPath, isMonorepo, hasEsmType
 
     **Verified by:** Detects existing package.json and skips creation,
     Fails gracefully when run outside a project directory
@@ -66,13 +74,15 @@ Feature: Interactive Setup Command
       And the command does not modify tsconfig.json
       And the command proceeds to preset selection
 
-    @acceptance-criteria @validation
+    @acceptance-criteria @validation @libar-docs-sequence-error
     Scenario: Fails gracefully when no package.json exists
       Given an empty directory with no package.json
       When running the init command
       Then the command prints "No package.json found. Run npm init first."
       And exits with code 1
 
+  @libar-docs-sequence-step:2
+  @libar-docs-sequence-module:prompts
   Rule: Interactive prompts configure preset and source paths with smart defaults
 
     **Invariant:** The init command prompts for preset selection from the three
@@ -85,6 +95,10 @@ Feature: Interactive Setup Command
     **Rationale:** New users do not know which preset to choose or what glob patterns
     to use. Smart defaults reduce decisions to confirmations. The --yes flag enables
     scripted adoption in CI.
+
+    **Input:** ProjectContext
+
+    **Output:** InitConfig -- targetDir, preset, sources, force, context
 
     **Verified by:** Preset selection shows all three presets,
     Non-interactive mode uses defaults without prompting
@@ -108,13 +122,15 @@ Feature: Interactive Setup Command
       And preset defaults to "libar-generic"
       And source globs use sensible defaults
 
-    @acceptance-criteria @validation
+    @acceptance-criteria @validation @libar-docs-sequence-error
     Scenario: Non-interactive mode refuses to overwrite existing config
       Given a directory with an existing delivery-process config file
       When running the init command with --yes flag
       Then the command prints a message requiring --force to overwrite
       And exits with code 1
 
+  @libar-docs-sequence-step:3
+  @libar-docs-sequence-module:generate-config
   Rule: Generated config file uses defineConfig with correct imports
 
     **Invariant:** The generated delivery-process.config.ts (or .js) imports
@@ -125,6 +141,10 @@ Feature: Interactive Setup Command
     **Rationale:** The config file is the most important artifact. An incorrect
     import path or malformed glob causes every subsequent command to fail. The
     overwrite guard prevents destroying custom configuration.
+
+    **Input:** InitConfig
+
+    **Output:** delivery-process.config.ts written to targetDir
 
     **Verified by:** Generated config is valid TypeScript,
     Existing config is not overwritten without confirmation
@@ -138,13 +158,15 @@ Feature: Interactive Setup Command
       And contains defineConfig with the selected preset
       And contains the configured source globs
 
-    @acceptance-criteria @validation
+    @acceptance-criteria @validation @libar-docs-sequence-error
     Scenario: Existing config file is not overwritten without confirmation
       Given a directory with an existing delivery-process config file
       When running the init command
       Then the command prompts for overwrite confirmation
       And answering "no" preserves the existing file
 
+  @libar-docs-sequence-step:4
+  @libar-docs-sequence-module:augment-package-json
   Rule: Npm scripts are injected using bin command names
 
     **Invariant:** Injected scripts reference bin names (process-api, generate-docs)
@@ -154,6 +176,10 @@ Feature: Interactive Setup Command
 
     **Rationale:** The tutorial uses long fragile dist paths. Bin commands are the
     stable public API. Setting type:module ensures ESM imports work for the config.
+
+    **Input:** InitConfig
+
+    **Output:** package.json updated with process and docs scripts
 
     **Verified by:** Injected scripts use bin names,
     Existing scripts are preserved
@@ -173,6 +199,8 @@ Feature: Interactive Setup Command
       Then existing scripts are unchanged
       And new process and docs scripts are added alongside them
 
+  @libar-docs-sequence-step:5
+  @libar-docs-sequence-module:scaffold-dirs,generate-example
   Rule: Directory structure and example annotation enable immediate first run
 
     **Invariant:** The init command creates directories for configured source globs
@@ -181,6 +209,10 @@ Feature: Interactive Setup Command
 
     **Rationale:** Empty source globs produce a confusing "0 patterns" result. An
     example file proves the pipeline works and teaches annotation syntax by example.
+
+    **Input:** InitConfig
+
+    **Output:** directories created for source globs, example annotated .ts file
 
     **Verified by:** Directories created for configured globs,
     Example file is detected by the scanner
@@ -191,6 +223,8 @@ Feature: Interactive Setup Command
       When running process-api overview
       Then the output shows 1 pattern detected
 
+  @libar-docs-sequence-step:6
+  @libar-docs-sequence-module:validate-setup
   Rule: Init validates the complete setup by running the pipeline
 
     **Invariant:** After all files are generated, init runs process-api overview and
@@ -200,6 +234,10 @@ Feature: Interactive Setup Command
     **Rationale:** Generating files without verification produces false confidence.
     Running the pipeline as the final step proves config, globs, directories, and
     the example annotation all work together.
+
+    **Input:** targetDir: string
+
+    **Output:** SetupResult -- success, patternCount, diagnostics
 
     **Verified by:** Successful setup prints summary,
     Failed validation prints diagnostics
@@ -212,7 +250,7 @@ Feature: Interactive Setup Command
       And prints next steps for annotating files and generating docs
       And exits with code 0
 
-    @acceptance-criteria @validation
+    @acceptance-criteria @validation @libar-docs-sequence-error
     Scenario: Failed validation prints diagnostic information
       Given init completed but the example file has an invalid glob match
       When the validation step detects 0 patterns

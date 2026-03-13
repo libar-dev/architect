@@ -338,6 +338,8 @@ export function extractPatternsFromGherkin(
     assignIfDefined(rawPattern, 'claudeModule', metadata.claudeModule);
     assignIfDefined(rawPattern, 'claudeSection', metadata.claudeSection);
     assignIfNonEmpty(rawPattern, 'claudeTags', metadata.claudeTags);
+    // Sequence diagram annotation fields
+    assignIfDefined(rawPattern, 'sequenceOrchestrator', metadata.sequenceOrchestrator);
     // NOTE: ADR content is now derived from Gherkin Rule: keywords
     // (Context, Decision, Consequences) instead of parsed markdown.
     // The rules array is populated below and rendered by the ADR codec.
@@ -387,12 +389,19 @@ export function extractPatternsFromGherkin(
 
     // Add rules if present (Gherkin v6+ business rule groupings)
     if (rules && rules.length > 0) {
-      rawPattern['rules'] = rules.map((rule) => ({
-        name: rule.name,
-        description: rule.description,
-        scenarioCount: rule.scenarios.length,
-        scenarioNames: rule.scenarios.map((s) => s.name),
-      }));
+      rawPattern['rules'] = rules.map((rule) => {
+        const errorNames = rule.scenarios
+          .filter((s) => s.tags.some((t) => t === 'sequence-error'))
+          .map((s) => s.name);
+        return {
+          name: rule.name,
+          description: rule.description,
+          scenarioCount: rule.scenarios.length,
+          scenarioNames: rule.scenarios.map((s) => s.name),
+          ...(rule.tags.length > 0 && { tags: rule.tags }),
+          ...(errorNames.length > 0 && { errorScenarioNames: errorNames }),
+        };
+      });
     }
 
     // Validate against schema (schema-first enforcement)
@@ -630,6 +639,8 @@ export async function extractPatternsFromGherkinAsync(
     assignIfNonEmpty(rawPattern, 'convention', metadata.convention);
     // Cross-cutting document inclusion tags
     assignIfNonEmpty(rawPattern, 'include', metadata.include);
+    // Sequence diagram annotation fields
+    assignIfDefined(rawPattern, 'sequenceOrchestrator', metadata.sequenceOrchestrator);
     // NOTE: ADR content derived from Gherkin Rule: keywords, not parsed markdown
     assignIfNonEmpty(rawPattern, 'whenToUse', whenToUse);
 
@@ -663,12 +674,19 @@ export async function extractPatternsFromGherkinAsync(
     assignIfDefined(rawPattern, 'behaviorFile', behaviorFile);
 
     if (rules && rules.length > 0) {
-      rawPattern['rules'] = rules.map((rule) => ({
-        name: rule.name,
-        description: rule.description,
-        scenarioCount: rule.scenarios.length,
-        scenarioNames: rule.scenarios.map((s) => s.name),
-      }));
+      rawPattern['rules'] = rules.map((rule) => {
+        const errorNames = rule.scenarios
+          .filter((s) => s.tags.some((t) => t === 'sequence-error'))
+          .map((s) => s.name);
+        return {
+          name: rule.name,
+          description: rule.description,
+          scenarioCount: rule.scenarios.length,
+          scenarioNames: rule.scenarios.map((s) => s.name),
+          ...(rule.tags.length > 0 && { tags: rule.tags }),
+          ...(errorNames.length > 0 && { errorScenarioNames: errorNames }),
+        };
+      });
     }
 
     const validation = ExtractedPatternSchema.safeParse(rawPattern);

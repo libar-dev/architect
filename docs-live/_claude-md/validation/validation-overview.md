@@ -9,30 +9,29 @@
 - Decider pattern: All validation is (state, changes, options) → result. State is derived from annotations, not maintained separately
 - Dual-source ownership: Anti-pattern detection enforces tag boundaries — `uses` on TypeScript (runtime deps), `depends-on`/`quarter`/`team` on Gherkin (planning metadata). Violations are flagged before they cause documentation drift
 
-
 **Components:** Lint (LintRules, LintEngine, ProcessGuardDecider), Validation (DoDValidator, AntiPatternDetector, FSMValidator, FSMTransitions, FSMStates)
 
 #### API Types
 
-| Type | Kind |
-| --- | --- |
-| AntiPatternDetectionOptions | interface |
-| LintRule | interface |
-| LintContext | interface |
-| ProtectionLevel | type |
-| isDeliverableComplete | function |
-| hasAcceptanceCriteria | function |
-| extractAcceptanceCriteriaScenarios | function |
-| validateDoDForPhase | function |
-| validateDoD | function |
-| formatDoDSummary | function |
-| detectAntiPatterns | function |
-| detectProcessInCode | function |
-| detectMagicComments | function |
-| detectScenarioBloat | function |
-| detectMegaFeature | function |
-| formatAntiPatternReport | function |
-| toValidationIssues | function |
-| filterRulesBySeverity | function |
-| isValidTransition | function |
-| getValidTransitionsFrom | function |
+| Type                               | Kind      |
+| ---------------------------------- | --------- |
+| AntiPatternDetectionOptions        | interface |
+| LintRule                           | interface |
+| LintContext                        | interface |
+| ProtectionLevel                    | type      |
+| isDeliverableComplete              | function  |
+| hasAcceptanceCriteria              | function  |
+| extractAcceptanceCriteriaScenarios | function  |
+| validateDoDForPhase                | function  |
+| validateDoD                        | function  |
+| formatDoDSummary                   | function  |
+| detectAntiPatterns                 | function  |
+| detectProcessInCode                | function  |
+| detectMagicComments                | function  |
+| detectScenarioBloat                | function  |
+| detectMegaFeature                  | function  |
+| formatAntiPatternReport            | function  |
+| toValidationIssues                 | function  |
+| filterRulesBySeverity              | function  |
+| isValidTransition                  | function  |
+| getValidTransitionsFrom            | function  |

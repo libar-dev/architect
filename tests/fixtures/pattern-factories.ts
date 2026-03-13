@@ -133,6 +133,8 @@ export interface TestPatternOptions {
   rules?: BusinessRule[];
   /** Extracted TypeScript shapes (default: none) */
   extractedShapes?: ExtractedShape[];
+  /** Sequence diagram orchestrator identifier (default: none) */
+  sequenceOrchestrator?: string;
 }
 
 /**
@@ -231,6 +233,8 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     convention,
     rules,
     extractedShapes,
+    // Sequence diagram fields
+    sequenceOrchestrator,
   } = options;
 
   const directive: DocDirective = {
@@ -311,6 +315,8 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     ...(convention && convention.length > 0 ? { convention } : {}),
     ...(rules && rules.length > 0 ? { rules } : {}),
     ...(extractedShapes && extractedShapes.length > 0 ? { extractedShapes } : {}),
+    // Sequence diagram fields
+    ...(sequenceOrchestrator ? { sequenceOrchestrator } : {}),
   };
 }
 

@@ -65,6 +65,7 @@ import type { ProcessStatusValue } from '../taxonomy/index.js';
 import { fuzzyMatchPatterns } from '../api/fuzzy-match.js';
 import {
   allPatternNames,
+  getSequenceEntry,
   suggestPattern,
   firstImplements,
   getPatternName,
@@ -353,6 +354,12 @@ Architecture Queries (JSON output):
   arch context [name]       Patterns in bounded context (list all if no name)
   arch layer [name]         Patterns in architecture layer (list all if no name)
   arch compare <c1> <c2>    Cross-context shared deps and integration points
+
+Design Review:
+
+  sequence [name]           Sequence diagram data for design reviews
+                              No args: list patterns with sequence annotations
+                              With name: steps, participants, data flow types
 
 Metadata & Inventory:
 
@@ -994,6 +1001,40 @@ async function handleArch(ctx: RouteContext): Promise<unknown> {
 // Stub Integration Handlers
 // =============================================================================
 
+function handleSequence(
+  dataset: RuntimeMasterDataset,
+  subArgs: string[],
+  modifiers: OutputModifiers
+): unknown {
+  const index = dataset.sequenceIndex;
+
+  if (!index || Object.keys(index).length === 0) {
+    return { message: 'No patterns with sequence annotations found', patterns: [], count: 0 };
+  }
+
+  if (subArgs.length === 0) {
+    const patterns = Object.keys(index);
+    if (modifiers.count) return { count: patterns.length };
+    if (modifiers.namesOnly) return patterns;
+    return { patterns, count: patterns.length };
+  }
+
+  const patternName = subArgs[0] ?? '';
+  const entry = getSequenceEntry(dataset, patternName);
+  if (!entry) {
+    const available = Object.keys(index);
+    const hint = suggestPattern(patternName, available);
+    throw new QueryApiError(
+      'PATTERN_NOT_FOUND',
+      `No sequence data for "${patternName}".${hint} Available: ${available.join(', ')}`
+    );
+  }
+
+  return entry;
+}
+
+// =============================================================================
+
 function handleStubs(dataset: RuntimeMasterDataset, subArgs: string[], baseDir: string): unknown {
   const stubs = findStubPatterns(dataset);
   const resolutions = resolveStubs(stubs, baseDir);
@@ -1479,6 +1520,9 @@ async function routeSubcommand(ctx: RouteContext): Promise<unknown> {
     case 'sources':
       return buildSourceInventory(ctx.dataset);
 
+    case 'sequence':
+      return handleSequence(ctx.dataset, ctx.subArgs, ctx.modifiers);
+
     case 'unannotated': {
       let pathFilter: string | undefined;
       for (let i = 0; i < ctx.subArgs.length; i++) {
@@ -1505,7 +1549,7 @@ async function routeSubcommand(ctx: RouteContext): Promise<unknown> {
     default:
       throw new QueryApiError(
         'UNKNOWN_METHOD',
-        `Unknown subcommand: ${ctx.subcommand}\nAvailable: context, files, dep-tree, overview, scope-validate, handoff, status, query, pattern, list, search, arch, stubs, decisions, pdr, rules, tags, sources, unannotated`
+        `Unknown subcommand: ${ctx.subcommand}\nAvailable: context, files, dep-tree, overview, scope-validate, handoff, status, query, pattern, list, search, arch, stubs, decisions, pdr, rules, tags, sources, sequence, unannotated`
       );
   }
 }

@@ -719,6 +719,7 @@ _- Completed specs modified without explicit unlock reason_
 
 - Valid transitions pass validation
 - Invalid transitions fail validation
+- Existing file with unlock-reason bypasses FSM check
 
 ---
 

@@ -15,7 +15,11 @@
  */
 
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
-import type { MasterDataset, RelationshipEntry } from '../validation-schemas/master-dataset.js';
+import type {
+  MasterDataset,
+  RelationshipEntry,
+  SequenceIndexEntry,
+} from '../validation-schemas/master-dataset.js';
 import { findBestMatch } from './fuzzy-match.js';
 
 /**
@@ -55,6 +59,23 @@ export function getRelationships(
     if (key.toLowerCase() === lower) return value;
   }
   return undefined;
+}
+
+/**
+ * Look up a sequenceIndex entry by pattern name with case-insensitive fallback.
+ */
+export function getSequenceEntry(
+  dataset: MasterDataset,
+  name: string
+): SequenceIndexEntry | undefined {
+  if (dataset.sequenceIndex === undefined) return undefined;
+  const exact = dataset.sequenceIndex[name];
+  if (exact !== undefined) return exact;
+
+  const pattern = findPatternByName(dataset.patterns, name);
+  if (pattern === undefined) return undefined;
+
+  return dataset.sequenceIndex[getPatternName(pattern)];
 }
 
 /**
