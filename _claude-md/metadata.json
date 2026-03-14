@@ -46,6 +46,11 @@
           "path": "api/data-api-cli.md",
           "tags": ["core"],
           "description": "Data API CLI for querying delivery process state"
+        },
+        {
+          "path": "api/mcp-server.md",
+          "tags": ["core"],
+          "description": "MCP server tools for native AI agent access to ProcessStateAPI"
         }
       ]
     },
