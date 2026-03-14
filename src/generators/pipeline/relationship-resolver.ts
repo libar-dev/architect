@@ -100,6 +100,7 @@ export function buildReverseLookups(
     entry.implementedBy.sort((a: ImplementationRef, b: ImplementationRef) =>
       a.file.localeCompare(b.file)
     );
+    entry.extendedBy.sort((a, b) => a.localeCompare(b));
     entry.enables.sort((a, b) => a.localeCompare(b));
     entry.usedBy.sort((a, b) => a.localeCompare(b));
   }

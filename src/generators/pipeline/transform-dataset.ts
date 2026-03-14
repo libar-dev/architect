@@ -177,49 +177,47 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
   // ─────────────────────────────────────────────────────────────────────────
 
   for (const pattern of patterns) {
-    const p = pattern;
-
     // ─── Status grouping ───────────────────────────────────────────────────
     const status = normalizeStatus(pattern.status);
-    byStatus[status].push(p);
+    byStatus[status].push(pattern);
 
     // ─── Phase grouping ────────────────────────────────────────────────────
     if (pattern.phase !== undefined) {
       const existing = byPhaseMap.get(pattern.phase) ?? [];
-      existing.push(p);
+      existing.push(pattern);
       byPhaseMap.set(pattern.phase, existing);
-      bySource.roadmap.push(p);
+      bySource.roadmap.push(pattern);
     }
 
     // ─── Quarter grouping ──────────────────────────────────────────────────
     if (pattern.quarter) {
       const quarter = pattern.quarter;
       const quarterPatterns = (byQuarter[quarter] ??= []);
-      quarterPatterns.push(p);
+      quarterPatterns.push(pattern);
     }
 
     // ─── Category grouping ─────────────────────────────────────────────────
     const category = pattern.category;
     const categoryPatterns = byCategoryMap.get(category) ?? [];
-    categoryPatterns.push(p);
+    categoryPatterns.push(pattern);
     byCategoryMap.set(category, categoryPatterns);
 
     // ─── Source grouping ───────────────────────────────────────────────────
     if (pattern.source.file.endsWith('.feature')) {
-      bySource.gherkin.push(p);
+      bySource.gherkin.push(pattern);
     } else {
-      bySource.typescript.push(p);
+      bySource.typescript.push(pattern);
     }
 
     // ─── PRD grouping (has productArea, userRole, or businessValue) ────────
     if (pattern.productArea || pattern.userRole || pattern.businessValue) {
-      bySource.prd.push(p);
+      bySource.prd.push(pattern);
     }
 
     // ─── Product area grouping ──────────────────────────────────────────
     if (pattern.productArea) {
       const areaPatterns = (byProductAreaMap[pattern.productArea] ??= []);
-      areaPatterns.push(p);
+      areaPatterns.push(pattern);
     }
 
     // ─── Relationship index ────────────────────────────────────────────────
@@ -247,28 +245,28 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
       pattern.archLayer !== undefined ||
       (pattern.include !== undefined && pattern.include.length > 0);
     if (hasArchMetadata) {
-      archIndex.all.push(p);
+      archIndex.all.push(pattern);
 
       if (pattern.archRole) {
         const rolePatterns = (archIndex.byRole[pattern.archRole] ??= []);
-        rolePatterns.push(p);
+        rolePatterns.push(pattern);
       }
 
       if (inferredContext) {
         const contextPatterns = (archIndex.byContext[inferredContext] ??= []);
-        contextPatterns.push(p);
+        contextPatterns.push(pattern);
       }
 
       if (pattern.archLayer) {
         const layerPatterns = (archIndex.byLayer[pattern.archLayer] ??= []);
-        layerPatterns.push(p);
+        layerPatterns.push(pattern);
       }
 
       if (pattern.include) {
         for (const view of pattern.include) {
           if (view.length === 0) continue;
           const viewPatterns = (archIndex.byView[view] ??= []);
-          viewPatterns.push(p);
+          viewPatterns.push(pattern);
         }
       }
     }

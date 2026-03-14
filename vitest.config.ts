@@ -33,8 +33,6 @@ export default defineConfig({
       exclude: ['src/**/*.d.ts'],
     },
   },
-  css: false,
   root: path.resolve(__dirname),
   clearScreen: false,
-  plugins: [],
 });
