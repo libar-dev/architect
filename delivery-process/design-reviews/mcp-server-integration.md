@@ -1,6 +1,6 @@
 # Design Review: MCPServerIntegration
 
-**Purpose:** Design review with sequence and component diagrams for the MCP server
+**Purpose:** Auto-generated design review with sequence and component diagrams
 **Detail Level:** Design review artifact from sequence annotations
 
 ---
@@ -32,70 +32,64 @@ Generated from: `@libar-docs-sequence-step`, `@libar-docs-sequence-module`, `@li
 
 ```mermaid
 sequenceDiagram
-    participant Client as "Claude Code / MCP Client"
+    participant User
     participant mcp_server as "mcp-server.ts"
     participant pipeline_session as "pipeline-session.ts"
     participant tool_registry as "tool-registry.ts"
     participant file_watcher as "file-watcher.ts"
 
-    Client->>mcp_server: spawn process
+    User->>mcp_server: invoke
 
-    Note over mcp_server: Step 1 — Server starts via stdio transport.<br/>Builds pipeline once during initialization.<br/>No non-MCP output on stdout.
+    Note over mcp_server: Rule 1 — The MCP server communicates over stdio using JSON-RPC. It builds the pipeline once during initialization, then enters a request-response loop. No non-MCP output is written to stdout (no console.log, no pnpm banners).
 
-    mcp_server->>+pipeline_session: SessionOptions (input, features, baseDir, watch)
-    pipeline_session->>pipeline_session: loadConfig() + buildMasterDataset() + createProcessStateAPI()
-    pipeline_session-->>-mcp_server: PipelineSession (dataset, api, registry, sourceGlobs, buildTimeMs)
+    mcp_server->>+pipeline_session: SessionOptions
+    pipeline_session-->>-mcp_server: PipelineSession
 
-    alt No config file and no explicit globs
-        mcp_server-->>Client: error
+    alt Server starts with explicit input globs
+        mcp_server-->>User: error
         mcp_server->>mcp_server: exit(1)
     end
 
-    Note over mcp_server: Step 2 — Register all CLI subcommands as MCP tools.<br/>25 tools with dp_ prefix and Zod input schemas.
+    Note over mcp_server: Rule 2 — Every CLI subcommand is registered as an MCP tool with a JSON Schema describing its input parameters. Tool names use snake_case with a &quot;dp_&quot; prefix to avoid collisions with other MCP servers.
 
-    mcp_server->>+tool_registry: PipelineSession (dataset, api, registry)
-    tool_registry->>tool_registry: registerTool() x 25 with Zod schemas
-    tool_registry-->>-mcp_server: RegisteredTools (25 tools)
+    mcp_server->>+tool_registry: PipelineSession
+    tool_registry-->>-mcp_server: RegisteredTools
 
-    Note over mcp_server: Step 3 — Tool call dispatch.<br/>Pipeline loaded once, all calls read in-memory dataset.
-
-    Client->>mcp_server: tools/call (e.g., dp_overview)
-    mcp_server->>+tool_registry: dispatch(toolName, args, session)
-    tool_registry->>tool_registry: handler calls ProcessStateAPI / assembler
-    tool_registry-->>-mcp_server: ToolCallResult (content, isError)
-    mcp_server-->>Client: JSON-RPC response
-
-    alt Tool call with missing required parameter
-        mcp_server-->>Client: MCP error (invalid params)
+    alt Tool call with missing required parameter returns error
+        mcp_server-->>User: error
+        mcp_server->>mcp_server: exit(1)
     end
 
-    alt dp_rebuild called
-        mcp_server->>+pipeline_session: rebuild()
-        pipeline_session-->>-mcp_server: new PipelineSession (atomic swap)
+    Note over mcp_server: Rule 3 — The pipeline runs exactly once during server initialization. All subsequent tool calls read from in-memory MasterDataset. A manual rebuild can be triggered via a &quot;dp_rebuild&quot; tool, and overlapping rebuild requests coalesce so the final in-memory session reflects the newest completed build.
+
+    mcp_server->>+pipeline_session: ToolCallRequest
+    pipeline_session-->>-mcp_server: ToolCallResult
+
+    alt Concurrent reads during rebuild use previous dataset
+        mcp_server-->>User: error
+        mcp_server->>mcp_server: exit(1)
     end
 
-    Note over mcp_server: Step 4 — File watcher (optional, --watch flag).<br/>500ms debounce, auto-rebuild on .ts/.feature changes.
+    Note over mcp_server: Rule 4 — When —watch is enabled, changes to source files trigger an automatic pipeline rebuild. Multiple rapid changes are debounced into a single rebuild (default 500ms window).
 
-    opt --watch enabled
-        mcp_server->>+file_watcher: start(globs, baseDir, sessionManager)
-        file_watcher->>file_watcher: chokidar.watch() with debounce
+    mcp_server->>+file_watcher: FileChangeEvent
+    file_watcher-->>-mcp_server: PipelineSession
 
-        file_watcher-->>file_watcher: onChange → debounced rebuild
-        file_watcher->>+pipeline_session: rebuild()
-        pipeline_session-->>-file_watcher: new PipelineSession
-        file_watcher-->>-mcp_server: rebuild complete (logged to stderr)
-
-        alt Rebuild failure during watch
-            file_watcher->>file_watcher: keep previous dataset, log error
-        end
+    alt Rebuild failure during watch does not crash server
+        mcp_server-->>User: error
+        mcp_server->>mcp_server: exit(1)
     end
 
-    Note over mcp_server: Step 5 — Configuration and shutdown.<br/>Auto-detects delivery-process.config.ts.<br/>Supports --input, --features, --base-dir overrides.
+    Note over mcp_server: Rule 5 — The server works with .mcp.json (Claude Code), claude_desktop_config.json (Claude Desktop), and any MCP client. It accepts —input, —features, —base-dir args, auto-detects delivery-process.config.ts, and reports the package version accurately through the CLI.
 
-    Client->>mcp_server: close connection
-    mcp_server->>file_watcher: stop()
-    mcp_server->>mcp_server: server.close()
-    mcp_server-->>Client: exit(0)
+    mcp_server->>+mcp_server: CLIArgs
+    mcp_server-->>-mcp_server: McpServerOptions
+
+    alt No config file and no explicit globs
+        mcp_server-->>User: error
+        mcp_server->>mcp_server: exit(1)
+    end
+
 ```
 
 ---
@@ -106,20 +100,24 @@ Generated from: `@libar-docs-sequence-module` (nodes), `**Input:**`/`**Output:**
 
 ```mermaid
 graph LR
-    subgraph phase_1["Phase 1: Initialization"]
-        pipeline_session["pipeline-session.ts"]
+    subgraph phase_1["Phase 1: SessionOptions"]
+        phase_1_pipeline_session["pipeline-session.ts"]
     end
 
-    subgraph phase_2["Phase 2: Tool Registration"]
-        tool_registry["tool-registry.ts"]
+    subgraph phase_2["Phase 2: PipelineSession"]
+        phase_2_tool_registry["tool-registry.ts"]
     end
 
-    subgraph phase_3["Phase 3: Request Loop"]
-        tool_registry_dispatch["tool-registry.ts (dispatch)"]
+    subgraph phase_3["Phase 3: ToolCallRequest"]
+        phase_3_pipeline_session["pipeline-session.ts"]
     end
 
-    subgraph phase_4["Phase 4: File Watching"]
-        file_watcher["file-watcher.ts"]
+    subgraph phase_4["Phase 4: FileChangeEvent"]
+        phase_4_file_watcher["file-watcher.ts"]
+    end
+
+    subgraph phase_5["Phase 5: CLIArgs"]
+        phase_5_mcp_server["mcp-server.ts"]
     end
 
     subgraph orchestrator["Orchestrator"]
@@ -127,34 +125,34 @@ graph LR
     end
 
     subgraph types["Key Types"]
-        SessionOptions{{"SessionOptions\n-----------\ninput\nfeatures\nbaseDir\nwatch"}}
         PipelineSession{{"PipelineSession\n-----------\ndataset\napi\nregistry\nbaseDir\nsourceGlobs\nbuildTimeMs"}}
-        RegisteredTools{{"RegisteredTools\n-----------\n25 tools\ndp_ prefix\nZod schemas\nhandler functions"}}
+        RegisteredTools{{"RegisteredTools\n-----------\n25 tools with dp_ prefix\nZod input schemas\nhandler functions"}}
         ToolCallResult{{"ToolCallResult\n-----------\ncontent\nisError"}}
+        McpServerOptions{{"McpServerOptions\n-----------\nparsed options merged with config defaults"}}
     end
 
-    mcp_server -->|"SessionOptions"| pipeline_session
-    pipeline_session -->|"PipelineSession"| mcp_server
-    mcp_server -->|"PipelineSession"| tool_registry
-    tool_registry -->|"RegisteredTools"| mcp_server
-    mcp_server -->|"ToolCallRequest"| tool_registry_dispatch
-    tool_registry_dispatch -->|"ToolCallResult"| mcp_server
-    mcp_server -->|"globs, sessionManager"| file_watcher
-    file_watcher -->|"rebuild trigger"| pipeline_session
+    phase_1_pipeline_session -->|"PipelineSession"| mcp_server
+    phase_2_tool_registry -->|"RegisteredTools"| mcp_server
+    phase_3_pipeline_session -->|"ToolCallResult"| mcp_server
+    phase_4_file_watcher -->|"PipelineSession"| mcp_server
+    phase_5_mcp_server -->|"McpServerOptions"| mcp_server
+    mcp_server -->|"SessionOptions"| phase_1_pipeline_session
+    mcp_server -->|"PipelineSession"| phase_2_tool_registry
+    mcp_server -->|"ToolCallRequest"| phase_3_pipeline_session
+    mcp_server -->|"FileChangeEvent"| phase_4_file_watcher
+    mcp_server -->|"CLIArgs"| phase_5_mcp_server
 ```
 
 ---
 
 ## Key Type Definitions
 
-| Type               | Fields                                                    | Produced By            | Consumed By                             |
-| ------------------ | --------------------------------------------------------- | ---------------------- | --------------------------------------- |
-| `SessionOptions`   | input, features, baseDir, watch                           | CLI arg parser         | pipeline-session                        |
-| `PipelineSession`  | dataset, api, registry, baseDir, sourceGlobs, buildTimeMs | pipeline-session       | tool-registry, file-watcher, mcp-server |
-| `RegisteredTools`  | 25 tools with dp\_ prefix, Zod schemas, handler functions | tool-registry          | mcp-server (via McpServer)              |
-| `ToolCallResult`   | content, isError                                          | tool-registry handlers | mcp-server (→ JSON-RPC response)        |
-| `FileChangeEvent`  | filePath, eventType                                       | chokidar               | file-watcher                            |
-| `McpServerOptions` | input, features, baseDir, watch, version                  | CLI arg parser         | mcp-server                              |
+| Type               | Fields                                                          | Produced By                    | Consumed By   |
+| ------------------ | --------------------------------------------------------------- | ------------------------------ | ------------- |
+| `PipelineSession`  | dataset, api, registry, baseDir, sourceGlobs, buildTimeMs       | pipeline-session, file-watcher | tool-registry |
+| `RegisteredTools`  | 25 tools with dp\_ prefix, Zod input schemas, handler functions | tool-registry                  |               |
+| `ToolCallResult`   | content, isError                                                | pipeline-session               |               |
+| `McpServerOptions` | parsed options merged with config defaults                      | mcp-server                     |               |
 
 ---
 
@@ -162,30 +160,13 @@ graph LR
 
 Verify these design properties against the diagrams above:
 
-| #    | Question                           | Auto-Check                      | Diagram   |
-| ---- | ---------------------------------- | ------------------------------- | --------- |
-| DQ-1 | Is the execution ordering correct? | 5 steps in monotonic order      | Sequence  |
-| DQ-2 | Are all interfaces well-defined?   | 6 distinct types across 5 steps | Component |
-| DQ-3 | Is error handling complete?        | 5 error paths identified        | Sequence  |
-| DQ-4 | Is data flow unidirectional?       | Review component diagram edges  | Component |
-| DQ-5 | Does the server isolate stdout?    | console.log redirected at load  | Sequence  |
-
----
-
-## Design Decisions Summary
-
-| #     | Decision                                                  | Rationale                                                                                                                      |
-| ----- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| DD-1  | Atomic dataset swap on rebuild                            | During rebuild, tool calls read from previous PipelineSession. New session replaces it atomically after successful build.      |
-| DD-2  | Config auto-detection mirrors CLI                         | Uses same applyProjectSourceDefaults() function, then falls back to filesystem detection.                                      |
-| DD-3  | No caching layer                                          | CLI uses dataset-cache.ts for inter-process caching, but in-process memory is sufficient for long-lived server.                |
-| DD-4  | Text output for session-aware tools                       | context, overview, scope-validate return formatted text matching CLI output — what Claude Code expects for direct consumption. |
-| DD-5  | JSON output for data tools                                | pattern, list, status return JSON for structured querying.                                                                     |
-| DD-6  | Synchronous handlers where possible                       | MCP SDK ToolCallback accepts both sync and async returns. Avoids require-await lint violations.                                |
-| DD-7  | dp\_ tool prefix                                          | Per spec invariant. Avoids collision with other MCP servers in multi-server setups.                                            |
-| DD-8  | Stdout isolation via console.log redirect                 | MCP JSON-RPC uses stdout exclusively. console.log → console.error at module load time.                                         |
-| DD-9  | Chokidar EventEmitter cast for Node 20                    | chokidar v5 typed EventEmitter requires Node 22+ @types/node. Cast to plain EventEmitter.                                      |
-| DD-10 | Pipeline failure fatal at startup, non-fatal during watch | Startup with bad config exits immediately. File-watch rebuild failure keeps previous dataset.                                  |
+| #    | Question                             | Auto-Check                      | Diagram   |
+| ---- | ------------------------------------ | ------------------------------- | --------- |
+| DQ-1 | Is the execution ordering correct?   | 5 steps in monotonic order      | Sequence  |
+| DQ-2 | Are all interfaces well-defined?     | 4 distinct types across 5 steps | Component |
+| DQ-3 | Is error handling complete?          | 5 error paths identified        | Sequence  |
+| DQ-4 | Is data flow unidirectional?         | Review component diagram edges  | Component |
+| DQ-5 | Does validation prove the full path? | Review final step               | Both      |
 
 ---
 
@@ -193,14 +174,12 @@ Verify these design properties against the diagrams above:
 
 Record design observations from reviewing the diagrams above. Each finding should reference which diagram revealed it and its impact on the spec.
 
-| #   | Finding                                                                                                                                                                                                                                                  | Diagram Source | Impact on Spec                                    |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ------------------------------------------------- |
-| F-1 | The tool-registry appears twice in the component diagram (registration + dispatch) because it serves two roles: static registration at startup and dynamic dispatch at runtime. This is correct — a single module handles both.                          | Component      | None — intentional dual-role design               |
-| F-2 | File watcher triggers rebuild on pipeline-session directly, bypassing mcp-server. This is correct — the watcher has a reference to the sessionManager, so the new dataset is available to the next tool call without orchestrator involvement.           | Sequence       | None — by-design for simplicity                   |
-| F-3 | No tool for query (the raw ProcessStateAPI method dispatcher). The CLI has a `query` subcommand that calls arbitrary API methods. The MCP server exposes each method as a dedicated tool instead, providing better discoverability and input validation. | Both           | DD-4 captures this — no generic query tool needed |
+| #   | Finding                                     | Diagram Source | Impact on Spec |
+| --- | ------------------------------------------- | -------------- | -------------- |
+| F-1 | (Review the diagrams and add findings here) | —              | —              |
 
 ---
 
 ## Summary
 
-The MCPServerIntegration design review covers 5 sequential steps across 4 participants (mcp-server, pipeline-session, tool-registry, file-watcher) with 6 key data types and 5 error paths. The architecture is a thin transport layer — all business logic delegates to existing ProcessStateAPI methods and CLI assembler functions. The 10 design decisions document key trade-offs around stdout isolation, output format selection, rebuild atomicity, and Node.js compatibility.
+The MCPServerIntegration design review covers 5 sequential steps across 4 participants with 4 key data types and 5 error paths.

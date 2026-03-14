@@ -58,7 +58,8 @@ export interface PipelineSession {
 
 export class PipelineSessionManager {
   private session: PipelineSession | null = null;
-  private rebuilding = false;
+  private rebuildPromise: Promise<PipelineSession> | null = null;
+  private pendingRebuild = false;
 
   async initialize(options: SessionOptions = {}): Promise<PipelineSession> {
     const baseDir = path.resolve(options.baseDir ?? process.cwd());
@@ -90,17 +91,18 @@ export class PipelineSessionManager {
     if (this.session === null) {
       throw new Error('Cannot rebuild: session not initialized');
     }
-    this.rebuilding = true;
+
+    if (this.rebuildPromise !== null) {
+      this.pendingRebuild = true;
+      return this.rebuildPromise;
+    }
+
+    this.rebuildPromise = this.runRebuildLoop();
     try {
-      const newSession = await this.buildSession(
-        this.session.baseDir,
-        [...this.session.sourceGlobs.input],
-        [...this.session.sourceGlobs.features]
-      );
-      this.session = newSession;
-      return newSession;
+      return await this.rebuildPromise;
     } finally {
-      this.rebuilding = false;
+      this.pendingRebuild = false;
+      this.rebuildPromise = null;
     }
   }
 
@@ -112,12 +114,38 @@ export class PipelineSessionManager {
   }
 
   isRebuilding(): boolean {
-    return this.rebuilding;
+    return this.rebuildPromise !== null;
   }
 
   // ---------------------------------------------------------------------------
   // Private
   // ---------------------------------------------------------------------------
+
+  private async runRebuildLoop(): Promise<PipelineSession> {
+    if (this.session === null) {
+      throw new Error('Cannot rebuild: session not initialized');
+    }
+
+    let latestSession = this.session;
+
+    for (;;) {
+      this.pendingRebuild = false;
+
+      const newSession = await this.buildSession(
+        latestSession.baseDir,
+        [...latestSession.sourceGlobs.input],
+        [...latestSession.sourceGlobs.features]
+      );
+      this.session = newSession;
+      latestSession = newSession;
+
+      // Another caller may set pendingRebuild while buildSession() is awaiting.
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (!this.pendingRebuild) {
+        return latestSession;
+      }
+    }
+  }
 
   private async buildSession(
     baseDir: string,
@@ -158,8 +186,9 @@ export class PipelineSessionManager {
     features: string[];
   }): void {
     if (config.input.length === 0) {
-      const configPath = path.join(config.baseDir, 'delivery-process.config.ts');
-      if (fs.existsSync(configPath)) {
+      const tsConfigPath = path.join(config.baseDir, 'delivery-process.config.ts');
+      const jsConfigPath = path.join(config.baseDir, 'delivery-process.config.js');
+      if (fs.existsSync(tsConfigPath) || fs.existsSync(jsConfigPath)) {
         config.input.push('src/**/*.ts');
         const stubsDir = path.join(config.baseDir, 'delivery-process', 'stubs');
         if (fs.existsSync(stubsDir)) {

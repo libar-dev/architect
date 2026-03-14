@@ -10,6 +10,9 @@
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
+import * as fs from 'fs/promises';
+import * as os from 'os';
+import * as path from 'path';
 import {
   PipelineSessionManager,
   type PipelineSession,
@@ -17,6 +20,7 @@ import {
   isWatchedFileType,
   registerAllTools,
 } from '../../../src/mcp/index.js';
+import { getPackageVersion } from '../../../src/cli/version.js';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import {
   type McpTestState,
@@ -41,7 +45,10 @@ let state: McpTestState | null = null;
 const feature = await loadFeature('tests/features/mcp/mcp-server.feature');
 
 describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
-  AfterEachScenario(() => {
+  AfterEachScenario(async () => {
+    if (state?.tempDir) {
+      await fs.rm(state.tempDir, { recursive: true, force: true });
+    }
     state = null;
   });
 
@@ -134,6 +141,149 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
+    RuleScenario(
+      'getSession returns the previous session during rebuild',
+      ({ Given, When, Then, And }) => {
+        let manager: PipelineSessionManager | null = null;
+        let originalSession: PipelineSession | null = null;
+        let sessionDuringRebuild: PipelineSession | null = null;
+        let rebuiltSession: PipelineSession | null = null;
+        let rebuildPromise: Promise<PipelineSession> | null = null;
+
+        Given('a PipelineSessionManager initialized with test data', async () => {
+          manager = new PipelineSessionManager();
+          originalSession = await manager.initialize({
+            input: ['src/**/*.ts'],
+            features: ['delivery-process/specs/*.feature'],
+          });
+        });
+
+        When('rebuild is started without awaiting', () => {
+          rebuildPromise = manager!.rebuild();
+        });
+
+        Then('getSession still returns the original session during rebuild', () => {
+          sessionDuringRebuild = manager!.getSession();
+          expect(sessionDuringRebuild).toBe(originalSession);
+        });
+
+        When('the rebuild completes', async () => {
+          rebuiltSession = await rebuildPromise!;
+        });
+
+        And('getSession returns the rebuilt session after completion', () => {
+          expect(rebuiltSession).not.toBeNull();
+          expect(rebuiltSession).not.toBe(originalSession);
+          expect(manager!.getSession()).toBe(rebuiltSession);
+        });
+      }
+    );
+
+    RuleScenario(
+      'Concurrent rebuild requests coalesce to the newest session',
+      ({ Given, When, Then, And }) => {
+        let manager: PipelineSessionManager | null = null;
+        let originalSession: PipelineSession | null = null;
+        let firstRebuild: Promise<PipelineSession> | null = null;
+        let secondRebuild: Promise<PipelineSession> | null = null;
+        let firstResult: PipelineSession | null = null;
+        let secondResult: PipelineSession | null = null;
+
+        Given('a PipelineSessionManager initialized with test data', async () => {
+          manager = new PipelineSessionManager();
+          originalSession = await manager.initialize({
+            input: ['src/**/*.ts'],
+            features: ['delivery-process/specs/*.feature'],
+          });
+        });
+
+        When('two rebuild calls are started without awaiting', () => {
+          firstRebuild = manager!.rebuild();
+          secondRebuild = manager!.rebuild();
+        });
+
+        Then('isRebuilding returns true while concurrent rebuilds are pending', () => {
+          expect(manager!.isRebuilding()).toBe(true);
+        });
+
+        When('both rebuild calls complete', async () => {
+          [firstResult, secondResult] = await Promise.all([firstRebuild!, secondRebuild!]);
+        });
+
+        Then('both rebuild calls resolve to the same latest session', () => {
+          expect(firstResult).not.toBeNull();
+          expect(firstResult).toBe(secondResult);
+          expect(firstResult).not.toBe(originalSession);
+        });
+
+        And('getSession returns that same latest session', () => {
+          expect(manager!.getSession()).toBe(firstResult);
+        });
+      }
+    );
+
+    RuleScenario(
+      'Config without sources falls back to conventional globs',
+      ({ Given, When, Then, And }) => {
+        let manager: PipelineSessionManager | null = null;
+        let session: PipelineSession | null = null;
+
+        Given(
+          'a temp project with a config file but no sources and conventional directories',
+          async () => {
+            state!.tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-config-fallback-test-'));
+            await fs.mkdir(path.join(state!.tempDir, 'src'), { recursive: true });
+            await fs.mkdir(path.join(state!.tempDir, 'delivery-process', 'specs'), {
+              recursive: true,
+            });
+
+            await fs.writeFile(
+              path.join(state!.tempDir, 'delivery-process.config.js'),
+              "export default { preset: 'libar-generic' };\n"
+            );
+            await fs.writeFile(
+              path.join(state!.tempDir, 'src', 'example.ts'),
+              [
+                '/**',
+                ' * @libar-docs',
+                ' * @libar-docs-pattern ExamplePattern',
+                ' * @libar-docs-status roadmap',
+                ' */',
+                'export const example = 1;',
+                '',
+              ].join('\n')
+            );
+            await fs.writeFile(
+              path.join(state!.tempDir, 'delivery-process', 'specs', 'example.feature'),
+              [
+                '@libar-docs',
+                'Feature: Example pattern metadata',
+                '',
+                '  Scenario: Placeholder',
+                '    Given nothing',
+                '',
+              ].join('\n')
+            );
+            manager = new PipelineSessionManager();
+          }
+        );
+
+        When('the PipelineSessionManager initializes from that temp project', async () => {
+          session = await manager!.initialize({ baseDir: state!.tempDir! });
+        });
+
+        Then('initialization succeeds using fallback source globs', () => {
+          expect(session).not.toBeNull();
+          expect(session!.dataset.patterns.length).toBeGreaterThan(0);
+        });
+
+        And('the session source globs include conventional TypeScript and feature paths', () => {
+          expect(session!.sourceGlobs.input).toContain('src/**/*.ts');
+          expect(session!.sourceGlobs.features).toContain('delivery-process/specs/*.feature');
+        });
+      }
+    );
+
     RuleScenario('isRebuilding flag lifecycle', ({ Given, Then, When }) => {
       let manager: PipelineSessionManager | null = null;
       let rebuildPromise: Promise<PipelineSession> | null = null;
@@ -196,7 +346,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
       And('each tool name starts with {string}', (_ctx: unknown, prefix: string) => {
         for (const [name] of state!.mockServer!.tools) {
-          expect(name).toMatch(new RegExp(`^${prefix}`));
+          expect(name.startsWith(prefix)).toBe(true);
         }
       });
     });
@@ -376,6 +526,21 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.parsedOptions!.input).toContain(expected);
       });
     });
+
+    RuleScenario('Version flag returns package version', ({ When, Then }) => {
+      let versionText: string | null = null;
+
+      When('parseCliArgs is called with {string}', (_ctx: unknown, args: string) => {
+        const argv = args.split(' ');
+        const result = parseCliArgs(argv);
+        expect(result.type).toBe('version');
+        versionText = result.type === 'version' ? result.text : null;
+      });
+
+      Then('the version text matches the package version', () => {
+        expect(versionText).toBe(`dp-mcp-server v${getPackageVersion()}`);
+      });
+    });
   });
 
   // ===========================================================================
@@ -501,7 +666,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     );
 
     RuleScenario(
-      'dp_pattern returns deliverables and dependencies',
+      'dp_pattern returns full metadata including business rules and extracted shapes',
       ({ Given, When, Then, And }) => {
         Given('a session with a pattern that has deliverables and dependencies', () => {
           state!.session = createRichPatternSession();
@@ -534,6 +699,26 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const parsed = JSON.parse(state!.toolResult!.content[0].text) as Record<string, unknown>;
           expect(parsed).toHaveProperty('dependencies');
           expect(parsed.dependencies).not.toBeNull();
+        });
+
+        And('the result contains directive and source metadata', () => {
+          const parsed = JSON.parse(state!.toolResult!.content[0].text) as Record<string, unknown>;
+          expect(parsed).toHaveProperty('directive');
+          expect(parsed).toHaveProperty('source');
+        });
+
+        And('the result contains business rules array', () => {
+          const parsed = JSON.parse(state!.toolResult!.content[0].text) as Record<string, unknown>;
+          expect(parsed).toHaveProperty('rules');
+          expect(Array.isArray(parsed.rules)).toBe(true);
+          expect((parsed.rules as unknown[]).length).toBeGreaterThan(0);
+        });
+
+        And('the result contains extracted shapes array', () => {
+          const parsed = JSON.parse(state!.toolResult!.content[0].text) as Record<string, unknown>;
+          expect(parsed).toHaveProperty('extractedShapes');
+          expect(Array.isArray(parsed.extractedShapes)).toBe(true);
+          expect((parsed.extractedShapes as unknown[]).length).toBeGreaterThan(0);
         });
       }
     );

@@ -25,6 +25,7 @@
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { getPackageVersion } from '../cli/version.js';
 import { PipelineSessionManager, type SessionOptions } from './pipeline-session.js';
 import { registerAllTools } from './tool-registry.js';
 import { McpFileWatcher } from './file-watcher.js';
@@ -60,6 +61,8 @@ function log(message: string): void {
   console.error(`[dp-mcp] ${message}`);
 }
 
+const DEFAULT_MCP_SERVER_VERSION = getPackageVersion();
+
 export async function startMcpServer(options: McpServerOptions = {}): Promise<void> {
   // Initialize pipeline session
   const sessionManager = new PipelineSessionManager();
@@ -73,7 +76,7 @@ export async function startMcpServer(options: McpServerOptions = {}): Promise<vo
   log(`Pipeline built in ${session.buildTimeMs}ms (${session.dataset.patterns.length} patterns)`);
 
   // Create MCP server
-  const version = options.version ?? '1.0.0';
+  const version = options.version ?? DEFAULT_MCP_SERVER_VERSION;
   const server = new McpServer(
     { name: 'delivery-process', version },
     { capabilities: { logging: {} } }
@@ -172,7 +175,10 @@ export function parseCliArgs(argv: string[], defaults: McpServerOptions = {}): P
       }
       case '--version':
       case '-v': {
-        return { type: 'version', text: 'dp-mcp-server v' + (defaults.version ?? '1.0.0') };
+        return {
+          type: 'version',
+          text: 'dp-mcp-server v' + (defaults.version ?? DEFAULT_MCP_SERVER_VERSION),
+        };
       }
       case '--help':
       case '-h': {

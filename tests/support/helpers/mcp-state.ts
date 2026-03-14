@@ -4,6 +4,8 @@
  * Shared state and mock infrastructure for MCP server tests.
  *
  * @libar-docs
+ * @libar-docs-depends-on MCPServerIntegration
+ * @libar-docs-uses MCPPipelineSession, ProcessStateAPI, TagRegistry
  */
 
 import type { PipelineSession, ParsedOptions } from '../../../src/mcp/index.js';
@@ -33,6 +35,7 @@ export interface McpTestState {
   error: Error | null;
   parsedOptions: ParsedOptions | null;
   isWatched: boolean | null;
+  tempDir: string | null;
 }
 
 // =============================================================================
@@ -126,6 +129,23 @@ export function createRichPatternSession(): PipelineSession {
       { name: 'Server entry point', status: 'complete', tests: 2, location: 'src/server.ts' },
       { name: 'Tool registry', status: 'in-progress', tests: 0, location: 'src/tools.ts' },
     ],
+    rules: [
+      {
+        name: 'Rich pattern metadata stays queryable',
+        description: 'Pattern detail output should include business rules and extracted shapes.',
+        scenarioCount: 1,
+        scenarioNames: ['Pattern detail includes full metadata'],
+      },
+    ],
+    extractedShapes: [
+      {
+        name: 'RichPatternShape',
+        kind: 'interface',
+        sourceText: 'export interface RichPatternShape { enabled: boolean; }',
+        lineNumber: 12,
+        exported: true,
+      },
+    ],
   });
   const dataset = createTestMasterDataset({ patterns: [focal, dep] });
   const api = createProcessStateAPI(dataset);
@@ -151,7 +171,8 @@ export function createRichPatternSession(): PipelineSession {
  */
 export class MockPipelineSessionManager {
   private session: PipelineSession;
-  private rebuilding = false;
+  private rebuildPromise: Promise<PipelineSession> | null = null;
+  private pendingRebuild = false;
 
   constructor(session: PipelineSession) {
     this.session = session;
@@ -163,14 +184,18 @@ export class MockPipelineSessionManager {
   }
 
   async rebuild(): Promise<PipelineSession> {
-    this.rebuilding = true;
-    this.session = {
-      ...this.session,
-      buildTimeMs: this.session.buildTimeMs + 100,
-    };
-    await Promise.resolve(); // Yield to preserve async contract
-    this.rebuilding = false;
-    return this.session;
+    if (this.rebuildPromise !== null) {
+      this.pendingRebuild = true;
+      return this.rebuildPromise;
+    }
+
+    this.rebuildPromise = this.runRebuildLoop();
+    try {
+      return await this.rebuildPromise;
+    } finally {
+      this.pendingRebuild = false;
+      this.rebuildPromise = null;
+    }
   }
 
   getSession(): PipelineSession {
@@ -178,7 +203,28 @@ export class MockPipelineSessionManager {
   }
 
   isRebuilding(): boolean {
-    return this.rebuilding;
+    return this.rebuildPromise !== null;
+  }
+
+  private async runRebuildLoop(): Promise<PipelineSession> {
+    let latestSession = this.session;
+
+    for (;;) {
+      this.pendingRebuild = false;
+      const newSession = {
+        ...latestSession,
+        buildTimeMs: latestSession.buildTimeMs + 100,
+      };
+      await Promise.resolve(); // Yield before swap to mirror production atomic rebuild semantics
+      this.session = newSession;
+      latestSession = newSession;
+
+      // Another caller may set pendingRebuild while the async boundary yields.
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (!this.pendingRebuild) {
+        return latestSession;
+      }
+    }
   }
 }
 
@@ -195,5 +241,6 @@ export function initMcpState(): McpTestState {
     error: null,
     parsedOptions: null,
     isWatched: null,
+    tempDir: null,
   };
 }

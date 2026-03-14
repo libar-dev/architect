@@ -93,7 +93,8 @@ Feature: MCP Server Integration
     **Output:** RegisteredTools -- 25 tools with dp_ prefix, Zod input schemas, handler functions
 
     **Verified by:** All CLI subcommands appear as MCP tools,
-    Tool schemas validate input parameters
+    Tool schemas validate input parameters,
+    Pattern detail returns full metadata
 
     @acceptance-criteria @happy-path
     Scenario: All CLI subcommands appear as MCP tools
@@ -115,13 +116,21 @@ Feature: MCP Server Integration
       When the client calls "dp_pattern" without the required "name" parameter
       Then the response is an MCP error indicating invalid params
 
+    @acceptance-criteria @happy-path
+    Scenario: Pattern detail returns full metadata
+      Given the MCP server is initialized
+      When the client calls "dp_pattern" for a pattern with rules and extracted shapes
+      Then the response contains the full pattern metadata payload
+      And the response includes deliverables, dependencies, business rules, and extracted shapes
+
   @libar-docs-sequence-step:3
   @libar-docs-sequence-module:pipeline-session
   Rule: MasterDataset is loaded once and reused across all tool invocations
 
     **Invariant:** The pipeline runs exactly once during server initialization. All
     subsequent tool calls read from in-memory MasterDataset. A manual rebuild can
-    be triggered via a "dp_rebuild" tool.
+    be triggered via a "dp_rebuild" tool, and overlapping rebuild requests coalesce
+    so the final in-memory session reflects the newest completed build.
 
     **Rationale:** The pipeline costs 2-5 seconds. Running it per tool call negates
     MCP benefits. Pre-computed views provide O(1) access ideal for a query server.
@@ -131,7 +140,8 @@ Feature: MCP Server Integration
     **Output:** ToolCallResult -- content, isError
 
     **Verified by:** Multiple tool calls share one pipeline build,
-    Rebuild refreshes the dataset
+    Rebuild refreshes the dataset,
+    Concurrent rebuild requests coalesce
 
     @acceptance-criteria @happy-path
     Scenario: Multiple tool calls share one pipeline build
@@ -146,6 +156,13 @@ Feature: MCP Server Integration
       When the client calls "dp_rebuild"
       Then the pipeline runs again
       And subsequent tool calls use the new dataset
+
+    @acceptance-criteria @happy-path
+    Scenario: Concurrent rebuild requests coalesce
+      Given the MCP server is running with a loaded dataset
+      When two rebuild requests arrive before the first rebuild completes
+      Then the server serializes the rebuild work
+      And the final in-memory session is the newest rebuilt dataset
 
     @acceptance-criteria @edge-case @libar-docs-sequence-error
     Scenario: Concurrent reads during rebuild use previous dataset
@@ -199,7 +216,8 @@ Feature: MCP Server Integration
 
     **Invariant:** The server works with .mcp.json (Claude Code), claude_desktop_config.json
     (Claude Desktop), and any MCP client. It accepts --input, --features, --base-dir
-    args and auto-detects delivery-process.config.ts.
+    args, auto-detects delivery-process.config.ts, and reports the package version
+    accurately through the CLI.
 
     **Rationale:** MCP clients discover servers through configuration files. The
     server must work with sensible defaults (config auto-detection) while supporting
@@ -210,7 +228,9 @@ Feature: MCP Server Integration
     **Output:** McpServerOptions -- parsed options merged with config defaults
 
     **Verified by:** Default config auto-detection,
-    Server works when started via npx
+    Config without explicit sources falls back to conventional globs,
+    Server works when started via npx,
+    Version flag reports package version
 
     @acceptance-criteria @happy-path
     Scenario: Default config auto-detection
@@ -220,11 +240,24 @@ Feature: MCP Server Integration
       And the pipeline builds successfully
 
     @acceptance-criteria @happy-path
+    Scenario: Config without explicit sources falls back to conventional globs
+      Given a project with delivery-process.config.ts but no explicit sources
+      When the MCP server is started without explicit arguments
+      Then it falls back to the conventional source globs
+      And the pipeline builds successfully
+
+    @acceptance-criteria @happy-path
     Scenario: Server works when started via npx
       Given the package is installed
       When running "npx @libar-dev/delivery-process dp-mcp-server"
       Then the server process starts and awaits MCP initialize
       And no extraneous output appears on stdout
+
+    @acceptance-criteria @happy-path
+    Scenario: Version flag reports package version
+      Given the package is installed
+      When running "npx @libar-dev/delivery-process dp-mcp-server --version"
+      Then the output contains the current package version
 
     @acceptance-criteria @edge-case @libar-docs-sequence-error
     Scenario: No config file and no explicit globs

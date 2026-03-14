@@ -19,7 +19,10 @@ Feature: MCP Server Integration Tests
 
     **Verified by:** Session initializes and contains dataset,
     getSession throws before initialization,
+    Config without sources falls back to conventional globs,
     Rebuild replaces session atomically,
+    getSession returns the previous session during rebuild,
+    Concurrent rebuild requests coalesce to the newest session,
     isRebuilding flag lifecycle
 
     Scenario: Session initializes and contains dataset
@@ -33,11 +36,32 @@ Feature: MCP Server Integration Tests
       When getSession is called without initialization
       Then it throws an error containing "Session not initialized"
 
+    Scenario: Config without sources falls back to conventional globs
+      Given a temp project with a config file but no sources and conventional directories
+      When the PipelineSessionManager initializes from that temp project
+      Then initialization succeeds using fallback source globs
+      And the session source globs include conventional TypeScript and feature paths
+
     Scenario: Rebuild replaces session atomically
       Given a PipelineSessionManager initialized with test data
       When rebuild is called
       Then a new session is returned
       And the new session has a different build time than the original
+
+    Scenario: getSession returns the previous session during rebuild
+      Given a PipelineSessionManager initialized with test data
+      When rebuild is started without awaiting
+      Then getSession still returns the original session during rebuild
+      When the rebuild completes
+      And getSession returns the rebuilt session after completion
+
+    Scenario: Concurrent rebuild requests coalesce to the newest session
+      Given a PipelineSessionManager initialized with test data
+      When two rebuild calls are started without awaiting
+      Then isRebuilding returns true while concurrent rebuilds are pending
+      When both rebuild calls complete
+      Then both rebuild calls resolve to the same latest session
+      And getSession returns that same latest session
 
     Scenario: isRebuilding flag lifecycle
       Given a PipelineSessionManager initialized with test data
@@ -120,7 +144,7 @@ Feature: MCP Server Integration Tests
   Rule: CLI argument parser handles all flag variants
 
     **Invariant:** The parser supports --input, --features, --base-dir,
-    --watch with short forms and handles -- separator and unknown args.
+    --watch with short forms, handles -- separator, and reports version correctly.
 
     **Rationale:** Verifies the exported parseCliArgs function directly.
 
@@ -131,7 +155,7 @@ Feature: MCP Server Integration Tests
     Base-dir flag sets directory,
     Multiple input globs accumulate,
     Double-dash separator is skipped,
-    Unknown flags produce no crash
+    Version flag returns package version
 
     Scenario Outline: CLI flags are parsed correctly
       When parseCliArgs is called with "<args>"
@@ -155,6 +179,10 @@ Feature: MCP Server Integration Tests
     Scenario: Double-dash separator is skipped
       When parseCliArgs is called with "-- --input src/**/*.ts"
       Then the parsed input contains "src/**/*.ts"
+
+    Scenario: Version flag returns package version
+      When parseCliArgs is called with "--version"
+      Then the version text matches the package version
 
   Rule: Tool output format matches expected content type
 
@@ -186,14 +214,14 @@ Feature: MCP Server Integration Tests
   Rule: Tool output correctness for edge cases
 
     **Invariant:** dp_rules without a pattern filter returns a compact summary
-    instead of the full rules corpus. dp_pattern returns rich metadata including
-    deliverables and dependencies.
+    instead of the full rules corpus. dp_pattern returns full metadata including
+    deliverables, dependencies, business rules, and extracted shapes.
 
     **Rationale:** Unfiltered dp_rules returned 889K chars which breaks MCP clients.
     dp_pattern must match its description ("full metadata") to enable accurate tool selection.
 
     **Verified by:** dp_rules without pattern returns compact summary,
-    dp_pattern returns deliverables and dependencies
+    dp_pattern returns full metadata including business rules and extracted shapes
 
     Scenario: dp_rules without pattern returns compact summary
       Given an McpServer mock with registered tools
@@ -202,9 +230,12 @@ Feature: MCP Server Integration Tests
       And the result contains a hint about using pattern parameter
       And the result does not contain full rule details
 
-    Scenario: dp_pattern returns deliverables and dependencies
+    Scenario: dp_pattern returns full metadata including business rules and extracted shapes
       Given a session with a pattern that has deliverables and dependencies
       And an McpServer mock with registered tools using that session
       When dp_pattern is called for that pattern
       Then the result contains deliverables array
       And the result contains dependencies object
+      And the result contains directive and source metadata
+      And the result contains business rules array
+      And the result contains extracted shapes array

@@ -269,7 +269,7 @@ export type ProjectConfigLoadResult =
  * Only fills in sources not already provided by CLI flags.
  *
  * @param config - Mutable config object with baseDir, input, and features arrays
- * @returns true if a non-default project config was found and applied
+ * @returns true if project config sources were applied to at least one empty source list
  */
 export async function applyProjectSourceDefaults(config: {
   readonly baseDir: string;
@@ -286,13 +286,17 @@ export async function applyProjectSourceDefaults(config: {
   }
 
   const resolved = result.value;
+  let applied = false;
+
   if (config.input.length === 0 && resolved.project.sources.typescript.length > 0) {
     config.input.push(...resolved.project.sources.typescript);
+    applied = true;
   }
   if (config.features.length === 0 && resolved.project.sources.features.length > 0) {
     config.features.push(...resolved.project.sources.features);
+    applied = true;
   }
-  return true;
+  return applied;
 }
 
 export async function loadProjectConfig(baseDir: string): Promise<ProjectConfigLoadResult> {

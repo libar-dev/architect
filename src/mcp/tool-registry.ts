@@ -54,7 +54,7 @@ import { queryBusinessRules } from '../api/rules-query.js';
 import { findStubPatterns, resolveStubs, groupStubsByPattern } from '../api/stub-resolver.js';
 import { fuzzyMatchPatterns } from '../api/fuzzy-match.js';
 import { allPatternNames, getPatternName } from '../api/pattern-helpers.js';
-import { summarizePattern, summarizePatterns } from '../api/summarize.js';
+import { summarizePatterns } from '../api/summarize.js';
 
 // =============================================================================
 // Types
@@ -273,8 +273,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
       }
       const canonicalName = getPatternName(pattern);
       return jsonResult({
-        ...summarizePattern(pattern),
-        description: pattern.directive.description || null,
+        ...pattern,
         deliverables: s.api.getPatternDeliverables(canonicalName),
         dependencies: s.api.getPatternDependencies(canonicalName) ?? null,
         relationships: s.api.getPatternRelationships(canonicalName) ?? null,
@@ -656,9 +655,6 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
       inputSchema: z.object({}),
     },
     safeHandler(async () => {
-      if (sessionManager.isRebuilding()) {
-        return textResult('Rebuild already in progress.');
-      }
       const newSession = await sessionManager.rebuild();
       return textResult(
         `Dataset rebuilt in ${newSession.buildTimeMs}ms. ${newSession.dataset.patterns.length} patterns loaded.`
