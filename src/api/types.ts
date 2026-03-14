@@ -25,6 +25,24 @@ import type { ImplementationRef } from '../validation-schemas/master-dataset.js'
 // =============================================================================
 
 /**
+ * Optional extended metadata for query responses.
+ * Populated when the pipeline runs (not for FSM short-circuit queries).
+ */
+export interface QueryMetadataExtra {
+  readonly validation?: {
+    readonly danglingReferenceCount: number;
+    readonly malformedPatternCount: number;
+    readonly unknownStatusCount: number;
+    readonly warningCount: number;
+  };
+  readonly cache?: {
+    readonly hit: boolean;
+    readonly ageMs?: number;
+  };
+  readonly pipelineMs?: number;
+}
+
+/**
  * Successful query response
  */
 export interface QuerySuccess<T> {
@@ -33,7 +51,7 @@ export interface QuerySuccess<T> {
   metadata: {
     timestamp: string;
     patternCount: number;
-  };
+  } & QueryMetadataExtra;
 }
 
 /**
@@ -247,15 +265,20 @@ export interface NeighborEntry {
 // =============================================================================
 
 /**
- * Create a success response
+ * Create a success response with optional extended metadata.
  */
-export function createSuccess<T>(data: T, patternCount: number): QuerySuccess<T> {
+export function createSuccess<T>(
+  data: T,
+  patternCount: number,
+  extra?: QueryMetadataExtra
+): QuerySuccess<T> {
   return {
     success: true,
     data,
     metadata: {
       timestamp: new Date().toISOString(),
       patternCount,
+      ...extra,
     },
   };
 }

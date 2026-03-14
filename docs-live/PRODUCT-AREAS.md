@@ -51,7 +51,7 @@ Validation is the enforcement boundary — it ensures that every change to annot
 
 The Data API provides direct terminal access to delivery process state. It replaces reading generated markdown or launching explore agents — targeted queries use 5-10x less context. The `context` command assembles curated bundles tailored to session type (planning, design, implement).
 
-**36 patterns** — 23 completed, 9 active, 4 planned
+**41 patterns** — 24 completed, 14 active, 3 planned
 
 **Key patterns:** DataAPIContextAssembly, ProcessStateAPICLI, DataAPIDesignSessionSupport, DataAPIRelationshipGraph, DataAPIOutputShaping
 
@@ -85,10 +85,10 @@ Process defines the USDP-inspired session workflow that governs how work moves t
 | [Configuration](product-areas/CONFIGURATION.md) | 11       | 8         | 0      | 3       |
 | [Generation](product-areas/GENERATION.md)       | 94       | 81        | 5      | 8       |
 | [Validation](product-areas/VALIDATION.md)       | 22       | 16        | 0      | 6       |
-| [DataAPI](product-areas/DATA-API.md)            | 36       | 23        | 9      | 4       |
+| [DataAPI](product-areas/DATA-API.md)            | 41       | 24        | 14     | 3       |
 | [CoreTypes](product-areas/CORE-TYPES.md)        | 7        | 7         | 0      | 0       |
 | [Process](product-areas/PROCESS.md)             | 11       | 4         | 0      | 7       |
-| **Total**                                       | **207**  | **162**   | **16** | **29**  |
+| **Total**                                       | **212**  | **163**   | **21** | **28**  |
 
 ---
 
@@ -120,9 +120,9 @@ C4Context
     System(DataAPIContextAssembly, "DataAPIContextAssembly")
     System(CrossCuttingDocumentInclusion, "CrossCuttingDocumentInclusion")
     System(CodecDrivenReferenceGeneration, "CodecDrivenReferenceGeneration")
+    System(StringUtils, "StringUtils")
     System(ResultMonad, "ResultMonad")
     System(ErrorFactories, "ErrorFactories")
-    System(StringUtils, "StringUtils")
     System(ExtractionPipelineEnhancementsTesting, "ExtractionPipelineEnhancementsTesting")
     System(KebabCaseSlugs, "KebabCaseSlugs")
     System(ErrorHandlingUnification, "ErrorHandlingUnification")
@@ -199,9 +199,9 @@ graph LR
     DataAPIContextAssembly["DataAPIContextAssembly"]
     CrossCuttingDocumentInclusion["CrossCuttingDocumentInclusion"]
     CodecDrivenReferenceGeneration["CodecDrivenReferenceGeneration"]
+    StringUtils["StringUtils"]
     ResultMonad["ResultMonad"]
     ErrorFactories["ErrorFactories"]
-    StringUtils["StringUtils"]
     ExtractionPipelineEnhancementsTesting["ExtractionPipelineEnhancementsTesting"]
     KebabCaseSlugs["KebabCaseSlugs"]
     ErrorHandlingUnification["ErrorHandlingUnification"]

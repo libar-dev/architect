@@ -7,11 +7,11 @@
 
 ## Overview
 
-This diagram was auto-generated from 158 annotated source files across 11 bounded contexts.
+This diagram was auto-generated from 160 annotated source files across 11 bounded contexts.
 
 | Metric           | Count |
 | ---------------- | ----- |
-| Total Components | 158   |
+| Total Components | 160   |
 | Bounded Contexts | 11    |
 | Component Roles  | 5     |
 
@@ -43,6 +43,7 @@ graph TB
     subgraph cli["Cli BC"]
         CLIVersionHelper["CLIVersionHelper"]
         ValidatePatternsCLI["ValidatePatternsCLI"]
+        ReplMode["ReplMode[service]"]
         ProcessAPICLIImpl["ProcessAPICLIImpl[service]"]
         OutputPipelineImpl["OutputPipelineImpl[service]"]
         LintProcessCLI["LintProcessCLI"]
@@ -50,6 +51,7 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
+        DatasetCache["DatasetCache[infrastructure]"]
         CLISchema["CLISchema"]
     end
     subgraph config["Config BC"]
@@ -179,7 +181,6 @@ graph TB
         FSMModule["FSMModule"]
     end
     subgraph shared["Shared Infrastructure"]
-        Convention_Annotation_Example___DD_3_Decision["Convention Annotation Example — DD-3 Decision[decider]"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -190,6 +191,8 @@ graph TB
         CodecUtils["CodecUtils"]
         ResultMonadTypes["ResultMonadTypes"]
         ErrorFactoryTypes["ErrorFactoryTypes"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
@@ -203,8 +206,15 @@ graph TB
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
         GeneratorRegistry["GeneratorRegistry"]
+        RenderableUtils["RenderableUtils"]
+        SectionBlock["SectionBlock"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         ShapeExtractor["ShapeExtractor"]
         LayerInference["LayerInference"]
+        ProcessStateTypes["ProcessStateTypes"]
+        StubResolverImpl["StubResolverImpl"]
+        RulesQueryModule["RulesQueryModule"]
+        APIModule["APIModule"]
         CLIVersionHelper["CLIVersionHelper"]
         ValidatePatternsCLI["ValidatePatternsCLI"]
         LintProcessCLI["LintProcessCLI"]
@@ -212,15 +222,8 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
-        ProcessStateTypes["ProcessStateTypes"]
-        StubResolverImpl["StubResolverImpl"]
-        RulesQueryModule["RulesQueryModule"]
-        APIModule["APIModule"]
-        RenderableUtils["RenderableUtils"]
-        SectionBlock["SectionBlock"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
+        Convention_Annotation_Example___DD_3_Decision["Convention Annotation Example — DD-3 Decision[decider]"]
+        FSMModule["FSMModule"]
         ProcessGuardTypes["ProcessGuardTypes"]
         ProcessGuardModule["ProcessGuardModule"]
         DetectChanges["DetectChanges"]
@@ -246,7 +249,6 @@ graph TB
         ClaudeModuleCodec["ClaudeModuleCodec"]
         BusinessRulesCodec["BusinessRulesCodec"]
         AdrDocumentCodec["AdrDocumentCodec"]
-        FSMModule["FSMModule"]
         CodecBaseOptions["CodecBaseOptions"]
         ADR006SingleReadModelArchitecture["ADR006SingleReadModelArchitecture"]
         ADR005CodecBasedMarkdownRendering["ADR005CodecBasedMarkdownRendering"]
@@ -264,10 +266,10 @@ graph TB
         EffortVarianceTracking["EffortVarianceTracking"]
         ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
         CliBehaviorTesting["CliBehaviorTesting"]
-        StringUtils["StringUtils"]
         ProcessGuardTesting["ProcessGuardTesting"]
         ResultMonad["ResultMonad"]
         ErrorFactories["ErrorFactories"]
+        StringUtils["StringUtils"]
         SessionHandoffs["SessionHandoffs"]
         SessionFileLifecycle["SessionFileLifecycle"]
         KebabCaseSlugs["KebabCaseSlugs"]
@@ -278,22 +280,22 @@ graph TB
     DocDirectiveSchema ..-> MvpWorkflowImplementation
     ResultMonadTypes ..-> ResultMonad
     ErrorFactoryTypes ..-> ErrorFactories
+    DoDValidator --> DoDValidationTypes
+    DoDValidator --> DualSourceExtractor
+    AntiPatternDetector --> DoDValidationTypes
     CategoryDefinition ..-> CategoryDefinitions
-    GherkinScanner --> GherkinASTParser
-    TypeScript_AST_Parser --> DocDirectiveSchema
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    GherkinScanner --> GherkinASTParser
+    TypeScript_AST_Parser --> DocDirectiveSchema
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> ShapeExtractor
     SourceMapper -.-> GherkinASTParser
     GeneratorRegistry --> GeneratorTypes
     Documentation_Generation_Orchestrator --> Pattern_Scanner
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
+    SectionBlock ..-> RenderableDocument
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     ConfigResolver --> ProjectConfigTypes
@@ -311,22 +313,10 @@ graph TB
     DefineConfig --> ProjectConfigTypes
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> GherkinExtractor
-    ValidatePatternsCLI --> MasterDataset
-    ValidatePatternsCLI --> CodecUtils
-    ProcessAPICLIImpl --> ProcessStateAPI
-    ProcessAPICLIImpl --> MasterDataset
-    ProcessAPICLIImpl --> PipelineFactory
-    ProcessAPICLIImpl --> RulesQueryModule
-    ProcessAPICLIImpl --> PatternSummarizerImpl
-    ProcessAPICLIImpl --> FuzzyMatcherImpl
-    ProcessAPICLIImpl --> OutputPipelineImpl
-    OutputPipelineImpl --> PatternSummarizerImpl
-    LintProcessCLI --> ProcessGuardModule
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    TagTaxonomyCLI --> ConfigLoader
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
@@ -349,10 +339,28 @@ graph TB
     ContextAssemblerImpl --> StubResolverImpl
     ArchQueriesImpl --> ProcessStateAPI
     ArchQueriesImpl --> MasterDataset
-    SectionBlock ..-> RenderableDocument
-    DoDValidator --> DoDValidationTypes
-    DoDValidator --> DualSourceExtractor
-    AntiPatternDetector --> DoDValidationTypes
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> GherkinExtractor
+    ValidatePatternsCLI --> MasterDataset
+    ValidatePatternsCLI --> CodecUtils
+    ReplMode --> PipelineFactory
+    ReplMode --> ProcessStateAPI
+    ProcessAPICLIImpl --> ProcessStateAPI
+    ProcessAPICLIImpl --> MasterDataset
+    ProcessAPICLIImpl --> PipelineFactory
+    ProcessAPICLIImpl --> RulesQueryModule
+    ProcessAPICLIImpl --> PatternSummarizerImpl
+    ProcessAPICLIImpl --> FuzzyMatcherImpl
+    ProcessAPICLIImpl --> OutputPipelineImpl
+    OutputPipelineImpl --> PatternSummarizerImpl
+    LintProcessCLI --> ProcessGuardModule
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    TagTaxonomyCLI --> ConfigLoader
+    DatasetCache --> PipelineFactory
+    DatasetCache --> WorkflowConfigSchema
+    FSMValidator --> FSMTransitions
+    FSMValidator --> FSMStates
     DetectChanges --> DeriveProcessState
     DeriveProcessState --> GherkinScanner
     DeriveProcessState --> FSMValidator
@@ -381,8 +389,6 @@ graph TB
     DesignReviewCodec --> MasterDataset
     DesignReviewCodec --> MermaidDiagramUtils
     ArchitectureCodec --> MasterDataset
-    FSMValidator --> FSMTransitions
-    FSMValidator --> FSMStates
     ADR006SingleReadModelArchitecture -.-> ADR005CodecBasedMarkdownRendering
     ADR003SourceFirstPatternArchitecture -.-> ADR001TaxonomyCanonicalValues
     ValidatorReadModelConsolidation -.-> ADR006SingleReadModelArchitecture
@@ -431,8 +437,10 @@ All components with architecture annotations:
 | 🚧 Process State API                                              | api        | service        | application    | src/api/process-state.ts                                                     |
 | ✅ Scope Validator Impl                                           | api        | service        | application    | src/api/scope-validator.ts                                                   |
 | ✅ CLI Schema                                                     | cli        | -              | domain         | src/cli/cli-schema.ts                                                        |
+| 🚧 Dataset Cache                                                  | cli        | infrastructure | infrastructure | src/cli/dataset-cache.ts                                                     |
 | 🚧 Output Pipeline Impl                                           | cli        | service        | application    | src/cli/output-pipeline.ts                                                   |
 | 🚧 Process API CLI Impl                                           | cli        | service        | application    | src/cli/process-api.ts                                                       |
+| 🚧 Repl Mode                                                      | cli        | service        | application    | src/cli/repl.ts                                                              |
 | ✅ Configuration Defaults                                         | config     | -              | domain         | src/config/defaults.ts                                                       |
 | ✅ Configuration Presets                                          | config     | -              | domain         | src/config/presets.ts                                                        |
 | ✅ Configuration Types                                            | config     | -              | domain         | src/config/types.ts                                                          |

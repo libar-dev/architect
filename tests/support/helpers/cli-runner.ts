@@ -37,6 +37,8 @@ export interface CLIOptions {
   env?: NodeJS.ProcessEnv;
   /** Timeout in milliseconds (default: 30000) */
   timeout?: number;
+  /** Data to pipe to stdin (closes stdin after writing) */
+  stdin?: string;
 }
 
 // =============================================================================
@@ -92,7 +94,12 @@ export async function runCLI(
   args: string[],
   options: CLIOptions = {}
 ): Promise<CLIResult> {
-  const { cwd = process.cwd(), env = process.env, timeout = DEFAULT_TIMEOUT } = options;
+  const {
+    cwd = process.cwd(),
+    env = process.env,
+    timeout = DEFAULT_TIMEOUT,
+    stdin: stdinData,
+  } = options;
 
   const cliPath = getCLIPath(cliName);
 
@@ -102,6 +109,16 @@ export async function runCLI(
       env: { ...env, FORCE_COLOR: '0' }, // Disable color codes for easier assertion
       shell: true,
     });
+
+    // Pipe stdin data if provided, then close stdin
+    if (stdinData !== undefined) {
+      child.stdin.on('error', (error: NodeJS.ErrnoException) => {
+        if (error.code !== 'EPIPE') {
+          reject(error);
+        }
+      });
+      child.stdin.end(stdinData);
+    }
 
     let stdout = '';
     let stderr = '';

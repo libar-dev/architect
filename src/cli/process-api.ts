@@ -47,7 +47,19 @@ import { createProcessStateAPI } from '../api/process-state.js';
 import type { ProcessStateAPI } from '../api/process-state.js';
 import type { ExtractedPattern } from '../validation-schemas/index.js';
 import type { TagRegistry } from '../validation-schemas/tag-registry.js';
-import { createSuccess, createError, QueryApiError } from '../api/types.js';
+import {
+  createSuccess,
+  createError,
+  QueryApiError,
+  type QueryMetadataExtra,
+} from '../api/types.js';
+import {
+  computeCacheKey,
+  tryLoadCache,
+  writeCache,
+  getCacheDir,
+  cacheFileExists,
+} from './dataset-cache.js';
 import { handleCliError } from './error-handler.js';
 import { printVersionAndExit } from './version.js';
 import { CLI_SCHEMA } from './cli-schema.js';
@@ -117,6 +129,8 @@ import {
   type HandoffSessionType,
 } from '../api/handoff-generator.js';
 import { execSync } from 'child_process';
+import { glob } from 'glob';
+import { startRepl } from './repl.js';
 import { queryBusinessRules } from '../api/rules-query.js';
 import type { RulesFilters } from '../api/rules-query.js';
 
@@ -136,6 +150,9 @@ interface ProcessAPICLIConfig {
   modifiers: OutputModifiers;
   format: 'json' | 'compact';
   sessionType: SessionType | null;
+  noCache: boolean;
+  dryRun: boolean;
+  subcommandHelp: string | null;
 }
 
 // =============================================================================
@@ -155,6 +172,9 @@ function parseArgs(argv: string[] = process.argv.slice(2)): ProcessAPICLIConfig 
     modifiers: { ...DEFAULT_OUTPUT_MODIFIERS },
     format: 'json',
     sessionType: null,
+    noCache: false,
+    dryRun: false,
+    subcommandHelp: null,
   };
 
   // Mutable modifiers for parsing
@@ -176,11 +196,26 @@ function parseArgs(argv: string[] = process.argv.slice(2)): ProcessAPICLIConfig 
 
     // Handle --help and --version regardless of position
     if (arg === '-h' || arg === '--help') {
-      config.help = true;
+      // If a subcommand was already parsed, this is per-subcommand help
+      if (config.subcommand !== null) {
+        config.subcommandHelp = config.subcommand;
+      } else {
+        config.help = true;
+      }
       continue;
     }
     if (arg === '-v' || arg === '--version') {
       config.version = true;
+      continue;
+    }
+
+    // Handle cache and diagnostic flags regardless of position
+    if (arg === '--no-cache') {
+      config.noCache = true;
+      continue;
+    }
+    if (arg === '--dry-run') {
+      config.dryRun = true;
       continue;
     }
 
@@ -433,6 +468,115 @@ Available API Methods (for 'query'):
             getRecentlyCompleted
   Raw:      getMasterDataset
 `);
+}
+
+/**
+ * Per-subcommand help: shows usage, flags, and examples for a specific subcommand.
+ * Looks up command narrative from CLI_SCHEMA.commandNarratives.
+ */
+function showSubcommandHelp(subcommand: string): void {
+  // Search for the command in commandNarratives groups
+  const narratives = CLI_SCHEMA.commandNarratives;
+  if (narratives !== undefined) {
+    for (const group of narratives) {
+      for (const cmd of group.commands) {
+        if (cmd.command === subcommand) {
+          console.log(`\nprocess-api ${subcommand} — ${cmd.description}\n`);
+          console.log(`Usage: ${cmd.usageExample}\n`);
+          if (cmd.details !== undefined) {
+            console.log(cmd.details);
+            console.log('');
+          }
+          if (cmd.expectedOutput !== undefined) {
+            console.log(`Expected output: ${cmd.expectedOutput}\n`);
+          }
+
+          // Show applicable option groups
+          const applicableGroups = getSubcommandOptionGroups(subcommand);
+          for (const groupKey of applicableGroups) {
+            const optGroup = CLI_SCHEMA[groupKey as keyof typeof CLI_SCHEMA] as
+              | CLIOptionGroup
+              | undefined;
+            if (optGroup !== undefined && 'options' in optGroup) {
+              console.log(`${optGroup.title}:\n`);
+              console.log(formatHelpOptions(optGroup));
+              console.log('');
+            }
+          }
+          return;
+        }
+      }
+    }
+  }
+
+  // Fallback: subcommand not found in narratives
+  console.log(`\nNo detailed help available for '${subcommand}'.`);
+  console.log('Run process-api --help for the full command reference.\n');
+}
+
+/**
+ * Map subcommands to their applicable CLI option groups.
+ */
+function getSubcommandOptionGroups(subcommand: string): readonly string[] {
+  const mapping: Record<string, readonly string[]> = {
+    context: ['sessionOptions'],
+    'scope-validate': ['sessionOptions'],
+    list: ['listFilters', 'outputModifiers'],
+    search: ['outputModifiers'],
+    query: ['outputModifiers'],
+    status: ['outputModifiers'],
+    pattern: ['outputModifiers'],
+    stubs: ['outputModifiers'],
+    decisions: ['outputModifiers'],
+    pdr: ['outputModifiers'],
+    rules: ['outputModifiers'],
+    tags: ['outputModifiers'],
+    sources: ['outputModifiers'],
+    arch: ['outputModifiers'],
+    sequence: ['outputModifiers'],
+  };
+  return mapping[subcommand] ?? [];
+}
+
+/**
+ * Execute dry-run: show pipeline scope (files, config, cache) without processing.
+ */
+async function executeDryRun(opts: ProcessAPICLIConfig): Promise<void> {
+  const baseDir = path.resolve(opts.baseDir);
+
+  // Resolve globs to file lists
+  const tsFiles = await glob(opts.input, { cwd: baseDir });
+  const featureFiles = await glob(opts.features, { cwd: baseDir });
+
+  // Check config file
+  const configPath = path.join(baseDir, 'delivery-process.config.ts');
+  const hasConfig = fs.existsSync(configPath);
+
+  // Check cache status
+  const cacheDir = getCacheDir(opts.baseDir);
+  const cacheInfo = cacheFileExists(cacheDir);
+
+  console.log('=== DRY RUN ===');
+  console.log(
+    `Config: ${hasConfig ? 'delivery-process.config.ts (auto-detected)' : 'none (filesystem fallback)'}`
+  );
+  console.log(`Base dir: ${baseDir}`);
+  console.log(`Input patterns: ${opts.input.join(', ')}`);
+  console.log(`Feature patterns: ${opts.features.join(', ')}`);
+  console.log(`TypeScript files: ${tsFiles.length}`);
+  console.log(`Feature files: ${featureFiles.length}`);
+  console.log(`Workflow: ${opts.workflowPath ?? 'default (6-phase-standard)'}`);
+  if (cacheInfo.exists) {
+    const sizeKb =
+      cacheInfo.sizeBytes !== undefined
+        ? `${(cacheInfo.sizeBytes / 1024).toFixed(1)}KB`
+        : 'unknown';
+    console.log(`Cache: ${path.join(cacheDir, 'dataset.json')} (${sizeKb})`);
+  } else {
+    console.log('Cache: none');
+  }
+  console.log(`Subcommand: ${opts.subcommand ?? '(none)'}`);
+  console.log('\nNo pipeline processing performed.');
 }
 
 // =============================================================================
@@ -1558,6 +1702,27 @@ async function routeSubcommand(ctx: RouteContext): Promise<unknown> {
 // Main
 // =============================================================================
 
+/**
+ * Build extended query metadata from pipeline results.
+ */
+function buildQueryMetadataExtra(
+  validation: ValidationSummary,
+  cacheHit: boolean,
+  cacheAgeMs: number | undefined,
+  pipelineMs: number
+): QueryMetadataExtra {
+  return {
+    validation: {
+      danglingReferenceCount: validation.danglingReferences.length,
+      malformedPatternCount: validation.malformedPatterns.length,
+      unknownStatusCount: validation.unknownStatuses.length,
+      warningCount: validation.warningCount,
+    },
+    cache: cacheAgeMs !== undefined ? { hit: cacheHit, ageMs: cacheAgeMs } : { hit: cacheHit },
+    pipelineMs,
+  };
+}
+
 async function main(): Promise<void> {
   const opts = parseArgs();
 
@@ -1568,6 +1733,24 @@ async function main(): Promise<void> {
   if (opts.help || !opts.subcommand) {
     showHelp();
     process.exit(opts.help ? 0 : 1);
+  }
+
+  // Per-subcommand help (e.g., `process-api context --help`)
+  if (opts.subcommandHelp !== null) {
+    showSubcommandHelp(opts.subcommandHelp);
+    process.exit(0);
+  }
+
+  // REPL mode: interactive multi-query session (manages its own pipeline lifecycle)
+  if (opts.subcommand === 'repl') {
+    await applyConfigDefaults(opts);
+    await startRepl({
+      input: opts.input,
+      features: opts.features,
+      baseDir: opts.baseDir,
+      workflowPath: opts.workflowPath,
+    });
+    return;
   }
 
   // Validate output modifiers before any expensive work
@@ -1597,8 +1780,46 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  // Build pipeline (steps 1-8)
-  const { dataset: masterDataset, validation } = await buildPipeline(opts);
+  // Dry-run: show pipeline scope without executing
+  if (opts.dryRun) {
+    await executeDryRun(opts);
+    return;
+  }
+
+  // Pipeline execution with caching
+  const startMs = performance.now();
+  let pipelineResult: PipelineResult;
+  let cacheHit = false;
+  let cacheAgeMs: number | undefined;
+
+  if (!opts.noCache) {
+    const cacheDir = getCacheDir(opts.baseDir);
+    const cacheKey = await computeCacheKey({
+      input: opts.input,
+      features: opts.features,
+      baseDir: opts.baseDir,
+      mergeConflictStrategy: 'fatal',
+      ...(opts.workflowPath !== null ? { workflowPath: opts.workflowPath } : {}),
+    });
+
+    const cached = await tryLoadCache(cacheKey, cacheDir);
+    if (cached !== undefined) {
+      pipelineResult = cached.result;
+      cacheHit = true;
+      cacheAgeMs = cached.ageMs;
+    } else {
+      pipelineResult = await buildPipeline(opts);
+      void writeCache(pipelineResult, cacheKey, cacheDir);
+    }
+  } else {
+    pipelineResult = await buildPipeline(opts);
+  }
+
+  const pipelineMs = Math.round(performance.now() - startMs);
+  const { dataset: masterDataset, validation } = pipelineResult;
+
+  // Build extended metadata for JSON responses
+  const extra = buildQueryMetadataExtra(validation, cacheHit, cacheAgeMs, pipelineMs);
 
   // Create ProcessStateAPI
   const api = createProcessStateAPI(masterDataset);
@@ -1623,7 +1844,7 @@ async function main(): Promise<void> {
   if (typeof result === 'string') {
     console.log(result);
   } else {
-    const envelope = createSuccess(result, masterDataset.counts.total);
+    const envelope = createSuccess(result, masterDataset.counts.total, extra);
     const output = formatOutput(envelope, opts.format);
     console.log(output);
   }

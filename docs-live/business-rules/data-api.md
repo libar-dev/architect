@@ -4,7 +4,7 @@
 
 ---
 
-**89 rules** from 21 features. 89 rules have explicit invariants.
+**95 rules** from 26 features. 95 rules have explicit invariants.
 
 ---
 
@@ -754,6 +754,26 @@ _Validates that summarizePattern() projects ExtractedPattern (~3.5KB) to_
 
 _summarize.feature_
 
+### Process Api Cli Cache
+
+_MasterDataset caching between CLI invocations: cache hits, mtime invalidation, and --no-cache bypass._
+
+---
+
+#### MasterDataset is cached between invocations
+
+> **Invariant:** When source files have not changed between CLI invocations, the second invocation must use the cached MasterDataset and report cache.hit as true with reduced pipelineMs.
+>
+> **Rationale:** The pipeline rebuild costs 2-5 seconds per invocation. Caching eliminates this cost for repeated queries against unchanged sources, which is the common case during interactive AI sessions.
+
+**Verified by:**
+
+- Second query uses cached dataset
+- Cache invalidated on source file change
+- No-cache flag bypasses cache
+
+_data-api-cache.feature_
+
 ### Process Api Cli Core
 
 _Core CLI infrastructure: help, version, input validation, status, query, pattern, arch basics, missing args, edge cases._
@@ -867,6 +887,63 @@ _Core CLI infrastructure: help, version, input validation, status, query, patter
 
 _process-api-core.feature_
 
+### Process Api Cli Dry Run
+
+_Dry-run mode shows pipeline scope without processing data._
+
+---
+
+#### Dry-run shows pipeline scope without processing
+
+> **Invariant:** The --dry-run flag must display file counts, config status, and cache status without executing the pipeline. Output must contain the DRY RUN marker and must not contain a JSON success envelope.
+>
+> **Rationale:** Dry-run enables users to verify their input patterns resolve to expected files before committing to the 2-5s pipeline cost, which is especially valuable when debugging glob patterns or config auto-detection.
+
+**Verified by:**
+
+- Dry-run shows file counts
+
+_data-api-dryrun.feature_
+
+### Process Api Cli Help
+
+_Per-subcommand help displays usage, flags, and examples for individual subcommands._
+
+---
+
+#### Per-subcommand help shows usage and flags
+
+> **Invariant:** Running any subcommand with --help must display usage information specific to that subcommand, including applicable flags and examples. Unknown subcommands must fall back to a descriptive message.
+>
+> **Rationale:** Per-subcommand help replaces the need to scroll through full --help output and provides contextual guidance for subcommand-specific flags like --session.
+
+**Verified by:**
+
+- Per-subcommand help for context
+- Global help still works
+- Unknown subcommand help
+
+_data-api-help.feature_
+
+### Process Api Cli Metadata
+
+_Response metadata includes validation summary and pipeline timing for diagnostics._
+
+---
+
+#### Response metadata includes validation summary
+
+> **Invariant:** Every JSON response envelope must include a metadata.validation object with danglingReferenceCount, malformedPatternCount, unknownStatusCount, and warningCount fields, plus a numeric pipelineMs timing.
+>
+> **Rationale:** Consumers use validation counts to detect annotation quality degradation without running a separate validation pass. Pipeline timing enables performance regression detection in CI.
+
+**Verified by:**
+
+- Validation summary in response metadata
+- Pipeline timing in metadata
+
+_data-api-metadata.feature_
+
 ### Process Api Cli Modifiers And Rules
 
 _Output modifiers, arch health, and rules subcommand._
@@ -920,6 +997,37 @@ _Output modifiers, arch health, and rules subcommand._
 - Rules combines product area and only-invariants filters
 
 _process-api-modifiers-rules.feature_
+
+### Process Api Cli Repl
+
+_Interactive REPL mode keeps the pipeline loaded for multi-query sessions and supports reload._
+
+---
+
+#### REPL mode accepts multiple queries on a single pipeline load
+
+> **Invariant:** REPL mode loads the pipeline once and accepts multiple queries on stdin, eliminating per-query pipeline overhead.
+>
+> **Rationale:** Design sessions involve 10-20 exploratory queries in sequence. REPL mode eliminates per-query pipeline overhead entirely.
+
+**Verified by:**
+
+- REPL accepts multiple queries
+- REPL shows help output
+
+---
+
+#### REPL reload rebuilds the pipeline from fresh sources
+
+> **Invariant:** The reload command rebuilds the pipeline from fresh sources and subsequent queries use the new dataset.
+>
+> **Rationale:** During implementation sessions, source files change frequently. Reload allows refreshing without restarting the REPL.
+
+**Verified by:**
+
+- REPL reloads pipeline on command
+
+_data-api-repl.feature_
 
 ### Process Api Cli Subcommands
 

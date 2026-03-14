@@ -78,11 +78,14 @@ graph TB
         ArchQueriesImpl("ArchQueriesImpl")
     end
     subgraph cli["Cli"]
+        ReplMode("ReplMode")
         ProcessAPICLIImpl("ProcessAPICLIImpl")
         OutputPipelineImpl("OutputPipelineImpl")
+        DatasetCache[/"DatasetCache"/]
         CLISchema["CLISchema"]
     end
     subgraph related["Related"]
+        WorkflowConfigSchema["WorkflowConfigSchema"]:::neighbor
         Pattern_Scanner["Pattern Scanner"]:::neighbor
         StubResolverImpl["StubResolverImpl"]:::neighbor
         RulesQueryModule["RulesQueryModule"]:::neighbor
@@ -94,8 +97,12 @@ graph TB
         DataAPIDesignSessionSupport["DataAPIDesignSessionSupport"]:::neighbor
         DataAPIOutputShaping["DataAPIOutputShaping"]:::neighbor
         DataAPIContextAssembly["DataAPIContextAssembly"]:::neighbor
+        DataAPICLIErgonomics["DataAPICLIErgonomics"]:::neighbor
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
     end
+    ReplMode -->|uses| PipelineFactory
+    ReplMode -->|uses| ProcessStateAPI
+    ReplMode ..->|implements| DataAPICLIErgonomics
     ProcessAPICLIImpl -->|uses| ProcessStateAPI
     ProcessAPICLIImpl -->|uses| MasterDataset
     ProcessAPICLIImpl -->|uses| PipelineFactory
@@ -106,6 +113,9 @@ graph TB
     ProcessAPICLIImpl ..->|implements| ProcessStateAPICLI
     OutputPipelineImpl -->|uses| PatternSummarizerImpl
     OutputPipelineImpl ..->|implements| DataAPIOutputShaping
+    DatasetCache -->|uses| PipelineFactory
+    DatasetCache -->|uses| WorkflowConfigSchema
+    DatasetCache ..->|implements| DataAPICLIErgonomics
     CLISchema ..->|implements| ProcessApiHybridGeneration
     PatternSummarizerImpl -->|uses| ProcessStateAPI
     PatternSummarizerImpl ..->|implements| DataAPIOutputShaping
@@ -472,7 +482,7 @@ ArchIndexSchema = z.object({
 
 ## Business Rules
 
-34 patterns, 145 rules with invariants (145 total)
+39 patterns, 151 rules with invariants (151 total)
 
 ### Arch Queries Test
 
@@ -674,6 +684,12 @@ ArchIndexSchema = z.object({
 | DD-6 - Both positional and flag forms for scope type | scope-validate must accept scope type as both a positional argument and a --type flag.                       | Supporting only one form creates inconsistency with CLI conventions and forces users to remember which form each subcommand uses.           |
 | DD-7 - Co-located formatter functions                | Each module must export both its data builder and text formatter as co-located functions.                    | Splitting builder and formatter across files increases coupling surface and makes it harder to trace data flow through the module.          |
 
+### Process Api Cli Cache
+
+| Rule                                        | Invariant                                                                                                                                                                 | Rationale                                                                                                                                                                                    |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MasterDataset is cached between invocations | When source files have not changed between CLI invocations, the second invocation must use the cached MasterDataset and report cache.hit as true with reduced pipelineMs. | The pipeline rebuild costs 2-5 seconds per invocation. Caching eliminates this cost for repeated queries against unchanged sources, which is the common case during interactive AI sessions. |
+
 ### Process Api Cli Core
 
 | Rule                                              | Invariant                                                                                                                | Rationale                                                                                                                                                       |
@@ -687,6 +703,24 @@ ArchIndexSchema = z.object({
 | CLI shows errors for missing subcommand arguments | Subcommands that require arguments must reject invocations with missing arguments and display usage guidance.            | Silent acceptance of incomplete input would produce confusing pipeline errors instead of actionable feedback at the CLI boundary.                               |
 | CLI handles argument edge cases                   | The CLI must gracefully handle non-standard argument forms including numeric coercion and the `--` pnpm separator.       | Real-world invocations via pnpm pass `--` separators and numeric strings; mishandling these causes silent data loss or crashes in automated workflows.          |
 
+### Process Api Cli Dry Run
+
+| Rule                                            | Invariant                                                                                                                                                                                         | Rationale                                                                                                                                                                                                       |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dry-run shows pipeline scope without processing | The --dry-run flag must display file counts, config status, and cache status without executing the pipeline. Output must contain the DRY RUN marker and must not contain a JSON success envelope. | Dry-run enables users to verify their input patterns resolve to expected files before committing to the 2-5s pipeline cost, which is especially valuable when debugging glob patterns or config auto-detection. |
+
+### Process Api Cli Help
+
+| Rule                                      | Invariant                                                                                                                                                                                            | Rationale                                                                                                                                                 |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Per-subcommand help shows usage and flags | Running any subcommand with --help must display usage information specific to that subcommand, including applicable flags and examples. Unknown subcommands must fall back to a descriptive message. | Per-subcommand help replaces the need to scroll through full --help output and provides contextual guidance for subcommand-specific flags like --session. |
+
+### Process Api Cli Metadata
+
+| Rule                                          | Invariant                                                                                                                                                                                                 | Rationale                                                                                                                                                                            |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Response metadata includes validation summary | Every JSON response envelope must include a metadata.validation object with danglingReferenceCount, malformedPatternCount, unknownStatusCount, and warningCount fields, plus a numeric pipelineMs timing. | Consumers use validation counts to detect annotation quality degradation without running a separate validation pass. Pipeline timing enables performance regression detection in CI. |
+
 ### Process Api Cli Modifiers And Rules
 
 | Rule                                                       | Invariant                                                                                                                                                                       | Rationale                                                                                                                                                                             |
@@ -694,6 +728,13 @@ ArchIndexSchema = z.object({
 | Output modifiers work when placed after the subcommand     | Output modifiers (--count, --names-only, --fields) produce identical results regardless of position relative to the subcommand and its filters.                                 | Users should not need to memorize argument ordering rules; the CLI should be forgiving.                                                                                               |
 | CLI arch health subcommands detect graph quality issues    | Health subcommands (dangling, orphans, blocking) operate on the relationship index, not the architecture index, and return results without requiring arch annotations.          | Graph quality issues (broken references, isolated patterns, blocked dependencies) are relationship-level concerns that should be queryable even when no architecture metadata exists. |
 | CLI rules subcommand queries business rules and invariants | The rules subcommand returns structured business rules extracted from Gherkin Rule: blocks, grouped by product area and phase, with parsed invariant and rationale annotations. | Live business rule queries replace static generated markdown, enabling on-demand filtering by product area, pattern, and invariant presence.                                          |
+
+### Process Api Cli Repl
+
+| Rule                                                         | Invariant                                                                                                         | Rationale                                                                                                                 |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| REPL mode accepts multiple queries on a single pipeline load | REPL mode loads the pipeline once and accepts multiple queries on stdin, eliminating per-query pipeline overhead. | Design sessions involve 10-20 exploratory queries in sequence. REPL mode eliminates per-query pipeline overhead entirely. |
+| REPL reload rebuilds the pipeline from fresh sources         | The reload command rebuilds the pipeline from fresh sources and subsequent queries use the new dataset.           | During implementation sessions, source files change frequently. Reload allows refreshing without restarting the REPL.     |
 
 ### Process Api Cli Subcommands
 
