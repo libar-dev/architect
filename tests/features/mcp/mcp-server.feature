@@ -42,7 +42,9 @@ Feature: MCP Server Integration Tests
     Scenario: isRebuilding flag lifecycle
       Given a PipelineSessionManager initialized with test data
       Then isRebuilding returns false before rebuild
-      When rebuild is called
+      When rebuild is started without awaiting
+      Then isRebuilding returns true during rebuild
+      When the rebuild completes
       Then isRebuilding returns false after rebuild completes
 
   Rule: Tool registration creates correctly named tools with schemas

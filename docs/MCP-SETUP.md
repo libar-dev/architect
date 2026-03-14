@@ -114,7 +114,7 @@ The MCP server:
 
 ## CLI Options
 
-```
+```text
 dp-mcp-server [options]
 
   -i, --input <glob>       TypeScript source globs (repeatable)

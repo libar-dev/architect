@@ -157,17 +157,18 @@ export class MockPipelineSessionManager {
     this.session = session;
   }
 
-  initialize(): PipelineSession {
+  async initialize(): Promise<PipelineSession> {
+    await Promise.resolve();
     return this.session;
   }
 
-  rebuild(): PipelineSession {
+  async rebuild(): Promise<PipelineSession> {
     this.rebuilding = true;
-    // Simulate rebuild with a new build time
     this.session = {
       ...this.session,
       buildTimeMs: this.session.buildTimeMs + 100,
     };
+    await Promise.resolve(); // Yield to preserve async contract
     this.rebuilding = false;
     return this.session;
   }

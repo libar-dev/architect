@@ -191,7 +191,7 @@ Feature: MCP Server Integration
       Given the MCP server is running with --watch enabled
       When a source file change introduces a parse error
       Then the server continues using the previous valid dataset
-      And an MCP notification indicates rebuild failure
+      And the rebuild failure is logged to stderr
 
   @libar-docs-sequence-step:5
   @libar-docs-sequence-module:mcp-server

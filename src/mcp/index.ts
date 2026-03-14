@@ -6,6 +6,7 @@
  * @libar-docs-arch-role infrastructure
  * @libar-docs-arch-context api
  * @libar-docs-arch-layer application
+ * @libar-docs-uses MCPServerImpl, MCPPipelineSession, MCPFileWatcher, MCPToolRegistry
  *
  * ## MCP Module Exports
  *
@@ -17,6 +18,7 @@ export {
   parseCliArgs,
   type McpServerOptions,
   type ParsedOptions,
+  type ParseCliResult,
 } from './server.js';
 export {
   PipelineSessionManager,

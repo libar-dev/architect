@@ -14,27 +14,14 @@
  * Main entry point for the delivery-process MCP server.
  * Initializes the pipeline, registers tools, and connects via stdio transport.
  *
- * ### Stdout Isolation
- *
- * CRITICAL: MCP protocol uses JSON-RPC over stdout. All application logging
- * must go to stderr. console.log is redirected to console.error at module
- * load time to prevent accidental stdout corruption.
+ * Stdout isolation (console.log → stderr redirect) is handled by the CLI
+ * entry point (`src/cli/mcp-server.ts`) before this module loads.
  *
  * ### When to Use
  *
  * - When starting the MCP server from the CLI bin entry
  * - When programmatically creating an MCP server instance
  */
-
-// =============================================================================
-// Stdout Isolation (MUST be first — before any other imports that might log)
-// =============================================================================
-
-// Redirect console.log to stderr so only MCP JSON-RPC goes to stdout.
-// eslint-disable-next-line no-console
-const _originalConsoleLog = console.log;
-// eslint-disable-next-line no-console
-console.log = console.error;
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
@@ -51,6 +38,20 @@ export interface McpServerOptions extends SessionOptions {
   readonly version?: string;
 }
 
+export interface ParsedOptions {
+  input?: readonly string[] | undefined;
+  features?: readonly string[] | undefined;
+  baseDir?: string | undefined;
+  watch?: boolean | undefined;
+  version?: string | undefined;
+}
+
+export type ParseCliResult =
+  | { readonly type: 'options'; readonly options: ParsedOptions }
+  | { readonly type: 'help'; readonly text: string }
+  | { readonly type: 'version'; readonly text: string }
+  | { readonly type: 'error'; readonly message: string };
+
 // =============================================================================
 // Server
 // =============================================================================
@@ -59,31 +60,20 @@ function log(message: string): void {
   console.error(`[dp-mcp] ${message}`);
 }
 
-export async function startMcpServer(
-  argv: string[] = [],
-  options: McpServerOptions = {}
-): Promise<void> {
-  // Parse CLI args
-  const parsedOptions = parseCliArgs(argv, options);
-
+export async function startMcpServer(options: McpServerOptions = {}): Promise<void> {
   // Initialize pipeline session
   const sessionManager = new PipelineSessionManager();
 
   log('Initializing pipeline...');
-  try {
-    const session = await sessionManager.initialize({
-      ...(parsedOptions.input !== undefined ? { input: parsedOptions.input } : {}),
-      ...(parsedOptions.features !== undefined ? { features: parsedOptions.features } : {}),
-      ...(parsedOptions.baseDir !== undefined ? { baseDir: parsedOptions.baseDir } : {}),
-    });
-    log(`Pipeline built in ${session.buildTimeMs}ms (${session.dataset.patterns.length} patterns)`);
-  } catch (error) {
-    log(`Failed to initialize pipeline: ${error instanceof Error ? error.message : String(error)}`);
-    process.exit(1);
-  }
+  const session = await sessionManager.initialize({
+    ...(options.input !== undefined ? { input: options.input } : {}),
+    ...(options.features !== undefined ? { features: options.features } : {}),
+    ...(options.baseDir !== undefined ? { baseDir: options.baseDir } : {}),
+  });
+  log(`Pipeline built in ${session.buildTimeMs}ms (${session.dataset.patterns.length} patterns)`);
 
   // Create MCP server
-  const version = parsedOptions.version ?? '1.0.0';
+  const version = options.version ?? '1.0.0';
   const server = new McpServer(
     { name: 'delivery-process', version },
     { capabilities: { logging: {} } }
@@ -95,8 +85,7 @@ export async function startMcpServer(
 
   // Start file watcher if requested
   let fileWatcher: McpFileWatcher | null = null;
-  if (parsedOptions.watch === true) {
-    const session = sessionManager.getSession();
+  if (options.watch === true) {
     fileWatcher = new McpFileWatcher({
       globs: [...session.sourceGlobs.input, ...session.sourceGlobs.features],
       baseDir: session.baseDir,
@@ -127,21 +116,20 @@ export async function startMcpServer(
   const transport = new StdioServerTransport();
   await server.connect(transport);
   log('MCP server running on stdio');
+
+  // Tear down file watcher when client disconnects (stdin EOF).
+  // Without this, chokidar holds the event loop open indefinitely.
+  process.stdin.on('end', () => {
+    log('Client disconnected (stdin closed)');
+    void cleanup().then(() => process.exit(0));
+  });
 }
 
 // =============================================================================
 // CLI Arg Parser
 // =============================================================================
 
-export interface ParsedOptions {
-  input?: readonly string[] | undefined;
-  features?: readonly string[] | undefined;
-  baseDir?: string | undefined;
-  watch?: boolean | undefined;
-  version?: string | undefined;
-}
-
-export function parseCliArgs(argv: string[], defaults: McpServerOptions = {}): ParsedOptions {
+export function parseCliArgs(argv: string[], defaults: McpServerOptions = {}): ParseCliResult {
   const result: ParsedOptions = { ...defaults };
   const input: string[] = [];
   const features: string[] = [];
@@ -153,18 +141,28 @@ export function parseCliArgs(argv: string[], defaults: McpServerOptions = {}): P
       case '--input':
       case '-i': {
         const val = argv[++i];
-        if (val !== undefined) input.push(val);
+        if (val === undefined || val.startsWith('-')) {
+          return { type: 'error', message: '--input requires a glob value' };
+        }
+        input.push(val);
         break;
       }
       case '--features':
       case '-f': {
         const val = argv[++i];
-        if (val !== undefined) features.push(val);
+        if (val === undefined || val.startsWith('-')) {
+          return { type: 'error', message: '--features requires a glob value' };
+        }
+        features.push(val);
         break;
       }
       case '--base-dir':
       case '-b': {
-        result.baseDir = argv[++i];
+        const val = argv[++i];
+        if (val === undefined || val.startsWith('-')) {
+          return { type: 'error', message: '--base-dir requires a directory path' };
+        }
+        result.baseDir = val;
         break;
       }
       case '--watch':
@@ -174,15 +172,11 @@ export function parseCliArgs(argv: string[], defaults: McpServerOptions = {}): P
       }
       case '--version':
       case '-v': {
-        console.error('dp-mcp-server v' + (defaults.version ?? '1.0.0'));
-        process.exit(0);
-        break;
+        return { type: 'version', text: 'dp-mcp-server v' + (defaults.version ?? '1.0.0') };
       }
       case '--help':
       case '-h': {
-        console.error(HELP_TEXT);
-        process.exit(0);
-        break;
+        return { type: 'help', text: HELP_TEXT };
       }
       case '--': {
         // Skip pnpm separator
@@ -190,7 +184,7 @@ export function parseCliArgs(argv: string[], defaults: McpServerOptions = {}): P
       }
       default: {
         if (typeof arg === 'string' && arg.startsWith('-')) {
-          console.error(`[dp-mcp] Warning: unknown argument "${arg}"`);
+          return { type: 'error', message: `Unknown flag: "${arg}"` };
         }
         break;
       }
@@ -200,7 +194,7 @@ export function parseCliArgs(argv: string[], defaults: McpServerOptions = {}): P
   if (input.length > 0) result.input = input;
   if (features.length > 0) result.features = features;
 
-  return result;
+  return { type: 'options', options: result };
 }
 
 const HELP_TEXT = `

@@ -82,6 +82,27 @@ function errorResult(message: string): ToolResult {
 export function registerAllTools(server: McpServer, sessionManager: PipelineSessionManager): void {
   const getSession = (): PipelineSession => sessionManager.getSession();
 
+  // Wrap handlers so thrown exceptions become MCP error payloads
+  // instead of propagating as transport-level errors.
+  function safeHandler<T>(
+    fn: (args: T) => ToolResult | Promise<ToolResult>
+  ): (args: T) => ToolResult | Promise<ToolResult> {
+    return (args: T): ToolResult | Promise<ToolResult> => {
+      try {
+        const result = fn(args);
+        if (result instanceof Promise) {
+          return result.catch(
+            (error: unknown): ToolResult =>
+              errorResult(error instanceof Error ? error.message : String(error))
+          );
+        }
+        return result;
+      } catch (error: unknown) {
+        return errorResult(error instanceof Error ? error.message : String(error));
+      }
+    };
+  }
+
   // ---------------------------------------------------------------------------
   // Session-aware tools (text output — matches CLI text output)
   // ---------------------------------------------------------------------------
@@ -94,11 +115,11 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         'Get project health summary: progress percentage, active phases, blocking chains, and data API commands. Start here to understand project state.',
       inputSchema: z.object({}),
     },
-    () => {
+    safeHandler(() => {
       const s = getSession();
       const overview = buildOverview(s.dataset);
       return textResult(formatOverview(overview));
-    }
+    })
   );
 
   server.registerTool(
@@ -115,7 +136,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
           .describe('Session type (planning, design, implement)'),
       }),
     },
-    ({ name, session }) => {
+    safeHandler(({ name, session }) => {
       const s = getSession();
       const validated = session ?? '';
       const sessionType: SessionType = isValidSessionType(validated) ? validated : 'implement';
@@ -125,7 +146,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         baseDir: s.baseDir,
       });
       return textResult(formatContextBundle(bundle));
-    }
+    })
   );
 
   server.registerTool(
@@ -138,11 +159,11 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         name: z.string().describe('Pattern name'),
       }),
     },
-    ({ name }) => {
+    safeHandler(({ name }) => {
       const s = getSession();
       const fileList = buildFileReadingList(s.dataset, name, true);
       return textResult(formatFileReadingList(fileList));
-    }
+    })
   );
 
   server.registerTool(
@@ -156,7 +177,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         maxDepth: z.number().optional().describe('Maximum depth (default: 10)'),
       }),
     },
-    ({ name, maxDepth }) => {
+    safeHandler(({ name, maxDepth }) => {
       const s = getSession();
       const tree = buildDepTree(s.dataset, {
         pattern: name,
@@ -164,7 +185,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         includeImplementationDeps: false,
       });
       return textResult(formatDepTree(tree));
-    }
+    })
   );
 
   server.registerTool(
@@ -178,7 +199,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         session: z.enum(['implement', 'design']).describe('Session type (implement or design)'),
       }),
     },
-    ({ name, session }) => {
+    safeHandler(({ name, session }) => {
       const s = getSession();
       const result = validateScope(s.api, s.dataset, {
         patternName: name,
@@ -186,7 +207,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         baseDir: s.baseDir,
       });
       return textResult(formatScopeValidation(result));
-    }
+    })
   );
 
   server.registerTool(
@@ -203,14 +224,14 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
           .describe('Session type'),
       }),
     },
-    ({ name, session }) => {
+    safeHandler(({ name, session }) => {
       const s = getSession();
       const handoff = generateHandoff(s.api, s.dataset, {
         patternName: name,
         sessionType: (session ?? 'implement') as HandoffSessionType,
       });
       return textResult(formatHandoff(handoff));
-    }
+    })
   );
 
   // ---------------------------------------------------------------------------
@@ -225,13 +246,13 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         'Get pattern counts by status (completed, active, roadmap, deferred) and completion percentage.',
       inputSchema: z.object({}),
     },
-    () => {
+    safeHandler(() => {
       const s = getSession();
       return jsonResult({
         counts: s.api.getStatusCounts(),
         distribution: s.api.getStatusDistribution(),
       });
-    }
+    })
   );
 
   server.registerTool(
@@ -244,7 +265,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         name: z.string().describe('Pattern name (case-insensitive)'),
       }),
     },
-    ({ name }) => {
+    safeHandler(({ name }) => {
       const s = getSession();
       const pattern = s.api.getPattern(name);
       if (pattern === undefined) {
@@ -258,7 +279,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         dependencies: s.api.getPatternDependencies(canonicalName) ?? null,
         relationships: s.api.getPatternRelationships(canonicalName) ?? null,
       });
-    }
+    })
   );
 
   server.registerTool(
@@ -278,7 +299,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         count: z.boolean().optional().describe('Return only the count'),
       }),
     },
-    ({ status, phase, category, namesOnly, count }) => {
+    safeHandler(({ status, phase, category, namesOnly, count }) => {
       const s = getSession();
       let patterns = [...s.dataset.patterns];
 
@@ -299,7 +320,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         return textResult(patterns.map((p) => p.name).join('\n'));
       }
       return jsonResult(summarizePatterns(patterns));
-    }
+    })
   );
 
   server.registerTool(
@@ -312,12 +333,12 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         query: z.string().describe('Search query string'),
       }),
     },
-    ({ query }) => {
+    safeHandler(({ query }) => {
       const s = getSession();
       const names = allPatternNames(s.dataset);
       const matches = fuzzyMatchPatterns(query, names);
       return jsonResult(matches);
-    }
+    })
   );
 
   server.registerTool(
@@ -334,7 +355,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
           .describe('Return only invariants (skip rationale/scenarios)'),
       }),
     },
-    ({ pattern, onlyInvariants }) => {
+    safeHandler(({ pattern, onlyInvariants }) => {
       const s = getSession();
       const result = queryBusinessRules(s.dataset, {
         productArea: null,
@@ -357,7 +378,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         });
       }
       return jsonResult(result);
-    }
+    })
   );
 
   server.registerTool(
@@ -367,10 +388,10 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
       description: 'Get tag inventory: counts per tag and value across all annotated sources.',
       inputSchema: z.object({}),
     },
-    () => {
+    safeHandler(() => {
       const s = getSession();
       return jsonResult(aggregateTagUsage(s.dataset));
-    }
+    })
   );
 
   server.registerTool(
@@ -381,10 +402,10 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         'Get file inventory by source type (TypeScript, Gherkin, stubs) with pattern counts.',
       inputSchema: z.object({}),
     },
-    () => {
+    safeHandler(() => {
       const s = getSession();
       return jsonResult(buildSourceInventory(s.dataset));
-    }
+    })
   );
 
   server.registerTool(
@@ -400,7 +421,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
           .describe('Show only unresolved stubs (no implementation yet)'),
       }),
     },
-    ({ unresolved }) => {
+    safeHandler(({ unresolved }) => {
       const s = getSession();
       const stubs = findStubPatterns(s.dataset);
       const resolutions = resolveStubs(stubs, s.baseDir);
@@ -410,7 +431,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         return jsonResult({ unresolvedCount: unresolvedOnly.length, stubs: unresolvedOnly });
       }
       return jsonResult(groupStubsByPattern(resolutions));
-    }
+    })
   );
 
   server.registerTool(
@@ -422,24 +443,20 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         name: z.string().optional().describe('Pattern name (shows all if omitted)'),
       }),
     },
-    ({ name }) => {
+    safeHandler(({ name }) => {
       const s = getSession();
-      // Extract decisions from pattern descriptions (stub descriptions contain AD-N entries)
+      // Extract decisions from pattern descriptions (stub descriptions contain AD-N / DD-N entries)
       const stubs = findStubPatterns(s.dataset);
       const decisions: Array<{ pattern: string; id: string; description: string }> = [];
 
       for (const stub of stubs) {
         const desc = stub.directive.description;
-        const regex = /AD-(\d+):\s*(.+?)(?:\n|$)/g;
+        const regex = /((?:AD|DD)-\d+):\s*(.+?)(?:\n|$)/g;
         let match = regex.exec(desc);
         while (match !== null) {
-          const matchedId = match[1] ?? '';
+          const id = match[1] ?? '';
           const matchedDesc = match[2]?.trim() ?? '';
-          decisions.push({
-            pattern: stub.name,
-            id: `AD-${matchedId}`,
-            description: matchedDesc,
-          });
+          decisions.push({ pattern: stub.name, id, description: matchedDesc });
           match = regex.exec(desc);
         }
       }
@@ -449,7 +466,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         return jsonResult(filtered);
       }
       return jsonResult(decisions);
-    }
+    })
   );
 
   // ---------------------------------------------------------------------------
@@ -466,7 +483,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         name: z.string().optional().describe('Filter to a specific bounded context'),
       }),
     },
-    ({ name }) => {
+    safeHandler(({ name }) => {
       const s = getSession();
       if (s.dataset.archIndex === undefined) {
         return jsonResult([]);
@@ -482,7 +499,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         patterns: patterns.map((p) => p.name),
       }));
       return jsonResult(contexts);
-    }
+    })
   );
 
   server.registerTool(
@@ -495,7 +512,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         name: z.string().optional().describe('Filter to a specific architecture layer'),
       }),
     },
-    ({ name }) => {
+    safeHandler(({ name }) => {
       const s = getSession();
       if (s.dataset.archIndex === undefined) {
         return jsonResult([]);
@@ -511,7 +528,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         patterns: patterns.map((p) => p.name),
       }));
       return jsonResult(layers);
-    }
+    })
   );
 
   server.registerTool(
@@ -524,10 +541,10 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         name: z.string().describe('Pattern name'),
       }),
     },
-    ({ name }) => {
+    safeHandler(({ name }) => {
       const s = getSession();
       return jsonResult(computeNeighborhood(name, s.dataset));
-    }
+    })
   );
 
   server.registerTool(
@@ -538,11 +555,11 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         'Find patterns blocked by incomplete dependencies. Shows which dependencies must be completed first.',
       inputSchema: z.object({}),
     },
-    () => {
+    safeHandler(() => {
       const s = getSession();
       const overview = buildOverview(s.dataset);
       return jsonResult(overview.blocking);
-    }
+    })
   );
 
   server.registerTool(
@@ -552,7 +569,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
       description: 'Find broken references to nonexistent pattern names in relationship tags.',
       inputSchema: z.object({}),
     },
-    () => {
+    safeHandler(() => {
       const s = getSession();
       const allNames = new Set(s.dataset.patterns.map((p) => p.name));
       const dangling: Array<{ pattern: string; tag: string; target: string }> = [];
@@ -571,7 +588,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
       }
 
       return jsonResult(dangling);
-    }
+    })
   );
 
   server.registerTool(
@@ -584,12 +601,24 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         path: z.string().optional().describe('Filter to a specific directory path'),
       }),
     },
-    async ({ path: pathFilter }) => {
+    safeHandler(async ({ path: pathFilter }) => {
       const s = getSession();
-      const globs = pathFilter !== undefined ? [`${pathFilter}/**/*.ts`] : [...s.sourceGlobs.input];
+      const globs =
+        pathFilter !== undefined
+          ? (() => {
+              // Preserve file extensions from configured globs instead of hardcoding *.ts
+              const extensions = new Set<string>();
+              for (const g of s.sourceGlobs.input) {
+                const m = /\*\.(\w+)$/.exec(g);
+                if (m?.[1] !== undefined) extensions.add(m[1]);
+              }
+              if (extensions.size === 0) extensions.add('ts');
+              return [...extensions].map((ext) => `${pathFilter}/**/*.${ext}`);
+            })()
+          : [...s.sourceGlobs.input];
       const report = await analyzeCoverage(s.dataset, globs, s.baseDir, s.registry);
       return jsonResult(report);
-    }
+    })
   );
 
   server.registerTool(
@@ -602,7 +631,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         path: z.string().optional().describe('Filter to a specific directory path'),
       }),
     },
-    async ({ path: pathFilter }) => {
+    safeHandler(async ({ path: pathFilter }) => {
       const s = getSession();
       const unannotated = await findUnannotatedFiles(
         [...s.sourceGlobs.input],
@@ -611,7 +640,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         pathFilter
       );
       return jsonResult(unannotated);
-    }
+    })
   );
 
   // ---------------------------------------------------------------------------
@@ -626,7 +655,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         'Force rebuild of the in-memory MasterDataset from current source files. Use after making changes to annotated sources.',
       inputSchema: z.object({}),
     },
-    async () => {
+    safeHandler(async () => {
       if (sessionManager.isRebuilding()) {
         return textResult('Rebuild already in progress.');
       }
@@ -634,7 +663,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
       return textResult(
         `Dataset rebuilt in ${newSession.buildTimeMs}ms. ${newSession.dataset.patterns.length} patterns loaded.`
       );
-    }
+    })
   );
 
   server.registerTool(
@@ -645,7 +674,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         'Show current project configuration: source globs, base directory, and build time.',
       inputSchema: z.object({}),
     },
-    () => {
+    safeHandler(() => {
       const s = getSession();
       return jsonResult({
         baseDir: s.baseDir,
@@ -655,7 +684,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         phaseCount: s.dataset.phaseCount,
         categoryCount: s.dataset.categoryCount,
       });
-    }
+    })
   );
 
   server.registerTool(
@@ -666,7 +695,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         'List all available MCP tools with descriptions. Use this to discover what queries are available.',
       inputSchema: z.object({}),
     },
-    () => {
+    safeHandler(() => {
       const tools = [
         'dp_overview         - Project health summary (start here)',
         'dp_context           - Session-aware context bundle for a pattern',
@@ -695,6 +724,6 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         'dp_help              - This help text',
       ];
       return textResult(`delivery-process MCP Server — Available Tools\n\n${tools.join('\n')}`);
-    }
+    })
   );
 }

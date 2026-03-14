@@ -163,7 +163,10 @@ export function fuzzyMatchPatterns(
   matches.sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
     // Tie-breaker: shorter name = more specific match
-    return a.patternName.length - b.patternName.length;
+    if (a.patternName.length !== b.patternName.length)
+      return a.patternName.length - b.patternName.length;
+    // Final tie-breaker: lexical ordering for deterministic results
+    return a.patternName.localeCompare(b.patternName);
   });
   return matches.slice(0, maxResults);
 }

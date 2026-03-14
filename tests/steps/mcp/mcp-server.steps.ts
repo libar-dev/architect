@@ -105,11 +105,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
     RuleScenario('Rebuild replaces session atomically', ({ Given, When, Then, And }) => {
       let manager: PipelineSessionManager | null = null;
+      let originalSession: PipelineSession | null = null;
       let newSession: PipelineSession | null = null;
 
       Given('a PipelineSessionManager initialized with test data', async () => {
         manager = new PipelineSessionManager();
-        await manager.initialize({
+        originalSession = await manager.initialize({
           input: ['src/**/*.ts'],
           features: ['delivery-process/specs/*.feature'],
         });
@@ -125,8 +126,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       And('the new session has a different build time than the original', () => {
-        // Build times will differ since rebuild runs the pipeline again
-        expect(newSession!.buildTimeMs).toBeGreaterThanOrEqual(0);
+        expect(originalSession).not.toBeNull();
+        // Rebuild produces a different session object
+        expect(newSession).not.toBe(originalSession);
         // The session stored by getSession should be the new one
         expect(manager!.getSession()).toBe(newSession);
       });
@@ -134,6 +136,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
     RuleScenario('isRebuilding flag lifecycle', ({ Given, Then, When }) => {
       let manager: PipelineSessionManager | null = null;
+      let rebuildPromise: Promise<PipelineSession> | null = null;
 
       Given('a PipelineSessionManager initialized with test data', async () => {
         manager = new PipelineSessionManager();
@@ -147,8 +150,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(manager!.isRebuilding()).toBe(false);
       });
 
-      When('rebuild is called', async () => {
-        await manager!.rebuild();
+      When('rebuild is started without awaiting', () => {
+        rebuildPromise = manager!.rebuild();
+      });
+
+      Then('isRebuilding returns true during rebuild', () => {
+        expect(manager!.isRebuilding()).toBe(true);
+      });
+
+      When('the rebuild completes', async () => {
+        await rebuildPromise!;
       });
 
       Then('isRebuilding returns false after rebuild completes', () => {
@@ -327,13 +338,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     RuleScenarioOutline(
       'CLI flags are parsed correctly',
       ({ When, Then }, variables: { args: string; option: string }) => {
-        When('parseCliArgs is called with {string}', () => {
+        When('parseCliArgs is called with "<args>"', () => {
           const argv = variables.args.split(' ');
-          state!.parsedOptions = parseCliArgs(argv);
+          const result = parseCliArgs(argv);
+          state!.parsedOptions = result.type === 'options' ? result.options : null;
         });
 
-        Then('the parsed result has {string} set', () => {
-          const opt = variables.option as keyof typeof state.parsedOptions;
+        Then('the parsed result has "<option>" set', () => {
+          const opt = variables.option as keyof NonNullable<typeof state.parsedOptions>;
           expect(state!.parsedOptions).not.toBeNull();
           expect(state!.parsedOptions![opt]).toBeDefined();
         });
@@ -343,7 +355,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     RuleScenario('Multiple input globs accumulate', ({ When, Then }) => {
       When('parseCliArgs is called with {string}', (_ctx: unknown, args: string) => {
         const argv = args.split(' ');
-        state!.parsedOptions = parseCliArgs(argv);
+        const result = parseCliArgs(argv);
+        state!.parsedOptions = result.type === 'options' ? result.options : null;
       });
 
       Then('the parsed input contains {int} globs', (_ctx: unknown, count: number) => {
@@ -354,7 +367,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     RuleScenario('Double-dash separator is skipped', ({ When, Then }) => {
       When('parseCliArgs is called with {string}', (_ctx: unknown, args: string) => {
         const argv = args.split(' ');
-        state!.parsedOptions = parseCliArgs(argv);
+        const result = parseCliArgs(argv);
+        state!.parsedOptions = result.type === 'options' ? result.options : null;
       });
 
       Then('the parsed input contains {string}', (_ctx: unknown, expected: string) => {
