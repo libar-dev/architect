@@ -92,7 +92,7 @@ describeFeature(feature, ({ Rule }) => {
       );
     });
 
-    RuleScenario('Prefix match scores 0.9', ({ Given, When, Then }) => {
+    RuleScenario('Prefix match scores above 0.9', ({ Given, When, Then, And }) => {
       Given('pattern names {string}, {string}', (_ctx: unknown, a: string, b: string) => {
         state = initState();
         state.patternNames = [a, b];
@@ -103,14 +103,17 @@ describeFeature(feature, ({ Rule }) => {
       });
 
       Then(
-        'the top result is {string} with score {string} and matchType {string}',
-        (_ctx: unknown, name: string, scoreStr: string, matchType: string) => {
+        'the top result is {string} with matchType {string}',
+        (_ctx: unknown, name: string, matchType: string) => {
           expect(state!.results.length).toBeGreaterThan(0);
           expect(state!.results[0].patternName).toBe(name);
-          expect(state!.results[0].score).toBe(parseFloat(scoreStr));
           expect(state!.results[0].matchType).toBe(matchType);
         }
       );
+
+      And('the top result score is above {string}', (_ctx: unknown, threshold: string) => {
+        expect(state!.results[0].score).toBeGreaterThan(parseFloat(threshold));
+      });
     });
 
     RuleScenario('Substring match scores 0.7', ({ Given, When, Then }) => {
@@ -178,6 +181,41 @@ describeFeature(feature, ({ Rule }) => {
       And('the second result has score at least {string}', (_ctx: unknown, scoreStr: string) => {
         expect(state!.results.length).toBeGreaterThanOrEqual(2);
         expect(state!.results[1].score).toBeGreaterThanOrEqual(parseFloat(scoreStr));
+      });
+    });
+
+    RuleScenario('Prefix matches rank shorter names higher', ({ Given, When, Then }) => {
+      Given(
+        'pattern names {string}, {string}, {string}',
+        (_ctx: unknown, a: string, b: string, c: string) => {
+          state = initState();
+          state.patternNames = [a, b, c];
+        }
+      );
+
+      When('I fuzzy match {string}', (_ctx: unknown, query: string) => {
+        state!.results = fuzzyMatchPatterns(query, state!.patternNames);
+      });
+
+      Then('the first result is {string}', (_ctx: unknown, expected: string) => {
+        expect(state!.results.length).toBeGreaterThan(0);
+        expect(state!.results[0].patternName).toBe(expected);
+      });
+    });
+
+    RuleScenario('Prefix match scores reflect query coverage', ({ Given, When, Then }) => {
+      Given('pattern names {string}, {string}', (_ctx: unknown, a: string, b: string) => {
+        state = initState();
+        state.patternNames = [a, b];
+      });
+
+      When('I fuzzy match {string}', (_ctx: unknown, query: string) => {
+        state!.results = fuzzyMatchPatterns(query, state!.patternNames);
+      });
+
+      Then('the first result score is higher than the second result score', () => {
+        expect(state!.results.length).toBeGreaterThanOrEqual(2);
+        expect(state!.results[0].score).toBeGreaterThan(state!.results[1].score);
       });
     });
 

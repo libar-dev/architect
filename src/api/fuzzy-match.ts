@@ -101,9 +101,11 @@ function scoreMatch(
     return { score: 1.0, matchType: 'exact' };
   }
 
-  // Tier 2: Prefix match
+  // Tier 2: Prefix match — score increases with query coverage of the name
   if (nameLower.startsWith(queryLower)) {
-    return { score: 0.9, matchType: 'prefix' };
+    const coverage = queryLower.length / nameLower.length;
+    const score = 0.9 + coverage * 0.09;
+    return { score: Math.min(score, 0.99), matchType: 'prefix' };
   }
 
   // Tier 3: Substring match
@@ -129,11 +131,11 @@ function scoreMatch(
  *
  * Scoring tiers (all case-insensitive):
  * 1. Exact match: score = 1.0
- * 2. Prefix match: score = 0.9
+ * 2. Prefix match: score = 0.9 + (queryLen/nameLen) * 0.09 (shorter names rank higher)
  * 3. Substring match: score = 0.7
  * 4. Levenshtein distance <= 3: score = 1 - (distance / max(len1, len2))
  *
- * Results are sorted by score descending, limited to maxResults.
+ * Results are sorted by score descending, with shorter names as tie-breaker.
  *
  * @param query - Search query string
  * @param patternNames - All available pattern names to search
@@ -158,7 +160,14 @@ export function fuzzyMatchPatterns(
     }
   }
 
-  matches.sort((a, b) => b.score - a.score);
+  matches.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    // Tie-breaker: shorter name = more specific match
+    if (a.patternName.length !== b.patternName.length)
+      return a.patternName.length - b.patternName.length;
+    // Final tie-breaker: lexical ordering for deterministic results
+    return a.patternName.localeCompare(b.patternName);
+  });
   return matches.slice(0, maxResults);
 }
 

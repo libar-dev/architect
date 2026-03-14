@@ -199,6 +199,44 @@ describeFeature(feature, ({ Rule }) => {
       }
     );
 
+    RuleScenario(
+      'Active pattern passes FSM check for implementation',
+      ({ Given, When, Then, And }) => {
+        Given('a pattern with active status and deliverables', () => {
+          state = initState();
+        });
+
+        When('validating scope for implement session', () => {
+          const focal = createTestPattern({
+            name: 'ActivePattern',
+            status: 'active',
+            filePath: 'specs/active.feature',
+            deliverables: [{ name: 'D1', status: 'in-progress', tests: 0, location: 'src/a.ts' }],
+          });
+
+          const { api, dataset } = buildApiAndDataset([focal]);
+          state!.api = api;
+          state!.dataset = dataset;
+          state!.result = validateScope(api, dataset, {
+            patternName: 'ActivePattern',
+            scopeType: 'implement',
+            baseDir: '/test',
+          });
+        });
+
+        Then('the FSM check shows PASS', () => {
+          const fsmCheck = state!.result!.checks.find((c) => c.id === 'fsm-allows-transition');
+          expect(fsmCheck).toBeDefined();
+          expect(fsmCheck!.severity).toBe('PASS');
+        });
+
+        And('the detail mentions already active', () => {
+          const fsmCheck = state!.result!.checks.find((c) => c.id === 'fsm-allows-transition');
+          expect(fsmCheck!.detail).toContain('Already active');
+        });
+      }
+    );
+
     RuleScenario('Missing PDR references produce WARN', ({ Given, When, Then, And }) => {
       Given('a pattern with no stubs or PDR references', () => {
         state = initState();

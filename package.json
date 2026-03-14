@@ -56,7 +56,11 @@
       "types": "./dist/validation/index.d.ts",
       "import": "./dist/validation/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./mcp": {
+      "types": "./dist/mcp/index.d.ts",
+      "import": "./dist/mcp/index.js"
+    }
   },
   "bin": {
     "generate-docs": "./dist/cli/generate-docs.js",
@@ -65,7 +69,8 @@
     "generate-tag-taxonomy": "./dist/cli/generate-tag-taxonomy.js",
     "validate-patterns": "./dist/cli/validate-patterns.js",
     "process-api": "./dist/cli/process-api.js",
-    "lint-steps": "./dist/cli/lint-steps.js"
+    "lint-steps": "./dist/cli/lint-steps.js",
+    "dp-mcp-server": "./dist/cli/mcp-server.js"
   },
   "scripts": {
     "build": "tsc",
@@ -181,7 +186,9 @@
   "dependencies": {
     "@cucumber/gherkin": "^29.0.0",
     "@cucumber/messages": "^25.0.1",
+    "@modelcontextprotocol/sdk": "^1.27.1",
     "@typescript-eslint/typescript-estree": "^8.18.0",
+    "chokidar": "^5.0.0",
     "glob": "^10.3.10",
     "zod": "^4.1.11"
   },

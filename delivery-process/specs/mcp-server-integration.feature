@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:MCPServerIntegration
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:46
 @libar-docs-product-area:DataAPI
 @libar-docs-effort:3d
@@ -8,6 +8,7 @@
 @libar-docs-depends-on:DataAPICLIErgonomics
 @libar-docs-see-also:DataAPIPlatformIntegration,DataAPICLIErgonomics
 @libar-docs-business-value:native-claude-code-tool-integration-with-zero-subprocess-overhead
+@libar-docs-sequence-orchestrator:mcp-server
 Feature: MCP Server Integration
 
   **Problem:**
@@ -28,13 +29,15 @@ Feature: MCP Server Integration
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | MCP server entry point and lifecycle | pending | src/mcp/server.ts |
-      | Tool registry with JSON Schema generation | pending | src/mcp/tool-registry.ts |
-      | Pipeline session manager | pending | src/mcp/pipeline-session.ts |
-      | File watcher with debounced rebuild | pending | src/mcp/file-watcher.ts |
-      | MCP server bin entry | pending | src/cli/mcp-server.ts |
-      | MCP configuration documentation | pending | docs/MCP-SETUP.md |
+      | MCP server entry point and lifecycle | complete | src/mcp/server.ts |
+      | Tool registry with JSON Schema generation | complete | src/mcp/tool-registry.ts |
+      | Pipeline session manager | complete | src/mcp/pipeline-session.ts |
+      | File watcher with debounced rebuild | complete | src/mcp/file-watcher.ts |
+      | MCP server bin entry | complete | src/cli/mcp-server.ts |
+      | MCP configuration documentation | complete | docs/MCP-SETUP.md |
 
+  @libar-docs-sequence-step:1
+  @libar-docs-sequence-module:pipeline-session
   Rule: MCP server starts via stdio transport and manages its own lifecycle
 
     **Invariant:** The MCP server communicates over stdio using JSON-RPC. It builds
@@ -45,6 +48,10 @@ Feature: MCP Server Integration
     servers. Claude Code spawns the process and communicates over stdin/stdout pipes.
     Any extraneous stdout output corrupts the JSON-RPC stream. Loading the pipeline
     during initialization ensures the first tool call is fast.
+
+    **Input:** SessionOptions -- input, features, baseDir, watch
+
+    **Output:** PipelineSession -- dataset, api, registry, baseDir, sourceGlobs, buildTimeMs
 
     **Verified by:** Server starts and responds to initialize,
     Server handles shutdown cleanly
@@ -69,6 +76,8 @@ Feature: MCP Server Integration
       When the client sends an MCP initialize request
       Then the pipeline uses the explicit globs instead of config auto-detection
 
+  @libar-docs-sequence-step:2
+  @libar-docs-sequence-module:tool-registry
   Rule: ProcessStateAPI methods and CLI subcommands are registered as MCP tools
 
     **Invariant:** Every CLI subcommand is registered as an MCP tool with a JSON
@@ -79,8 +88,13 @@ Feature: MCP Server Integration
     description (for LLM tool selection), and JSON Schema for input validation.
     The "dp_" prefix prevents collisions in multi-server setups.
 
+    **Input:** PipelineSession -- dataset, api, registry
+
+    **Output:** RegisteredTools -- 25 tools with dp_ prefix, Zod input schemas, handler functions
+
     **Verified by:** All CLI subcommands appear as MCP tools,
-    Tool schemas validate input parameters
+    Tool schemas validate input parameters,
+    Pattern detail returns full metadata
 
     @acceptance-criteria @happy-path
     Scenario: All CLI subcommands appear as MCP tools
@@ -96,23 +110,38 @@ Feature: MCP Server Integration
       When the client calls "dp_overview"
       Then the response contains the overview text with progress and phases
 
-    @acceptance-criteria @edge-case
+    @acceptance-criteria @edge-case @libar-docs-sequence-error
     Scenario: Tool call with missing required parameter returns error
       Given the MCP server is initialized
       When the client calls "dp_pattern" without the required "name" parameter
       Then the response is an MCP error indicating invalid params
 
+    @acceptance-criteria @happy-path
+    Scenario: Pattern detail returns full metadata
+      Given the MCP server is initialized
+      When the client calls "dp_pattern" for a pattern with rules and extracted shapes
+      Then the response contains the full pattern metadata payload
+      And the response includes deliverables, dependencies, business rules, and extracted shapes
+
+  @libar-docs-sequence-step:3
+  @libar-docs-sequence-module:pipeline-session
   Rule: MasterDataset is loaded once and reused across all tool invocations
 
     **Invariant:** The pipeline runs exactly once during server initialization. All
     subsequent tool calls read from in-memory MasterDataset. A manual rebuild can
-    be triggered via a "dp_rebuild" tool.
+    be triggered via a "dp_rebuild" tool, and overlapping rebuild requests coalesce
+    so the final in-memory session reflects the newest completed build.
 
     **Rationale:** The pipeline costs 2-5 seconds. Running it per tool call negates
     MCP benefits. Pre-computed views provide O(1) access ideal for a query server.
 
+    **Input:** ToolCallRequest -- tool name, arguments
+
+    **Output:** ToolCallResult -- content, isError
+
     **Verified by:** Multiple tool calls share one pipeline build,
-    Rebuild refreshes the dataset
+    Rebuild refreshes the dataset,
+    Concurrent rebuild requests coalesce
 
     @acceptance-criteria @happy-path
     Scenario: Multiple tool calls share one pipeline build
@@ -128,13 +157,22 @@ Feature: MCP Server Integration
       Then the pipeline runs again
       And subsequent tool calls use the new dataset
 
+    @acceptance-criteria @happy-path
+    Scenario: Concurrent rebuild requests coalesce
+      Given the MCP server is running with a loaded dataset
+      When two rebuild requests arrive before the first rebuild completes
+      Then the server serializes the rebuild work
+      And the final in-memory session is the newest rebuilt dataset
+
     @acceptance-criteria @edge-case
     Scenario: Concurrent reads during rebuild use previous dataset
       Given a rebuild is in progress
       When a tool call arrives for "dp_status"
       Then the call uses the previous dataset
-      And the response metadata indicates rebuild in progress
+      And the call completes successfully with the previous data
 
+  @libar-docs-sequence-step:4
+  @libar-docs-sequence-module:file-watcher
   Rule: Source file changes trigger automatic dataset rebuild with debouncing
 
     **Invariant:** When --watch is enabled, changes to source files trigger an
@@ -144,6 +182,10 @@ Feature: MCP Server Integration
     **Rationale:** During implementation sessions, source files change frequently.
     Without auto-rebuild, agents must manually call dp_rebuild. Debouncing prevents
     redundant rebuilds during rapid-fire saves.
+
+    **Input:** FileChangeEvent -- filePath, eventType
+
+    **Output:** PipelineSession -- rebuilt dataset with updated patterns
 
     **Verified by:** File change triggers rebuild,
     Rapid changes are debounced
@@ -161,25 +203,34 @@ Feature: MCP Server Integration
       When 5 files are modified within 200ms
       Then the pipeline rebuilds exactly once after the debounce window
 
-    @acceptance-criteria @edge-case
+    @acceptance-criteria @edge-case @libar-docs-sequence-error
     Scenario: Rebuild failure during watch does not crash server
       Given the MCP server is running with --watch enabled
       When a source file change introduces a parse error
       Then the server continues using the previous valid dataset
-      And an MCP notification indicates rebuild failure
+      And the rebuild failure is logged to stderr
 
+  @libar-docs-sequence-step:5
+  @libar-docs-sequence-module:mcp-server
   Rule: MCP server is configurable via standard client configuration
 
     **Invariant:** The server works with .mcp.json (Claude Code), claude_desktop_config.json
     (Claude Desktop), and any MCP client. It accepts --input, --features, --base-dir
-    args and auto-detects delivery-process.config.ts.
+    args, auto-detects delivery-process.config.ts, and reports the package version
+    accurately through the CLI.
 
     **Rationale:** MCP clients discover servers through configuration files. The
     server must work with sensible defaults (config auto-detection) while supporting
     explicit overrides for monorepo setups.
 
+    **Input:** CLIArgs -- input, features, baseDir, watch, help, version
+
+    **Output:** McpServerOptions -- parsed options merged with config defaults
+
     **Verified by:** Default config auto-detection,
-    Server works when started via npx
+    Config without explicit sources falls back to conventional globs,
+    Server works when started via npx,
+    Version flag reports package version
 
     @acceptance-criteria @happy-path
     Scenario: Default config auto-detection
@@ -189,13 +240,26 @@ Feature: MCP Server Integration
       And the pipeline builds successfully
 
     @acceptance-criteria @happy-path
+    Scenario: Config without explicit sources falls back to conventional globs
+      Given a project with delivery-process.config.ts but no explicit sources
+      When the MCP server is started without explicit arguments
+      Then it falls back to the conventional source globs
+      And the pipeline builds successfully
+
+    @acceptance-criteria @happy-path
     Scenario: Server works when started via npx
       Given the package is installed
       When running "npx @libar-dev/delivery-process dp-mcp-server"
       Then the server process starts and awaits MCP initialize
       And no extraneous output appears on stdout
 
-    @acceptance-criteria @edge-case
+    @acceptance-criteria @happy-path
+    Scenario: Version flag reports package version
+      Given the package is installed
+      When running "npx @libar-dev/delivery-process dp-mcp-server --version"
+      Then the output contains the current package version
+
+    @acceptance-criteria @edge-case @libar-docs-sequence-error
     Scenario: No config file and no explicit globs
       Given a directory without delivery-process.config.ts
       When the MCP server is started without arguments

@@ -253,6 +253,16 @@ export function checkFsmAllowsTransition(
     };
   }
 
+  // Pattern is already active — no transition needed for implement session
+  if (status === 'active') {
+    return {
+      id: 'fsm-allows-transition',
+      label: 'FSM allows transition',
+      severity: 'PASS',
+      detail: 'Already active — no transition needed',
+    };
+  }
+
   const isValid = api.isValidTransition(status, 'active');
 
   if (isValid) {
