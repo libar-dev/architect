@@ -498,7 +498,7 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
     question: 'How do I query process state?',
     covers: 'Process state API, stubs, context assembly, CLI',
     intro:
-      'The Data API provides direct terminal access to delivery process state. ' +
+      'The Data API provides direct terminal access to project state. ' +
       'It replaces reading generated markdown or launching explore agents — targeted queries ' +
       'use 5-10x less context. The `context` command assembles curated bundles tailored to ' +
       'session type (planning, design, implement).',

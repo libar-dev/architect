@@ -64,7 +64,7 @@ export function getPackageName(): string {
 /**
  * Print version information and exit
  *
- * @param cliName - Name of the CLI command (e.g., "generate-docs")
+ * @param cliName - Name of the CLI command (e.g., "architect-generate")
  */
 export function printVersionAndExit(cliName: string): never {
   console.log(`${cliName} (${getPackageName()}) v${getPackageVersion()}`);

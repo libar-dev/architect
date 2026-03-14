@@ -13,7 +13,7 @@
  *
  * - Validating tag registry configuration at runtime
  * - Merging custom registry overrides with default registry
- * - Creating delivery process instances with custom categories
+ * - Creating Architect instances with custom categories
  */
 
 import { z } from 'zod';

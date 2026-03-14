@@ -12,8 +12,8 @@ We welcome contributions! This guide covers how to get started.
 
 ```bash
 # Fork the repo on GitHub, then:
-git clone https://github.com/<your-username>/delivery-process.git
-cd delivery-process
+git clone https://github.com/<your-username>/architect.git
+cd architect
 pnpm install
 pnpm build && pnpm test
 ```

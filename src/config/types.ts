@@ -25,7 +25,7 @@ import type { MetadataTagDefinitionForRegistry } from '../taxonomy/registry-buil
 import type { ContextInferenceRule } from '../generators/pipeline/context-inference.js';
 
 /**
- * Configuration for creating a delivery process instance.
+ * Configuration for creating an Architect instance.
  * Uses generics to preserve literal types from presets.
  */
 export interface ArchitectConfig {

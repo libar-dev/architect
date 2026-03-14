@@ -11,7 +11,7 @@
  *
  * ## Process State API - Programmatic Query Interface
  *
- * TypeScript interface for querying delivery process state.
+ * TypeScript interface for querying project state.
  * Designed for Claude Code integration and programmatic access.
  *
  * ### When to Use
@@ -82,7 +82,7 @@ import type {
 // =============================================================================
 
 /**
- * Programmatic API for querying delivery process state
+ * Programmatic API for querying project state
  */
 export interface ProcessStateAPI {
   // ─────────────────────────────────────────────────────────────────────────

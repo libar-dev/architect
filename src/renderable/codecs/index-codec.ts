@@ -191,7 +191,7 @@ function buildPackageMetadata(dataset: MasterDataset): SectionBlock[] {
       ['Field', 'Value'],
       [
         ['**Package**', '@libar-dev/architect'],
-        ['**Purpose**', 'Code-first documentation and delivery process toolkit'],
+        ['**Purpose**', 'Context engineering platform for AI-assisted codebases'],
         [
           '**Patterns**',
           `${totalPatterns} tracked (${counts.completed} completed, ${counts.active} active, ${counts.planned} planned)`,

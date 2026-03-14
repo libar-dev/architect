@@ -86,7 +86,7 @@ pnpm architect:query -- list --status roadmap --names-only      # Available patt
 - Transition to `active`
 - Ask "Ready to implement?"
 
-### Example: delivery-process dogfood
+### Example: Architect dogfood
 
 See [`tests/features/validation/fsm-validator.feature`](../tests/features/validation/fsm-validator.feature) for a complete roadmap spec with Rules, ScenarioOutlines, and proper tagging.
 

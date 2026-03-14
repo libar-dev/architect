@@ -70,7 +70,7 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
     // .mcp.json or claude_desktop_config.json
     {
       "mcpServers": {
-        "delivery-process": {
+        "architect": {
           "command": "npx",
           "args": ["tsx", "src/mcp/server.ts", "--input", "src/**/*.ts", ...]
         }

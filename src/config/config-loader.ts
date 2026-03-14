@@ -150,12 +150,28 @@ export async function findConfigFile(startDir: string): Promise<string | null> {
     // Check for TypeScript config first
     const tsConfigPath = path.join(currentDir, CONFIG_FILE_NAME);
     if (await fileExists(tsConfigPath)) {
+      // Warn if legacy config also exists — user should clean up
+      const legacyTsPath = path.join(currentDir, LEGACY_CONFIG_FILE_NAME);
+      if (await fileExists(legacyTsPath)) {
+        console.error(
+          `Warning: Both '${CONFIG_FILE_NAME}' and '${LEGACY_CONFIG_FILE_NAME}' exist in ${currentDir}. ` +
+            `Using '${CONFIG_FILE_NAME}'. Delete '${LEGACY_CONFIG_FILE_NAME}' to silence this warning.`
+        );
+      }
       return tsConfigPath;
     }
 
     // Check for JavaScript config (pre-compiled)
     const jsConfigPath = path.join(currentDir, CONFIG_FILE_NAME_JS);
     if (await fileExists(jsConfigPath)) {
+      // Warn if legacy config also exists — user should clean up
+      const legacyJsPath = path.join(currentDir, LEGACY_CONFIG_FILE_NAME_JS);
+      if (await fileExists(legacyJsPath)) {
+        console.error(
+          `Warning: Both '${CONFIG_FILE_NAME_JS}' and '${LEGACY_CONFIG_FILE_NAME_JS}' exist in ${currentDir}. ` +
+            `Using '${CONFIG_FILE_NAME_JS}'. Delete '${LEGACY_CONFIG_FILE_NAME_JS}' to silence this warning.`
+        );
+      }
       return jsConfigPath;
     }
 
@@ -424,7 +440,7 @@ export async function loadProjectConfig(baseDir: string): Promise<ProjectConfigL
     error: {
       type: 'config-load-error',
       path: configPath,
-      message: `Config file must export a ArchitectProjectConfig (use defineConfig()) or ArchitectInstance (use createArchitect()): ${configPath}`,
+      message: `Config file must export an ArchitectProjectConfig (use defineConfig()) or an ArchitectInstance (use createArchitect()): ${configPath}`,
     },
   };
 }

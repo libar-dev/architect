@@ -2,16 +2,16 @@
 
 ```text
 Need to check annotation quality?
-  Yes -> lint-patterns
+  Yes -> architect-lint-patterns
 
 Need to check vitest-cucumber compatibility?
-  Yes -> lint-steps
+  Yes -> architect-lint-steps
 
 Need FSM workflow validation?
-  Yes -> lint-process
+  Yes -> architect-guard
 
 Need cross-source or DoD validation?
-  Yes -> validate-patterns
+  Yes -> architect-validate
 
 Running pre-commit hook?
   architect-guard --staged (default)
@@ -28,13 +28,13 @@ Running pre-commit hook?
 
 ---
 
-## lint-patterns
+## architect-lint-patterns
 
 Validates `@<prefix>-*` annotation quality in TypeScript files.
 
 ```bash
-npx lint-patterns -i "src/**/*.ts"
-npx lint-patterns -i "src/**/*.ts" --strict   # CI
+npx architect-lint-patterns -i "src/**/*.ts"
+npx architect-lint-patterns -i "src/**/*.ts" --strict   # CI
 ```
 
 ### CLI Flags
@@ -64,7 +64,7 @@ npx lint-patterns -i "src/**/*.ts" --strict   # CI
 
 ---
 
-## lint-steps
+## architect-lint-steps
 
 Static analyzer for vitest-cucumber feature/step compatibility. Catches mismatches that cause cryptic runtime failures.
 
@@ -112,7 +112,7 @@ pnpm lint:steps --strict     # CI
 
 ---
 
-## lint-process
+## architect-guard
 
 FSM validation for delivery workflow. Enforces status transitions and protection levels.
 
@@ -132,12 +132,12 @@ For detailed rules, escape hatches, and error fixes, see the [Process Guard Refe
 
 ---
 
-## validate-patterns
+## architect-validate
 
 Cross-source validator combining multiple checks.
 
 ```bash
-npx validate-patterns \
+npx architect-validate \
   -i "src/**/*.ts" \
   -F "specs/**/*.feature" \
   --dod \
@@ -194,12 +194,12 @@ For patterns with `completed` status, checks:
 ```json
 {
   "scripts": {
-    "lint:patterns": "lint-patterns -i 'src/**/*.ts'",
-    "lint:steps": "lint-steps",
-    "lint:steps:ci": "lint-steps --strict",
+    "lint:patterns": "architect-lint-patterns -i 'src/**/*.ts'",
+    "lint:steps": "architect-lint-steps",
+    "lint:steps:ci": "architect-lint-steps --strict",
     "lint:process": "architect-guard --staged",
     "lint:process:ci": "architect-guard --all --strict",
-    "validate:all": "validate-patterns -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns"
+    "validate:all": "architect-validate -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns"
   }
 }
 ```
@@ -214,20 +214,20 @@ npx architect-guard --staged
 
 ```yaml
 - name: Lint annotations
-  run: npx lint-patterns -i "src/**/*.ts" --strict
+  run: npx architect-lint-patterns -i "src/**/*.ts" --strict
 
 - name: Lint steps
-  run: npx lint-steps --strict
+  run: npx architect-lint-steps --strict
 
 - name: Validate patterns
-  run: npx validate-patterns -i "src/**/*.ts" -F "specs/**/*.feature" --dod --anti-patterns
+  run: npx architect-validate -i "src/**/*.ts" -F "specs/**/*.feature" --dod --anti-patterns
 ```
 
 ---
 
 ## Exit Codes
 
-| Code | lint-patterns / lint-steps / lint-process    | validate-patterns                   |
+| Code | architect-lint-patterns / architect-lint-steps / architect-guard    | architect-validate                   |
 | ---- | -------------------------------------------- | ----------------------------------- |
 | `0`  | No errors (warnings allowed unless --strict) | No issues found                     |
 | `1`  | Errors found (or warnings with --strict)     | Errors found                        |

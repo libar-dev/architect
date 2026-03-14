@@ -55,7 +55,7 @@ export class UserAuthentication {
 ### 3. Generate Documentation
 
 ```bash
-npx generate-docs -g patterns -i "src/**/*.ts" -o docs -f
+npx architect-generate -g patterns -i "src/**/*.ts" -o docs -f
 ```
 
 ### 4. Enforce Workflow (Pre-commit Hook)
@@ -115,7 +115,7 @@ All output goes to [`docs-live/`](docs-live/INDEX.md) — 57+ auto-generated fil
 
 | Command                   | Purpose                                                | Docs                                                                      |
 | ------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------- |
-| `architect-generate`      | Generate documentation from annotated sources          | `generate-docs --help`                                                    |
+| `architect-generate`      | Generate documentation from annotated sources          | `architect-generate --help`                                               |
 | `architect`               | Query delivery state for AI coding sessions            | [Process API Reference](docs-live/reference/PROCESS-API-REFERENCE.md)     |
 | `architect-lint-patterns` | Validate annotation quality (missing tags, etc.)       | [Validation Rules](docs-live/VALIDATION-RULES.md)                         |
 | `architect-guard`         | Validate delivery workflow FSM transitions             | [Process Guard Reference](docs-live/reference/PROCESS-GUARD-REFERENCE.md) |

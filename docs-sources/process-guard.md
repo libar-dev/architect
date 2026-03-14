@@ -32,7 +32,7 @@
 ## CLI Usage
 
 ```bash
-lint-process [options]
+architect-guard [options]
 ```
 
 ### Modes

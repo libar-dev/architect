@@ -8,7 +8,7 @@
  *
  * ## ProcessGuardModule - Process Guard Linter
  *
- * Enforces delivery process rules by validating changes against:
+ * Enforces workflow rules by validating changes against:
  * - Protection levels (completed files require unlock-reason)
  * - Status transitions (must follow PDR-005 FSM)
  * - Scope creep (active specs cannot add new deliverables)

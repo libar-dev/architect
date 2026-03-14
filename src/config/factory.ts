@@ -11,9 +11,9 @@
  * @architect-used-by PublicAPI
  * @architect-extract-shapes CreateArchitectOptions, createArchitect
  *
- * ## Delivery Process Factory
+ * ## Architect Factory
  *
- * Main factory function for creating configured delivery process instances.
+ * Main factory function for creating configured Architect instances.
  * Supports presets, custom configuration, and configuration overrides.
  *
  * ### When to Use
@@ -30,7 +30,7 @@ import { createRegexBuilders } from './regex-builders.js';
 import { LIBAR_GENERIC_PRESET, PRESETS, type PresetName } from './presets.js';
 
 /**
- * Options for creating a delivery process instance
+ * Options for creating an Architect instance
  */
 export interface CreateArchitectOptions {
   /** Use a preset configuration */
@@ -44,7 +44,7 @@ export interface CreateArchitectOptions {
 }
 
 /**
- * Creates a configured delivery process instance.
+ * Creates a configured Architect instance.
  *
  * Configuration resolution order:
  * 1. Start with preset (or libar-generic default)
@@ -57,7 +57,7 @@ export interface CreateArchitectOptions {
  * Categories from the preset replace base categories entirely.
  *
  * @param options - Configuration options
- * @returns Configured delivery process instance
+ * @returns Configured Architect instance
  *
  * @example
  * ```typescript

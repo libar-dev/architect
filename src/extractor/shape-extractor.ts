@@ -1112,7 +1112,7 @@ function extractShapeTag(jsDocText: string): { tagged: boolean; group?: string }
  * @param jsDocText - Raw JSDoc text including delimiters
  */
 function extractIncludeTag(jsDocText: string): readonly string[] | undefined {
-  const match = /libar-docs-include(?!-)(?:\s+([^\n@*]+))?/.exec(jsDocText);
+  const match = /architect-include(?!-)(?:\s+([^\n@*]+))?/.exec(jsDocText);
   if (!match) return undefined;
   const raw = match[1];
   if (raw === undefined) return undefined;

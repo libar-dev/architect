@@ -29,7 +29,7 @@ export interface TempDirContext {
  * Options for creating a temporary directory.
  */
 export interface TempDirOptions {
-  /** Prefix for the temp directory name (default: "delivery-process-test-") */
+  /** Prefix for the temp directory name (default: "architect-test-") */
   prefix?: string;
   /** Whether to keep the directory after cleanup (for debugging) */
   keepOnCleanup?: boolean;
@@ -54,7 +54,7 @@ export interface TempDirOptions {
  * ```
  */
 export async function createTempDir(options: TempDirOptions = {}): Promise<TempDirContext> {
-  const { prefix = 'delivery-process-test-', keepOnCleanup = false } = options;
+  const { prefix = 'architect-test-', keepOnCleanup = false } = options;
 
   const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), prefix));
 

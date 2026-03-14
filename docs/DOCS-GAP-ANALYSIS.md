@@ -275,7 +275,7 @@ sync-content.mjs
 
 | Section                | Directory      | Source                                     | Collapsed |
 | ---------------------- | -------------- | ------------------------------------------ | --------- |
-| Tutorial               | tutorial/      | delivery-process-tutorials repo            | No        |
+| Tutorial               | tutorial/      | architect-tutorials repo            | No        |
 | Guides                 | guides/        | docs/ manual (5 files)                     | No        |
 | Reference              | reference/     | docs/ manual (5 files)                     | No        |
 | Product Areas          | product-areas/ | docs-live/product-areas/                   | No        |
@@ -475,7 +475,7 @@ the sync script should be updated to read from `docs-live/` instead of `docs/`:
 **Scope:** libar-dev-website repo
 **Effort:** Small (1 session)
 **Spec alignment:** Consequence of DocsLiveConsolidation (Phase 37, completed).
-No new delivery-process spec needed -- this is a website-repo fix.
+No new architect spec needed -- this is a website-repo fix.
 
 Update `sync-content.mjs` and `content-manifest.mjs` to:
 
@@ -492,7 +492,7 @@ Update `sync-content.mjs` and `content-manifest.mjs` to:
 ### WP-2: Enhance Generated Index (P1)
 
 **Type:** Design + Implementation
-**Scope:** delivery-process repo
+**Scope:** architect repo
 **Effort:** Small (1-2 sessions)
 **Spec alignment:** Maps to DocsConsolidationStrategy Phase 6 (Index navigation update, pending).
 Update the existing deliverable status when implementing.
@@ -510,7 +510,7 @@ to generate audience-appropriate navigation.
 ### WP-3: Add Architecture Generator to docs:all (P1)
 
 **Type:** Implementation session
-**Scope:** delivery-process repo
+**Scope:** architect repo
 **Effort:** Small (1 session)
 **Spec alignment:** Extends Phase 4 (Architecture decomposition, complete). Phase 4
 decomposed the manual ARCHITECTURE.md; this adds the generated Mermaid equivalent.
@@ -522,7 +522,7 @@ that partially replace the manual ARCHITECTURE.md data flow diagrams.
 ### WP-4: Add Changelog Generator to docs:all (P2)
 
 **Type:** Implementation session
-**Scope:** delivery-process repo
+**Scope:** architect repo
 **Effort:** Small (1 session)
 **Spec alignment:** New work, not covered by DocsConsolidationStrategy. Consider
 adding as a new deliverable if a spec is created.
@@ -533,7 +533,7 @@ New content for the website (no manual equivalent to replace).
 ### WP-5: Create Error Guide Codec (P2)
 
 **Type:** Design + Implementation
-**Scope:** delivery-process repo
+**Scope:** architect repo
 **Effort:** Medium (2-3 sessions)
 **Spec alignment:** Maps to DocsConsolidationStrategy Phase 3 (Process Guard
 consolidation, pending). The spec says "enhanced ValidationRulesCodec" -- design
@@ -557,7 +557,7 @@ This replaces the manual PROCESS-GUARD.md "Error Messages and Fixes" section.
 ### WP-6: Create CLI Recipe Codec (P2)
 
 **Type:** Design + Implementation
-**Scope:** delivery-process repo
+**Scope:** architect repo
 **Effort:** Medium (2-3 sessions)
 **Spec alignment:** Extends ProcessApiHybridGeneration (Phase 43, completed). Phase 43
 generated reference tables from CLI schema; this adds recipe/guide content. The manual
@@ -580,7 +580,7 @@ This replaces manual PROCESS-API.md "Common Recipes" and "Session Workflow Comma
 ### WP-7: Create Procedural Guide Codec (P3)
 
 **Type:** Design + Implementation
-**Scope:** delivery-process repo
+**Scope:** architect repo
 **Effort:** Large (3-5 sessions)
 **Spec alignment:** Maps to DocsConsolidationStrategy Phase 41 (GHERKIN-PATTERNS.md
 restructure, pending) and Phase 39 (Session workflow module generation, pending --
@@ -612,7 +612,7 @@ GHERKIN-PATTERNS.md (366 lines of authoring guidance) have no generation source.
 ### WP-8: Decide Methodology Page Disposition (P3)
 
 **Type:** Design session
-**Scope:** delivery-process repo
+**Scope:** architect repo
 **Effort:** Small (1 session)
 **Spec alignment:** DocsConsolidationStrategy explicitly says "Keep: philosophy and
 core thesis" for METHODOLOGY.md. The master spec already decided this stays manual.
@@ -711,7 +711,7 @@ manual maintenance burden while preserving irreducibly editorial content.
 
 ## 10.5. Spec Coverage Status
 
-Maps each WP to its delivery-process spec, design status, and code stubs.
+Maps each WP to its architect spec, design status, and code stubs.
 
 | WP   | Pattern                    | Spec Status  | Design Status                                | Stubs   |
 | ---- | -------------------------- | ------------ | -------------------------------------------- | ------- |

@@ -7,11 +7,11 @@
  * ## API Module - Programmatic Process State Interface
  *
  * Central export for the Process State API, providing a TypeScript
- * interface for querying delivery process state.
+ * interface for querying project state.
  *
  * ### When to Use
  *
- * - When building tools that need programmatic access to delivery process state
+ * - When building tools that need programmatic access to project state
  * - When integrating with Claude Code for real-time process queries
  * - When building CI/CD pipelines that validate delivery workflow
  *

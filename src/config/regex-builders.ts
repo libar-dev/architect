@@ -17,7 +17,7 @@
  *
  * ### When to Use
  *
- * - When creating a new delivery process instance
+ * - When creating a new Architect instance
  * - When detecting doc directives in source code
  * - When normalizing tags for comparison
  */

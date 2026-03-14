@@ -11,7 +11,7 @@
  *
  * ## LintProcessCLI - Process Guard Linter CLI
  *
- * Validates git changes against delivery process rules.
+ * Validates git changes against workflow rules.
  * Enforces protection levels, status transitions, and session scope.
  *
  * ### When to Use
@@ -139,7 +139,7 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ProcessGuardC
  */
 export function printHelp(): void {
   console.log(`
-architect-guard - Validate changes against delivery process rules
+architect-guard - Validate changes against workflow rules
 
 Usage:
   architect-guard [options] [files...]

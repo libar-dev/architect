@@ -1,5 +1,5 @@
 /**
- * Delivery-process package configuration.
+ * Architect package configuration.
  *
  * Unified config replacing repeated CLI globs across 15+ package.json scripts.
  * Uses @architect- prefix with simplified 3-category taxonomy.
@@ -275,7 +275,7 @@ export default defineConfig({
       outputDirectory: 'docs-live',
     },
     'design-review': {
-      outputDirectory: 'delivery-process',
+      outputDirectory: 'architect',
     },
   },
   codecOptions: {

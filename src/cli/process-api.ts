@@ -10,7 +10,7 @@
  * @architect-arch-layer application
  * @architect-uses ProcessStateAPI, MasterDataset, PipelineFactory, RulesQueryModule, PatternSummarizerImpl, FuzzyMatcherImpl, OutputPipelineImpl
  * @architect-used-by npm scripts, Claude Code sessions
- * @architect-usecase "When querying delivery process state from CLI"
+ * @architect-usecase "When querying project state from CLI"
  * @architect-usecase "When Claude Code needs real-time delivery state queries"
  *
  * ## architect - CLI Query Interface to ProcessStateAPI
@@ -389,7 +389,7 @@ function showHelp(): void {
   const sessions = formatHelpOptions(CLI_SCHEMA.sessionOptions);
 
   console.log(`
-architect - Query delivery process state from annotated sources
+architect - Query project state from annotated sources
 
   Use this instead of reading generated markdown or launching explore agents.
   Targeted queries use 5-10x less context than file reads.

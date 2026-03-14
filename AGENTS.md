@@ -24,12 +24,12 @@ This file helps future Codex sessions ramp up quickly in this repository.
 
 ## Onboarding Context (Tutorial WIP)
 
-- External tutorial source: `/Users/darkomijic/dev-projects/delivery-process-tutorials/TUTORIAL-ARTICLE-v1.md`
+- External tutorial source: `/Users/darkomijic/dev-projects/architect-tutorials/TUTORIAL-ARTICLE-v1.md`
 - Tutorial goal: bootstrap from blank project to full docs/query flow (`11 patterns`, `26 generated files` in demo scenario).
 - Treat tutorial outputs as illustrative; validate commands against current CLI behavior before codemods/docs changes.
 - Important known alignment points from tutorial review:
-  - `process-api overview` includes the Data API helper section in output (not always shown in article snippets).
-  - Current `generate-docs --list-generators` output does not include `product-area-docs`.
+  - `architect overview` includes the Data API helper section in output (not always shown in article snippets).
+  - Current `architect-generate --list-generators` output does not include `product-area-docs`.
   - `architect-generate` accepts both repeated `-g` flags and comma-separated generator lists.
   - Shape-derived entries can affect counts and `stubs` output (shape patterns appear as separate entries).
   - `arch context` groups only patterns carrying explicit `@architect-arch-context`.
@@ -41,11 +41,11 @@ When guiding users in external repos, pick command style based on config format:
 - If the repo uses `architect.config.js` (or no config), package binaries are fine:
 
 ```bash
-npx generate-docs --help
+npx architect-generate --help
 npx architect --help
-npx lint-patterns --help
+npx architect-lint-patterns --help
 npx architect-guard --help
-npx validate-patterns --help
+npx architect-validate --help
 ```
 
 - If the repo uses `architect.config.ts`, use `tsx`-based wrappers (or switch to `.js` config).
@@ -123,8 +123,8 @@ pnpm test
 Process/quality checks:
 
 ```bash
-pnpm lint:steps
-pnpm lint-patterns
+pnpm architect:lint-steps
+pnpm architect:lint-patterns
 pnpm architect:guard
 pnpm validate:patterns
 pnpm validate:dod
@@ -147,7 +147,7 @@ pnpm docs:all
 
 Rule: do not hand-edit generated artifacts when regeneration is the intended flow.
 
-Current built-in generator list is discovered from CLI (`generate-docs --list-generators`).
+Current built-in generator list is discovered from CLI (`architect-generate --list-generators`).
 Do not assume undocumented generator names are available without checking.
 
 ## Testing Rules (Important)
@@ -184,7 +184,7 @@ There is currently no dedicated interactive onboarding command in this package.
 If implementing one, design for existing-repo adoption first:
 
 1. Command shape
-   - Add a new bin command (example: `delivery-process-init`) so users can run `npx delivery-process-init`.
+   - Add a new bin command (example: `architect-init`) so users can run `npx architect-init`.
 2. Wizard responsibilities
    - Detect package manager and module mode (`type: module`).
    - Scaffold `architect.config.ts` with chosen preset and discovered source globs.
@@ -194,4 +194,4 @@ If implementing one, design for existing-repo adoption first:
    - Dry-run mode and explicit overwrite confirmations.
    - Never silently overwrite existing `architect.config.ts` or user scripts.
 4. Success criteria
-   - User can run `process-api overview` and `generate-docs --list-generators` immediately after setup.
+   - User can run `architect overview` and `architect-generate --list-generators` immediately after setup.

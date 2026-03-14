@@ -94,7 +94,7 @@ Feature: Workflow Configuration, Process Instance, and FSM Extensibility
   Rule: Three projects with different workflow requirements
 
     | Context | Workflow Needs | Config Complexity |
-    | This package (delivery-process) | Full 6-phase, 298 patterns | Uses itself as POC |
+    | This package (architect) | Full 6-phase, 298 patterns | Uses itself as POC |
     | Monorepo (libar-platform) | Full 6-phase, multi-package | Primary consumer |
     | Future adopters (open-source) | Minimal or custom phases | Must work with zero config |
 

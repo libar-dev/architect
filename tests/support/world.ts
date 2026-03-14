@@ -1,5 +1,5 @@
 /**
- * BDD Test World - Shared Types for delivery-process Tests
+ * BDD Test World - Shared Types for Architect Tests
  *
  * This module defines shared types and interfaces used across all BDD step definitions.
  * It follows the vitest-cucumber pattern of module-level state that gets reset per scenario.

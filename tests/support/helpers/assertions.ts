@@ -1,5 +1,5 @@
 /**
- * BDD Assertion Helpers for delivery-process Tests
+ * BDD Assertion Helpers for Architect Tests
  *
  * Custom assertion utilities that work with vitest-cucumber step definitions.
  * These helpers provide domain-specific assertions for:
