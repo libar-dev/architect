@@ -16,7 +16,7 @@ Feature: Scope Validator - Pre-flight Session Readiness Checks
 
     **Invariant:** Implementation scope validation must check FSM transition validity, dependency completeness, PDR references, and deliverable presence, with strict mode promoting warnings to blockers.
     **Rationale:** Starting implementation without passing scope validation wastes an entire session — the validator catches all known blockers before any code is written.
-    **Verified by:** All implementation checks pass, Incomplete dependency blocks implementation, FSM transition from completed blocks implementation, Missing PDR references produce WARN, No deliverables blocks implementation, Strict mode promotes WARN to BLOCKED, Pattern not found throws error
+    **Verified by:** All implementation checks pass, Incomplete dependency blocks implementation, FSM transition from completed blocks implementation, Active pattern passes FSM check for implementation, Missing PDR references produce WARN, No deliverables blocks implementation, Strict mode promotes WARN to BLOCKED, Pattern not found throws error
 
     @acceptance-criteria @happy-path
     Scenario: All implementation checks pass
@@ -38,6 +38,13 @@ Feature: Scope Validator - Pre-flight Session Readiness Checks
       When validating scope for implement session
       Then the verdict is "blocked"
       And the FSM check shows BLOCKED
+
+    @acceptance-criteria @happy-path
+    Scenario: Active pattern passes FSM check for implementation
+      Given a pattern with active status and deliverables
+      When validating scope for implement session
+      Then the FSM check shows PASS
+      And the detail mentions already active
 
     @acceptance-criteria @edge-case
     Scenario: Missing PDR references produce WARN

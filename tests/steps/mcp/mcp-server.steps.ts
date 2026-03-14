@@ -25,6 +25,7 @@ import {
   initMcpState,
   createTestPipelineSession,
   createFilterTestSession,
+  createRichPatternSession,
 } from '../../support/helpers/mcp-state.js';
 
 // =============================================================================
@@ -433,5 +434,94 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(parsed).toHaveProperty(key);
       });
     });
+  });
+
+  // ===========================================================================
+  // Rule 6: Tool output correctness for edge cases
+  // ===========================================================================
+
+  Rule('Tool output correctness for edge cases', ({ RuleScenario }) => {
+    RuleScenario(
+      'dp_rules without pattern returns compact summary',
+      ({ Given, When, Then, And }) => {
+        Given('an McpServer mock with registered tools', () => {
+          const session = createTestPipelineSession();
+          const mockSessionManager = new MockPipelineSessionManager(session);
+          const mockServer = new MockMcpServer();
+          registerAllTools(
+            mockServer as unknown as McpServer,
+            mockSessionManager as unknown as PipelineSessionManager
+          );
+          state!.mockServer = mockServer;
+          state!.session = session;
+        });
+
+        When('the dp_rules handler is called without pattern', () => {
+          const tool = state!.mockServer!.tools.get('dp_rules');
+          expect(tool).toBeDefined();
+          state!.toolResult = tool!.handler({}) as McpTestState['toolResult'];
+        });
+
+        Then('the result contains totalRules and allRuleNames', () => {
+          const parsed = JSON.parse(state!.toolResult!.content[0].text) as Record<string, unknown>;
+          expect(parsed).toHaveProperty('totalRules');
+          expect(parsed).toHaveProperty('allRuleNames');
+        });
+
+        And('the result contains a hint about using pattern parameter', () => {
+          const parsed = JSON.parse(state!.toolResult!.content[0].text) as Record<string, unknown>;
+          expect(parsed).toHaveProperty('hint');
+          expect(String(parsed.hint)).toContain('pattern');
+        });
+
+        And('the result does not contain full rule details', () => {
+          const text = state!.toolResult!.content[0].text;
+          const parsed = JSON.parse(text) as Record<string, unknown>;
+          // Compact summary productAreas should NOT have nested 'phases' with 'rules' arrays
+          const areas = parsed.productAreas as Array<Record<string, unknown>>;
+          if (areas.length > 0) {
+            expect(areas[0]).not.toHaveProperty('phases');
+          }
+        });
+      }
+    );
+
+    RuleScenario(
+      'dp_pattern returns deliverables and dependencies',
+      ({ Given, When, Then, And }) => {
+        Given('a session with a pattern that has deliverables and dependencies', () => {
+          state!.session = createRichPatternSession();
+        });
+
+        And('an McpServer mock with registered tools using that session', () => {
+          const mockSessionManager = new MockPipelineSessionManager(state!.session!);
+          const mockServer = new MockMcpServer();
+          registerAllTools(
+            mockServer as unknown as McpServer,
+            mockSessionManager as unknown as PipelineSessionManager
+          );
+          state!.mockServer = mockServer;
+        });
+
+        When('dp_pattern is called for that pattern', () => {
+          const tool = state!.mockServer!.tools.get('dp_pattern');
+          expect(tool).toBeDefined();
+          state!.toolResult = tool!.handler({ name: 'RichPattern' }) as McpTestState['toolResult'];
+        });
+
+        Then('the result contains deliverables array', () => {
+          const parsed = JSON.parse(state!.toolResult!.content[0].text) as Record<string, unknown>;
+          expect(parsed).toHaveProperty('deliverables');
+          expect(Array.isArray(parsed.deliverables)).toBe(true);
+          expect((parsed.deliverables as unknown[]).length).toBeGreaterThan(0);
+        });
+
+        And('the result contains dependencies object', () => {
+          const parsed = JSON.parse(state!.toolResult!.content[0].text) as Record<string, unknown>;
+          expect(parsed).toHaveProperty('dependencies');
+          expect(parsed.dependencies).not.toBeNull();
+        });
+      }
+    );
   });
 });

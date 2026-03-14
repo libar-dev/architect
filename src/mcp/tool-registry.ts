@@ -53,7 +53,7 @@ import {
 import { queryBusinessRules } from '../api/rules-query.js';
 import { findStubPatterns, resolveStubs, groupStubsByPattern } from '../api/stub-resolver.js';
 import { fuzzyMatchPatterns } from '../api/fuzzy-match.js';
-import { allPatternNames } from '../api/pattern-helpers.js';
+import { allPatternNames, getPatternName } from '../api/pattern-helpers.js';
 import { summarizePattern, summarizePatterns } from '../api/summarize.js';
 
 // =============================================================================
@@ -250,7 +250,14 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
       if (pattern === undefined) {
         return errorResult(`Pattern "${name}" not found.`);
       }
-      return jsonResult(summarizePattern(pattern));
+      const canonicalName = getPatternName(pattern);
+      return jsonResult({
+        ...summarizePattern(pattern),
+        description: pattern.directive.description || null,
+        deliverables: s.api.getPatternDeliverables(canonicalName),
+        dependencies: s.api.getPatternDependencies(canonicalName) ?? null,
+        relationships: s.api.getPatternRelationships(canonicalName) ?? null,
+      });
     }
   );
 
@@ -334,6 +341,21 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
         patternName: pattern ?? null,
         onlyInvariants: onlyInvariants ?? false,
       });
+
+      // Without pattern filter, return compact summary to avoid 800K+ response
+      if (pattern === undefined) {
+        return jsonResult({
+          totalRules: result.totalRules,
+          totalInvariants: result.totalInvariants,
+          allRuleNames: result.allRuleNames,
+          productAreas: result.productAreas.map((pa) => ({
+            productArea: pa.productArea,
+            ruleCount: pa.ruleCount,
+            invariantCount: pa.invariantCount,
+          })),
+          hint: 'Use the "pattern" parameter to get full rule details for a specific pattern.',
+        });
+      }
       return jsonResult(result);
     }
   );

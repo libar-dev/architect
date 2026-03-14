@@ -106,6 +106,41 @@ export function createFilterTestSession(): PipelineSession {
   };
 }
 
+/**
+ * Creates a PipelineSession with a pattern that has deliverables and dependencies.
+ * Used for dp_pattern enrichment tests.
+ */
+export function createRichPatternSession(): PipelineSession {
+  const dep = createTestPattern({
+    name: 'DepPattern',
+    status: 'completed',
+    filePath: 'specs/dep.feature',
+  });
+  const focal = createTestPattern({
+    name: 'RichPattern',
+    status: 'active',
+    phase: 46,
+    filePath: 'specs/rich-pattern.feature',
+    dependsOn: ['DepPattern'],
+    deliverables: [
+      { name: 'Server entry point', status: 'complete', tests: 2, location: 'src/server.ts' },
+      { name: 'Tool registry', status: 'in-progress', tests: 0, location: 'src/tools.ts' },
+    ],
+  });
+  const dataset = createTestMasterDataset({ patterns: [focal, dep] });
+  const api = createProcessStateAPI(dataset);
+  const registry = createDefaultTagRegistry();
+
+  return {
+    dataset,
+    api,
+    registry,
+    baseDir: '/tmp/test-project',
+    sourceGlobs: { input: ['src/**/*.ts'], features: ['specs/**/*.feature'] },
+    buildTimeMs: 55,
+  };
+}
+
 // =============================================================================
 // Mock Pipeline Session Manager
 // =============================================================================

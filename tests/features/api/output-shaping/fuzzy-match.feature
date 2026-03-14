@@ -10,7 +10,7 @@ Feature: Fuzzy Pattern Matching
 
     **Invariant:** Pattern matching must use a tiered scoring system: exact match (1.0) > prefix match (0.9) > substring match (0.7) > Levenshtein distance, with results sorted by score descending and case-insensitive matching.
     **Rationale:** Tiered scoring ensures the most intuitive match wins — an exact match should always rank above a substring match, preventing surprising suggestions for common pattern names.
-    **Verified by:** Exact match scores 1.0, Exact match is case-insensitive, Prefix match scores 0.9, Substring match scores 0.7, Levenshtein match for close typos, Results are sorted by score descending, Empty query matches all patterns as prefix, No candidate patterns returns no results
+    **Verified by:** Exact match scores 1.0, Exact match is case-insensitive, Prefix match scores above 0.9, Substring match scores 0.7, Levenshtein match for close typos, Results are sorted by score descending, Prefix matches rank shorter names higher, Prefix match scores reflect query coverage, Empty query matches all patterns as prefix, No candidate patterns returns no results
 
     @acceptance-criteria @happy-path
     Scenario: Exact match scores 1.0
@@ -25,10 +25,11 @@ Feature: Fuzzy Pattern Matching
       Then the top result is "OrderSaga" with score "1.0" and matchType "exact"
 
     @acceptance-criteria @happy-path
-    Scenario: Prefix match scores 0.9
+    Scenario: Prefix match scores above 0.9
       Given pattern names "AgentCommandInfrastructure", "EventStore"
       When I fuzzy match "AgentCommand"
-      Then the top result is "AgentCommandInfrastructure" with score "0.9" and matchType "prefix"
+      Then the top result is "AgentCommandInfrastructure" with matchType "prefix"
+      And the top result score is above "0.9"
 
     @acceptance-criteria @happy-path
     Scenario: Substring match scores 0.7
@@ -49,6 +50,18 @@ Feature: Fuzzy Pattern Matching
       When I fuzzy match "Command"
       Then the first result has score "1.0"
       And the second result has score at least "0.7"
+
+    @acceptance-criteria @happy-path
+    Scenario: Prefix matches rank shorter names higher
+      Given pattern names "MCPModule", "MCPServerIntegration", "MCPToolRegistry"
+      When I fuzzy match "MCP"
+      Then the first result is "MCPModule"
+
+    @acceptance-criteria @happy-path
+    Scenario: Prefix match scores reflect query coverage
+      Given pattern names "MCPModule", "MCPServerIntegration"
+      When I fuzzy match "MCP"
+      Then the first result score is higher than the second result score
 
     @edge-case
     Scenario: Empty query matches all patterns as prefix

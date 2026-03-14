@@ -180,3 +180,29 @@ Feature: MCP Server Integration Tests
       When the dp_status handler is called
       Then the JSON result contains "counts" key
       And the JSON result contains "distribution" key
+
+  Rule: Tool output correctness for edge cases
+
+    **Invariant:** dp_rules without a pattern filter returns a compact summary
+    instead of the full rules corpus. dp_pattern returns rich metadata including
+    deliverables and dependencies.
+
+    **Rationale:** Unfiltered dp_rules returned 889K chars which breaks MCP clients.
+    dp_pattern must match its description ("full metadata") to enable accurate tool selection.
+
+    **Verified by:** dp_rules without pattern returns compact summary,
+    dp_pattern returns deliverables and dependencies
+
+    Scenario: dp_rules without pattern returns compact summary
+      Given an McpServer mock with registered tools
+      When the dp_rules handler is called without pattern
+      Then the result contains totalRules and allRuleNames
+      And the result contains a hint about using pattern parameter
+      And the result does not contain full rule details
+
+    Scenario: dp_pattern returns deliverables and dependencies
+      Given a session with a pattern that has deliverables and dependencies
+      And an McpServer mock with registered tools using that session
+      When dp_pattern is called for that pattern
+      Then the result contains deliverables array
+      And the result contains dependencies object
