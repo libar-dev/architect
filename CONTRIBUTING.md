@@ -69,7 +69,7 @@ These run automatically — no manual setup needed after `pnpm install`.
 
 ## Reporting Issues
 
-- Use [GitHub Issues](https://github.com/libar-dev/architect/issues)
+- Use [GitHub Issues](https://github.com/libar-dev/delivery-process/issues)
 - For security vulnerabilities, see [SECURITY.md](SECURITY.md)
 
 ## Code of Conduct

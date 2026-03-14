@@ -5,7 +5,7 @@
 Turn TypeScript annotations and Gherkin specs into a **structured, queryable delivery state** — living documentation, architecture graphs, and FSM-enforced workflows that AI agents consume without hallucinating.
 
 [![npm version](https://img.shields.io/npm/v/@libar-dev/architect.svg)](https://www.npmjs.com/package/@libar-dev/architect)
-[![Build Status](https://github.com/libar-dev/architect/workflows/CI/badge.svg)](https://github.com/libar-dev/architect/actions)
+[![Build Status](https://github.com/libar-dev/delivery-process/workflows/CI/badge.svg)](https://github.com/libar-dev/delivery-process/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/node/v/@libar-dev/architect.svg)](https://nodejs.org/)
 

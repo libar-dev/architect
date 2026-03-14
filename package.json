@@ -175,12 +175,12 @@
   "license": "(MIT AND BUSL-1.1)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/libar-dev/architect.git"
+    "url": "git+https://github.com/libar-dev/delivery-process.git"
   },
   "bugs": {
-    "url": "https://github.com/libar-dev/architect/issues"
+    "url": "https://github.com/libar-dev/delivery-process/issues"
   },
-  "homepage": "https://github.com/libar-dev/architect#readme",
+  "homepage": "https://github.com/libar-dev/delivery-process#readme",
   "engines": {
     "node": ">=18.0.0"
   },
