@@ -53,10 +53,14 @@ export function getResult(state: CLITestState | null): CLIResult {
 
 export async function runCLICommand(
   state: CLITestState | null,
-  commandString: string
+  commandString: string,
+  options: { timeout?: number } = {}
 ): Promise<void> {
   const s = getState(state);
-  s.result = await runCommand(commandString, { cwd: getTempDir(state) });
+  s.result = await runCommand(commandString, {
+    cwd: getTempDir(state),
+    ...(options.timeout !== undefined ? { timeout: options.timeout } : {}),
+  });
 }
 
 // =============================================================================

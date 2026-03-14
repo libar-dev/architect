@@ -187,7 +187,9 @@
   },
   "devDependencies": {
     "@amiceli/vitest-cucumber": "^5.2.1",
+    "@libar-dev/modular-claude-md": "github:libar-dev/modular-claude-md#3a37c573ae8611f1e0e92c00f565bb0ab45e1263",
     "@types/node": "^20.10.0",
+    "@vitest/coverage-v8": "^2.1.9",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
@@ -196,8 +198,7 @@
     "tsx": "^4.7.0",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.2",
-    "vitest": "^2.1.8",
-    "@libar-dev/modular-claude-md": "github:libar-dev/modular-claude-md#3a37c573ae8611f1e0e92c00f565bb0ab45e1263"
+    "vitest": "^2.1.8"
   },
   "files": [
     "dist",

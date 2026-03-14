@@ -1,5 +1,5 @@
 @libar-docs
-@libar-docs-pattern:TagRegistryBuilder
+@libar-docs-pattern:TagRegistryBuilderTesting
 @libar-docs-status:active
 @libar-docs-product-area:CoreTypes
 @libar-docs-include:core-types

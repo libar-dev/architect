@@ -1,5 +1,5 @@
 @libar-docs
-@libar-docs-pattern:FileCache
+@libar-docs-pattern:FileCacheTesting
 @libar-docs-status:active
 @libar-docs-product-area:CoreTypes
 @libar-docs-include:core-types

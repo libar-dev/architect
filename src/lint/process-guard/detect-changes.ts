@@ -35,6 +35,7 @@ import * as path from 'path';
 import type { Result } from '../../types/index.js';
 import { Result as R } from '../../types/index.js';
 import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from '../../taxonomy/index.js';
+import { parseGitNameStatus } from '../../git/name-status.js';
 import type {
   ChangeDetection,
   StatusTransition,
@@ -87,8 +88,8 @@ export function detectStagedChanges(
 
   try {
     // Get list of staged files with status
-    const nameStatus = execGitSafe('diff', ['--cached', '--name-status'], baseDir);
-    const { modified, added, deleted } = parseNameStatus(nameStatus);
+    const nameStatus = execGitSafe('diff', ['--cached', '--name-status', '-z'], baseDir);
+    const { modified, added, deleted } = parseGitNameStatus(nameStatus);
 
     // Get full diff for content analysis
     const diff = execGitSafe('diff', ['--cached'], baseDir);
@@ -134,8 +135,8 @@ export function detectBranchChanges(
     const mergeBase = execGitSafe('merge-base', [safeBranch, 'HEAD'], baseDir).trim();
 
     // Get list of changed files
-    const nameStatus = execGitSafe('diff', ['--name-status', mergeBase], baseDir);
-    const { modified, added, deleted } = parseNameStatus(nameStatus);
+    const nameStatus = execGitSafe('diff', ['--name-status', '-z', mergeBase], baseDir);
+    const { modified, added, deleted } = parseGitNameStatus(nameStatus);
 
     // Get full diff
     const diff = execGitSafe('diff', [mergeBase], baseDir);
@@ -258,49 +259,6 @@ function sanitizeBranchName(branch: string): string {
     throw new Error(`Invalid branch name (contains ..): ${branch}`);
   }
   return branch;
-}
-
-/**
- * Parse git name-status output into file lists.
- */
-function parseNameStatus(output: string): {
-  modified: string[];
-  added: string[];
-  deleted: string[];
-} {
-  const modified: string[] = [];
-  const added: string[] = [];
-  const deleted: string[] = [];
-
-  for (const line of output.split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-
-    const [status, ...pathParts] = trimmed.split(/\s+/);
-    const filePath = pathParts.join(' ');
-
-    if (!filePath) continue;
-
-    switch (status) {
-      case 'M':
-        modified.push(filePath);
-        break;
-      case 'A':
-        added.push(filePath);
-        break;
-      case 'D':
-        deleted.push(filePath);
-        break;
-      case 'R':
-      case 'C':
-        // Renamed/Copied: path is "old -> new"
-        const newPath = filePath.includes('->') ? filePath.split('->')[1]?.trim() : filePath;
-        if (newPath) modified.push(newPath);
-        break;
-    }
-  }
-
-  return { modified, added, deleted };
 }
 
 // =============================================================================

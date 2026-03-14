@@ -1,5 +1,5 @@
 @libar-docs
-@libar-docs-pattern:DeliverableStatusTaxonomy
+@libar-docs-pattern:DeliverableStatusTaxonomyTesting
 @libar-docs-status:active
 @libar-docs-product-area:CoreTypes
 @libar-docs-include:core-types

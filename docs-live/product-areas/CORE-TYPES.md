@@ -137,7 +137,15 @@ type DocError =
 
 ## Business Rules
 
-5 patterns, 22 rules with invariants (22 total)
+9 patterns, 34 rules with invariants (34 total)
+
+### Deliverable Status Taxonomy Testing
+
+| Rule                                                                        | Invariant                                                                                                                           | Rationale                                                                                                                                                    |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| isDeliverableStatusTerminal identifies terminal statuses for DoD validation | Only complete, n/a, and superseded are terminal. Deferred is NOT terminal because it implies unfinished work that should block DoD. | Marking a pattern as completed when deliverables are merely deferred creates a hard-locked state with incomplete work, violating delivery process integrity. |
+| Status predicates classify individual deliverable states                    | isDeliverableStatusComplete, isDeliverableStatusInProgress, and isDeliverableStatusPending each match exactly one status value.     | Single-value predicates provide type-safe branching for consumers that need to distinguish specific states rather than terminal vs non-terminal groupings.   |
+| getDeliverableStatusEmoji returns display emoji for all statuses            | getDeliverableStatusEmoji returns a non-empty string for all 6 canonical statuses. No status value is unmapped.                     | Missing emoji mappings would cause empty display cells in generated documentation tables, breaking visual consistency.                                       |
 
 ### Error Factories
 
@@ -158,6 +166,15 @@ type DocError =
 | Gherkin extractor collects errors without console side effects | Extraction errors must include structured context (file path, pattern name, validation errors) and must never use console.warn to report warnings. | console.warn bypasses error collection, making warnings invisible to callers and untestable. Structured error objects enable programmatic handling across all consumers.                |
 | CLI error handler formats unknown errors gracefully            | Unknown error values (non-DocError, non-Error) must be formatted as "Error: {value}" strings for safe display without crashing.                    | CLI commands can receive arbitrary thrown values (strings, numbers, objects); coercing them to a safe string prevents the error handler itself from crashing on unexpected types.       |
 
+### File Cache Testing
+
+| Rule                                            | Invariant                                                                                                                                             | Rationale                                                                                                                             |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Store and retrieve round-trip preserves content | Content stored via set is returned identically by get. No transformation or encoding occurs.                                                          | File content must survive caching verbatim; any mutation would cause extraction to produce different results on cache hits vs misses. |
+| has checks membership without affecting stats   | has returns true for cached paths and false for uncached paths. It does not increment hit or miss counters.                                           | has is used for guard checks before get; double-counting would inflate stats and misrepresent actual cache effectiveness.             |
+| Stats track hits and misses accurately          | Every get call increments either hits or misses. hitRate is computed as (hits / total) \* 100 with a zero-division guard returning 0 when total is 0. | Accurate stats enable performance analysis of generation runs; incorrect counts would lead to wrong caching decisions.                |
+| Clear resets cache and stats                    | clear removes all cached entries and resets hit/miss counters to zero.                                                                                | Per-run scoping requires a clean slate; stale entries from a previous run would cause the extractor to use outdated content.          |
+
 ### Kebab Case Slugs
 
 | Rule                                  | Invariant                                                                                                                                                     | Rationale                                                                                                                                                                     |
@@ -166,6 +183,13 @@ type DocError =
 | Edge cases are handled correctly      | Slug generation must handle special characters, consecutive separators, and leading/trailing hyphens without producing invalid slugs.                         | Unhandled edge cases produce malformed file names (double hyphens, leading dashes) that break cross-platform path resolution and make generated links inconsistent.           |
 | Requirements include phase prefix     | Requirement slugs must be prefixed with "phase-NN-" where NN is the zero-padded phase number, defaulting to "00" when no phase is assigned.                   | Phase prefixes enable lexicographic sorting of requirement files by delivery order, so directory listings naturally reflect the roadmap sequence.                             |
 | Phase slugs use kebab-case for names  | Phase slugs must combine a zero-padded phase number with the kebab-case name in the format "phase-NN-name", defaulting to "unnamed" when no name is provided. | A consistent "phase-NN-name" format ensures phase files sort numerically and remain identifiable even when the phase number alone would be ambiguous across roadmap versions. |
+
+### Normalized Status Testing
+
+| Rule                                                   | Invariant                                                                                                                                                             | Rationale                                                                                                                                               |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| normalizeStatus maps raw FSM states to display buckets | normalizeStatus must map every raw FSM status to exactly one of three display buckets: completed, active, or planned. Unknown or undefined inputs default to planned. | UI and generated documentation need a simplified status model; the raw 4-state FSM is an implementation detail that should not leak into display logic. |
+| Pattern status predicates check normalized state       | isPatternComplete, isPatternActive, and isPatternPlanned are mutually exclusive for any given status input. Exactly one returns true.                                 | Consumers branch on these predicates; overlapping true values would cause double-rendering or contradictory UI states.                                  |
 
 ### Result Monad
 
@@ -185,5 +209,13 @@ type DocError =
 | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | slugify generates URL-safe slugs               | slugify must produce lowercase, alphanumeric, hyphen-only strings with no leading/trailing hyphens.                              | URL slugs appear in file paths and links across all generated documentation; inconsistent slugification would break cross-references.                             |
 | camelCaseToTitleCase generates readable titles | camelCaseToTitleCase must insert spaces at camelCase boundaries and preserve known acronyms (HTTP, XML, API, DoD, AST, GraphQL). | Pattern names stored as PascalCase identifiers appear as human-readable titles in generated documentation; incorrect splitting would produce unreadable headings. |
+
+### Tag Registry Builder Testing
+
+| Rule                                               | Invariant                                                                                                                                                  | Rationale                                                                                                                                                                      |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| buildRegistry returns a well-formed TagRegistry    | buildRegistry always returns a TagRegistry with version, categories, metadataTags, aggregationTags, formatOptions, tagPrefix, and fileOptInTag properties. | All downstream consumers (scanner, extractor, validator) depend on registry structure. A malformed registry would cause silent extraction failures across the entire pipeline. |
+| Metadata tags have correct configuration           | The pattern tag is required, the status tag has a default value, and tags with transforms apply them correctly.                                            | Misconfigured tag metadata would cause the extractor to skip required fields or apply wrong defaults, producing silently corrupt patterns.                                     |
+| Registry includes standard prefixes and opt-in tag | tagPrefix is the standard annotation prefix and fileOptInTag is the bare opt-in marker. These are non-empty strings.                                       | Changing these values without updating all annotated files would break scanner opt-in detection across the entire monorepo.                                                    |
 
 ---

@@ -29,6 +29,7 @@
 import { execFileSync } from 'child_process';
 import type { Result } from '../types/index.js';
 import { Result as R } from '../types/index.js';
+import { parseGitNameStatus } from './name-status.js';
 
 /**
  * Maximum buffer size for git command output (50MB).
@@ -65,46 +66,6 @@ function sanitizeBranchName(branch: string): string {
 }
 
 /**
- * Parse git diff --name-status output into categorized file lists.
- *
- * Git outputs rename/copy statuses with a similarity percentage (e.g., R100, C087).
- * Paths are tab-separated: `R100\told_path\tnew_path`, so after splitting on
- * whitespace, pathParts = ['old_path', 'new_path']. We take the last element
- * as the new (current) file path.
- */
-function parseNameStatus(output: string): {
-  modified: string[];
-  added: string[];
-  deleted: string[];
-} {
-  const modified: string[] = [];
-  const added: string[] = [];
-  const deleted: string[] = [];
-
-  for (const line of output.split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-
-    const [status, ...pathParts] = trimmed.split(/\s+/);
-    if (!status || pathParts.length === 0) continue;
-
-    if (status === 'M') {
-      modified.push(pathParts[0] ?? '');
-    } else if (status === 'A') {
-      added.push(pathParts[0] ?? '');
-    } else if (status === 'D') {
-      deleted.push(pathParts[0] ?? '');
-    } else if (status.startsWith('R') || status.startsWith('C')) {
-      // Rename/copy: pathParts = ['old_path', 'new_path'] — take the new path
-      const newPath = pathParts[pathParts.length - 1];
-      if (newPath) modified.push(newPath);
-    }
-  }
-
-  return { modified, added, deleted };
-}
-
-/**
  * Get all files changed relative to a base branch (excludes deleted files).
  *
  * This is a lightweight alternative to detectBranchChanges from lint/process-guard
@@ -125,8 +86,8 @@ export function getChangedFilesList(
   try {
     const safeBranch = sanitizeBranchName(baseBranch);
     const mergeBase = execGitSafe('merge-base', [safeBranch, 'HEAD'], baseDir).trim();
-    const nameStatus = execGitSafe('diff', ['--name-status', mergeBase], baseDir);
-    const { modified, added } = parseNameStatus(nameStatus);
+    const nameStatus = execGitSafe('diff', ['--name-status', '-z', mergeBase], baseDir);
+    const { modified, added } = parseGitNameStatus(nameStatus);
     return R.ok([...modified, ...added]);
   } catch (error) {
     return R.err(error instanceof Error ? error : new Error(String(error)));

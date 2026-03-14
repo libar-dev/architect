@@ -37,6 +37,7 @@ Feature: Context Auto-Inference from File Paths
         | pattern           | filePath                          | expectedContext |
         | src/validation/** | src/validation/rules.ts           | test-context    |
         | src/validation/** | src/validation/deep/nested.ts     | test-context    |
+        | src/validation/** | src/validation2/file.ts           | none            |
         | src/validation/** | src/other/file.ts                 | none            |
         | src/validation/** | other/validation/rules.ts         | none            |
 
@@ -61,6 +62,7 @@ Feature: Context Auto-Inference from File Paths
         | pattern          | filePath                      | expectedContext |
         | src/validation/* | src/validation/rules.ts       | test-context    |
         | src/validation/* | src/validation/deep/nested.ts | none            |
+        | src/validation/* | src/validation2/file.ts       | none            |
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Pattern Matching - Prefix Matching

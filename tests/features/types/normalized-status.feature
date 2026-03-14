@@ -1,5 +1,5 @@
 @libar-docs
-@libar-docs-pattern:NormalizedStatus
+@libar-docs-pattern:NormalizedStatusTesting
 @libar-docs-status:active
 @libar-docs-product-area:CoreTypes
 @libar-docs-include:core-types

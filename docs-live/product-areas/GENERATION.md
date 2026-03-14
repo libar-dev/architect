@@ -61,12 +61,13 @@ graph TB
     subgraph generator["Generator"]
         SourceMapper[/"SourceMapper"/]
         Documentation_Generation_Orchestrator("Documentation Generation Orchestrator")
-        TransformDataset("TransformDataset")
-        SequenceTransformUtils("SequenceTransformUtils")
         ProcessApiReferenceGenerator["ProcessApiReferenceGenerator"]
         DesignReviewGenerator("DesignReviewGenerator")
         DecisionDocGenerator("DecisionDocGenerator")
         CliRecipeGenerator["CliRecipeGenerator"]
+        TransformDataset("TransformDataset")
+        SequenceTransformUtils("SequenceTransformUtils")
+        ContextInferenceImpl["ContextInferenceImpl"]
     end
     subgraph renderer["Renderer"]
         loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser["loadPreambleFromMarkdown — Shared Markdown-to-SectionBlock Parser"]
@@ -88,6 +89,7 @@ graph TB
         PatternRelationshipModel["PatternRelationshipModel"]:::neighbor
         DesignReviewGeneration["DesignReviewGeneration"]:::neighbor
         CliRecipeCodec["CliRecipeCodec"]:::neighbor
+        ContextInference["ContextInference"]:::neighbor
     end
     loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
     SourceMapper -.->|depends on| DecisionDocCodec
@@ -100,10 +102,6 @@ graph TB
     DesignReviewCodec ..->|implements| DesignReviewGeneration
     CompositeCodec ..->|implements| ReferenceDocShowcase
     ArchitectureCodec -->|uses| MasterDataset
-    TransformDataset -->|uses| MasterDataset
-    TransformDataset ..->|implements| PatternRelationshipModel
-    SequenceTransformUtils -->|uses| MasterDataset
-    SequenceTransformUtils ..->|implements| DesignReviewGeneration
     ProcessApiReferenceGenerator ..->|implements| ProcessApiHybridGeneration
     DesignReviewGenerator -->|uses| DesignReviewCodec
     DesignReviewGenerator -->|uses| MasterDataset
@@ -111,6 +109,11 @@ graph TB
     DecisionDocGenerator -.->|depends on| DecisionDocCodec
     DecisionDocGenerator -.->|depends on| SourceMapper
     CliRecipeGenerator ..->|implements| CliRecipeCodec
+    TransformDataset -->|uses| MasterDataset
+    TransformDataset ..->|implements| PatternRelationshipModel
+    SequenceTransformUtils -->|uses| MasterDataset
+    SequenceTransformUtils ..->|implements| DesignReviewGeneration
+    ContextInferenceImpl ..->|implements| ContextInference
     DesignReviewGeneration -.->|depends on| MermaidDiagramUtils
     CliRecipeCodec -.->|depends on| ProcessApiHybridGeneration
     classDef neighbor stroke-dasharray: 5 5
@@ -245,7 +248,7 @@ type CollapsibleBlock = {
 
 ### transformToMasterDataset (function)
 
-````typescript
+```typescript
 /**
  * Transform raw extracted data into a MasterDataset with all pre-computed views.
  *
@@ -263,22 +266,8 @@ type CollapsibleBlock = {
  *
  * @param raw - Raw dataset with patterns, registry, and optional workflow
  * @returns MasterDataset with all pre-computed views
- *
- * @example
- * ```typescript
- * const masterDataset = transformToMasterDataset({
- *   patterns: mergedPatterns,
- *   tagRegistry: registry,
- *   workflow,
- * });
- *
- * // Access pre-computed views
- * const completed = masterDataset.byStatus.completed;
- * const phase3Patterns = masterDataset.byPhase.find(p => p.phaseNumber === 3);
- * const q42024 = masterDataset.byQuarter["Q4-2024"];
- * ```
  */
-````
+```
 
 ```typescript
 function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
@@ -294,7 +283,7 @@ function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 
 ## Business Rules
 
-91 patterns, 439 rules with invariants (440 total)
+92 patterns, 442 rules with invariants (443 total)
 
 ### ADR 005 Codec Based Markdown Rendering
 
@@ -697,6 +686,14 @@ function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 | Step Linting content belongs in VALIDATION.md   | All validation tooling reference content lives in VALIDATION.md.                         | VALIDATION.md already documents lint-patterns, lint-process, and validate-patterns. Step Linting is a fourth quality tool in the same family — it must follow the same pattern. Redirecting from VALIDATION.md to GHERKIN-PATTERNS.md for lint rules breaks the principle that VALIDATION.md is the single place to find quality tooling documentation. |
 | GHERKIN-PATTERNS.md remains the authoring guide | GHERKIN-PATTERNS.md covers only Gherkin writing patterns, not tooling reference.         | The writing guide is useful during spec authoring. Quality tool reference is useful during CI setup and debugging. Mixing them forces authors to scroll past 148 lines of tooling reference they do not need during writing, and forces CI engineers to look in the wrong file for lint rule documentation.                                             |
 | INDEX.md reflects current document structure    | INDEX.md section tables and line counts must be updated when content moves between docs. | INDEX.md serves as the navigation hub for all documentation. Stale line counts and missing section entries cause developers to land in the wrong part of a document or miss content entirely. Both GHERKIN-PATTERNS.md and VALIDATION.md entries must reflect the restructure.                                                                          |
+
+### Git Branch Diff Testing
+
+| Rule                                                    | Invariant                                                                                              | Rationale                                                                                                                                                       |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| getChangedFilesList returns only existing changed files | Modified and added files are returned, while deleted tracked files are excluded from the final list.   | PR-scoped generation only needs files that still exist on the current branch; including deleted paths would force consumers to chase files that cannot be read. |
+| Paths with spaces are preserved                         | A filename containing spaces is returned as the exact original path, not split into multiple tokens.   | Whitespace splitting corrupts file paths and breaks PR-scoped generation in repositories with descriptive filenames.                                            |
+| NUL-delimited rename and copy statuses use the new path | Rename and copy statuses with similarity scores must record the current path, not the old/source path. | Git emits statuses like R100 and C087 in real diffs; parsing the wrong side of the pair causes generators to scope output to stale paths.                       |
 
 ### Implementation Link Path Normalization
 

@@ -82,17 +82,28 @@ function matchPattern(filePath: string, pattern: string): boolean {
   // Handle `**` wildcard patterns (recursive match)
   if (pattern.endsWith('/**')) {
     const prefix = pattern.slice(0, -3); // Remove '/**'
-    return filePath.startsWith(prefix);
+    return hasPathPrefix(filePath, prefix);
   }
 
   // Handle `/*` wildcard patterns (single level match)
   if (pattern.endsWith('/*')) {
     const prefix = pattern.slice(0, -2); // Remove '/*'
-    const afterPrefix = filePath.slice(prefix.length);
-    // Must start with prefix and have exactly one path segment after
-    return filePath.startsWith(prefix) && !afterPrefix.slice(1).includes('/');
+    if (!hasPathPrefix(filePath, prefix)) {
+      return false;
+    }
+
+    const afterPrefix = filePath.slice(prefix.length + 1);
+    return afterPrefix.length > 0 && !afterPrefix.includes('/');
   }
 
   // Simple prefix matching
-  return filePath.startsWith(pattern);
+  if (pattern.endsWith('/')) {
+    return hasPathPrefix(filePath, pattern.slice(0, -1));
+  }
+
+  return filePath === pattern || filePath.startsWith(`${pattern}/`);
+}
+
+function hasPathPrefix(filePath: string, prefix: string): boolean {
+  return filePath === prefix || filePath.startsWith(`${prefix}/`);
 }
