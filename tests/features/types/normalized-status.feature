@@ -5,9 +5,10 @@
 @libar-docs-include:core-types
 @taxonomy @status
 Feature: Normalized Status Taxonomy
-  The normalized status module maps raw FSM states (roadmap, active, completed,
-  deferred) to three display buckets (completed, active, planned) for UI
-  presentation and generated documentation output.
+  The normalized status module maps any status input — raw FSM states (roadmap,
+  active, completed, deferred), already-normalized values (planned), undefined,
+  or unknown strings — to exactly one of three display buckets (completed,
+  active, planned) for UI presentation and generated documentation output.
 
   Background:
     Given a normalized status test context

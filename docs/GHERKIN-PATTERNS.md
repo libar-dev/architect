@@ -1,6 +1,6 @@
 # Gherkin Patterns Guide
 
-> **Deprecated:** This document is superseded by the auto-generated [Gherkin Authoring Guide](../docs-live/reference/GHERKIN-AUTHORING-GUIDE.md). This file is preserved for reference only.
+> **Deprecated:** This document is superseded by the auto-generated [Gherkin Authoring Guide](../docs-live/reference/GHERKIN-AUTHORING-GUIDE.md). This file is preserved for reference only. Examples below may be stale and should not be used as templates — refer to the auto-generated guide for current patterns.
 
 Practical patterns for writing Gherkin specs that work with `delivery-process` generators.
 

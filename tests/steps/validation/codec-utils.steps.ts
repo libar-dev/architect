@@ -1,4 +1,8 @@
 /**
+ * @libar-docs
+ * @libar-docs-implements CodecUtilsTesting
+ * @libar-docs-uses CodecUtils
+ *
  * Codec Utils Step Definitions
  *
  * BDD step definitions for testing codec utility functions:

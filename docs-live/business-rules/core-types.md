@@ -309,7 +309,7 @@ _file-cache.feature_
 
 ### Normalized Status
 
-_The normalized status module maps raw FSM states (roadmap, active, completed,_
+_The normalized status module maps any status input — raw FSM states (roadmap,_
 
 ---
 

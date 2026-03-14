@@ -1,4 +1,8 @@
 /**
+ * @libar-docs
+ * @libar-docs-implements GitBranchDiffTesting
+ * @libar-docs-uses GitBranchDiff, GitHelpers
+ *
  * Git Branch Diff Step Definitions
  *
  * BDD step definitions for testing branch-scoped git change detection and the

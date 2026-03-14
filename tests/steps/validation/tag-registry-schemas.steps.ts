@@ -1,4 +1,8 @@
 /**
+ * @libar-docs
+ * @libar-docs-implements TagRegistrySchemasTesting
+ * @libar-docs-uses TagRegistrySchema
+ *
  * Tag Registry Schema Step Definitions
  *
  * BDD step definitions for testing tag registry configuration:

@@ -1,4 +1,8 @@
 /**
+ * @libar-docs
+ * @libar-docs-implements NormalizedStatusTesting
+ * @libar-docs-uses NormalizedStatus
+ *
  * Normalized Status Step Definitions
  *
  * BDD step definitions for testing the normalized status taxonomy:
@@ -67,11 +71,11 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
       RuleScenarioOutline(
         'Status normalization',
         ({ When, Then }, variables: { rawStatus: string; normalizedStatus: string }) => {
-          When('normalizing status {string}', () => {
+          When('normalizing status "<rawStatus>"', () => {
             state!.normalizedResult = normalizeStatus(variables.rawStatus);
           });
 
-          Then('the normalized status is {string}', () => {
+          Then('the normalized status is "<normalizedStatus>"', () => {
             expect(state!.normalizedResult).toBe(variables.normalizedStatus);
           });
         }
@@ -107,11 +111,11 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     RuleScenarioOutline(
       'isPatternComplete classification',
       ({ When, Then }, variables: { status: string; expected: string }) => {
-        When('checking isPatternComplete for {string}', () => {
+        When('checking isPatternComplete for "<status>"', () => {
           state!.predicateResult = isPatternComplete(variables.status);
         });
 
-        Then('the predicate result is {string}', () => {
+        Then('the predicate result is "<expected>"', () => {
           expect(state!.predicateResult).toBe(variables.expected === 'true');
         });
       }
@@ -120,11 +124,11 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     RuleScenarioOutline(
       'isPatternActive classification',
       ({ When, Then }, variables: { status: string; expected: string }) => {
-        When('checking isPatternActive for {string}', () => {
+        When('checking isPatternActive for "<status>"', () => {
           state!.predicateResult = isPatternActive(variables.status);
         });
 
-        Then('the predicate result is {string}', () => {
+        Then('the predicate result is "<expected>"', () => {
           expect(state!.predicateResult).toBe(variables.expected === 'true');
         });
       }
@@ -133,11 +137,11 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     RuleScenarioOutline(
       'isPatternPlanned classification',
       ({ When, Then }, variables: { status: string; expected: string }) => {
-        When('checking isPatternPlanned for {string}', () => {
+        When('checking isPatternPlanned for "<status>"', () => {
           state!.predicateResult = isPatternPlanned(variables.status);
         });
 
-        Then('the predicate result is {string}', () => {
+        Then('the predicate result is "<expected>"', () => {
           expect(state!.predicateResult).toBe(variables.expected === 'true');
         });
       }

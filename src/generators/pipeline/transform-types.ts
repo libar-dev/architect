@@ -6,6 +6,7 @@
  * @libar-docs-arch-context generator
  * @libar-docs-arch-layer application
  * @libar-docs-used-by TransformDataset, Orchestrator
+ * @libar-docs-uses MasterDataset, LoadedWorkflow, ExtractedPattern, TagRegistry, ContextInferenceRule
  *
  * ## TransformTypes - MasterDataset Transformation Types
  *

@@ -203,7 +203,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
     byCategoryMap.set(category, categoryPatterns);
 
     // ─── Source grouping ───────────────────────────────────────────────────
-    if (pattern.source.file.endsWith('.feature')) {
+    if (pattern.source.file.endsWith('.feature') || pattern.source.file.endsWith('.feature.md')) {
       bySource.gherkin.push(pattern);
     } else {
       bySource.typescript.push(pattern);

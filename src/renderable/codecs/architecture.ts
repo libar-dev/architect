@@ -210,7 +210,9 @@ function buildArchitectureDocument(
     : filteredIndex;
 
   // 1. Summary section
-  sections.push(...buildSummarySection(diagramIndex, filteredIndex.all.length));
+  sections.push(
+    ...buildSummarySection(diagramIndex, filteredIndex.all.length, options.diagramKeyComponentsOnly)
+  );
 
   // 3. Main diagram based on type
   if (options.diagramType === 'component') {
@@ -340,11 +342,19 @@ function filterToKeyComponents(
     }
   }
 
+  const filteredByView: Record<string, ExtractedPattern[]> = {};
+  for (const [view, patterns] of Object.entries(archIndex.byView)) {
+    const filtered = patterns.filter(hasRole);
+    if (filtered.length > 0) {
+      filteredByView[view] = filtered;
+    }
+  }
+
   return {
     byContext: filteredByContext,
     byRole: filteredByRole,
     byLayer: filteredByLayer,
-    byView: archIndex.byView,
+    byView: filteredByView,
     all: filteredAll,
   };
 }
@@ -358,7 +368,8 @@ function filterToKeyComponents(
  */
 function buildSummarySection(
   diagramIndex: NonNullable<MasterDataset['archIndex']>,
-  totalAnnotated: number
+  totalAnnotated: number,
+  keyComponentsOnly: boolean
 ): SectionBlock[] {
   const contextCount = Object.keys(diagramIndex.byContext).length;
   const roleCount = Object.keys(diagramIndex.byRole).length;
@@ -374,12 +385,15 @@ function buildSummarySection(
     rows.push(['Total Annotated', String(totalAnnotated)]);
   }
 
+  const description = keyComponentsOnly
+    ? `This diagram shows ${diagramComponents} key components with explicit architectural roles ` +
+      `across ${contextCount} bounded context${contextCount !== 1 ? 's' : ''}.`
+    : `This diagram shows all ${diagramComponents} annotated components ` +
+      `across ${contextCount} bounded context${contextCount !== 1 ? 's' : ''}.`;
+
   return [
     heading(2, 'Overview'),
-    paragraph(
-      `This diagram shows ${diagramComponents} key components with explicit architectural roles ` +
-        `across ${contextCount} bounded context${contextCount !== 1 ? 's' : ''}.`
-    ),
+    paragraph(description),
     table(['Metric', 'Count'], rows),
     separator(),
   ];

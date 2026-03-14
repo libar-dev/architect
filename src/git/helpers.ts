@@ -55,6 +55,10 @@ export function execGitSafe(subcommand: string, args: readonly string[], cwd: st
  * @throws Error if branch name contains invalid characters or path traversal
  */
 export function sanitizeBranchName(branch: string): string {
+  // Reject leading hyphens to prevent git option injection (e.g., --help, -c)
+  if (branch.startsWith('-')) {
+    throw new Error(`Invalid branch name (starts with hyphen): ${branch}`);
+  }
   if (!/^[a-zA-Z0-9._\-/]+$/.test(branch)) {
     throw new Error(`Invalid branch name: ${branch}`);
   }

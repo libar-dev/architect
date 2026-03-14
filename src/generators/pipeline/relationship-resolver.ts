@@ -6,6 +6,7 @@
  * @libar-docs-arch-context generator
  * @libar-docs-arch-layer application
  * @libar-docs-used-by TransformDataset
+ * @libar-docs-uses ExtractedPattern, RelationshipEntry, ImplementationRef, PatternHelpers
  *
  * ## RelationshipResolver - Reverse Lookup and Dangling Reference Detection
  *

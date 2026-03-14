@@ -59,14 +59,19 @@ Scoped architecture diagram showing component relationships:
 ```mermaid
 graph TB
     subgraph generator["Generator"]
+        GitModule["GitModule"]
+        GitHelpers["GitHelpers"]
+        GitBranchDiff["GitBranchDiff"]
         SourceMapper[/"SourceMapper"/]
         Documentation_Generation_Orchestrator("Documentation Generation Orchestrator")
         ProcessApiReferenceGenerator["ProcessApiReferenceGenerator"]
         DesignReviewGenerator("DesignReviewGenerator")
         DecisionDocGenerator("DecisionDocGenerator")
         CliRecipeGenerator["CliRecipeGenerator"]
+        TransformTypes["TransformTypes"]
         TransformDataset("TransformDataset")
         SequenceTransformUtils("SequenceTransformUtils")
+        RelationshipResolver("RelationshipResolver")
         ContextInferenceImpl["ContextInferenceImpl"]
     end
     subgraph renderer["Renderer"]
@@ -82,6 +87,7 @@ graph TB
         MasterDataset["MasterDataset"]:::neighbor
         Pattern_Scanner["Pattern Scanner"]:::neighbor
         GherkinASTParser["GherkinASTParser"]:::neighbor
+        PatternHelpers["PatternHelpers"]:::neighbor
         ShapeExtractor["ShapeExtractor"]:::neighbor
         ReferenceDocShowcase["ReferenceDocShowcase"]:::neighbor
         ProcessApiHybridGeneration["ProcessApiHybridGeneration"]:::neighbor
@@ -92,6 +98,8 @@ graph TB
         ContextInference["ContextInference"]:::neighbor
     end
     loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
+    GitModule -->|uses| GitBranchDiff
+    GitModule -->|uses| GitHelpers
     SourceMapper -.->|depends on| DecisionDocCodec
     SourceMapper -.->|depends on| ShapeExtractor
     SourceMapper -.->|depends on| GherkinASTParser
@@ -109,10 +117,12 @@ graph TB
     DecisionDocGenerator -.->|depends on| DecisionDocCodec
     DecisionDocGenerator -.->|depends on| SourceMapper
     CliRecipeGenerator ..->|implements| CliRecipeCodec
+    TransformTypes -->|uses| MasterDataset
     TransformDataset -->|uses| MasterDataset
     TransformDataset ..->|implements| PatternRelationshipModel
     SequenceTransformUtils -->|uses| MasterDataset
     SequenceTransformUtils ..->|implements| DesignReviewGeneration
+    RelationshipResolver -->|uses| PatternHelpers
     ContextInferenceImpl ..->|implements| ContextInference
     DesignReviewGeneration -.->|depends on| MermaidDiagramUtils
     CliRecipeCodec -.->|depends on| ProcessApiHybridGeneration

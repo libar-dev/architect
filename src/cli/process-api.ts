@@ -838,6 +838,47 @@ function coerceArg(arg: string): string | number {
   return arg;
 }
 
+/**
+ * Require a string argument at the given index, throwing INVALID_ARGUMENT if missing.
+ */
+function requireStringArg(
+  args: ReadonlyArray<string | number>,
+  index: number,
+  methodName: string
+): string {
+  if (args[index] === undefined) {
+    throw new QueryApiError(
+      'INVALID_ARGUMENT',
+      `${methodName} requires an argument at position ${index + 1}`
+    );
+  }
+  return String(args[index]);
+}
+
+/**
+ * Require a numeric argument at the given index, throwing INVALID_ARGUMENT if missing or NaN.
+ */
+function requireNumberArg(
+  args: ReadonlyArray<string | number>,
+  index: number,
+  methodName: string
+): number {
+  if (args[index] === undefined) {
+    throw new QueryApiError(
+      'INVALID_ARGUMENT',
+      `${methodName} requires a numeric argument at position ${index + 1}`
+    );
+  }
+  const value = Number(args[index]);
+  if (isNaN(value)) {
+    throw new QueryApiError(
+      'INVALID_ARGUMENT',
+      `${methodName} requires a numeric argument, got: "${String(args[index])}"`
+    );
+  }
+  return value;
+}
+
 const API_METHODS = [
   'getPatternsByNormalizedStatus',
   'getPatternsByStatus',
@@ -881,42 +922,63 @@ const API_DISPATCH: Record<
 > = {
   // Status queries
   getPatternsByNormalizedStatus: (api, args) =>
-    api.getPatternsByNormalizedStatus(String(args[0]) as 'completed' | 'active' | 'planned'),
+    api.getPatternsByNormalizedStatus(
+      requireStringArg(args, 0, 'getPatternsByNormalizedStatus') as
+        | 'completed'
+        | 'active'
+        | 'planned'
+    ),
   getPatternsByStatus: (api, args) =>
-    api.getPatternsByStatus(String(args[0]) as ProcessStatusValue),
+    api.getPatternsByStatus(requireStringArg(args, 0, 'getPatternsByStatus') as ProcessStatusValue),
   getStatusCounts: (api) => api.getStatusCounts(),
   getStatusDistribution: (api) => api.getStatusDistribution(),
   getCompletionPercentage: (api) => api.getCompletionPercentage(),
 
   // Phase queries
-  getPatternsByPhase: (api, args) => api.getPatternsByPhase(Number(args[0])),
-  getPhaseProgress: (api, args) => api.getPhaseProgress(Number(args[0])),
+  getPatternsByPhase: (api, args) =>
+    api.getPatternsByPhase(requireNumberArg(args, 0, 'getPatternsByPhase')),
+  getPhaseProgress: (api, args) =>
+    api.getPhaseProgress(requireNumberArg(args, 0, 'getPhaseProgress')),
   getActivePhases: (api) => api.getActivePhases(),
   getAllPhases: (api) => api.getAllPhases(),
 
   // FSM queries
   isValidTransition: (api, args) =>
     api.isValidTransition(
-      String(args[0]) as ProcessStatusValue,
-      String(args[1]) as ProcessStatusValue
+      requireStringArg(args, 0, 'isValidTransition') as ProcessStatusValue,
+      requireStringArg(args, 1, 'isValidTransition') as ProcessStatusValue
     ),
-  checkTransition: (api, args) => api.checkTransition(String(args[0]), String(args[1])),
+  checkTransition: (api, args) =>
+    api.checkTransition(
+      requireStringArg(args, 0, 'checkTransition'),
+      requireStringArg(args, 1, 'checkTransition')
+    ),
   getValidTransitionsFrom: (api, args) =>
-    api.getValidTransitionsFrom(String(args[0]) as ProcessStatusValue),
-  getProtectionInfo: (api, args) => api.getProtectionInfo(String(args[0]) as ProcessStatusValue),
+    api.getValidTransitionsFrom(
+      requireStringArg(args, 0, 'getValidTransitionsFrom') as ProcessStatusValue
+    ),
+  getProtectionInfo: (api, args) =>
+    api.getProtectionInfo(requireStringArg(args, 0, 'getProtectionInfo') as ProcessStatusValue),
 
   // Pattern queries
-  getPattern: (api, args) => api.getPattern(String(args[0])),
-  getPatternDependencies: (api, args) => api.getPatternDependencies(String(args[0])),
-  getPatternRelationships: (api, args) => api.getPatternRelationships(String(args[0])),
-  getRelatedPatterns: (api, args) => api.getRelatedPatterns(String(args[0])),
-  getApiReferences: (api, args) => api.getApiReferences(String(args[0])),
-  getPatternDeliverables: (api, args) => api.getPatternDeliverables(String(args[0])),
-  getPatternsByCategory: (api, args) => api.getPatternsByCategory(String(args[0])),
+  getPattern: (api, args) => api.getPattern(requireStringArg(args, 0, 'getPattern')),
+  getPatternDependencies: (api, args) =>
+    api.getPatternDependencies(requireStringArg(args, 0, 'getPatternDependencies')),
+  getPatternRelationships: (api, args) =>
+    api.getPatternRelationships(requireStringArg(args, 0, 'getPatternRelationships')),
+  getRelatedPatterns: (api, args) =>
+    api.getRelatedPatterns(requireStringArg(args, 0, 'getRelatedPatterns')),
+  getApiReferences: (api, args) =>
+    api.getApiReferences(requireStringArg(args, 0, 'getApiReferences')),
+  getPatternDeliverables: (api, args) =>
+    api.getPatternDeliverables(requireStringArg(args, 0, 'getPatternDeliverables')),
+  getPatternsByCategory: (api, args) =>
+    api.getPatternsByCategory(requireStringArg(args, 0, 'getPatternsByCategory')),
   getCategories: (api) => api.getCategories(),
 
   // Timeline queries
-  getPatternsByQuarter: (api, args) => api.getPatternsByQuarter(String(args[0])),
+  getPatternsByQuarter: (api, args) =>
+    api.getPatternsByQuarter(requireStringArg(args, 0, 'getPatternsByQuarter')),
   getQuarters: (api) => api.getQuarters(),
   getCurrentWork: (api) => api.getCurrentWork(),
   getRoadmapItems: (api) => api.getRoadmapItems(),

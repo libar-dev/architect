@@ -25,7 +25,7 @@ Feature: Process API CLI - Dataset Cache
       When running status and capturing the first result
       And running status and capturing the second result
       Then the second result metadata has cache.hit true
-      And the second result pipelineMs is less than 500
+      And the second result pipelineMs is less than the first
 
     @happy-path
     Scenario: Cache invalidated on source file change

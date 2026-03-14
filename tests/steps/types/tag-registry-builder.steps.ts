@@ -1,4 +1,8 @@
 /**
+ * @libar-docs
+ * @libar-docs-implements TagRegistryBuilderTesting
+ * @libar-docs-uses RegistryBuilder, TagRegistry
+ *
  * Tag Registry Builder Step Definitions
  *
  * BDD step definitions for testing the tag registry builder:

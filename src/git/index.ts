@@ -5,6 +5,7 @@
  * @libar-docs-arch-role barrel
  * @libar-docs-arch-context generator
  * @libar-docs-arch-layer infrastructure
+ * @libar-docs-uses GitBranchDiff, GitHelpers
  *
  * ## Git Module - Pure Git Operations
  *

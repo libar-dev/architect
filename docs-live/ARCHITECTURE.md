@@ -111,6 +111,10 @@ graph TB
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> GherkinASTParser
     Documentation_Generation_Orchestrator --> Pattern_Scanner
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
     ReplMode --> ProcessStateAPI
     ProcessAPICLIImpl --> ProcessStateAPI
     ProcessAPICLIImpl --> MasterDataset
@@ -121,10 +125,6 @@ graph TB
     ConfigResolver --> DeliveryProcessFactory
     DeliveryProcessFactory --> RegexBuilders
     ConfigLoader --> DeliveryProcessFactory
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
     PatternSummarizerImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
     ScopeValidatorImpl --> MasterDataset
@@ -144,9 +144,9 @@ graph TB
     ArchQueriesImpl --> MasterDataset
     FSMValidator --> FSMTransitions
     FSMValidator --> FSMStates
-    ProcessGuardDecider --> FSMValidator
     DesignReviewCodec --> MasterDataset
     ArchitectureCodec --> MasterDataset
+    ProcessGuardDecider --> FSMValidator
     TransformDataset --> MasterDataset
     SequenceTransformUtils --> MasterDataset
     DesignReviewGenerator --> DesignReviewCodec

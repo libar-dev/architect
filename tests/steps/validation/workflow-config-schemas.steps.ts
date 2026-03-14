@@ -1,4 +1,8 @@
 /**
+ * @libar-docs
+ * @libar-docs-implements WorkflowConfigSchemasTesting
+ * @libar-docs-uses WorkflowConfigSchema
+ *
  * Workflow Config Schema Step Definitions
  *
  * BDD step definitions for testing workflow configuration schemas:

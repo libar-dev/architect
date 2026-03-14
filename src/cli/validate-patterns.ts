@@ -848,5 +848,7 @@ async function main(): Promise<void> {
   }
 }
 
-// Entry point
-void main();
+// Entry point — catch ensures parseArgs errors reach the unified handler
+void main().catch((error: unknown) => {
+  handleCliError(error, 1);
+});

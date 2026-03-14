@@ -242,11 +242,32 @@ Scoped architecture diagram showing component relationships:
 
 ```mermaid
 classDiagram
+    class GitModule {
+        +getChangedFilesList const
+    }
+    class GitHelpers {
+    }
+    class GitBranchDiff {
+    }
     class SourceMapper {
         <<infrastructure>>
     }
     class Documentation_Generation_Orchestrator {
         <<service>>
+    }
+    class TransformTypes {
+    }
+    class TransformDataset {
+        <<service>>
+    }
+    class SequenceTransformUtils {
+        <<service>>
+    }
+    class RelationshipResolver {
+        <<service>>
+    }
+    class ContextInferenceImpl {
+        +ContextInferenceRule interface
     }
     class ProcessApiReferenceGenerator {
     }
@@ -258,19 +279,11 @@ classDiagram
     }
     class CliRecipeGenerator {
     }
-    class TransformDataset {
-        <<service>>
-    }
-    class SequenceTransformUtils {
-        <<service>>
-    }
-    class ContextInferenceImpl {
-        +ContextInferenceRule interface
-    }
     class MasterDataset
-    class ShapeExtractor
     class Pattern_Scanner
     class GherkinASTParser
+    class ShapeExtractor
+    class PatternHelpers
     class DesignReviewCodec
     class DecisionDocCodec
     class ProcessApiHybridGeneration
@@ -278,10 +291,19 @@ classDiagram
     class DesignReviewGeneration
     class CliRecipeCodec
     class ContextInference
+    GitModule ..> GitBranchDiff : uses
+    GitModule ..> GitHelpers : uses
     SourceMapper ..> DecisionDocCodec : depends on
     SourceMapper ..> ShapeExtractor : depends on
     SourceMapper ..> GherkinASTParser : depends on
     Documentation_Generation_Orchestrator ..> Pattern_Scanner : uses
+    TransformTypes ..> MasterDataset : uses
+    TransformDataset ..> MasterDataset : uses
+    TransformDataset ..|> PatternRelationshipModel : implements
+    SequenceTransformUtils ..> MasterDataset : uses
+    SequenceTransformUtils ..|> DesignReviewGeneration : implements
+    RelationshipResolver ..> PatternHelpers : uses
+    ContextInferenceImpl ..|> ContextInference : implements
     ProcessApiReferenceGenerator ..|> ProcessApiHybridGeneration : implements
     DesignReviewGenerator ..> DesignReviewCodec : uses
     DesignReviewGenerator ..> MasterDataset : uses
@@ -289,11 +311,6 @@ classDiagram
     DecisionDocGenerator ..> DecisionDocCodec : depends on
     DecisionDocGenerator ..> SourceMapper : depends on
     CliRecipeGenerator ..|> CliRecipeCodec : implements
-    TransformDataset ..> MasterDataset : uses
-    TransformDataset ..|> PatternRelationshipModel : implements
-    SequenceTransformUtils ..> MasterDataset : uses
-    SequenceTransformUtils ..|> DesignReviewGeneration : implements
-    ContextInferenceImpl ..|> ContextInference : implements
     DesignReviewCodec ..> MasterDataset : uses
     DesignReviewCodec ..|> DesignReviewGeneration : implements
     CliRecipeCodec ..> ProcessApiHybridGeneration : depends on
@@ -351,15 +368,15 @@ C4Context
     }
     System_Ext(DocDirectiveSchema, "DocDirectiveSchema")
     System_Ext(GherkinRulesSupport, "GherkinRulesSupport")
+    Rel(GherkinScanner, GherkinASTParser, "uses")
+    Rel(GherkinScanner, GherkinRulesSupport, "implements")
+    Rel(GherkinASTParser, GherkinRulesSupport, "implements")
+    Rel(TypeScript_AST_Parser, DocDirectiveSchema, "uses")
     Rel(GherkinExtractor, GherkinASTParser, "uses")
     Rel(GherkinExtractor, GherkinRulesSupport, "implements")
     Rel(DualSourceExtractor, GherkinExtractor, "uses")
     Rel(DualSourceExtractor, GherkinScanner, "uses")
     Rel(Document_Extractor, Pattern_Scanner, "uses")
-    Rel(GherkinScanner, GherkinASTParser, "uses")
-    Rel(GherkinScanner, GherkinRulesSupport, "implements")
-    Rel(GherkinASTParser, GherkinRulesSupport, "implements")
-    Rel(TypeScript_AST_Parser, DocDirectiveSchema, "uses")
 ```
 
 ---
@@ -402,7 +419,6 @@ graph LR
         DataAPIOutputShaping["DataAPIOutputShaping"]:::neighbor
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
     end
-    TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
     loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
     ProjectConfigTypes -->|uses| ConfigurationTypes
     ProjectConfigTypes -->|uses| ConfigurationPresets
@@ -412,6 +428,7 @@ graph LR
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
+    TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
     FSMTransitions ..->|implements| PhaseStateMachineValidation
     FSMStates ..->|implements| PhaseStateMachineValidation
     ProcessStateAPI -->|uses| MasterDataset
@@ -423,6 +440,21 @@ graph LR
 ---
 
 ## API Types
+
+### SectionBlock (type)
+
+```typescript
+type SectionBlock =
+  | HeadingBlock
+  | ParagraphBlock
+  | SeparatorBlock
+  | TableBlock
+  | ListBlock
+  | CodeBlock
+  | MermaidBlock
+  | CollapsibleBlock
+  | LinkOutBlock;
+```
 
 ### normalizeStatus (function)
 
@@ -516,21 +548,6 @@ interface CategoryDefinition {
 | priority    | Display order priority - lower values appear first in sorted output               |
 | description | Brief description of the category's purpose and typical patterns                  |
 | aliases     | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
-
-### SectionBlock (type)
-
-```typescript
-type SectionBlock =
-  | HeadingBlock
-  | ParagraphBlock
-  | SeparatorBlock
-  | TableBlock
-  | ListBlock
-  | CodeBlock
-  | MermaidBlock
-  | CollapsibleBlock
-  | LinkOutBlock;
-```
 
 ---
 
