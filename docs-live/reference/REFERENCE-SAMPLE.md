@@ -254,6 +254,9 @@ classDiagram
     class SequenceTransformUtils {
         <<service>>
     }
+    class ContextInferenceImpl {
+        +ContextInferenceRule interface
+    }
     class ProcessApiReferenceGenerator {
     }
     class DesignReviewGenerator {
@@ -274,6 +277,7 @@ classDiagram
     class PatternRelationshipModel
     class DesignReviewGeneration
     class CliRecipeCodec
+    class ContextInference
     SourceMapper ..> DecisionDocCodec : depends on
     SourceMapper ..> ShapeExtractor : depends on
     SourceMapper ..> GherkinASTParser : depends on
@@ -282,6 +286,7 @@ classDiagram
     TransformDataset ..|> PatternRelationshipModel : implements
     SequenceTransformUtils ..> MasterDataset : uses
     SequenceTransformUtils ..|> DesignReviewGeneration : implements
+    ContextInferenceImpl ..|> ContextInference : implements
     ProcessApiReferenceGenerator ..|> ProcessApiHybridGeneration : implements
     DesignReviewGenerator ..> DesignReviewCodec : uses
     DesignReviewGenerator ..> MasterDataset : uses
@@ -399,10 +404,10 @@ graph LR
     end
     TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
     loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
+    CLISchema ..->|implements| ProcessApiHybridGeneration
     ProjectConfigTypes -->|uses| ConfigurationTypes
     ProjectConfigTypes -->|uses| ConfigurationPresets
     ConfigurationPresets -->|uses| ConfigurationTypes
-    CLISchema ..->|implements| ProcessApiHybridGeneration
     PatternHelpers ..->|implements| DataAPIOutputShaping
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset

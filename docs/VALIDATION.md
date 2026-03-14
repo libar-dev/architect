@@ -1,6 +1,6 @@
 # Validation Tools
 
-> **Generated Reference:** See [VALIDATION-RULES.md](../docs-live/VALIDATION-RULES.md) for auto-generated Process Guard rules extracted from annotated source code.
+> **Deprecated:** This document is superseded by the auto-generated [Validation Tools Guide](../docs-live/reference/VALIDATION-TOOLS-GUIDE.md). This file is preserved for reference only.
 
 Quick reference for choosing and running the right validation command.
 

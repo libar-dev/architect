@@ -1,8 +1,6 @@
 # Annotation Guide
 
-> **Generated Reference Available:** Comprehensive annotation reference with
-> tag tables and conventions is generated at `docs-live/reference/ANNOTATION-REFERENCE.md`.
-> Run `pnpm docs:all` to regenerate.
+> **Deprecated:** This document is superseded by the auto-generated [Annotation Reference Guide](../docs-live/reference/ANNOTATION-REFERENCE.md) which includes all content from this guide plus auto-updated tag tables. This file is preserved for reference only.
 
 How to annotate TypeScript and Gherkin files for pattern extraction, documentation generation, and architecture diagrams.
 

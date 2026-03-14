@@ -61,13 +61,13 @@ graph TB
     subgraph generator["Generator"]
         SourceMapper[/"SourceMapper"/]
         Documentation_Generation_Orchestrator("Documentation Generation Orchestrator")
+        TransformDataset("TransformDataset")
+        SequenceTransformUtils("SequenceTransformUtils")
+        ContextInferenceImpl["ContextInferenceImpl"]
         ProcessApiReferenceGenerator["ProcessApiReferenceGenerator"]
         DesignReviewGenerator("DesignReviewGenerator")
         DecisionDocGenerator("DecisionDocGenerator")
         CliRecipeGenerator["CliRecipeGenerator"]
-        TransformDataset("TransformDataset")
-        SequenceTransformUtils("SequenceTransformUtils")
-        ContextInferenceImpl["ContextInferenceImpl"]
     end
     subgraph renderer["Renderer"]
         loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser["loadPreambleFromMarkdown — Shared Markdown-to-SectionBlock Parser"]
@@ -102,6 +102,11 @@ graph TB
     DesignReviewCodec ..->|implements| DesignReviewGeneration
     CompositeCodec ..->|implements| ReferenceDocShowcase
     ArchitectureCodec -->|uses| MasterDataset
+    TransformDataset -->|uses| MasterDataset
+    TransformDataset ..->|implements| PatternRelationshipModel
+    SequenceTransformUtils -->|uses| MasterDataset
+    SequenceTransformUtils ..->|implements| DesignReviewGeneration
+    ContextInferenceImpl ..->|implements| ContextInference
     ProcessApiReferenceGenerator ..->|implements| ProcessApiHybridGeneration
     DesignReviewGenerator -->|uses| DesignReviewCodec
     DesignReviewGenerator -->|uses| MasterDataset
@@ -109,11 +114,6 @@ graph TB
     DecisionDocGenerator -.->|depends on| DecisionDocCodec
     DecisionDocGenerator -.->|depends on| SourceMapper
     CliRecipeGenerator ..->|implements| CliRecipeCodec
-    TransformDataset -->|uses| MasterDataset
-    TransformDataset ..->|implements| PatternRelationshipModel
-    SequenceTransformUtils -->|uses| MasterDataset
-    SequenceTransformUtils ..->|implements| DesignReviewGeneration
-    ContextInferenceImpl ..->|implements| ContextInference
     DesignReviewGeneration -.->|depends on| MermaidDiagramUtils
     CliRecipeCodec -.->|depends on| ProcessApiHybridGeneration
     classDef neighbor stroke-dasharray: 5 5

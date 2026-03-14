@@ -1,15 +1,6 @@
-# Configuration Guide
+### Configuration Guide
 
-> **Deprecated:** This document is superseded by the auto-generated [Configuration Guide](../docs-live/reference/CONFIGURATION-GUIDE.md). This file is preserved for reference only.
-
-Configure tag prefixes, presets, sources, output, and custom taxonomies for `@libar-dev/delivery-process`.
-
-> **Prerequisites:** See [README.md](../README.md) for installation and basic usage.
-> **Tag Reference:** Run `npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f` for a complete tag list. See [TAXONOMY.md](./TAXONOMY.md) for concepts.
-
----
-
-## Quick Reference
+#### Quick Reference
 
 | Preset                        | Tag Prefix     | Categories | Use Case                             |
 | ----------------------------- | -------------- | ---------- | ------------------------------------ |
@@ -30,140 +21,41 @@ export default defineConfig({
   },
   output: { directory: 'docs-generated' },
 });
-
-// DDD-ES-CQRS preset (full 21-category taxonomy)
-export default defineConfig({
-  preset: 'ddd-es-cqrs',
-  sources: {
-    typescript: ['packages/*/src/**/*.ts'],
-    features: ['delivery-process/specs/**/*.feature'],
-    stubs: ['delivery-process/stubs/**/*.ts'],
-  },
-  output: { directory: 'docs-living', overwrite: true },
-});
-
-// Generic preset (simple taxonomy with @docs- prefix)
-export default defineConfig({
-  preset: 'generic',
-  sources: { typescript: ['src/**/*.ts'] },
-});
-
-// Custom prefix with any taxonomy
-export default defineConfig({
-  preset: 'libar-generic',
-  tagPrefix: '@acme-',
-  fileOptInTag: '@acme',
-  sources: { typescript: ['src/**/*.ts'] },
-});
 ```
 
-### Preset Category Behavior
+#### Preset Selection
 
-When using a preset, the preset's categories **replace** the base taxonomy categories entirely (not merged):
+##### When to Use Each Preset
 
-| Preset          | Categories        | Count |
-| --------------- | ----------------- | ----- |
-| `generic`       | core, api, infra  | 3     |
-| `libar-generic` | core, api, infra  | 3     |
-| `ddd-es-cqrs`   | Full DDD taxonomy | 21    |
+| Preset          | Use When                                                     | Categories                                                                               |
+| --------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| `libar-generic` | Simple projects, standard `@libar-docs-` prefix              | 3 (core, api, infra)                                                                     |
+| `generic`       | Prefer shorter `@docs-` prefix                               | 3 (core, api, infra)                                                                     |
+| `ddd-es-cqrs`   | DDD architecture with bounded contexts, event sourcing, CQRS | 21 (domain, ddd, bounded-context, event-sourcing, decider, cqrs, saga, projection, etc.) |
 
-**Design decision:** If you need DDD categories (ddd, event-sourcing, cqrs, saga, projection, decider, etc.), use the `ddd-es-cqrs` preset. The `generic` and `libar-generic` presets provide a simpler 3-category taxonomy.
+**Design decision:** Presets **replace** the base taxonomy categories entirely (not merged). If you need DDD categories, use the `ddd-es-cqrs` preset.
 
-### Default Preset Selection
+##### Default Preset Selection
 
-All entry points use the same default:
+All entry points default to `libar-generic`:
 
-| Entry Point                              | Default Preset                 | Context                  |
-| ---------------------------------------- | ------------------------------ | ------------------------ |
-| `defineConfig()`                         | `libar-generic` (3 categories) | Config file              |
-| `loadProjectConfig()` fallback (no file) | `libar-generic` (3 categories) | CLI tools                |
-| This package's config file               | `libar-generic` (3 categories) | Standalone package usage |
+| Entry Point                    | Default Preset                 | Context                          |
+| ------------------------------ | ------------------------------ | -------------------------------- |
+| `defineConfig()`               | `libar-generic` (3 categories) | Config file                      |
+| `loadProjectConfig()` fallback | `libar-generic` (3 categories) | CLI tools (no config file found) |
+| This package's config file     | `libar-generic` (3 categories) | Standalone package usage         |
 
-**Rationale:** Simple defaults for most users. Use `preset: 'ddd-es-cqrs'` explicitly if you need the full 21-category DDD taxonomy.
-
----
-
-## Presets
-
-### Libar-Generic Preset (Default)
-
-The default preset used by this package. Same 3 categories as `generic` but with `@libar-docs-` prefix.
-
-| Property        | Value                |
-| --------------- | -------------------- |
-| **Tag Prefix**  | `@libar-docs-`       |
-| **File Opt-In** | `@libar-docs`        |
-| **Categories**  | 3 (core, api, infra) |
-
-```typescript
-/**
- * @libar-docs
- * @libar-docs-pattern PatternScanner
- * @libar-docs-status completed
- * @libar-docs-core
- * @libar-docs-uses FileDiscovery, ASTParser
- */
-export function scanPatterns(config: ScanConfig): Promise<ScanResult> { ... }
-```
-
-### Generic Preset
-
-Same 3 categories as `libar-generic` but with `@docs-` prefix. Use when you prefer shorter tag names.
-
-| Property        | Value                |
-| --------------- | -------------------- |
-| **Tag Prefix**  | `@docs-`             |
-| **File Opt-In** | `@docs`              |
-| **Categories**  | 3 (core, api, infra) |
-
-```typescript
-/**
- * @docs
- * @docs-pattern PatternScanner
- * @docs-status completed
- * @docs-core
- * @docs-uses FileDiscovery, ASTParser
- */
-export function scanPatterns(config: ScanConfig): Promise<ScanResult> { ... }
-```
-
-### DDD-ES-CQRS Preset
-
-Full taxonomy for domain-driven architectures with 21 categories.
-
-| Property        | Value                                                                  |
-| --------------- | ---------------------------------------------------------------------- |
-| **Tag Prefix**  | `@libar-docs-`                                                         |
-| **File Opt-In** | `@libar-docs`                                                          |
-| **Categories**  | 21 (domain, ddd, bounded-context, event-sourcing, decider, cqrs, etc.) |
-
-```typescript
-/**
- * @libar-docs
- * @libar-docs-pattern TransformDataset
- * @libar-docs-status completed
- * @libar-docs-core
- * @libar-docs-uses MasterDataset, ExtractedPattern
- * @libar-docs-used-by Orchestrator
- */
-export function transformToMasterDataset(input: TransformInput): MasterDataset { ... }
-```
-
-> **Category Reference:** Run `npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f` for the complete list. See [TAXONOMY.md](./TAXONOMY.md) for concepts.
-
----
-
-## Unified Config File
+#### Unified Config File
 
 The `defineConfig()` function centralizes taxonomy, sources, output, and generator overrides in a single `delivery-process.config.ts` file. CLI tools discover this file automatically.
 
-### Discovery Order
+##### Discovery Order
 
 1. Current directory: check `delivery-process.config.ts`, then `.js`
 2. Walk up to repo root (`.git` folder), checking each directory
 3. Fall back to libar-generic preset (3 categories, `@libar-docs-` prefix)
 
-### Config File Format
+##### Config File Format
 
 ```typescript
 // delivery-process.config.ts
@@ -183,7 +75,7 @@ export default defineConfig({
 });
 ```
 
-### Sources Configuration
+##### Sources Configuration
 
 | Field        | Type       | Description                                          |
 | ------------ | ---------- | ---------------------------------------------------- |
@@ -194,14 +86,14 @@ export default defineConfig({
 
 Stubs are merged into TypeScript sources at resolution time. No parent directory traversal (`..`) is allowed in globs.
 
-### Output Configuration
+##### Output Configuration
 
 | Field       | Type      | Default               | Description                         |
 | ----------- | --------- | --------------------- | ----------------------------------- |
 | `directory` | `string`  | `'docs/architecture'` | Output directory for generated docs |
 | `overwrite` | `boolean` | `false`               | Overwrite existing files            |
 
-### Generator Overrides
+##### Generator Overrides
 
 Some generators need different sources than the base config. Use `generatorOverrides` for per-generator customization:
 
@@ -233,23 +125,17 @@ export default defineConfig({
 
 **Constraint:** `replaceFeatures` and `additionalFeatures` are mutually exclusive when both are non-empty.
 
-### Monorepo Example
+#### Monorepo Setup
+
+```my-monorepo/ delivery-process.config.ts          # Repo-level: ddd-es-cqrs   packages/     my-package/       delivery-process.config.ts      # Package-level: generic
 
 ```
-my-monorepo/
-├── delivery-process.config.ts          # Repo: ddd-es-cqrs
-└── packages/
-    └── my-package/
-        └── delivery-process.config.ts  # Package: generic
-```
 
-CLI tools use the nearest config file to the working directory.
+CLI tools use the nearest config file to the working directory. Each package can have its own preset and source globs.
 
----
+#### Custom Configuration
 
-## Custom Configuration
-
-### Custom Tag Prefix
+##### Custom Tag Prefix
 
 Keep a preset's taxonomy but change the prefix:
 
@@ -267,7 +153,7 @@ export default defineConfig({
 // /** @team-core */
 ```
 
-### Custom Categories
+##### Custom Categories
 
 Define your own taxonomy:
 
@@ -296,9 +182,7 @@ export default defineConfig({
 });
 ```
 
----
-
-## Programmatic Config Loading
+#### Programmatic Config Loading
 
 For tools that need to load configuration files:
 
@@ -333,9 +217,7 @@ const effectiveSources = mergeSourcesForGenerator(
 // effectiveSources.features   - merged or replaced feature globs
 ```
 
----
-
-## Backward Compatibility
+#### Backward Compatibility
 
 The legacy `createDeliveryProcess()` API is still exported and supported. Config files using the old format are detected automatically by `loadProjectConfig()` and wrapped in a `ResolvedConfig` with default project settings.
 
@@ -346,14 +228,3 @@ export default createDeliveryProcess({ preset: 'ddd-es-cqrs' });
 ```
 
 New projects should use `defineConfig()` for the unified configuration experience.
-
----
-
-## Related Documentation
-
-| Document                             | Purpose                         |
-| ------------------------------------ | ------------------------------- |
-| [README.md](../README.md)            | Installation and quick start    |
-| [TAXONOMY.md](./TAXONOMY.md)         | Tag taxonomy concepts and API   |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | Pipeline and codec architecture |
-| [METHODOLOGY.md](./METHODOLOGY.md)   | Dual-source ownership strategy  |

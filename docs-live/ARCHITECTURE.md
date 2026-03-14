@@ -7,11 +7,11 @@
 
 ## Overview
 
-This diagram was auto-generated from 160 annotated source files across 11 bounded contexts.
+This diagram was auto-generated from 162 annotated source files across 11 bounded contexts.
 
 | Metric           | Count |
 | ---------------- | ----- |
-| Total Components | 160   |
+| Total Components | 162   |
 | Bounded Contexts | 11    |
 | Component Roles  | 5     |
 
@@ -76,6 +76,9 @@ graph TB
         Document_Extractor["Document Extractor[service]"]
     end
     subgraph generator["Generator BC"]
+        GitNameStatusParser["GitNameStatusParser"]
+        GitModule["GitModule"]
+        GitBranchDiff["GitBranchDiff"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
@@ -85,11 +88,6 @@ graph TB
         ContentDeduplicator["ContentDeduplicator[infrastructure]"]
         CodecBasedGenerator["CodecBasedGenerator[service]"]
         FileCache["FileCache[infrastructure]"]
-        TransformDataset["TransformDataset[service]"]
-        SequenceTransformUtils["SequenceTransformUtils[service]"]
-        MergePatterns["MergePatterns"]
-        PipelineModule["PipelineModule"]
-        PipelineFactory["PipelineFactory"]
         ReferenceGeneratorRegistration["ReferenceGeneratorRegistration"]
         ProcessApiReferenceGenerator["ProcessApiReferenceGenerator"]
         BuiltInGenerators["BuiltInGenerators"]
@@ -97,6 +95,14 @@ graph TB
         DecisionDocGenerator["DecisionDocGenerator[service]"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
         CliRecipeGenerator["CliRecipeGenerator"]
+        TransformTypes["TransformTypes"]
+        TransformDataset["TransformDataset[service]"]
+        SequenceTransformUtils["SequenceTransformUtils[service]"]
+        RelationshipResolver["RelationshipResolver[service]"]
+        MergePatterns["MergePatterns"]
+        PipelineModule["PipelineModule"]
+        ContextInferenceImpl["ContextInferenceImpl"]
+        PipelineFactory["PipelineFactory"]
     end
     subgraph lint["Lint BC"]
         LintRules["LintRules[service]"]
@@ -163,14 +169,6 @@ graph TB
         ErrorFactoryTypes["ErrorFactoryTypes"]
     end
     subgraph validation["Validation BC"]
-        WorkflowConfigSchema["WorkflowConfigSchema"]
-        Tag_Registry_Configuration["Tag Registry Configuration"]
-        OutputSchemas["OutputSchemas"]
-        ExtractedShapeSchema["ExtractedShapeSchema"]
-        ExtractedPatternSchema["ExtractedPatternSchema"]
-        DualSourceSchemas["DualSourceSchemas"]
-        DocDirectiveSchema["DocDirectiveSchema"]
-        CodecUtils["CodecUtils"]
         DoDValidationTypes["DoDValidationTypes"]
         ValidationModule["ValidationModule"]
         DoDValidator["DoDValidator[service]"]
@@ -181,18 +179,14 @@ graph TB
         FSMModule["FSMModule"]
     end
     subgraph shared["Shared Infrastructure"]
-        WorkflowConfigSchema["WorkflowConfigSchema"]
-        Tag_Registry_Configuration["Tag Registry Configuration"]
-        OutputSchemas["OutputSchemas"]
-        ExtractedShapeSchema["ExtractedShapeSchema"]
-        ExtractedPatternSchema["ExtractedPatternSchema"]
-        DualSourceSchemas["DualSourceSchemas"]
-        DocDirectiveSchema["DocDirectiveSchema"]
-        CodecUtils["CodecUtils"]
-        ResultMonadTypes["ResultMonadTypes"]
-        ErrorFactoryTypes["ErrorFactoryTypes"]
+        Convention_Annotation_Example___DD_3_Decision["Convention Annotation Example — DD-3 Decision[decider]"]
         DoDValidationTypes["DoDValidationTypes"]
         ValidationModule["ValidationModule"]
+        ResultMonadTypes["ResultMonadTypes"]
+        ErrorFactoryTypes["ErrorFactoryTypes"]
+        RenderableUtils["RenderableUtils"]
+        SectionBlock["SectionBlock"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
@@ -202,19 +196,12 @@ graph TB
         DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
         CategoryDefinition["CategoryDefinition"]
         LintModule["LintModule"]
+        ShapeExtractor["ShapeExtractor"]
+        LayerInference["LayerInference"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
         GeneratorRegistry["GeneratorRegistry"]
-        RenderableUtils["RenderableUtils"]
-        SectionBlock["SectionBlock"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
-        ShapeExtractor["ShapeExtractor"]
-        LayerInference["LayerInference"]
-        ProcessStateTypes["ProcessStateTypes"]
-        StubResolverImpl["StubResolverImpl"]
-        RulesQueryModule["RulesQueryModule"]
-        APIModule["APIModule"]
         CLIVersionHelper["CLIVersionHelper"]
         ValidatePatternsCLI["ValidatePatternsCLI"]
         LintProcessCLI["LintProcessCLI"]
@@ -222,18 +209,11 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
-        Convention_Annotation_Example___DD_3_Decision["Convention Annotation Example — DD-3 Decision[decider]"]
+        ProcessStateTypes["ProcessStateTypes"]
+        StubResolverImpl["StubResolverImpl"]
+        RulesQueryModule["RulesQueryModule"]
+        APIModule["APIModule"]
         FSMModule["FSMModule"]
-        ProcessGuardTypes["ProcessGuardTypes"]
-        ProcessGuardModule["ProcessGuardModule"]
-        DetectChanges["DetectChanges"]
-        DeriveProcessState["DeriveProcessState"]
-        MergePatterns["MergePatterns"]
-        PipelineModule["PipelineModule"]
-        PipelineFactory["PipelineFactory"]
-        ReferenceGeneratorRegistration["ReferenceGeneratorRegistration"]
-        BuiltInGenerators["BuiltInGenerators"]
-        CodecGeneratorRegistration["CodecGeneratorRegistration"]
         ValidationRulesCodec["ValidationRulesCodec"]
         TimelineCodec["TimelineCodec"]
         TaxonomyCodec["TaxonomyCodec"]
@@ -249,6 +229,16 @@ graph TB
         ClaudeModuleCodec["ClaudeModuleCodec"]
         BusinessRulesCodec["BusinessRulesCodec"]
         AdrDocumentCodec["AdrDocumentCodec"]
+        ProcessGuardTypes["ProcessGuardTypes"]
+        ProcessGuardModule["ProcessGuardModule"]
+        DetectChanges["DetectChanges"]
+        DeriveProcessState["DeriveProcessState"]
+        ReferenceGeneratorRegistration["ReferenceGeneratorRegistration"]
+        BuiltInGenerators["BuiltInGenerators"]
+        CodecGeneratorRegistration["CodecGeneratorRegistration"]
+        MergePatterns["MergePatterns"]
+        PipelineModule["PipelineModule"]
+        PipelineFactory["PipelineFactory"]
         CodecBaseOptions["CodecBaseOptions"]
         ADR006SingleReadModelArchitecture["ADR006SingleReadModelArchitecture"]
         ADR005CodecBasedMarkdownRendering["ADR005CodecBasedMarkdownRendering"]
@@ -266,38 +256,34 @@ graph TB
         EffortVarianceTracking["EffortVarianceTracking"]
         ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
         CliBehaviorTesting["CliBehaviorTesting"]
-        ProcessGuardTesting["ProcessGuardTesting"]
-        ResultMonad["ResultMonad"]
-        ErrorFactories["ErrorFactories"]
         StringUtils["StringUtils"]
+        FileCacheTesting["FileCacheTesting"]
+        ProcessGuardTesting["ProcessGuardTesting"]
+        TagRegistryBuilderTesting["TagRegistryBuilderTesting"]
+        ResultMonad["ResultMonad"]
+        NormalizedStatusTesting["NormalizedStatusTesting"]
+        ErrorFactories["ErrorFactories"]
+        DeliverableStatusTaxonomyTesting["DeliverableStatusTaxonomyTesting"]
         SessionHandoffs["SessionHandoffs"]
         SessionFileLifecycle["SessionFileLifecycle"]
         KebabCaseSlugs["KebabCaseSlugs"]
         ErrorHandlingUnification["ErrorHandlingUnification"]
     end
-    ExtractedPatternSchema --> DocDirectiveSchema
-    DualSourceSchemas ..-> MvpWorkflowImplementation
-    DocDirectiveSchema ..-> MvpWorkflowImplementation
-    ResultMonadTypes ..-> ResultMonad
-    ErrorFactoryTypes ..-> ErrorFactories
     DoDValidator --> DoDValidationTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
+    ResultMonadTypes ..-> ResultMonad
+    ErrorFactoryTypes ..-> ErrorFactories
+    GherkinScanner --> GherkinASTParser
+    SectionBlock ..-> RenderableDocument
     CategoryDefinition ..-> CategoryDefinitions
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
-    LintEngine --> CodecUtils
-    GherkinScanner --> GherkinASTParser
-    TypeScript_AST_Parser --> DocDirectiveSchema
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    SectionBlock ..-> RenderableDocument
-    WorkflowLoader --> WorkflowConfigSchema
-    WorkflowLoader --> CodecUtils
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
     ConfigResolver --> ProjectConfigTypes
     ConfigResolver --> DeliveryProcessFactory
     ConfigResolver --> ConfigurationDefaults
@@ -313,10 +299,29 @@ graph TB
     DefineConfig --> ProjectConfigTypes
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> GherkinExtractor
+    ValidatePatternsCLI --> MasterDataset
+    ReplMode --> PipelineFactory
+    ReplMode --> ProcessStateAPI
+    ProcessAPICLIImpl --> ProcessStateAPI
+    ProcessAPICLIImpl --> MasterDataset
+    ProcessAPICLIImpl --> PipelineFactory
+    ProcessAPICLIImpl --> RulesQueryModule
+    ProcessAPICLIImpl --> PatternSummarizerImpl
+    ProcessAPICLIImpl --> FuzzyMatcherImpl
+    ProcessAPICLIImpl --> OutputPipelineImpl
+    OutputPipelineImpl --> PatternSummarizerImpl
+    LintProcessCLI --> ProcessGuardModule
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    TagTaxonomyCLI --> ConfigLoader
+    DatasetCache --> PipelineFactory
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
@@ -339,43 +344,17 @@ graph TB
     ContextAssemblerImpl --> StubResolverImpl
     ArchQueriesImpl --> ProcessStateAPI
     ArchQueriesImpl --> MasterDataset
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> GherkinExtractor
-    ValidatePatternsCLI --> MasterDataset
-    ValidatePatternsCLI --> CodecUtils
-    ReplMode --> PipelineFactory
-    ReplMode --> ProcessStateAPI
-    ProcessAPICLIImpl --> ProcessStateAPI
-    ProcessAPICLIImpl --> MasterDataset
-    ProcessAPICLIImpl --> PipelineFactory
-    ProcessAPICLIImpl --> RulesQueryModule
-    ProcessAPICLIImpl --> PatternSummarizerImpl
-    ProcessAPICLIImpl --> FuzzyMatcherImpl
-    ProcessAPICLIImpl --> OutputPipelineImpl
-    OutputPipelineImpl --> PatternSummarizerImpl
-    LintProcessCLI --> ProcessGuardModule
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    TagTaxonomyCLI --> ConfigLoader
-    DatasetCache --> PipelineFactory
-    DatasetCache --> WorkflowConfigSchema
     FSMValidator --> FSMTransitions
     FSMValidator --> FSMStates
+    DesignReviewCodec --> MasterDataset
+    DesignReviewCodec --> MermaidDiagramUtils
+    ArchitectureCodec --> MasterDataset
     DetectChanges --> DeriveProcessState
     DeriveProcessState --> GherkinScanner
     DeriveProcessState --> FSMValidator
     ProcessGuardDecider --> FSMValidator
     ProcessGuardDecider --> DeriveProcessState
     ProcessGuardDecider --> DetectChanges
-    TransformDataset --> MasterDataset
-    SequenceTransformUtils --> MasterDataset
-    MergePatterns --> PatternHelpers
-    MergePatterns ..-> OrchestratorPipelineFactoryMigration
-    PipelineModule --> TransformDataset
-    PipelineFactory --> GherkinScanner
-    PipelineFactory --> GherkinExtractor
-    PipelineFactory --> MasterDataset
-    PipelineFactory ..-> ProcessAPILayeredExtraction
     BuiltInGenerators --> GeneratorRegistry
     BuiltInGenerators --> CodecBasedGenerator
     DesignReviewGenerator --> DesignReviewCodec
@@ -386,9 +365,15 @@ graph TB
     CodecGeneratorRegistration --> DecisionDocGenerator
     CodecGeneratorRegistration --> ProcessApiReferenceGenerator
     CodecGeneratorRegistration --> CliRecipeGenerator
-    DesignReviewCodec --> MasterDataset
-    DesignReviewCodec --> MermaidDiagramUtils
-    ArchitectureCodec --> MasterDataset
+    TransformDataset --> MasterDataset
+    SequenceTransformUtils --> MasterDataset
+    MergePatterns --> PatternHelpers
+    MergePatterns ..-> OrchestratorPipelineFactoryMigration
+    PipelineModule --> TransformDataset
+    PipelineFactory --> GherkinScanner
+    PipelineFactory --> GherkinExtractor
+    PipelineFactory --> MasterDataset
+    PipelineFactory ..-> ProcessAPILayeredExtraction
     ADR006SingleReadModelArchitecture -.-> ADR005CodecBasedMarkdownRendering
     ADR003SourceFirstPatternArchitecture -.-> ADR001TaxonomyCanonicalValues
     ValidatorReadModelConsolidation -.-> ADR006SingleReadModelArchitecture
@@ -457,7 +442,12 @@ All components with architecture annotations:
 | ✅ Dual Source Extractor                                          | extractor  | service        | application    | src/extractor/dual-source-extractor.ts                                       |
 | ✅ Gherkin Extractor                                              | extractor  | service        | application    | src/extractor/gherkin-extractor.ts                                           |
 | Cli Recipe Generator                                              | generator  | -              | application    | src/generators/built-in/cli-recipe-generator.ts                              |
+| ✅ Context Inference Impl                                         | generator  | -              | application    | src/generators/pipeline/context-inference.ts                                 |
+| 🚧 Git Branch Diff                                                | generator  | -              | infrastructure | src/git/branch-diff.ts                                                       |
+| 🚧 Git Module                                                     | generator  | -              | infrastructure | src/git/index.ts                                                             |
+| 🚧 Git Name Status Parser                                         | generator  | -              | infrastructure | src/git/name-status.ts                                                       |
 | ✅ Process Api Reference Generator                                | generator  | -              | application    | src/generators/built-in/process-api-reference-generator.ts                   |
+| 🚧 Transform Types                                                | generator  | -              | application    | src/generators/pipeline/transform-types.ts                                   |
 | ✅ Content Deduplicator                                           | generator  | infrastructure | infrastructure | src/generators/content-deduplicator.ts                                       |
 | 🚧 File Cache                                                     | generator  | infrastructure | infrastructure | src/cache/file-cache.ts                                                      |
 | ✅ Source Mapper                                                  | generator  | infrastructure | infrastructure | src/generators/source-mapper.ts                                              |
@@ -465,6 +455,7 @@ All components with architecture annotations:
 | ✅ Decision Doc Generator                                         | generator  | service        | application    | src/generators/built-in/decision-doc-generator.ts                            |
 | 🚧 Design Review Generator                                        | generator  | service        | application    | src/generators/built-in/design-review-generator.ts                           |
 | ✅ Documentation Generation Orchestrator                          | generator  | service        | application    | src/generators/orchestrator.ts                                               |
+| 🚧 Relationship Resolver                                          | generator  | service        | application    | src/generators/pipeline/relationship-resolver.ts                             |
 | 🚧 Sequence Transform Utils                                       | generator  | service        | application    | src/generators/pipeline/sequence-utils.ts                                    |
 | ✅ Transform Dataset                                              | generator  | service        | application    | src/generators/pipeline/transform-dataset.ts                                 |
 | 🚧 Process Guard Decider                                          | lint       | decider        | application    | src/lint/process-guard/decider.ts                                            |
@@ -508,22 +499,19 @@ All components with architecture annotations:
 | ✅ CLI Version Helper                                             | -          | -              | -              | src/cli/version.ts                                                           |
 | ✅ Codec Base Options                                             | -          | -              | -              | src/renderable/codecs/types/base.ts                                          |
 | ✅ Codec Generator Registration                                   | -          | -              | -              | src/generators/built-in/codec-generators.ts                                  |
-| ✅ Codec Utils                                                    | -          | -              | -              | src/validation-schemas/codec-utils.ts                                        |
 | ✅ Config Based Workflow Definition                               | -          | -              | -              | delivery-process/specs/config-based-workflow-definition.feature              |
 | 🚧 Deliverable Status Taxonomy                                    | -          | -              | -              | src/taxonomy/deliverable-status.ts                                           |
+| 🚧 Deliverable Status Taxonomy Testing                            | -          | -              | -              | tests/features/types/deliverable-status.feature                              |
 | 🚧 Derive Process State                                           | -          | -              | -              | src/lint/process-guard/derive-state.ts                                       |
 | 🚧 Detect Changes                                                 | -          | -              | -              | src/lint/process-guard/detect-changes.ts                                     |
-| ✅ Doc Directive Schema                                           | -          | -              | -              | src/validation-schemas/doc-directive.ts                                      |
 | ✅ Documentation Generator CLI                                    | -          | -              | -              | src/cli/generate-docs.ts                                                     |
 | ✅ Document Codecs                                                | -          | -              | -              | src/renderable/codecs/index.ts                                               |
 | ✅ DoD Validation Types                                           | -          | -              | -              | src/validation/types.ts                                                      |
-| ✅ Dual Source Schemas                                            | -          | -              | -              | src/validation-schemas/dual-source.ts                                        |
 | 📋 Effort Variance Tracking                                       | -          | -              | -              | delivery-process/specs/effort-variance-tracking.feature                      |
 | ✅ Error Factories                                                | -          | -              | -              | tests/features/types/error-factories.feature                                 |
 | ✅ Error Factory Types                                            | -          | -              | -              | src/types/errors.ts                                                          |
 | ✅ Error Handling Unification                                     | -          | -              | -              | tests/features/behavior/error-handling.feature                               |
-| ✅ Extracted Pattern Schema                                       | -          | -              | -              | src/validation-schemas/extracted-pattern.ts                                  |
-| ✅ Extracted Shape Schema                                         | -          | -              | -              | src/validation-schemas/extracted-shape.ts                                    |
+| 🚧 File Cache Testing                                             | -          | -              | -              | tests/features/utils/file-cache.feature                                      |
 | ✅ Format Types                                                   | -          | -              | -              | src/taxonomy/format-types.ts                                                 |
 | 🚧 FSM Module                                                     | -          | -              | -              | src/validation/fsm/index.ts                                                  |
 | ✅ Generator Registry                                             | -          | -              | -              | src/generators/registry.ts                                                   |
@@ -540,8 +528,8 @@ All components with architecture annotations:
 | ✅ Merge Patterns                                                 | -          | -              | -              | src/generators/pipeline/merge-patterns.ts                                    |
 | ✅ Mvp Workflow Implementation                                    | -          | -              | -              | delivery-process/specs/mvp-workflow-implementation.feature                   |
 | ✅ Normalized Status                                              | -          | -              | -              | src/taxonomy/normalized-status.ts                                            |
+| 🚧 Normalized Status Testing                                      | -          | -              | -              | tests/features/types/normalized-status.feature                               |
 | ✅ Orchestrator Pipeline Factory Migration                        | -          | -              | -              | delivery-process/specs/orchestrator-pipeline-factory-migration.feature       |
-| ✅ Output Schemas                                                 | -          | -              | -              | src/validation-schemas/output-schemas.ts                                     |
 | ✅ Pipeline Factory                                               | -          | -              | -              | src/generators/pipeline/build-pipeline.ts                                    |
 | ✅ Pipeline Module                                                | -          | -              | -              | src/generators/pipeline/index.ts                                             |
 | ✅ Planning Codecs                                                | -          | -              | -              | src/renderable/codecs/planning.ts                                            |
@@ -574,7 +562,7 @@ All components with architecture annotations:
 | 📋 Step Definition Completion                                     | -          | -              | -              | delivery-process/specs/step-definition-completion.feature                    |
 | ✅ String Utils                                                   | -          | -              | -              | tests/features/utils/string-utils.feature                                    |
 | 🚧 Stub Resolver Impl                                             | -          | -              | -              | src/api/stub-resolver.ts                                                     |
-| ✅ Tag Registry Configuration                                     | -          | -              | -              | src/validation-schemas/tag-registry.ts                                       |
+| 🚧 Tag Registry Builder Testing                                   | -          | -              | -              | tests/features/types/tag-registry-builder.feature                            |
 | ⏸️ Tag Taxonomy CLI                                               | -          | -              | -              | src/cli/generate-tag-taxonomy.ts                                             |
 | ✅ Taxonomy Codec                                                 | -          | -              | -              | src/renderable/codecs/taxonomy.ts                                            |
 | ✅ Timeline Codec                                                 | -          | -              | -              | src/renderable/codecs/timeline.ts                                            |
@@ -583,5 +571,4 @@ All components with architecture annotations:
 | ✅ Validation Rules Codec                                         | -          | -              | -              | src/renderable/codecs/validation-rules.ts                                    |
 | ✅ Validator Read Model Consolidation                             | -          | -              | -              | delivery-process/specs/validator-read-model-consolidation.feature            |
 | ✅ Warning Collector                                              | -          | -              | -              | src/generators/warning-collector.ts                                          |
-| ✅ Workflow Config Schema                                         | -          | -              | -              | src/validation-schemas/workflow-config.ts                                    |
 | 📋 Convention Annotation Example — DD-3 Decision                  | -          | decider        | -              | delivery-process/stubs/error-guide-codec/convention-annotation-example.ts    |
