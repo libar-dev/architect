@@ -14,7 +14,7 @@ This diagram shows 59 key components with explicit architectural roles across 10
 | Diagram Components | 59    |
 | Bounded Contexts   | 10    |
 | Component Roles    | 5     |
-| Total Annotated    | 162   |
+| Total Annotated    | 163   |
 
 ---
 
@@ -108,10 +108,6 @@ graph TB
     DoDValidator --> DualSourceExtractor
     GherkinScanner --> GherkinASTParser
     LintEngine --> LintRules
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> GherkinASTParser
     Documentation_Generation_Orchestrator --> Pattern_Scanner
@@ -125,6 +121,10 @@ graph TB
     ConfigResolver --> DeliveryProcessFactory
     DeliveryProcessFactory --> RegexBuilders
     ConfigLoader --> DeliveryProcessFactory
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
     PatternSummarizerImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
     ScopeValidatorImpl --> MasterDataset
@@ -208,6 +208,7 @@ All components with architecture annotations:
 | Cli Recipe Generator                                              | generator  | -              | application    | src/generators/built-in/cli-recipe-generator.ts                              |
 | ✅ Context Inference Impl                                         | generator  | -              | application    | src/generators/pipeline/context-inference.ts                                 |
 | 🚧 Git Branch Diff                                                | generator  | -              | infrastructure | src/git/branch-diff.ts                                                       |
+| 🚧 Git Helpers                                                    | generator  | -              | infrastructure | src/git/helpers.ts                                                           |
 | 🚧 Git Module                                                     | generator  | -              | infrastructure | src/git/index.ts                                                             |
 | 🚧 Git Name Status Parser                                         | generator  | -              | infrastructure | src/git/name-status.ts                                                       |
 | ✅ Process Api Reference Generator                                | generator  | -              | application    | src/generators/built-in/process-api-reference-generator.ts                   |

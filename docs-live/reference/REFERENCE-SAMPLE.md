@@ -248,15 +248,6 @@ classDiagram
     class Documentation_Generation_Orchestrator {
         <<service>>
     }
-    class TransformDataset {
-        <<service>>
-    }
-    class SequenceTransformUtils {
-        <<service>>
-    }
-    class ContextInferenceImpl {
-        +ContextInferenceRule interface
-    }
     class ProcessApiReferenceGenerator {
     }
     class DesignReviewGenerator {
@@ -267,10 +258,19 @@ classDiagram
     }
     class CliRecipeGenerator {
     }
+    class TransformDataset {
+        <<service>>
+    }
+    class SequenceTransformUtils {
+        <<service>>
+    }
+    class ContextInferenceImpl {
+        +ContextInferenceRule interface
+    }
     class MasterDataset
+    class ShapeExtractor
     class Pattern_Scanner
     class GherkinASTParser
-    class ShapeExtractor
     class DesignReviewCodec
     class DecisionDocCodec
     class ProcessApiHybridGeneration
@@ -282,11 +282,6 @@ classDiagram
     SourceMapper ..> ShapeExtractor : depends on
     SourceMapper ..> GherkinASTParser : depends on
     Documentation_Generation_Orchestrator ..> Pattern_Scanner : uses
-    TransformDataset ..> MasterDataset : uses
-    TransformDataset ..|> PatternRelationshipModel : implements
-    SequenceTransformUtils ..> MasterDataset : uses
-    SequenceTransformUtils ..|> DesignReviewGeneration : implements
-    ContextInferenceImpl ..|> ContextInference : implements
     ProcessApiReferenceGenerator ..|> ProcessApiHybridGeneration : implements
     DesignReviewGenerator ..> DesignReviewCodec : uses
     DesignReviewGenerator ..> MasterDataset : uses
@@ -294,6 +289,11 @@ classDiagram
     DecisionDocGenerator ..> DecisionDocCodec : depends on
     DecisionDocGenerator ..> SourceMapper : depends on
     CliRecipeGenerator ..|> CliRecipeCodec : implements
+    TransformDataset ..> MasterDataset : uses
+    TransformDataset ..|> PatternRelationshipModel : implements
+    SequenceTransformUtils ..> MasterDataset : uses
+    SequenceTransformUtils ..|> DesignReviewGeneration : implements
+    ContextInferenceImpl ..|> ContextInference : implements
     DesignReviewCodec ..> MasterDataset : uses
     DesignReviewCodec ..|> DesignReviewGeneration : implements
     CliRecipeCodec ..> ProcessApiHybridGeneration : depends on
@@ -351,15 +351,15 @@ C4Context
     }
     System_Ext(DocDirectiveSchema, "DocDirectiveSchema")
     System_Ext(GherkinRulesSupport, "GherkinRulesSupport")
-    Rel(GherkinScanner, GherkinASTParser, "uses")
-    Rel(GherkinScanner, GherkinRulesSupport, "implements")
-    Rel(GherkinASTParser, GherkinRulesSupport, "implements")
-    Rel(TypeScript_AST_Parser, DocDirectiveSchema, "uses")
     Rel(GherkinExtractor, GherkinASTParser, "uses")
     Rel(GherkinExtractor, GherkinRulesSupport, "implements")
     Rel(DualSourceExtractor, GherkinExtractor, "uses")
     Rel(DualSourceExtractor, GherkinScanner, "uses")
     Rel(Document_Extractor, Pattern_Scanner, "uses")
+    Rel(GherkinScanner, GherkinASTParser, "uses")
+    Rel(GherkinScanner, GherkinRulesSupport, "implements")
+    Rel(GherkinASTParser, GherkinRulesSupport, "implements")
+    Rel(TypeScript_AST_Parser, DocDirectiveSchema, "uses")
 ```
 
 ---
@@ -407,11 +407,11 @@ graph LR
     ProjectConfigTypes -->|uses| ConfigurationTypes
     ProjectConfigTypes -->|uses| ConfigurationPresets
     ConfigurationPresets -->|uses| ConfigurationTypes
+    CLISchema ..->|implements| ProcessApiHybridGeneration
     PatternHelpers ..->|implements| DataAPIOutputShaping
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
-    CLISchema ..->|implements| ProcessApiHybridGeneration
     FSMTransitions ..->|implements| PhaseStateMachineValidation
     FSMStates ..->|implements| PhaseStateMachineValidation
     ProcessStateAPI -->|uses| MasterDataset
