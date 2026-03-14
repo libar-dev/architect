@@ -30,12 +30,11 @@
  * - When detecting scope creep (new deliverables)
  */
 
-import { execFileSync } from 'child_process';
 import * as path from 'path';
 import type { Result } from '../../types/index.js';
 import { Result as R } from '../../types/index.js';
 import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from '../../taxonomy/index.js';
-import { parseGitNameStatus } from '../../git/name-status.js';
+import { execGitSafe, sanitizeBranchName, parseGitNameStatus } from '../../git/index.js';
 import type {
   ChangeDetection,
   StatusTransition,
@@ -45,13 +44,6 @@ import type {
 import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
 import { DEFAULT_STATUS } from '../../taxonomy/status-values.js';
 import type { WithTagRegistry } from '../../validation/types.js';
-
-/**
- * Maximum buffer size for git command output (50MB).
- * Large enough to handle staging entire dist/ folders with source maps.
- * Prevents ENOBUFS errors when diff output exceeds Node.js default (~1MB).
- */
-const GIT_MAX_BUFFER = 50 * 1024 * 1024;
 
 /**
  * Options for change detection functions.
@@ -215,52 +207,6 @@ export function detectFileChanges(
 }
 
 // =============================================================================
-// Git Helpers
-// =============================================================================
-
-/**
- * Execute a git command safely using execFileSync to prevent command injection.
- *
- * Uses array-based arguments instead of string interpolation to avoid shell
- * metacharacter injection vulnerabilities.
- *
- * @param subcommand - Git subcommand (e.g., 'merge-base', 'diff', 'ls-files')
- * @param args - Array of arguments (never interpolated into a shell command)
- * @param cwd - Working directory
- * @returns Command output as string
- */
-function execGitSafe(subcommand: string, args: readonly string[], cwd: string): string {
-  return execFileSync('git', [subcommand, ...args], {
-    cwd,
-    encoding: 'utf-8',
-    stdio: ['pipe', 'pipe', 'pipe'],
-    maxBuffer: GIT_MAX_BUFFER,
-  });
-}
-
-/**
- * Validate and sanitize a git branch name to prevent command injection.
- *
- * Allows only alphanumeric characters, dots, hyphens, underscores, and forward slashes.
- * This matches the valid git branch name character set per git-check-ref-format.
- *
- * @param branch - Branch name to validate
- * @returns The validated branch name (unchanged if valid)
- * @throws Error if branch name contains invalid characters
- */
-function sanitizeBranchName(branch: string): string {
-  // Git branch names: alphanumeric, dots, hyphens, underscores, forward slashes
-  // Excludes shell metacharacters: ; | & $ ` ( ) { } [ ] < > ! ~ ^ * ? " ' \
-  if (!/^[a-zA-Z0-9._\-/]+$/.test(branch)) {
-    throw new Error(`Invalid branch name: ${branch}`);
-  }
-  // Prevent path traversal attempts in branch names
-  if (branch.includes('..')) {
-    throw new Error(`Invalid branch name (contains ..): ${branch}`);
-  }
-  return branch;
-}
-
 // =============================================================================
 // Status Transition Detection
 // =============================================================================

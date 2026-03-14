@@ -26,44 +26,10 @@
  * - For status transition detection — use detectStagedChanges/detectBranchChanges
  */
 
-import { execFileSync } from 'child_process';
 import type { Result } from '../types/index.js';
 import { Result as R } from '../types/index.js';
+import { execGitSafe, sanitizeBranchName } from './helpers.js';
 import { parseGitNameStatus } from './name-status.js';
-
-/**
- * Maximum buffer size for git command output (50MB).
- * Large enough to handle staging entire dist/ folders with source maps.
- */
-const GIT_MAX_BUFFER = 50 * 1024 * 1024;
-
-/**
- * Execute a git subcommand safely using execFileSync (no shell interpolation).
- */
-function execGitSafe(subcommand: string, args: readonly string[], cwd: string): string {
-  return execFileSync('git', [subcommand, ...args], {
-    cwd,
-    encoding: 'utf-8',
-    stdio: ['pipe', 'pipe', 'pipe'],
-    maxBuffer: GIT_MAX_BUFFER,
-  });
-}
-
-/**
- * Validate and sanitize a git branch name to prevent command injection.
- *
- * Allows only alphanumeric characters, dots, hyphens, underscores, and forward slashes.
- * This matches the valid git branch name character set per git-check-ref-format.
- */
-function sanitizeBranchName(branch: string): string {
-  if (!/^[a-zA-Z0-9._\-/]+$/.test(branch)) {
-    throw new Error(`Invalid branch name: ${branch}`);
-  }
-  if (branch.includes('..')) {
-    throw new Error(`Invalid branch name (contains ..): ${branch}`);
-  }
-  return branch;
-}
 
 /**
  * Get all files changed relative to a base branch (excludes deleted files).

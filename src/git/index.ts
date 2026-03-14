@@ -13,3 +13,5 @@
  */
 
 export { getChangedFilesList } from './branch-diff.js';
+export { parseGitNameStatus, type ParsedGitNameStatus } from './name-status.js';
+export { execGitSafe, sanitizeBranchName, GIT_MAX_BUFFER } from './helpers.js';

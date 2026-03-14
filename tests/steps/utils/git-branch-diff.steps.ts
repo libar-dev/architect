@@ -10,8 +10,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
-import { getChangedFilesList } from '../../../src/git/index.js';
-import { parseGitNameStatus } from '../../../src/git/name-status.js';
+import { getChangedFilesList, parseGitNameStatus } from '../../../src/git/index.js';
 import {
   createTempDir,
   writeTempFile,
