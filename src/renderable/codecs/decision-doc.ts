@@ -1,11 +1,11 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern DecisionDocCodec
- * @libar-docs-status completed
- * @libar-docs-arch-role projection
- * @libar-docs-arch-context renderer
- * @libar-docs-arch-layer application
+ * @architect
+ * @architect-core
+ * @architect-pattern DecisionDocCodec
+ * @architect-status completed
+ * @architect-arch-role projection
+ * @architect-arch-context renderer
+ * @architect-arch-layer application
  *
  * ## Decision Doc Codec
  *

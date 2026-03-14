@@ -75,13 +75,13 @@
 
 ### `pattern`
 
-| Property   | Value                                     |
-| ---------- | ----------------------------------------- |
-| Format     | value                                     |
-| Purpose    | Explicit pattern name                     |
-| Required   | Yes                                       |
-| Repeatable | No                                        |
-| Example    | `@libar-docs-pattern CommandOrchestrator` |
+| Property   | Value                                    |
+| ---------- | ---------------------------------------- |
+| Format     | value                                    |
+| Purpose    | Explicit pattern name                    |
+| Required   | Yes                                      |
+| Repeatable | No                                       |
+| Example    | `@architect-pattern CommandOrchestrator` |
 
 ### `status`
 
@@ -93,7 +93,7 @@
 | Repeatable   | No                                           |
 | Valid Values | roadmap, active, completed, deferred         |
 | Default      | roadmap                                      |
-| Example      | `@libar-docs-status roadmap`                 |
+| Example      | `@architect-status roadmap`                  |
 
 ### `core`
 
@@ -103,37 +103,37 @@
 | Purpose    | Marks as essential/must-know pattern |
 | Required   | No                                   |
 | Repeatable | No                                   |
-| Example    | `@libar-docs-core`                   |
+| Example    | `@architect-core`                    |
 
 ### `usecase`
 
-| Property   | Value                                                  |
-| ---------- | ------------------------------------------------------ |
-| Format     | quoted-value                                           |
-| Purpose    | Use case association                                   |
-| Required   | No                                                     |
-| Repeatable | Yes                                                    |
-| Example    | `@libar-docs-usecase "When handling command failures"` |
+| Property   | Value                                                 |
+| ---------- | ----------------------------------------------------- |
+| Format     | quoted-value                                          |
+| Purpose    | Use case association                                  |
+| Required   | No                                                    |
+| Repeatable | Yes                                                   |
+| Example    | `@architect-usecase "When handling command failures"` |
 
 ### `uses`
 
-| Property   | Value                                     |
-| ---------- | ----------------------------------------- |
-| Format     | csv                                       |
-| Purpose    | Patterns this depends on                  |
-| Required   | No                                        |
-| Repeatable | No                                        |
-| Example    | `@libar-docs-uses CommandBus, EventStore` |
+| Property   | Value                                    |
+| ---------- | ---------------------------------------- |
+| Format     | csv                                      |
+| Purpose    | Patterns this depends on                 |
+| Required   | No                                       |
+| Repeatable | No                                       |
+| Example    | `@architect-uses CommandBus, EventStore` |
 
 ### `used-by`
 
-| Property   | Value                                  |
-| ---------- | -------------------------------------- |
-| Format     | csv                                    |
-| Purpose    | Patterns that depend on this           |
-| Required   | No                                     |
-| Repeatable | No                                     |
-| Example    | `@libar-docs-used-by SagaOrchestrator` |
+| Property   | Value                                 |
+| ---------- | ------------------------------------- |
+| Format     | csv                                   |
+| Purpose    | Patterns that depend on this          |
+| Required   | No                                    |
+| Repeatable | No                                    |
+| Example    | `@architect-used-by SagaOrchestrator` |
 
 ### `phase`
 
@@ -143,7 +143,7 @@
 | Purpose    | Roadmap phase number (unified across monorepo) |
 | Required   | No                                             |
 | Repeatable | No                                             |
-| Example    | `@libar-docs-phase 14`                         |
+| Example    | `@architect-phase 14`                          |
 
 ### `release`
 
@@ -153,47 +153,47 @@
 | Purpose    | Target release version (semver or vNEXT for unreleased work) |
 | Required   | No                                                           |
 | Repeatable | No                                                           |
-| Example    | `@libar-docs-release v0.1.0`                                 |
+| Example    | `@architect-release v0.1.0`                                  |
 
 ### `brief`
 
-| Property   | Value                                              |
-| ---------- | -------------------------------------------------- |
-| Format     | value                                              |
-| Purpose    | Path to pattern brief markdown                     |
-| Required   | No                                                 |
-| Repeatable | No                                                 |
-| Example    | `@libar-docs-brief docs/briefs/decider-pattern.md` |
+| Property   | Value                                             |
+| ---------- | ------------------------------------------------- |
+| Format     | value                                             |
+| Purpose    | Path to pattern brief markdown                    |
+| Required   | No                                                |
+| Repeatable | No                                                |
+| Example    | `@architect-brief docs/briefs/decider-pattern.md` |
 
 ### `depends-on`
 
-| Property   | Value                                           |
-| ---------- | ----------------------------------------------- |
-| Format     | csv                                             |
-| Purpose    | Roadmap dependencies (pattern or phase names)   |
-| Required   | No                                              |
-| Repeatable | No                                              |
-| Example    | `@libar-docs-depends-on EventStore, CommandBus` |
+| Property   | Value                                          |
+| ---------- | ---------------------------------------------- |
+| Format     | csv                                            |
+| Purpose    | Roadmap dependencies (pattern or phase names)  |
+| Required   | No                                             |
+| Repeatable | No                                             |
+| Example    | `@architect-depends-on EventStore, CommandBus` |
 
 ### `enables`
 
-| Property   | Value                                                     |
-| ---------- | --------------------------------------------------------- |
-| Format     | csv                                                       |
-| Purpose    | Patterns this enables                                     |
-| Required   | No                                                        |
-| Repeatable | No                                                        |
-| Example    | `@libar-docs-enables SagaOrchestrator, ProjectionBuilder` |
+| Property   | Value                                                    |
+| ---------- | -------------------------------------------------------- |
+| Format     | csv                                                      |
+| Purpose    | Patterns this enables                                    |
+| Required   | No                                                       |
+| Repeatable | No                                                       |
+| Example    | `@architect-enables SagaOrchestrator, ProjectionBuilder` |
 
 ### `implements`
 
-| Property   | Value                                                           |
-| ---------- | --------------------------------------------------------------- |
-| Format     | csv                                                             |
-| Purpose    | Patterns this code file realizes (realization relationship)     |
-| Required   | No                                                              |
-| Repeatable | No                                                              |
-| Example    | `@libar-docs-implements EventStoreDurability, IdempotentAppend` |
+| Property   | Value                                                          |
+| ---------- | -------------------------------------------------------------- |
+| Format     | csv                                                            |
+| Purpose    | Patterns this code file realizes (realization relationship)    |
+| Required   | No                                                             |
+| Repeatable | No                                                             |
+| Example    | `@architect-implements EventStoreDurability, IdempotentAppend` |
 
 ### `extends`
 
@@ -203,7 +203,7 @@
 | Purpose    | Base pattern this pattern extends (generalization relationship) |
 | Required   | No                                                              |
 | Repeatable | No                                                              |
-| Example    | `@libar-docs-extends ProjectionCategories`                      |
+| Example    | `@architect-extends ProjectionCategories`                       |
 
 ### `quarter`
 
@@ -213,7 +213,7 @@
 | Purpose    | Delivery quarter for timeline tracking |
 | Required   | No                                     |
 | Repeatable | No                                     |
-| Example    | `@libar-docs-quarter Q1-2026`          |
+| Example    | `@architect-quarter Q1-2026`           |
 
 ### `completed`
 
@@ -223,7 +223,7 @@
 | Purpose    | Completion date (YYYY-MM-DD format) |
 | Required   | No                                  |
 | Repeatable | No                                  |
-| Example    | `@libar-docs-completed 2026-01-08`  |
+| Example    | `@architect-completed 2026-01-08`   |
 
 ### `effort`
 
@@ -233,7 +233,7 @@
 | Purpose    | Estimated effort (4h, 2d, 1w format) |
 | Required   | No                                   |
 | Repeatable | No                                   |
-| Example    | `@libar-docs-effort 2d`              |
+| Example    | `@architect-effort 2d`               |
 
 ### `effort-actual`
 
@@ -243,7 +243,7 @@
 | Purpose    | Actual effort spent (4h, 2d, 1w format) |
 | Required   | No                                      |
 | Repeatable | No                                      |
-| Example    | `@libar-docs-effort-actual 3d`          |
+| Example    | `@architect-effort-actual 3d`           |
 
 ### `team`
 
@@ -253,7 +253,7 @@
 | Purpose    | Responsible team assignment |
 | Required   | No                          |
 | Repeatable | No                          |
-| Example    | `@libar-docs-team platform` |
+| Example    | `@architect-team platform`  |
 
 ### `workflow`
 
@@ -264,18 +264,18 @@
 | Required     | No                                                  |
 | Repeatable   | No                                                  |
 | Valid Values | implementation, planning, validation, documentation |
-| Example      | `@libar-docs-workflow implementation`               |
+| Example      | `@architect-workflow implementation`                |
 
 ### `risk`
 
-| Property     | Value                     |
-| ------------ | ------------------------- |
-| Format       | enum                      |
-| Purpose      | Risk level for planning   |
-| Required     | No                        |
-| Repeatable   | No                        |
-| Valid Values | low, medium, high         |
-| Example      | `@libar-docs-risk medium` |
+| Property     | Value                    |
+| ------------ | ------------------------ |
+| Format       | enum                     |
+| Purpose      | Risk level for planning  |
+| Required     | No                       |
+| Repeatable   | No                       |
+| Valid Values | low, medium, high        |
+| Example      | `@architect-risk medium` |
 
 ### `priority`
 
@@ -286,17 +286,17 @@
 | Required     | No                                  |
 | Repeatable   | No                                  |
 | Valid Values | critical, high, medium, low         |
-| Example      | `@libar-docs-priority high`         |
+| Example      | `@architect-priority high`          |
 
 ### `product-area`
 
-| Property   | Value                                   |
-| ---------- | --------------------------------------- |
-| Format     | value                                   |
-| Purpose    | Product area for PRD grouping           |
-| Required   | No                                      |
-| Repeatable | No                                      |
-| Example    | `@libar-docs-product-area PlatformCore` |
+| Property   | Value                                  |
+| ---------- | -------------------------------------- |
+| Format     | value                                  |
+| Purpose    | Product area for PRD grouping          |
+| Required   | No                                     |
+| Repeatable | No                                     |
+| Example    | `@architect-product-area PlatformCore` |
 
 ### `user-role`
 
@@ -306,17 +306,17 @@
 | Purpose    | Target user persona for this feature |
 | Required   | No                                   |
 | Repeatable | No                                   |
-| Example    | `@libar-docs-user-role Developer`    |
+| Example    | `@architect-user-role Developer`     |
 
 ### `business-value`
 
-| Property   | Value                                                           |
-| ---------- | --------------------------------------------------------------- |
-| Format     | value                                                           |
-| Purpose    | Business value statement (hyphenated for tag format)            |
-| Required   | No                                                              |
-| Repeatable | No                                                              |
-| Example    | `@libar-docs-business-value eliminates-event-replay-complexity` |
+| Property   | Value                                                          |
+| ---------- | -------------------------------------------------------------- |
+| Format     | value                                                          |
+| Purpose    | Business value statement (hyphenated for tag format)           |
+| Required   | No                                                             |
+| Repeatable | No                                                             |
+| Example    | `@architect-business-value eliminates-event-replay-complexity` |
 
 ### `constraint`
 
@@ -326,7 +326,7 @@
 | Purpose    | Technical constraint affecting feature implementation |
 | Required   | No                                                    |
 | Repeatable | Yes                                                   |
-| Example    | `@libar-docs-constraint requires-convex-backend`      |
+| Example    | `@architect-constraint requires-convex-backend`       |
 
 ### `adr`
 
@@ -336,7 +336,7 @@
 | Purpose    | ADR/PDR number for decision tracking |
 | Required   | No                                   |
 | Repeatable | No                                   |
-| Example    | `@libar-docs-adr 015`                |
+| Example    | `@architect-adr 015`                 |
 
 ### `adr-status`
 
@@ -348,7 +348,7 @@
 | Repeatable   | No                                         |
 | Valid Values | proposed, accepted, deprecated, superseded |
 | Default      | proposed                                   |
-| Example      | `@libar-docs-adr-status accepted`          |
+| Example      | `@architect-adr-status accepted`           |
 
 ### `adr-category`
 
@@ -358,7 +358,7 @@
 | Purpose    | ADR/PDR category (architecture, process, tooling) |
 | Required   | No                                                |
 | Repeatable | No                                                |
-| Example    | `@libar-docs-adr-category architecture`           |
+| Example    | `@architect-adr-category architecture`            |
 
 ### `adr-supersedes`
 
@@ -368,7 +368,7 @@
 | Purpose    | ADR/PDR number this decision supersedes |
 | Required   | No                                      |
 | Repeatable | No                                      |
-| Example    | `@libar-docs-adr-supersedes 012`        |
+| Example    | `@architect-adr-supersedes 012`         |
 
 ### `adr-superseded-by`
 
@@ -378,7 +378,7 @@
 | Purpose    | ADR/PDR number that supersedes this decision |
 | Required   | No                                           |
 | Repeatable | No                                           |
-| Example    | `@libar-docs-adr-superseded-by 020`          |
+| Example    | `@architect-adr-superseded-by 020`           |
 
 ### `adr-theme`
 
@@ -389,7 +389,7 @@
 | Required     | No                                                                             |
 | Repeatable   | No                                                                             |
 | Valid Values | persistence, isolation, commands, projections, coordination, taxonomy, testing |
-| Example      | `@libar-docs-adr-theme persistence`                                            |
+| Example      | `@architect-adr-theme persistence`                                             |
 
 ### `adr-layer`
 
@@ -400,7 +400,7 @@
 | Required     | No                                     |
 | Repeatable   | No                                     |
 | Valid Values | foundation, infrastructure, refinement |
-| Example      | `@libar-docs-adr-layer foundation`     |
+| Example      | `@architect-adr-layer foundation`      |
 
 ### `level`
 
@@ -412,7 +412,7 @@
 | Repeatable   | No                                              |
 | Valid Values | epic, phase, task                               |
 | Default      | phase                                           |
-| Example      | `@libar-docs-level epic`                        |
+| Example      | `@architect-level epic`                         |
 
 ### `parent`
 
@@ -422,7 +422,7 @@
 | Purpose    | Parent pattern name in hierarchy (links tasks to phases, phases to epics) |
 | Required   | No                                                                        |
 | Repeatable | No                                                                        |
-| Example    | `@libar-docs-parent AggregateArchitecture`                                |
+| Example    | `@architect-parent AggregateArchitecture`                                 |
 
 ### `title`
 
@@ -432,17 +432,17 @@
 | Purpose    | Human-readable display title (supports quoted values with spaces) |
 | Required   | No                                                                |
 | Repeatable | No                                                                |
-| Example    | `@libar-docs-title:"Process Guard Linter"`                        |
+| Example    | `@architect-title:"Process Guard Linter"`                         |
 
 ### `executable-specs`
 
-| Property   | Value                                                                   |
-| ---------- | ----------------------------------------------------------------------- |
-| Format     | csv                                                                     |
-| Purpose    | Links roadmap spec to package executable spec locations (PDR-007)       |
-| Required   | No                                                                      |
-| Repeatable | No                                                                      |
-| Example    | `@libar-docs-executable-specs platform-decider/tests/features/behavior` |
+| Property   | Value                                                                  |
+| ---------- | ---------------------------------------------------------------------- |
+| Format     | csv                                                                    |
+| Purpose    | Links roadmap spec to package executable spec locations (PDR-007)      |
+| Required   | No                                                                     |
+| Repeatable | No                                                                     |
+| Example    | `@architect-executable-specs platform-decider/tests/features/behavior` |
 
 ### `roadmap-spec`
 
@@ -452,67 +452,67 @@
 | Purpose    | Links package spec back to roadmap pattern for traceability (PDR-007) |
 | Required   | No                                                                    |
 | Repeatable | No                                                                    |
-| Example    | `@libar-docs-roadmap-spec DeciderPattern`                             |
+| Example    | `@architect-roadmap-spec DeciderPattern`                              |
 
 ### `behavior-file`
 
-| Property   | Value                                                   |
-| ---------- | ------------------------------------------------------- |
-| Format     | value                                                   |
-| Purpose    | Path to behavior test feature file for traceability     |
-| Required   | No                                                      |
-| Repeatable | No                                                      |
-| Example    | `@libar-docs-behavior-file behavior/my-pattern.feature` |
+| Property   | Value                                                  |
+| ---------- | ------------------------------------------------------ |
+| Format     | value                                                  |
+| Purpose    | Path to behavior test feature file for traceability    |
+| Required   | No                                                     |
+| Repeatable | No                                                     |
+| Example    | `@architect-behavior-file behavior/my-pattern.feature` |
 
 ### `discovered-gap`
+
+| Property   | Value                                              |
+| ---------- | -------------------------------------------------- |
+| Format     | value                                              |
+| Purpose    | Gap identified during session retrospective        |
+| Required   | No                                                 |
+| Repeatable | Yes                                                |
+| Example    | `@architect-discovered-gap missing-error-handling` |
+
+### `discovered-improvement`
+
+| Property   | Value                                                  |
+| ---------- | ------------------------------------------------------ |
+| Format     | value                                                  |
+| Purpose    | Improvement identified during session retrospective    |
+| Required   | No                                                     |
+| Repeatable | Yes                                                    |
+| Example    | `@architect-discovered-improvement cache-invalidation` |
+
+### `discovered-risk`
 
 | Property   | Value                                               |
 | ---------- | --------------------------------------------------- |
 | Format     | value                                               |
-| Purpose    | Gap identified during session retrospective         |
+| Purpose    | Risk identified during session retrospective        |
 | Required   | No                                                  |
 | Repeatable | Yes                                                 |
-| Example    | `@libar-docs-discovered-gap missing-error-handling` |
+| Example    | `@architect-discovered-risk data-loss-on-migration` |
 
-### `discovered-improvement`
+### `discovered-learning`
 
 | Property   | Value                                                   |
 | ---------- | ------------------------------------------------------- |
 | Format     | value                                                   |
-| Purpose    | Improvement identified during session retrospective     |
+| Purpose    | Learning captured during session retrospective          |
 | Required   | No                                                      |
 | Repeatable | Yes                                                     |
-| Example    | `@libar-docs-discovered-improvement cache-invalidation` |
-
-### `discovered-risk`
-
-| Property   | Value                                                |
-| ---------- | ---------------------------------------------------- |
-| Format     | value                                                |
-| Purpose    | Risk identified during session retrospective         |
-| Required   | No                                                   |
-| Repeatable | Yes                                                  |
-| Example    | `@libar-docs-discovered-risk data-loss-on-migration` |
-
-### `discovered-learning`
-
-| Property   | Value                                                    |
-| ---------- | -------------------------------------------------------- |
-| Format     | value                                                    |
-| Purpose    | Learning captured during session retrospective           |
-| Required   | No                                                       |
-| Repeatable | Yes                                                      |
-| Example    | `@libar-docs-discovered-learning convex-mutation-limits` |
+| Example    | `@architect-discovered-learning convex-mutation-limits` |
 
 ### `see-also`
 
-| Property   | Value                                                                 |
-| ---------- | --------------------------------------------------------------------- |
-| Format     | csv                                                                   |
-| Purpose    | Related patterns for cross-reference without dependency implication   |
-| Required   | No                                                                    |
-| Repeatable | No                                                                    |
-| Example    | `@libar-docs-see-also AgentAsBoundedContext, CrossContextIntegration` |
+| Property   | Value                                                                |
+| ---------- | -------------------------------------------------------------------- |
+| Format     | csv                                                                  |
+| Purpose    | Related patterns for cross-reference without dependency implication  |
+| Required   | No                                                                   |
+| Repeatable | No                                                                   |
+| Example    | `@architect-see-also AgentAsBoundedContext, CrossContextIntegration` |
 
 ### `api-ref`
 
@@ -522,17 +522,17 @@
 | Purpose    | File paths to implementation APIs (replaces 'See:' Markdown text in Rules) |
 | Required   | No                                                                         |
 | Repeatable | No                                                                         |
-| Example    | `@libar-docs-api-ref @libar-dev/platform-core/src/durability/outbox.ts`    |
+| Example    | `@architect-api-ref @libar-dev/platform-core/src/durability/outbox.ts`     |
 
 ### `extract-shapes`
 
-| Property   | Value                                                                         |
-| ---------- | ----------------------------------------------------------------------------- |
-| Format     | csv                                                                           |
-| Purpose    | TypeScript type names to extract from this file for documentation             |
-| Required   | No                                                                            |
-| Repeatable | No                                                                            |
-| Example    | `@libar-docs-extract-shapes DeciderInput, ValidationResult, ProcessViolation` |
+| Property   | Value                                                                        |
+| ---------- | ---------------------------------------------------------------------------- |
+| Format     | csv                                                                          |
+| Purpose    | TypeScript type names to extract from this file for documentation            |
+| Required   | No                                                                           |
+| Repeatable | No                                                                           |
+| Example    | `@architect-extract-shapes DeciderInput, ValidationResult, ProcessViolation` |
 
 ### `shape`
 
@@ -542,7 +542,7 @@
 | Purpose    | Marks declaration as documentable shape, optionally with group name |
 | Required   | No                                                                  |
 | Repeatable | No                                                                  |
-| Example    | `@libar-docs-shape api-types`                                       |
+| Example    | `@architect-shape api-types`                                        |
 
 ### `arch-role`
 
@@ -553,7 +553,7 @@
 | Required     | No                                                                                                                            |
 | Repeatable   | No                                                                                                                            |
 | Valid Values | bounded-context, command-handler, projection, saga, process-manager, infrastructure, repository, decider, read-model, service |
-| Example      | `@libar-docs-arch-role projection`                                                                                            |
+| Example      | `@architect-arch-role projection`                                                                                             |
 
 ### `arch-context`
 
@@ -563,7 +563,7 @@
 | Purpose    | Bounded context this component belongs to (for subgraph grouping) |
 | Required   | No                                                                |
 | Repeatable | No                                                                |
-| Example    | `@libar-docs-arch-context orders`                                 |
+| Example    | `@architect-arch-context orders`                                  |
 
 ### `arch-layer`
 
@@ -574,7 +574,7 @@
 | Required     | No                                       |
 | Repeatable   | No                                       |
 | Valid Values | domain, application, infrastructure      |
-| Example      | `@libar-docs-arch-layer application`     |
+| Example      | `@architect-arch-layer application`      |
 
 ### `include`
 
@@ -584,17 +584,17 @@
 | Purpose    | Cross-cutting document inclusion for content routing and diagram scoping |
 | Required   | No                                                                       |
 | Repeatable | No                                                                       |
-| Example    | `@libar-docs-include reference-sample,codec-system`                      |
+| Example    | `@architect-include reference-sample,codec-system`                       |
 
 ### `target`
 
-| Property   | Value                                         |
-| ---------- | --------------------------------------------- |
-| Format     | value                                         |
-| Purpose    | Target implementation path for stub files     |
-| Required   | No                                            |
-| Repeatable | No                                            |
-| Example    | `@libar-docs-target src/api/stub-resolver.ts` |
+| Property   | Value                                        |
+| ---------- | -------------------------------------------- |
+| Format     | value                                        |
+| Purpose    | Target implementation path for stub files    |
+| Required   | No                                           |
+| Repeatable | No                                           |
+| Example    | `@architect-target src/api/stub-resolver.ts` |
 
 ### `since`
 
@@ -604,7 +604,7 @@
 | Purpose    | Design session that created this pattern |
 | Required   | No                                       |
 | Repeatable | No                                       |
-| Example    | `@libar-docs-since DS-A`                 |
+| Example    | `@architect-since DS-A`                  |
 
 ### `convention`
 
@@ -615,7 +615,7 @@
 | Required     | No                                                                                                                                                                                                                                   |
 | Repeatable   | No                                                                                                                                                                                                                                   |
 | Valid Values | testing-policy, fsm-rules, cli-patterns, output-format, pattern-naming, session-workflow, config-presets, annotation-system, pipeline-architecture, publishing, doc-generation, taxonomy-rules, codec-registry, process-guard-errors |
-| Example      | `@libar-docs-convention fsm-rules, testing-policy`                                                                                                                                                                                   |
+| Example      | `@architect-convention fsm-rules, testing-policy`                                                                                                                                                                                    |
 
 ### `claude-module`
 
@@ -625,7 +625,7 @@
 | Purpose    | Module identifier for CLAUDE.md module generation (becomes filename) |
 | Required   | No                                                                   |
 | Repeatable | No                                                                   |
-| Example    | `@libar-docs-claude-module process-guard`                            |
+| Example    | `@architect-claude-module process-guard`                             |
 
 ### `claude-section`
 
@@ -636,17 +636,17 @@
 | Required     | No                                                         |
 | Repeatable   | No                                                         |
 | Valid Values | core, delivery-process, testing, infrastructure, workflow  |
-| Example      | `@libar-docs-claude-section delivery-process`              |
+| Example      | `@architect-claude-section delivery-process`               |
 
 ### `claude-tags`
 
-| Property   | Value                                                      |
-| ---------- | ---------------------------------------------------------- |
-| Format     | csv                                                        |
-| Purpose    | Variation filtering tags for modular-claude-md inclusion   |
-| Required   | No                                                         |
-| Repeatable | No                                                         |
-| Example    | `@libar-docs-claude-tags core-mandatory, delivery-process` |
+| Property   | Value                                                     |
+| ---------- | --------------------------------------------------------- |
+| Format     | csv                                                       |
+| Purpose    | Variation filtering tags for modular-claude-md inclusion  |
+| Required   | No                                                        |
+| Repeatable | No                                                        |
+| Example    | `@architect-claude-tags core-mandatory, delivery-process` |
 
 ### `sequence-orchestrator`
 
@@ -656,7 +656,7 @@
 | Purpose    | Identifies the coordinator module for sequence diagram generation |
 | Required   | No                                                                |
 | Repeatable | No                                                                |
-| Example    | `@libar-docs-sequence-orchestrator:init-cli`                      |
+| Example    | `@architect-sequence-orchestrator:init-cli`                       |
 
 ### `sequence-step`
 
@@ -666,7 +666,7 @@
 | Purpose    | Explicit execution ordering number for sequence diagram steps |
 | Required   | No                                                            |
 | Repeatable | No                                                            |
-| Example    | `@libar-docs-sequence-step:1`                                 |
+| Example    | `@architect-sequence-step:1`                                  |
 
 ### `sequence-module`
 
@@ -676,7 +676,7 @@
 | Purpose    | Maps Rule to deliverable module(s) for sequence diagram participants |
 | Required   | No                                                                   |
 | Repeatable | No                                                                   |
-| Example    | `@libar-docs-sequence-module:detect-context`                         |
+| Example    | `@architect-sequence-module:detect-context`                          |
 
 ### `sequence-error`
 
@@ -686,7 +686,7 @@
 | Purpose    | Marks scenario as error/alternative path in sequence diagram |
 | Required   | No                                                           |
 | Repeatable | No                                                           |
-| Example    | `@libar-docs-sequence-error`                                 |
+| Example    | `@architect-sequence-error`                                  |
 
 ---
 

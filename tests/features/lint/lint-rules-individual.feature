@@ -1,9 +1,9 @@
-@libar-docs
-@lint @libar-docs-pattern:LintRuleIndividualTesting
-@libar-docs-implements:LintRules
-@libar-docs-status:completed
-@libar-docs-unlock-reason:'Split-from-original'
-@libar-docs-product-area:Validation
+@architect
+@lint @architect-pattern:LintRuleIndividualTesting
+@architect-implements:LintRules
+@architect-status:completed
+@architect-unlock-reason:'Split-from-original'
+@architect-product-area:Validation
 Feature: Pattern Annotation Lint Rules - Individual Rule Validation
   Individual lint rules that check parsed directives for completeness.
   Tests presence/absence checks: pattern name, status, whenToUse, and relationships.
@@ -66,7 +66,7 @@ Feature: Pattern Annotation Lint Rules - Individual Rule Validation
       When I apply the missing-status rule
       Then a violation should be detected
       And the violation severity should be "warning"
-      And the violation message should contain "@libar-docs-status"
+      And the violation message should contain "@architect-status"
 
     @rule:missing-status @happy-path
     Scenario: Accept completed status

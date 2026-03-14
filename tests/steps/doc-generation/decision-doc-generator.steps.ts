@@ -676,8 +676,8 @@ describeFeature(feature, ({ Background, Rule }) => {
         createTestTypeScriptFile(
           'src/types.ts',
           `/**
- * @libar-docs
- * @libar-docs-extract-shapes TestType
+ * @architect
+ * @architect-extract-shapes TestType
  */
 export interface TestType {
   id: string;

@@ -95,7 +95,7 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): LintStepsCLIC
  */
 export function printHelp(): void {
   console.log(`
-lint-steps - Validate vitest-cucumber feature/step compatibility
+architect-lint-steps - Validate vitest-cucumber feature/step compatibility
 
 Detects common traps statically before tests run:
   - {string} function params inside ScenarioOutline (should use variables)
@@ -108,7 +108,7 @@ Detects common traps statically before tests run:
   - $ in step text (causes matching issues)
 
 Usage:
-  lint-steps [options]
+  architect-lint-steps [options]
 
 Options:
   --strict              Treat warnings as errors (exit 1 on warnings)
@@ -123,8 +123,8 @@ Exit Codes:
 
 Scan Scope:
   Feature files:  tests/features/**/*.feature
-                  delivery-process/specs/**/*.feature
-                  delivery-process/decisions/**/*.feature
+                  architect/specs/**/*.feature
+                  architect/decisions/**/*.feature
   Step files:     tests/steps/**/*.steps.ts
 
 Rules:
@@ -143,13 +143,13 @@ Rules:
 
 Examples:
   # Standard check
-  lint-steps
+  architect-lint-steps
 
   # Strict mode (warnings are errors)
-  lint-steps --strict
+  architect-lint-steps --strict
 
   # JSON output for CI
-  lint-steps --format json
+  architect-lint-steps --format json
   `);
 }
 
@@ -160,7 +160,7 @@ function main(): void {
   const config = parseArgs();
 
   if (config.version) {
-    printVersionAndExit('lint-steps');
+    printVersionAndExit('architect-lint-steps');
   }
 
   if (config.help) {

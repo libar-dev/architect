@@ -1,8 +1,8 @@
-@libar-docs
-@behavior @detect-changes @libar-docs-pattern:DetectChangesTesting
-@libar-docs-implements:DetectChanges
-@libar-docs-status:completed
-@libar-docs-product-area:Validation
+@architect
+@behavior @detect-changes @architect-pattern:DetectChangesTesting
+@architect-implements:DetectChanges
+@architect-status:completed
+@architect-product-area:Validation
 Feature: Deliverable Change Detection from Git Diff
   Tests for the detectDeliverableChanges function that parses git diff output.
   Verifies that status changes are correctly identified as modifications,

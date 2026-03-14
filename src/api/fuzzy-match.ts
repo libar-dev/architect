@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern FuzzyMatcherImpl
- * @libar-docs-status active
- * @libar-docs-implements DataAPIOutputShaping
- * @libar-docs-used-by ProcessAPICLIImpl
- * @libar-docs-arch-role service
- * @libar-docs-arch-context api
- * @libar-docs-arch-layer application
+ * @architect
+ * @architect-core
+ * @architect-pattern FuzzyMatcherImpl
+ * @architect-status active
+ * @architect-implements DataAPIOutputShaping
+ * @architect-used-by ProcessAPICLIImpl
+ * @architect-arch-role service
+ * @architect-arch-context api
+ * @architect-arch-layer application
  *
  * ## FuzzyMatcher — Pattern Name Fuzzy Search
  *

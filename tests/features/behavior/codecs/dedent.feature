@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:DedentHelper
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:DedentHelper
+@architect-status:completed
+@architect-product-area:Generation
 @behavior @dedent
 Feature: Dedent Helper Function Edge Cases
 

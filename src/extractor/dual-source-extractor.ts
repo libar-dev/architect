@@ -1,18 +1,18 @@
 /**
- * @libar-docs
- * @libar-docs-extractor
- * @libar-docs-pattern DualSourceExtractor
- * @libar-docs-status completed
- * @libar-docs-uses DocExtractor, GherkinExtractor, GherkinScanner
- * @libar-docs-used-by Orchestrator
- * @libar-docs-arch-role service
- * @libar-docs-arch-context extractor
- * @libar-docs-arch-layer application
+ * @architect
+ * @architect-extractor
+ * @architect-pattern DualSourceExtractor
+ * @architect-status completed
+ * @architect-uses DocExtractor, GherkinExtractor, GherkinScanner
+ * @architect-used-by Orchestrator
+ * @architect-arch-role service
+ * @architect-arch-context extractor
+ * @architect-arch-layer application
  *
  * ## DualSourceExtractor - Compose Pattern Data from Code + Features
  *
- * Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*)
- * and Gherkin feature files (@libar-docs-*), validates consistency,
+ * Extracts pattern metadata from both TypeScript code stubs (@architect-*)
+ * and Gherkin feature files (@architect-*), validates consistency,
  * and composes unified pattern data for documentation generation.
  *
  * ### When to Use
@@ -24,8 +24,8 @@
  *
  * ### Key Concepts
  *
- * - **Code Source**: @libar-docs-* tags define timeless pattern graph
- * - **Feature Source**: @libar-docs-* tags add temporal process metadata
+ * - **Code Source**: @architect-* tags define timeless pattern graph
+ * - **Feature Source**: @architect-* tags add temporal process metadata
  * - **Cross-Validation**: Pattern name + phase must match across sources
  * - **Deliverables**: Parsed from Gherkin Background tables in features
  */
@@ -81,7 +81,7 @@ export interface DualSourcePattern extends ExtractedPattern {
   readonly deliverables?: readonly Deliverable[];
   /**
    * Multiple source patterns when there's a name collision (optional)
-   * Present when multiple code files use the same @libar-docs-pattern name
+   * Present when multiple code files use the same @architect-pattern name
    */
   readonly sources?: readonly ExtractedPattern[];
 }
@@ -98,7 +98,7 @@ export interface DualSourcePattern extends ExtractedPattern {
 export function extractProcessMetadata(feature: ScannedGherkinFile): ProcessMetadata | null {
   const tags = feature.feature.tags;
 
-  // Extract normalized tags (scanner strips @ and configured prefix like @libar-docs-)
+  // Extract normalized tags (scanner strips @ and configured prefix like @architect-)
   const patternTag = tags.find((t) => t.startsWith('pattern:'));
   const phaseTag = tags.find((t) => t.startsWith('phase:'));
   const statusTag = tags.find((t) => t.startsWith('status:'));
@@ -318,7 +318,7 @@ export function extractDeliverables(feature: ScannedGherkinFile): readonly Deliv
  * Creates unified pattern objects with both code and process metadata.
  *
  * **Pattern Name Collisions:**
- * When multiple code files use the same `@libar-docs-pattern` name (e.g.,
+ * When multiple code files use the same `@architect-pattern` name (e.g.,
  * ServiceIndependence with ECST and Reservation sub-patterns), they are
  * automatically merged:
  * - Categories, dependencies, and enables are unioned across all sources

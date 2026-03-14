@@ -1,10 +1,10 @@
-@libar-docs
-@libar-docs-pattern:ConfigurationAPI
-@libar-docs-status:completed
-@libar-docs-product-area:Configuration
+@architect
+@architect-pattern:ConfigurationAPI
+@architect-status:completed
+@architect-product-area:Configuration
 @behavior @configuration
 Feature: Configuration API for Open-Sourcing
-  The createDeliveryProcess factory provides a type-safe way to configure
+  The createArchitect factory provides a type-safe way to configure
   the delivery process with custom tag prefixes and presets.
 
   **Problem:**
@@ -13,7 +13,7 @@ Feature: Configuration API for Open-Sourcing
   - Configuration should be type-safe and validated
 
   **Solution:**
-  - createDeliveryProcess() factory with preset support
+  - createArchitect() factory with preset support
   - Custom tagPrefix and fileOptInTag overrides
   - Type-safe configuration with generics
 
@@ -32,30 +32,30 @@ Feature: Configuration API for Open-Sourcing
 
     @happy-path
     Scenario: Create with no arguments uses libar-generic preset
-      When I call createDeliveryProcess without arguments
-      Then the registry tagPrefix should be "@libar-docs-"
-      And the registry fileOptInTag should be "@libar-docs"
+      When I call createArchitect without arguments
+      Then the registry tagPrefix should be "@architect-"
+      And the registry fileOptInTag should be "@architect"
       And the registry should have exactly 3 categories
 
     @happy-path
     Scenario: Create with generic preset
-      When I call createDeliveryProcess with preset "generic"
+      When I call createArchitect with preset "generic"
       Then the registry tagPrefix should be "@docs-"
       And the registry fileOptInTag should be "@docs"
       And the registry should have exactly 3 categories
 
     @happy-path
     Scenario: Create with libar-generic preset
-      When I call createDeliveryProcess with preset "libar-generic"
-      Then the registry tagPrefix should be "@libar-docs-"
-      And the registry fileOptInTag should be "@libar-docs"
+      When I call createArchitect with preset "libar-generic"
+      Then the registry tagPrefix should be "@architect-"
+      And the registry fileOptInTag should be "@architect"
       And the registry should have exactly 3 categories
 
     @happy-path
     Scenario: Create with ddd-es-cqrs preset explicitly
-      When I call createDeliveryProcess with preset "ddd-es-cqrs"
-      Then the registry tagPrefix should be "@libar-docs-"
-      And the registry fileOptInTag should be "@libar-docs"
+      When I call createArchitect with preset "ddd-es-cqrs"
+      Then the registry tagPrefix should be "@architect-"
+      And the registry fileOptInTag should be "@architect"
       And the registry should have 21 categories
 
   # ==========================================================================
@@ -70,17 +70,17 @@ Feature: Configuration API for Open-Sourcing
 
     @happy-path
     Scenario: Custom tag prefix overrides preset
-      When I call createDeliveryProcess with tagPrefix "@custom-"
+      When I call createArchitect with tagPrefix "@custom-"
       Then the registry tagPrefix should be "@custom-"
 
     @happy-path
     Scenario: Custom file opt-in tag overrides preset
-      When I call createDeliveryProcess with fileOptInTag "@my-docs"
+      When I call createArchitect with fileOptInTag "@my-docs"
       Then the registry fileOptInTag should be "@my-docs"
 
     @happy-path
     Scenario: Both prefix and opt-in tag can be customized together
-      When I call createDeliveryProcess with tagPrefix "@proj-" and fileOptInTag "@proj"
+      When I call createArchitect with tagPrefix "@proj-" and fileOptInTag "@proj"
       Then the registry tagPrefix should be "@proj-"
       And the registry fileOptInTag should be "@proj"
 
@@ -96,7 +96,7 @@ Feature: Configuration API for Open-Sourcing
 
     @happy-path
     Scenario: Generic preset excludes DDD categories
-      When I call createDeliveryProcess with preset "generic"
+      When I call createArchitect with preset "generic"
       Then the registry should NOT include category "ddd"
       And the registry should NOT include category "event-sourcing"
       And the registry should NOT include category "cqrs"
@@ -104,7 +104,7 @@ Feature: Configuration API for Open-Sourcing
 
     @happy-path
     Scenario: Libar-generic preset excludes DDD categories
-      When I call createDeliveryProcess with preset "libar-generic"
+      When I call createArchitect with preset "libar-generic"
       Then the registry should NOT include category "ddd"
       And the registry should NOT include category "event-sourcing"
       And the registry should NOT include category "cqrs"

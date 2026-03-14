@@ -4,8 +4,8 @@
  * BDD step definitions for testing the lint-process CLI
  * which validates changes against delivery process rules.
  *
- * @libar-docs
- * @libar-docs-implements CliBehaviorTesting
+ * @architect
+ * @architect-implements CliBehaviorTesting
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -57,9 +57,9 @@ function initGitRepo(dir: string): void {
 // =============================================================================
 
 function createFeatureFile(status: string): string {
-  return `@libar-docs-pattern:TestPattern
-@libar-docs-phase:1
-@libar-docs-status:${status}
+  return `@architect-pattern:TestPattern
+@architect-phase:1
+@architect-status:${status}
 Feature: Test Pattern
   A test feature for lint-process CLI testing.
 

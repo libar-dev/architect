@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:StringUtils
-@libar-docs-status:completed
-@libar-docs-product-area:CoreTypes
-@libar-docs-include:core-types
+@architect
+@architect-pattern:StringUtils
+@architect-status:completed
+@architect-product-area:CoreTypes
+@architect-include:core-types
 @utils @strings
 Feature: String Utility Functions
   String utilities provide consistent text transformations across the codebase.

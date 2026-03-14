@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern DecisionDocGenerator
- * @libar-docs-status completed
- * @libar-docs-phase 27
- * @libar-docs-arch-role service
- * @libar-docs-arch-context generator
- * @libar-docs-arch-layer application
- * @libar-docs-depends-on DecisionDocCodec,SourceMapper
+ * @architect
+ * @architect-core
+ * @architect-pattern DecisionDocGenerator
+ * @architect-status completed
+ * @architect-phase 27
+ * @architect-arch-role service
+ * @architect-arch-context generator
+ * @architect-arch-layer application
+ * @architect-depends-on DecisionDocCodec,SourceMapper
  *
  * ## Decision Doc Generator - Documentation from Decision Documents
  *
@@ -143,7 +143,7 @@ export interface DecisionDocGeneratorResult {
 /**
  * Extract claude-md-section from pattern tags
  *
- * Looks for `@libar-docs-claude-md-section:VALUE` tag and extracts the value.
+ * Looks for `@architect-claude-md-section:VALUE` tag and extracts the value.
  * Returns undefined if tag not found.
  *
  * @param pattern - Extracted pattern with directive tags
@@ -151,7 +151,7 @@ export interface DecisionDocGeneratorResult {
  *
  * @example
  * ```typescript
- * // Pattern with @libar-docs-claude-md-section:validation tag
+ * // Pattern with @architect-claude-md-section:validation tag
  * const section = extractClaudeMdSection(pattern);
  * // Returns: "validation"
  * ```
@@ -159,7 +159,7 @@ export interface DecisionDocGeneratorResult {
 export function extractClaudeMdSection(pattern: ExtractedPattern): string | undefined {
   const tags = pattern.directive.tags;
   for (const tag of tags) {
-    // Match @libar-docs-claude-md-section:VALUE or @docs-claude-md-section:VALUE
+    // Match @architect-claude-md-section:VALUE or @docs-claude-md-section:VALUE
     const match = /^@(?:libar-)?docs-claude-md-section[:\s]+(.+)$/i.exec(tag);
     if (match?.[1]) {
       return match[1].trim();

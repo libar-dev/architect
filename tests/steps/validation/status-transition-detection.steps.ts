@@ -4,7 +4,7 @@
  * BDD step definitions for testing the detectStatusTransitions function
  * that parses git diff output with docstring awareness.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -245,7 +245,7 @@ describeFeature(feature, ({ Background, Rule }) => {
           const file = 'specs/new.feature';
           state!.files = [file];
           state!.diff = `${createDiffHeader(file)}
-+@libar-docs-status:active
++@architect-status:active
 +Feature: Test`;
         });
 
@@ -278,8 +278,8 @@ describeFeature(feature, ({ Background, Rule }) => {
           const file = 'specs/existing.feature';
           state!.files = [file];
           state!.diff = `${createModifiedDiffHeader(file)}
--@libar-docs-status:roadmap
-+@libar-docs-status:active
+-@architect-status:roadmap
++@architect-status:active
  Feature: Test`;
         }
       );
@@ -312,8 +312,8 @@ describeFeature(feature, ({ Background, Rule }) => {
           const file = 'specs/unchanged.feature';
           state!.files = [file];
           state!.diff = `${createModifiedDiffHeader(file)}
--@libar-docs-status:active
-+@libar-docs-status:active
+-@architect-status:active
++@architect-status:active
  Feature: Test`;
         }
       );
@@ -504,7 +504,7 @@ index 1234567..abcdefg 100644
 --- a/${file}
 +++ b/${file}
 @@ -0,0 +5,10 @@
-+@libar-docs-status:active
++@architect-status:active
 +Feature: Test`;
           }
         );
@@ -536,7 +536,7 @@ index 1234567..abcdefg 100644
         const file = 'docs-generated/patterns.md';
         state!.files = [file];
         state!.diff = `${createDiffHeader(file)}
-+@libar-docs-status:completed`;
++@architect-status:completed`;
       });
 
       When('detecting status transitions', () => {
@@ -554,7 +554,7 @@ index 1234567..abcdefg 100644
         const file = 'docs-living/roadmap.md';
         state!.files = [file];
         state!.diff = `${createDiffHeader(file)}
-+@libar-docs-status:active`;
++@architect-status:active`;
       });
 
       When('detecting status transitions', () => {

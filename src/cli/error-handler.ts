@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 /**
- * @libar-docs
- * @libar-docs-cli
- * @libar-docs-pattern CLIErrorHandler
- * @libar-docs-status completed
- * @libar-docs-uses DocError
- * @libar-docs-used-by LintPatternsCLI, ValidatePatternsCLI, DocumentationGeneratorCLI
+ * @architect
+ * @architect-cli
+ * @architect-pattern CLIErrorHandler
+ * @architect-status completed
+ * @architect-uses DocError
+ * @architect-used-by LintPatternsCLI, ValidatePatternsCLI, DocumentationGeneratorCLI
  *
  * ## CLIErrorHandler - Unified CLI Error Handling Utilities
  *

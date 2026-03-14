@@ -1,10 +1,10 @@
 /**
- * @libar-docs
- * @libar-docs-pattern PatternHelpers
- * @libar-docs-status active
- * @libar-docs-implements DataAPIOutputShaping
- * @libar-docs-arch-context api
- * @libar-docs-arch-layer domain
+ * @architect
+ * @architect-pattern PatternHelpers
+ * @architect-status active
+ * @architect-implements DataAPIOutputShaping
+ * @architect-arch-context api
+ * @architect-arch-layer domain
  *
  * ## Pattern Helpers — Shared Lookup Utilities
  *

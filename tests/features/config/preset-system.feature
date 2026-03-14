@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:PresetSystem
-@libar-docs-status:completed
-@libar-docs-product-area:Configuration
+@architect
+@architect-pattern:PresetSystem
+@architect-status:completed
+@architect-product-area:Configuration
 @behavior @presets
 Feature: Preset System for Configuration
   Presets provide pre-configured taxonomies for different project types.
@@ -50,15 +50,15 @@ Feature: Preset System for Configuration
 
   Rule: Libar generic preset provides minimal taxonomy with libar prefix
 
-    **Invariant:** The libar-generic preset must provide exactly 3 categories with @libar-docs- prefix.
-    **Rationale:** This package uses @libar-docs- prefix to avoid collisions with consumer projects' annotations.
+    **Invariant:** The libar-generic preset must provide exactly 3 categories with @architect- prefix.
+    **Rationale:** This package uses @architect- prefix to avoid collisions with consumer projects' annotations.
     **Verified by:** Libar generic preset has correct prefix configuration, Libar generic preset has core categories only
 
     @happy-path
     Scenario: Libar generic preset has correct prefix configuration
       Given the libar-generic preset
-      Then it should have tagPrefix "@libar-docs-"
-      And it should have fileOptInTag "@libar-docs"
+      Then it should have tagPrefix "@architect-"
+      And it should have fileOptInTag "@architect"
 
     @happy-path
     Scenario: Libar generic preset has core categories only
@@ -85,8 +85,8 @@ Feature: Preset System for Configuration
     @happy-path
     Scenario: Full preset has correct prefix configuration
       Given the ddd-es-cqrs preset
-      Then it should have tagPrefix "@libar-docs-"
-      And it should have fileOptInTag "@libar-docs"
+      Then it should have tagPrefix "@architect-"
+      And it should have fileOptInTag "@architect"
 
     @happy-path
     Scenario: Full preset has all DDD categories
@@ -133,9 +133,9 @@ Feature: Preset System for Configuration
     @happy-path
     Scenario: DDD preset accessible via PRESETS map
       When I access PRESETS with key "ddd-es-cqrs"
-      Then the preset tagPrefix should be "@libar-docs-"
+      Then the preset tagPrefix should be "@architect-"
 
     @happy-path
     Scenario: Libar generic preset accessible via PRESETS map
       When I access PRESETS with key "libar-generic"
-      Then the preset tagPrefix should be "@libar-docs-"
+      Then the preset tagPrefix should be "@architect-"

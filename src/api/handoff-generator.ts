@@ -1,14 +1,14 @@
 /**
- * @libar-docs
- * @libar-docs-pattern HandoffGeneratorImpl
- * @libar-docs-status completed
- * @libar-docs-implements DataAPIDesignSessionSupport
- * @libar-docs-uses ProcessStateAPI, MasterDataset, ContextFormatterImpl
- * @libar-docs-used-by ProcessAPICLIImpl
- * @libar-docs-target src/api/handoff-generator.ts
- * @libar-docs-arch-role service
- * @libar-docs-arch-context api
- * @libar-docs-arch-layer application
+ * @architect
+ * @architect-pattern HandoffGeneratorImpl
+ * @architect-status completed
+ * @architect-implements DataAPIDesignSessionSupport
+ * @architect-uses ProcessStateAPI, MasterDataset, ContextFormatterImpl
+ * @architect-used-by ProcessAPICLIImpl
+ * @architect-target src/api/handoff-generator.ts
+ * @architect-arch-role service
+ * @architect-arch-context api
+ * @architect-arch-layer application
  *
  * ## HandoffGenerator — Session-End State Summary
  *

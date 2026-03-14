@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:DocStringMediaType
-@libar-docs-status:completed
-@libar-docs-product-area:Annotation
+@architect
+@architect-pattern:DocStringMediaType
+@architect-status:completed
+@architect-product-area:Annotation
 Feature: DocString MediaType Preservation
 
   DocString language hints (mediaType) should be preserved through the parsing

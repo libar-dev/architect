@@ -2,29 +2,29 @@
  * Define Config Step Definitions
  *
  * BDD step definitions for testing the defineConfig identity function,
- * DeliveryProcessProjectConfigSchema Zod validation, and type guard functions.
+ * ArchitectProjectConfigSchema Zod validation, and type guard functions.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import { defineConfig } from '../../../src/config/define-config.js';
 import {
-  DeliveryProcessProjectConfigSchema,
+  ArchitectProjectConfigSchema,
   GeneratorSourceOverrideSchema,
   isProjectConfig,
   isLegacyInstance,
 } from '../../../src/config/project-config-schema.js';
-import type { DeliveryProcessProjectConfig } from '../../../src/config/project-config.js';
+import type { ArchitectProjectConfig } from '../../../src/config/project-config.js';
 
 // =============================================================================
 // Types
 // =============================================================================
 
 interface DefineConfigState {
-  inputConfig: DeliveryProcessProjectConfig | null;
-  resultConfig: DeliveryProcessProjectConfig | null;
+  inputConfig: ArchitectProjectConfig | null;
+  resultConfig: ArchitectProjectConfig | null;
   validationResult: { success: boolean; error?: { issues: Array<{ message: string }> } } | null;
   overrideValidationResult: {
     success: boolean;
@@ -106,8 +106,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         state!.testObject = { preset: 'libar-generic' };
       });
 
-      When('validating against DeliveryProcessProjectConfigSchema', () => {
-        state!.validationResult = DeliveryProcessProjectConfigSchema.safeParse(state!.testObject);
+      When('validating against ArchitectProjectConfigSchema', () => {
+        state!.validationResult = ArchitectProjectConfigSchema.safeParse(state!.testObject);
       });
 
       Then('validation should succeed', () => {
@@ -145,8 +145,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         };
       });
 
-      When('validating against DeliveryProcessProjectConfigSchema', () => {
-        state!.validationResult = DeliveryProcessProjectConfigSchema.safeParse(state!.testObject);
+      When('validating against ArchitectProjectConfigSchema', () => {
+        state!.validationResult = ArchitectProjectConfigSchema.safeParse(state!.testObject);
       });
 
       Then('validation should succeed', () => {
@@ -169,8 +169,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         };
       });
 
-      When('validating against DeliveryProcessProjectConfigSchema', () => {
-        state!.validationResult = DeliveryProcessProjectConfigSchema.safeParse(state!.testObject);
+      When('validating against ArchitectProjectConfigSchema', () => {
+        state!.validationResult = ArchitectProjectConfigSchema.safeParse(state!.testObject);
       });
 
       Then('validation should fail', () => {
@@ -194,8 +194,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         };
       });
 
-      When('validating against DeliveryProcessProjectConfigSchema', () => {
-        state!.validationResult = DeliveryProcessProjectConfigSchema.safeParse(state!.testObject);
+      When('validating against ArchitectProjectConfigSchema', () => {
+        state!.validationResult = ArchitectProjectConfigSchema.safeParse(state!.testObject);
       });
 
       Then('validation should fail', () => {
@@ -244,8 +244,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         state!.testObject = { preset: 'nonexistent-preset' };
       });
 
-      When('validating against DeliveryProcessProjectConfigSchema', () => {
-        state!.validationResult = DeliveryProcessProjectConfigSchema.safeParse(state!.testObject);
+      When('validating against ArchitectProjectConfigSchema', () => {
+        state!.validationResult = ArchitectProjectConfigSchema.safeParse(state!.testObject);
       });
 
       Then('validation should fail', () => {
@@ -258,8 +258,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         state!.testObject = { preset: 'libar-generic', foobar: 'baz' };
       });
 
-      When('validating against DeliveryProcessProjectConfigSchema', () => {
-        state!.validationResult = DeliveryProcessProjectConfigSchema.safeParse(state!.testObject);
+      When('validating against ArchitectProjectConfigSchema', () => {
+        state!.validationResult = ArchitectProjectConfigSchema.safeParse(state!.testObject);
       });
 
       Then('validation should fail', () => {

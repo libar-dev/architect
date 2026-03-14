@@ -1,17 +1,17 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern AdrDocumentCodec
- * @libar-docs-status completed
- * @libar-docs-convention codec-registry
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-core
+ * @architect-pattern AdrDocumentCodec
+ * @architect-status completed
+ * @architect-convention codec-registry
+ * @architect-product-area:Generation
  *
  * ## AdrDocumentCodec
  *
  * Transforms MasterDataset into RenderableDocument for Architecture Decision Records.
- * Extracts ADRs from patterns with `@libar-docs-adr` tags.
+ * Extracts ADRs from patterns with `@architect-adr` tags.
  *
- * **Purpose:** Architecture Decision Records extracted from patterns with @libar-docs-adr tags.
+ * **Purpose:** Architecture Decision Records extracted from patterns with @architect-adr tags.
  *
  * **Output Files:** `DECISIONS.md` (ADR index), `decisions/<category-slug>.md` (category details)
  *
@@ -169,7 +169,7 @@ function buildAdrDocument(
   if (adrPatterns.length === 0) {
     sections.push(
       heading(2, 'No Architecture Decisions'),
-      paragraph('No patterns have @libar-docs-adr tags.')
+      paragraph('No patterns have @architect-adr tags.')
     );
 
     return document('Architecture Decision Records', sections, {

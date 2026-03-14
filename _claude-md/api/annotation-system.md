@@ -3,20 +3,20 @@
 Files must opt-in with a marker to be scanned:
 
 ```typescript
-/** @libar-docs */
+/** @architect */
 
 /**
- * @libar-docs-pattern PatternName
- * @libar-docs-status completed
- * @libar-docs-core
- * @libar-docs-uses OtherPattern
+ * @architect-pattern PatternName
+ * @architect-status completed
+ * @architect-core
+ * @architect-uses OtherPattern
  *
  * ## Description in markdown
  */
 export class MyClass { ... }
 ```
 
-**Note:** Both TypeScript files and Gherkin feature files require the `@libar-docs` opt-in marker. For TypeScript, use a JSDoc comment `/** @libar-docs */`. For Gherkin, add the `@libar-docs` tag at the feature level.
+**Note:** Both TypeScript files and Gherkin feature files require the `@architect` opt-in marker. For TypeScript, use a JSDoc comment `/** @architect */`. For Gherkin, add the `@architect` tag at the feature level.
 
 #### Key Tags
 
@@ -37,14 +37,14 @@ export class MyClass { ... }
 | `arch-context`     | value  | Bounded context grouping (free-form): e.g. `orders`, `inventory`, `agent` — omit for cross-cutting                                                                   |
 | `arch-layer`       | enum   | Architecture layer: `domain`, `application`, `infrastructure`                                                                                                        |
 
-**Category tags** are flags (no value): `@libar-docs-core`, `@libar-docs-api`, `@libar-docs-infra`, `@libar-docs-domain`, etc.
+**Category tags** are flags (no value): `@architect-core`, `@architect-api`, `@architect-infra`, `@architect-domain`, etc.
 
 #### CLI Commands
 
-| Command                 | Purpose                                                    |
-| ----------------------- | ---------------------------------------------------------- |
-| `generate-docs`         | Generate documentation from annotated sources              |
-| `lint-patterns`         | Validate annotation quality (missing tags, invalid status) |
-| `lint-process`          | FSM validation for delivery process                        |
-| `validate-patterns`     | Cross-source validation with DoD checks                    |
-| `generate-tag-taxonomy` | Generate tag reference from TypeScript                     |
+| Command                   | Purpose                                                    |
+| ------------------------- | ---------------------------------------------------------- |
+| `architect-generate`      | Generate documentation from annotated sources              |
+| `architect-lint-patterns` | Validate annotation quality (missing tags, invalid status) |
+| `architect-guard`         | FSM validation for delivery process                        |
+| `architect-validate`      | Cross-source validation with DoD checks                    |
+| `architect-taxonomy`      | Generate tag reference from TypeScript                     |

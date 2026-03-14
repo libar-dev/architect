@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:ArchitectureDocRefactoringTesting
-@libar-docs-status:active
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:ArchitectureDocRefactoringTesting
+@architect-status:active
+@architect-product-area:Generation
 @integration
 Feature: Architecture Doc Refactoring Coverage
 
@@ -43,7 +43,7 @@ Feature: Architecture Doc Refactoring Coverage
 
   Rule: Four-Stage Pipeline section retains annotation format examples
 
-    **Invariant:** The Four-Stage Pipeline section contains annotation format examples (e.g., @libar-docs-shape, extract-shapes) and appears before the Source Systems section in document order.
+    **Invariant:** The Four-Stage Pipeline section contains annotation format examples (e.g., @architect-shape, extract-shapes) and appears before the Source Systems section in document order.
 
     **Rationale:** Annotation format examples in the pipeline section demonstrate the source-first architecture. Their ordering establishes the conceptual flow: pipeline stages first, then the source systems that feed them.
 
@@ -52,7 +52,7 @@ Feature: Architecture Doc Refactoring Coverage
     @acceptance-criteria @happy-path
     Scenario: Annotation format examples appear before Source Systems
       When reading the "Four-Stage Pipeline" section
-      Then the section contains "@libar-docs-shape"
+      Then the section contains "@architect-shape"
       And the section also contains "extract-shapes"
       And section "Four-Stage Pipeline" appears before section "Source Systems"
 

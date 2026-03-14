@@ -1,4 +1,4 @@
-# Contributing to @libar-dev/delivery-process
+# Contributing to @libar-dev/architect
 
 We welcome contributions! This guide covers how to get started.
 
@@ -69,7 +69,7 @@ These run automatically — no manual setup needed after `pnpm install`.
 
 ## Reporting Issues
 
-- Use [GitHub Issues](https://github.com/libar-dev/delivery-process/issues)
+- Use [GitHub Issues](https://github.com/libar-dev/architect/issues)
 - For security vulnerabilities, see [SECURITY.md](SECURITY.md)
 
 ## Code of Conduct

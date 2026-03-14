@@ -1,15 +1,15 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern SequenceTransformUtils
- * @libar-docs-status active
- * @libar-docs-implements DesignReviewGeneration
- * @libar-docs-arch-role service
- * @libar-docs-arch-context generator
- * @libar-docs-arch-layer application
- * @libar-docs-include pipeline-stages
- * @libar-docs-uses MasterDataset, ExtractedPattern
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-core
+ * @architect-pattern SequenceTransformUtils
+ * @architect-status active
+ * @architect-implements DesignReviewGeneration
+ * @architect-arch-role service
+ * @architect-arch-context generator
+ * @architect-arch-layer application
+ * @architect-include pipeline-stages
+ * @architect-uses MasterDataset, ExtractedPattern
+ * @architect-product-area:Generation
  *
  * ## SequenceTransformUtils - Sequence Index Builder
  *
@@ -40,7 +40,7 @@ interface RuleSequenceTags {
 /**
  * Parse sequence-step and sequence-module from a rule's tag array.
  *
- * Tags arrive normalized (without @libar-docs- prefix) from the scanner.
+ * Tags arrive normalized (without @architect- prefix) from the scanner.
  */
 function parseRuleSequenceTags(tags: readonly string[]): RuleSequenceTags {
   let step: number | undefined;
@@ -210,7 +210,7 @@ export function buildSequenceIndexEntryWithValidation(
 
     if (modules.length === 0) {
       issues.push(
-        `Rule "${rule.name}" has @libar-docs-sequence-step:${String(step)} but no @libar-docs-sequence-module values`
+        `Rule "${rule.name}" has @architect-sequence-step:${String(step)} but no @architect-sequence-module values`
       );
       continue;
     }
@@ -232,7 +232,7 @@ export function buildSequenceIndexEntryWithValidation(
   for (const [stepNumber, ruleNames] of stepNumbers.entries()) {
     if (ruleNames.length > 1) {
       issues.push(
-        `Duplicate @libar-docs-sequence-step:${String(stepNumber)} used by rules: ${ruleNames.join(', ')}`
+        `Duplicate @architect-sequence-step:${String(stepNumber)} used by rules: ${ruleNames.join(', ')}`
       );
     }
   }

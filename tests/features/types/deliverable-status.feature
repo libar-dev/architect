@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:DeliverableStatusTaxonomyTesting
-@libar-docs-status:active
-@libar-docs-product-area:CoreTypes
-@libar-docs-include:core-types
+@architect
+@architect-pattern:DeliverableStatusTaxonomyTesting
+@architect-status:active
+@architect-product-area:CoreTypes
+@architect-include:core-types
 @taxonomy @deliverable
 Feature: Deliverable Status Taxonomy
   The deliverable status module defines the 6 canonical status values for

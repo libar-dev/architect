@@ -106,7 +106,7 @@ export function generateTagTaxonomy(registry: TagRegistry, config?: TagTaxonomyC
   // Format Options
   sections.push('## Format Options');
   sections.push('');
-  sections.push('Used in template placeholders: `{{@libar-docs-core format=X}}`');
+  sections.push('Used in template placeholders: `{{@architect-core format=X}}`');
   sections.push('');
   for (const fmt of registry.formatOptions) {
     sections.push(`- \`${fmt}\``);

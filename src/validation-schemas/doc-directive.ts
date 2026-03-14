@@ -1,19 +1,19 @@
 /**
- * @libar-docs
- * @libar-docs-validation
- * @libar-docs-pattern DocDirectiveSchema
- * @libar-docs-status completed
- * @libar-docs-implements MvpWorkflowImplementation
- * @libar-docs-used-by DocExtractor, ExtractedPatternSchema
+ * @architect
+ * @architect-validation
+ * @architect-pattern DocDirectiveSchema
+ * @architect-status completed
+ * @architect-implements MvpWorkflowImplementation
+ * @architect-used-by DocExtractor, ExtractedPatternSchema
  *
  * ## DocDirectiveSchema - Parsed JSDoc Directive Validation
  *
- * Zod schemas for validating parsed @libar-docs-* directives from JSDoc comments.
+ * Zod schemas for validating parsed @architect-* directives from JSDoc comments.
  * Enforces tag format, position validity, and metadata extraction.
  *
  * ### When to Use
  *
- * - Use when parsing JSDoc comments for @libar-docs-* tags
+ * - Use when parsing JSDoc comments for @architect-* tags
  * - Use when validating directive structure at boundaries
  */
 
@@ -47,9 +47,9 @@ export type Position = z.infer<typeof PositionSchema>;
 
 /**
  * Creates a DirectiveTag schema for a given tag prefix.
- * This factory enables projects to use custom prefixes (e.g., "@docs-" instead of "@libar-docs-").
+ * This factory enables projects to use custom prefixes (e.g., "@docs-" instead of "@architect-").
  *
- * @param tagPrefix - The tag prefix to validate against (e.g., "@docs-" or "@libar-docs-")
+ * @param tagPrefix - The tag prefix to validate against (e.g., "@docs-" or "@architect-")
  * @returns Zod schema that validates and transforms tags with the given prefix
  *
  * @example
@@ -59,8 +59,8 @@ export type Position = z.infer<typeof PositionSchema>;
  * customSchema.parse("@docs-pattern"); // Valid
  *
  * // Default prefix
- * const defaultSchema = createDirectiveTagSchema("@libar-docs-");
- * defaultSchema.parse("@libar-docs-status"); // Valid
+ * const defaultSchema = createDirectiveTagSchema("@architect-");
+ * defaultSchema.parse("@architect-status"); // Valid
  * ```
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -76,11 +76,11 @@ export function createDirectiveTagSchema(tagPrefix: string) {
 
 /**
  * Directive tag validation (default prefix)
- * Must start with @libar-docs-
+ * Must start with @architect-
  *
  * For custom prefixes, use createDirectiveTagSchema().
  */
-const DirectiveTagSchema = createDirectiveTagSchema('@libar-docs-');
+const DirectiveTagSchema = createDirectiveTagSchema('@architect-');
 
 /**
  * Default status values for pattern implementation state
@@ -144,7 +144,7 @@ export function createPatternStatusSchema(registry: TagRegistry): z.ZodType<stri
 }
 
 /**
- * Parsed @libar-docs-* directive from JSDoc comment
+ * Parsed @architect-* directive from JSDoc comment
  *
  * Schema enforces:
  * - At least one tag
@@ -154,14 +154,14 @@ export function createPatternStatusSchema(registry: TagRegistry): z.ZodType<stri
  * Description defaults to empty string to allow tag-only directives:
  * ```typescript
  * /**
- *  * @libar-docs-core
+ *  * @architect-core
  *  *\/
  * export function myFunction() {}
  * ```
  */
 export const DocDirectiveSchema = z
   .object({
-    /** Tags found in comment (e.g., ['@libar-docs-core', '@libar-docs-types']). Empty allowed for Gherkin-sourced patterns. */
+    /** Tags found in comment (e.g., ['@architect-core', '@architect-types']). Empty allowed for Gherkin-sourced patterns. */
     tags: z.array(DirectiveTagSchema).readonly(),
 
     /** Full description text from JSDoc (defaults to empty for tag-only directives) */
@@ -173,114 +173,114 @@ export const DocDirectiveSchema = z
     /** Position in source file */
     position: PositionSchema,
 
-    /** Explicit pattern name from @libar-docs-pattern tag */
+    /** Explicit pattern name from @architect-pattern tag */
     patternName: z.string().optional(),
 
-    /** Implementation status from @libar-docs-status tag */
+    /** Implementation status from @architect-status tag */
     status: PatternStatusSchema.optional(),
 
-    /** Whether this is a core/essential pattern from @libar-docs-core tag */
+    /** Whether this is a core/essential pattern from @architect-core tag */
     isCore: z.boolean().optional(),
 
-    /** Use cases this pattern applies to from @libar-docs-usecase tags */
+    /** Use cases this pattern applies to from @architect-usecase tags */
     useCases: z.array(z.string()).readonly().optional(),
 
     /** "When to use" bullet points extracted from description (### When to Use or **When to use:**) */
     whenToUse: z.array(z.string()).readonly().optional(),
 
-    /** Patterns this pattern uses (from @libar-docs-uses tag) */
+    /** Patterns this pattern uses (from @architect-uses tag) */
     uses: z.array(z.string()).readonly().optional(),
 
-    /** Patterns that use this pattern (from @libar-docs-used-by tag) */
+    /** Patterns that use this pattern (from @architect-used-by tag) */
     usedBy: z.array(z.string()).readonly().optional(),
 
-    /** Roadmap phase number (from @libar-docs-phase tag) */
+    /** Roadmap phase number (from @architect-phase tag) */
     phase: z.number().int().positive().optional(),
 
-    /** Path to pattern brief markdown file (from @libar-docs-brief tag) */
+    /** Path to pattern brief markdown file (from @architect-brief tag) */
     brief: z.string().optional(),
 
-    /** Patterns this pattern depends on for roadmap planning (from @libar-docs-depends-on tag) */
+    /** Patterns this pattern depends on for roadmap planning (from @architect-depends-on tag) */
     dependsOn: z.array(z.string()).readonly().optional(),
 
-    /** Patterns this pattern enables/unlocks (from @libar-docs-enables tag) */
+    /** Patterns this pattern enables/unlocks (from @architect-enables tag) */
     enables: z.array(z.string()).readonly().optional(),
 
-    /** Patterns this code realizes (from @libar-docs-implements tag) */
+    /** Patterns this code realizes (from @architect-implements tag) */
     implements: z.array(z.string()).readonly().optional(),
 
-    /** Base pattern this extends (from @libar-docs-extends tag) */
+    /** Base pattern this extends (from @architect-extends tag) */
     extends: z.string().optional(),
 
-    /** Related patterns for cross-reference without dependency (from @libar-docs-see-also tag) */
+    /** Related patterns for cross-reference without dependency (from @architect-see-also tag) */
     seeAlso: z.array(z.string()).readonly().optional(),
 
-    /** File paths to implementation APIs (from @libar-docs-api-ref tag) */
+    /** File paths to implementation APIs (from @architect-api-ref tag) */
     apiRef: z.array(z.string()).readonly().optional(),
 
-    /** Delivery quarter for timeline workflow (from @libar-docs-quarter tag) */
+    /** Delivery quarter for timeline workflow (from @architect-quarter tag) */
     quarter: z.string().optional(),
 
-    /** Completion date for timeline workflow (from @libar-docs-completed tag) */
+    /** Completion date for timeline workflow (from @architect-completed tag) */
     completed: z.string().optional(),
 
-    /** Effort estimate for timeline workflow (from @libar-docs-effort tag) */
+    /** Effort estimate for timeline workflow (from @architect-effort tag) */
     effort: z.string().optional(),
 
-    /** Responsible team for process workflow (from @libar-docs-team tag) */
+    /** Responsible team for process workflow (from @architect-team tag) */
     team: z.string().optional(),
 
-    /** Workflow/discipline for process workflow (from @libar-docs-workflow tag) */
+    /** Workflow/discipline for process workflow (from @architect-workflow tag) */
     workflow: z.string().optional(),
 
-    /** Risk level for process workflow (from @libar-docs-risk tag) */
+    /** Risk level for process workflow (from @architect-risk tag) */
     risk: z.string().optional(),
 
-    /** Priority level for process workflow (from @libar-docs-priority tag) */
+    /** Priority level for process workflow (from @architect-priority tag) */
     priority: z.string().optional(),
 
-    // Design session stub metadata (from @libar-docs-target, @libar-docs-since tags)
+    // Design session stub metadata (from @architect-target, @architect-since tags)
 
-    /** Target implementation path for stub files (from @libar-docs-target tag) */
+    /** Target implementation path for stub files (from @architect-target tag) */
     target: z.string().optional(),
 
-    /** Design session that created this pattern (from @libar-docs-since tag) */
+    /** Design session that created this pattern (from @architect-since tag) */
     since: z.string().optional(),
 
-    // Architecture diagram generation fields (from @libar-docs-arch-* tags)
+    // Architecture diagram generation fields (from @architect-arch-* tags)
 
-    /** Architectural role for diagram generation (from @libar-docs-arch-role tag) */
+    /** Architectural role for diagram generation (from @architect-arch-role tag) */
     archRole: z.string().optional(),
 
-    /** Bounded context this component belongs to (from @libar-docs-arch-context tag) */
+    /** Bounded context this component belongs to (from @architect-arch-context tag) */
     archContext: z.string().optional(),
 
-    /** Architectural layer (from @libar-docs-arch-layer tag) */
+    /** Architectural layer (from @architect-arch-layer tag) */
     archLayer: z.string().optional(),
 
-    /** Cross-cutting document inclusion for content routing and diagram scoping (from @libar-docs-include CSV tag) */
+    /** Cross-cutting document inclusion for content routing and diagram scoping (from @architect-include CSV tag) */
     include: z.array(z.string().min(1)).readonly().optional(),
 
-    /** Product area for PRD grouping (from @libar-docs-product-area tag) */
+    /** Product area for PRD grouping (from @architect-product-area tag) */
     productArea: z.string().optional(),
 
     // Shape extraction fields
 
-    /** Shape names to extract from this file (from @libar-docs-extract-shapes tag) */
+    /** Shape names to extract from this file (from @architect-extract-shapes tag) */
     extractShapes: z.array(z.string()).readonly().optional(),
 
-    /** Convention domains for reference document generation (from @libar-docs-convention CSV tag) */
+    /** Convention domains for reference document generation (from @architect-convention CSV tag) */
     convention: z.array(z.string()).readonly().optional(),
 
-    // Claude module generation fields (from @libar-docs-claude-* tags)
+    // Claude module generation fields (from @architect-claude-* tags)
 
-    /** Module identifier for CLAUDE.md generation (from @libar-docs-claude-module tag) */
+    /** Module identifier for CLAUDE.md generation (from @architect-claude-module tag) */
     claudeModule: z.string().optional(),
 
-    /** Target section directory in _claude-md/ (from @libar-docs-claude-section tag) */
+    /** Target section directory in _claude-md/ (from @architect-claude-section tag) */
     claudeSection: z.enum(CLAUDE_SECTION_VALUES).optional(),
 
-    /** Variation filtering tags for modular-claude-md (from @libar-docs-claude-tags CSV tag) */
+    /** Variation filtering tags for modular-claude-md (from @architect-claude-tags CSV tag) */
     claudeTags: z.array(z.string()).readonly().optional(),
   })
   .strict();

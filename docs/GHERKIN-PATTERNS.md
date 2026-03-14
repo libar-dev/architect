@@ -13,9 +13,9 @@ Practical patterns for writing Gherkin specs that work with `delivery-process` g
 Roadmap specs define planned work with Problem/Solution descriptions and a Background deliverables table.
 
 ```gherkin
-@libar-docs-pattern:ProcessGuardLinter
-@libar-docs-status:roadmap
-@libar-docs-phase:99
+@architect-pattern:ProcessGuardLinter
+@architect-status:roadmap
+@architect-phase:99
 Feature: Process Guard Linter
 
   **Problem:**
@@ -39,8 +39,8 @@ Feature: Process Guard Linter
 
 **Key elements:**
 
-- `@libar-docs-pattern:Name` - Unique identifier (required)
-- `@libar-docs-status:roadmap` - FSM state
+- `@architect-pattern:Name` - Unique identifier (required)
+- `@architect-status:roadmap` - FSM state
 - `**Problem:**` / `**Solution:**` - Extracted by generators
 - Background deliverables table - Tracks implementation progress
 
@@ -104,13 +104,13 @@ Test features focus on behavior verification with section dividers for organizat
 
 ```gherkin
 @behavior @scanner-core
-@libar-docs-pattern:ScannerCore
+@architect-pattern:ScannerCore
 Feature: Scanner Core Integration
   The scanPatterns function orchestrates file discovery and AST parsing.
 
   **Problem:**
   - Need to scan codebases for documentation directives efficiently
-  - Files without @libar-docs opt-in should be skipped
+  - Files without @architect opt-in should be skipped
 
   **Solution:**
   - Two-phase filtering: quick regex check, then file opt-in validation
@@ -127,9 +127,9 @@ Feature: Scanner Core Integration
   Scenario: Scan files and extract directives
     Given a file "src/auth.ts" with content:
       """
-      /** @libar-docs */
+      /** @architect */
 
-      /** @libar-docs-core */
+      /** @architect-core */
       export function authenticate() {}
       """
     When scanning with pattern "src/**/*.ts"
@@ -188,16 +188,16 @@ Use `"""typescript` for code blocks. Essential when content contains pipes or sp
 Scenario: Extract directive from TypeScript
   Given a file with content:
     """typescript
-    /** @libar-docs */
+    /** @architect */
 
     /**
-     * @libar-docs-core
+     * @architect-core
      * Authentication utilities
      */
     export function authenticate() {}
     """
   When scanning the file
-  Then directive should have tag "@libar-docs-core"
+  Then directive should have tag "@architect-core"
 ```
 
 ---
@@ -237,7 +237,7 @@ Combine scenario-level tags with feature-level tags for filtering:
 
 ```gherkin
 @behavior @scanner-core
-@libar-docs-pattern:ScannerCore
+@architect-pattern:ScannerCore
 Feature: Scanner Core Integration
 ```
 
@@ -330,29 +330,29 @@ Given the following code:
 
 **Tag values cannot contain spaces.** Use hyphens:
 
-| Invalid                          | Valid                           |
-| -------------------------------- | ------------------------------- |
-| `@unlock-reason:Fix for issue`   | `@unlock-reason:Fix-for-issue`  |
-| `@libar-docs-pattern:My Pattern` | `@libar-docs-pattern:MyPattern` |
+| Invalid                         | Valid                          |
+| ------------------------------- | ------------------------------ |
+| `@unlock-reason:Fix for issue`  | `@unlock-reason:Fix-for-issue` |
+| `@architect-pattern:My Pattern` | `@architect-pattern:MyPattern` |
 
 For values with spaces, use the `quoted-value` format where supported:
 
 ```gherkin
-@libar-docs-usecase "When handling command failures"
+@architect-usecase "When handling command failures"
 ```
 
 ---
 
 ## Quick Reference
 
-| Element              | Use For                                | Example Location                                         |
-| -------------------- | -------------------------------------- | -------------------------------------------------------- |
-| Background DataTable | Deliverables, shared reference data    | `delivery-process/specs/process-guard-linter.feature`    |
-| Rule:                | Group scenarios by business constraint | `tests/features/validation/*.feature`                    |
-| Scenario Outline     | Same pattern with variations           | `tests/features/validation/fsm-validator.feature`        |
-| DocString `"""`      | Code examples, content with pipes      | `tests/features/behavior/scanner-*.feature`              |
-| Section comments `#` | Organize large feature files           | Most test features                                       |
-| `lint-steps`         | Catch vitest-cucumber traps statically | [VALIDATION.md — lint-steps](./VALIDATION.md#lint-steps) |
+| Element                | Use For                                | Example Location                                         |
+| ---------------------- | -------------------------------------- | -------------------------------------------------------- |
+| Background DataTable   | Deliverables, shared reference data    | `architect/specs/process-guard-linter.feature`           |
+| Rule:                  | Group scenarios by business constraint | `tests/features/validation/*.feature`                    |
+| Scenario Outline       | Same pattern with variations           | `tests/features/validation/fsm-validator.feature`        |
+| DocString `"""`        | Code examples, content with pipes      | `tests/features/behavior/scanner-*.feature`              |
+| Section comments `#`   | Organize large feature files           | Most test features                                       |
+| `architect-lint-steps` | Catch vitest-cucumber traps statically | [VALIDATION.md — lint-steps](./VALIDATION.md#lint-steps) |
 
 ---
 

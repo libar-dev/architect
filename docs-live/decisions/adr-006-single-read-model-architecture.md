@@ -12,7 +12,7 @@
 | Category | architecture |
 
 **Context:**
-The delivery-process package applies event sourcing to itself: git is
+The Architect package applies event sourcing to itself: git is
 the event store, annotated source files are authoritative state, generated
 documentation is a projection. The MasterDataset is the read model —
 produced by a single-pass O(n) transformer with pre-computed views

@@ -1,8 +1,8 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern APIModule
- * @libar-docs-status active
+ * @architect
+ * @architect-core
+ * @architect-pattern APIModule
+ * @architect-status active
  *
  * ## API Module - Programmatic Process State Interface
  *
@@ -22,7 +22,7 @@
  *   createProcessStateAPI,
  *   type ProcessStateAPI,
  *   type QueryResult,
- * } from "@libar-dev/delivery-process/api";
+ * } from "@libar-dev/architect/api";
  *
  * const api = createProcessStateAPI(masterDataset);
  *

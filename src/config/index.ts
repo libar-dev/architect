@@ -1,13 +1,13 @@
 /**
  * Configuration Module
  *
- * Unified project configuration for delivery-process. Use `defineConfig()` in
- * `delivery-process.config.ts` to centralize taxonomy, sources, output, and
+ * Unified project configuration for Architect. Use `defineConfig()` in
+ * `architect.config.ts` to centralize taxonomy, sources, output, and
  * generator overrides.
  *
  * @example
  * ```typescript
- * import { defineConfig } from '@libar-dev/delivery-process/config';
+ * import { defineConfig } from '@libar-dev/architect/config';
  *
  * // Unified config file
  * export default defineConfig({
@@ -19,7 +19,7 @@
  *
  * @example
  * ```typescript
- * import { loadProjectConfig } from '@libar-dev/delivery-process/config';
+ * import { loadProjectConfig } from '@libar-dev/architect/config';
  *
  * // Programmatic loading
  * const result = await loadProjectConfig(process.cwd());
@@ -30,10 +30,10 @@
  */
 
 // Factory function
-export { createDeliveryProcess, type CreateDeliveryProcessOptions } from './factory.js';
+export { createArchitect, type CreateArchitectOptions } from './factory.js';
 
 // Types
-export type { DeliveryProcessConfig, DeliveryProcessInstance, RegexBuilders } from './types.js';
+export type { ArchitectConfig, ArchitectInstance, RegexBuilders } from './types.js';
 
 // Regex builders (for advanced use cases)
 export { createRegexBuilders } from './regex-builders.js';
@@ -75,7 +75,7 @@ export {
 // Unified project configuration
 export { defineConfig } from './define-config.js';
 export type {
-  DeliveryProcessProjectConfig,
+  ArchitectProjectConfig,
   SourcesConfig,
   OutputConfig,
   GeneratorSourceOverride,
@@ -84,7 +84,7 @@ export type {
   ResolvedSourcesConfig,
 } from './project-config.js';
 export {
-  DeliveryProcessProjectConfigSchema,
+  ArchitectProjectConfigSchema,
   SourcesConfigSchema,
   OutputConfigSchema,
   GeneratorSourceOverrideSchema,

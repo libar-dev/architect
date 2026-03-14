@@ -1,17 +1,20 @@
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright (c) 2026 EBIZ d.o.o. All rights reserved.
+
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern MCPServerImpl
- * @libar-docs-status active
- * @libar-docs-arch-role service
- * @libar-docs-arch-context api
- * @libar-docs-arch-layer application
- * @libar-docs-uses MCPPipelineSession, MCPToolRegistry, MCPFileWatcher
- * @libar-docs-implements MCPServerIntegration
+ * @architect
+ * @architect-core
+ * @architect-pattern MCPServerImpl
+ * @architect-status active
+ * @architect-arch-role service
+ * @architect-arch-context api
+ * @architect-arch-layer application
+ * @architect-uses MCPPipelineSession, MCPToolRegistry, MCPFileWatcher
+ * @architect-implements MCPServerIntegration
  *
  * ## MCP Server Entry Point
  *
- * Main entry point for the delivery-process MCP server.
+ * Main entry point for the Architect MCP server.
  * Initializes the pipeline, registers tools, and connects via stdio transport.
  *
  * Stdout isolation (console.log → stderr redirect) is handled by the CLI
@@ -58,7 +61,7 @@ export type ParseCliResult =
 // =============================================================================
 
 function log(message: string): void {
-  console.error(`[dp-mcp] ${message}`);
+  console.error(`[architect-mcp] ${message}`);
 }
 
 const DEFAULT_MCP_SERVER_VERSION = getPackageVersion();
@@ -77,10 +80,7 @@ export async function startMcpServer(options: McpServerOptions = {}): Promise<vo
 
   // Create MCP server
   const version = options.version ?? DEFAULT_MCP_SERVER_VERSION;
-  const server = new McpServer(
-    { name: 'delivery-process', version },
-    { capabilities: { logging: {} } }
-  );
+  const server = new McpServer({ name: 'architect', version }, { capabilities: { logging: {} } });
 
   // Register all tools
   registerAllTools(server, sessionManager);
@@ -183,7 +183,7 @@ export function parseCliArgs(argv: string[], defaults: McpServerOptions = {}): P
       case '-v': {
         return {
           type: 'version',
-          text: 'dp-mcp-server v' + (defaults.version ?? DEFAULT_MCP_SERVER_VERSION),
+          text: 'architect-mcp v' + (defaults.version ?? DEFAULT_MCP_SERVER_VERSION),
         };
       }
       case '--help':
@@ -210,9 +210,9 @@ export function parseCliArgs(argv: string[], defaults: McpServerOptions = {}): P
 }
 
 const HELP_TEXT = `
-dp-mcp-server — MCP server for delivery-process
+architect-mcp — Architect MCP server
 
-Usage: dp-mcp-server [options]
+Usage: architect-mcp [options]
 
 Options:
   -i, --input <glob>       TypeScript source globs (repeatable)
@@ -222,14 +222,14 @@ Options:
   -h, --help               Show this help
   -v, --version            Show version
 
-The server auto-detects delivery-process.config.ts if no explicit
+The server auto-detects architect.config.ts if no explicit
 globs are provided. Configure in Claude Code via .mcp.json:
 
   {
     "mcpServers": {
-      "delivery-process": {
+      "architect": {
         "command": "npx",
-        "args": ["dp-mcp-server"],
+        "args": ["architect-mcp"],
         "cwd": "/path/to/project"
       }
     }

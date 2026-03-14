@@ -3,8 +3,8 @@
  *
  * Shared state and mock infrastructure for MCP server tests.
  *
- * @libar-docs
- * @libar-docs-uses MCPPipelineSession, ProcessStateAPI, TagRegistry
+ * @architect
+ * @architect-uses MCPPipelineSession, ProcessStateAPI, TagRegistry
  */
 
 import type { PipelineSession, ParsedOptions } from '../../../src/mcp/index.js';
@@ -85,7 +85,7 @@ export function createTestPipelineSession(): PipelineSession {
 
 /**
  * Creates a PipelineSession with specific patterns for filter testing.
- * Returns patterns with known status+phase combinations for dp_list filter verification.
+ * Returns patterns with known status+phase combinations for architect_list filter verification.
  */
 export function createFilterTestSession(): PipelineSession {
   const patterns = [
@@ -110,7 +110,7 @@ export function createFilterTestSession(): PipelineSession {
 
 /**
  * Creates a PipelineSession with a pattern that has deliverables and dependencies.
- * Used for dp_pattern enrichment tests.
+ * Used for architect_pattern enrichment tests.
  */
 export function createRichPatternSession(): PipelineSession {
   const dep = createTestPattern({

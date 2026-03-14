@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-lint
- * @libar-docs-pattern LintModule
- * @libar-docs-status completed
- * @libar-docs-uses LintRules, LintEngine
+ * @architect
+ * @architect-lint
+ * @architect-pattern LintModule
+ * @architect-status completed
+ * @architect-uses LintRules, LintEngine
  *
  * ## LintModule - Annotation Quality Checking
  *

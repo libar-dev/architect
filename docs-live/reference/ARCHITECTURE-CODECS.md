@@ -240,7 +240,7 @@ const doc = codec.decode(dataset);
 
 A single codec factory that creates reference document codecs from
 configuration objects. Convention content is sourced from
-decision records tagged with @libar-docs-convention.
+decision records tagged with @architect-convention.
 
 **Purpose:** Scoped reference documentation assembling four content layers (conventions, diagrams, shapes, behaviors) into a single document.
 
@@ -248,7 +248,7 @@ decision records tagged with @libar-docs-convention.
 
 ### 4-Layer Composition (in order)
 
-1. **Convention content** -- Extracted from `@libar-docs-convention`-tagged patterns (rules, invariants, tables)
+1. **Convention content** -- Extracted from `@architect-convention`-tagged patterns (rules, invariants, tables)
 2. **Scoped diagrams** -- Mermaid diagrams filtered by `archContext`, `archLayer`, `patterns`, or `include` tags
 3. **TypeScript shapes** -- API surfaces from `shapeSources` globs or `shapeSelectors` (declaration-level filtering)
 4. **Behavior content** -- Gherkin-sourced patterns from `behaviorCategories`
@@ -463,7 +463,7 @@ and design question templates.
 **Purpose:** Auto-generate design review documents from sequence annotations
 on Gherkin specs. Diagrams stay synchronized with spec changes.
 
-**Output Files:** `delivery-process/design-reviews/{pattern-name}.md`
+**Output Files:** `architect/design-reviews/{pattern-name}.md`
 
 ### Factory Pattern
 
@@ -640,9 +640,9 @@ const doc = ArchitectureDocumentCodec.decode(dataset);
 ## AdrDocumentCodec
 
 Transforms MasterDataset into RenderableDocument for Architecture Decision Records.
-Extracts ADRs from patterns with `@libar-docs-adr` tags.
+Extracts ADRs from patterns with `@architect-adr` tags.
 
-**Purpose:** Architecture Decision Records extracted from patterns with @libar-docs-adr tags.
+**Purpose:** Architecture Decision Records extracted from patterns with @architect-adr tags.
 
 **Output Files:** `DECISIONS.md` (ADR index), `decisions/<category-slug>.md` (category details)
 

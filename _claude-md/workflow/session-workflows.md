@@ -43,7 +43,7 @@
 
 **Invariant:** A design session makes architectural decisions and creates code stubs with interfaces. It must not produce implementation code. Context gathering via the Process Data API must precede any explore agent usage.
 
-**Rationale:** Design sessions resolve ambiguity before implementation begins. Code stubs in delivery-process/stubs/ live outside src/ to avoid TypeScript compilation and ESLint issues, making them zero-risk artifacts.
+**Rationale:** Design sessions resolve ambiguity before implementation begins. Code stubs in architect/stubs/ live outside src/ to avoid TypeScript compilation and ESLint issues, making them zero-risk artifacts.
 
 | Use Design Session         | Skip Design Session |
 | -------------------------- | ------------------- |
@@ -78,11 +78,11 @@
 | session-scope (warning)   | Modified file outside session scope            | Add to scope OR use --ignore-session        |
 | session-excluded          | Modified excluded pattern during session       | Remove from exclusion OR override           |
 
-| Situation                    | Solution              | Example                                |
-| ---------------------------- | --------------------- | -------------------------------------- |
-| Fix bug in completed spec    | Add unlock reason tag | libar-docs-unlock-reason:Fix-typo      |
-| Modify outside session scope | Use ignore flag       | lint-process --staged --ignore-session |
-| CI treats warnings as errors | Use strict flag       | lint-process --all --strict            |
+| Situation                    | Solution              | Example                                   |
+| ---------------------------- | --------------------- | ----------------------------------------- |
+| Fix bug in completed spec    | Add unlock reason tag | libar-docs-unlock-reason:Fix-typo         |
+| Modify outside session scope | Use ignore flag       | architect-guard --staged --ignore-session |
+| CI treats warnings as errors | Use strict flag       | architect-guard --all --strict            |
 
 #### Handoff captures session-end state for continuity
 
@@ -92,6 +92,6 @@
 
 #### ClaudeModuleGeneration is the generation mechanism
 
-**Invariant:** Phase 39 depends on ClaudeModuleGeneration (Phase 25). Adding `@libar-docs-claude-module` and `@libar-docs-claude-section:workflow` tags to this spec will cause ClaudeModuleGeneration to produce `_claude-md/workflow/` output files. The hand-written `_claude-md/workflow/` files are deleted after successful verified generation.
+**Invariant:** Phase 39 depends on ClaudeModuleGeneration (Phase 25). Adding `@architect-claude-module` and `@architect-claude-section:workflow` tags to this spec will cause ClaudeModuleGeneration to produce `_claude-md/workflow/` output files. The hand-written `_claude-md/workflow/` files are deleted after successful verified generation.
 
-**Rationale:** The annotation work (Rule blocks in this spec) is immediately useful — queryable via `pnpm process:query -- rules`. Generation deliverables cannot complete until Phase 25 ships the ClaudeModuleCodec. This sequencing is intentional: the annotation investment has standalone value regardless of whether the codec exists yet.
+**Rationale:** The annotation work (Rule blocks in this spec) is immediately useful — queryable via `pnpm architect:query -- rules`. Generation deliverables cannot complete until Phase 25 ships the ClaudeModuleCodec. This sequencing is intentional: the annotation investment has standalone value regardless of whether the codec exists yet.

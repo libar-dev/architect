@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:GenerateDocsCli
-@libar-docs-status:completed
-@libar-docs-product-area:DataAPI
-@libar-docs-implements:CliBehaviorTesting
+@architect
+@architect-pattern:GenerateDocsCli
+@architect-status:completed
+@architect-product-area:DataAPI
+@architect-implements:CliBehaviorTesting
 @cli @generate-docs
 Feature: generate-docs CLI
   Command-line interface for generating documentation from annotated TypeScript.

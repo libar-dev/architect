@@ -5,7 +5,7 @@
  * These tests verify that uses/usedBy relationships are extracted correctly
  * and that malformed/empty input is handled gracefully.
  *
- * @libar-docs
+ * @architect
  */
 
 import {
@@ -61,7 +61,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   Rule('Relationship tags extract uses and usedBy dependencies', ({ RuleScenario }) => {
-    RuleScenario('Extract @libar-docs-uses with single value', ({ Given, When, Then, And }) => {
+    RuleScenario('Extract @architect-uses with single value', ({ Given, When, Then, And }) => {
       Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
       When('the file is parsed for directives', whenFileIsParsed);
       Then('{int} directive should be found', thenDirectiveCountShouldBe);
@@ -69,7 +69,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     });
 
     RuleScenario(
-      'Extract @libar-docs-uses with comma-separated values',
+      'Extract @architect-uses with comma-separated values',
       ({ Given, When, Then, And }) => {
         Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
         When('the file is parsed for directives', whenFileIsParsed);
@@ -79,7 +79,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
       }
     );
 
-    RuleScenario('Extract @libar-docs-used-by with single value', ({ Given, When, Then, And }) => {
+    RuleScenario('Extract @architect-used-by with single value', ({ Given, When, Then, And }) => {
       Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
       When('the file is parsed for directives', whenFileIsParsed);
       Then('{int} directive should be found', thenDirectiveCountShouldBe);
@@ -87,7 +87,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     });
 
     RuleScenario(
-      'Extract @libar-docs-used-by with comma-separated values',
+      'Extract @architect-used-by with comma-separated values',
       ({ Given, When, Then, And }) => {
         Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
         When('the file is parsed for directives', whenFileIsParsed);
@@ -138,7 +138,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   Rule('Edge cases and malformed input are handled gracefully', ({ RuleScenario }) => {
-    RuleScenario('Skip comments without @libar-docs-* tags', ({ Given, When, Then }) => {
+    RuleScenario('Skip comments without @architect-* tags', ({ Given, When, Then }) => {
       Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
       When('the file is parsed for directives', whenFileIsParsed);
       Then('{int} directives should be found', thenDirectiveCountShouldBe);

@@ -1,12 +1,12 @@
-@libar-docs
-@libar-docs-pattern:DependsOnTagTesting
-@libar-docs-status:active
-@libar-docs-implements:PatternRelationshipModel
-@libar-docs-product-area:Annotation
+@architect
+@architect-pattern:DependsOnTagTesting
+@architect-status:active
+@architect-implements:PatternRelationshipModel
+@architect-product-area:Annotation
 @pattern-relationships
 Feature: Planning Dependency Tags
 
-  Tests extraction of @libar-docs-depends-on and @libar-docs-enables
+  Tests extraction of @architect-depends-on and @architect-enables
   relationship tags from Gherkin files.
 
   # ===========================================================================
@@ -49,10 +49,10 @@ Feature: Planning Dependency Tags
     Scenario: Depends-on extracted from feature file
       Given a Gherkin file with tags:
         """gherkin
-        @libar-docs
-        @libar-docs-pattern:FeatureB
-        @libar-docs-status:roadmap
-        @libar-docs-depends-on:FeatureA
+        @architect
+        @architect-pattern:FeatureB
+        @architect-status:roadmap
+        @architect-depends-on:FeatureA
         Feature: Feature B
         """
       When the Gherkin parser extracts metadata
@@ -62,10 +62,10 @@ Feature: Planning Dependency Tags
     Scenario: Multiple depends-on values extracted as CSV
       Given a Gherkin file with tags:
         """gherkin
-        @libar-docs
-        @libar-docs-pattern:FeatureC
-        @libar-docs-status:roadmap
-        @libar-docs-depends-on:FeatureA,FeatureB
+        @architect
+        @architect-pattern:FeatureC
+        @architect-status:roadmap
+        @architect-depends-on:FeatureA,FeatureB
         Feature: Feature C
         """
       When the Gherkin parser extracts metadata
@@ -105,10 +105,10 @@ Feature: Planning Dependency Tags
     Scenario: Enables extracted from feature file
       Given a Gherkin file with tags:
         """gherkin
-        @libar-docs
-        @libar-docs-pattern:FeatureA
-        @libar-docs-status:active
-        @libar-docs-enables:FeatureB
+        @architect
+        @architect-pattern:FeatureA
+        @architect-status:active
+        @architect-enables:FeatureB
         Feature: Feature A
         """
       When the Gherkin parser extracts metadata
@@ -118,10 +118,10 @@ Feature: Planning Dependency Tags
     Scenario: Multiple enables values extracted as CSV
       Given a Gherkin file with tags:
         """gherkin
-        @libar-docs
-        @libar-docs-pattern:Foundation
-        @libar-docs-status:active
-        @libar-docs-enables:ServiceA,ServiceB
+        @architect
+        @architect-pattern:Foundation
+        @architect-status:active
+        @architect-enables:ServiceA,ServiceB
         Feature: Foundation
         """
       When the Gherkin parser extracts metadata

@@ -1,7 +1,7 @@
-@libar-docs
-@scanner @libar-docs-pattern:GherkinAstParser @unit
-@libar-docs-status:completed
-@libar-docs-product-area:Annotation
+@architect
+@scanner @architect-pattern:GherkinAstParser @unit
+@architect-status:completed
+@architect-product-area:Annotation
 Feature: Gherkin AST Parser
   The Gherkin AST parser extracts feature metadata, scenarios, and steps
   from .feature files for timeline generation and process documentation.
@@ -19,7 +19,7 @@ Feature: Gherkin AST Parser
     Scenario: Parse valid feature file with pattern metadata
       Given a Gherkin feature file with content:
         """
-        @libar-docs-pattern:ProjectionCategories @libar-docs-phase:15 @libar-docs-status:roadmap
+        @architect-pattern:ProjectionCategories @architect-phase:15 @architect-status:roadmap
         Feature: Projection Categories
           A taxonomy that categorizes projections by purpose.
 
@@ -59,7 +59,7 @@ Feature: Gherkin AST Parser
     Scenario: Parse multiple scenarios
       Given a Gherkin feature file with content:
         """
-        @libar-docs-pattern:MyPattern
+        @architect-pattern:MyPattern
         Feature: My Pattern
           Description
 
@@ -106,7 +106,7 @@ Feature: Gherkin AST Parser
       Given a Gherkin feature file with content:
         """
         This is not valid Gherkin
-        @libar-docs-pattern:Invalid
+        @architect-pattern:Invalid
         """
       When the feature file is parsed
       Then parsing should fail
@@ -116,7 +116,7 @@ Feature: Gherkin AST Parser
     Scenario: Return error for file without feature
       Given a Gherkin feature file with content:
         """
-        @libar-docs-pattern:Invalid
+        @architect-pattern:Invalid
         # Just a comment
         """
       When the feature file is parsed

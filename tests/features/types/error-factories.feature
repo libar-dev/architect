@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:ErrorFactories
-@libar-docs-status:completed
-@libar-docs-product-area:CoreTypes
-@libar-docs-include:core-types
+@architect
+@architect-pattern:ErrorFactories
+@architect-status:completed
+@architect-product-area:CoreTypes
+@architect-include:core-types
 @types @errors
 Feature: Error Factory Functions
   Error factories create structured, discriminated error types with consistent
@@ -67,8 +67,8 @@ Feature: Error Factory Functions
 
     @function:createDirectiveValidationError
     Scenario: createDirectiveValidationError includes optional directive snippet
-      When I create a DirectiveValidationError with directive "@libar-docs-"
-      Then the error should have directive "@libar-docs-"
+      When I create a DirectiveValidationError with directive "@architect-"
+      Then the error should have directive "@architect-"
 
     @function:createDirectiveValidationError
     Scenario: createDirectiveValidationError omits directive when not provided

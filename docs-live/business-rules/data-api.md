@@ -1105,7 +1105,7 @@ _Discovery subcommands: list, search, context assembly, tags/sources, extended a
 
 #### CLI unannotated subcommand finds files without annotations
 
-> **Invariant:** The unannotated subcommand must return valid JSON listing every TypeScript file that lacks the `@libar-docs` opt-in marker.
+> **Invariant:** The unannotated subcommand must return valid JSON listing every TypeScript file that lacks the `@architect` opt-in marker.
 >
 > **Rationale:** Files missing the opt-in marker are invisible to the scanner; without this subcommand, unannotated files silently drop out of generated documentation and validation.
 

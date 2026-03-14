@@ -1,12 +1,12 @@
-@libar-docs
+@architect
 @behavior @extraction
-@libar-docs-pattern:DualSourceExtractorTesting
-@libar-docs-implements:DualSourceExtractor
-@libar-docs-status:completed
-@libar-docs-product-area:Annotation
+@architect-pattern:DualSourceExtractorTesting
+@architect-implements:DualSourceExtractor
+@architect-status:completed
+@architect-product-area:Annotation
 Feature: Dual-Source Extraction
   Extracts and combines pattern metadata from both TypeScript code stubs
-  (@libar-docs-*) and Gherkin feature files (@libar-process-*), validates
+  (@architect-*) and Gherkin feature files (@libar-process-*), validates
   consistency, and composes unified pattern data for documentation.
 
   **Problem:**

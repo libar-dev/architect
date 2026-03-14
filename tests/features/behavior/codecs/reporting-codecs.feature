@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:ReportingCodecTesting
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
-@libar-docs-implements:CodecBehaviorTesting
+@architect
+@architect-pattern:ReportingCodecTesting
+@architect-status:completed
+@architect-product-area:Generation
+@architect-implements:CodecBehaviorTesting
 @behavior @reporting-codecs
 Feature: Reporting Document Codecs
   The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)

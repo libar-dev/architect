@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:LintProcessCli
-@libar-docs-status:completed
-@libar-docs-product-area:DataAPI
-@libar-docs-implements:CliBehaviorTesting
+@architect
+@architect-pattern:LintProcessCli
+@architect-status:completed
+@architect-product-area:DataAPI
+@architect-implements:CliBehaviorTesting
 @cli @lint-process
 Feature: lint-process CLI
   Command-line interface for validating changes against delivery process rules.
@@ -36,7 +36,7 @@ Feature: lint-process CLI
     Scenario: Display version with --version flag
       When running "lint-process --version"
       Then exit code is 0
-      And stdout contains "lint-process"
+      And stdout contains "architect-guard"
 
     @happy-path
     Scenario: Display version with -v flag

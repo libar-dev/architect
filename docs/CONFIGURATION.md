@@ -2,7 +2,7 @@
 
 > **Deprecated:** This document is superseded by the auto-generated [Configuration Guide](../docs-live/reference/CONFIGURATION-GUIDE.md). This file is preserved for reference only.
 
-Configure tag prefixes, presets, sources, output, and custom taxonomies for `@libar-dev/delivery-process`.
+Configure tag prefixes, presets, sources, output, and custom taxonomies for `@libar-dev/architect`.
 
 > **Prerequisites:** See [README.md](../README.md) for installation and basic usage.
 > **Tag Reference:** Run `npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f` for a complete tag list. See [TAXONOMY.md](./TAXONOMY.md) for concepts.
@@ -11,15 +11,15 @@ Configure tag prefixes, presets, sources, output, and custom taxonomies for `@li
 
 ## Quick Reference
 
-| Preset                        | Tag Prefix     | Categories | Use Case                             |
-| ----------------------------- | -------------- | ---------- | ------------------------------------ |
-| **`libar-generic`** (default) | `@libar-docs-` | 3          | Simple projects (this package)       |
-| `generic`                     | `@docs-`       | 3          | Simple projects with `@docs-` prefix |
-| `ddd-es-cqrs`                 | `@libar-docs-` | 21         | DDD/Event Sourcing architectures     |
+| Preset                        | Tag Prefix    | Categories | Use Case                             |
+| ----------------------------- | ------------- | ---------- | ------------------------------------ |
+| **`libar-generic`** (default) | `@architect-` | 3          | Simple projects (this package)       |
+| `generic`                     | `@docs-`      | 3          | Simple projects with `@docs-` prefix |
+| `ddd-es-cqrs`                 | `@architect-` | 21         | DDD/Event Sourcing architectures     |
 
 ```typescript
-// delivery-process.config.ts
-import { defineConfig } from '@libar-dev/delivery-process/config';
+// architect.config.ts
+import { defineConfig } from '@libar-dev/architect/config';
 
 // Default: libar-generic preset (simple 3-category taxonomy)
 export default defineConfig({
@@ -36,8 +36,8 @@ export default defineConfig({
   preset: 'ddd-es-cqrs',
   sources: {
     typescript: ['packages/*/src/**/*.ts'],
-    features: ['delivery-process/specs/**/*.feature'],
-    stubs: ['delivery-process/stubs/**/*.ts'],
+    features: ['architect/specs/**/*.feature'],
+    stubs: ['architect/stubs/**/*.ts'],
   },
   output: { directory: 'docs-living', overwrite: true },
 });
@@ -87,21 +87,21 @@ All entry points use the same default:
 
 ### Libar-Generic Preset (Default)
 
-The default preset used by this package. Same 3 categories as `generic` but with `@libar-docs-` prefix.
+The default preset used by this package. Same 3 categories as `generic` but with `@architect-` prefix.
 
 | Property        | Value                |
 | --------------- | -------------------- |
-| **Tag Prefix**  | `@libar-docs-`       |
-| **File Opt-In** | `@libar-docs`        |
+| **Tag Prefix**  | `@architect-`        |
+| **File Opt-In** | `@architect`         |
 | **Categories**  | 3 (core, api, infra) |
 
 ```typescript
 /**
- * @libar-docs
- * @libar-docs-pattern PatternScanner
- * @libar-docs-status completed
- * @libar-docs-core
- * @libar-docs-uses FileDiscovery, ASTParser
+ * @architect
+ * @architect-pattern PatternScanner
+ * @architect-status completed
+ * @architect-core
+ * @architect-uses FileDiscovery, ASTParser
  */
 export function scanPatterns(config: ScanConfig): Promise<ScanResult> { ... }
 ```
@@ -133,18 +133,18 @@ Full taxonomy for domain-driven architectures with 21 categories.
 
 | Property        | Value                                                                  |
 | --------------- | ---------------------------------------------------------------------- |
-| **Tag Prefix**  | `@libar-docs-`                                                         |
-| **File Opt-In** | `@libar-docs`                                                          |
+| **Tag Prefix**  | `@architect-`                                                          |
+| **File Opt-In** | `@architect`                                                           |
 | **Categories**  | 21 (domain, ddd, bounded-context, event-sourcing, decider, cqrs, etc.) |
 
 ```typescript
 /**
- * @libar-docs
- * @libar-docs-pattern TransformDataset
- * @libar-docs-status completed
- * @libar-docs-core
- * @libar-docs-uses MasterDataset, ExtractedPattern
- * @libar-docs-used-by Orchestrator
+ * @architect
+ * @architect-pattern TransformDataset
+ * @architect-status completed
+ * @architect-core
+ * @architect-uses MasterDataset, ExtractedPattern
+ * @architect-used-by Orchestrator
  */
 export function transformToMasterDataset(input: TransformInput): MasterDataset { ... }
 ```
@@ -155,26 +155,26 @@ export function transformToMasterDataset(input: TransformInput): MasterDataset {
 
 ## Unified Config File
 
-The `defineConfig()` function centralizes taxonomy, sources, output, and generator overrides in a single `delivery-process.config.ts` file. CLI tools discover this file automatically.
+The `defineConfig()` function centralizes taxonomy, sources, output, and generator overrides in a single `architect.config.ts` file. CLI tools discover this file automatically.
 
 ### Discovery Order
 
-1. Current directory: check `delivery-process.config.ts`, then `.js`
+1. Current directory: check `architect.config.ts`, then `.js`
 2. Walk up to repo root (`.git` folder), checking each directory
-3. Fall back to libar-generic preset (3 categories, `@libar-docs-` prefix)
+3. Fall back to libar-generic preset (3 categories, `@architect-` prefix)
 
 ### Config File Format
 
 ```typescript
-// delivery-process.config.ts
-import { defineConfig } from '@libar-dev/delivery-process/config';
+// architect.config.ts
+import { defineConfig } from '@libar-dev/architect/config';
 
 export default defineConfig({
   preset: 'libar-generic',
   sources: {
     typescript: ['src/**/*.ts'],
-    stubs: ['delivery-process/stubs/**/*.ts'],
-    features: ['delivery-process/specs/*.feature'],
+    stubs: ['architect/stubs/**/*.ts'],
+    features: ['architect/specs/*.feature'],
   },
   output: {
     directory: 'docs-generated',
@@ -210,15 +210,15 @@ export default defineConfig({
   preset: 'libar-generic',
   sources: {
     typescript: ['src/**/*.ts'],
-    features: ['delivery-process/specs/*.feature'],
+    features: ['architect/specs/*.feature'],
   },
   output: { directory: 'docs-generated', overwrite: true },
   generatorOverrides: {
     changelog: {
-      additionalFeatures: ['delivery-process/decisions/*.feature'],
+      additionalFeatures: ['architect/decisions/*.feature'],
     },
     'doc-from-decision': {
-      replaceFeatures: ['delivery-process/decisions/*.feature'],
+      replaceFeatures: ['architect/decisions/*.feature'],
     },
   },
 });
@@ -237,10 +237,10 @@ export default defineConfig({
 
 ```
 my-monorepo/
-├── delivery-process.config.ts          # Repo: ddd-es-cqrs
+├── architect.config.ts          # Repo: ddd-es-cqrs
 └── packages/
     └── my-package/
-        └── delivery-process.config.ts  # Package: generic
+        └── architect.config.ts  # Package: generic
 ```
 
 CLI tools use the nearest config file to the working directory.
@@ -303,7 +303,7 @@ export default defineConfig({
 For tools that need to load configuration files:
 
 ```typescript
-import { loadProjectConfig } from '@libar-dev/delivery-process/config';
+import { loadProjectConfig } from '@libar-dev/architect/config';
 
 const result = await loadProjectConfig(process.cwd());
 
@@ -313,7 +313,7 @@ if (!result.ok) {
 }
 
 const resolved = result.value;
-// resolved.instance    - DeliveryProcessInstance (registry + regexBuilders)
+// resolved.instance    - ArchitectInstance (registry + regexBuilders)
 // resolved.project     - ResolvedProjectConfig (sources, output, generators)
 // resolved.isDefault   - true if no config file found
 // resolved.configPath  - config file path (if found)
@@ -322,7 +322,7 @@ const resolved = result.value;
 For per-generator source resolution:
 
 ```typescript
-import { mergeSourcesForGenerator } from '@libar-dev/delivery-process/config';
+import { mergeSourcesForGenerator } from '@libar-dev/architect/config';
 
 const effectiveSources = mergeSourcesForGenerator(
   resolved.project.sources,
@@ -337,12 +337,12 @@ const effectiveSources = mergeSourcesForGenerator(
 
 ## Backward Compatibility
 
-The legacy `createDeliveryProcess()` API is still exported and supported. Config files using the old format are detected automatically by `loadProjectConfig()` and wrapped in a `ResolvedConfig` with default project settings.
+The legacy `createArchitect()` API is still exported and supported. Config files using the old format are detected automatically by `loadProjectConfig()` and wrapped in a `ResolvedConfig` with default project settings.
 
 ```typescript
 // Legacy format (still works)
-import { createDeliveryProcess } from '@libar-dev/delivery-process';
-export default createDeliveryProcess({ preset: 'ddd-es-cqrs' });
+import { createArchitect } from '@libar-dev/architect';
+export default createArchitect({ preset: 'ddd-es-cqrs' });
 ```
 
 New projects should use `defineConfig()` for the unified configuration experience.

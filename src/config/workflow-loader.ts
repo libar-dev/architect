@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-config
- * @libar-docs-pattern WorkflowLoader
- * @libar-docs-status completed
- * @libar-docs-arch-layer infrastructure
- * @libar-docs-arch-context config
- * @libar-docs-arch-role infrastructure
- * @libar-docs-uses WorkflowConfigSchema, CodecUtils
- * @libar-docs-used-by GeneratorOrchestrator, SectionHelpers
+ * @architect
+ * @architect-config
+ * @architect-pattern WorkflowLoader
+ * @architect-status completed
+ * @architect-arch-layer infrastructure
+ * @architect-arch-context config
+ * @architect-arch-role infrastructure
+ * @architect-uses WorkflowConfigSchema, CodecUtils
+ * @architect-used-by GeneratorOrchestrator, SectionHelpers
  *
  * ## WorkflowLoader - Workflow Configuration Loading
  *

@@ -1,24 +1,24 @@
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-config
- * @libar-docs-pattern ProjectConfigTypes
- * @libar-docs-status active
- * @libar-docs-arch-layer domain
- * @libar-docs-arch-context config
- * @libar-docs-uses ConfigurationTypes, ConfigurationPresets
- * @libar-docs-used-by DefineConfig, ConfigLoader
- * @libar-docs-extract-shapes DeliveryProcessProjectConfig, SourcesConfig, OutputConfig, GeneratorSourceOverride, ResolvedConfig, ResolvedProjectConfig, ResolvedSourcesConfig
+ * @architect
+ * @architect-core @architect-config
+ * @architect-pattern ProjectConfigTypes
+ * @architect-status active
+ * @architect-arch-layer domain
+ * @architect-arch-context config
+ * @architect-uses ConfigurationTypes, ConfigurationPresets
+ * @architect-used-by DefineConfig, ConfigLoader
+ * @architect-extract-shapes ArchitectProjectConfig, SourcesConfig, OutputConfig, GeneratorSourceOverride, ResolvedConfig, ResolvedProjectConfig, ResolvedSourcesConfig
  *
  * ## Project Configuration Types
  *
- * Unified project configuration for the delivery-process package.
+ * Unified project configuration for the Architect package.
  * Replaces the fragmented system where taxonomy, source discovery,
  * and output config lived in three disconnected layers.
  *
  * ### Architecture
  *
  * ```
- * defineConfig() → raw DeliveryProcessProjectConfig
+ * defineConfig() → raw ArchitectProjectConfig
  *     ↓
  * loadProjectConfig() → validates (Zod) → resolveProjectConfig()
  *     ↓
@@ -29,13 +29,13 @@
  *
  * ### When to Use
  *
- * - Define project config in `delivery-process.config.ts`
+ * - Define project config in `architect.config.ts`
  * - Internal resolution via `resolveProjectConfig()`
  * - CLI override merging
  */
 
 import type { PresetName } from './presets.js';
-import type { DeliveryProcessConfig, DeliveryProcessInstance } from './types.js';
+import type { ArchitectConfig, ArchitectInstance } from './types.js';
 import type { ContextInferenceRule } from '../generators/pipeline/context-inference.js';
 // ═══ Cross-Layer Imports: config → renderable ═══════════════════════════════
 // Project configuration declares which reference documents to generate,
@@ -64,7 +64,7 @@ export interface SourcesConfig {
 
   /**
    * Glob patterns for design stub files.
-   * Stubs are TypeScript files that live outside `src/` (e.g., `delivery-process/stubs/`).
+   * Stubs are TypeScript files that live outside `src/` (e.g., `architect/stubs/`).
    * Merged into TypeScript sources at resolution time.
    */
   readonly stubs?: readonly string[];
@@ -135,27 +135,27 @@ export interface GeneratorSourceOverride {
 }
 
 /**
- * Unified project configuration for delivery-process.
+ * Unified project configuration for Architect.
  *
- * This is the shape users provide in `delivery-process.config.ts`.
+ * This is the shape users provide in `architect.config.ts`.
  * `defineConfig()` is an identity function providing type safety.
  *
  * @example
  * ```typescript
- * import { defineConfig } from '@libar-dev/delivery-process/config';
+ * import { defineConfig } from '@libar-dev/architect/config';
  *
  * export default defineConfig({
  *   preset: 'ddd-es-cqrs',
  *   sources: {
  *     typescript: ['packages/* /src/** /*.ts'],
- *     features: ['delivery-process/specs/** /*.feature'],
- *     stubs: ['delivery-process/stubs/** /*.ts'],
+ *     features: ['architect/specs/** /*.feature'],
+ *     stubs: ['architect/stubs/** /*.ts'],
  *   },
  *   output: { directory: 'docs-living', overwrite: true },
  * });
  * ```
  */
-export interface DeliveryProcessProjectConfig {
+export interface ArchitectProjectConfig {
   // --- Taxonomy ---
 
   /** Use a preset taxonomy configuration */
@@ -168,7 +168,7 @@ export interface DeliveryProcessProjectConfig {
   readonly fileOptInTag?: string;
 
   /** Custom categories (replaces preset categories entirely) */
-  readonly categories?: DeliveryProcessConfig['categories'];
+  readonly categories?: ArchitectConfig['categories'];
 
   // --- Sources ---
 
@@ -254,7 +254,7 @@ export interface ResolvedProjectConfig {
 export type ResolvedConfig =
   | {
       /** The taxonomy instance (registry + regexBuilders) */
-      readonly instance: DeliveryProcessInstance;
+      readonly instance: ArchitectInstance;
       /** The resolved project config with defaults applied */
       readonly project: ResolvedProjectConfig;
       /** Config was generated from defaults (no config file found) */
@@ -264,7 +264,7 @@ export type ResolvedConfig =
     }
   | {
       /** The taxonomy instance (registry + regexBuilders) */
-      readonly instance: DeliveryProcessInstance;
+      readonly instance: ArchitectInstance;
       /** The resolved project config with defaults applied */
       readonly project: ResolvedProjectConfig;
       /** Config was loaded from a file */

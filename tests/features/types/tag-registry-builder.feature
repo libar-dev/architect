@@ -1,12 +1,12 @@
-@libar-docs
-@libar-docs-pattern:TagRegistryBuilderTesting
-@libar-docs-status:active
-@libar-docs-product-area:CoreTypes
-@libar-docs-include:core-types
+@architect
+@architect-pattern:TagRegistryBuilderTesting
+@architect-status:active
+@architect-product-area:CoreTypes
+@architect-include:core-types
 @taxonomy @registry
 Feature: Tag Registry Builder
   The tag registry builder constructs a complete TagRegistry from TypeScript
-  constants. It is the single source of truth for the delivery-process
+  constants. It is the single source of truth for the Architect
   annotation taxonomy, providing tag definitions, categories, and format
   options used by scanners and extractors.
 

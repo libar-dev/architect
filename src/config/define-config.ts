@@ -1,14 +1,14 @@
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-config
- * @libar-docs-pattern DefineConfig
- * @libar-docs-status active
- * @libar-docs-arch-layer infrastructure
- * @libar-docs-arch-context config
- * @libar-docs-arch-role infrastructure
- * @libar-docs-include reference-sample
- * @libar-docs-uses ProjectConfigTypes
- * @libar-docs-used-by ConfigLoader
+ * @architect
+ * @architect-core @architect-config
+ * @architect-pattern DefineConfig
+ * @architect-status active
+ * @architect-arch-layer infrastructure
+ * @architect-arch-context config
+ * @architect-arch-role infrastructure
+ * @architect-include reference-sample
+ * @architect-uses ProjectConfigTypes
+ * @architect-used-by ConfigLoader
  *
  * ## Define Config
  *
@@ -20,13 +20,13 @@
  *
  * ### When to Use
  *
- * - In `delivery-process.config.ts` at project root to get type-safe configuration with autocompletion.
+ * - In `architect.config.ts` at project root to get type-safe configuration with autocompletion.
  */
 
-import type { DeliveryProcessProjectConfig } from './project-config.js';
+import type { ArchitectProjectConfig } from './project-config.js';
 
 /**
- * Type-safe identity function for delivery-process project configuration.
+ * Type-safe identity function for Architect project configuration.
  *
  * Returns the config object unchanged. Provides TypeScript autocompletion
  * and type checking without runtime overhead. Validation happens at
@@ -35,6 +35,6 @@ import type { DeliveryProcessProjectConfig } from './project-config.js';
  * @param config - The project configuration object
  * @returns The same config object (identity)
  */
-export function defineConfig(config: DeliveryProcessProjectConfig): DeliveryProcessProjectConfig {
+export function defineConfig(config: ArchitectProjectConfig): ArchitectProjectConfig {
   return config;
 }

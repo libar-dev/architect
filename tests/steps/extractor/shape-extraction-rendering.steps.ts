@@ -294,9 +294,9 @@ describeFeature(feature, ({ Background, Rule }) => {
             expect(shape!.jsDoc).toContain('@returns');
           });
 
-          And('the shape "MixedTags" jsDoc should not contain "@libar-docs"', () => {
+          And('the shape "MixedTags" jsDoc should not contain "@architect"', () => {
             const shape = state.extractionResult!.shapes.find((s) => s.name === 'MixedTags');
-            expect(shape!.jsDoc).not.toContain('@libar-docs');
+            expect(shape!.jsDoc).not.toContain('@architect');
           });
         }
       );

@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:ProcessApiCliRepl
-@libar-docs-implements:DataAPICLIErgonomics
-@libar-docs-status:active
-@libar-docs-product-area:DataAPI
+@architect
+@architect-pattern:ProcessApiCliRepl
+@architect-implements:DataAPICLIErgonomics
+@architect-status:active
+@architect-product-area:DataAPI
 @cli @process-api @repl
 Feature: Process API CLI - REPL Mode
   Interactive REPL mode keeps the pipeline loaded for multi-query sessions and supports reload.

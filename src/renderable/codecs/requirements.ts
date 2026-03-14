@@ -1,10 +1,10 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern RequirementsCodec
- * @libar-docs-status completed
- * @libar-docs-convention codec-registry
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-core
+ * @architect-pattern RequirementsCodec
+ * @architect-status completed
+ * @architect-convention codec-registry
+ * @architect-product-area:Generation
  *
  * ## RequirementsDocumentCodec
  *
@@ -591,7 +591,7 @@ function buildSingleRequirementDocument(
     sections.push(heading(2, 'Deliverables'), list(deliverableItems));
   }
 
-  // Implementations (files that implement this pattern via @libar-docs-implements)
+  // Implementations (files that implement this pattern via @architect-implements)
   const patternKey = getPatternName(pattern);
   const rel = dataset.relationshipIndex?.[patternKey];
   if (rel?.implementedBy && rel.implementedBy.length > 0) {

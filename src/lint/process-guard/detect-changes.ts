@@ -1,22 +1,22 @@
 /**
- * @libar-docs
- * @libar-docs-lint
- * @libar-docs-pattern DetectChanges
- * @libar-docs-status active
- * @libar-docs-implements ProcessGuardLinter
- * @libar-docs-uses DeriveProcessState
+ * @architect
+ * @architect-lint
+ * @architect-pattern DetectChanges
+ * @architect-status active
+ * @architect-implements ProcessGuardLinter
+ * @architect-uses DeriveProcessState
  *
  * ## DetectChanges - Git Diff Change Detection
  *
  * Detects changes from git diff including:
  * - Modified, added, deleted files
- * - Status transitions (@libar-docs-status changes)
+ * - Status transitions (@architect-status changes)
  * - Deliverable changes in Background tables
  *
  * ### Design Principles
  *
  * - **Parse Git Output**: Uses `git diff --name-status` and `git diff`
- * - **Status Detection**: Regex patterns for @libar-docs-status changes
+ * - **Status Detection**: Regex patterns for @architect-status changes
  * - **Deliverable Detection**: Parses DataTable changes
  *
  * Note: Taxonomy modification detection was removed when taxonomy
@@ -258,7 +258,7 @@ interface DiffFileParseState {
  *
  * @param diff - Git diff content
  * @param files - List of files to analyze
- * @param tagPrefix - Tag prefix to match (default: "@libar-docs-")
+ * @param tagPrefix - Tag prefix to match (default: "@architect-")
  */
 function detectStatusTransitions(
   diff: string,

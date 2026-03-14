@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:ArchGeneratorRegistration
-@libar-docs-status:completed
-@libar-docs-implements:ArchitectureDiagramGeneration
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:ArchGeneratorRegistration
+@architect-status:completed
+@architect-implements:ArchitectureDiagramGeneration
+@architect-product-area:Generation
 @architecture
 Feature: Architecture Generator Registration
 

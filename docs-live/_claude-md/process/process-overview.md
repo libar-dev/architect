@@ -4,7 +4,7 @@
 
 #### Key Invariants
 
-- TypeScript source owns pattern identity: `@libar-docs-pattern` in TypeScript defines the pattern. Tier 1 specs are ephemeral working documents
+- TypeScript source owns pattern identity: `@architect-pattern` in TypeScript defines the pattern. Tier 1 specs are ephemeral working documents
 - 7 canonical product-area values: Annotation, Configuration, Generation, Validation, DataAPI, CoreTypes, Process — reader-facing sections, not source modules
 - Two distinct status domains: Pattern FSM status (4 values) vs. deliverable status (6 values). Never cross domains
 - Session types define capabilities: planning creates specs, design creates stubs, implementation writes code. Each session type has a fixed input/output contract enforced by convention
@@ -74,14 +74,14 @@
 
 **Invariant:** Every tag has one of 6 format types that determines how its value is parsed.
 
-| Format       | Parsing                        | Example                        |
-| ------------ | ------------------------------ | ------------------------------ |
-| flag         | Boolean presence, no value     | @libar-docs-core               |
-| value        | Simple string                  | @libar-docs-pattern MyPattern  |
-| enum         | Constrained to predefined list | @libar-docs-status completed   |
-| csv          | Comma-separated values         | @libar-docs-uses A, B, C       |
-| number       | Numeric value                  | @libar-docs-phase 15           |
-| quoted-value | Preserves spaces               | @libar-docs-brief:'Multi word' |
+| Format       | Parsing                        | Example                       |
+| ------------ | ------------------------------ | ----------------------------- |
+| flag         | Boolean presence, no value     | @architect-core               |
+| value        | Simple string                  | @architect-pattern MyPattern  |
+| enum         | Constrained to predefined list | @architect-status completed   |
+| csv          | Comma-separated values         | @architect-uses A, B, C       |
+| number       | Numeric value                  | @architect-phase 15           |
+| quoted-value | Preserves spaces               | @architect-brief:'Multi word' |
 
 #### Source ownership
 

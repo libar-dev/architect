@@ -2,7 +2,7 @@
 
 #### Getting Started
 
-Every file that participates in the annotation system must have a `@libar-docs` opt-in marker. Files without this marker are invisible to the scanner.
+Every file that participates in the annotation system must have a `@architect` opt-in marker. Files without this marker are invisible to the scanner.
 
 ##### File-Level Opt-In
 
@@ -10,10 +10,10 @@ Every file that participates in the annotation system must have a `@libar-docs` 
 
 ```typescript
 /**
- * @libar-docs
- * @libar-docs-pattern MyPattern
- * @libar-docs-status roadmap
- * @libar-docs-uses EventStore, CommandBus
+ * @architect
+ * @architect-pattern MyPattern
+ * @architect-status roadmap
+ * @architect-uses EventStore, CommandBus
  *
  * ## My Pattern - Description
  */
@@ -22,10 +22,10 @@ Every file that participates in the annotation system must have a `@libar-docs` 
 **Gherkin** -- file-level tags before `Feature:`:
 
 ```gherkin
-@libar-docs
-@libar-docs-pattern:MyPattern
-@libar-docs-status:roadmap
-@libar-docs-phase:14
+@architect
+@architect-pattern:MyPattern
+@architect-status:roadmap
+@architect-phase:14
 Feature: My Pattern
 
   **Problem:**
@@ -34,11 +34,11 @@ Feature: My Pattern
 
 ##### Tag Prefix by Preset
 
-| Preset                    | Prefix         | Categories | Use Case                      |
-| ------------------------- | -------------- | ---------- | ----------------------------- |
-| `libar-generic` (default) | `@libar-docs-` | 3          | Simple projects               |
-| `ddd-es-cqrs`             | `@libar-docs-` | 21         | DDD/Event Sourcing monorepos  |
-| `generic`                 | `@docs-`       | 3          | Simple projects, short prefix |
+| Preset                    | Prefix        | Categories | Use Case                      |
+| ------------------------- | ------------- | ---------- | ----------------------------- |
+| `libar-generic` (default) | `@architect-` | 3          | Simple projects               |
+| `ddd-es-cqrs`             | `@architect-` | 21         | DDD/Event Sourcing monorepos  |
+| `generic`                 | `@docs-`      | 3          | Simple projects, short prefix |
 
 ##### Dual-Source Ownership
 
@@ -57,8 +57,8 @@ List specific declaration names in the file-level JSDoc:
 
 ```typescript
 /**
- * @libar-docs
- * @libar-docs-extract-shapes MasterDatasetSchema, StatusGroupsSchema
+ * @architect
+ * @architect-extract-shapes MasterDatasetSchema, StatusGroupsSchema
  */
 ```
 
@@ -68,8 +68,8 @@ Names appear in the generated output in the order listed.
 
 ```typescript
 /**
- * @libar-docs
- * @libar-docs-extract-shapes *
+ * @architect
+ * @architect-extract-shapes *
  */
 ```
 
@@ -77,17 +77,17 @@ Wildcard must be the sole value -- `*, Foo` is invalid.
 
 ##### Mode 3: Declaration-Level Tagging
 
-Tag individual declarations with `@libar-docs-shape`, optionally with a group name:
+Tag individual declarations with `@architect-shape`, optionally with a group name:
 
 ```typescript
-/** @libar-docs-shape api-types */
+/** @architect-shape api-types */
 export interface CommandInput {
   readonly aggregateId: string;
   readonly payload: unknown;
 }
 ```
 
-The optional group name (`api-types`) enables filtering in diagram scopes and product area documents via `@libar-docs-include`.
+The optional group name (`api-types`) enables filtering in diagram scopes and product area documents via `@architect-include`.
 
 #### Critical Gotcha: Zod Schemas
 
@@ -104,10 +104,10 @@ For Zod files, extract the **schema constant** (with `Schema` suffix), not the i
 
 ```typescript
 /**
- * @libar-docs
- * @libar-docs-pattern MasterDataset
- * @libar-docs-status completed
- * @libar-docs-extract-shapes MasterDatasetSchema, StatusGroupsSchema, PhaseGroupSchema
+ * @architect
+ * @architect-pattern MasterDataset
+ * @architect-status completed
+ * @architect-extract-shapes MasterDatasetSchema, StatusGroupsSchema, PhaseGroupSchema
  */
 ```
 
@@ -115,10 +115,10 @@ For Zod files, extract the **schema constant** (with `Schema` suffix), not the i
 
 ```typescript
 /**
- * @libar-docs
- * @libar-docs-pattern DocumentGenerator
- * @libar-docs-status completed
- * @libar-docs-extract-shapes DocumentGenerator, GeneratorContext, GeneratorOutput
+ * @architect
+ * @architect-pattern DocumentGenerator
+ * @architect-status completed
+ * @architect-extract-shapes DocumentGenerator, GeneratorContext, GeneratorOutput
  */
 ```
 
@@ -126,23 +126,23 @@ For Zod files, extract the **schema constant** (with `Schema` suffix), not the i
 
 ```typescript
 /**
- * @libar-docs
- * @libar-docs-pattern TransformDataset
- * @libar-docs-status completed
- * @libar-docs-arch-context generator
- * @libar-docs-arch-layer application
- * @libar-docs-extract-shapes transformToMasterDataset, RuntimeMasterDataset
+ * @architect
+ * @architect-pattern TransformDataset
+ * @architect-status completed
+ * @architect-arch-context generator
+ * @architect-arch-layer application
+ * @architect-extract-shapes transformToMasterDataset, RuntimeMasterDataset
  */
 ```
 
 ##### Gherkin Feature Files
 
 ```gherkin
-@libar-docs
-@libar-docs-pattern:ProcessGuardLinter
-@libar-docs-status:roadmap
-@libar-docs-phase:99
-@libar-docs-depends-on:StateMachine,ValidationRules
+@architect
+@architect-pattern:ProcessGuardLinter
+@architect-status:roadmap
+@architect-phase:99
+@architect-depends-on:StateMachine,ValidationRules
 Feature: Process Guard Linter
 
   Background: Deliverables
@@ -187,16 +187,16 @@ Tags are organized into 12 functional groups. For the complete reference with al
 
 ```bash
 # Tag usage inventory (counts per tag and value)
-pnpm process:query -- tags
+pnpm architect:query -- tags
 
-# Find files missing @libar-docs opt-in marker
-pnpm process:query -- unannotated --path src/types
+# Find files missing @architect opt-in marker
+pnpm architect:query -- unannotated --path src/types
 
 # File inventory by type (TS, Gherkin, Stubs)
-pnpm process:query -- sources
+pnpm architect:query -- sources
 
 # Full pattern JSON including extractedShapes
-pnpm process:query -- query getPattern MyPattern
+pnpm architect:query -- query getPattern MyPattern
 
 # Generate complete tag reference
 npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f
@@ -204,11 +204,11 @@ npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f
 
 #### Common Issues
 
-| Symptom                         | Cause                               | Fix                                              |
-| ------------------------------- | ----------------------------------- | ------------------------------------------------ |
-| Pattern not in scanner output   | Missing `@libar-docs` opt-in marker | Add file-level `@libar-docs` JSDoc/tag           |
-| Shape shows `z.infer<>` wrapper | Extracted type alias, not schema    | Use schema constant name (e.g., `FooSchema`)     |
-| Shape not in product area doc   | Missing `@libar-docs-product-area`  | Add product-area tag to file-level annotation    |
-| Declaration-level shape missing | No `@libar-docs-shape` on decl      | Add `@libar-docs-shape` JSDoc to the declaration |
-| Tag value rejected              | Wrong format or invalid enum value  | Check format type in taxonomy reference          |
-| Anti-pattern validation error   | Tag on wrong source type            | Move tag to correct source (TS vs Gherkin)       |
+| Symptom                         | Cause                              | Fix                                             |
+| ------------------------------- | ---------------------------------- | ----------------------------------------------- |
+| Pattern not in scanner output   | Missing `@architect` opt-in marker | Add file-level `@architect` JSDoc/tag           |
+| Shape shows `z.infer<>` wrapper | Extracted type alias, not schema   | Use schema constant name (e.g., `FooSchema`)    |
+| Shape not in product area doc   | Missing `@architect-product-area`  | Add product-area tag to file-level annotation   |
+| Declaration-level shape missing | No `@architect-shape` on decl      | Add `@architect-shape` JSDoc to the declaration |
+| Tag value rejected              | Wrong format or invalid enum value | Check format type in taxonomy reference         |
+| Anti-pattern validation error   | Tag on wrong source type           | Move tag to correct source (TS vs Gherkin)      |

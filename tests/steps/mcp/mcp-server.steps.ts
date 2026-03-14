@@ -5,8 +5,8 @@
  * Tests the MCP-specific layer: tool registration, pipeline session
  * lifecycle, file watcher filtering, CLI parsing, and output formatting.
  *
- * @libar-docs
- * @libar-docs-uses MCPServerImpl, MCPPipelineSession, MCPToolRegistry, MCPFileWatcher
+ * @architect
+ * @architect-uses MCPServerImpl, MCPPipelineSession, MCPToolRegistry, MCPFileWatcher
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -71,7 +71,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         const manager = new PipelineSessionManager();
         session = await manager.initialize({
           input: ['src/**/*.ts'],
-          features: ['delivery-process/specs/*.feature'],
+          features: ['architect/specs/*.feature'],
         });
         state!.session = session;
       });
@@ -120,7 +120,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         manager = new PipelineSessionManager();
         originalSession = await manager.initialize({
           input: ['src/**/*.ts'],
-          features: ['delivery-process/specs/*.feature'],
+          features: ['architect/specs/*.feature'],
         });
       });
 
@@ -155,7 +155,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           manager = new PipelineSessionManager();
           originalSession = await manager.initialize({
             input: ['src/**/*.ts'],
-            features: ['delivery-process/specs/*.feature'],
+            features: ['architect/specs/*.feature'],
           });
         });
 
@@ -194,7 +194,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           manager = new PipelineSessionManager();
           originalSession = await manager.initialize({
             input: ['src/**/*.ts'],
-            features: ['delivery-process/specs/*.feature'],
+            features: ['architect/specs/*.feature'],
           });
         });
 
@@ -234,30 +234,30 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           async () => {
             state!.tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'mcp-config-fallback-test-'));
             await fs.mkdir(path.join(state!.tempDir, 'src'), { recursive: true });
-            await fs.mkdir(path.join(state!.tempDir, 'delivery-process', 'specs'), {
+            await fs.mkdir(path.join(state!.tempDir, 'architect', 'specs'), {
               recursive: true,
             });
 
             await fs.writeFile(
-              path.join(state!.tempDir, 'delivery-process.config.js'),
+              path.join(state!.tempDir, 'architect.config.js'),
               "export default { preset: 'libar-generic' };\n"
             );
             await fs.writeFile(
               path.join(state!.tempDir, 'src', 'example.ts'),
               [
                 '/**',
-                ' * @libar-docs',
-                ' * @libar-docs-pattern ExamplePattern',
-                ' * @libar-docs-status roadmap',
+                ' * @architect',
+                ' * @architect-pattern ExamplePattern',
+                ' * @architect-status roadmap',
                 ' */',
                 'export const example = 1;',
                 '',
               ].join('\n')
             );
             await fs.writeFile(
-              path.join(state!.tempDir, 'delivery-process', 'specs', 'example.feature'),
+              path.join(state!.tempDir, 'architect', 'specs', 'example.feature'),
               [
-                '@libar-docs',
+                '@architect',
                 'Feature: Example pattern metadata',
                 '',
                 '  Scenario: Placeholder',
@@ -280,7 +280,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
         And('the session source globs include conventional TypeScript and feature paths', () => {
           expect(session!.sourceGlobs.input).toContain('src/**/*.ts');
-          expect(session!.sourceGlobs.features).toContain('delivery-process/specs/*.feature');
+          expect(session!.sourceGlobs.features).toContain('architect/specs/*.feature');
         });
       }
     );
@@ -293,7 +293,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         manager = new PipelineSessionManager();
         await manager.initialize({
           input: ['src/**/*.ts'],
-          features: ['delivery-process/specs/*.feature'],
+          features: ['architect/specs/*.feature'],
         });
       });
 
@@ -336,7 +336,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       state!.session = session;
     }
 
-    RuleScenario('All tools registered with dp_ prefix', ({ Given, Then, And }) => {
+    RuleScenario('All tools registered with architect_ prefix', ({ Given, Then, And }) => {
       Given('an McpServer mock with registered tools', () => {
         setupMockServer();
       });
@@ -365,13 +365,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
-    RuleScenario('dp_overview returns formatted text', ({ Given, When, Then, And }) => {
+    RuleScenario('architect_overview returns formatted text', ({ Given, When, Then, And }) => {
       Given('an McpServer mock with registered tools', () => {
         setupMockServer();
       });
 
-      When('the dp_overview handler is called', () => {
-        const tool = state!.mockServer!.tools.get('dp_overview');
+      When('the architect_overview handler is called', () => {
+        const tool = state!.mockServer!.tools.get('architect_overview');
         expect(tool).toBeDefined();
         state!.toolResult = tool!.handler({}) as McpTestState['toolResult'];
       });
@@ -388,27 +388,33 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
-    RuleScenario('dp_pattern returns error for unknown pattern', ({ Given, When, Then, And }) => {
-      Given('an McpServer mock with registered tools', () => {
-        setupMockServer();
-      });
+    RuleScenario(
+      'architect_pattern returns error for unknown pattern',
+      ({ Given, When, Then, And }) => {
+        Given('an McpServer mock with registered tools', () => {
+          setupMockServer();
+        });
 
-      When('the dp_pattern handler is called with name {string}', (_ctx: unknown, name: string) => {
-        const tool = state!.mockServer!.tools.get('dp_pattern');
-        expect(tool).toBeDefined();
-        state!.toolResult = tool!.handler({ name }) as McpTestState['toolResult'];
-      });
+        When(
+          'the architect_pattern handler is called with name {string}',
+          (_ctx: unknown, name: string) => {
+            const tool = state!.mockServer!.tools.get('architect_pattern');
+            expect(tool).toBeDefined();
+            state!.toolResult = tool!.handler({ name }) as McpTestState['toolResult'];
+          }
+        );
 
-      Then('the result is an error', () => {
-        expect(state!.toolResult!.isError).toBe(true);
-      });
+        Then('the result is an error', () => {
+          expect(state!.toolResult!.isError).toBe(true);
+        });
 
-      And('the error message contains {string}', (_ctx: unknown, expected: string) => {
-        expect(state!.toolResult!.content[0].text).toContain(expected);
-      });
-    });
+        And('the error message contains {string}', (_ctx: unknown, expected: string) => {
+          expect(state!.toolResult!.content[0].text).toContain(expected);
+        });
+      }
+    );
 
-    RuleScenario('dp_list filters apply cumulatively', ({ Given, When, Then, And }) => {
+    RuleScenario('architect_list filters apply cumulatively', ({ Given, When, Then, And }) => {
       Given('a session with patterns of mixed status and phase', () => {
         state!.session = createFilterTestSession();
       });
@@ -424,9 +430,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       When(
-        'dp_list is called with status {string} and phase {int}',
+        'architect_list is called with status {string} and phase {int}',
         (_ctx: unknown, status: string, phase: number) => {
-          const tool = state!.mockServer!.tools.get('dp_list');
+          const tool = state!.mockServer!.tools.get('architect_list');
           expect(tool).toBeDefined();
           state!.toolResult = tool!.handler({ status, phase }) as McpTestState['toolResult'];
         }
@@ -539,7 +545,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       Then('the version text matches the package version', () => {
-        expect(versionText).toBe(`dp-mcp-server v${getPackageVersion()}`);
+        expect(versionText).toBe(`architect-mcp v${getPackageVersion()}`);
       });
     });
   });
@@ -566,8 +572,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         setupMockServer();
       });
 
-      When('the dp_overview handler is called', () => {
-        const tool = state!.mockServer!.tools.get('dp_overview');
+      When('the architect_overview handler is called', () => {
+        const tool = state!.mockServer!.tools.get('architect_overview');
         state!.toolResult = tool!.handler({}) as McpTestState['toolResult'];
       });
 
@@ -581,8 +587,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         setupMockServer();
       });
 
-      When('the dp_status handler is called', () => {
-        const tool = state!.mockServer!.tools.get('dp_status');
+      When('the architect_status handler is called', () => {
+        const tool = state!.mockServer!.tools.get('architect_status');
         state!.toolResult = tool!.handler({}) as McpTestState['toolResult'];
       });
 
@@ -594,13 +600,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
-    RuleScenario('dp_status returns JSON with counts', ({ Given, When, Then, And }) => {
+    RuleScenario('architect_status returns JSON with counts', ({ Given, When, Then, And }) => {
       Given('an McpServer mock with registered tools', () => {
         setupMockServer();
       });
 
-      When('the dp_status handler is called', () => {
-        const tool = state!.mockServer!.tools.get('dp_status');
+      When('the architect_status handler is called', () => {
+        const tool = state!.mockServer!.tools.get('architect_status');
         state!.toolResult = tool!.handler({}) as McpTestState['toolResult'];
       });
 
@@ -622,7 +628,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
   Rule('Tool output correctness for edge cases', ({ RuleScenario }) => {
     RuleScenario(
-      'dp_rules without pattern returns compact summary',
+      'architect_rules without pattern returns compact summary',
       ({ Given, When, Then, And }) => {
         Given('an McpServer mock with registered tools', () => {
           const session = createTestPipelineSession();
@@ -636,8 +642,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           state!.session = session;
         });
 
-        When('the dp_rules handler is called without pattern', () => {
-          const tool = state!.mockServer!.tools.get('dp_rules');
+        When('the architect_rules handler is called without pattern', () => {
+          const tool = state!.mockServer!.tools.get('architect_rules');
           expect(tool).toBeDefined();
           state!.toolResult = tool!.handler({}) as McpTestState['toolResult'];
         });
@@ -667,7 +673,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     );
 
     RuleScenario(
-      'dp_pattern returns full metadata including business rules and extracted shapes',
+      'architect_pattern returns full metadata including business rules and extracted shapes',
       ({ Given, When, Then, And }) => {
         Given('a session with a pattern that has deliverables and dependencies', () => {
           state!.session = createRichPatternSession();
@@ -683,8 +689,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           state!.mockServer = mockServer;
         });
 
-        When('dp_pattern is called for that pattern', () => {
-          const tool = state!.mockServer!.tools.get('dp_pattern');
+        When('architect_pattern is called for that pattern', () => {
+          const tool = state!.mockServer!.tools.get('architect_pattern');
           expect(tool).toBeDefined();
           state!.toolResult = tool!.handler({ name: 'RichPattern' }) as McpTestState['toolResult'];
         });

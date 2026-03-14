@@ -1,12 +1,12 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern SourceMapper
- * @libar-docs-status completed
- * @libar-docs-arch-role infrastructure
- * @libar-docs-arch-context generator
- * @libar-docs-arch-layer infrastructure
- * @libar-docs-depends-on DecisionDocCodec,ShapeExtractor,GherkinASTParser
+ * @architect
+ * @architect-core
+ * @architect-pattern SourceMapper
+ * @architect-status completed
+ * @architect-arch-role infrastructure
+ * @architect-arch-context generator
+ * @architect-arch-layer infrastructure
+ * @architect-depends-on DecisionDocCodec,ShapeExtractor,GherkinASTParser
  *
  * ## Source Mapper - Multi-Source Content Aggregation
  *
@@ -324,8 +324,8 @@ export async function extractFromTypeScript(
   let shapes: ExtractedShape[] | undefined;
 
   if (method === 'EXTRACT_SHAPES') {
-    // Look for @libar-docs-extract-shapes tag in the file
-    const extractShapesMatch = /@libar-docs-extract-shapes\s+(.+?)(?:\n|$)/i.exec(sourceCode);
+    // Look for @architect-extract-shapes tag in the file
+    const extractShapesMatch = /@architect-extract-shapes\s+(.+?)(?:\n|$)/i.exec(sourceCode);
 
     if (extractShapesMatch?.[1]) {
       const shapeNames = extractShapesMatch[1]
@@ -370,7 +370,7 @@ export async function extractFromTypeScript(
             source: filePath,
             category: 'extraction',
             subcategory: 'shape-imported',
-            message: `Shape '${name}' is imported, not defined in this file. Add @libar-docs-extract-shapes to the source file instead.`,
+            message: `Shape '${name}' is imported, not defined in this file. Add @architect-extract-shapes to the source file instead.`,
           });
         }
 
@@ -381,14 +381,14 @@ export async function extractFromTypeScript(
             source: filePath,
             category: 'extraction',
             subcategory: 'shape-re-exported',
-            message: `Shape '${reExport.name}' is re-exported${typeOnlyNote} from '${reExport.sourceModule}'. Add @libar-docs-extract-shapes to ${reExport.sourceModule} instead.`,
+            message: `Shape '${reExport.name}' is re-exported${typeOnlyNote} from '${reExport.sourceModule}'. Add @architect-extract-shapes to ${reExport.sourceModule} instead.`,
           });
         }
       }
     } else {
       // No @extract-shapes tag found - extract all exported types
       // This is a fallback for files without explicit shape tags
-      return R.err(new Error(`No @libar-docs-extract-shapes tag found in ${filePath}`));
+      return R.err(new Error(`No @architect-extract-shapes tag found in ${filePath}`));
     }
   } else if (method === 'JSDOC_SECTION') {
     // Extract JSDoc markdown from the file's main JSDoc block

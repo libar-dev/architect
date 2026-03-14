@@ -1,18 +1,18 @@
 /**
  * Configuration API Step Definitions
  *
- * BDD step definitions for testing the createDeliveryProcess factory
+ * BDD step definitions for testing the createArchitect factory
  * and configuration options.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import {
-  createDeliveryProcess,
+  createArchitect,
   createRegexBuilders,
-  type CreateDeliveryProcessOptions,
+  type CreateArchitectOptions,
 } from '../../../src/config/index.js';
 import type { TagRegistry } from '../../../src/validation-schemas/tag-registry.js';
 import type { RegexBuilders } from '../../../src/config/types.js';
@@ -22,7 +22,7 @@ import type { RegexBuilders } from '../../../src/config/types.js';
 // =============================================================================
 
 interface ConfigurationTestState {
-  options: CreateDeliveryProcessOptions;
+  options: CreateArchitectOptions;
   registry: TagRegistry | null;
   regexBuilders: RegexBuilders | null;
   content: string;
@@ -70,17 +70,17 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
   Rule('Factory creates configured instances with correct defaults', ({ RuleScenario }) => {
     RuleScenario('Create with no arguments uses libar-generic preset', ({ When, Then, And }) => {
-      When('I call createDeliveryProcess without arguments', () => {
-        const dp = createDeliveryProcess();
+      When('I call createArchitect without arguments', () => {
+        const dp = createArchitect();
         state!.registry = dp.registry;
       });
 
-      Then('the registry tagPrefix should be "@libar-docs-"', () => {
-        expect(state!.registry!.tagPrefix).toBe('@libar-docs-');
+      Then('the registry tagPrefix should be "@architect-"', () => {
+        expect(state!.registry!.tagPrefix).toBe('@architect-');
       });
 
-      And('the registry fileOptInTag should be "@libar-docs"', () => {
-        expect(state!.registry!.fileOptInTag).toBe('@libar-docs');
+      And('the registry fileOptInTag should be "@architect"', () => {
+        expect(state!.registry!.fileOptInTag).toBe('@architect');
       });
 
       And('the registry should have exactly 3 categories', () => {
@@ -94,8 +94,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
 
     RuleScenario('Create with generic preset', ({ When, Then, And }) => {
-      When('I call createDeliveryProcess with preset "generic"', () => {
-        const dp = createDeliveryProcess({ preset: 'generic' });
+      When('I call createArchitect with preset "generic"', () => {
+        const dp = createArchitect({ preset: 'generic' });
         state!.registry = dp.registry;
       });
 
@@ -119,17 +119,17 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
 
     RuleScenario('Create with libar-generic preset', ({ When, Then, And }) => {
-      When('I call createDeliveryProcess with preset "libar-generic"', () => {
-        const dp = createDeliveryProcess({ preset: 'libar-generic' });
+      When('I call createArchitect with preset "libar-generic"', () => {
+        const dp = createArchitect({ preset: 'libar-generic' });
         state!.registry = dp.registry;
       });
 
-      Then('the registry tagPrefix should be "@libar-docs-"', () => {
-        expect(state!.registry!.tagPrefix).toBe('@libar-docs-');
+      Then('the registry tagPrefix should be "@architect-"', () => {
+        expect(state!.registry!.tagPrefix).toBe('@architect-');
       });
 
-      And('the registry fileOptInTag should be "@libar-docs"', () => {
-        expect(state!.registry!.fileOptInTag).toBe('@libar-docs');
+      And('the registry fileOptInTag should be "@architect"', () => {
+        expect(state!.registry!.fileOptInTag).toBe('@architect');
       });
 
       And('the registry should have exactly 3 categories', () => {
@@ -143,17 +143,17 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
 
     RuleScenario('Create with ddd-es-cqrs preset explicitly', ({ When, Then, And }) => {
-      When('I call createDeliveryProcess with preset "ddd-es-cqrs"', () => {
-        const dp = createDeliveryProcess({ preset: 'ddd-es-cqrs' });
+      When('I call createArchitect with preset "ddd-es-cqrs"', () => {
+        const dp = createArchitect({ preset: 'ddd-es-cqrs' });
         state!.registry = dp.registry;
       });
 
-      Then('the registry tagPrefix should be "@libar-docs-"', () => {
-        expect(state!.registry!.tagPrefix).toBe('@libar-docs-');
+      Then('the registry tagPrefix should be "@architect-"', () => {
+        expect(state!.registry!.tagPrefix).toBe('@architect-');
       });
 
-      And('the registry fileOptInTag should be "@libar-docs"', () => {
-        expect(state!.registry!.fileOptInTag).toBe('@libar-docs');
+      And('the registry fileOptInTag should be "@architect"', () => {
+        expect(state!.registry!.fileOptInTag).toBe('@architect');
       });
 
       And('the registry should have 21 categories', () => {
@@ -168,8 +168,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
   Rule('Custom prefix configuration works correctly', ({ RuleScenario }) => {
     RuleScenario('Custom tag prefix overrides preset', ({ When, Then }) => {
-      When('I call createDeliveryProcess with tagPrefix "@custom-"', () => {
-        const dp = createDeliveryProcess({ tagPrefix: '@custom-' });
+      When('I call createArchitect with tagPrefix "@custom-"', () => {
+        const dp = createArchitect({ tagPrefix: '@custom-' });
         state!.registry = dp.registry;
       });
 
@@ -179,8 +179,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
 
     RuleScenario('Custom file opt-in tag overrides preset', ({ When, Then }) => {
-      When('I call createDeliveryProcess with fileOptInTag "@my-docs"', () => {
-        const dp = createDeliveryProcess({ fileOptInTag: '@my-docs' });
+      When('I call createArchitect with fileOptInTag "@my-docs"', () => {
+        const dp = createArchitect({ fileOptInTag: '@my-docs' });
         state!.registry = dp.registry;
       });
 
@@ -190,8 +190,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
 
     RuleScenario('Both prefix and opt-in tag can be customized together', ({ When, Then, And }) => {
-      When('I call createDeliveryProcess with tagPrefix "@proj-" and fileOptInTag "@proj"', () => {
-        const dp = createDeliveryProcess({ tagPrefix: '@proj-', fileOptInTag: '@proj' });
+      When('I call createArchitect with tagPrefix "@proj-" and fileOptInTag "@proj"', () => {
+        const dp = createArchitect({ tagPrefix: '@proj-', fileOptInTag: '@proj' });
         state!.registry = dp.registry;
       });
 
@@ -211,8 +211,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
   Rule('Preset categories replace base categories entirely', ({ RuleScenario }) => {
     RuleScenario('Generic preset excludes DDD categories', ({ When, Then, And }) => {
-      When('I call createDeliveryProcess with preset "generic"', () => {
-        const dp = createDeliveryProcess({ preset: 'generic' });
+      When('I call createArchitect with preset "generic"', () => {
+        const dp = createArchitect({ preset: 'generic' });
         state!.registry = dp.registry;
       });
 
@@ -238,8 +238,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
 
     RuleScenario('Libar-generic preset excludes DDD categories', ({ When, Then, And }) => {
-      When('I call createDeliveryProcess with preset "libar-generic"', () => {
-        const dp = createDeliveryProcess({ preset: 'libar-generic' });
+      When('I call createArchitect with preset "libar-generic"', () => {
+        const dp = createArchitect({ preset: 'libar-generic' });
         state!.registry = dp.registry;
       });
 

@@ -22,17 +22,17 @@ Need cross-source or DoD validation?
 ├─ Yes → validate-patterns
 │
 Running pre-commit hook?
-└─ lint-process --staged (default)
+└─ architect-guard --staged (default)
 ```
 
 ## Command Summary
 
-| Command             | Purpose                           | When to Use                                   |
-| ------------------- | --------------------------------- | --------------------------------------------- |
-| `lint-patterns`     | Annotation quality                | Ensure patterns have required tags            |
-| `lint-steps`        | vitest-cucumber compatibility     | After writing/modifying feature or step files |
-| `lint-process`      | FSM workflow enforcement          | Pre-commit hooks, CI pipelines                |
-| `validate-patterns` | Cross-source + DoD + anti-pattern | Release validation, comprehensive             |
+| Command                   | Purpose                           | When to Use                                   |
+| ------------------------- | --------------------------------- | --------------------------------------------- |
+| `architect-lint-patterns` | Annotation quality                | Ensure patterns have required tags            |
+| `architect-lint-steps`    | vitest-cucumber compatibility     | After writing/modifying feature or step files |
+| `architect-guard`         | FSM workflow enforcement          | Pre-commit hooks, CI pipelines                |
+| `architect-validate`      | Cross-source + DoD + anti-pattern | Release validation, comprehensive             |
 
 ---
 
@@ -220,8 +220,8 @@ describeFeature(feature, ({ Given, When, Then, And }) => { ... });
 
 ```
 Feature files:  tests/features/**/*.feature
-                delivery-process/specs/**/*.feature
-                delivery-process/decisions/**/*.feature
+                architect/specs/**/*.feature
+                architect/decisions/**/*.feature
 Step files:     tests/steps/**/*.steps.ts
 ```
 
@@ -240,10 +240,10 @@ FSM validation for delivery workflow (PDR-005). Enforces status transitions and 
 
 ```bash
 # Pre-commit (default)
-npx lint-process --staged
+npx architect-guard --staged
 
 # CI pipeline
-npx lint-process --all --strict
+npx architect-guard --all --strict
 ```
 
 **What it validates:**
@@ -345,8 +345,8 @@ Add these scripts to your project's `package.json`:
     "lint:patterns": "lint-patterns -i 'src/**/*.ts'",
     "lint:steps": "lint-steps",
     "lint:steps:ci": "lint-steps --strict",
-    "lint:process": "lint-process --staged",
-    "lint:process:ci": "lint-process --all --strict",
+    "lint:process": "architect-guard --staged",
+    "lint:process:ci": "architect-guard --all --strict",
     "validate:all": "validate-patterns -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns"
   }
 }
@@ -356,7 +356,7 @@ Add these scripts to your project's `package.json`:
 
 ```bash
 # .husky/pre-commit
-npx lint-process --staged
+npx architect-guard --staged
 ```
 
 ### GitHub Actions
@@ -376,11 +376,11 @@ npx lint-process --staged
 
 ## Exit Codes
 
-| Code | `lint-patterns` / `lint-steps` / `lint-process` | `validate-patterns`                   |
-| ---- | ----------------------------------------------- | ------------------------------------- |
-| `0`  | No errors (warnings allowed unless `--strict`)  | No issues found                       |
-| `1`  | Errors found (or warnings with `--strict`)      | Errors found                          |
-| `2`  | —                                               | Warnings found (with `--strict` only) |
+| Code | `architect-lint-patterns` / `architect-lint-steps` / `architect-guard` | `architect-validate`                  |
+| ---- | ---------------------------------------------------------------------- | ------------------------------------- |
+| `0`  | No errors (warnings allowed unless `--strict`)                         | No issues found                       |
+| `1`  | Errors found (or warnings with `--strict`)                             | Errors found                          |
+| `2`  | —                                                                      | Warnings found (with `--strict` only) |
 
 ---
 
@@ -390,19 +390,19 @@ All validation tools expose programmatic APIs. Import from subpaths:
 
 ```typescript
 // Pattern linting
-import { lintFiles, hasFailures } from '@libar-dev/delivery-process/lint';
+import { lintFiles, hasFailures } from '@libar-dev/architect/lint';
 
 // Step linting
-import { runStepLint, STEP_LINT_RULES } from '@libar-dev/delivery-process/lint';
+import { runStepLint, STEP_LINT_RULES } from '@libar-dev/architect/lint';
 
 // Process guard
-import { deriveProcessState, validateChanges } from '@libar-dev/delivery-process/lint';
+import { deriveProcessState, validateChanges } from '@libar-dev/architect/lint';
 
 // Anti-patterns and DoD
-import { detectAntiPatterns, validateDoD } from '@libar-dev/delivery-process/validation';
+import { detectAntiPatterns, validateDoD } from '@libar-dev/architect/validation';
 ```
 
-`validatePatterns()` now accepts a `RuntimeMasterDataset`. Build one via `buildMasterDataset()` from `@libar-dev/delivery-process/generators`.
+`validatePatterns()` now accepts a `RuntimeMasterDataset`. Build one via `buildMasterDataset()` from `@libar-dev/architect/generators`.
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed API documentation.
 

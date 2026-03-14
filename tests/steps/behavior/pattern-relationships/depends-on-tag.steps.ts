@@ -1,7 +1,7 @@
 /**
  * Planning Dependency Tags Step Definitions
  *
- * BDD step definitions for testing @libar-docs-depends-on and @libar-docs-enables
+ * BDD step definitions for testing @architect-depends-on and @architect-enables
  * tag extraction from Gherkin files.
  *
  * These step definitions test:

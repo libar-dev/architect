@@ -16,16 +16,16 @@ The CLI has two output modes:
 - **Text commands** (6) -- formatted for terminal reading or AI context. Use `===` section markers for structure.
 - **JSON commands** (12+) -- wrapped in a `QueryResult` envelope. Pipeable to `jq`.
 
-Run `process-api --help` for the full command reference with all flags and 26 available API methods.
+Run `architect --help` for the full command reference with all flags and 26 available API methods.
 
 ## Quick Start
 
 The recommended session startup is three commands:
 
 ```bash
-pnpm process:query -- overview
-pnpm process:query -- scope-validate MyPattern implement
-pnpm process:query -- context MyPattern --session implement
+pnpm architect:query -- overview
+pnpm architect:query -- scope-validate MyPattern implement
+pnpm architect:query -- context MyPattern --session implement
 ```
 
 Example `overview` output:
@@ -42,7 +42,7 @@ Phase 25: DataAPIStubIntegration (1 active)
 StepLintExtendedRules blocked by: StepLintVitestCucumber
 
 === DATA API ===
-pnpm process:query -- <subcommand>
+pnpm architect:query -- <subcommand>
   overview, context, scope-validate, dep-tree, list, stubs, files, rules, arch blocking
 ```
 
@@ -69,7 +69,7 @@ These 6 commands output structured text (not JSON). They are designed for termin
 Executive summary: progress percentage, active phases, blocking patterns, and a CLI cheat sheet.
 
 ```bash
-pnpm process:query -- overview
+pnpm architect:query -- overview
 ```
 
 Example output:
@@ -86,7 +86,7 @@ Phase 25: DataAPIStubIntegration (1 active)
 StepLintExtendedRules blocked by: StepLintVitestCucumber
 
 === DATA API — Use Instead of Explore Agents ===
-pnpm process:query -- <subcommand>
+pnpm architect:query -- <subcommand>
   overview, context, scope-validate, dep-tree, list, stubs, files, rules, arch blocking
 ```
 
@@ -95,7 +95,7 @@ pnpm process:query -- <subcommand>
 **Highest-impact command.** Pre-flight readiness check that prevents wasted sessions. Returns a PASS/BLOCKED/WARN verdict covering: dependency completion, deliverable definitions, FSM transition validity, and design decisions.
 
 ```bash
-pnpm process:query -- scope-validate MyPattern implement
+pnpm architect:query -- scope-validate MyPattern implement
 ```
 
 Checks: dependency completion, deliverable definitions, FSM transition validity, design decisions, executable spec location. Valid session types for scope-validate: `implement`, `design`.
@@ -120,7 +120,7 @@ BLOCKED: 1 blocker(s) prevent implement session
 Curated context bundle tailored to session type.
 
 ```bash
-pnpm process:query -- context MyPattern --session design
+pnpm architect:query -- context MyPattern --session design
 ```
 
 Example output:
@@ -152,17 +152,17 @@ ProcessStateAPI (active, service)
 Dependency chain with status indicators. Shows what a pattern depends on, recursively.
 
 ```bash
-pnpm process:query -- dep-tree MyPattern
+pnpm architect:query -- dep-tree MyPattern
 ```
 
-Use `--depth` to limit recursion depth: `pnpm process:query -- dep-tree MyPattern --depth 2`.
+Use `--depth` to limit recursion depth: `pnpm architect:query -- dep-tree MyPattern --depth 2`.
 
 ### `files`
 
 File reading list with implementation paths. Use `--related` to include architecture neighbors.
 
 ```bash
-pnpm process:query -- files MyPattern --related
+pnpm architect:query -- files MyPattern --related
 ```
 
 Example output:
@@ -182,7 +182,7 @@ src/cli/error-handler.ts
 Captures session-end state: deliverable statuses, blockers, and modification date.
 
 ```bash
-pnpm process:query -- handoff --pattern MyPattern
+pnpm architect:query -- handoff --pattern MyPattern
 ```
 
 Use `--git` to include recent commits. Use `--session` to tag the handoff with a session id.
@@ -212,7 +212,7 @@ These commands output JSON wrapped in a `QueryResult` envelope.
 Status counts and completion percentage.
 
 ```bash
-pnpm process:query -- status
+pnpm architect:query -- status
 ```
 
 **Output:** `{ counts: { completed, active, planned, total }, completionPercentage, distribution }`
@@ -222,7 +222,7 @@ pnpm process:query -- status
 Filtered pattern listing. Composable with output modifiers and list filters.
 
 ```bash
-pnpm process:query -- list --status roadmap --names-only
+pnpm architect:query -- list --status roadmap --names-only
 ```
 
 See Output Modifiers and List Filters for all options. Examples: `list --status active --count`, `list --phase 25 --fields patternName,status,file`.
@@ -232,7 +232,7 @@ See Output Modifiers and List Filters for all options. Examples: `list --status 
 Fuzzy name search with match scores. Suggests close matches when a pattern is not found.
 
 ```bash
-pnpm process:query -- search EventStore
+pnpm architect:query -- search EventStore
 ```
 
 ### `pattern`
@@ -240,7 +240,7 @@ pnpm process:query -- search EventStore
 Full detail for one pattern including deliverables, dependencies, and all relationship fields.
 
 ```bash
-pnpm process:query -- pattern TransformDataset
+pnpm architect:query -- pattern TransformDataset
 ```
 
 **Warning:** Completed patterns can produce ~66KB of output. Prefer `context --session` for interactive sessions.
@@ -250,17 +250,17 @@ pnpm process:query -- pattern TransformDataset
 Design stubs with target paths and resolution status.
 
 ```bash
-pnpm process:query -- stubs MyPattern
+pnpm architect:query -- stubs MyPattern
 ```
 
-Use `--unresolved` to show only stubs missing target files: `pnpm process:query -- stubs --unresolved`.
+Use `--unresolved` to show only stubs missing target files: `pnpm architect:query -- stubs --unresolved`.
 
 ### `decisions`
 
 AD-N design decisions extracted from stub descriptions.
 
 ```bash
-pnpm process:query -- decisions MyPattern
+pnpm architect:query -- decisions MyPattern
 ```
 
 **Note:** Returns exit code 1 when no decisions are found (unlike `list`/`search` which return empty arrays).
@@ -270,7 +270,7 @@ pnpm process:query -- decisions MyPattern
 Cross-reference patterns mentioning a PDR number.
 
 ```bash
-pnpm process:query -- pdr 1
+pnpm architect:query -- pdr 1
 ```
 
 **Note:** Returns exit code 1 when no PDR references are found, same as `decisions`.
@@ -280,7 +280,7 @@ pnpm process:query -- pdr 1
 Business rules and invariants extracted from Gherkin `Rule:` blocks, grouped by product area, phase, and feature.
 
 ```bash
-pnpm process:query -- rules --pattern ProcessGuardDecider
+pnpm architect:query -- rules --pattern ProcessGuardDecider
 ```
 
 **Warning:** Unfiltered `rules` output can exceed 600KB. Always use `--pattern` or `--product-area` filters. **Output shape:** `{ productAreas: [{ productArea, ruleCount, invariantCount, phases: [{ phase, features: [{ pattern, source, rules }] }] }], totalRules, totalInvariants }`
@@ -289,14 +289,14 @@ pnpm process:query -- rules --pattern ProcessGuardDecider
 
 ## Architecture Queries
 
-All architecture queries output JSON. They use `@libar-docs-arch-*` annotations.
+All architecture queries output JSON. They use `@architect-arch-*` annotations.
 
 ### `arch roles`
 
 All arch-roles with pattern counts
 
 ```bash
-pnpm process:query -- arch roles
+pnpm architect:query -- arch roles
 ```
 
 ### `arch context`
@@ -304,7 +304,7 @@ pnpm process:query -- arch roles
 All bounded contexts
 
 ```bash
-pnpm process:query -- arch context
+pnpm architect:query -- arch context
 ```
 
 ### `arch context <name>`
@@ -312,7 +312,7 @@ pnpm process:query -- arch context
 Patterns in one bounded context
 
 ```bash
-pnpm process:query -- arch context scanner
+pnpm architect:query -- arch context scanner
 ```
 
 ### `arch layer`
@@ -320,7 +320,7 @@ pnpm process:query -- arch context scanner
 All architecture layers
 
 ```bash
-pnpm process:query -- arch layer
+pnpm architect:query -- arch layer
 ```
 
 ### `arch layer <name>`
@@ -328,7 +328,7 @@ pnpm process:query -- arch layer
 Patterns in one layer
 
 ```bash
-pnpm process:query -- arch layer domain
+pnpm architect:query -- arch layer domain
 ```
 
 ### `arch neighborhood <pattern>`
@@ -336,7 +336,7 @@ pnpm process:query -- arch layer domain
 Uses, usedBy, dependsOn, same-context
 
 ```bash
-pnpm process:query -- arch neighborhood EventStore
+pnpm architect:query -- arch neighborhood EventStore
 ```
 
 ### `arch compare <c1> <c2>`
@@ -344,7 +344,7 @@ pnpm process:query -- arch neighborhood EventStore
 Cross-context shared deps + integration
 
 ```bash
-pnpm process:query -- arch compare scanner codec
+pnpm architect:query -- arch compare scanner codec
 ```
 
 ### `arch coverage`
@@ -352,7 +352,7 @@ pnpm process:query -- arch compare scanner codec
 Annotation completeness across input files
 
 ```bash
-pnpm process:query -- arch coverage
+pnpm architect:query -- arch coverage
 ```
 
 ### `arch dangling`
@@ -360,7 +360,7 @@ pnpm process:query -- arch coverage
 Broken references (names that don't exist)
 
 ```bash
-pnpm process:query -- arch dangling
+pnpm architect:query -- arch dangling
 ```
 
 ### `arch orphans`
@@ -368,7 +368,7 @@ pnpm process:query -- arch dangling
 Patterns with no relationships (isolated)
 
 ```bash
-pnpm process:query -- arch orphans
+pnpm architect:query -- arch orphans
 ```
 
 ### `arch blocking`
@@ -376,7 +376,7 @@ pnpm process:query -- arch orphans
 Patterns blocked by incomplete deps
 
 ```bash
-pnpm process:query -- arch blocking
+pnpm architect:query -- arch blocking
 ```
 
 ---
@@ -388,7 +388,7 @@ pnpm process:query -- arch blocking
 Tag usage report — counts per tag and value across all annotated sources.
 
 ```bash
-pnpm process:query -- tags
+pnpm architect:query -- tags
 ```
 
 ### `sources`
@@ -396,15 +396,15 @@ pnpm process:query -- tags
 File inventory by type (TypeScript, Gherkin, Stubs, Decisions).
 
 ```bash
-pnpm process:query -- sources
+pnpm architect:query -- sources
 ```
 
 ### `unannotated`
 
-TypeScript files missing the `@libar-docs` opt-in marker. Use `--path` to scope to a directory.
+TypeScript files missing the `@architect` opt-in marker. Use `--path` to scope to a directory.
 
 ```bash
-pnpm process:query -- unannotated --path src/types
+pnpm architect:query -- unannotated --path src/types
 ```
 
 ### `query`
@@ -412,10 +412,10 @@ pnpm process:query -- unannotated --path src/types
 Execute any of the 26 query API methods directly by name. This is the escape hatch for methods not exposed as dedicated subcommands.
 
 ```bash
-pnpm process:query -- query getStatusCounts
+pnpm architect:query -- query getStatusCounts
 ```
 
-Integer-like arguments are automatically coerced to numbers. Run `process-api --help` for the full list of available API methods. Examples: `query isValidTransition roadmap active`, `query getPatternsByPhase 18`, `query getRecentlyCompleted 5`.
+Integer-like arguments are automatically coerced to numbers. Run `architect --help` for the full list of available API methods. Examples: `query isValidTransition roadmap active`, `query getPatternsByPhase 18`, `query getRecentlyCompleted 5`.
 
 ---
 
@@ -428,9 +428,9 @@ Frequently-used command sequences for daily workflow.
 The recommended session startup is three commands.
 
 ```bash
-pnpm process:query -- overview   # project health
-pnpm process:query -- scope-validate MyPattern implement   # pre-flight
-pnpm process:query -- context MyPattern --session implement   # curated context
+pnpm architect:query -- overview   # project health
+pnpm architect:query -- scope-validate MyPattern implement   # pre-flight
+pnpm architect:query -- context MyPattern --session implement   # curated context
 ```
 
 ### Finding What to Work On
@@ -438,9 +438,9 @@ pnpm process:query -- context MyPattern --session implement   # curated context
 Discover available patterns, blockers, and missing implementations.
 
 ```bash
-pnpm process:query -- list --status roadmap --names-only   # available patterns
-pnpm process:query -- arch blocking   # stuck patterns
-pnpm process:query -- stubs --unresolved   # missing implementations
+pnpm architect:query -- list --status roadmap --names-only   # available patterns
+pnpm architect:query -- arch blocking   # stuck patterns
+pnpm architect:query -- stubs --unresolved   # missing implementations
 ```
 
 ### Investigating a Pattern
@@ -448,10 +448,10 @@ pnpm process:query -- stubs --unresolved   # missing implementations
 Deep-dive into a specific pattern: search, dependencies, neighbors, and files.
 
 ```bash
-pnpm process:query -- search EventStore   # fuzzy name search
-pnpm process:query -- dep-tree MyPattern --depth 2   # dependency chain
-pnpm process:query -- arch neighborhood MyPattern   # what it touches
-pnpm process:query -- files MyPattern --related   # file paths
+pnpm architect:query -- search EventStore   # fuzzy name search
+pnpm architect:query -- dep-tree MyPattern --depth 2   # dependency chain
+pnpm architect:query -- arch neighborhood MyPattern   # what it touches
+pnpm architect:query -- files MyPattern --related   # file paths
 ```
 
 ### Design Session Prep
@@ -459,9 +459,9 @@ pnpm process:query -- files MyPattern --related   # file paths
 Gather full context, design decisions, and stubs before a design session.
 
 ```bash
-pnpm process:query -- context MyPattern --session design   # full context
-pnpm process:query -- decisions MyPattern   # design decisions
-pnpm process:query -- stubs MyPattern   # existing stubs
+pnpm architect:query -- context MyPattern --session design   # full context
+pnpm architect:query -- decisions MyPattern   # design decisions
+pnpm architect:query -- stubs MyPattern   # existing stubs
 ```
 
 ### Ending a Session
@@ -469,8 +469,8 @@ pnpm process:query -- stubs MyPattern   # existing stubs
 Capture session-end state for continuity.
 
 ```bash
-pnpm process:query -- handoff --pattern MyPattern   # capture state
-pnpm process:query -- handoff --pattern MyPattern --git   # include commits
+pnpm architect:query -- handoff --pattern MyPattern   # capture state
+pnpm architect:query -- handoff --pattern MyPattern --git   # include commits
 ```
 
 ---

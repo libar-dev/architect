@@ -5,8 +5,8 @@
  * between CLI invocations: cache hits, mtime invalidation,
  * and --no-cache bypass.
  *
- * @libar-docs
- * @libar-docs-implements DataAPICLIErgonomics
+ * @architect
+ * @architect-implements DataAPICLIErgonomics
  */
 
 import * as fs from 'node:fs';

@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-pattern ContextFormatterImpl
- * @libar-docs-status active
- * @libar-docs-implements DataAPIContextAssembly
- * @libar-docs-uses ContextAssemblerImpl
- * @libar-docs-used-by ProcessAPICLIImpl
- * @libar-docs-arch-role service
- * @libar-docs-arch-context api
- * @libar-docs-arch-layer application
+ * @architect
+ * @architect-pattern ContextFormatterImpl
+ * @architect-status active
+ * @architect-implements DataAPIContextAssembly
+ * @architect-uses ContextAssemblerImpl
+ * @architect-used-by ProcessAPICLIImpl
+ * @architect-arch-role service
+ * @architect-arch-context api
+ * @architect-arch-layer application
  *
  * ## ContextFormatter — Plain Text Renderer for Context Bundles
  *

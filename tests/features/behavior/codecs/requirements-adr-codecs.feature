@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:RequirementsAdrCodecTesting
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
-@libar-docs-implements:CodecBehaviorTesting
+@architect
+@architect-pattern:RequirementsAdrCodecTesting
+@architect-status:completed
+@architect-product-area:Generation
+@architect-implements:CodecBehaviorTesting
 @behavior @requirements-adr-codecs
 Feature: Requirements and ADR Document Codecs
   The RequirementsDocumentCodec and AdrDocumentCodec transform MasterDataset

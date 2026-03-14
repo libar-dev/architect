@@ -4,7 +4,7 @@
  * This module provides common setup utilities for BDD tests.
  * It handles test lifecycle hooks and global configuration.
  *
- * @libar-docs
+ * @architect
  */
 
 import { beforeEach } from 'vitest';

@@ -4,8 +4,8 @@
  * BDD step definitions for testing the generate-docs CLI
  * which generates documentation from annotated TypeScript.
  *
- * @libar-docs
- * @libar-docs-implements CliBehaviorTesting
+ * @architect
+ * @architect-implements CliBehaviorTesting
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -45,13 +45,13 @@ function initState(): CLITestState {
 // =============================================================================
 
 function createPatternFile(): string {
-  return `/** @libar-docs */
+  return `/** @architect */
 
 /**
- * @libar-docs-core
- * @libar-docs-pattern TestGeneratorPattern
- * @libar-docs-status completed
- * @libar-docs-uses AnotherPattern
+ * @architect-core
+ * @architect-pattern TestGeneratorPattern
+ * @architect-status completed
+ * @architect-uses AnotherPattern
  *
  * ## TestGeneratorPattern
  *

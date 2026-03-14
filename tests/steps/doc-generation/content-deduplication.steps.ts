@@ -7,7 +7,7 @@
  * - Section ordering preservation
  * - Integration with source mapper pipeline
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

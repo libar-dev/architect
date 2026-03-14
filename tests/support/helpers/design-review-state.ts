@@ -4,8 +4,8 @@
  * Provides test state management and fixture builders for testing
  * the SequenceIndex builder and DesignReviewCodec pipeline.
  *
- * @libar-docs
- * @libar-docs-uses SequenceIndex, DesignReviewCodec, MasterDataset
+ * @architect
+ * @architect-uses SequenceIndex, DesignReviewCodec, MasterDataset
  */
 
 import type { BusinessRule } from '../../../src/validation-schemas/extracted-pattern.js';
@@ -152,7 +152,7 @@ export function generateDesignReview(state: DesignReviewState): void {
   const pattern = createTestPattern({
     name: state.patternName || 'TestPattern',
     status: 'active',
-    filePath: 'delivery-process/specs/test-pattern.feature',
+    filePath: 'architect/specs/test-pattern.feature',
     rules: state.rules,
     sequenceOrchestrator: state.orchestrator,
   });
@@ -176,7 +176,7 @@ export function transformWithValidation(state: DesignReviewState): void {
   const pattern = createTestPattern({
     name: state.patternName || 'TestPattern',
     status: 'active',
-    filePath: 'delivery-process/specs/test-pattern.feature',
+    filePath: 'architect/specs/test-pattern.feature',
     rules: state.rules,
     sequenceOrchestrator: state.orchestrator,
   });
@@ -202,7 +202,7 @@ export function resolveSequenceEntry(
   const pattern = createTestPattern({
     name: state.patternName || 'TestPattern',
     status: 'active',
-    filePath: 'delivery-process/specs/test-pattern.feature',
+    filePath: 'architect/specs/test-pattern.feature',
     rules: state.rules,
     sequenceOrchestrator: state.orchestrator,
   });

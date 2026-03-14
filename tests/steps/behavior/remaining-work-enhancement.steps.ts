@@ -7,7 +7,7 @@
  * - Quarter-based grouping
  * - Progressive disclosure
  *
- * @libar-docs
+ * @architect
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';

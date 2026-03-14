@@ -320,9 +320,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       });
     });
 
-    RuleScenario('Skip feature files without @libar-docs opt-in', ({ Given, When, Then }) => {
-      Given('a Gherkin feature file without @libar-docs opt-in marker', () => {
-        // Create a file with pattern tags but NO @libar-docs opt-in marker
+    RuleScenario('Skip feature files without @architect opt-in', ({ Given, When, Then }) => {
+      Given('a Gherkin feature file without @architect opt-in marker', () => {
+        // Create a file with pattern tags but NO @architect opt-in marker
         const noOptInFile: ScannedGherkinFile = {
           filePath: '/test/no-optin.feature',
           feature: {

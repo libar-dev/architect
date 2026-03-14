@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:LintPatternsCli
-@libar-docs-status:completed
-@libar-docs-product-area:DataAPI
-@libar-docs-implements:CliBehaviorTesting
+@architect
+@architect-pattern:LintPatternsCli
+@architect-status:completed
+@architect-product-area:DataAPI
+@architect-implements:CliBehaviorTesting
 @cli @lint-patterns
 Feature: lint-patterns CLI
   Command-line interface for validating pattern annotation quality.

@@ -4,7 +4,7 @@
  * BDD step definitions for testing the preset system including
  * GENERIC_PRESET, DDD_ES_CQRS_PRESET, and PRESETS lookup.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -16,15 +16,15 @@ import {
   PRESETS,
   type PresetName,
 } from '../../../src/config/presets.js';
-import type { DeliveryProcessConfig } from '../../../src/config/types.js';
+import type { ArchitectConfig } from '../../../src/config/types.js';
 
 // =============================================================================
 // Type Definitions
 // =============================================================================
 
 interface PresetTestState {
-  preset: DeliveryProcessConfig | null;
-  presetFromMap: DeliveryProcessConfig | null;
+  preset: ArchitectConfig | null;
+  presetFromMap: ArchitectConfig | null;
 }
 
 // =============================================================================
@@ -131,12 +131,12 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
           state.preset = LIBAR_GENERIC_PRESET;
         });
 
-        Then('it should have tagPrefix "@libar-docs-"', () => {
-          expect(state!.preset!.tagPrefix).toBe('@libar-docs-');
+        Then('it should have tagPrefix "@architect-"', () => {
+          expect(state!.preset!.tagPrefix).toBe('@architect-');
         });
 
-        And('it should have fileOptInTag "@libar-docs"', () => {
-          expect(state!.preset!.fileOptInTag).toBe('@libar-docs');
+        And('it should have fileOptInTag "@architect"', () => {
+          expect(state!.preset!.fileOptInTag).toBe('@architect');
         });
       }
     );
@@ -199,12 +199,12 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
         state.preset = DDD_ES_CQRS_PRESET;
       });
 
-      Then('it should have tagPrefix "@libar-docs-"', () => {
-        expect(state!.preset!.tagPrefix).toBe('@libar-docs-');
+      Then('it should have tagPrefix "@architect-"', () => {
+        expect(state!.preset!.tagPrefix).toBe('@architect-');
       });
 
-      And('it should have fileOptInTag "@libar-docs"', () => {
-        expect(state!.preset!.fileOptInTag).toBe('@libar-docs');
+      And('it should have fileOptInTag "@architect"', () => {
+        expect(state!.preset!.fileOptInTag).toBe('@architect');
       });
     });
 
@@ -326,8 +326,8 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
         state.presetFromMap = PRESETS['ddd-es-cqrs' as PresetName];
       });
 
-      Then('the preset tagPrefix should be "@libar-docs-"', () => {
-        expect(state!.presetFromMap!.tagPrefix).toBe('@libar-docs-');
+      Then('the preset tagPrefix should be "@architect-"', () => {
+        expect(state!.presetFromMap!.tagPrefix).toBe('@architect-');
       });
     });
 
@@ -337,8 +337,8 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
         state.presetFromMap = PRESETS['libar-generic' as PresetName];
       });
 
-      Then('the preset tagPrefix should be "@libar-docs-"', () => {
-        expect(state!.presetFromMap!.tagPrefix).toBe('@libar-docs-');
+      Then('the preset tagPrefix should be "@architect-"', () => {
+        expect(state!.presetFromMap!.tagPrefix).toBe('@architect-');
       });
     });
   });

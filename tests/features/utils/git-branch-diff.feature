@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:GitBranchDiffTesting
-@libar-docs-status:active
-@libar-docs-product-area:Generation
-@libar-docs-implements:GitBranchDiff
+@architect
+@architect-pattern:GitBranchDiffTesting
+@architect-status:active
+@architect-product-area:Generation
+@architect-implements:GitBranchDiff
 @git @branch-diff
 Feature: Git Branch Diff
   The branch diff utility returns changed files relative to a base branch for

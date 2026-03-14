@@ -4,8 +4,8 @@
  * BDD step definitions for testing the generate-tag-taxonomy CLI
  * which generates TAG_TAXONOMY.md from tag registry configuration.
  *
- * @libar-docs
- * @libar-docs-implements CliBehaviorTesting
+ * @architect
+ * @architect-implements CliBehaviorTesting
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

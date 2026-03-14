@@ -210,8 +210,8 @@ describeFeature(feature, ({ Background, Rule }) => {
         createTestTypeScriptFile(
           'src/test-types.ts',
           `/**
- * @libar-docs
- * @libar-docs-extract-shapes TestInterface
+ * @architect
+ * @architect-extract-shapes TestInterface
  */
 
 export interface TestInterface {
@@ -441,8 +441,8 @@ export interface TestInterface {
         createTestTypeScriptFile(
           'src/test-types.ts',
           `/**
- * @libar-docs
- * @libar-docs-extract-shapes MyInterface
+ * @architect
+ * @architect-extract-shapes MyInterface
  */
 export interface MyInterface { id: string; }
 `
@@ -505,8 +505,8 @@ export interface MyInterface { id: string; }
         createTestTypeScriptFile(
           'src/test-types.ts',
           `/**
- * @libar-docs
- * @libar-docs-extract-shapes Type
+ * @architect
+ * @architect-extract-shapes Type
  */
 export type Type = string;
 `

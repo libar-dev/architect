@@ -12,16 +12,16 @@ The CLI has two output modes:
 - **Text commands** (6) -- formatted for terminal reading or AI context. Use `===` section markers for structure.
 - **JSON commands** (12+) -- wrapped in a `QueryResult` envelope. Pipeable to `jq`.
 
-Run `process-api --help` for the full command reference with all flags and 26 available API methods.
+Run `architect --help` for the full command reference with all flags and 26 available API methods.
 
 ## Quick Start
 
 The recommended session startup is three commands:
 
 ```bash
-pnpm process:query -- overview
-pnpm process:query -- scope-validate MyPattern implement
-pnpm process:query -- context MyPattern --session implement
+pnpm architect:query -- overview
+pnpm architect:query -- scope-validate MyPattern implement
+pnpm architect:query -- context MyPattern --session implement
 ```
 
 Example `overview` output:
@@ -38,7 +38,7 @@ Phase 25: DataAPIStubIntegration (1 active)
 StepLintExtendedRules blocked by: StepLintVitestCucumber
 
 === DATA API ===
-pnpm process:query -- <subcommand>
+pnpm architect:query -- <subcommand>
   overview, context, scope-validate, dep-tree, list, stubs, files, rules, arch blocking
 ```
 

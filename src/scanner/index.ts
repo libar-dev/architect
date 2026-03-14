@@ -56,7 +56,7 @@ export interface ScanResults {
 }
 
 /**
- * Scans source files for @libar-docs-* directives and extracts them
+ * Scans source files for @architect-* directives and extracts them
  * with their associated code blocks and export information.
  *
  * **Result Pattern**: Returns Result<ScanResults, never> where:

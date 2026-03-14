@@ -2,8 +2,8 @@
  * Branded type helper
  * Creates nominal types for better compile-time safety
  *
- * @libar-docs-shape
- * @libar-docs-include core-types
+ * @architect-shape
+ * @architect-include core-types
  */
 type Branded<T, Brand extends string> = T & { readonly __brand: Brand };
 
@@ -99,7 +99,7 @@ export function asRegistryFilePath(path: string): RegistryFilePath {
 
 /**
  * Directive tag name
- * Format: @libar-docs-{category} or @libar-docs-{category}-{subcategory}
+ * Format: @architect-{category} or @architect-{category}-{subcategory}
  */
 export type DirectiveTag = Branded<string, 'DirectiveTag'>;
 

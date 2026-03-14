@@ -7,7 +7,7 @@
  * - Template and checklist validation
  * - PROCESS_SETUP.md documentation
  *
- * @libar-docs
+ * @architect
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';

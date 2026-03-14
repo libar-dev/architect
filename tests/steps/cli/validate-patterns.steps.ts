@@ -4,8 +4,8 @@
  * BDD step definitions for testing the validate-patterns CLI
  * which cross-validates TypeScript patterns vs Gherkin feature files.
  *
- * @libar-docs
- * @libar-docs-implements CliBehaviorTesting
+ * @architect
+ * @architect-implements CliBehaviorTesting
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -44,13 +44,13 @@ function initState(): CLITestState {
 // =============================================================================
 
 function createTypeScriptPatternFile(patternName: string, phase: number, status: string): string {
-  return `/** @libar-docs */
+  return `/** @architect */
 
 /**
- * @libar-docs-core
- * @libar-docs-pattern ${patternName}
- * @libar-docs-phase ${phase}
- * @libar-docs-status ${status}
+ * @architect-core
+ * @architect-pattern ${patternName}
+ * @architect-phase ${phase}
+ * @architect-status ${status}
  *
  * ## ${patternName}
  *
@@ -78,10 +78,10 @@ function createGherkinPatternFile(patternName: string, phase: number, status: st
 `
       : '';
 
-  return `@libar-docs
-@libar-docs-pattern:${patternName}
-@libar-docs-phase:${phase}
-@libar-docs-status:${status}
+  return `@architect
+@architect-pattern:${patternName}
+@architect-phase:${phase}
+@architect-status:${status}
 Feature: ${patternName}
   Test feature for validate-patterns CLI testing.
 ${backgroundSection}

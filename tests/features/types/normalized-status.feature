@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:NormalizedStatusTesting
-@libar-docs-status:active
-@libar-docs-product-area:CoreTypes
-@libar-docs-include:core-types
+@architect
+@architect-pattern:NormalizedStatusTesting
+@architect-status:active
+@architect-product-area:CoreTypes
+@architect-include:core-types
 @taxonomy @status
 Feature: Normalized Status Taxonomy
   The normalized status module maps any status input — raw FSM states (roadmap,

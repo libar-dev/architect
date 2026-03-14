@@ -1,8 +1,8 @@
 /**
  * Uses Tag Step Definitions
  *
- * BDD step definitions for testing @libar-docs-uses and @libar-docs-used-by
- * tag extraction and processing through the delivery-process pipeline.
+ * BDD step definitions for testing @architect-uses and @architect-used-by
+ * tag extraction and processing through the Architect pipeline.
  *
  * These step definitions test:
  * 1. Tag registry definition (CSV format)

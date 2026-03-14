@@ -5,7 +5,7 @@
  * Tests file discovery with glob patterns, default exclusions,
  * and custom exclude patterns.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

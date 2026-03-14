@@ -1,10 +1,10 @@
-# Architecture: @libar-dev/delivery-process
+# Architecture: @libar-dev/architect
 
 > **Deprecated:** Architecture documentation is now auto-generated across multiple reference docs: [Architecture Diagram](../docs-live/ARCHITECTURE.md), [Architecture Codecs](../docs-live/reference/ARCHITECTURE-CODECS.md), and [Architecture Types](../docs-live/reference/ARCHITECTURE-TYPES.md). This file is preserved for reference only.
 
 > **Code-Driven Documentation Generator with Codec-Based Transformation Pipeline**
 
-This document describes the architecture of the `@libar-dev/delivery-process` package, a documentation generator that extracts patterns from TypeScript and Gherkin sources, transforms them through a unified pipeline, and renders them as markdown via typed codecs.
+This document describes the architecture of the `@libar-dev/architect` package, a documentation generator that extracts patterns from TypeScript and Gherkin sources, transforms them through a unified pipeline, and renders them as markdown via typed codecs.
 
 ---
 
@@ -31,9 +31,9 @@ This document describes the architecture of the `@libar-dev/delivery-process` pa
 
 ### What This Package Does
 
-The `@libar-dev/delivery-process` package generates LLM-optimized documentation from dual sources:
+The `@libar-dev/architect` package generates LLM-optimized documentation from dual sources:
 
-- **TypeScript code** with configurable JSDoc annotations (e.g., `@docs-*` or `@libar-docs-*`)
+- **TypeScript code** with configurable JSDoc annotations (e.g., `@docs-*` or `@architect-*`)
 - **Gherkin feature files** with matching tags
 
 The tag prefix is configurable via presets or custom configuration (see [Configuration Architecture](#configuration-architecture)).
@@ -76,8 +76,8 @@ The package supports configurable tag prefixes via the Configuration API.
 ### Entry Point
 
 ```typescript
-// delivery-process.config.ts
-import { defineConfig } from '@libar-dev/delivery-process/config';
+// architect.config.ts
+import { defineConfig } from '@libar-dev/architect/config';
 
 export default defineConfig({
   preset: 'libar-generic',
@@ -127,12 +127,12 @@ defineConfig(userConfig)
 | File                                  | Purpose                                                    |
 | ------------------------------------- | ---------------------------------------------------------- |
 | `src/config/define-config.ts`         | `defineConfig()` identity function for type-safe authoring |
-| `src/config/project-config.ts`        | `DeliveryProcessProjectConfig`, `ResolvedConfig` types     |
+| `src/config/project-config.ts`        | `ArchitectProjectConfig`, `ResolvedConfig` types           |
 | `src/config/project-config-schema.ts` | Zod validation schema, `isProjectConfig()` type guard      |
 | `src/config/resolve-config.ts`        | `resolveProjectConfig()` — defaults + taxonomy resolution  |
 | `src/config/merge-sources.ts`         | `mergeSourcesForGenerator()` — per-generator sources       |
 | `src/config/config-loader.ts`         | `loadProjectConfig()` — file discovery + loading           |
-| `src/config/factory.ts`               | `createDeliveryProcess()` — taxonomy factory (internal)    |
+| `src/config/factory.ts`               | `createArchitect()` — taxonomy factory (internal)          |
 | `src/config/presets.ts`               | GENERIC_PRESET, LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET   |
 
 > **See:** [CONFIGURATION.md](./CONFIGURATION.md) for usage examples and API reference.
@@ -147,16 +147,16 @@ The pipeline has two entry points. The orchestrator (`src/generators/orchestrato
 
 **Purpose:** Discover source files and parse them into structured AST representations.
 
-| Scanner Type | Input                          | Output                 | Key File                         |
-| ------------ | ------------------------------ | ---------------------- | -------------------------------- |
-| TypeScript   | `.ts` files with `@libar-docs` | `ScannedFile[]`        | `src/scanner/pattern-scanner.ts` |
-| Gherkin      | `.feature` files               | `ScannedGherkinFile[]` | `src/scanner/gherkin-scanner.ts` |
+| Scanner Type | Input                         | Output                 | Key File                         |
+| ------------ | ----------------------------- | ---------------------- | -------------------------------- |
+| TypeScript   | `.ts` files with `@architect` | `ScannedFile[]`        | `src/scanner/pattern-scanner.ts` |
+| Gherkin      | `.feature` files              | `ScannedGherkinFile[]` | `src/scanner/gherkin-scanner.ts` |
 
 **TypeScript Scanning Flow:**
 
 ```
 findFilesToScan()     →  hasFileOptIn()      →  parseFileDirectives()
-(glob patterns)          (@libar-docs check)    (AST extraction)
+(glob patterns)          (@architect check)    (AST extraction)
 ```
 
 **Gherkin Scanning Flow:**
@@ -177,13 +177,13 @@ findFeatureFiles()    →  parseFeatureFile()  →  extractPatternTags()
 
 **Shape Extraction Modes:**
 
-| Mode                    | Trigger                                | Behavior                                       |
-| ----------------------- | -------------------------------------- | ---------------------------------------------- |
-| Explicit names          | `@libar-docs-extract-shapes Foo, Bar`  | Extracts named declarations only               |
-| Wildcard auto-discovery | `@libar-docs-extract-shapes *`         | Extracts all exported declarations from file   |
-| Declaration-level       | `@libar-docs-shape` on individual decl | Extracts tagged declarations (exported or not) |
+| Mode                    | Trigger                               | Behavior                                       |
+| ----------------------- | ------------------------------------- | ---------------------------------------------- |
+| Explicit names          | `@architect-extract-shapes Foo, Bar`  | Extracts named declarations only               |
+| Wildcard auto-discovery | `@architect-extract-shapes *`         | Extracts all exported declarations from file   |
+| Declaration-level       | `@architect-shape` on individual decl | Extracts tagged declarations (exported or not) |
 
-Shapes now include `params`, `returns`, and `throws` fields (parsed from `@param`/`@returns`/`@throws` JSDoc tags on function shapes), and an optional `group` field from the `@libar-docs-shape` tag value. `ExportInfo` includes an optional `signature` field for function/const/class declarations.
+Shapes now include `params`, `returns`, and `throws` fields (parsed from `@param`/`@returns`/`@throws` JSDoc tags on function shapes), and an optional `group` field from the `@architect-shape` tag value. `ExportInfo` includes an optional `signature` field for function/const/class declarations.
 
 ```typescript
 interface ExtractedPattern {
@@ -278,11 +278,11 @@ function buildMasterDataset(
 
 **Consumer Table:**
 
-| Consumer            | `mergeConflictStrategy`          | Error Handling              |
-| ------------------- | -------------------------------- | --------------------------- |
-| `process-api`       | `'fatal'`                        | Maps to `process.exit(1)`   |
-| `validate-patterns` | `'concatenate'`                  | Falls back to concatenation |
-| `orchestrator`      | inline (equivalent to `'fatal'`) | Inline error reporting      |
+| Consumer             | `mergeConflictStrategy`          | Error Handling              |
+| -------------------- | -------------------------------- | --------------------------- |
+| `architect`          | `'fatal'`                        | Maps to `process.exit(1)`   |
+| `architect-validate` | `'concatenate'`                  | Falls back to concatenation |
+| `orchestrator`       | inline (equivalent to `'fatal'`) | Inline error reporting      |
 
 **Consumer Layers (ADR-006):**
 
@@ -392,12 +392,12 @@ interface MasterDataset {
     string,
     {
       // Forward relationships (from annotations)
-      uses: string[]; // @libar-docs-uses
-      dependsOn: string[]; // @libar-docs-depends-on
-      implementsPatterns: string[]; // @libar-docs-implements
-      extendsPattern?: string; // @libar-docs-extends
-      seeAlso: string[]; // @libar-docs-see-also
-      apiRef: string[]; // @libar-docs-api-ref
+      uses: string[]; // @architect-uses
+      dependsOn: string[]; // @architect-depends-on
+      implementsPatterns: string[]; // @architect-implements
+      extendsPattern?: string; // @architect-extends
+      seeAlso: string[]; // @architect-see-also
+      apiRef: string[]; // @architect-api-ref
 
       // Reverse lookups (computed by transformer)
       usedBy: string[]; // inverse of uses
@@ -484,7 +484,7 @@ export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset 
 
 ### Key Concepts
 
-The delivery-process package uses a codec-based architecture for document generation:
+The Architect package uses a codec-based architecture for document generation:
 
 ```
 MasterDataset → Codec.decode() → RenderableDocument ─┬→ renderToMarkdown       → Markdown Files
@@ -701,7 +701,7 @@ const doc = codec.decode(dataset);
 
 #### AdrDocumentCodec
 
-**Purpose:** Architecture Decision Records extracted from patterns with @libar-docs-adr tags.
+**Purpose:** Architecture Decision Records extracted from patterns with @architect-adr tags.
 
 **Output Files:**
 
@@ -817,7 +817,7 @@ const doc = codec.decode(dataset);
 
 **4-Layer Composition (in order):**
 
-1. **Convention content** — Extracted from `@libar-docs-convention`-tagged patterns (rules, invariants, tables)
+1. **Convention content** — Extracted from `@architect-convention`-tagged patterns (rules, invariants, tables)
 2. **Scoped diagrams** — Mermaid diagrams filtered by `archContext`, `archLayer`, `patterns`, or `archView`
 3. **TypeScript shapes** — API surfaces from `shapeSources` globs or `shapeSelectors` (declaration-level filtering)
 4. **Behavior content** — Gherkin-sourced patterns from `behaviorCategories`
@@ -928,21 +928,21 @@ The `detailLevel` option controls output verbosity:
 - `src/scanner/ast-parser.ts` - TypeScript AST parsing
 
 > **Note:** The scanner uses `RegexBuilders` from configuration to detect tags.
-> The examples below use `@libar-docs-*` (DDD_ES_CQRS_PRESET). For other prefixes, substitute accordingly.
+> The examples below use `@architect-*` (DDD_ES_CQRS_PRESET). For other prefixes, substitute accordingly.
 
 **Annotation Format:**
 
 ```typescript
 /**
- * @libar-docs                              // Required opt-in (file level)
- * @libar-docs-core @libar-docs-infra       // Category tags
- * @libar-docs-pattern MyPatternName        // Pattern name
- * @libar-docs-status completed             // Status: roadmap|active|completed|deferred
- * @libar-docs-phase 14                     // Roadmap phase number
- * @libar-docs-uses OtherPattern, Another   // Dependencies (CSV)
- * @libar-docs-usecase "When doing X"       // Use cases (repeatable)
- * @libar-docs-convention fsm-rules         // Convention tag (CSV, links to decisions)
- * @libar-docs-extract-shapes *             // Auto-shape discovery (wildcard = all exports)
+ * @architect                              // Required opt-in (file level)
+ * @architect-core @architect-infra       // Category tags
+ * @architect-pattern MyPatternName        // Pattern name
+ * @architect-status completed             // Status: roadmap|active|completed|deferred
+ * @architect-phase 14                     // Roadmap phase number
+ * @architect-uses OtherPattern, Another   // Dependencies (CSV)
+ * @architect-usecase "When doing X"       // Use cases (repeatable)
+ * @architect-convention fsm-rules         // Convention tag (CSV, links to decisions)
+ * @architect-extract-shapes *             // Auto-shape discovery (wildcard = all exports)
  *
  * ## Pattern Description                   // Markdown description
  *
@@ -952,11 +952,11 @@ The `detailLevel` option controls output verbosity:
 
 **Declaration-Level Shape Tagging:**
 
-Individual declarations can be tagged with `@libar-docs-shape` in their JSDoc, without requiring a file-level `@libar-docs-extract-shapes` tag:
+Individual declarations can be tagged with `@architect-shape` in their JSDoc, without requiring a file-level `@architect-extract-shapes` tag:
 
 ```typescript
 /**
- * @libar-docs-shape api-types
+ * @architect-shape api-types
  * Configuration for the delivery process pipeline.
  */
 export interface PipelineConfig { ... }
@@ -976,11 +976,11 @@ The optional value (e.g., `api-types`) sets the shape's `group` field, enabling 
 **Annotation Format:**
 
 ```gherkin
-@libar-docs-pattern:MyPattern @libar-docs-phase:15 @libar-docs-status:roadmap
-@libar-docs-quarter:Q1-2025 @libar-docs-effort:2w @libar-docs-team:platform
-@libar-docs-depends-on:OtherPattern @libar-docs-enables:NextPattern
-@libar-docs-product-area:Generators @libar-docs-user-role:Developer
-@libar-docs-release:v0.1.0
+@architect-pattern:MyPattern @architect-phase:15 @architect-status:roadmap
+@architect-quarter:Q1-2025 @architect-effort:2w @architect-team:platform
+@architect-depends-on:OtherPattern @architect-enables:NextPattern
+@architect-product-area:Generators @architect-user-role:Developer
+@architect-release:v0.1.0
 Feature: My Pattern Implementation
 
   Background:
@@ -1001,17 +1001,17 @@ The Gherkin parser uses a data-driven approach — a `TAG_LOOKUP` map is built f
 
 **Tag Mapping:**
 
-| Gherkin Tag                    | ExtractedPattern Field |
-| ------------------------------ | ---------------------- |
-| `@libar-docs-pattern:Name`     | `patternName`          |
-| `@libar-docs-phase:N`          | `phase`                |
-| `@libar-docs-status:*`         | `status`               |
-| `@libar-docs-quarter:*`        | `quarter`              |
-| `@libar-docs-release:*`        | `release`              |
-| `@libar-docs-depends-on:*`     | `dependsOn`            |
-| `@libar-docs-product-area:*`   | `productArea`          |
-| `@libar-docs-convention:*`     | `convention`           |
-| `@libar-docs-discovered-gap:*` | `discoveredGaps`       |
+| Gherkin Tag                   | ExtractedPattern Field |
+| ----------------------------- | ---------------------- |
+| `@architect-pattern:Name`     | `patternName`          |
+| `@architect-phase:N`          | `phase`                |
+| `@architect-status:*`         | `status`               |
+| `@architect-quarter:*`        | `quarter`              |
+| `@architect-release:*`        | `release`              |
+| `@architect-depends-on:*`     | `dependsOn`            |
+| `@architect-product-area:*`   | `productArea`          |
+| `@architect-convention:*`     | `convention`           |
+| `@architect-discovered-gap:*` | `discoveredGaps`       |
 
 ### Status Normalization
 
@@ -1099,7 +1099,7 @@ Data-driven configuration for pattern categorization:
 
 **Category Inference Algorithm:**
 
-1. Extract tag parts (e.g., `@libar-docs-core-utils` → `["core", "utils"]`)
+1. Extract tag parts (e.g., `@architect-core-utils` → `["core", "utils"]`)
 2. Find matching categories in registry (with aliases)
 3. Select highest priority (lowest number)
 4. Fallback to "uncategorized"
@@ -1298,7 +1298,7 @@ buildMasterDataset(options)
 Use planning codecs to prepare for implementation:
 
 ```typescript
-import { createSessionPlanCodec, createPlanningChecklistCodec } from '@libar-dev/delivery-process';
+import { createSessionPlanCodec, createPlanningChecklistCodec } from '@libar-dev/architect';
 
 // Generate planning documents
 const planCodec = createSessionPlanCodec({
@@ -1322,7 +1322,7 @@ const checklistCodec = createPlanningChecklistCodec({
 Use session context and PR changes for active development:
 
 ```typescript
-import { createSessionContextCodec, createPrChangesCodec } from '@libar-dev/delivery-process';
+import { createSessionContextCodec, createPrChangesCodec } from '@libar-dev/architect';
 
 // Current session context
 const sessionCodec = createSessionContextCodec({
@@ -1347,7 +1347,7 @@ const prCodec = createPrChangesCodec({
 Use milestone and changelog codecs for release documentation:
 
 ```typescript
-import { createMilestonesCodec, createChangelogCodec } from '@libar-dev/delivery-process';
+import { createMilestonesCodec, createChangelogCodec } from '@libar-dev/architect';
 
 // Quarter-filtered milestones
 const milestonesCodec = createMilestonesCodec({
@@ -1374,7 +1374,7 @@ import {
   createSessionContextCodec,
   createRemainingWorkCodec,
   createCurrentWorkCodec,
-} from '@libar-dev/delivery-process';
+} from '@libar-dev/architect';
 
 // Full session context bundle
 const sessionCodec = createSessionContextCodec({
@@ -1407,8 +1407,8 @@ const currentCodec = createCurrentWorkCodec({
 ### Direct Codec Usage
 
 ```typescript
-import { createPatternsCodec, type MasterDataset } from '@libar-dev/delivery-process';
-import { renderToMarkdown } from '@libar-dev/delivery-process/renderable';
+import { createPatternsCodec, type MasterDataset } from '@libar-dev/architect';
+import { renderToMarkdown } from '@libar-dev/architect/renderable';
 
 // Create custom codec
 const codec = createPatternsCodec({
@@ -1426,7 +1426,7 @@ const markdown = renderToMarkdown(document);
 ### Using generateDocument
 
 ```typescript
-import { generateDocument, type DocumentType } from '@libar-dev/delivery-process/renderable';
+import { generateDocument, type DocumentType } from '@libar-dev/architect/renderable';
 
 // Generate with default options
 const files = generateDocument('patterns', masterDataset);
@@ -1504,8 +1504,8 @@ export function createMyCodec(options?: MyCodecOptions) {
 ### Registering a Custom Generator
 
 ```typescript
-import { generatorRegistry } from '@libar-dev/delivery-process/generators';
-import { createCodecGenerator } from '@libar-dev/delivery-process/generators/codec-based';
+import { generatorRegistry } from '@libar-dev/architect/generators';
+import { createCodecGenerator } from '@libar-dev/architect/generators/codec-based';
 
 // Register if using existing document type
 generatorRegistry.register(createCodecGenerator('my-patterns', 'patterns'));

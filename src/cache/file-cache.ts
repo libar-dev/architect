@@ -1,10 +1,10 @@
 /**
- * @libar-docs
- * @libar-docs-pattern FileCache
- * @libar-docs-status active
- * @libar-docs-arch-role infrastructure
- * @libar-docs-arch-context generator
- * @libar-docs-arch-layer infrastructure
+ * @architect
+ * @architect-pattern FileCache
+ * @architect-status active
+ * @architect-arch-role infrastructure
+ * @architect-arch-context generator
+ * @architect-arch-layer infrastructure
  *
  * ## File Cache - Request-Scoped Content Caching
  *

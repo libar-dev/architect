@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:ContextFormatterTests
-@libar-docs-status:active
-@libar-docs-product-area:DataAPI
+@architect
+@architect-pattern:ContextFormatterTests
+@architect-status:active
+@architect-product-area:DataAPI
 Feature: Context Formatter - Plain Text Rendering
 
   Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),

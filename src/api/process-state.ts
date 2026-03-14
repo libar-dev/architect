@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern ProcessStateAPI
- * @libar-docs-status active
- * @libar-docs-implements PhaseStateMachineValidation
- * @libar-docs-arch-role service
- * @libar-docs-arch-context api
- * @libar-docs-arch-layer application
- * @libar-docs-uses MasterDataset, FSMValidator
+ * @architect
+ * @architect-core
+ * @architect-pattern ProcessStateAPI
+ * @architect-status active
+ * @architect-implements PhaseStateMachineValidation
+ * @architect-arch-role service
+ * @architect-arch-context api
+ * @architect-arch-layer application
+ * @architect-uses MasterDataset, FSMValidator
  *
  * ## Process State API - Programmatic Query Interface
  *
@@ -32,7 +32,7 @@
  * ### Usage
  *
  * ```typescript
- * import { createProcessStateAPI } from "@libar-dev/delivery-process";
+ * import { createProcessStateAPI } from "@libar-dev/architect";
  *
  * const api = createProcessStateAPI(masterDataset);
  *
@@ -214,7 +214,7 @@ export interface ProcessStateAPI {
   getPatternRelationships(name: string): PatternRelationships | undefined;
 
   /**
-   * Get related patterns (from @libar-docs-see-also tag)
+   * Get related patterns (from @architect-see-also tag)
    *
    * Returns patterns that are related for cross-reference without implying
    * dependency. Used for planning session scoping.
@@ -224,7 +224,7 @@ export interface ProcessStateAPI {
   getRelatedPatterns(name: string): readonly string[];
 
   /**
-   * Get API references (from @libar-docs-api-ref tag)
+   * Get API references (from @architect-api-ref tag)
    *
    * Returns file paths to implementation APIs. Used for code navigation
    * from spec to implementation.

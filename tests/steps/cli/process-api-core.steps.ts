@@ -5,8 +5,8 @@
  * core infrastructure: help, version, input validation,
  * status, query, pattern, arch basics, missing args, edge cases.
  *
- * @libar-docs
- * @libar-docs-implements ProcessStateAPICLI
+ * @architect
+ * @architect-implements ProcessStateAPICLI
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

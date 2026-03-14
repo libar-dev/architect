@@ -1,14 +1,14 @@
 /**
- * @libar-docs
- * @libar-docs-validation
- * @libar-docs-pattern FSMValidator
- * @libar-docs-status active
- * @libar-docs-implements PhaseStateMachineValidation
- * @libar-docs-uses FSMTransitions, FSMStates
- * @libar-docs-depends-on:PDR005MvpWorkflow
- * @libar-docs-arch-role decider
- * @libar-docs-arch-context validation
- * @libar-docs-arch-layer application
+ * @architect
+ * @architect-validation
+ * @architect-pattern FSMValidator
+ * @architect-status active
+ * @architect-implements PhaseStateMachineValidation
+ * @architect-uses FSMTransitions, FSMStates
+ * @architect-depends-on:PDR005MvpWorkflow
+ * @architect-arch-role decider
+ * @architect-arch-context validation
+ * @architect-arch-layer application
  *
  * ## FSM Validator - Pure Validation Functions
  *

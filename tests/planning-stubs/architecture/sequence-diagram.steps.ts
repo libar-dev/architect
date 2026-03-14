@@ -6,7 +6,7 @@
  *
  * STATUS: NOT IMPLEMENTED - Move to tests/steps/architecture/ when ready.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

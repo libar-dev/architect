@@ -5,7 +5,7 @@
  * Tests that repository prefixes like "libar-platform/" are stripped from
  * implementation paths to generate correct relative links in pattern documents.
  *
- * @libar-docs
+ * @architect
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';

@@ -1,11 +1,11 @@
-@libar-docs
-@libar-docs-pattern:AstParserExports
-@libar-docs-implements:AstParser
-@libar-docs-status:completed
-@libar-docs-unlock-reason:'Split-from-original'
-@libar-docs-product-area:Annotation
+@architect
+@architect-pattern:AstParserExports
+@architect-implements:AstParser
+@architect-status:completed
+@architect-unlock-reason:'Split-from-original'
+@architect-product-area:Annotation
 Feature: TypeScript AST Parser - Export Type Identification
-  The AST Parser extracts @libar-docs-* directives from TypeScript source files
+  The AST Parser extracts @architect-* directives from TypeScript source files
   using the TypeScript compiler API. It identifies exports, extracts metadata,
   and validates directive structure.
 
@@ -23,7 +23,7 @@ Feature: TypeScript AST Parser - Export Type Identification
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * Test function for authentication
          */
         export function authenticate(username: string, password: string): boolean {
@@ -32,7 +32,7 @@ Feature: TypeScript AST Parser - Export Type Identification
         """
       When the file is parsed for directives
       Then 1 directive should be found
-      And the directive should have tag "@libar-docs-core"
+      And the directive should have tag "@architect-core"
       And the directive description should contain "Test function for authentication"
       And the first export should be:
         | field | value        |
@@ -44,7 +44,7 @@ Feature: TypeScript AST Parser - Export Type Identification
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core @libar-docs-types
+         * @architect-core @architect-types
          * User type definition
          */
         export type User = {
@@ -56,8 +56,8 @@ Feature: TypeScript AST Parser - Export Type Identification
       Then 1 directive should be found
       And the directive should have tags:
         | value              |
-        | @libar-docs-core   |
-        | @libar-docs-types  |
+        | @architect-core   |
+        | @architect-types  |
       And the first export should be:
         | field | value |
         | type  | type  |
@@ -68,7 +68,7 @@ Feature: TypeScript AST Parser - Export Type Identification
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * Config interface
          */
         export interface Config {
@@ -88,7 +88,7 @@ Feature: TypeScript AST Parser - Export Type Identification
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * API configuration
          */
         export const API_CONFIG = {
@@ -108,7 +108,7 @@ Feature: TypeScript AST Parser - Export Type Identification
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * User service class
          */
         export class UserService {
@@ -131,7 +131,7 @@ Feature: TypeScript AST Parser - Export Type Identification
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * Enum export
          */
         export enum Status {
@@ -153,7 +153,7 @@ Feature: TypeScript AST Parser - Export Type Identification
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * Const enum export
          */
         export const enum Direction {
@@ -176,7 +176,7 @@ Feature: TypeScript AST Parser - Export Type Identification
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * Abstract class export
          */
         export abstract class BaseService {
@@ -199,7 +199,7 @@ Feature: TypeScript AST Parser - Export Type Identification
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * Arrow function export
          */
         export const fetchData = async (url: string): Promise<Response> => {
@@ -218,7 +218,7 @@ Feature: TypeScript AST Parser - Export Type Identification
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * Async function export
          */
         export async function loadData(id: string): Promise<Data> {
@@ -239,7 +239,7 @@ Feature: TypeScript AST Parser - Export Type Identification
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * Generic function export
          */
         export function map<T, U>(items: T[], fn: (item: T) => U): U[] {
@@ -259,7 +259,7 @@ Feature: TypeScript AST Parser - Export Type Identification
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * Default export
          */
         export default function authenticate() {
@@ -278,7 +278,7 @@ Feature: TypeScript AST Parser - Export Type Identification
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * Re-exported utilities
          */
         export { foo, bar } from './utils';
@@ -296,7 +296,7 @@ Feature: TypeScript AST Parser - Export Type Identification
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * Multiple exports
          */
         export const USER_ROLE = 'admin', USER_STATUS = 'active';
@@ -314,7 +314,7 @@ Feature: TypeScript AST Parser - Export Type Identification
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * First function
          */
         export function first() {
@@ -322,7 +322,7 @@ Feature: TypeScript AST Parser - Export Type Identification
         }
 
         /**
-         * @libar-docs-domain
+         * @architect-domain
          * Second function
          */
         export function second() {
@@ -333,5 +333,5 @@ Feature: TypeScript AST Parser - Export Type Identification
       Then 2 directives should be found
       And the directives should have details:
         | index | tag                 | exportName |
-        | 1     | @libar-docs-core    | first      |
-        | 2     | @libar-docs-domain  | second     |
+        | 1     | @architect-core    | first      |
+        | 2     | @architect-domain  | second     |

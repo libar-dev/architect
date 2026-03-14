@@ -5,7 +5,7 @@
  * transformToMasterDataset. The archIndex groups patterns by role,
  * context, and layer for efficient architecture diagram generation.
  *
- * @libar-docs
+ * @architect
  */
 
 import { expect } from 'vitest';

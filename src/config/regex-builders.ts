@@ -1,14 +1,14 @@
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-config
- * @libar-docs-pattern RegexBuilders
- * @libar-docs-status completed
- * @libar-docs-arch-layer infrastructure
- * @libar-docs-arch-context config
- * @libar-docs-arch-role infrastructure
- * @libar-docs-uses ConfigurationTypes
- * @libar-docs-used-by DeliveryProcessFactory
- * @libar-docs-extract-shapes createRegexBuilders
+ * @architect
+ * @architect-core @architect-config
+ * @architect-pattern RegexBuilders
+ * @architect-status completed
+ * @architect-arch-layer infrastructure
+ * @architect-arch-context config
+ * @architect-arch-role infrastructure
+ * @architect-uses ConfigurationTypes
+ * @architect-used-by ArchitectFactory
+ * @architect-extract-shapes createRegexBuilders
  *
  * ## Regex Builders
  *
@@ -41,8 +41,8 @@ function escapeRegex(str: string): string {
  * Creates type-safe regex builders for a given tag prefix configuration.
  * These are used throughout the scanner and validation pipeline.
  *
- * @param tagPrefix - The tag prefix (e.g., "@docs-" or "@libar-docs-")
- * @param fileOptInTag - The file opt-in tag (e.g., "@docs" or "@libar-docs")
+ * @param tagPrefix - The tag prefix (e.g., "@docs-" or "@architect-")
+ * @param fileOptInTag - The file opt-in tag (e.g., "@docs" or "@architect")
  * @returns RegexBuilders instance with pattern matching methods
  *
  * @example

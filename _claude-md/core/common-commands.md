@@ -19,7 +19,7 @@ pnpm validate:all       # All validations including anti-patterns and DoD
 pnpm docs:all           # Generate all doc types
 
 # Data API (see Context Gathering Protocol above)
-pnpm process:query -- --help                              # All subcommands and options
-pnpm process:query -- context <pattern> --session design  # Session context bundle
-pnpm process:query -- overview                            # Project health summary
+pnpm architect:query -- --help                              # All subcommands and options
+pnpm architect:query -- context <pattern> --session design  # Session context bundle
+pnpm architect:query -- overview                            # Project health summary
 ```

@@ -8,7 +8,7 @@ The taxonomy defines the vocabulary for pattern annotations: what tags exist, th
 
 ## Concept
 
-A **taxonomy** is a classification system. In `@libar-dev/delivery-process`, the taxonomy defines:
+A **taxonomy** is a classification system. In `@libar-dev/architect`, the taxonomy defines:
 
 | Component        | Purpose                                                   |
 | ---------------- | --------------------------------------------------------- |
@@ -45,11 +45,11 @@ src/taxonomy/
 The `buildRegistry()` function creates a `TagRegistry` containing all taxonomy definitions:
 
 ```typescript
-import { buildRegistry } from '@libar-dev/delivery-process/taxonomy';
+import { buildRegistry } from '@libar-dev/architect/taxonomy';
 
 const registry = buildRegistry();
-// registry.tagPrefix       → "@libar-docs-"
-// registry.fileOptInTag    → "@libar-docs"
+// registry.tagPrefix       → "@architect-"
+// registry.fileOptInTag    → "@architect"
 // registry.categories      → CategoryDefinition[]
 // registry.metadataTags    → MetadataTagDefinition[]
 // registry.aggregationTags → AggregationTagDefinition[]
@@ -58,11 +58,11 @@ const registry = buildRegistry();
 
 ### Presets Select Taxonomy Subsets
 
-| Preset                    | Categories | Tag Prefix     | Use Case                           |
-| ------------------------- | ---------- | -------------- | ---------------------------------- |
-| `libar-generic` (default) | 3          | `@libar-docs-` | Simple projects (this package)     |
-| `ddd-es-cqrs`             | 21         | `@libar-docs-` | DDD/Event Sourcing architectures   |
-| `generic`                 | 3          | `@docs-`       | Simple projects with @docs- prefix |
+| Preset                    | Categories | Tag Prefix    | Use Case                           |
+| ------------------------- | ---------- | ------------- | ---------------------------------- |
+| `libar-generic` (default) | 3          | `@architect-` | Simple projects (this package)     |
+| `ddd-es-cqrs`             | 21         | `@architect-` | DDD/Event Sourcing architectures   |
+| `generic`                 | 3          | `@docs-`      | Simple projects with @docs- prefix |
 
 The preset determines which categories are available. All presets share the same status values and format types.
 

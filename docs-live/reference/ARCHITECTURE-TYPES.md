@@ -211,16 +211,16 @@ SourceViewsSchema = z.object({
 
 ```typescript
 RelationshipEntrySchema = z.object({
-  /** Patterns this pattern uses (from @libar-docs-uses) */
+  /** Patterns this pattern uses (from @architect-uses) */
   uses: z.array(z.string()),
 
-  /** Patterns that use this pattern (from @libar-docs-used-by) */
+  /** Patterns that use this pattern (from @architect-used-by) */
   usedBy: z.array(z.string()),
 
-  /** Patterns this pattern depends on (from @libar-docs-depends-on) */
+  /** Patterns this pattern depends on (from @architect-depends-on) */
   dependsOn: z.array(z.string()),
 
-  /** Patterns this pattern enables (from @libar-docs-enables) */
+  /** Patterns this pattern enables (from @architect-enables) */
   enables: z.array(z.string()),
 
   // UML-inspired relationship fields (PatternRelationshipModel)
@@ -236,10 +236,10 @@ RelationshipEntrySchema = z.object({
   /** Patterns that extend this pattern (computed inverse) */
   extendedBy: z.array(z.string()),
 
-  /** Related patterns for cross-reference without dependency (from @libar-docs-see-also tag) */
+  /** Related patterns for cross-reference without dependency (from @architect-see-also tag) */
   seeAlso: z.array(z.string()),
 
-  /** File paths to implementation APIs (from @libar-docs-api-ref tag) */
+  /** File paths to implementation APIs (from @architect-api-ref tag) */
   apiRef: z.array(z.string()),
 });
 ```
@@ -403,7 +403,7 @@ and `transformToMasterDataset` with validation summary.
 
 ## Consumer Architecture and PipelineOptions Differentiation
 
-Three consumers share this factory: `process-api`, `validate-patterns`, and the
+Three consumers share this factory: `architect`, `architect-validate`, and the
 generation orchestrator. `PipelineOptions` differentiates behavior by
 `mergeConflictStrategy` (`fatal` vs `concatenate`), `includeValidation` toggles,
 and `failOnScanErrors` policy without forking pipeline logic.

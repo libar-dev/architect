@@ -1,10 +1,10 @@
-@libar-docs
+@architect
 @behavior @reference-codec
-@libar-docs-pattern:ReferenceCodecDiagramTypeTesting
-@libar-docs-status:completed
-@libar-docs-unlock-reason:'Split-from-original'
-@libar-docs-implements:ReferenceDocShowcase
-@libar-docs-product-area:Generation
+@architect-pattern:ReferenceCodecDiagramTypeTesting
+@architect-status:completed
+@architect-unlock-reason:'Split-from-original'
+@architect-implements:ReferenceDocShowcase
+@architect-product-area:Generation
 Feature: Reference Codec - Diagram Type Rendering
 
   Diagram type controls Mermaid output format including flowchart,

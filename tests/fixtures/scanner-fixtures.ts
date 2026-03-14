@@ -5,7 +5,7 @@
  * These builders create various export types and directive configurations
  * needed to test the AST parser comprehensively.
  *
- * @libar-docs
+ * @architect
  */
 
 // =============================================================================
@@ -29,7 +29,7 @@ export type ExportType =
   | 'multiple-const';
 
 /**
- * Options for building TypeScript content with @libar-docs directives.
+ * Options for building TypeScript content with @architect directives.
  */
 export interface TsContentOptions {
   /** Export type to generate */
@@ -56,14 +56,14 @@ export interface TsContentOptions {
   whenToUse?: string[];
   /** When to use inline format (single string) */
   whenToUseInline?: string;
-  /** Include file-level @libar-docs opt-in */
+  /** Include file-level @architect opt-in */
   includeFileOptIn?: boolean;
   /** Use asterisk bullets instead of dashes in When to Use */
   useAsteriskBullets?: boolean;
 }
 
 /**
- * Build TypeScript file content with @libar-docs directive.
+ * Build TypeScript file content with @architect directive.
  *
  * @example
  * ```typescript
@@ -97,7 +97,7 @@ export function buildTsContent(options: TsContentOptions = {}): string {
 
   // File-level opt-in (separate comment block)
   if (includeFileOptIn) {
-    lines.push('/** @libar-docs */');
+    lines.push('/** @architect */');
     lines.push('');
   }
 
@@ -105,30 +105,27 @@ export function buildTsContent(options: TsContentOptions = {}): string {
   lines.push('/**');
 
   // Category tags on first line
-  const categoryTags = [
-    `@libar-docs-${category}`,
-    ...additionalTags.map((t) => `@libar-docs-${t}`),
-  ];
+  const categoryTags = [`@architect-${category}`, ...additionalTags.map((t) => `@architect-${t}`)];
   lines.push(` * ${categoryTags.join(' ')}`);
 
   // Pattern name
   if (patternName) {
-    lines.push(` * @libar-docs-pattern ${patternName}`);
+    lines.push(` * @architect-pattern ${patternName}`);
   }
 
   // Status
   if (status) {
-    lines.push(` * @libar-docs-status ${status}`);
+    lines.push(` * @architect-status ${status}`);
   }
 
   // Uses relationships
   if (uses.length > 0) {
-    lines.push(` * @libar-docs-uses ${uses.join(', ')}`);
+    lines.push(` * @architect-uses ${uses.join(', ')}`);
   }
 
   // Used-by relationships
   if (usedBy.length > 0) {
-    lines.push(` * @libar-docs-used-by ${usedBy.join(', ')}`);
+    lines.push(` * @architect-used-by ${usedBy.join(', ')}`);
   }
 
   // Description
@@ -232,10 +229,10 @@ function buildExportStatement(exportType: ExportType, name: string): string {
  */
 export function buildContentWithTagsInDescription(category: string): string {
   return `/**
- * @libar-docs-${category}
+ * @architect-${category}
  *
- * This function works with @libar-docs-api patterns.
- * It supports @libar-docs-saga for orchestration.
+ * This function works with @architect-api patterns.
+ * It supports @architect-saga for orchestration.
  */
 export function processRequest() {
   return true;
@@ -247,17 +244,17 @@ export function processRequest() {
  */
 export function buildContentWithTagsInExample(category: string): string {
   return `/**
- * @libar-docs-${category}
+ * @architect-${category}
  * Test function
  *
  * @example
  * \`\`\`typescript
- * hasTag('@libar-docs-example'); // checking for a tag
- * hasTag('@libar-docs-saga'); // another example
+ * hasTag('@architect-example'); // checking for a tag
+ * hasTag('@architect-saga'); // another example
  * \`\`\`
  */
 export function hasTag(tag: string): boolean {
-  return tag.startsWith('@libar-docs');
+  return tag.startsWith('@architect');
 }`;
 }
 
@@ -270,7 +267,7 @@ export function buildContentWithMultipleDirectives(
   return items
     .map(
       (item) => `/**
- * @libar-docs-${item.category}
+ * @architect-${item.category}
  * ${item.description}
  */
 export function ${item.name}() {
@@ -285,7 +282,7 @@ export function ${item.name}() {
  */
 export function buildMalformedTsContent(): string {
   return `/**
- * @libar-docs-core
+ * @architect-core
  * This will fail to parse
  */
 export function broken(
@@ -299,7 +296,7 @@ export function buildContentWithLineNumbers(): string {
   return `// Line 1
 // Line 2
 /**
- * @libar-docs-core
+ * @architect-core
  * Test
  */
 export function test() {
@@ -308,7 +305,7 @@ export function test() {
 }
 
 /**
- * Build content without @libar-docs-* tags (regular JSDoc).
+ * Build content without @architect-* tags (regular JSDoc).
  */
 export function buildContentWithoutDirective(): string {
   return `/**
@@ -325,7 +322,7 @@ export function regular(foo: string) {
  * Build content with inline comment (not block comment).
  */
 export function buildContentWithInlineComment(): string {
-  return `// @libar-docs-core - This is an inline comment
+  return `// @architect-core - This is an inline comment
 export function test() {
   return 'test';
 }`;
@@ -336,7 +333,7 @@ export function test() {
  */
 export function buildContentWithJsDocTags(): string {
   return `/**
- * @libar-docs-core
+ * @architect-core
  * Test function
  *
  * @param input - The input string
@@ -352,7 +349,7 @@ export function test(input: string): string {
  */
 export function buildContentWithUnicode(): string {
   return `/**
- * @libar-docs-core
+ * @architect-core
  * Función de autenticación con émojis
  */
 export function autenticar() {
@@ -365,7 +362,7 @@ export function autenticar() {
  */
 export function buildContentWithMultilineDescription(): string {
   return `/**
- * @libar-docs-core
+ * @architect-core
  *
  * This is a detailed description
  * that spans multiple lines
@@ -417,7 +414,7 @@ export interface GherkinContentOptions {
 }
 
 /**
- * Build Gherkin feature file content with @libar-docs-* tags.
+ * Build Gherkin feature file content with @architect-* tags.
  *
  * @example
  * ```typescript
@@ -462,33 +459,33 @@ Scenario: Orphan scenario
 
   const lines: string[] = [];
 
-  // Process metadata tags (using @libar-docs-* prefix per PDR-004)
+  // Process metadata tags (using @architect-* prefix per PDR-004)
   if (phase !== undefined) {
-    lines.push(`@libar-docs-phase:${phase}`);
+    lines.push(`@architect-phase:${phase}`);
   }
   if (status) {
-    lines.push(`@libar-docs-status:${status}`);
+    lines.push(`@architect-status:${status}`);
   }
   if (quarter) {
-    lines.push(`@libar-docs-quarter:${quarter}`);
+    lines.push(`@architect-quarter:${quarter}`);
   }
   if (effort) {
-    lines.push(`@libar-docs-effort:${effort}`);
+    lines.push(`@architect-effort:${effort}`);
   }
   if (team) {
-    lines.push(`@libar-docs-team:${team}`);
+    lines.push(`@architect-team:${team}`);
   }
   if (patternName) {
-    lines.push(`@libar-docs-pattern:${patternName}`);
+    lines.push(`@architect-pattern:${patternName}`);
   }
   if (briefPath) {
-    lines.push(`@libar-docs-brief:${briefPath}`);
+    lines.push(`@architect-brief:${briefPath}`);
   }
   for (const dep of dependencies) {
-    lines.push(`@libar-docs-depends-on:${dep}`);
+    lines.push(`@architect-depends-on:${dep}`);
   }
   for (const enable of enables) {
-    lines.push(`@libar-docs-enables:${enable}`);
+    lines.push(`@architect-enables:${enable}`);
   }
   for (const cat of categories) {
     lines.push(`@${cat}`);
@@ -502,7 +499,7 @@ Scenario: Orphan scenario
   // Scenarios
   for (const scenario of scenarios) {
     if (scenario.status) {
-      lines.push(`  @libar-docs-status:${scenario.status}`);
+      lines.push(`  @architect-status:${scenario.status}`);
     }
     lines.push(`  Scenario: ${scenario.name}`);
     lines.push(`    Given some precondition`);

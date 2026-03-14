@@ -1,6 +1,6 @@
 # Documentation Index
 
-**Purpose:** Navigate the full documentation set for @libar-dev/delivery-process. Use section links for targeted reading.
+**Purpose:** Navigate the full documentation set for @libar-dev/architect. Use section links for targeted reading.
 
 ---
 
@@ -8,7 +8,7 @@
 
 | Field             | Value                                                 |
 | ----------------- | ----------------------------------------------------- |
-| **Package**       | @libar-dev/delivery-process                           |
+| **Package**       | @libar-dev/architect                                  |
 | **Purpose**       | Code-first documentation and delivery process toolkit |
 | **Patterns**      | 386 tracked (258 completed, 74 active, 54 planned)    |
 | **Product Areas** | 7                                                     |

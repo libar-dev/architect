@@ -2,13 +2,13 @@
 
 > **Deprecated:** This document is superseded by the auto-generated [Documentation Index](../docs-live/INDEX.md) which includes live statistics, audience-based navigation, and document roles. This file is preserved for reference only.
 
-**Navigate the full documentation set for `@libar-dev/delivery-process`.** Use section links below for targeted reading.
+**Navigate the full documentation set for `@libar-dev/architect`.** Use section links below for targeted reading.
 
 ## Package Metadata
 
 | Field            | Value                                                |
 | ---------------- | ---------------------------------------------------- |
-| **Package**      | @libar-dev/delivery-process                          |
+| **Package**      | @libar-dev/architect                                 |
 | **Version**      | 1.0.0-pre.0                                          |
 | **Purpose**      | Context engineering for AI-assisted codebases        |
 | **Key Features** | Living docs, FSM enforcement, AI-native Data API CLI |
@@ -96,7 +96,7 @@
 | Unified Config File    | 154-244 | defineConfig(), sources, output, gen overrides  |
 | Custom Configuration   | 248-295 | Custom tag prefix, custom categories            |
 | Programmatic Config    | 299-331 | loadProjectConfig(), mergeSourcesForGenerator() |
-| Backward Compatibility | 336-346 | Legacy createDeliveryProcess() support          |
+| Backward Compatibility | 336-346 | Legacy createArchitect() support                |
 | Related Documentation  | 350-357 | Links to README, TAXONOMY, ARCHITECTURE         |
 
 ---
@@ -305,10 +305,10 @@ It queries annotated sources in real time — not generated snapshots.
 See [PROCESS-API.md](./PROCESS-API.md).
 
 ```bash
-pnpm process:query -- scope-validate MyPattern implement      # ALWAYS run first
-pnpm process:query -- context MyPattern --session implement    # Curated context bundle
-pnpm process:query -- files MyPattern --related                # Implementation paths
-pnpm process:query -- handoff --pattern MyPattern              # Capture session end state
+pnpm architect:query -- scope-validate MyPattern implement      # ALWAYS run first
+pnpm architect:query -- context MyPattern --session implement    # Curated context bundle
+pnpm architect:query -- files MyPattern --related                # Implementation paths
+pnpm architect:query -- handoff --pattern MyPattern              # Capture session end state
 ```
 
 ---

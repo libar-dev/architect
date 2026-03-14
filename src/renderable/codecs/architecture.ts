@@ -1,15 +1,15 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern ArchitectureCodec
- * @libar-docs-status completed
- * @libar-docs-arch-role projection
- * @libar-docs-arch-context renderer
- * @libar-docs-arch-layer application
- * @libar-docs-include codec-transformation
- * @libar-docs-uses MasterDataset, ArchIndex
- * @libar-docs-convention codec-registry
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-core
+ * @architect-pattern ArchitectureCodec
+ * @architect-status completed
+ * @architect-arch-role projection
+ * @architect-arch-context renderer
+ * @architect-arch-layer application
+ * @architect-include codec-transformation
+ * @architect-uses MasterDataset, ArchIndex
+ * @architect-convention codec-registry
+ * @architect-product-area:Generation
  *
  * ## ArchitectureDocumentCodec
  *
@@ -195,8 +195,8 @@ function buildArchitectureDocument(
       heading(2, 'No Architecture Data'),
       paragraph(
         'No patterns with architecture annotations found. ' +
-          'Add `@libar-docs-arch-role`, `@libar-docs-arch-context`, or ' +
-          '`@libar-docs-arch-layer` tags to source files to generate architecture diagrams.'
+          'Add `@architect-arch-role`, `@architect-arch-context`, or ' +
+          '`@architect-arch-layer` tags to source files to generate architecture diagrams.'
       ),
     ]);
   }

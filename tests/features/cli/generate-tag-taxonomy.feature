@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:GenerateTagTaxonomyCli
-@libar-docs-status:completed
-@libar-docs-product-area:DataAPI
-@libar-docs-implements:CliBehaviorTesting
+@architect
+@architect-pattern:GenerateTagTaxonomyCli
+@architect-status:completed
+@architect-product-area:DataAPI
+@architect-implements:CliBehaviorTesting
 @cli @generate-tag-taxonomy
 Feature: generate-tag-taxonomy CLI
   Command-line interface for generating TAG_TAXONOMY.md from tag registry configuration.
@@ -36,7 +36,7 @@ Feature: generate-tag-taxonomy CLI
     Scenario: Display version with --version flag
       When running "generate-tag-taxonomy --version"
       Then exit code is 0
-      And stdout contains "generate-tag-taxonomy"
+      And stdout contains "architect-taxonomy"
 
     @happy-path
     Scenario: Display version with -v flag

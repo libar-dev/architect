@@ -23,7 +23,7 @@ import { buildRegistry } from '../../../../src/taxonomy/registry-builder.js';
 
 /**
  * Test configs: 7 product area configs + 2 manual reference configs.
- * Mirrors the shape of delivery-process.config.ts.
+ * Mirrors the shape of architect.config.ts.
  */
 const TEST_CONFIGS: readonly ReferenceDocConfig[] = [
   ...createProductAreaConfigs(),

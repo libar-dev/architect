@@ -5,7 +5,7 @@
  * human-readable display names, behavior file verification, PRD formatting,
  * and business value display.
  *
- * @libar-docs
+ * @architect
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';

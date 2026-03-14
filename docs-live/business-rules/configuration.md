@@ -309,9 +309,9 @@ _- New users need sensible defaults for their project type_
 
 #### Libar generic preset provides minimal taxonomy with libar prefix
 
-> **Invariant:** The libar-generic preset must provide exactly 3 categories with @libar-docs- prefix.
+> **Invariant:** The libar-generic preset must provide exactly 3 categories with @architect- prefix.
 >
-> **Rationale:** This package uses @libar-docs- prefix to avoid collisions with consumer projects' annotations.
+> **Rationale:** This package uses @architect- prefix to avoid collisions with consumer projects' annotations.
 
 **Verified by:**
 
@@ -381,13 +381,13 @@ _- Two config formats exist (new-style and legacy) that need unified loading_
 
 #### Legacy config is loaded with backward compatibility
 
-> **Invariant:** A file exporting createDeliveryProcess must be loaded and produce a valid resolved config.
+> **Invariant:** A file exporting createArchitect must be loaded and produce a valid resolved config.
 >
 > **Rationale:** Backward compatibility prevents breaking existing consumers during migration to the new config format.
 
 **Verified by:**
 
-- Legacy createDeliveryProcess export loads correctly
+- Legacy createArchitect export loads correctly
 
 ---
 

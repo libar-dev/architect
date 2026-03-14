@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:DecisionDocGeneratorTesting
-@libar-docs-implements:DecisionDocGenerator
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:DecisionDocGeneratorTesting
+@architect-implements:DecisionDocGenerator
+@architect-status:completed
+@architect-product-area:Generation
 Feature: Decision Document Generator
 
   The Decision Doc Generator orchestrates the full documentation generation

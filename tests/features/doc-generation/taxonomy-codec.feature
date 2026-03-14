@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:TaxonomyCodecTesting
-@libar-docs-implements:TaxonomyCodec
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:TaxonomyCodecTesting
+@architect-implements:TaxonomyCodec
+@architect-status:completed
+@architect-product-area:Generation
 Feature: Taxonomy Document Codec
 
   Validates the Taxonomy Codec that transforms MasterDataset into a

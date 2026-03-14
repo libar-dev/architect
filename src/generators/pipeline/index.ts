@@ -1,10 +1,10 @@
 /**
- * @libar-docs
- * @libar-docs-generator @libar-docs-infra
- * @libar-docs-pattern PipelineModule
- * @libar-docs-status completed
- * @libar-docs-uses TransformDataset
- * @libar-docs-used-by Orchestrator, Generators
+ * @architect
+ * @architect-generator @architect-infra
+ * @architect-pattern PipelineModule
+ * @architect-status completed
+ * @architect-uses TransformDataset
+ * @architect-used-by Orchestrator, Generators
  *
  * ## Pipeline Module - Unified Transformation Infrastructure
  *

@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-pattern NormalizedStatus
- * @libar-docs-status completed
- * @libar-docs-core
- * @libar-docs-extract-shapes NORMALIZED_STATUS_VALUES, NormalizedStatus, STATUS_NORMALIZATION_MAP, normalizeStatus
+ * @architect
+ * @architect-pattern NormalizedStatus
+ * @architect-status completed
+ * @architect-core
+ * @architect-extract-shapes NORMALIZED_STATUS_VALUES, NormalizedStatus, STATUS_NORMALIZATION_MAP, normalizeStatus
  *
  * ## Normalized Status Values for Display
  *
- * The delivery-process system uses a two-level status taxonomy:
+ * The Architect system uses a two-level status taxonomy:
  *
  * 1. Raw status (PROCESS_STATUS_VALUES in status-values.ts):
  *    The 4 FSM states stored in data: roadmap, active, completed, deferred
@@ -57,7 +57,7 @@ export const STATUS_NORMALIZATION_MAP: Readonly<Record<string, NormalizedStatus>
  *
  * Per PDR-005: deferred items are treated as planned (not actively worked on)
  *
- * @libar-docs-shape reference-sample
+ * @architect-shape reference-sample
  * @param status - Raw status from pattern (case-insensitive)
  * @returns "completed" | "active" | "planned"
  *

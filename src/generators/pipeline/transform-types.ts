@@ -1,12 +1,12 @@
 /**
- * @libar-docs
- * @libar-docs-pattern TransformTypes
- * @libar-docs-status active
- * @libar-docs-arch-role types
- * @libar-docs-arch-context generator
- * @libar-docs-arch-layer application
- * @libar-docs-used-by TransformDataset, Orchestrator
- * @libar-docs-uses MasterDataset, LoadedWorkflow, ExtractedPattern, TagRegistry, ContextInferenceRule
+ * @architect
+ * @architect-pattern TransformTypes
+ * @architect-status active
+ * @architect-arch-role types
+ * @architect-arch-context generator
+ * @architect-arch-layer application
+ * @architect-used-by TransformDataset, Orchestrator
+ * @architect-uses MasterDataset, LoadedWorkflow, ExtractedPattern, TagRegistry, ContextInferenceRule
  *
  * ## TransformTypes - MasterDataset Transformation Types
  *
@@ -83,7 +83,7 @@ export interface TransformResult {
  * LoadedWorkflow contains Maps which aren't JSON-serializable,
  * so it's kept separate from the Zod schema.
  *
- * @libar-docs-shape master-dataset
+ * @architect-shape master-dataset
  */
 export interface RuntimeMasterDataset extends MasterDataset {
   /** Optional workflow configuration (not serializable) */
@@ -93,7 +93,7 @@ export interface RuntimeMasterDataset extends MasterDataset {
 /**
  * Raw input data for transformation
  *
- * @libar-docs-shape master-dataset
+ * @architect-shape master-dataset
  */
 export interface RawDataset {
   /** Extracted patterns from TypeScript and/or Gherkin sources */

@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:SourceMappingValidatorTesting
-@libar-docs-implements:SourceMappingValidator
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:SourceMappingValidatorTesting
+@architect-implements:SourceMappingValidator
+@architect-status:completed
+@architect-product-area:Generation
 Feature: Source Mapping Validator
 
   **Context:** Source mappings reference files that may not exist, use invalid

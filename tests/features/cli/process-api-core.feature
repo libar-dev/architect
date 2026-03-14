@@ -1,9 +1,9 @@
-@libar-docs
-@libar-docs-pattern:ProcessApiCliCore
-@libar-docs-implements:ProcessApiCli
-@libar-docs-status:completed
-@libar-docs-unlock-reason:'Split-from-original'
-@libar-docs-product-area:DataAPI
+@architect
+@architect-pattern:ProcessApiCliCore
+@architect-implements:ProcessApiCli
+@architect-status:completed
+@architect-unlock-reason:'Split-from-original'
+@architect-product-area:DataAPI
 @cli @process-api
 Feature: Process API CLI - Core Infrastructure
   Core CLI infrastructure: help, version, input validation, status, query, pattern, arch basics, missing args, edge cases.

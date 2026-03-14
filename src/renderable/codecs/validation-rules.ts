@@ -1,10 +1,10 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern ValidationRulesCodec
- * @libar-docs-status completed
- * @libar-docs-convention codec-registry
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-core
+ * @architect-pattern ValidationRulesCodec
+ * @architect-status completed
+ * @architect-convention codec-registry
+ * @architect-product-area:Generation
  *
  * ## ValidationRulesCodec
  *
@@ -136,8 +136,8 @@ export const RULE_DEFINITIONS: readonly RuleDefinition[] = [
     id: 'completed-protection',
     severity: 'error',
     description: 'Completed specs require unlock-reason tag to modify',
-    cause: 'File has `completed` status but no `@libar-docs-unlock-reason` tag',
-    fix: "Add `@libar-docs-unlock-reason:'your reason'` to proceed",
+    cause: 'File has `completed` status but no `@architect-unlock-reason` tag',
+    fix: "Add `@architect-unlock-reason:'your reason'` to proceed",
   },
   {
     id: 'invalid-status-transition',
@@ -179,7 +179,7 @@ export const RULE_DEFINITIONS: readonly RuleDefinition[] = [
 /**
  * Compose rationale from convention-extracted content into rule definitions.
  *
- * Convention bundles extracted from `@libar-docs-convention process-guard-errors`
+ * Convention bundles extracted from `@architect-convention process-guard-errors`
  * annotations contain per-rule sections with **Invariant:** and **Rationale:**
  * markers plus situation/solution tables.
  *
@@ -493,7 +493,7 @@ function buildEscapeHatchesSection(): SectionBlock[] {
         [
           'Fix bug in completed spec',
           'Add unlock reason tag',
-          "`@libar-docs-unlock-reason:'Fix-typo'`",
+          "`@architect-unlock-reason:'Fix-typo'`",
         ],
         [
           'Modify outside session scope',
@@ -581,7 +581,7 @@ function buildFSMTransitionsDetailDocument(): RenderableDocument {
     if ((targets as readonly string[]).length === 0) {
       sections.push(
         paragraph(
-          `**Terminal state** - no valid transitions. Use \`@libar-docs-unlock-reason\` to modify.`
+          `**Terminal state** - no valid transitions. Use \`@architect-unlock-reason\` to modify.`
         )
       );
     } else {

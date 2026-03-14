@@ -1,8 +1,8 @@
 /**
- * @libar-docs
- * @libar-docs-pattern ReferenceGeneratorRegistration
- * @libar-docs-status active
- * @libar-docs-implements CodecDrivenReferenceGeneration
+ * @architect
+ * @architect-pattern ReferenceGeneratorRegistration
+ * @architect-status active
+ * @architect-implements CodecDrivenReferenceGeneration
  *
  * ## Reference Generator Registrations
  *

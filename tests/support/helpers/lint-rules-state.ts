@@ -58,7 +58,7 @@ export function initState(): LintRulesScenarioState {
 
 export function createTestDirective(overrides: Partial<DocDirective> = {}): DocDirective {
   return {
-    tags: [asDirectiveTag('@libar-docs-test')],
+    tags: [asDirectiveTag('@architect-test')],
     description: '',
     examples: [],
     position: { startLine: 1, endLine: 10 },

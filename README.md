@@ -1,13 +1,13 @@
-# @libar-dev/delivery-process
+# @libar-dev/architect
 
 **Context engineering for AI-assisted codebases.**
 
 Turn TypeScript annotations and Gherkin specs into a **structured, queryable delivery state** — living documentation, architecture graphs, and FSM-enforced workflows that AI agents consume without hallucinating.
 
-[![npm version](https://img.shields.io/npm/v/@libar-dev/delivery-process.svg)](https://www.npmjs.com/package/@libar-dev/delivery-process)
-[![Build Status](https://github.com/libar-dev/delivery-process/workflows/CI/badge.svg)](https://github.com/libar-dev/delivery-process/actions)
+[![npm version](https://img.shields.io/npm/v/@libar-dev/architect.svg)](https://www.npmjs.com/package/@libar-dev/architect)
+[![Build Status](https://github.com/libar-dev/architect/workflows/CI/badge.svg)](https://github.com/libar-dev/architect/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/node/v/@libar-dev/delivery-process.svg)](https://nodejs.org/)
+[![Node.js Version](https://img.shields.io/node/v/@libar-dev/architect.svg)](https://nodejs.org/)
 
 ---
 
@@ -23,10 +23,10 @@ AI coding agents need architectural context to generate correct code. This packa
 
 ```bash
 # npm
-npm install @libar-dev/delivery-process@pre
+npm install @libar-dev/architect@pre
 
 # pnpm (recommended)
-pnpm add @libar-dev/delivery-process@pre
+pnpm add @libar-dev/architect@pre
 ```
 
 **Requirements:** Node.js >= 18.0.0, ESM project (`"type": "module"` in package.json)
@@ -50,7 +50,7 @@ export class UserAuthentication {
 }
 ```
 
-> Tag prefix is configurable. The `generic` preset uses `@docs-*` (shown above). The default `libar-generic` preset uses `@libar-docs-*`. See [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
+> Tag prefix is configurable. The `generic` preset uses `@docs-*` (shown above). The default `libar-generic` preset uses `@architect-*`. See [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
 
 ### 3. Generate Documentation
 
@@ -61,7 +61,7 @@ npx generate-docs -g patterns -i "src/**/*.ts" -o docs -f
 ### 4. Enforce Workflow (Pre-commit Hook)
 
 ```bash
-npx lint-process --staged
+npx architect-guard --staged
 ```
 
 This validates FSM transitions and blocks invalid status changes.
@@ -74,10 +74,10 @@ This validates FSM transitions and blocks invalid status changes.
 
 ```typescript
 /**
- * @libar-docs
- * @libar-docs-pattern TransformDataset
- * @libar-docs-status completed
- * @libar-docs-uses MasterDataset, ExtractedPattern, TagRegistry
+ * @architect
+ * @architect-pattern TransformDataset
+ * @architect-status completed
+ * @architect-uses MasterDataset, ExtractedPattern, TagRegistry
  */
 export function transformToMasterDataset(input: TransformInput): MasterDataset {
   // ...
@@ -113,14 +113,14 @@ All output goes to [`docs-live/`](docs-live/INDEX.md) — 57+ auto-generated fil
 
 ## CLI Commands
 
-| Command             | Purpose                                                | Docs                                                                      |
-| ------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------- |
-| `generate-docs`     | Generate documentation from annotated sources          | `generate-docs --help`                                                    |
-| `process-api`       | Query delivery state for AI coding sessions            | [Process API Reference](docs-live/reference/PROCESS-API-REFERENCE.md)     |
-| `lint-patterns`     | Validate annotation quality (missing tags, etc.)       | [Validation Rules](docs-live/VALIDATION-RULES.md)                         |
-| `lint-process`      | Validate delivery workflow FSM transitions             | [Process Guard Reference](docs-live/reference/PROCESS-GUARD-REFERENCE.md) |
-| `lint-steps`        | Validate vitest-cucumber feature/step compatibility    | [Validation Rules](docs-live/VALIDATION-RULES.md)                         |
-| `validate-patterns` | Cross-source validation with Definition of Done checks | [Validation Rules](docs-live/VALIDATION-RULES.md)                         |
+| Command                   | Purpose                                                | Docs                                                                      |
+| ------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------- |
+| `architect-generate`      | Generate documentation from annotated sources          | `generate-docs --help`                                                    |
+| `architect`               | Query delivery state for AI coding sessions            | [Process API Reference](docs-live/reference/PROCESS-API-REFERENCE.md)     |
+| `architect-lint-patterns` | Validate annotation quality (missing tags, etc.)       | [Validation Rules](docs-live/VALIDATION-RULES.md)                         |
+| `architect-guard`         | Validate delivery workflow FSM transitions             | [Process Guard Reference](docs-live/reference/PROCESS-GUARD-REFERENCE.md) |
+| `architect-lint-steps`    | Validate vitest-cucumber feature/step compatibility    | [Validation Rules](docs-live/VALIDATION-RULES.md)                         |
+| `architect-validate`      | Cross-source validation with Definition of Done checks | [Validation Rules](docs-live/VALIDATION-RULES.md)                         |
 
 ---
 

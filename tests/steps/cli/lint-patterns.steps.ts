@@ -4,8 +4,8 @@
  * BDD step definitions for testing the lint-patterns CLI
  * which validates pattern annotation quality.
  *
- * @libar-docs
- * @libar-docs-implements CliBehaviorTesting
+ * @architect
+ * @architect-implements CliBehaviorTesting
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -44,13 +44,13 @@ function initState(): CLITestState {
 // =============================================================================
 
 function createCompletePatternFile(): string {
-  return `/** @libar-docs */
+  return `/** @architect */
 
 /**
- * @libar-docs-core
- * @libar-docs-pattern TestPattern
- * @libar-docs-status completed
- * @libar-docs-uses AnotherPattern
+ * @architect-core
+ * @architect-pattern TestPattern
+ * @architect-status completed
+ * @architect-uses AnotherPattern
  *
  * ## TestPattern
  *
@@ -65,11 +65,11 @@ export interface TestPattern {
 }
 
 function createMissingPatternNameFile(): string {
-  return `/** @libar-docs */
+  return `/** @architect */
 
 /**
- * @libar-docs-core
- * @libar-docs-status completed
+ * @architect-core
+ * @architect-status completed
  *
  * ## Some Pattern
  *
@@ -82,15 +82,15 @@ export interface MissingName {
 }
 
 function createMissingStatusFile(): string {
-  return `/** @libar-docs */
+  return `/** @architect */
 
 /**
- * @libar-docs-core
- * @libar-docs-pattern WarningPattern
+ * @architect-core
+ * @architect-pattern WarningPattern
  *
  * ## WarningPattern
  *
- * Missing @libar-docs-status tag (warning level).
+ * Missing @architect-status tag (warning level).
  *
  * ### When to Use
  *

@@ -33,8 +33,8 @@ Starting from pattern brief?
 ### Context Gathering
 
 ```bash
-pnpm process:query -- overview                                # Project health
-pnpm process:query -- list --status roadmap --names-only      # Available patterns
+pnpm architect:query -- overview                                # Project health
+pnpm architect:query -- list --status roadmap --names-only      # Available patterns
 ```
 
 ### Checklist
@@ -99,9 +99,9 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 ### Context Gathering
 
 ```bash
-pnpm process:query -- context <PatternName> --session design  # Full context bundle
-pnpm process:query -- dep-tree <PatternName>                  # Dependency chain
-pnpm process:query -- stubs <PatternName>                     # Existing design stubs
+pnpm architect:query -- context <PatternName> --session design  # Full context bundle
+pnpm architect:query -- dep-tree <PatternName>                  # Dependency chain
+pnpm architect:query -- stubs <PatternName>                     # Existing design stubs
 ```
 
 Use these **before** launching explore agents. See [PROCESS-API.md](./PROCESS-API.md).
@@ -116,16 +116,16 @@ Use these **before** launching explore agents. See [PROCESS-API.md](./PROCESS-AP
 
 ### Checklist
 
-- [ ] **Record decisions** as PDR `.feature` files in `delivery-process/decisions/`
+- [ ] **Record decisions** as PDR `.feature` files in `architect/decisions/`
 
 - [ ] **Document options** — At least 2-3 approaches with pros/cons
 
 - [ ] **Get approval** — User must approve recommended approach
 
-- [ ] **Create code stubs** in `delivery-process/stubs/{pattern-name}/`:
+- [ ] **Create code stubs** in `architect/stubs/{pattern-name}/`:
 
   ```typescript
-  // delivery-process/stubs/{pattern-name}/my-function.ts
+  // architect/stubs/{pattern-name}/my-function.ts
   /**
    * @<prefix>
    * @<prefix>-status roadmap
@@ -147,7 +147,7 @@ Use these **before** launching explore agents. See [PROCESS-API.md](./PROCESS-AP
   }
   ```
 
-  Stubs live outside `src/` to avoid TypeScript compilation and ESLint issues. They are scanned by the documentation pipeline via `-i 'delivery-process/stubs/**/*.ts'`.
+  Stubs live outside `src/` to avoid TypeScript compilation and ESLint issues. They are scanned by the documentation pipeline via `-i 'architect/stubs/**/*.ts'`.
 
 - [ ] **Verify stub identifier spelling** — Check all exported function/type/interface names for typos before committing stubs
 
@@ -170,13 +170,13 @@ Use these **before** launching explore agents. See [PROCESS-API.md](./PROCESS-AP
 
 ```bash
 # Pre-flight — catches FSM violations, missing deps, incomplete deliverables
-pnpm process:query -- scope-validate <PatternName> implement
+pnpm architect:query -- scope-validate <PatternName> implement
 
 # Curated context — deliverables, FSM state, test files
-pnpm process:query -- context <PatternName> --session implement
+pnpm architect:query -- context <PatternName> --session implement
 
 # File paths for implementation
-pnpm process:query -- files <PatternName> --related
+pnpm architect:query -- files <PatternName> --related
 ```
 
 The `scope-validate` command replaces the manual pre-flight checklist — it checks
@@ -212,7 +212,7 @@ See [PROCESS-API.md](./PROCESS-API.md#scope-validate).
      ```
 
 4. **Verify all design decisions addressed:**
-   - [ ] Run `pnpm process:query -- decisions <SpecName>` and confirm each DD-N has a corresponding `// DD-N:` comment in the implementation
+   - [ ] Run `pnpm architect:query -- decisions <SpecName>` and confirm each DD-N has a corresponding `// DD-N:` comment in the implementation
 
 5. **Transition to completed** (only when ALL done):
 
@@ -324,8 +324,8 @@ For multi-session work, capture state at session boundaries.
 
 ```bash
 # Generate handoff from actual annotation state (preferred over manual template)
-pnpm process:query -- handoff --pattern <PatternName>
-pnpm process:query -- handoff --pattern <PatternName> --git   # include recent commits
+pnpm architect:query -- handoff --pattern <PatternName>
+pnpm architect:query -- handoff --pattern <PatternName> --git   # include recent commits
 ```
 
 The CLI handoff always reflects current annotation state. The template below is for additional context:

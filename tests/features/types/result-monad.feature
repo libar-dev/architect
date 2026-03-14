@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:ResultMonad
-@libar-docs-status:completed
-@libar-docs-product-area:CoreTypes
-@libar-docs-include:core-types
+@architect
+@architect-pattern:ResultMonad
+@architect-status:completed
+@architect-product-area:CoreTypes
+@architect-include:core-types
 @types @result
 Feature: Result Monad
   The Result type provides explicit error handling via a discriminated union.

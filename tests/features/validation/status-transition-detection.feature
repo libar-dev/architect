@@ -1,8 +1,8 @@
-@libar-docs
-@behavior @status-transitions @libar-docs-pattern:StatusTransitionDetectionTesting
-@libar-docs-implements:DetectChanges
-@libar-docs-status:completed
-@libar-docs-product-area:Validation
+@architect
+@behavior @status-transitions @architect-pattern:StatusTransitionDetectionTesting
+@architect-implements:DetectChanges
+@architect-status:completed
+@architect-product-area:Validation
 Feature: Status Transition Detection from Git Diff
   Tests for the detectStatusTransitions function that parses git diff output.
   Verifies that status tags inside docstrings are ignored and only file-level
@@ -17,7 +17,7 @@ Feature: Status Transition Detection from Git Diff
 
   Rule: Status transitions are detected from file-level tags
 
-    **Invariant:** Status transitions must be detected by comparing @libar-docs-status tags at the file level between the old and new versions of a file.
+    **Invariant:** Status transitions must be detected by comparing @architect-status tags at the file level between the old and new versions of a file.
     **Rationale:** File-level tags are the canonical source of pattern status — detecting transitions from tags ensures consistency with the FSM validator.
     **Verified by:** New file with status tag is detected as transition from roadmap, Modified file with status change is detected, No transition when status unchanged
 
@@ -57,9 +57,9 @@ Feature: Status Transition Detection from Git Diff
     Scenario: Status tag inside docstring is not used for transition
       Given a git diff for new file "specs/test.feature" with:
         | line | content                           |
-        | 2    | @libar-docs-status:active         |
+        | 2    | @architect-status:active         |
         | 10   | """                               |
-        | 11   | @libar-docs-status:completed      |
+        | 11   | @architect-status:completed      |
         | 12   | """                               |
       When detecting status transitions
       Then a transition is detected for "specs/test.feature"
@@ -70,12 +70,12 @@ Feature: Status Transition Detection from Git Diff
     Scenario: Multiple docstring status tags are all ignored
       Given a git diff for new file "specs/multi-docstring.feature" with:
         | line | content                           |
-        | 2    | @libar-docs-status:active         |
+        | 2    | @architect-status:active         |
         | 15   | """                               |
-        | 16   | @libar-docs-status:roadmap        |
+        | 16   | @architect-status:roadmap        |
         | 17   | """                               |
         | 30   | """                               |
-        | 31   | @libar-docs-status:completed      |
+        | 31   | @architect-status:completed      |
         | 32   | """                               |
       When detecting status transitions
       Then a transition is detected for "specs/multi-docstring.feature"
@@ -87,7 +87,7 @@ Feature: Status Transition Detection from Git Diff
       Given a git diff for new file "specs/only-docstring.feature" with:
         | line | content                           |
         | 5    | """                               |
-        | 6    | @libar-docs-status:active         |
+        | 6    | @architect-status:active         |
         | 7    | """                               |
       When detecting status transitions
       Then no transition is detected for "specs/only-docstring.feature"
@@ -106,8 +106,8 @@ Feature: Status Transition Detection from Git Diff
     Scenario: First file-level tag wins over subsequent tags
       Given a git diff for new file "specs/multi-tag.feature" with:
         | line | content                           |
-        | 2    | @libar-docs-status:active         |
-        | 50   | @libar-docs-status:completed      |
+        | 2    | @architect-status:active         |
+        | 50   | @architect-status:completed      |
       When detecting status transitions
       Then a transition is detected for "specs/multi-tag.feature"
       And the transition is from "roadmap" to "active"

@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:DesignReviewGenerationTests
-@libar-docs-status:active
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:DesignReviewGenerationTests
+@architect-status:active
+@architect-product-area:Generation
 @behavior @design-review
 Feature: Design Review Generation Pipeline
 
@@ -182,14 +182,14 @@ Feature: Design Review Generation Pipeline
     Scenario: Duplicate step numbers are reported as malformed
       Given a pattern with duplicate sequence-step values
       When transforming the pattern with validation
-      Then validation issues contain "Duplicate @libar-docs-sequence-step:1"
+      Then validation issues contain "Duplicate @architect-sequence-step:1"
       And sequenceIndex does not contain the pattern
 
     @acceptance-criteria @validation
     Scenario: Sequence step without modules is reported as malformed
       Given a pattern with a sequence step but no sequence modules
       When transforming the pattern with validation
-      Then validation issues contain "has @libar-docs-sequence-step:1 but no @libar-docs-sequence-module values"
+      Then validation issues contain "has @architect-sequence-step:1 but no @architect-sequence-module values"
       And sequenceIndex does not contain the pattern
 
   Rule: Process API sequence lookup resolves pattern names case-insensitively

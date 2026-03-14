@@ -17,7 +17,7 @@ test approaches: 97 legacy `.test.ts` files alongside Gherkin features.
 This undermined the core thesis that Gherkin IS sufficient for all testing.
 
 **Decision:**
-Enforce strict Gherkin-only testing for the delivery-process package:
+Enforce strict Gherkin-only testing for the Architect package:
 
 - All tests must be `.feature` files with step definitions
 - No new `.test.ts` files
@@ -46,7 +46,7 @@ Enforce strict Gherkin-only testing for the delivery-process package:
 | Tests               | .test.ts (hidden from docs) | .feature (visible in docs)         |
 | Business rules      | Manually maintained         | Extracted from Rule blocks         |
 | Acceptance criteria | Implicit in test code       | Explicit @acceptance-criteria tags |
-| Traceability        | Manual cross-referencing    | @libar-docs-implements links       |
+| Traceability        | Manual cross-referencing    | @architect-implements links        |
 
 **Verified by:**
 

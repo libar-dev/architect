@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:DescriptionHeaderNormalization
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:DescriptionHeaderNormalization
+@architect-status:completed
+@architect-product-area:Generation
 Feature: Description Header Normalization
 
   Pattern descriptions should not create duplicate headers when rendered.

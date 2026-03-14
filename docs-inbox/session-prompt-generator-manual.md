@@ -19,26 +19,26 @@ Run these commands BEFORE reading any files. They replace explore agents for nav
 
 ```bash
 # 1. Implementation context bundle (deliverables, FSM state, deps)
-pnpm process:query -- context DataAPIDesignSessionSupport --session implement
+pnpm architect:query -- context DataAPIDesignSessionSupport --session implement
 
 # 2. Design stubs with target paths and resolution status
-pnpm process:query -- stubs DataAPIDesignSessionSupport
+pnpm architect:query -- stubs DataAPIDesignSessionSupport
 
 # 3. Dependency chain — confirm all deps are completed
-pnpm process:query -- dep-tree DataAPIDesignSessionSupport
+pnpm architect:query -- dep-tree DataAPIDesignSessionSupport
 
 # 4. Design decisions from stubs (DD-1 through DD-7)
-pnpm process:query -- decisions DataAPIDesignSessionSupport
+pnpm architect:query -- decisions DataAPIDesignSessionSupport
 
 # 5. How the completed context-assembler is wired (reusable helpers)
-pnpm process:query -- arch neighborhood DataAPIContextAssembly
+pnpm architect:query -- arch neighborhood DataAPIContextAssembly
 
 # 6. Existing implementation files for scope-validator target path
-pnpm process:query -- files DataAPIDesignSessionSupport --related
+pnpm architect:query -- files DataAPIDesignSessionSupport --related
 
 # 7. Verify no naming conflicts before creating patterns
-pnpm process:query -- search ScopeValidator
-pnpm process:query -- search HandoffGenerator
+pnpm architect:query -- search ScopeValidator
+pnpm architect:query -- search HandoffGenerator
 ```
 
 Only use file reads for comprehension (how existing code works internally) — not for navigation (what exists and how it relates).
@@ -47,19 +47,19 @@ Only use file reads for comprehension (how existing code works internally) — n
 
 After the API commands, read these for implementation patterns:
 
-| File                                                                            | Why                                                        |
-| ------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| Design stubs (2 files in `delivery-process/stubs/DataAPIDesignSessionSupport/`) | Approved types + function signatures                       |
-| `delivery-process/decisions/pdr-002-session-workflow-commands.feature`          | DD-1 through DD-7 design decisions                         |
-| `delivery-process/specs/data-api-session-support.feature`                       | Spec with deliverables and scenarios                       |
-| `src/api/context-assembler.ts`                                                  | Reusable helpers: `requirePattern()`, `resolveFsm()`       |
-| `src/api/context-formatter.ts`                                                  | `=== MARKERS ===` text formatting conventions              |
-| `src/cli/process-api.ts`                                                        | CLI subcommand wiring pattern (how to add new subcommands) |
-| `src/validation/dod-validator.ts`                                               | `isDeliverableComplete()` for handoff completion logic     |
+| File                                                                     | Why                                                        |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| Design stubs (2 files in `architect/stubs/DataAPIDesignSessionSupport/`) | Approved types + function signatures                       |
+| `architect/decisions/pdr-002-session-workflow-commands.feature`          | DD-1 through DD-7 design decisions                         |
+| `architect/specs/data-api-session-support.feature`                       | Spec with deliverables and scenarios                       |
+| `src/api/context-assembler.ts`                                           | Reusable helpers: `requirePattern()`, `resolveFsm()`       |
+| `src/api/context-formatter.ts`                                           | `=== MARKERS ===` text formatting conventions              |
+| `src/cli/process-api.ts`                                                 | CLI subcommand wiring pattern (how to add new subcommands) |
+| `src/validation/dod-validator.ts`                                        | `isDeliverableComplete()` for handoff completion logic     |
 
 ### Execution order (CRITICAL)
 
-1. **Transition spec to `active` FIRST** — change `@libar-docs-status:roadmap` → `@libar-docs-status:active` in the spec file. Commit this change alone before writing any implementation code.
+1. **Transition spec to `active` FIRST** — change `@architect-status:roadmap` → `@architect-status:active` in the spec file. Commit this change alone before writing any implementation code.
 
 2. **Implement deliverables in dependency order:**
    - Scope validation logic (`src/api/scope-validator.ts`) — core functions, no CLI
@@ -81,20 +81,20 @@ After each deliverable, verify using Process API commands:
 
 ```bash
 # After implementing scope-validator.ts — verify it's scanned
-pnpm process:query -- search ScopeValidator
+pnpm architect:query -- search ScopeValidator
 
 # After wiring CLI — verify subcommands work
-pnpm process:query -- context DataAPIDesignSessionSupport --session implement
+pnpm architect:query -- context DataAPIDesignSessionSupport --session implement
 
 # After implementing handoff-generator.ts
-pnpm process:query -- stubs DataAPIDesignSessionSupport  # should show targetExists: true
+pnpm architect:query -- stubs DataAPIDesignSessionSupport  # should show targetExists: true
 
 # After transitioning to completed — verify FSM
-pnpm process:query -- pattern DataAPIDesignSessionSupport --fields status
-pnpm process:query -- status  # completion % should increase
+pnpm architect:query -- pattern DataAPIDesignSessionSupport --fields status
+pnpm architect:query -- status  # completion % should increase
 
 # Final validation — the new commands should work on themselves
-pnpm process:query -- overview  # should reflect updated status
+pnpm architect:query -- overview  # should reflect updated status
 ```
 
 ### Lint rules to remember
@@ -115,7 +115,7 @@ pnpm process:query -- overview  # should reflect updated status
 
 ### Pattern naming
 
-Check `delivery-process/specs/*.feature` before choosing `@libar-docs-pattern` names in TypeScript. Implementation files must use a DIFFERENT pattern name + `@libar-docs-implements DataAPIDesignSessionSupport` to avoid conflicts with the Gherkin spec's pattern name.
+Check `architect/specs/*.feature` before choosing `@architect-pattern` names in TypeScript. Implementation files must use a DIFFERENT pattern name + `@architect-implements DataAPIDesignSessionSupport` to avoid conflicts with the Gherkin spec's pattern name.
 
 ---
 

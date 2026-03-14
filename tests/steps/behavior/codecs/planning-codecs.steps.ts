@@ -8,7 +8,7 @@
  *
  * Tests document structure, sections, options, and content rendering.
  *
- * @libar-docs
+ * @architect
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';

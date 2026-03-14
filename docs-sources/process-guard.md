@@ -22,9 +22,9 @@
 
 | Situation                     | Solution                           | Example                                       |
 | ----------------------------- | ---------------------------------- | --------------------------------------------- |
-| Fix bug in completed spec     | Add `@*-unlock-reason:'reason'`    | `@libar-docs-unlock-reason:'Fix typo'`        |
-| Modify outside session scope  | `--ignore-session` flag            | `lint-process --staged --ignore-session`      |
-| CI treats warnings as errors  | `--strict` flag                    | `lint-process --all --strict`                 |
+| Fix bug in completed spec     | Add `@*-unlock-reason:'reason'`    | `@architect-unlock-reason:'Fix typo'`         |
+| Modify outside session scope  | `--ignore-session` flag            | `architect-guard --staged --ignore-session`   |
+| CI treats warnings as errors  | `--strict` flag                    | `architect-guard --all --strict`              |
 | Skip workflow (legacy import) | Multiple transitions in one commit | Set `roadmap` then `completed` in same commit |
 
 ---
@@ -64,11 +64,11 @@ lint-process [options]
 ### Examples
 
 ```bash
-lint-process --staged                        # Pre-commit hook (recommended)
-lint-process --all --strict                  # CI pipeline with strict mode
-lint-process --file specs/my-feature.feature # Validate specific file
-lint-process --staged --show-state           # Debug: see derived state
-lint-process --staged --ignore-session       # Override session scope
+architect-guard --staged                        # Pre-commit hook (recommended)
+architect-guard --all --strict                  # CI pipeline with strict mode
+architect-guard --file specs/my-feature.feature # Validate specific file
+architect-guard --staged --show-state           # Debug: see derived state
+architect-guard --staged --ignore-session       # Override session scope
 ```
 
 ---
@@ -81,7 +81,7 @@ Configure Process Guard as a pre-commit hook using Husky.
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-npx lint-process --staged
+npx architect-guard --staged
 ```
 
 ### package.json Scripts
@@ -89,8 +89,8 @@ npx lint-process --staged
 ```json
 {
   "scripts": {
-    "lint:process": "lint-process --staged",
-    "lint:process:ci": "lint-process --all --strict"
+    "lint:process": "architect-guard --staged",
+    "lint:process:ci": "architect-guard --all --strict"
   }
 }
 ```
@@ -108,7 +108,7 @@ import {
   validateChanges,
   hasErrors,
   summarizeResult,
-} from '@libar-dev/delivery-process/lint';
+} from '@libar-dev/architect/lint';
 
 // 1. Derive state from annotations
 const state = (await deriveProcessState({ baseDir: '.' })).value;

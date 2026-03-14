@@ -21,17 +21,17 @@ Need cross-source or DoD validation?
   Yes -> validate-patterns
 
 Running pre-commit hook?
-  lint-process --staged (default)
+  architect-guard --staged (default)
 ```
 
 ## Command Summary
 
-| Command             | Purpose                           | When to Use                                   |
-| ------------------- | --------------------------------- | --------------------------------------------- |
-| `lint-patterns`     | Annotation quality                | Ensure patterns have required tags            |
-| `lint-steps`        | vitest-cucumber compatibility     | After writing/modifying feature or step files |
-| `lint-process`      | FSM workflow enforcement          | Pre-commit hooks, CI pipelines                |
-| `validate-patterns` | Cross-source + DoD + anti-pattern | Release validation, comprehensive             |
+| Command                   | Purpose                           | When to Use                                   |
+| ------------------------- | --------------------------------- | --------------------------------------------- |
+| `architect-lint-patterns` | Annotation quality                | Ensure patterns have required tags            |
+| `architect-lint-steps`    | vitest-cucumber compatibility     | After writing/modifying feature or step files |
+| `architect-guard`         | FSM workflow enforcement          | Pre-commit hooks, CI pipelines                |
+| `architect-validate`      | Cross-source + DoD + anti-pattern | Release validation, comprehensive             |
 
 ---
 
@@ -124,8 +124,8 @@ pnpm lint:steps --strict     # CI
 FSM validation for delivery workflow. Enforces status transitions and protection levels.
 
 ```bash
-npx lint-process --staged          # Pre-commit (default)
-npx lint-process --all --strict    # CI pipeline
+npx architect-guard --staged          # Pre-commit (default)
+npx architect-guard --all --strict    # CI pipeline
 ```
 
 **What it validates:**
@@ -204,8 +204,8 @@ For patterns with `completed` status, checks:
     "lint:patterns": "lint-patterns -i 'src/**/*.ts'",
     "lint:steps": "lint-steps",
     "lint:steps:ci": "lint-steps --strict",
-    "lint:process": "lint-process --staged",
-    "lint:process:ci": "lint-process --all --strict",
+    "lint:process": "architect-guard --staged",
+    "lint:process:ci": "architect-guard --all --strict",
     "validate:all": "validate-patterns -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns"
   }
 }
@@ -214,7 +214,7 @@ For patterns with `completed` status, checks:
 ### Pre-commit Hook
 
 ```bash
-npx lint-process --staged
+npx architect-guard --staged
 ```
 
 ### GitHub Actions
@@ -248,16 +248,16 @@ All validation tools expose programmatic APIs:
 
 ```typescript
 // Pattern linting
-import { lintFiles, hasFailures } from '@libar-dev/delivery-process/lint';
+import { lintFiles, hasFailures } from '@libar-dev/architect/lint';
 
 // Step linting
-import { runStepLint, STEP_LINT_RULES } from '@libar-dev/delivery-process/lint';
+import { runStepLint, STEP_LINT_RULES } from '@libar-dev/architect/lint';
 
 // Process guard
-import { deriveProcessState, validateChanges } from '@libar-dev/delivery-process/lint';
+import { deriveProcessState, validateChanges } from '@libar-dev/architect/lint';
 
 // Anti-patterns and DoD
-import { detectAntiPatterns, validateDoD } from '@libar-dev/delivery-process/validation';
+import { detectAntiPatterns, validateDoD } from '@libar-dev/architect/validation';
 ```
 
 ---

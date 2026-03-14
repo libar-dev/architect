@@ -90,13 +90,13 @@ The gap is **convention injection** — loading relevant rules from decision rec
 
 ## 4. Taxonomy Extension Evaluation
 
-### `@libar-docs-convention` (P0) — Recommended with refinement
+### `@architect-convention` (P0) — Recommended with refinement
 
-This is useful. Decision records already have `@libar-docs-adr-category` (process/architecture/tooling), but that's too coarse. A convention like "Gherkin-only testing" and a convention like "FSM transition rules" both have `adr-category:process` but serve different prompt sections.
+This is useful. Decision records already have `@architect-adr-category` (process/architecture/tooling), but that's too coarse. A convention like "Gherkin-only testing" and a convention like "FSM transition rules" both have `adr-category:process` but serve different prompt sections.
 
-**Recommendation:** Add `@libar-docs-convention` as `csv` format. Values like `testing-policy`, `lint-rules`, `fsm-rules`, `cli-patterns`, `pattern-naming`. This is orthogonal to `adr-category`.
+**Recommendation:** Add `@architect-convention` as `csv` format. Values like `testing-policy`, `lint-rules`, `fsm-rules`, `cli-patterns`, `pattern-naming`. This is orthogonal to `adr-category`.
 
-### `@libar-docs-session-type` (P1) — Recommended but optional
+### `@architect-session-type` (P1) — Recommended but optional
 
 Filtering conventions by session type is valuable. ADR-004 (Gherkin-only testing) applies to implementation sessions but not design sessions. However, this can be computed from the convention topic rather than tagged explicitly:
 
@@ -109,7 +109,7 @@ Filtering conventions by session type is valuable. ADR-004 (Gherkin-only testing
 
 If the mapping is stable, hardcode it in the assembler. If it changes frequently, tag it. For now, I'd hardcode it and add the tag later if needed (YAGNI).
 
-### `@libar-docs-prompt-section` (P2) — Not recommended
+### `@architect-prompt-section` (P2) — Not recommended
 
 The Source Mapping system already supports `THIS DECISION (Rule: RuleName)` for extracting specific Rule blocks. This tag is redundant with existing infrastructure.
 
@@ -154,7 +154,7 @@ function assembleSessionPrompt(api, dataset, options):
   4. return { ...bundle, conventions, scopeResult }
 ```
 
-Step 3 is the only new thing: filter `dataset.patterns` for decision records with `@libar-docs-convention` tags, extract their Rule block content, group by convention topic.
+Step 3 is the only new thing: filter `dataset.patterns` for decision records with `@architect-convention` tags, extract their Rule block content, group by convention topic.
 
 `★ Insight ─────────────────────────────────────`
 **The recipe system's real value — declarative content structure — can be preserved without using the recipe pipeline.** Define the prompt section ordering in a simple config or constant (which conventions go in which order, for which session types). This gives you the auditability of a recipe without the rendering overhead. The "recipe" is just a data structure, not a Gherkin feature file.
@@ -166,9 +166,9 @@ Step 3 is the only new thing: filter `dataset.patterns` for decision records wit
 
 ### Step 1: Extract conventions into decision records (same as proposed)
 
-Create ADR-009 (Coding Conventions), ADR-010 (CLI Patterns), ADR-011 (Pattern Naming). Tag existing ADRs with `@libar-docs-convention`.
+Create ADR-009 (Coding Conventions), ADR-010 (CLI Patterns), ADR-011 (Pattern Naming). Tag existing ADRs with `@architect-convention`.
 
-This is independently valuable — it makes conventions queryable via `pnpm process:query -- decisions`.
+This is independently valuable — it makes conventions queryable via `pnpm architect:query -- decisions`.
 
 ### Step 2: Add `convention` tag to taxonomy
 
@@ -198,7 +198,7 @@ The formatter:
 Add to `src/cli/process-api.ts` following the established CLI pattern.
 
 ```bash
-pnpm process:query -- session-prompt DataAPIDesignSessionSupport --type implement
+pnpm architect:query -- session-prompt DataAPIDesignSessionSupport --type implement
 ```
 
 ---
@@ -255,7 +255,7 @@ This is auditable, version-controlled, and doesn't require a template engine or 
 ## Summary Recommendation
 
 1. **Do** extract conventions into decision records (proposed Step 1) — this is the highest-value change
-2. **Do** add `@libar-docs-convention` to the taxonomy (proposed P0)
+2. **Do** add `@architect-convention` to the taxonomy (proposed P0)
 3. **Don't** build a template engine — extend the existing assembler/formatter pattern instead
 4. **Don't** route prompts through the recipe/markdown pipeline — use the text output path (ADR-008)
 5. **Do** follow the `scope-validator.ts` / `handoff-generator.ts` pattern for the new module

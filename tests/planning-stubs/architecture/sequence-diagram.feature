@@ -1,9 +1,9 @@
-@libar-docs
-@libar-docs-pattern:SequenceDiagramGeneration
-@libar-docs-status:roadmap
-@libar-docs-implements:ArchitectureDiagramGeneration
-@libar-docs-phase:23
-@libar-docs-product-area:DeliveryProcess
+@architect
+@architect-pattern:SequenceDiagramGeneration
+@architect-status:roadmap
+@architect-implements:ArchitectureDiagramGeneration
+@architect-phase:23
+@architect-product-area:DeliveryProcess
 @architecture
 @future
 Feature: Sequence Diagram Generation

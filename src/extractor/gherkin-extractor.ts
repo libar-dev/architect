@@ -1,14 +1,14 @@
 /**
- * @libar-docs
- * @libar-docs-extractor
- * @libar-docs-pattern GherkinExtractor
- * @libar-docs-status completed
- * @libar-docs-implements GherkinRulesSupport
- * @libar-docs-uses GherkinTypes, GherkinASTParser
- * @libar-docs-used-by DualSourceExtractor, Orchestrator
- * @libar-docs-arch-role service
- * @libar-docs-arch-context extractor
- * @libar-docs-arch-layer application
+ * @architect
+ * @architect-extractor
+ * @architect-pattern GherkinExtractor
+ * @architect-status completed
+ * @architect-implements GherkinRulesSupport
+ * @architect-uses GherkinTypes, GherkinASTParser
+ * @architect-used-by DualSourceExtractor, Orchestrator
+ * @architect-arch-role service
+ * @architect-arch-context extractor
+ * @architect-arch-layer application
  *
  * ## GherkinExtractor - Convert Feature Files to Pattern Documentation
  *
@@ -174,9 +174,9 @@ export function extractPatternsFromGherkin(
     // Extract pattern metadata from feature tags
     const metadata = extractPatternTags(feature.tags);
 
-    // Skip if no @libar-docs opt-in marker (consistent with TypeScript requirement)
-    // The marker normalizes to 'libar-docs' after stripping the @ prefix
-    const hasOptIn = feature.tags.some((tag) => tag === 'libar-docs' || tag === '@libar-docs');
+    // Skip if no @architect opt-in marker (consistent with TypeScript requirement)
+    // The marker normalizes to 'architect' after stripping the @ prefix
+    const hasOptIn = feature.tags.some((tag) => tag === 'libar-docs' || tag === 'architect');
     if (!hasOptIn) {
       continue;
     }
@@ -239,9 +239,9 @@ export function extractPatternsFromGherkin(
     // This avoids ~50 intermediate objects created by conditional spreads
     const directive: Record<string, unknown> = {
       // Preserve ALL tags (including value tags like claude-md-section:validation)
-      // Tags are stored as @libar-docs-{tag} to match TypeScript directive format
+      // Tags are stored as @architect-{tag} to match TypeScript directive format
       tags: feature.tags.map((tag) =>
-        asDirectiveTag(`@libar-docs-${tag}`)
+        asDirectiveTag(`@architect-${tag}`)
       ) as readonly DirectiveTag[],
       description: feature.description,
       examples: [],
@@ -319,7 +319,7 @@ export function extractPatternsFromGherkin(
     assignIfNonEmpty(rawPattern, 'discoveredRisks', metadata.discoveredRisks);
     assignIfNonEmpty(rawPattern, 'discoveredLearnings', metadata.discoveredLearnings);
 
-    // Technical constraints from @libar-docs-constraint tags
+    // Technical constraints from @architect-constraint tags
     assignIfNonEmpty(rawPattern, 'constraints', metadata.constraints);
 
     // ADR (Architecture Decision Record) fields
@@ -526,8 +526,9 @@ export async function extractPatternsFromGherkinAsync(
     const relativePath = path.relative(baseDir, filePath);
     const metadata = extractPatternTags(feature.tags);
 
-    // Skip if no @libar-docs opt-in marker (consistent with TypeScript requirement)
-    const hasOptIn = feature.tags.some((tag) => tag === 'libar-docs' || tag === '@libar-docs');
+    // Skip if no @architect opt-in marker (consistent with TypeScript requirement)
+    // The marker normalizes to 'architect' after stripping the @ prefix
+    const hasOptIn = feature.tags.some((tag) => tag === 'libar-docs' || tag === 'architect');
     if (!hasOptIn) continue;
 
     // Skip if no pattern or status tag
@@ -567,7 +568,7 @@ export async function extractPatternsFromGherkinAsync(
     const directive: Record<string, unknown> = {
       // Preserve ALL tags (including value tags like claude-md-section:validation)
       tags: feature.tags.map((tag) =>
-        asDirectiveTag(`@libar-docs-${tag}`)
+        asDirectiveTag(`@architect-${tag}`)
       ) as readonly DirectiveTag[],
       description: feature.description,
       examples: [],

@@ -1,9 +1,9 @@
-@libar-docs
-@libar-docs-pattern:ErrorHandlingUnification
-@libar-docs-status:completed
-@libar-docs-product-area:CoreTypes
-@libar-docs-include:core-types
-@libar-docs-depends-on:ResultMonad,ErrorFactories
+@architect
+@architect-pattern:ErrorHandlingUnification
+@architect-status:completed
+@architect-product-area:CoreTypes
+@architect-include:core-types
+@architect-depends-on:ResultMonad,ErrorFactories
 @behavior @error-handling
 Feature: Error Handling Unification
   All CLI commands and extractors should use the DocError discriminated
@@ -87,7 +87,7 @@ Feature: Error Handling Unification
 
       **Rationale:** console.warn bypasses error collection, making warnings invisible to callers and untestable. Structured error objects enable programmatic handling across all consumers.
 
-      **Verified by:** Errors include structured context, No console.warn bypasses error collection, Skip feature files without @libar-docs opt-in
+      **Verified by:** Errors include structured context, No console.warn bypasses error collection, Skip feature files without @architect opt-in
 
     @acceptance-criteria @extractor
     Scenario: Errors include structured context
@@ -106,8 +106,8 @@ Feature: Error Handling Unification
       And console.warn should not have been called
 
     @edge-case @extractor @opt-in-required
-    Scenario: Skip feature files without @libar-docs opt-in
-      Given a Gherkin feature file without @libar-docs opt-in marker
+    Scenario: Skip feature files without @architect opt-in
+      Given a Gherkin feature file without @architect opt-in marker
       When patterns are extracted from Gherkin files
       Then no patterns should be extracted
 

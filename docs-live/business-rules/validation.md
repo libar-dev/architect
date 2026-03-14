@@ -18,7 +18,7 @@ _- Dependencies in features (should be code-only) cause drift_
 
 #### Process metadata should not appear in TypeScript code
 
-> **Invariant:** Process metadata tags (@libar-docs-status, @libar-docs-phase, etc.) must only appear in Gherkin feature files, never in TypeScript source code.
+> **Invariant:** Process metadata tags (@architect-status, @architect-phase, etc.) must only appear in Gherkin feature files, never in TypeScript source code.
 >
 > **Rationale:** TypeScript owns runtime behavior while Gherkin owns delivery process metadata — mixing them creates dual-source conflicts and validation ambiguity.
 
@@ -732,7 +732,7 @@ _- Completed specs modified without explicit unlock reason_
 
 #### Completed files require unlock-reason to modify
 
-> **Invariant:** A completed spec file cannot be modified unless it carries an @libar-docs-unlock-reason tag.
+> **Invariant:** A completed spec file cannot be modified unless it carries an @architect-unlock-reason tag.
 >
 > **Rationale:** Completed work represents validated, shipped functionality — accidental modification risks regression.
 
@@ -827,7 +827,7 @@ _Tests for the detectStatusTransitions function that parses git diff output._
 
 #### Status transitions are detected from file-level tags
 
-> **Invariant:** Status transitions must be detected by comparing @libar-docs-status tags at the file level between the old and new versions of a file.
+> **Invariant:** Status transitions must be detected by comparing @architect-status tags at the file level between the old and new versions of a file.
 >
 > **Rationale:** File-level tags are the canonical source of pattern status — detecting transitions from tags ensures consistency with the FSM validator.
 

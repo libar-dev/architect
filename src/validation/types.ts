@@ -1,10 +1,10 @@
 /**
- * @libar-docs
- * @libar-docs-validation
- * @libar-docs-pattern DoDValidationTypes
- * @libar-docs-status completed
- * @libar-docs-used-by DoDValidator, AntiPatternDetector
- * @libar-docs-extract-shapes AntiPatternId, AntiPatternViolation, AntiPatternThresholds, AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, DoDValidationResult, DoDValidationSummary, getPhaseStatusEmoji, WithTagRegistry
+ * @architect
+ * @architect-validation
+ * @architect-pattern DoDValidationTypes
+ * @architect-status completed
+ * @architect-used-by DoDValidator, AntiPatternDetector
+ * @architect-extract-shapes AntiPatternId, AntiPatternViolation, AntiPatternThresholds, AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, DoDValidationResult, DoDValidationSummary, getPhaseStatusEmoji, WithTagRegistry
  *
  * ## DoDValidationTypes - Type Definitions for DoD Validation
  *
@@ -30,7 +30,7 @@ import type { TagRegistry } from '../validation-schemas/tag-registry.js';
  * Base interface for options that accept a TagRegistry for prefix-aware behavior.
  *
  * Many validation functions need to be aware of the configured tag prefix
- * (e.g., "@libar-docs-" vs "@docs-"). This interface provides a consistent
+ * (e.g., "@architect-" vs "@docs-"). This interface provides a consistent
  * way to pass that configuration.
  *
  * ### When to Use
@@ -48,7 +48,7 @@ import type { TagRegistry } from '../validation-schemas/tag-registry.js';
  * ```
  */
 export interface WithTagRegistry {
-  /** Tag registry for prefix-aware behavior (defaults to @libar-docs- if not provided) */
+  /** Tag registry for prefix-aware behavior (defaults to @architect- if not provided) */
   readonly registry?: TagRegistry;
 }
 

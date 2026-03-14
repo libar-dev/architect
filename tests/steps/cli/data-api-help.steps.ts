@@ -4,8 +4,8 @@
  * BDD step definitions for testing per-subcommand help output,
  * global help, and unknown subcommand help fallback.
  *
- * @libar-docs
- * @libar-docs-implements DataAPICLIErgonomics
+ * @architect
+ * @architect-implements DataAPICLIErgonomics
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

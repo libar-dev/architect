@@ -1,18 +1,18 @@
 /**
- * @libar-docs
- * @libar-docs-lint
- * @libar-docs-pattern LintRules
- * @libar-docs-status completed
- * @libar-docs-arch-role service
- * @libar-docs-arch-context lint
- * @libar-docs-arch-layer application
- * @libar-docs-implements PatternRelationshipModel
- * @libar-docs-used-by LintEngine
- * @libar-docs-extract-shapes LintRule, LintContext, defaultRules, severityOrder, filterRulesBySeverity, missingPatternName, missingStatus, invalidStatus, missingWhenToUse, tautologicalDescription, missingRelationships, patternConflictInImplements, missingRelationshipTarget
+ * @architect
+ * @architect-lint
+ * @architect-pattern LintRules
+ * @architect-status completed
+ * @architect-arch-role service
+ * @architect-arch-context lint
+ * @architect-arch-layer application
+ * @architect-implements PatternRelationshipModel
+ * @architect-used-by LintEngine
+ * @architect-extract-shapes LintRule, LintContext, defaultRules, severityOrder, filterRulesBySeverity, missingPatternName, missingStatus, invalidStatus, missingWhenToUse, tautologicalDescription, missingRelationships, patternConflictInImplements, missingRelationshipTarget
  *
  * ## LintRules - Annotation Quality Rules
  *
- * Defines lint rules that check @libar-docs-* directives for completeness
+ * Defines lint rules that check @architect-* directives for completeness
  * and quality. Rules include: missing-pattern-name, missing-status,
  * missing-when-to-use, tautological-description, and missing-relationships.
  *
@@ -297,12 +297,12 @@ export const missingRelationships: LintRule = {
  * Rule: pattern-conflict-in-implements
  *
  * Validates that a file doesn't create a circular reference by defining
- * a pattern that it also implements. Having both @libar-docs-pattern X
- * AND @libar-docs-implements X on the same file is a conflict.
+ * a pattern that it also implements. Having both @architect-pattern X
+ * AND @architect-implements X on the same file is a conflict.
  *
  * However, a file CAN have both tags when they reference DIFFERENT patterns:
- * - @libar-docs-pattern SubPattern (defines its own identity)
- * - @libar-docs-implements ParentSpec (links to parent spec)
+ * - @architect-pattern SubPattern (defines its own identity)
+ * - @architect-implements ParentSpec (links to parent spec)
  *
  * This supports the sub-pattern hierarchy where implementation files can be
  * named patterns that also implement a larger spec (e.g., MockPaymentActions

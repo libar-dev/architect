@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:TableExtraction
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:TableExtraction
+@architect-status:completed
+@architect-product-area:Generation
 Feature: Table Extraction Without Duplication
 
   Tables in business rule descriptions should appear exactly once in output.

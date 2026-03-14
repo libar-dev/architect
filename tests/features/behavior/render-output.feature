@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:RendererOutputFormats
-@libar-docs-implements:UniversalMarkdownRenderer
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:RendererOutputFormats
+@architect-implements:UniversalMarkdownRenderer
+@architect-status:completed
+@architect-product-area:Generation
 @behavior @render
 Feature: Universal Markdown Renderer - Output Formats
   The universal renderer converts RenderableDocument to markdown.

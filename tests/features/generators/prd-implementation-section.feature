@@ -1,12 +1,12 @@
-@libar-docs
-@libar-docs-pattern:PrdImplementationSectionTesting
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
-@libar-docs-implements:PrdImplementationSection
+@architect
+@architect-pattern:PrdImplementationSectionTesting
+@architect-status:completed
+@architect-product-area:Generation
+@architect-implements:PrdImplementationSection
 Feature: PRD Implementation Section
 
   Tests the Implementations section rendering in pattern documents.
-  Verifies that code stubs with @libar-docs-implements tags appear in pattern docs
+  Verifies that code stubs with @architect-implements tags appear in pattern docs
   with working links to the source files.
 
   Background: Pattern generator test context
@@ -16,9 +16,9 @@ Feature: PRD Implementation Section
   # Rule 1: Implementation files appear in pattern docs
   # ===========================================================================
 
-  Rule: Implementation files appear in pattern docs via @libar-docs-implements
+  Rule: Implementation files appear in pattern docs via @architect-implements
 
-    **Invariant:** Any TypeScript file with a matching @libar-docs-implements tag must appear in the pattern document's Implementations section with a working file link.
+    **Invariant:** Any TypeScript file with a matching @architect-implements tag must appear in the pattern document's Implementations section with a working file link.
     **Rationale:** Implementation discovery relies on tag-based linking — missing entries break traceability between specs and code.
     **Verified by:** Implementations section renders with file links, Implementation includes description when available
 

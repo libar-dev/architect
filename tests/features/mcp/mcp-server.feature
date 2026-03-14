@@ -1,4 +1,4 @@
-@libar-docs
+@architect
 Feature: MCP Server Integration Tests
 
   Verifies the MCP-specific layer: tool registration, pipeline session
@@ -74,42 +74,42 @@ Feature: MCP Server Integration Tests
   Rule: Tool registration creates correctly named tools with schemas
 
     **Invariant:** Every CLI subcommand is registered as an MCP tool with
-    dp_ prefix, non-empty description, and Zod input schema.
+    architect_ prefix, non-empty description, and Zod input schema.
 
     **Rationale:** Verifies tool registration correctness via MockMcpServer
     that records registerTool calls.
 
-    **Verified by:** All tools registered with dp_ prefix,
+    **Verified by:** All tools registered with architect_ prefix,
     Each tool has a non-empty description,
-    dp_overview returns formatted text,
-    dp_pattern returns error for unknown pattern,
-    dp_list filters apply cumulatively
+    architect_overview returns formatted text,
+    architect_pattern returns error for unknown pattern,
+    architect_list filters apply cumulatively
 
-    Scenario: All tools registered with dp_ prefix
+    Scenario: All tools registered with architect_ prefix
       Given an McpServer mock with registered tools
       Then at least 25 tools are registered
-      And each tool name starts with "dp_"
+      And each tool name starts with "architect_"
 
     Scenario: Each tool has a non-empty description
       Given an McpServer mock with registered tools
       Then each registered tool has a non-empty description
 
-    Scenario: dp_overview returns formatted text
+    Scenario: architect_overview returns formatted text
       Given an McpServer mock with registered tools
-      When the dp_overview handler is called
+      When the architect_overview handler is called
       Then the result contains text content
       And the result is not an error
 
-    Scenario: dp_pattern returns error for unknown pattern
+    Scenario: architect_pattern returns error for unknown pattern
       Given an McpServer mock with registered tools
-      When the dp_pattern handler is called with name "NonExistentPattern"
+      When the architect_pattern handler is called with name "NonExistentPattern"
       Then the result is an error
       And the error message contains "not found"
 
-    Scenario: dp_list filters apply cumulatively
+    Scenario: architect_list filters apply cumulatively
       Given a session with patterns of mixed status and phase
       And an McpServer mock with registered tools using that session
-      When dp_list is called with status "active" and phase 46
+      When architect_list is called with status "active" and phase 46
       Then only patterns matching both status and phase are returned
 
   Rule: File watcher filters file types correctly
@@ -193,47 +193,47 @@ Feature: MCP Server Integration Tests
 
     **Verified by:** Session-aware tools return text content,
     Data query tools return valid JSON,
-    dp_status returns JSON with counts
+    architect_status returns JSON with counts
 
     Scenario: Session-aware tools return text content
       Given an McpServer mock with registered tools
-      When the dp_overview handler is called
+      When the architect_overview handler is called
       Then the result content type is "text"
 
     Scenario: Data query tools return valid JSON
       Given an McpServer mock with registered tools
-      When the dp_status handler is called
+      When the architect_status handler is called
       Then the result content is valid JSON
 
-    Scenario: dp_status returns JSON with counts
+    Scenario: architect_status returns JSON with counts
       Given an McpServer mock with registered tools
-      When the dp_status handler is called
+      When the architect_status handler is called
       Then the JSON result contains "counts" key
       And the JSON result contains "distribution" key
 
   Rule: Tool output correctness for edge cases
 
-    **Invariant:** dp_rules without a pattern filter returns a compact summary
-    instead of the full rules corpus. dp_pattern returns full metadata including
+    **Invariant:** architect_rules without a pattern filter returns a compact summary
+    instead of the full rules corpus. architect_pattern returns full metadata including
     deliverables, dependencies, business rules, and extracted shapes.
 
-    **Rationale:** Unfiltered dp_rules returned 889K chars which breaks MCP clients.
-    dp_pattern must match its description ("full metadata") to enable accurate tool selection.
+    **Rationale:** Unfiltered architect_rules returned 889K chars which breaks MCP clients.
+    architect_pattern must match its description ("full metadata") to enable accurate tool selection.
 
-    **Verified by:** dp_rules without pattern returns compact summary,
-    dp_pattern returns full metadata including business rules and extracted shapes
+    **Verified by:** architect_rules without pattern returns compact summary,
+    architect_pattern returns full metadata including business rules and extracted shapes
 
-    Scenario: dp_rules without pattern returns compact summary
+    Scenario: architect_rules without pattern returns compact summary
       Given an McpServer mock with registered tools
-      When the dp_rules handler is called without pattern
+      When the architect_rules handler is called without pattern
       Then the result contains totalRules and allRuleNames
       And the result contains a hint about using pattern parameter
       And the result does not contain full rule details
 
-    Scenario: dp_pattern returns full metadata including business rules and extracted shapes
+    Scenario: architect_pattern returns full metadata including business rules and extracted shapes
       Given a session with a pattern that has deliverables and dependencies
       And an McpServer mock with registered tools using that session
-      When dp_pattern is called for that pattern
+      When architect_pattern is called for that pattern
       Then the result contains deliverables array
       And the result contains dependencies object
       And the result contains directive and source metadata

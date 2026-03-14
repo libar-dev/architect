@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:GeneratorRegistryTesting
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
-@libar-docs-implements:GeneratorRegistry,GeneratorInfrastructureTesting
+@architect
+@architect-pattern:GeneratorRegistryTesting
+@architect-status:completed
+@architect-product-area:Generation
+@architect-implements:GeneratorRegistry,GeneratorInfrastructureTesting
 Feature: Generator Registry
 
   Tests the GeneratorRegistry registration, lookup, and listing capabilities.

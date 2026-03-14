@@ -5,8 +5,8 @@
  * discovery subcommands: list, search, context assembly,
  * tags/sources, extended arch, unannotated.
  *
- * @libar-docs
- * @libar-docs-implements ProcessStateAPICLI
+ * @architect
+ * @architect-implements ProcessStateAPICLI
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

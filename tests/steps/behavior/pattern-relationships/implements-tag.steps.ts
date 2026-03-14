@@ -1,8 +1,8 @@
 /**
  * Implements Tag Step Definitions
  *
- * BDD step definitions for testing @libar-docs-implements tag extraction
- * and processing through the delivery-process pipeline.
+ * BDD step definitions for testing @architect-implements tag extraction
+ * and processing through the Architect pipeline.
  *
  * These step definitions test:
  * 1. Tag registry definition (data-driven extraction)
@@ -209,8 +209,8 @@ describeFeature(feature, ({ Rule }) => {
     RuleScenario('CSV values are trimmed', ({ Given, When, Then }) => {
       Given('a TypeScript file with implements " Pattern1 , Pattern2 "', () => {
         state!.sourceCode = `/**
-         * @libar-docs
-         * @libar-docs-implements  Pattern1 , Pattern2
+         * @architect
+         * @architect-implements  Pattern1 , Pattern2
          */
         export function test() {}`;
       });

@@ -5,7 +5,7 @@
  * that the parseFileDirectives function correctly extracts metadata, tags,
  * and When to Use sections from JSDoc comments.
  *
- * @libar-docs
+ * @architect
  */
 
 import {

@@ -1,9 +1,9 @@
-@libar-docs
-@libar-docs-pattern:SessionHandoffs
-@libar-docs-status:completed
-@libar-docs-unlock-reason:Add-process-workflow-include-tag
-@libar-docs-product-area:Process
-@libar-docs-include:process-workflow
+@architect
+@architect-pattern:SessionHandoffs
+@architect-status:completed
+@architect-unlock-reason:Add-process-workflow-include-tag
+@architect-product-area:Process
+@architect-include:process-workflow
 @behavior @session-handoffs
 Feature: Session Handoffs and Multi-Developer Coordination
   The delivery process supports mid-phase handoffs between sessions and

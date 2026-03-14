@@ -76,7 +76,7 @@
 **Verified by:** Canonical values are enforced
 
     Completed is a terminal state. Modifications require
-    `@libar-docs-unlock-reason` escape hatch.
+    `@architect-unlock-reason` escape hatch.
 
 ---
 
@@ -86,14 +86,14 @@
 
 **Rationale:** Without explicit format types, parsers must guess value structure, leading to silent data corruption when CSV values are treated as single strings or numbers are treated as text.
 
-| Format       | Parsing                        | Example                        |
-| ------------ | ------------------------------ | ------------------------------ |
-| flag         | Boolean presence, no value     | @libar-docs-core               |
-| value        | Simple string                  | @libar-docs-pattern MyPattern  |
-| enum         | Constrained to predefined list | @libar-docs-status completed   |
-| csv          | Comma-separated values         | @libar-docs-uses A, B, C       |
-| number       | Numeric value                  | @libar-docs-phase 15           |
-| quoted-value | Preserves spaces               | @libar-docs-brief:'Multi word' |
+| Format       | Parsing                        | Example                       |
+| ------------ | ------------------------------ | ----------------------------- |
+| flag         | Boolean presence, no value     | @architect-core               |
+| value        | Simple string                  | @architect-pattern MyPattern  |
+| enum         | Constrained to predefined list | @architect-status completed   |
+| csv          | Comma-separated values         | @architect-uses A, B, C       |
+| number       | Numeric value                  | @architect-phase 15           |
+| quoted-value | Preserves spaces               | @architect-brief:'Multi word' |
 
 **Verified by:** Canonical values are enforced
 
@@ -171,7 +171,7 @@ Scoped architecture diagram showing component relationships:
 ```mermaid
 graph TB
     subgraph config["Config"]
-        DeliveryProcessFactory("DeliveryProcessFactory")
+        ArchitectFactory("ArchitectFactory")
         DefineConfig[/"DefineConfig"/]
     end
     ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
@@ -186,9 +186,9 @@ graph TB
         PhaseStateMachineValidation["PhaseStateMachineValidation"]:::neighbor
         MvpWorkflowImplementation["MvpWorkflowImplementation"]:::neighbor
     end
-    DeliveryProcessFactory -->|uses| ConfigurationTypes
-    DeliveryProcessFactory -->|uses| ConfigurationPresets
-    DeliveryProcessFactory -->|uses| RegexBuilders
+    ArchitectFactory -->|uses| ConfigurationTypes
+    ArchitectFactory -->|uses| ConfigurationPresets
+    ArchitectFactory -->|uses| RegexBuilders
     DefineConfig -->|uses| ProjectConfigTypes
     ConfigBasedWorkflowDefinition -.->|depends on| MvpWorkflowImplementation
     ProcessGuardTesting -.->|depends on| PhaseStateMachineValidation
@@ -553,9 +553,9 @@ interface CategoryDefinition {
 
 ## Behavior Specifications
 
-### DeliveryProcessFactory
+### ArchitectFactory
 
-[View DeliveryProcessFactory source](src/config/factory.ts)
+[View ArchitectFactory source](src/config/factory.ts)
 
 ## Delivery Process Factory
 
@@ -582,11 +582,11 @@ Validation happens later at load time via Zod schema in `loadProjectConfig()`.
 
 ### When to Use
 
-- In `delivery-process.config.ts` at project root to get type-safe configuration with autocompletion.
+- In `architect.config.ts` at project root to get type-safe configuration with autocompletion.
 
 ### ADR005CodecBasedMarkdownRendering
 
-[View ADR005CodecBasedMarkdownRendering source](delivery-process/decisions/adr-005-codec-based-markdown-rendering.feature)
+[View ADR005CodecBasedMarkdownRendering source](architect/decisions/adr-005-codec-based-markdown-rendering.feature)
 
 **Context:**
 The documentation generator needs to transform structured pattern data
@@ -728,7 +728,7 @@ const referenceDoc = CompositeCodec.create({
 
 ### ADR001TaxonomyCanonicalValues
 
-[View ADR001TaxonomyCanonicalValues source](delivery-process/decisions/adr-001-taxonomy-canonical-values.feature)
+[View ADR001TaxonomyCanonicalValues source](architect/decisions/adr-001-taxonomy-canonical-values.feature)
 
 **Context:**
 The annotation system requires well-defined canonical values for taxonomy
@@ -807,7 +807,7 @@ These are the durable constants of the delivery process.
 - Canonical values are enforced
 
   Completed is a terminal state. Modifications require
-  `@libar-docs-unlock-reason` escape hatch.
+  `@architect-unlock-reason` escape hatch.
 
 </details>
 
@@ -888,10 +888,10 @@ These are the durable constants of the delivery process.
 
 ### ConfigBasedWorkflowDefinition
 
-[View ConfigBasedWorkflowDefinition source](delivery-process/specs/config-based-workflow-definition.feature)
+[View ConfigBasedWorkflowDefinition source](architect/specs/config-based-workflow-definition.feature)
 
 **Problem:**
-Every `pnpm process:query` and `pnpm docs:*` invocation prints:
+Every `pnpm architect:query` and `pnpm docs:*` invocation prints:
 `Failed to load default workflow (6-phase-standard): Workflow file not found`
 
 The `loadDefaultWorkflow()` function resolves to `catalogue/workflows/`
@@ -985,8 +985,8 @@ Design Decisions (DS-1, 2026-02-15):
 
 - N/A - deferred until preset integration
 
-  Adding `workflow` as a field on `DeliveryProcessConfig` (presets) and
-  `DeliveryProcessProjectConfig` (project config) is a natural next step
+  Adding `workflow` as a field on `ArchitectConfig` (presets) and
+  `ArchitectProjectConfig` (project config) is a natural next step
   but NOT required for the MVP fix.
 
   The inline constant in `workflow-loader.ts` resolves the warning. Moving
@@ -994,11 +994,11 @@ Design Decisions (DS-1, 2026-02-15):
   - Different presets with different default phases (e.g.
 
 - 3-phase generic)
-  - Per-project phase customization in delivery-process.config.ts
+  - Per-project phase customization in architect.config.ts
   - Phase definitions appearing in generated documentation
 
   See ideation artifact for design options:
-  delivery-process/ideations/2026-02-15-workflow-config-and-fsm-extensibility.feature
+  architect/ideations/2026-02-15-workflow-config-and-fsm-extensibility.feature
 
 </details>
 
@@ -1029,7 +1029,7 @@ All validation follows the Decider pattern: (state, changes, options) => result.
 
 #### Completed files require unlock-reason to modify
 
-**Invariant:** A completed spec file cannot be modified unless it carries an @libar-docs-unlock-reason tag.
+**Invariant:** A completed spec file cannot be modified unless it carries an @architect-unlock-reason tag.
 
 **Rationale:** Completed work represents validated, shipped functionality — accidental modification risks regression.
 

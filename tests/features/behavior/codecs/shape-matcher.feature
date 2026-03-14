@@ -1,9 +1,9 @@
-@libar-docs
+@architect
 @behavior @shape-matcher
-@libar-docs-pattern:ShapeMatcherTesting
-@libar-docs-status:completed
-@libar-docs-implements:ReferenceDocShowcase,DeclarationLevelShapeTagging
-@libar-docs-product-area:Generation
+@architect-pattern:ShapeMatcherTesting
+@architect-status:completed
+@architect-implements:ReferenceDocShowcase,DeclarationLevelShapeTagging
+@architect-product-area:Generation
 Feature: Shape Source Pattern Matching
 
   Matches file paths against glob patterns for TypeScript shape extraction.

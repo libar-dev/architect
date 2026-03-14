@@ -18,7 +18,7 @@ Rule: Reservations use atomic claim
   See `src/reservations/reserve.ts` for API.
 ```
 
-Code stubs live in `delivery-process/stubs/{pattern-name}/` — annotated TypeScript with `throw new Error("not yet implemented")`.
+Code stubs live in `architect/stubs/{pattern-name}/` — annotated TypeScript with `throw new Error("not yet implemented")`.
 
 #### Forbidden in Feature Descriptions
 
@@ -33,7 +33,7 @@ Code stubs live in `delivery-process/stubs/{pattern-name}/` — annotated TypeSc
 
 **Tag values cannot contain spaces.** Use hyphens instead:
 
-| Invalid                          | Valid                           |
-| -------------------------------- | ------------------------------- |
-| `@unlock-reason:Fix for issue`   | `@unlock-reason:Fix-for-issue`  |
-| `@libar-docs-pattern:My Pattern` | `@libar-docs-pattern:MyPattern` |
+| Invalid                         | Valid                          |
+| ------------------------------- | ------------------------------ |
+| `@unlock-reason:Fix for issue`  | `@unlock-reason:Fix-for-issue` |
+| `@architect-pattern:My Pattern` | `@architect-pattern:MyPattern` |

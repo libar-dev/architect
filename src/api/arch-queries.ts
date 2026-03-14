@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-pattern ArchQueriesImpl
- * @libar-docs-status active
- * @libar-docs-implements DataAPIArchitectureQueries
- * @libar-docs-uses ProcessStateAPI, MasterDataset
- * @libar-docs-used-by ProcessAPICLIImpl
- * @libar-docs-arch-role service
- * @libar-docs-arch-context api
- * @libar-docs-arch-layer domain
+ * @architect
+ * @architect-pattern ArchQueriesImpl
+ * @architect-status active
+ * @architect-implements DataAPIArchitectureQueries
+ * @architect-uses ProcessStateAPI, MasterDataset
+ * @architect-used-by ProcessAPICLIImpl
+ * @architect-arch-role service
+ * @architect-arch-context api
+ * @architect-arch-layer domain
  *
  * ## ArchQueries — Neighborhood, Comparison, Tags, Sources
  *

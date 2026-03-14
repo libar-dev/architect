@@ -1,10 +1,10 @@
-@libar-docs
+@architect
 @behavior @reference-codec
-@libar-docs-pattern:ReferenceCodecCoreTesting
-@libar-docs-status:completed
-@libar-docs-unlock-reason:'Split-from-original'
-@libar-docs-implements:ReferenceDocShowcase
-@libar-docs-product-area:Generation
+@architect-pattern:ReferenceCodecCoreTesting
+@architect-status:completed
+@architect-unlock-reason:'Split-from-original'
+@architect-implements:ReferenceDocShowcase
+@architect-product-area:Generation
 Feature: Reference Codec - Core Behavior
 
   Parameterized codec factory that creates reference document codecs

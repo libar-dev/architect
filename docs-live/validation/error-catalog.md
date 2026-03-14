@@ -21,12 +21,12 @@ Complete error messages and fix instructions for all 6 validation rules.
 
 ### `completed-protection`
 
-| Property    | Value                                                              |
-| ----------- | ------------------------------------------------------------------ |
-| Severity    | error                                                              |
-| Description | Completed specs require unlock-reason tag to modify                |
-| Cause       | File has `completed` status but no `@libar-docs-unlock-reason` tag |
-| Fix         | Add `@libar-docs-unlock-reason:'your reason'` to proceed           |
+| Property    | Value                                                             |
+| ----------- | ----------------------------------------------------------------- |
+| Severity    | error                                                             |
+| Description | Completed specs require unlock-reason tag to modify               |
+| Cause       | File has `completed` status but no `@architect-unlock-reason` tag |
+| Fix         | Add `@architect-unlock-reason:'your reason'` to proceed           |
 
 ### `invalid-status-transition`
 

@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:ExtractSummary
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:ExtractSummary
+@architect-status:completed
+@architect-product-area:Generation
 @renderable @utils
 Feature: Extract Summary from Pattern Descriptions
   The extractSummary function transforms multi-line pattern descriptions into

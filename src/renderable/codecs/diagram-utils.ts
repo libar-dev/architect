@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-pattern MermaidDiagramUtils
- * @libar-docs-status completed
- * @libar-docs-used-by Architecture Codec, Reference Codec
- * @libar-docs-arch-context renderer
+ * @architect
+ * @architect-pattern MermaidDiagramUtils
+ * @architect-status completed
+ * @architect-used-by Architecture Codec, Reference Codec
+ * @architect-arch-context renderer
  *
  * ## Shared Mermaid Diagram Utilities
  *

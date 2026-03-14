@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:LoadPreambleParser
-@libar-docs-status:active
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:LoadPreambleParser
+@architect-status:active
+@architect-product-area:Generation
 @behavior @load-preamble
 Feature: Markdown-to-SectionBlock Parser
 

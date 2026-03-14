@@ -2,7 +2,7 @@
  * Step definitions for Declaration-Level Shape Tagging tests
  *
  * Tests the discoverTaggedShapes function that scans TypeScript source
- * code for declarations annotated with the @libar-docs-shape JSDoc tag.
+ * code for declarations annotated with the @architect-shape JSDoc tag.
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

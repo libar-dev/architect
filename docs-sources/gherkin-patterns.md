@@ -5,10 +5,10 @@
 Roadmap specs define planned work with Problem/Solution descriptions and a Background deliverables table.
 
 ```gherkin
-@libar-docs
-@libar-docs-pattern:ProcessGuardLinter
-@libar-docs-status:roadmap
-@libar-docs-phase:99
+@architect
+@architect-pattern:ProcessGuardLinter
+@architect-status:roadmap
+@architect-phase:99
 Feature: Process Guard Linter
 
   **Problem:**
@@ -32,9 +32,9 @@ Feature: Process Guard Linter
 
 **Key elements:**
 
-- `@libar-docs` -- bare opt-in marker (required)
-- `@libar-docs-pattern:Name` -- unique identifier (required)
-- `@libar-docs-status:roadmap` -- FSM state
+- `@architect` -- bare opt-in marker (required)
+- `@architect-pattern:Name` -- unique identifier (required)
+- `@architect-status:roadmap` -- FSM state
 - `**Problem:**` / `**Solution:**` -- extracted by generators
 - Background deliverables table -- tracks implementation progress
 
@@ -102,7 +102,7 @@ Test features focus on behavior verification with section dividers for organizat
 
 ```gherkin
 @behavior @scanner-core
-@libar-docs-pattern:ScannerCore
+@architect-pattern:ScannerCore
 Feature: Scanner Core Integration
 
   Background:
@@ -155,11 +155,11 @@ Use `"""typescript` for code blocks. Essential when content contains pipes or sp
 Scenario: Extract directive from TypeScript
   Given a file with content:
     """typescript
-    /** @libar-docs */
+    /** @architect */
     export function authenticate() {}
     """
   When scanning the file
-  Then directive should have tag "@libar-docs-core"
+  Then directive should have tag "@architect-core"
 ```
 
 ---
@@ -207,7 +207,7 @@ Feature files serve dual purposes: **executable specs** and **documentation sour
 | DocStrings (`"""typescript`) | Brief examples (5-10 lines), current/target state comparison |
 | Code stub reference          | Complex APIs, interfaces, full implementations               |
 
-Code stubs are annotated TypeScript files with `throw new Error("not yet implemented")`, located in `delivery-process/stubs/{pattern-name}/`.
+Code stubs are annotated TypeScript files with `throw new Error("not yet implemented")`, located in `architect/stubs/{pattern-name}/`.
 
 ### Valid Rich Content
 
@@ -237,15 +237,15 @@ Code stubs are annotated TypeScript files with `throw new Error("not yet impleme
 
 **Tag values cannot contain spaces.** Use hyphens:
 
-| Invalid                          | Valid                           |
-| -------------------------------- | ------------------------------- |
-| `@unlock-reason:Fix for issue`   | `@unlock-reason:Fix-for-issue`  |
-| `@libar-docs-pattern:My Pattern` | `@libar-docs-pattern:MyPattern` |
+| Invalid                         | Valid                          |
+| ------------------------------- | ------------------------------ |
+| `@unlock-reason:Fix for issue`  | `@unlock-reason:Fix-for-issue` |
+| `@architect-pattern:My Pattern` | `@architect-pattern:MyPattern` |
 
 For values with spaces, use the `quoted-value` format where supported:
 
 ```gherkin
-@libar-docs-usecase "When handling command failures"
+@architect-usecase "When handling command failures"
 ```
 
 ---

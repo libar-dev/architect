@@ -1,17 +1,17 @@
 /**
- * @libar-docs
- * @libar-docs-validation @libar-docs-core
- * @libar-docs-pattern MasterDataset
- * @libar-docs-status completed
- * @libar-docs-uses Zod, ExtractedPattern, TagRegistry
- * @libar-docs-used-by Orchestrator, SectionRenderer, ReportCodecs
- * @libar-docs-usecase "When providing pre-computed views to section renderers"
- * @libar-docs-usecase "When eliminating redundant filtering across generators"
- * @libar-docs-extract-shapes MasterDatasetSchema, StatusGroupsSchema, StatusCountsSchema, PhaseGroupSchema, SourceViewsSchema, RelationshipEntrySchema, ArchIndexSchema
- * @libar-docs-arch-role read-model
- * @libar-docs-arch-context api
- * @libar-docs-arch-layer domain
- * @libar-docs-include codec-transformation
+ * @architect
+ * @architect-validation @architect-core
+ * @architect-pattern MasterDataset
+ * @architect-status completed
+ * @architect-uses Zod, ExtractedPattern, TagRegistry
+ * @architect-used-by Orchestrator, SectionRenderer, ReportCodecs
+ * @architect-usecase "When providing pre-computed views to section renderers"
+ * @architect-usecase "When eliminating redundant filtering across generators"
+ * @architect-extract-shapes MasterDatasetSchema, StatusGroupsSchema, StatusCountsSchema, PhaseGroupSchema, SourceViewsSchema, RelationshipEntrySchema, ArchIndexSchema
+ * @architect-arch-role read-model
+ * @architect-arch-context api
+ * @architect-arch-layer domain
+ * @architect-include codec-transformation
  *
  * ## MasterDataset - Unified Pattern Views Schema
  *
@@ -51,7 +51,7 @@ import { TagRegistrySchema } from './tag-registry.js';
  * - active: active, partial, in-progress
  * - planned: roadmap, planned, undefined
  *
- * @libar-docs-shape master-dataset
+ * @architect-shape master-dataset
  */
 export const StatusGroupsSchema = z.object({
   /** Patterns with status 'completed' or 'implemented' */
@@ -67,7 +67,7 @@ export const StatusGroupsSchema = z.object({
 /**
  * Status counts for aggregate statistics
  *
- * @libar-docs-shape master-dataset
+ * @architect-shape master-dataset
  */
 export const StatusCountsSchema = z.object({
   /** Number of completed patterns */
@@ -89,7 +89,7 @@ export const StatusCountsSchema = z.object({
  * Groups patterns by their phase number, with pre-computed
  * status counts for each phase.
  *
- * @libar-docs-shape master-dataset
+ * @architect-shape master-dataset
  */
 export const PhaseGroupSchema = z.object({
   /** Phase number (e.g., 1, 2, 3, 14, 39) */
@@ -108,7 +108,7 @@ export const PhaseGroupSchema = z.object({
 /**
  * Source-based views for different data origins
  *
- * @libar-docs-shape master-dataset
+ * @architect-shape master-dataset
  */
 export const SourceViewsSchema = z.object({
   /** Patterns from TypeScript files (.ts) */
@@ -146,19 +146,19 @@ export const ImplementationRefSchema = z.object({
  *
  * Maps pattern names to their relationship metadata.
  *
- * @libar-docs-shape master-dataset
+ * @architect-shape master-dataset
  */
 export const RelationshipEntrySchema = z.object({
-  /** Patterns this pattern uses (from @libar-docs-uses) */
+  /** Patterns this pattern uses (from @architect-uses) */
   uses: z.array(z.string()),
 
-  /** Patterns that use this pattern (from @libar-docs-used-by) */
+  /** Patterns that use this pattern (from @architect-used-by) */
   usedBy: z.array(z.string()),
 
-  /** Patterns this pattern depends on (from @libar-docs-depends-on) */
+  /** Patterns this pattern depends on (from @architect-depends-on) */
   dependsOn: z.array(z.string()),
 
-  /** Patterns this pattern enables (from @libar-docs-enables) */
+  /** Patterns this pattern enables (from @architect-enables) */
   enables: z.array(z.string()),
 
   // UML-inspired relationship fields (PatternRelationshipModel)
@@ -174,10 +174,10 @@ export const RelationshipEntrySchema = z.object({
   /** Patterns that extend this pattern (computed inverse) */
   extendedBy: z.array(z.string()),
 
-  /** Related patterns for cross-reference without dependency (from @libar-docs-see-also tag) */
+  /** Related patterns for cross-reference without dependency (from @architect-see-also tag) */
   seeAlso: z.array(z.string()),
 
-  /** File paths to implementation APIs (from @libar-docs-api-ref tag) */
+  /** File paths to implementation APIs (from @architect-api-ref tag) */
   apiRef: z.array(z.string()),
 });
 
@@ -211,11 +211,11 @@ export const ArchIndexSchema = z.object({
  * A single step in a sequence diagram, derived from a Rule with sequence annotations
  */
 export const SequenceStepSchema = z.object({
-  /** Step execution order (from @libar-docs-sequence-step tag) */
+  /** Step execution order (from @architect-sequence-step tag) */
   stepNumber: z.number().int().positive(),
   /** Business rule name (the Rule: keyword text) */
   ruleName: z.string().trim().min(1),
-  /** Module identifiers for this step (from @libar-docs-sequence-module CSV tag) */
+  /** Module identifiers for this step (from @architect-sequence-module CSV tag) */
   modules: z.array(z.string().trim().min(1)).min(1).readonly(),
   /** Input type annotation (from **Input:** marker in rule description) */
   input: z.string().optional(),
@@ -223,7 +223,7 @@ export const SequenceStepSchema = z.object({
   output: z.string().optional(),
   /** Invariant text (for Note blocks in sequence diagram) */
   invariant: z.string().optional(),
-  /** Scenario names tagged with @libar-docs-sequence-error */
+  /** Scenario names tagged with @architect-sequence-error */
   errorScenarios: z.array(z.string().trim().min(1)).readonly(),
 });
 
@@ -231,7 +231,7 @@ export const SequenceStepSchema = z.object({
  * Pre-computed sequence data for a single pattern, keyed by pattern name
  */
 export const SequenceIndexEntrySchema = z.object({
-  /** Orchestrator module identifier (from @libar-docs-sequence-orchestrator tag) */
+  /** Orchestrator module identifier (from @architect-sequence-orchestrator tag) */
   orchestrator: z.string().trim().min(1),
   /** Ordered sequence steps (sorted by stepNumber) */
   steps: z.array(SequenceStepSchema).min(1).readonly(),
@@ -260,7 +260,7 @@ export const SequenceIndexSchema = z.record(z.string().trim().min(1), SequenceIn
  * Contains raw patterns plus pre-computed views and statistics.
  * This is the primary data structure passed to generators and sections.
  *
- * @libar-docs-shape master-dataset
+ * @architect-shape master-dataset
  */
 export const MasterDatasetSchema = z.object({
   // ─────────────────────────────────────────────────────────────────────────

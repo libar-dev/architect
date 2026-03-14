@@ -4,7 +4,7 @@
  * This module defines shared types and interfaces used across all BDD step definitions.
  * It follows the vitest-cucumber pattern of module-level state that gets reset per scenario.
  *
- * @libar-docs
+ * @architect
  */
 
 import type { Result } from '../../src/types/result.js';

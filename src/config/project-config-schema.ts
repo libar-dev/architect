@@ -1,17 +1,17 @@
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-config
- * @libar-docs-pattern ProjectConfigSchema
- * @libar-docs-status active
- * @libar-docs-arch-layer infrastructure
- * @libar-docs-arch-context config
- * @libar-docs-arch-role infrastructure
- * @libar-docs-uses ProjectConfigTypes
- * @libar-docs-used-by ConfigLoader
+ * @architect
+ * @architect-core @architect-config
+ * @architect-pattern ProjectConfigSchema
+ * @architect-status active
+ * @architect-arch-layer infrastructure
+ * @architect-arch-context config
+ * @architect-arch-role infrastructure
+ * @architect-uses ProjectConfigTypes
+ * @architect-used-by ConfigLoader
  *
  * ## Project Configuration Schema
  *
- * Zod validation schema for `DeliveryProcessProjectConfig`.
+ * Zod validation schema for `ArchitectProjectConfig`.
  * Validates at load time (not at `defineConfig()` call time)
  * following the Vite/Vitest identity-function convention.
  *
@@ -22,12 +22,12 @@
  * - Preset name must be one of the known presets
  * - `replaceFeatures` and `additionalFeatures` are mutually exclusive
  *
- * **When to Use:** When loading and validating project configuration from `delivery-process.config.ts` at startup.
+ * **When to Use:** When loading and validating project configuration from `architect.config.ts` at startup.
  */
 
 import { z } from 'zod';
-import type { DeliveryProcessProjectConfig } from './project-config.js';
-import type { DeliveryProcessInstance } from './types.js';
+import type { ArchitectProjectConfig } from './project-config.js';
+import type { ArchitectInstance } from './types.js';
 // Cross-layer: config → renderable (see comment in project-config.ts)
 import { DIAGRAM_SOURCE_VALUES } from '../renderable/codecs/reference.js';
 import { SectionBlockSchema } from '../renderable/schema.js';
@@ -188,7 +188,7 @@ const ReferenceDocConfigSchema = z
  * The `defineConfig()` identity function does NOT validate —
  * it only provides TypeScript type checking.
  */
-export const DeliveryProcessProjectConfigSchema = z
+export const ArchitectProjectConfigSchema = z
   .object({
     // Taxonomy
     preset: PresetNameSchema.optional(),
@@ -235,10 +235,10 @@ export const DeliveryProcessProjectConfigSchema = z
  * Type guard for raw project config objects.
  *
  * Used by `loadProjectConfig()` to distinguish between:
- * - New-style `DeliveryProcessProjectConfig` (has `sources`, `preset`, `output`, etc.)
- * - Legacy `DeliveryProcessInstance` (has `registry` + `regexBuilders`)
+ * - New-style `ArchitectProjectConfig` (has `sources`, `preset`, `output`, etc.)
+ * - Legacy `ArchitectInstance` (has `registry` + `regexBuilders`)
  */
-export function isProjectConfig(value: unknown): value is DeliveryProcessProjectConfig {
+export function isProjectConfig(value: unknown): value is ArchitectProjectConfig {
   if (value === null || typeof value !== 'object') {
     return false;
   }
@@ -254,9 +254,9 @@ export function isProjectConfig(value: unknown): value is DeliveryProcessProject
 }
 
 /**
- * Type guard for legacy DeliveryProcessInstance objects.
+ * Type guard for legacy ArchitectInstance objects.
  */
-export function isLegacyInstance(value: unknown): value is DeliveryProcessInstance {
+export function isLegacyInstance(value: unknown): value is ArchitectInstance {
   if (value === null || typeof value !== 'object') {
     return false;
   }
@@ -269,32 +269,32 @@ export function isLegacyInstance(value: unknown): value is DeliveryProcessInstan
 // If this line errors, the schema and interface have drifted out of sync.
 // ---------------------------------------------------------------------------
 
-type _ZodOutput = z.output<typeof DeliveryProcessProjectConfigSchema>;
+type _ZodOutput = z.output<typeof ArchitectProjectConfigSchema>;
 
 // Bidirectional key-set check: both types must have the same top-level keys.
 // This catches added/removed fields without fighting readonly/refine variance.
-type _AssertSameKeys = keyof _ZodOutput extends keyof DeliveryProcessProjectConfig
-  ? keyof DeliveryProcessProjectConfig extends keyof _ZodOutput
+type _AssertSameKeys = keyof _ZodOutput extends keyof ArchitectProjectConfig
+  ? keyof ArchitectProjectConfig extends keyof _ZodOutput
     ? true
     : {
         error: 'Interface has keys not in Zod schema';
-        extra: Exclude<keyof DeliveryProcessProjectConfig, keyof _ZodOutput>;
+        extra: Exclude<keyof ArchitectProjectConfig, keyof _ZodOutput>;
       }
   : {
       error: 'Zod schema has keys not in interface';
-      extra: Exclude<keyof _ZodOutput, keyof DeliveryProcessProjectConfig>;
+      extra: Exclude<keyof _ZodOutput, keyof ArchitectProjectConfig>;
     };
 
 const _schemaKeyCheck: _AssertSameKeys = true;
 
 // Field-level assignability for simple scalar fields (preset, tagPrefix, etc.).
 // Complex fields (sources, output, generatorOverrides) have known readonly/refine
-// variance between Zod output and the interface — the `as DeliveryProcessProjectConfig`
+// variance between Zod output and the interface — the `as ArchitectProjectConfig`
 // cast in loadProjectConfig() bridges this gap safely since Zod validates at runtime.
-type _AssertScalarFields = _ZodOutput['preset'] extends DeliveryProcessProjectConfig['preset']
-  ? _ZodOutput['tagPrefix'] extends DeliveryProcessProjectConfig['tagPrefix']
-    ? _ZodOutput['fileOptInTag'] extends DeliveryProcessProjectConfig['fileOptInTag']
-      ? _ZodOutput['workflowPath'] extends DeliveryProcessProjectConfig['workflowPath']
+type _AssertScalarFields = _ZodOutput['preset'] extends ArchitectProjectConfig['preset']
+  ? _ZodOutput['tagPrefix'] extends ArchitectProjectConfig['tagPrefix']
+    ? _ZodOutput['fileOptInTag'] extends ArchitectProjectConfig['fileOptInTag']
+      ? _ZodOutput['workflowPath'] extends ArchitectProjectConfig['workflowPath']
         ? true
         : { error: 'workflowPath drift' }
       : { error: 'fileOptInTag drift' }

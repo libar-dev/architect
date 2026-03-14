@@ -1,16 +1,16 @@
 /**
- * @libar-docs
- * @libar-docs-pattern CLISchema
- * @libar-docs-status completed
- * @libar-docs-unlock-reason:Add-recipe-and-narrative-fields-for-CliRecipeCodec
- * @libar-docs-implements ProcessApiHybridGeneration
- * @libar-docs-arch-context cli
- * @libar-docs-arch-layer domain
- * @libar-docs-product-area:DataAPI
+ * @architect
+ * @architect-pattern CLISchema
+ * @architect-status completed
+ * @architect-unlock-reason:Add-recipe-and-narrative-fields-for-CliRecipeCodec
+ * @architect-implements ProcessApiHybridGeneration
+ * @architect-arch-context cli
+ * @architect-arch-layer domain
+ * @architect-product-area:DataAPI
  *
  * ## CLI Schema — Single Source of Truth for CLI Reference
  *
- * Declarative schema defining all CLI options for the process-api command.
+ * Declarative schema defining all CLI options for the architect command.
  * Consumed by:
  * - `showHelp()` in process-api.ts (terminal help text)
  * - `ProcessApiReferenceGenerator` (generated markdown reference)
@@ -100,7 +100,7 @@ export const CLI_SCHEMA: CLISchema = {
   globalOptions: {
     title: 'Global Options',
     postNote:
-      '**Config auto-detection:** If `--input` and `--features` are not provided, the CLI loads defaults from `delivery-process.config.ts` in the current directory. If no config file exists, it falls back to filesystem-based detection. If neither works, `--input` is required.',
+      '**Config auto-detection:** If `--input` and `--features` are not provided, the CLI loads defaults from `architect.config.ts` in the current directory. If no config file exists, it falls back to filesystem-based detection. If neither works, `--input` is required.',
     options: [
       {
         flag: '--input <pattern>',
@@ -240,7 +240,7 @@ export const CLI_SCHEMA: CLISchema = {
           command: 'overview',
           description:
             'Executive summary: progress percentage, active phases, blocking patterns, and a CLI cheat sheet.',
-          usageExample: 'pnpm process:query -- overview',
+          usageExample: 'pnpm architect:query -- overview',
           expectedOutput: [
             '=== PROGRESS ===',
             '318 patterns (224 completed, 47 active, 47 planned) = 70%',
@@ -253,7 +253,7 @@ export const CLI_SCHEMA: CLISchema = {
             'StepLintExtendedRules blocked by: StepLintVitestCucumber',
             '',
             '=== DATA API \u2014 Use Instead of Explore Agents ===',
-            'pnpm process:query -- <subcommand>',
+            'pnpm architect:query -- <subcommand>',
             '  overview, context, scope-validate, dep-tree, list, stubs, files, rules, arch blocking',
           ].join('\n'),
         },
@@ -261,7 +261,7 @@ export const CLI_SCHEMA: CLISchema = {
           command: 'scope-validate',
           description:
             '**Highest-impact command.** Pre-flight readiness check that prevents wasted sessions. Returns a PASS/BLOCKED/WARN verdict covering: dependency completion, deliverable definitions, FSM transition validity, and design decisions.',
-          usageExample: 'pnpm process:query -- scope-validate MyPattern implement',
+          usageExample: 'pnpm architect:query -- scope-validate MyPattern implement',
           details:
             'Checks: dependency completion, deliverable definitions, FSM transition validity, design decisions, executable spec location. Valid session types for scope-validate: `implement`, `design`.',
           expectedOutput: [
@@ -280,7 +280,7 @@ export const CLI_SCHEMA: CLISchema = {
         {
           command: 'context',
           description: 'Curated context bundle tailored to session type.',
-          usageExample: 'pnpm process:query -- context MyPattern --session design',
+          usageExample: 'pnpm architect:query -- context MyPattern --session design',
           expectedOutput: [
             '=== PATTERN: ContextAssemblerImpl ===',
             'Status: active | Category: pattern',
@@ -307,15 +307,15 @@ export const CLI_SCHEMA: CLISchema = {
           command: 'dep-tree',
           description:
             'Dependency chain with status indicators. Shows what a pattern depends on, recursively.',
-          usageExample: 'pnpm process:query -- dep-tree MyPattern',
+          usageExample: 'pnpm architect:query -- dep-tree MyPattern',
           details:
-            'Use `--depth` to limit recursion depth: `pnpm process:query -- dep-tree MyPattern --depth 2`.',
+            'Use `--depth` to limit recursion depth: `pnpm architect:query -- dep-tree MyPattern --depth 2`.',
         },
         {
           command: 'files',
           description:
             'File reading list with implementation paths. Use `--related` to include architecture neighbors.',
-          usageExample: 'pnpm process:query -- files MyPattern --related',
+          usageExample: 'pnpm architect:query -- files MyPattern --related',
           expectedOutput: [
             '=== PRIMARY ===',
             'src/cli/process-api.ts',
@@ -330,7 +330,7 @@ export const CLI_SCHEMA: CLISchema = {
           command: 'handoff',
           description:
             'Captures session-end state: deliverable statuses, blockers, and modification date.',
-          usageExample: 'pnpm process:query -- handoff --pattern MyPattern',
+          usageExample: 'pnpm architect:query -- handoff --pattern MyPattern',
           details:
             'Use `--git` to include recent commits. Use `--session` to tag the handoff with a session id.',
           expectedOutput: [
@@ -356,7 +356,7 @@ export const CLI_SCHEMA: CLISchema = {
         {
           command: 'status',
           description: 'Status counts and completion percentage.',
-          usageExample: 'pnpm process:query -- status',
+          usageExample: 'pnpm architect:query -- status',
           details:
             '**Output:** `{ counts: { completed, active, planned, total }, completionPercentage, distribution }`',
         },
@@ -364,7 +364,7 @@ export const CLI_SCHEMA: CLISchema = {
           command: 'list',
           description:
             'Filtered pattern listing. Composable with output modifiers and list filters.',
-          usageExample: 'pnpm process:query -- list --status roadmap --names-only',
+          usageExample: 'pnpm architect:query -- list --status roadmap --names-only',
           details:
             'See Output Modifiers and List Filters for all options. Examples: `list --status active --count`, `list --phase 25 --fields patternName,status,file`.',
         },
@@ -372,34 +372,34 @@ export const CLI_SCHEMA: CLISchema = {
           command: 'search',
           description:
             'Fuzzy name search with match scores. Suggests close matches when a pattern is not found.',
-          usageExample: 'pnpm process:query -- search EventStore',
+          usageExample: 'pnpm architect:query -- search EventStore',
         },
         {
           command: 'pattern',
           description:
             'Full detail for one pattern including deliverables, dependencies, and all relationship fields.',
-          usageExample: 'pnpm process:query -- pattern TransformDataset',
+          usageExample: 'pnpm architect:query -- pattern TransformDataset',
           details:
             '**Warning:** Completed patterns can produce ~66KB of output. Prefer `context --session` for interactive sessions.',
         },
         {
           command: 'stubs',
           description: 'Design stubs with target paths and resolution status.',
-          usageExample: 'pnpm process:query -- stubs MyPattern',
+          usageExample: 'pnpm architect:query -- stubs MyPattern',
           details:
-            'Use `--unresolved` to show only stubs missing target files: `pnpm process:query -- stubs --unresolved`.',
+            'Use `--unresolved` to show only stubs missing target files: `pnpm architect:query -- stubs --unresolved`.',
         },
         {
           command: 'decisions',
           description: 'AD-N design decisions extracted from stub descriptions.',
-          usageExample: 'pnpm process:query -- decisions MyPattern',
+          usageExample: 'pnpm architect:query -- decisions MyPattern',
           details:
             '**Note:** Returns exit code 1 when no decisions are found (unlike `list`/`search` which return empty arrays).',
         },
         {
           command: 'pdr',
           description: 'Cross-reference patterns mentioning a PDR number.',
-          usageExample: 'pnpm process:query -- pdr 1',
+          usageExample: 'pnpm architect:query -- pdr 1',
           details:
             '**Note:** Returns exit code 1 when no PDR references are found, same as `decisions`.',
         },
@@ -407,7 +407,7 @@ export const CLI_SCHEMA: CLISchema = {
           command: 'rules',
           description:
             'Business rules and invariants extracted from Gherkin `Rule:` blocks, grouped by product area, phase, and feature.',
-          usageExample: 'pnpm process:query -- rules --pattern ProcessGuardDecider',
+          usageExample: 'pnpm architect:query -- rules --pattern ProcessGuardDecider',
           details:
             '**Warning:** Unfiltered `rules` output can exceed 600KB. Always use `--pattern` or `--product-area` filters. **Output shape:** `{ productAreas: [{ productArea, ruleCount, invariantCount, phases: [{ phase, features: [{ pattern, source, rules }] }] }], totalRules, totalInvariants }`',
         },
@@ -418,62 +418,62 @@ export const CLI_SCHEMA: CLISchema = {
     {
       title: 'Architecture Queries',
       description:
-        'All architecture queries output JSON. They use `@libar-docs-arch-*` annotations.',
+        'All architecture queries output JSON. They use `@architect-arch-*` annotations.',
       commands: [
         {
           command: 'arch roles',
           description: 'All arch-roles with pattern counts',
-          usageExample: 'pnpm process:query -- arch roles',
+          usageExample: 'pnpm architect:query -- arch roles',
         },
         {
           command: 'arch context',
           description: 'All bounded contexts',
-          usageExample: 'pnpm process:query -- arch context',
+          usageExample: 'pnpm architect:query -- arch context',
         },
         {
           command: 'arch context <name>',
           description: 'Patterns in one bounded context',
-          usageExample: 'pnpm process:query -- arch context scanner',
+          usageExample: 'pnpm architect:query -- arch context scanner',
         },
         {
           command: 'arch layer',
           description: 'All architecture layers',
-          usageExample: 'pnpm process:query -- arch layer',
+          usageExample: 'pnpm architect:query -- arch layer',
         },
         {
           command: 'arch layer <name>',
           description: 'Patterns in one layer',
-          usageExample: 'pnpm process:query -- arch layer domain',
+          usageExample: 'pnpm architect:query -- arch layer domain',
         },
         {
           command: 'arch neighborhood <pattern>',
           description: 'Uses, usedBy, dependsOn, same-context',
-          usageExample: 'pnpm process:query -- arch neighborhood EventStore',
+          usageExample: 'pnpm architect:query -- arch neighborhood EventStore',
         },
         {
           command: 'arch compare <c1> <c2>',
           description: 'Cross-context shared deps + integration',
-          usageExample: 'pnpm process:query -- arch compare scanner codec',
+          usageExample: 'pnpm architect:query -- arch compare scanner codec',
         },
         {
           command: 'arch coverage',
           description: 'Annotation completeness across input files',
-          usageExample: 'pnpm process:query -- arch coverage',
+          usageExample: 'pnpm architect:query -- arch coverage',
         },
         {
           command: 'arch dangling',
           description: "Broken references (names that don't exist)",
-          usageExample: 'pnpm process:query -- arch dangling',
+          usageExample: 'pnpm architect:query -- arch dangling',
         },
         {
           command: 'arch orphans',
           description: 'Patterns with no relationships (isolated)',
-          usageExample: 'pnpm process:query -- arch orphans',
+          usageExample: 'pnpm architect:query -- arch orphans',
         },
         {
           command: 'arch blocking',
           description: 'Patterns blocked by incomplete deps',
-          usageExample: 'pnpm process:query -- arch blocking',
+          usageExample: 'pnpm architect:query -- arch blocking',
         },
       ],
     },
@@ -486,26 +486,26 @@ export const CLI_SCHEMA: CLISchema = {
           command: 'tags',
           description:
             'Tag usage report \u2014 counts per tag and value across all annotated sources.',
-          usageExample: 'pnpm process:query -- tags',
+          usageExample: 'pnpm architect:query -- tags',
         },
         {
           command: 'sources',
           description: 'File inventory by type (TypeScript, Gherkin, Stubs, Decisions).',
-          usageExample: 'pnpm process:query -- sources',
+          usageExample: 'pnpm architect:query -- sources',
         },
         {
           command: 'unannotated',
           description:
-            'TypeScript files missing the `@libar-docs` opt-in marker. Use `--path` to scope to a directory.',
-          usageExample: 'pnpm process:query -- unannotated --path src/types',
+            'TypeScript files missing the `@architect` opt-in marker. Use `--path` to scope to a directory.',
+          usageExample: 'pnpm architect:query -- unannotated --path src/types',
         },
         {
           command: 'query',
           description:
             'Execute any of the 26 query API methods directly by name. This is the escape hatch for methods not exposed as dedicated subcommands.',
-          usageExample: 'pnpm process:query -- query getStatusCounts',
+          usageExample: 'pnpm architect:query -- query getStatusCounts',
           details:
-            'Integer-like arguments are automatically coerced to numbers. Run `process-api --help` for the full list of available API methods. Examples: `query isValidTransition roadmap active`, `query getPatternsByPhase 18`, `query getRecentlyCompleted 5`.',
+            'Integer-like arguments are automatically coerced to numbers. Run `architect --help` for the full list of available API methods. Examples: `query isValidTransition roadmap active`, `query getPatternsByPhase 18`, `query getRecentlyCompleted 5`.',
         },
       ],
     },
@@ -525,15 +525,15 @@ export const CLI_SCHEMA: CLISchema = {
           purpose: 'The recommended session startup is three commands.',
           steps: [
             {
-              command: 'pnpm process:query -- overview',
+              command: 'pnpm architect:query -- overview',
               comment: 'project health',
             },
             {
-              command: 'pnpm process:query -- scope-validate MyPattern implement',
+              command: 'pnpm architect:query -- scope-validate MyPattern implement',
               comment: 'pre-flight',
             },
             {
-              command: 'pnpm process:query -- context MyPattern --session implement',
+              command: 'pnpm architect:query -- context MyPattern --session implement',
               comment: 'curated context',
             },
           ],
@@ -543,15 +543,15 @@ export const CLI_SCHEMA: CLISchema = {
           purpose: 'Discover available patterns, blockers, and missing implementations.',
           steps: [
             {
-              command: 'pnpm process:query -- list --status roadmap --names-only',
+              command: 'pnpm architect:query -- list --status roadmap --names-only',
               comment: 'available patterns',
             },
             {
-              command: 'pnpm process:query -- arch blocking',
+              command: 'pnpm architect:query -- arch blocking',
               comment: 'stuck patterns',
             },
             {
-              command: 'pnpm process:query -- stubs --unresolved',
+              command: 'pnpm architect:query -- stubs --unresolved',
               comment: 'missing implementations',
             },
           ],
@@ -561,19 +561,19 @@ export const CLI_SCHEMA: CLISchema = {
           purpose: 'Deep-dive into a specific pattern: search, dependencies, neighbors, and files.',
           steps: [
             {
-              command: 'pnpm process:query -- search EventStore',
+              command: 'pnpm architect:query -- search EventStore',
               comment: 'fuzzy name search',
             },
             {
-              command: 'pnpm process:query -- dep-tree MyPattern --depth 2',
+              command: 'pnpm architect:query -- dep-tree MyPattern --depth 2',
               comment: 'dependency chain',
             },
             {
-              command: 'pnpm process:query -- arch neighborhood MyPattern',
+              command: 'pnpm architect:query -- arch neighborhood MyPattern',
               comment: 'what it touches',
             },
             {
-              command: 'pnpm process:query -- files MyPattern --related',
+              command: 'pnpm architect:query -- files MyPattern --related',
               comment: 'file paths',
             },
           ],
@@ -583,15 +583,15 @@ export const CLI_SCHEMA: CLISchema = {
           purpose: 'Gather full context, design decisions, and stubs before a design session.',
           steps: [
             {
-              command: 'pnpm process:query -- context MyPattern --session design',
+              command: 'pnpm architect:query -- context MyPattern --session design',
               comment: 'full context',
             },
             {
-              command: 'pnpm process:query -- decisions MyPattern',
+              command: 'pnpm architect:query -- decisions MyPattern',
               comment: 'design decisions',
             },
             {
-              command: 'pnpm process:query -- stubs MyPattern',
+              command: 'pnpm architect:query -- stubs MyPattern',
               comment: 'existing stubs',
             },
           ],
@@ -601,11 +601,11 @@ export const CLI_SCHEMA: CLISchema = {
           purpose: 'Capture session-end state for continuity.',
           steps: [
             {
-              command: 'pnpm process:query -- handoff --pattern MyPattern',
+              command: 'pnpm architect:query -- handoff --pattern MyPattern',
               comment: 'capture state',
             },
             {
-              command: 'pnpm process:query -- handoff --pattern MyPattern --git',
+              command: 'pnpm architect:query -- handoff --pattern MyPattern --git',
               comment: 'include commits',
             },
           ],

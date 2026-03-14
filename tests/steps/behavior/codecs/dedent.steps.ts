@@ -8,7 +8,7 @@
  * - Unicode whitespace
  * - Relative indentation preservation
  *
- * @libar-docs
+ * @architect
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';

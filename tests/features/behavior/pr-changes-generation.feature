@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:PrChangesGeneration
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:PrChangesGeneration
+@architect-status:completed
+@architect-product-area:Generation
 @behavior @pr-changes
 Feature: PR Changes Generation
   The delivery process generates PR-CHANGES.md from active or completed phases,

@@ -322,7 +322,7 @@ _Validates that ARCHITECTURE.md retains its full reference content and that_
 
 #### Four-Stage Pipeline section retains annotation format examples
 
-> **Invariant:** The Four-Stage Pipeline section contains annotation format examples (e.g., @libar-docs-shape, extract-shapes) and appears before the Source Systems section in document order.
+> **Invariant:** The Four-Stage Pipeline section contains annotation format examples (e.g., @architect-shape, extract-shapes) and appears before the Source Systems section in document order.
 >
 > **Rationale:** Annotation format examples in the pipeline section demonstrate the source-first architecture. Their ordering establishes the conceptual flow: pipeline stages first, then the source systems that feed them.
 
@@ -2813,9 +2813,9 @@ _Tests the Implementations section rendering in pattern documents._
 
 ---
 
-#### Implementation files appear in pattern docs via @libar-docs-implements
+#### Implementation files appear in pattern docs via @architect-implements
 
-> **Invariant:** Any TypeScript file with a matching @libar-docs-implements tag must appear in the pattern document's Implementations section with a working file link.
+> **Invariant:** Any TypeScript file with a matching @architect-implements tag must appear in the pattern document's Implementations section with a working file link.
 >
 > **Rationale:** Implementation discovery relies on tag-based linking — missing entries break traceability between specs and code.
 

@@ -1,14 +1,14 @@
 /**
- * @libar-docs
- * @libar-docs-validation
- * @libar-docs-pattern FSMTransitions
- * @libar-docs-status active
- * @libar-docs-implements PhaseStateMachineValidation
- * @libar-docs-depends-on:PDR005MvpWorkflow
- * @libar-docs-extract-shapes VALID_TRANSITIONS, isValidTransition, getValidTransitionsFrom, getTransitionErrorMessage
- * @libar-docs-arch-role read-model
- * @libar-docs-arch-context validation
- * @libar-docs-arch-layer domain
+ * @architect
+ * @architect-validation
+ * @architect-pattern FSMTransitions
+ * @architect-status active
+ * @architect-implements PhaseStateMachineValidation
+ * @architect-depends-on:PDR005MvpWorkflow
+ * @architect-extract-shapes VALID_TRANSITIONS, isValidTransition, getValidTransitionsFrom, getTransitionErrorMessage
+ * @architect-arch-role read-model
+ * @architect-arch-context validation
+ * @architect-arch-layer domain
  *
  * ## FSM Transitions - Valid State Transition Matrix
  *

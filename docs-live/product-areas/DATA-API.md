@@ -45,7 +45,7 @@ and `transformToMasterDataset` with validation summary.
 
 ## Consumer Architecture and PipelineOptions Differentiation
 
-Three consumers share this factory: `process-api`, `validate-patterns`, and the
+Three consumers share this factory: `architect`, `architect-validate`, and the
 generation orchestrator. `PipelineOptions` differentiates behavior by
 `mergeConflictStrategy` (`fatal` vs `concatenate`), `includeValidation` toggles,
 and `failOnScanErrors` policy without forking pipeline logic.
@@ -416,16 +416,16 @@ SourceViewsSchema = z.object({
 
 ```typescript
 RelationshipEntrySchema = z.object({
-  /** Patterns this pattern uses (from @libar-docs-uses) */
+  /** Patterns this pattern uses (from @architect-uses) */
   uses: z.array(z.string()),
 
-  /** Patterns that use this pattern (from @libar-docs-used-by) */
+  /** Patterns that use this pattern (from @architect-used-by) */
   usedBy: z.array(z.string()),
 
-  /** Patterns this pattern depends on (from @libar-docs-depends-on) */
+  /** Patterns this pattern depends on (from @architect-depends-on) */
   dependsOn: z.array(z.string()),
 
-  /** Patterns this pattern enables (from @libar-docs-enables) */
+  /** Patterns this pattern enables (from @architect-enables) */
   enables: z.array(z.string()),
 
   // UML-inspired relationship fields (PatternRelationshipModel)
@@ -441,10 +441,10 @@ RelationshipEntrySchema = z.object({
   /** Patterns that extend this pattern (computed inverse) */
   extendedBy: z.array(z.string()),
 
-  /** Related patterns for cross-reference without dependency (from @libar-docs-see-also tag) */
+  /** Related patterns for cross-reference without dependency (from @architect-see-also tag) */
   seeAlso: z.array(z.string()),
 
-  /** File paths to implementation APIs (from @libar-docs-api-ref tag) */
+  /** File paths to implementation APIs (from @architect-api-ref tag) */
   apiRef: z.array(z.string()),
 });
 ```
@@ -573,11 +573,11 @@ ArchIndexSchema = z.object({
 
 ### Data API Stub Integration
 
-| Rule                                                           | Invariant                                                                                                                            | Rationale                                                                                                                                                                                                                                                                                                                                                                  |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| All stubs are visible to the scanner pipeline                  | Every stub file in `delivery-process/stubs/` has `@libar-docs` opt-in and `@libar-docs-implements` linking it to its parent pattern. | The scanner requires `@libar-docs` opt-in marker to include a file. Without it, stubs are invisible regardless of other annotations. The `@libar-docs-implements` tag creates the bidirectional link: spec defines the pattern (via `@libar-docs-pattern`), stub implements it. Per PDR-009, stubs must NOT use `@libar-docs-pattern` -- that belongs to the feature file. |
-| Stubs subcommand lists design stubs with implementation status | `stubs` returns stub files with their target paths, design session origins, and whether the target file already exists.              | Before implementation, agents need to know: which stubs exist for a pattern, where they should be moved to, and which have already been implemented. The stub-to-implementation resolver compares `@libar-docs-target` paths against actual files to determine status.                                                                                                     |
-| Decisions and PDR commands surface design rationale            | Design decisions (AD-N items) and PDR references from stub annotations are queryable by pattern name or PDR number.                  | Design sessions produce numbered decisions (AD-1, AD-2, etc.) and reference PDR decision records (see PDR-012). When reviewing designs or starting implementation, agents need to find these decisions without reading every stub file manually.                                                                                                                           |
+| Rule                                                           | Invariant                                                                                                                   | Rationale                                                                                                                                                                                                                                                                                                                                                              |
+| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| All stubs are visible to the scanner pipeline                  | Every stub file in `architect/stubs/` has `@architect` opt-in and `@architect-implements` linking it to its parent pattern. | The scanner requires `@architect` opt-in marker to include a file. Without it, stubs are invisible regardless of other annotations. The `@architect-implements` tag creates the bidirectional link: spec defines the pattern (via `@architect-pattern`), stub implements it. Per PDR-009, stubs must NOT use `@architect-pattern` -- that belongs to the feature file. |
+| Stubs subcommand lists design stubs with implementation status | `stubs` returns stub files with their target paths, design session origins, and whether the target file already exists.     | Before implementation, agents need to know: which stubs exist for a pattern, where they should be moved to, and which have already been implemented. The stub-to-implementation resolver compares `@architect-target` paths against actual files to determine status.                                                                                                  |
+| Decisions and PDR commands surface design rationale            | Design decisions (AD-N items) and PDR references from stub annotations are queryable by pattern name or PDR number.         | Design sessions produce numbered decisions (AD-1, AD-2, etc.) and reference PDR decision records (see PDR-012). When reviewing designs or starting implementation, agents need to find these decisions without reading every stub file manually.                                                                                                                       |
 
 ### Fuzzy Match Tests
 
@@ -643,9 +643,9 @@ ArchIndexSchema = z.object({
 | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | MCP server starts via stdio transport and manages its own lifecycle     | The MCP server communicates over stdio using JSON-RPC. It builds the pipeline once during initialization, then enters a request-response loop. No non-MCP output is written to stdout (no console.log, no pnpm banners). | MCP defines stdio as the standard transport for local tool servers. Claude Code spawns the process and communicates over stdin/stdout pipes. Any extraneous stdout output corrupts the JSON-RPC stream. Loading the pipeline during initialization ensures the first tool call is fast. |
 | ProcessStateAPI methods and CLI subcommands are registered as MCP tools | Every CLI subcommand is registered as an MCP tool with a JSON Schema describing its input parameters. Tool names use snake*case with a "dp*" prefix to avoid collisions with other MCP servers.                          | MCP tools are the unit of interaction. Each tool needs a name, description (for LLM tool selection), and JSON Schema for input validation. The "dp\_" prefix prevents collisions in multi-server setups.                                                                                |
-| MasterDataset is loaded once and reused across all tool invocations     | The pipeline runs exactly once during server initialization. All subsequent tool calls read from in-memory MasterDataset. A manual rebuild can be triggered via a "dp_rebuild" tool.                                     | The pipeline costs 2-5 seconds. Running it per tool call negates MCP benefits. Pre-computed views provide O(1) access ideal for a query server.                                                                                                                                         |
-| Source file changes trigger automatic dataset rebuild with debouncing   | When --watch is enabled, changes to source files trigger an automatic pipeline rebuild. Multiple rapid changes are debounced into a single rebuild (default 500ms window).                                               | During implementation sessions, source files change frequently. Without auto-rebuild, agents must manually call dp_rebuild. Debouncing prevents redundant rebuilds during rapid-fire saves.                                                                                             |
-| MCP server is configurable via standard client configuration            | The server works with .mcp.json (Claude Code), claude_desktop_config.json (Claude Desktop), and any MCP client. It accepts --input, --features, --base-dir args and auto-detects delivery-process.config.ts.             | MCP clients discover servers through configuration files. The server must work with sensible defaults (config auto-detection) while supporting explicit overrides for monorepo setups.                                                                                                  |
+| MasterDataset is loaded once and reused across all tool invocations     | The pipeline runs exactly once during server initialization. All subsequent tool calls read from in-memory MasterDataset. A manual rebuild can be triggered via a "architect_rebuild" tool.                              | The pipeline costs 2-5 seconds. Running it per tool call negates MCP benefits. Pre-computed views provide O(1) access ideal for a query server.                                                                                                                                         |
+| Source file changes trigger automatic dataset rebuild with debouncing   | When --watch is enabled, changes to source files trigger an automatic pipeline rebuild. Multiple rapid changes are debounced into a single rebuild (default 500ms window).                                               | During implementation sessions, source files change frequently. Without auto-rebuild, agents must manually call architect_rebuild. Debouncing prevents redundant rebuilds during rapid-fire saves.                                                                                      |
+| MCP server is configurable via standard client configuration            | The server works with .mcp.json (Claude Code), claude_desktop_config.json (Claude Desktop), and any MCP client. It accepts --input, --features, --base-dir args and auto-detects architect.config.ts.                    | MCP clients discover servers through configuration files. The server must work with sensible defaults (config auto-detection) while supporting explicit overrides for monorepo setups.                                                                                                  |
 
 ### Output Pipeline Tests
 
@@ -745,7 +745,7 @@ ArchIndexSchema = z.object({
 | CLI context assembly subcommands return text output            | Context assembly subcommands (context, overview, dep-tree) must produce non-empty human-readable text containing the requested pattern or summary, and require a pattern argument where applicable. | These subcommands replace manual file reads in AI sessions; empty or off-target output forces expensive explore-agent fallbacks that consume 5-10x more context.               |
 | CLI tags and sources subcommands return JSON                   | The tags and sources subcommands must return valid JSON with the expected top-level structure (data key for tags, array for sources).                                                               | Annotation exploration depends on machine-parseable output; invalid JSON prevents automated enrichment workflows from detecting unannotated files and tag gaps.                |
 | CLI extended arch subcommands query architecture relationships | Extended arch subcommands (neighborhood, compare, coverage) must return valid JSON reflecting the actual architecture relationships present in the scanned sources.                                 | Architecture queries drive design-session decisions; stale or structurally invalid output leads to incorrect dependency analysis and missed coupling between bounded contexts. |
-| CLI unannotated subcommand finds files without annotations     | The unannotated subcommand must return valid JSON listing every TypeScript file that lacks the `@libar-docs` opt-in marker.                                                                         | Files missing the opt-in marker are invisible to the scanner; without this subcommand, unannotated files silently drop out of generated documentation and validation.          |
+| CLI unannotated subcommand finds files without annotations     | The unannotated subcommand must return valid JSON listing every TypeScript file that lacks the `@architect` opt-in marker.                                                                          | Files missing the opt-in marker are invisible to the scanner; without this subcommand, unannotated files silently drop out of generated documentation and validation.          |
 
 ### Process API Layered Extraction
 

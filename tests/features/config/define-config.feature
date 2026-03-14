@@ -1,11 +1,11 @@
-@libar-docs
-@libar-docs-pattern:DefineConfigTesting
-@libar-docs-implements:DefineConfig
-@libar-docs-status:completed
-@libar-docs-product-area:Configuration
+@architect
+@architect-pattern:DefineConfigTesting
+@architect-implements:DefineConfig
+@architect-status:completed
+@architect-product-area:Configuration
 @behavior @config
 Feature: Define Config - Schema Validation and Type Guards
-  The defineConfig identity function and DeliveryProcessProjectConfigSchema
+  The defineConfig identity function and ArchitectProjectConfigSchema
   provide type-safe configuration authoring with runtime validation.
 
   **Problem:**
@@ -42,13 +42,13 @@ Feature: Define Config - Schema Validation and Type Guards
     @happy-path
     Scenario: Valid minimal config passes validation
       Given a config object with only preset "libar-generic"
-      When validating against DeliveryProcessProjectConfigSchema
+      When validating against ArchitectProjectConfigSchema
       Then validation should succeed
 
     @happy-path
     Scenario: Valid full config passes validation
       Given a config object with all fields populated
-      When validating against DeliveryProcessProjectConfigSchema
+      When validating against ArchitectProjectConfigSchema
       Then validation should succeed
 
   Rule: Schema rejects invalid configurations
@@ -60,14 +60,14 @@ Feature: Define Config - Schema Validation and Type Guards
     @validation
     Scenario: Empty glob pattern rejected
       Given a config with an empty string in typescript sources
-      When validating against DeliveryProcessProjectConfigSchema
+      When validating against ArchitectProjectConfigSchema
       Then validation should fail
       And the validation error should contain "empty"
 
     @validation
     Scenario: Parent directory traversal rejected in globs
       Given a config with a glob containing ".."
-      When validating against DeliveryProcessProjectConfigSchema
+      When validating against ArchitectProjectConfigSchema
       Then validation should fail
       And the validation error should contain "parent directory traversal"
 
@@ -81,13 +81,13 @@ Feature: Define Config - Schema Validation and Type Guards
     @validation
     Scenario: Invalid preset name rejected
       Given a config object with preset "nonexistent-preset"
-      When validating against DeliveryProcessProjectConfigSchema
+      When validating against ArchitectProjectConfigSchema
       Then validation should fail
 
     @validation
     Scenario: Unknown fields rejected in strict mode
       Given a config object with an unknown field "foobar"
-      When validating against DeliveryProcessProjectConfigSchema
+      When validating against ArchitectProjectConfigSchema
       Then validation should fail
 
   Rule: Type guards distinguish config formats

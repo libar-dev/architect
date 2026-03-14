@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:ProcessApiCliCache
-@libar-docs-implements:DataAPICLIErgonomics
-@libar-docs-status:active
-@libar-docs-product-area:DataAPI
+@architect
+@architect-pattern:ProcessApiCliCache
+@architect-implements:DataAPICLIErgonomics
+@architect-status:active
+@architect-product-area:DataAPI
 @cli @process-api @cache
 Feature: Process API CLI - Dataset Cache
   MasterDataset caching between CLI invocations: cache hits, mtime invalidation, and --no-cache bypass.

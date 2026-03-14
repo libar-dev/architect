@@ -1,16 +1,16 @@
 /**
- * @libar-docs
- * @libar-docs-lint
- * @libar-docs-pattern ProcessGuardDecider
- * @libar-docs-status active
- * @libar-docs-arch-role decider
- * @libar-docs-arch-context lint
- * @libar-docs-arch-layer application
- * @libar-docs-implements ProcessGuardLinter
- * @libar-docs-uses FSMValidator, DeriveProcessState, DetectChanges
- * @libar-docs-depends-on:FSMValidator,DeriveProcessState,DetectChanges
- * @libar-docs-convention process-guard-errors
- * @libar-docs-extract-shapes validateChanges
+ * @architect
+ * @architect-lint
+ * @architect-pattern ProcessGuardDecider
+ * @architect-status active
+ * @architect-arch-role decider
+ * @architect-arch-context lint
+ * @architect-arch-layer application
+ * @architect-implements ProcessGuardLinter
+ * @architect-uses FSMValidator, DeriveProcessState, DetectChanges
+ * @architect-depends-on:FSMValidator,DeriveProcessState,DetectChanges
+ * @architect-convention process-guard-errors
+ * @architect-extract-shapes validateChanges
  *
  * ## ProcessGuardDecider - Pure Validation Logic
  *
@@ -52,7 +52,7 @@
  *
  * | Situation | Solution | Example |
  * |-----------|----------|---------|
- * | Fix typo in completed spec | Add unlock reason tag | `@libar-docs-unlock-reason:Fix-typo-in-FSM-diagram` |
+ * | Fix typo in completed spec | Add unlock reason tag | `@architect-unlock-reason:Fix-typo-in-FSM-diagram` |
  * | Spec needs rework | Create new spec instead | New feature file with `roadmap` status |
  * | Legacy import | Multiple transitions in one commit | Set `roadmap` then `completed` |
  *

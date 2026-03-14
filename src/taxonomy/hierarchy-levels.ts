@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-pattern HierarchyLevels
- * @libar-docs-status completed
- * @libar-docs-core
- * @libar-docs-extract-shapes HIERARCHY_LEVELS, HierarchyLevel, DEFAULT_HIERARCHY_LEVEL
+ * @architect
+ * @architect-pattern HierarchyLevels
+ * @architect-status completed
+ * @architect-core
+ * @architect-extract-shapes HIERARCHY_LEVELS, HierarchyLevel, DEFAULT_HIERARCHY_LEVEL
  *
  * ## Hierarchy Levels for Work Item Breakdown
  *

@@ -1,15 +1,15 @@
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-config
- * @libar-docs-pattern ConfigurationTypes
- * @libar-docs-status completed
- * @libar-docs-arch-layer domain
- * @libar-docs-arch-context config
- * @libar-docs-extract-shapes DeliveryProcessConfig, DeliveryProcessInstance, RegexBuilders
+ * @architect
+ * @architect-core @architect-config
+ * @architect-pattern ConfigurationTypes
+ * @architect-status completed
+ * @architect-arch-layer domain
+ * @architect-arch-context config
+ * @architect-extract-shapes ArchitectConfig, ArchitectInstance, RegexBuilders
  *
  * ## Configuration Types
  *
- * Type definitions for the delivery process configuration system.
+ * Type definitions for the Architect configuration system.
  * Provides fully type-safe configuration with generics to preserve literal types from presets.
  *
  * ### When to Use
@@ -28,10 +28,10 @@ import type { ContextInferenceRule } from '../generators/pipeline/context-infere
  * Configuration for creating a delivery process instance.
  * Uses generics to preserve literal types from presets.
  */
-export interface DeliveryProcessConfig {
-  /** Tag prefix for directives (e.g., "@docs-" or "@libar-docs-") */
+export interface ArchitectConfig {
+  /** Tag prefix for directives (e.g., "@docs-" or "@architect-") */
   readonly tagPrefix: string;
-  /** File-level opt-in tag (e.g., "@docs" or "@libar-docs") */
+  /** File-level opt-in tag (e.g., "@docs" or "@architect") */
   readonly fileOptInTag: string;
   /** Category definitions for pattern classification */
   readonly categories: readonly CategoryDefinition[];
@@ -55,9 +55,9 @@ export interface DeliveryProcessConfig {
 }
 
 /**
- * Instance returned by createDeliveryProcess with configured registry
+ * Instance returned by createArchitect with configured registry
  */
-export interface DeliveryProcessInstance {
+export interface ArchitectInstance {
   /** The fully configured tag registry */
   readonly registry: TagRegistry;
   /** Regex builders for tag detection */

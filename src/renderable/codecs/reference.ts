@@ -1,16 +1,16 @@
 /**
- * @libar-docs
- * @libar-docs-pattern ReferenceDocumentCodec
- * @libar-docs-status active
- * @libar-docs-implements CodecDrivenReferenceGeneration
- * @libar-docs-convention codec-registry
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-pattern ReferenceDocumentCodec
+ * @architect-status active
+ * @architect-implements CodecDrivenReferenceGeneration
+ * @architect-convention codec-registry
+ * @architect-product-area:Generation
  *
  * ## ReferenceDocumentCodec
  *
  * A single codec factory that creates reference document codecs from
  * configuration objects. Convention content is sourced from
- * decision records tagged with @libar-docs-convention.
+ * decision records tagged with @architect-convention.
  *
  * **Purpose:** Scoped reference documentation assembling four content layers (conventions, diagrams, shapes, behaviors) into a single document.
  *
@@ -18,7 +18,7 @@
  *
  * ### 4-Layer Composition (in order)
  *
- * 1. **Convention content** -- Extracted from `@libar-docs-convention`-tagged patterns (rules, invariants, tables)
+ * 1. **Convention content** -- Extracted from `@architect-convention`-tagged patterns (rules, invariants, tables)
  * 2. **Scoped diagrams** -- Mermaid diagrams filtered by `archContext`, `archLayer`, `patterns`, or `include` tags
  * 3. **TypeScript shapes** -- API surfaces from `shapeSources` globs or `shapeSelectors` (declaration-level filtering)
  * 4. **Behavior content** -- Gherkin-sourced patterns from `behaviorCategories`
@@ -239,7 +239,7 @@ export interface ReferenceDocConfig {
   /**
    * Exclude patterns whose source.file starts with any of these prefixes.
    * Used to filter ephemeral planning specs from behavior sections.
-   * @example ['delivery-process/specs/']
+   * @example ['architect/specs/']
    */
   readonly excludeSourcePaths?: readonly string[];
 
@@ -344,11 +344,11 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
     covers: 'Config loading, presets, resolution, source merging, schema validation',
     intro:
       'Configuration is the entry boundary — it transforms a user-authored ' +
-      '`delivery-process.config.ts` file into a fully resolved `DeliveryProcessInstance` ' +
+      '`architect.config.ts` file into a fully resolved `ArchitectInstance` ' +
       'that powers the entire pipeline. The flow is: `defineConfig()` provides type-safe ' +
       'authoring (Vite convention, zero validation), `ConfigLoader` discovers and loads ' +
       'the file, `ProjectConfigSchema` validates via Zod, `ConfigResolver` applies defaults ' +
-      'and merges stubs into sources, and `DeliveryProcessFactory` builds the final instance ' +
+      'and merges stubs into sources, and `ArchitectFactory` builds the final instance ' +
       'with `TagRegistry` and `RegexBuilders`. Three presets define escalating taxonomy ' +
       'complexity — from 3 categories (`generic`, `libar-generic`) to 21 (`ddd-es-cqrs`). ' +
       '`SourceMerger` computes per-generator source overrides, enabling generators like ' +
@@ -366,13 +366,13 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
       },
     ],
     keyInvariants: [
-      'Preset-based taxonomy: `generic` (3 categories, `@docs-`), `libar-generic` (3 categories, `@libar-docs-`), `ddd-es-cqrs` (21 categories, full DDD). Presets replace base categories entirely — they define prefix, categories, and metadata tags as a unit',
-      'Resolution pipeline: defineConfig() → ConfigLoader → ProjectConfigSchema (Zod) → ConfigResolver → DeliveryProcessFactory → DeliveryProcessInstance. Each stage has a single responsibility',
+      'Preset-based taxonomy: `generic` (3 categories, `@docs-`), `libar-generic` (3 categories, `@architect-`), `ddd-es-cqrs` (21 categories, full DDD). Presets replace base categories entirely — they define prefix, categories, and metadata tags as a unit',
+      'Resolution pipeline: defineConfig() → ConfigLoader → ProjectConfigSchema (Zod) → ConfigResolver → ArchitectFactory → ArchitectInstance. Each stage has a single responsibility',
       'Stubs merged at resolution time: Stub directory globs are appended to typescript sources, making stubs transparent to the downstream pipeline',
       'Source override composition: SourceMerger applies per-generator overrides (`replaceFeatures`, `additionalFeatures`, `additionalInput`) to base sources. Exclude is always inherited from base',
     ],
     keyPatterns: [
-      'DeliveryProcessFactory',
+      'ArchitectFactory',
       'ConfigLoader',
       'ConfigResolver',
       'DefineConfig',
@@ -397,7 +397,7 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
       table(
         ['Stage', 'Module', 'Responsibility'],
         [
-          ['Scanner', '`src/scanner/`', 'File discovery, AST parsing, opt-in via `@libar-docs`'],
+          ['Scanner', '`src/scanner/`', 'File discovery, AST parsing, opt-in via `@architect`'],
           [
             'Extractor',
             '`src/extractor/`',
@@ -441,7 +441,7 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
       'Config-driven generation: A single `ReferenceDocConfig` produces a complete document. Content sources compose in fixed order: conventions, diagrams, shapes, behaviors',
       'RenderableDocument IR: Codecs express intent ("this is a table"), the renderer handles syntax ("pipe-delimited markdown"). Switching output format requires only a new renderer',
       'Composition order: Reference docs compose four content layers in fixed order. Product area docs compose five layers: intro, conventions, diagrams, shapes, business rules',
-      'Shape extraction: TypeScript shapes (`interface`, `type`, `enum`, `function`, `const`) are extracted by declaration-level `@libar-docs-shape` tags. Shapes include source text, JSDoc, type parameters, and property documentation',
+      'Shape extraction: TypeScript shapes (`interface`, `type`, `enum`, `function`, `const`) are extracted by declaration-level `@architect-shape` tags. Shapes include source text, JSDoc, type parameters, and property documentation',
       'Generator registration: Generators self-register via `registerGenerator()`. The orchestrator runs them in registration order. Each generator owns its output files and codec configuration',
     ],
     keyPatterns: [
@@ -465,7 +465,7 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
       'directed graph, the Process Guard orchestrates commit-time validation using a Decider pattern ' +
       '(state derived from annotations, not stored separately), and the lint engine provides pluggable ' +
       'rule execution with pretty and JSON output. Anti-pattern detection enforces dual-source ownership ' +
-      'boundaries — `@libar-docs-uses` belongs on TypeScript, `@libar-docs-depends-on` belongs on Gherkin — ' +
+      'boundaries — `@architect-uses` belongs on TypeScript, `@architect-depends-on` belongs on Gherkin — ' +
       'preventing cross-domain tag confusion that causes documentation drift. Definition of Done validation ' +
       'ensures completed patterns have all deliverables marked done and at least one acceptance-criteria scenario.',
     diagramScopes: [
@@ -481,7 +481,7 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
       },
     ],
     keyInvariants: [
-      'Protection levels: `roadmap`/`deferred` = none (fully editable), `active` = scope-locked (no new deliverables), `completed` = hard-locked (requires `@libar-docs-unlock-reason`)',
+      'Protection levels: `roadmap`/`deferred` = none (fully editable), `active` = scope-locked (no new deliverables), `completed` = hard-locked (requires `@architect-unlock-reason`)',
       'Valid FSM transitions: Only roadmap→active, roadmap→deferred, active→completed, active→roadmap, deferred→roadmap. Completed is terminal',
       'Decider pattern: All validation is (state, changes, options) → result. State is derived from annotations, not maintained separately',
       'Dual-source ownership: Anti-pattern detection enforces tag boundaries — `uses` on TypeScript (runtime deps), `depends-on`/`quarter`/`team` on Gherkin (planning metadata). Violations are flagged before they cause documentation drift',
@@ -578,7 +578,7 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
       },
     ],
     keyInvariants: [
-      'TypeScript source owns pattern identity: `@libar-docs-pattern` in TypeScript defines the pattern. Tier 1 specs are ephemeral working documents',
+      'TypeScript source owns pattern identity: `@architect-pattern` in TypeScript defines the pattern. Tier 1 specs are ephemeral working documents',
       '7 canonical product-area values: Annotation, Configuration, Generation, Validation, DataAPI, CoreTypes, Process — reader-facing sections, not source modules',
       'Two distinct status domains: Pattern FSM status (4 values) vs. deliverable status (6 values). Never cross domains',
       'Session types define capabilities: planning creates specs, design creates stubs, implementation writes code. Each session type has a fixed input/output contract enforced by convention',

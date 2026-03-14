@@ -4,8 +4,8 @@
  * BDD step definitions for testing --dry-run mode:
  * pipeline scope display without processing.
  *
- * @libar-docs
- * @libar-docs-implements DataAPICLIErgonomics
+ * @architect
+ * @architect-implements DataAPICLIErgonomics
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

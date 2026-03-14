@@ -1,15 +1,15 @@
 /**
- * @libar-docs
+ * @architect
  */
 
 /**
- * @libar-docs-core @libar-docs-intro
- * @libar-docs-pattern PublicAPI
- * @libar-docs-status completed
+ * @architect-core @architect-intro
+ * @architect-pattern PublicAPI
+ * @architect-status completed
  *
  * ## PublicAPI - Package Entry Point
  *
- * Main entry point for the @libar-dev/delivery-process package.
+ * Main entry point for the @libar-dev/architect package.
  * Exports the three-stage pipeline (Scanner → Extractor → Generator) for
  * extracting documentation directly from TypeScript source code.
  *
@@ -30,29 +30,25 @@
 // ============================================================================
 
 /**
- * Configuration API for creating customized delivery-process instances.
+ * Configuration API for creating customized Architect instances.
  *
  * @example
  * ```typescript
- * import { createDeliveryProcess, GENERIC_PRESET } from '@libar-dev/delivery-process';
+ * import { createArchitect, GENERIC_PRESET } from '@libar-dev/architect';
  *
  * // Use generic preset for non-DDD projects
- * const dp = createDeliveryProcess({ preset: "generic" });
+ * const dp = createArchitect({ preset: "generic" });
  *
  * // Or customize the tag prefix
- * const dp = createDeliveryProcess({
+ * const dp = createArchitect({
  *   tagPrefix: "@my-project-",
  *   fileOptInTag: "@my-project"
  * });
  * ```
  */
-export { createDeliveryProcess, type CreateDeliveryProcessOptions } from './config/factory.js';
+export { createArchitect, type CreateArchitectOptions } from './config/factory.js';
 
-export type {
-  DeliveryProcessConfig,
-  DeliveryProcessInstance,
-  RegexBuilders,
-} from './config/types.js';
+export type { ArchitectConfig, ArchitectInstance, RegexBuilders } from './config/types.js';
 
 export { createRegexBuilders } from './config/regex-builders.js';
 
@@ -88,8 +84,8 @@ export * from './validation-schemas/index.js';
  *
  * @example
  * ```typescript
- * import { generatorRegistry } from '@libar-dev/delivery-process/generators';
- * import '@libar-dev/delivery-process/generators/built-in';
+ * import { generatorRegistry } from '@libar-dev/architect/generators';
+ * import '@libar-dev/architect/generators/built-in';
  *
  * const generator = generatorRegistry.get('patterns');
  * const output = await generator.generate(patterns, context);
@@ -109,7 +105,7 @@ export * as generators from './generators/index.js';
  *
  * @example
  * ```typescript
- * import { generateDocument, generateAllDocuments } from '@libar-dev/delivery-process/renderable';
+ * import { generateDocument, generateAllDocuments } from '@libar-dev/architect/renderable';
  *
  * // Generate a single document type
  * const files = generateDocument("patterns", masterDataset);
@@ -133,7 +129,7 @@ export * as renderable from './renderable/index.js';
  *
  * @example
  * ```typescript
- * import { lintFiles, validateChanges } from '@libar-dev/delivery-process/lint';
+ * import { lintFiles, validateChanges } from '@libar-dev/architect/lint';
  *
  * // Lint pattern annotations
  * const result = await lintFiles(['src/**\/*.ts']);

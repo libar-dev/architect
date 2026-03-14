@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-pattern CoverageAnalyzerImpl
- * @libar-docs-status active
- * @libar-docs-implements DataAPIArchitectureQueries
- * @libar-docs-uses Pattern Scanner, MasterDataset
- * @libar-docs-used-by ProcessAPICLIImpl
- * @libar-docs-arch-role service
- * @libar-docs-arch-context api
- * @libar-docs-arch-layer application
+ * @architect
+ * @architect-pattern CoverageAnalyzerImpl
+ * @architect-status active
+ * @architect-implements DataAPIArchitectureQueries
+ * @architect-uses Pattern Scanner, MasterDataset
+ * @architect-used-by ProcessAPICLIImpl
+ * @architect-arch-role service
+ * @architect-arch-context api
+ * @architect-arch-layer application
  *
  * ## CoverageAnalyzer — Annotation Coverage and Taxonomy Gap Detection
  *

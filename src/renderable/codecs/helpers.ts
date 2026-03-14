@@ -1,8 +1,8 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern RichContentHelpers
- * @libar-docs-status completed
+ * @architect
+ * @architect-core
+ * @architect-pattern RichContentHelpers
+ * @architect-status completed
  *
  * ## Rich Content Rendering Helpers
  *

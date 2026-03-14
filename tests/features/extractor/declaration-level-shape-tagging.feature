@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:DeclarationLevelShapeTaggingTesting
-@libar-docs-status:completed
-@libar-docs-implements:DeclarationLevelShapeTagging
-@libar-docs-product-area:Annotation
+@architect
+@architect-pattern:DeclarationLevelShapeTaggingTesting
+@architect-status:completed
+@architect-implements:DeclarationLevelShapeTagging
+@architect-product-area:Annotation
 Feature: Declaration-Level Shape Tagging - Extraction
 
   Tests the discoverTaggedShapes function that scans TypeScript source
@@ -29,7 +29,7 @@ Feature: Declaration-Level Shape Tagging - Extraction
     Scenario: Tagged declaration is extracted as shape
       Given a TypeScript source file containing:
         """typescript
-        /** @libar-docs-shape */
+        /** @architect-shape */
         export interface RiskLevel {
           readonly name: string;
           readonly severity: number;
@@ -57,7 +57,7 @@ Feature: Declaration-Level Shape Tagging - Extraction
     Scenario: Group name is captured from tag value
       Given a TypeScript source file containing:
         """typescript
-        /** @libar-docs-shape api-types */
+        /** @architect-shape api-types */
         export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
         """
       When discoverTaggedShapes runs on the source
@@ -68,7 +68,7 @@ Feature: Declaration-Level Shape Tagging - Extraction
     Scenario: Bare tag works without group name
       Given a TypeScript source file containing:
         """typescript
-        /** @libar-docs-shape */
+        /** @architect-shape */
         export enum Priority { Low, Medium, High }
         """
       When discoverTaggedShapes runs on the source
@@ -79,7 +79,7 @@ Feature: Declaration-Level Shape Tagging - Extraction
     Scenario: Non-exported tagged declaration is extracted
       Given a TypeScript source file containing:
         """typescript
-        /** @libar-docs-shape internal-types */
+        /** @architect-shape internal-types */
         interface InternalConfig {
           readonly maxRetries: number;
         }
@@ -94,7 +94,7 @@ Feature: Declaration-Level Shape Tagging - Extraction
       Given a TypeScript source file containing:
         """typescript
         /**
-         * @libar-docs-shape core-types
+         * @architect-shape core-types
          */
         export type Result<T, E = Error> =
           | { readonly ok: true; readonly value: T }
@@ -118,12 +118,12 @@ Feature: Declaration-Level Shape Tagging - Extraction
     Scenario: Both same-name declarations tagged produces shapes for each
       Given a TypeScript source file containing:
         """typescript
-        /** @libar-docs-shape core-types */
+        /** @architect-shape core-types */
         export type Result<T, E = Error> =
           | { readonly ok: true; readonly value: T }
           | { readonly ok: false; readonly error: E };
 
-        /** @libar-docs-shape core-types */
+        /** @architect-shape core-types */
         export const Result = {
           ok<T>(value: T): Result<T, never> {
             return { ok: true, value };
@@ -149,23 +149,23 @@ Feature: Declaration-Level Shape Tagging - Extraction
     Scenario: All five declaration kinds are discoverable
       Given a TypeScript source file containing:
         """typescript
-        /** @libar-docs-shape core-types */
+        /** @architect-shape core-types */
         export interface Config {
           readonly name: string;
         }
 
-        /** @libar-docs-shape core-types */
+        /** @architect-shape core-types */
         export type Status = 'active' | 'inactive';
 
-        /** @libar-docs-shape core-types */
+        /** @architect-shape core-types */
         export enum Priority { Low, Medium, High }
 
-        /** @libar-docs-shape core-types */
+        /** @architect-shape core-types */
         export function validate(input: string): boolean {
           return input.length > 0;
         }
 
-        /** @libar-docs-shape core-types */
+        /** @architect-shape core-types */
         export const MAX_RETRIES: number = 3;
         """
       When discoverTaggedShapes runs on the source
@@ -177,7 +177,7 @@ Feature: Declaration-Level Shape Tagging - Extraction
     Scenario: JSDoc with gap larger than MAX_JSDOC_LINE_DISTANCE is not matched
       Given a TypeScript source file containing:
         """typescript
-        /** @libar-docs-shape */
+        /** @architect-shape */
 
 
         // unrelated comment
@@ -196,7 +196,7 @@ Feature: Declaration-Level Shape Tagging - Extraction
         """typescript
         /**
          * Configuration options.
-         * @libar-docs-shape config-types
+         * @architect-shape config-types
          */
         export interface AppConfig {
           readonly debug: boolean;
@@ -210,7 +210,7 @@ Feature: Declaration-Level Shape Tagging - Extraction
     Scenario: Hypothetical libar-docs-shape-extended tag is not matched
       Given a TypeScript source file containing:
         """typescript
-        /** @libar-docs-shape-extended */
+        /** @architect-shape-extended */
         export interface NotAShape {
           readonly value: string;
         }
@@ -225,7 +225,7 @@ Feature: Declaration-Level Shape Tagging - Extraction
         /**
          * Represents risk severity levels.
          *
-         * @libar-docs-shape risk-types
+         * @architect-shape risk-types
          * @see RiskCalculator
          */
         export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
@@ -239,7 +239,7 @@ Feature: Declaration-Level Shape Tagging - Extraction
     Scenario: Generic arrow function in non-JSX context parses correctly
       Given a TypeScript source file containing:
         """typescript
-        /** @libar-docs-shape */
+        /** @architect-shape */
         export const identity = <T>(value: T): T => value;
         """
       When discoverTaggedShapes runs on the source

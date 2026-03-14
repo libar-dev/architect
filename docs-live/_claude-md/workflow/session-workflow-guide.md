@@ -18,7 +18,7 @@ Use this flowchart to determine which session type to run.
 Implementation sessions MUST follow this strict 5-step sequence. Skipping steps causes Process Guard rejection at commit time.
 
 1. **Transition to `active` FIRST** (before any code changes)
-2. **Create executable spec stubs** (if `@libar-docs-executable-specs` present)
+2. **Create executable spec stubs** (if `@architect-executable-specs` present)
 3. **For each deliverable:** implement, test, update status to `complete`
 4. **Transition to `completed`** (only when ALL deliverables done)
 5. **Regenerate docs:** `pnpm docs:all`
@@ -39,8 +39,8 @@ Implementation sessions MUST follow this strict 5-step sequence. Skipping steps 
 ##### Context Gathering
 
 ```bash
-pnpm process:query -- overview                                # Project health
-pnpm process:query -- list --status roadmap --names-only      # Available patterns
+pnpm architect:query -- overview                                # Project health
+pnpm architect:query -- list --status roadmap --names-only      # Available patterns
 ```
 
 ##### Planning Checklist
@@ -50,7 +50,7 @@ pnpm process:query -- list --status roadmap --names-only      # Available patter
 - [ ] **Structure the feature** with Problem/Solution, tags, deliverables table
 - [ ] **Convert constraints to Rule: blocks** with Invariant/Rationale
 - [ ] **Add scenarios** per Rule: 1 happy-path + 1 validation minimum
-- [ ] **Set executable specs location** via `@libar-docs-executable-specs` tag
+- [ ] **Set executable specs location** via `@architect-executable-specs` tag
 
 ##### Planning Do NOT
 
@@ -65,9 +65,9 @@ pnpm process:query -- list --status roadmap --names-only      # Available patter
 ##### Context Gathering
 
 ```bash
-pnpm process:query -- context <PatternName> --session design  # Full context bundle
-pnpm process:query -- dep-tree <PatternName>                  # Dependency chain
-pnpm process:query -- stubs <PatternName>                     # Existing design stubs
+pnpm architect:query -- context <PatternName> --session design  # Full context bundle
+pnpm architect:query -- dep-tree <PatternName>                  # Dependency chain
+pnpm architect:query -- stubs <PatternName>                     # Existing design stubs
 ```
 
 ##### When to Use Design Sessions
@@ -80,12 +80,12 @@ pnpm process:query -- stubs <PatternName>                     # Existing design 
 
 ##### Design Checklist
 
-- [ ] **Record decisions** as PDR `.feature` files in `delivery-process/decisions/`
+- [ ] **Record decisions** as PDR `.feature` files in `architect/decisions/`
 - [ ] **Document options** with at least 2-3 approaches and pros/cons
 - [ ] **Get approval** from user on recommended approach
-- [ ] **Create code stubs** in `delivery-process/stubs/{pattern-name}/`
+- [ ] **Create code stubs** in `architect/stubs/{pattern-name}/`
 - [ ] **Verify stub identifier spelling** before committing
-- [ ] **List canonical helpers** in `@libar-docs-uses` tags
+- [ ] **List canonical helpers** in `@architect-uses` tags
 
 ##### Design Do NOT
 
@@ -111,8 +111,8 @@ pnpm process:query -- stubs <PatternName>                     # Existing design 
 For multi-session work, capture state at session boundaries using the Process Data API.
 
 ```bash
-pnpm process:query -- handoff --pattern <PatternName>
-pnpm process:query -- handoff --pattern <PatternName> --git   # include recent commits
+pnpm architect:query -- handoff --pattern <PatternName>
+pnpm architect:query -- handoff --pattern <PatternName> --git   # include recent commits
 ```
 
 #### Quick Reference: FSM Protection
@@ -138,4 +138,4 @@ pnpm process:query -- handoff --pattern <PatternName> --git   # include recent c
 | Implementation sessions follow FSM-enforced execution order      | **Invariant:** Implementation sessions must follow a strict 5-step execution order.<br> Transition to active must...     |
 | FSM errors have documented fixes                                 | **Invariant:** Every Process Guard error code has a defined cause and fix. The<br> error codes, causes, and fixes...     |
 | Handoff captures session-end state for continuity                | **Invariant:** Multi-session work requires handoff documentation generated from<br> the Process Data API. Handoff...     |
-| ClaudeModuleGeneration is the generation mechanism               | **Invariant:** Phase 39 depends on ClaudeModuleGeneration (Phase 25). Adding<br> `@libar-docs-claude-module` and...      |
+| ClaudeModuleGeneration is the generation mechanism               | **Invariant:** Phase 39 depends on ClaudeModuleGeneration (Phase 25). Adding<br> `@architect-claude-module` and...       |

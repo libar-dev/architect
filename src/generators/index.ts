@@ -1,9 +1,9 @@
 /**
  * Generators Module
  *
- * @libar-docs
- * @libar-docs-core @libar-docs-infra
- * @libar-docs-pattern Generators Module
+ * @architect
+ * @architect-core @architect-infra
+ * @architect-pattern Generators Module
  *
  * RDM (RenderableDocument Model) based document generation system.
  * Uses Zod 4 codecs to transform MasterDataset into RenderableDocuments.
@@ -17,8 +17,8 @@
  * ## Usage
  *
  * ```typescript
- * import { generatorRegistry } from '@libar-dev/delivery-process/generators';
- * import '@libar-dev/delivery-process/generators/built-in'; // Register built-in generators
+ * import { generatorRegistry } from '@libar-dev/architect/generators';
+ * import '@libar-dev/architect/generators/built-in'; // Register built-in generators
  *
  * const generator = generatorRegistry.get('patterns');
  * const output = await generator.generate(patterns, context);
@@ -77,7 +77,7 @@ export {
  * Import './built-in/index.js' explicitly to register them:
  *
  * ```typescript
- * import '@libar-dev/delivery-process/generators/built-in';
+ * import '@libar-dev/architect/generators/built-in';
  * ```
  *
  * This explicit registration makes side effects visible and prevents

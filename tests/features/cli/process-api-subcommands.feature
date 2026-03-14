@@ -1,9 +1,9 @@
-@libar-docs
-@libar-docs-pattern:ProcessApiCliSubcommands
-@libar-docs-implements:ProcessApiCli
-@libar-docs-status:completed
-@libar-docs-unlock-reason:'Split-from-original'
-@libar-docs-product-area:DataAPI
+@architect
+@architect-pattern:ProcessApiCliSubcommands
+@architect-implements:ProcessApiCli
+@architect-status:completed
+@architect-unlock-reason:'Split-from-original'
+@architect-product-area:DataAPI
 @cli @process-api
 Feature: Process API CLI - Discovery Subcommands
   Discovery subcommands: list, search, context assembly, tags/sources, extended arch, unannotated.
@@ -157,7 +157,7 @@ Feature: Process API CLI - Discovery Subcommands
 
   Rule: CLI unannotated subcommand finds files without annotations
 
-    **Invariant:** The unannotated subcommand must return valid JSON listing every TypeScript file that lacks the `@libar-docs` opt-in marker.
+    **Invariant:** The unannotated subcommand must return valid JSON listing every TypeScript file that lacks the `@architect` opt-in marker.
     **Rationale:** Files missing the opt-in marker are invisible to the scanner; without this subcommand, unannotated files silently drop out of generated documentation and validation.
 
     @happy-path

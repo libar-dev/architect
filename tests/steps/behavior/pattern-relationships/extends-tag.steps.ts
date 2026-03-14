@@ -1,7 +1,7 @@
 /**
  * Extends Tag Step Definitions
  *
- * BDD step definitions for testing @libar-docs-extends tag extraction
+ * BDD step definitions for testing @architect-extends tag extraction
  * and processing for pattern generalization relationships.
  *
  * These step definitions test:

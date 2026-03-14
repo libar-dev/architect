@@ -1,14 +1,14 @@
-@libar-docs
+@architect
 @behavior @convention-extractor
-@libar-docs-pattern:ConventionExtractorTesting
-@libar-docs-status:completed
-@libar-docs-unlock-reason:Fix-escaped-pipe-parsing-in-convention-tables
-@libar-docs-implements:ReferenceDocShowcase
-@libar-docs-product-area:Generation
+@architect-pattern:ConventionExtractorTesting
+@architect-status:completed
+@architect-unlock-reason:Fix-escaped-pipe-parsing-in-convention-tables
+@architect-implements:ReferenceDocShowcase
+@architect-product-area:Generation
 Feature: Convention Extractor
 
   Extracts convention content from MasterDataset decision records
-  tagged with @libar-docs-convention. Produces structured ConventionBundles
+  tagged with @architect-convention. Produces structured ConventionBundles
   with rule content, tables, and invariant/rationale metadata.
 
   Background:

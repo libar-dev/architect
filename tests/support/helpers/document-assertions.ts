@@ -5,7 +5,7 @@
  * universal renderer. These helpers enable expressive BDD-style
  * assertions on document structure and content.
  *
- * @libar-docs
+ * @architect
  */
 
 import { expect } from 'vitest';

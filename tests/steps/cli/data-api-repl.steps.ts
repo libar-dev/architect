@@ -4,8 +4,8 @@
  * BDD step definitions for testing the interactive REPL mode:
  * multi-query sessions, help output, and pipeline reload.
  *
- * @libar-docs
- * @libar-docs-implements DataAPICLIErgonomics
+ * @architect
+ * @architect-implements DataAPICLIErgonomics
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

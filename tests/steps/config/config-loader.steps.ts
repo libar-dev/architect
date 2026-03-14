@@ -5,7 +5,7 @@
  * Uses temp directories with actual config files to test the full
  * config loading pipeline.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -40,8 +40,8 @@ interface ConfigLoaderState {
 // =============================================================================
 
 const VALID_GENERIC_CONFIG = `
-import { createDeliveryProcess } from "./src/index.js";
-export default createDeliveryProcess({ preset: "generic" });
+import { createArchitect } from "./src/index.js";
+export default createArchitect({ preset: "generic" });
 `.trim();
 
 const NO_DEFAULT_EXPORT_CONFIG = `
@@ -115,8 +115,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.configPath).not.toBeNull();
       });
 
-      And('config path should end with "delivery-process.config.js"', () => {
-        expect(state!.configPath!).toMatch(/delivery-process\.config\.js$/);
+      And('config path should end with "architect.config.js"', () => {
+        expect(state!.configPath!).toMatch(/architect\.config\.js$/);
       });
     });
 
@@ -134,8 +134,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.configPath).not.toBeNull();
       });
 
-      And('config path should end with "delivery-process.config.js"', () => {
-        expect(state!.configPath!).toMatch(/delivery-process\.config\.js$/);
+      And('config path should end with "architect.config.js"', () => {
+        expect(state!.configPath!).toMatch(/architect\.config\.js$/);
       });
     });
 
@@ -152,8 +152,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.configPath).not.toBeNull();
       });
 
-      And('config path should end with "delivery-process.config.ts"', () => {
-        expect(state!.configPath!).toMatch(/delivery-process\.config\.ts$/);
+      And('config path should end with "architect.config.ts"', () => {
+        expect(state!.configPath!).toMatch(/architect\.config\.ts$/);
       });
     });
 
@@ -222,9 +222,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.configResult!.value.isDefault).toBe(true);
       });
 
-      And('loaded registry tagPrefix should be "@libar-docs-"', () => {
+      And('loaded registry tagPrefix should be "@architect-"', () => {
         if (!state!.configResult!.ok) throw new Error('Expected success');
-        expect(state!.configResult!.value.instance.registry.tagPrefix).toBe('@libar-docs-');
+        expect(state!.configResult!.value.instance.registry.tagPrefix).toBe('@architect-');
       });
 
       And('loaded registry should have exactly 3 categories', () => {
@@ -259,7 +259,7 @@ export default {
   }
 };
 `.trim();
-        const configPath = path.join(state!.tempDir!, 'delivery-process.config.js');
+        const configPath = path.join(state!.tempDir!, 'architect.config.js');
         await fs.writeFile(configPath, configContent);
       });
 
@@ -284,7 +284,7 @@ export default {
 
     RuleScenario('Error on config without default export', ({ Given, When, Then, And }) => {
       Given('a config file without default export', async () => {
-        const configPath = path.join(state!.tempDir!, 'delivery-process.config.js');
+        const configPath = path.join(state!.tempDir!, 'architect.config.js');
         await fs.writeFile(configPath, NO_DEFAULT_EXPORT_CONFIG);
       });
 
@@ -304,7 +304,7 @@ export default {
 
     RuleScenario('Error on config with wrong type', ({ Given, When, Then, And }) => {
       Given('a config file exporting wrong type', async () => {
-        const configPath = path.join(state!.tempDir!, 'delivery-process.config.js');
+        const configPath = path.join(state!.tempDir!, 'architect.config.js');
         await fs.writeFile(configPath, WRONG_TYPE_CONFIG);
       });
 
@@ -316,9 +316,9 @@ export default {
         expect(state!.configResult!.ok).toBe(false);
       });
 
-      And('config error message should contain "DeliveryProcessInstance"', () => {
+      And('config error message should contain "ArchitectInstance"', () => {
         if (state!.configResult!.ok) throw new Error('Expected failure');
-        expect(state!.configResult!.error.message).toContain('DeliveryProcessInstance');
+        expect(state!.configResult!.error.message).toContain('ArchitectInstance');
       });
     });
   });

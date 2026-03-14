@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:ShapeSelectorTesting
-@libar-docs-status:completed
-@libar-docs-implements:ReferenceDocShowcase,DeclarationLevelShapeTagging
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:ShapeSelectorTesting
+@architect-status:completed
+@architect-implements:ReferenceDocShowcase,DeclarationLevelShapeTagging
+@architect-product-area:Generation
 Feature: Shape Selector Filtering
 
   Tests the filterShapesBySelectors function that provides fine-grained

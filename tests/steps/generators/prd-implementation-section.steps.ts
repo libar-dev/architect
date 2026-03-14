@@ -2,7 +2,7 @@
  * PRD Implementation Section Step Definitions
  *
  * BDD step definitions for testing the Implementations section in pattern documents.
- * Tests that code stubs with @libar-docs-implements tags appear in pattern docs
+ * Tests that code stubs with @architect-implements tags appear in pattern docs
  * with working links to source files.
  *
  * Uses Rule() + RuleScenario() pattern as feature file uses Rule: blocks.
@@ -182,7 +182,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // ===========================================================================
 
   Rule(
-    'Implementation files appear in pattern docs via @libar-docs-implements',
+    'Implementation files appear in pattern docs via @architect-implements',
     ({ RuleScenario }) => {
       RuleScenario(
         'Implementations section renders with file links',

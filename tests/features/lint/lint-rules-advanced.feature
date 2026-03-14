@@ -1,8 +1,8 @@
-@libar-docs
-@lint @libar-docs-pattern:LintRuleAdvancedTesting
-@libar-docs-implements:LintRules
-@libar-docs-status:completed
-@libar-docs-product-area:Validation
+@architect
+@lint @architect-pattern:LintRuleAdvancedTesting
+@architect-implements:LintRules
+@architect-status:completed
+@architect-product-area:Validation
 Feature: Pattern Annotation Lint Rules - Advanced Rule Logic
   Complex lint rule logic and collection-level behavior.
   Tests tautological description detection, default collection, and severity filtering.

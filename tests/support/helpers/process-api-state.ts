@@ -4,7 +4,7 @@
  * Extracted from process-api.steps.ts to be shared across
  * the split test files (core, subcommands, modifiers-rules).
  *
- * @libar-docs
+ * @architect
  */
 
 import { writeTempFile, createTsFileWithDirective, type TempDirContext } from './file-system.js';
@@ -98,12 +98,12 @@ export function createFeatureFilesWithRules(): Array<{ path: string; content: st
     {
       path: 'specs/validation-rules.feature',
       content: [
-        '@libar-docs',
-        '@libar-docs-pattern:ValidationRulesTest',
-        '@libar-docs-status:completed',
-        '@libar-docs-unlock-reason:Split-from-original',
-        '@libar-docs-product-area:Validation',
-        '@libar-docs-phase:10',
+        '@architect',
+        '@architect-pattern:ValidationRulesTest',
+        '@architect-status:completed',
+        '@architect-unlock-reason:Split-from-original',
+        '@architect-product-area:Validation',
+        '@architect-phase:10',
         'Feature: Validation Rules Test',
         '',
         '  Rule: Completed files require unlock',
@@ -132,11 +132,11 @@ export function createFeatureFilesWithRules(): Array<{ path: string; content: st
     {
       path: 'specs/core-utils.feature',
       content: [
-        '@libar-docs',
-        '@libar-docs-pattern:CoreUtilsTest',
-        '@libar-docs-status:completed',
-        '@libar-docs-product-area:CoreTypes',
-        '@libar-docs-phase:5',
+        '@architect',
+        '@architect-pattern:CoreUtilsTest',
+        '@architect-status:completed',
+        '@architect-product-area:CoreTypes',
+        '@architect-phase:5',
         'Feature: Core Utils Test',
         '',
         '  Rule: Slugify produces URL-safe slugs',

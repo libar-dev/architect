@@ -1,10 +1,10 @@
 /**
- * @libar-docs
- * @libar-docs-lint
- * @libar-docs-pattern ProcessGuardModule
- * @libar-docs-status active
- * @libar-docs-implements ProcessGuardLinter
- * @libar-docs-depends-on:FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider
+ * @architect
+ * @architect-lint
+ * @architect-pattern ProcessGuardModule
+ * @architect-status active
+ * @architect-implements ProcessGuardLinter
+ * @architect-depends-on:FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider
  *
  * ## ProcessGuardModule - Process Guard Linter
  *

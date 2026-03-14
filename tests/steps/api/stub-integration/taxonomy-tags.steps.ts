@@ -1,7 +1,7 @@
 /**
  * Taxonomy Tags Step Definitions
  *
- * Tests for @libar-docs-target and @libar-docs-since tag registration.
+ * Tests for @architect-target and @architect-since tag registration.
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

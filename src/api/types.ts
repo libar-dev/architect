@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern ProcessStateTypes
- * @libar-docs-status active
- * @libar-docs-depends-on:MasterDataset
+ * @architect
+ * @architect-core
+ * @architect-pattern ProcessStateTypes
+ * @architect-status active
+ * @architect-depends-on:MasterDataset
  *
  * ## Process State API Types
  *
@@ -163,25 +163,25 @@ export interface PatternDependencies {
  * relationship graph from the MasterDataset's relationshipIndex.
  */
 export interface PatternRelationships {
-  /** Patterns this pattern depends on (from @libar-docs-depends-on) */
+  /** Patterns this pattern depends on (from @architect-depends-on) */
   dependsOn: readonly string[];
-  /** Patterns this pattern enables (from @libar-docs-enables) */
+  /** Patterns this pattern enables (from @architect-enables) */
   enables: readonly string[];
-  /** Patterns this pattern uses (from @libar-docs-uses) */
+  /** Patterns this pattern uses (from @architect-uses) */
   uses: readonly string[];
-  /** Patterns that use this pattern (from @libar-docs-used-by) */
+  /** Patterns that use this pattern (from @architect-used-by) */
   usedBy: readonly string[];
-  /** Patterns this code implements (from @libar-docs-implements) */
+  /** Patterns this code implements (from @architect-implements) */
   implementsPatterns: readonly string[];
   /** Files that implement this pattern with metadata (computed inverse) */
   implementedBy: readonly ImplementationRef[];
-  /** Pattern this extends (from @libar-docs-extends) */
+  /** Pattern this extends (from @architect-extends) */
   extendsPattern: string | undefined;
   /** Patterns that extend this pattern (computed inverse) */
   extendedBy: readonly string[];
-  /** Related patterns for cross-reference without dependency (from @libar-docs-see-also) */
+  /** Related patterns for cross-reference without dependency (from @architect-see-also) */
   seeAlso: readonly string[];
-  /** File paths to implementation APIs (from @libar-docs-api-ref) */
+  /** File paths to implementation APIs (from @architect-api-ref) */
   apiRef: readonly string[];
 }
 

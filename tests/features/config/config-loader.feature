@@ -1,11 +1,11 @@
-@libar-docs
-@libar-docs-pattern:ConfigLoaderTesting
-@libar-docs-implements:ConfigLoader
-@libar-docs-status:completed
-@libar-docs-product-area:Configuration
+@architect
+@architect-pattern:ConfigLoaderTesting
+@architect-implements:ConfigLoader
+@architect-status:completed
+@architect-product-area:Configuration
 @behavior @config
 Feature: Config Loader - TypeScript Configuration Discovery
-  The config loader discovers and loads `delivery-process.config.ts` files
+  The config loader discovers and loads `architect.config.ts` files
   for hierarchical configuration, enabling package-level and repo-level
   taxonomy customization.
 
@@ -15,7 +15,7 @@ Feature: Config Loader - TypeScript Configuration Discovery
   - CLI tools need automatic config discovery
 
   **Solution:**
-  - Walk up directories looking for `delivery-process.config.ts`
+  - Walk up directories looking for `architect.config.ts`
   - Stop at repo root (.git marker)
   - Fall back to libar-generic preset (3 categories) if no config found
 
@@ -36,30 +36,30 @@ Feature: Config Loader - TypeScript Configuration Discovery
     Scenario: Find config file in current directory
       Given a directory structure:
         | path                          | type   |
-        | delivery-process.config.js    | config |
+        | architect.config.js    | config |
       When finding config file from the base directory
       Then config file should be found
-      And config path should end with "delivery-process.config.js"
+      And config path should end with "architect.config.js"
 
     @happy-path
     Scenario: Find config file in parent directory
       Given a directory structure:
         | path                          | type    |
-        | delivery-process.config.js    | config  |
+        | architect.config.js    | config  |
         | nested/src/file.ts            | source  |
       When finding config file from "nested/src"
       Then config file should be found
-      And config path should end with "delivery-process.config.js"
+      And config path should end with "architect.config.js"
 
     @happy-path
     Scenario: Prefer TypeScript config over JavaScript
       Given a directory structure:
         | path                          | type   |
-        | delivery-process.config.ts    | config |
-        | delivery-process.config.js    | config |
+        | architect.config.ts    | config |
+        | architect.config.js    | config |
       When finding config file from the base directory
       Then config file should be found
-      And config path should end with "delivery-process.config.ts"
+      And config path should end with "architect.config.ts"
 
     @edge-case
     Scenario: Return null when no config file exists
@@ -84,7 +84,7 @@ Feature: Config Loader - TypeScript Configuration Discovery
       Given a directory structure:
         | path                               | type    |
         | .git/config                        | git     |
-        | delivery-process.config.js         | config  |
+        | architect.config.js         | config  |
         | project/nested/src/file.ts         | source  |
       When finding config file from "project/nested/src"
       Then config file should be found
@@ -106,7 +106,7 @@ Feature: Config Loader - TypeScript Configuration Discovery
       When loading config from base directory
       Then config loading should succeed
       And loaded config should be the default
-      And loaded registry tagPrefix should be "@libar-docs-"
+      And loaded registry tagPrefix should be "@architect-"
       And loaded registry should have exactly 3 categories
 
     @happy-path
@@ -129,7 +129,7 @@ Feature: Config Loader - TypeScript Configuration Discovery
       Given a config file exporting wrong type
       When loading config from base directory
       Then config loading should fail
-      And config error message should contain "DeliveryProcessInstance"
+      And config error message should contain "ArchitectInstance"
 
   # ==========================================================================
   # Error Formatting

@@ -1,8 +1,8 @@
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-infra
- * @libar-docs-pattern Tag Registry Configuration
- * @libar-docs-status completed
+ * @architect
+ * @architect-core @architect-infra
+ * @architect-pattern Tag Registry Configuration
+ * @architect-status completed
  *
  * ## Tag Registry Configuration Schema
  *
@@ -69,7 +69,7 @@ export type CategoryDefinition = z.infer<typeof CategoryDefinitionSchema>;
  *   required: false,
  *   values: ["roadmap", "active", "completed"],
  *   default: "roadmap",
- *   example: "@libar-docs-status completed"
+ *   example: "@architect-status completed"
  * }
  * ```
  */
@@ -148,8 +148,8 @@ export type AggregationTagDefinition = z.infer<typeof AggregationTagDefinitionSc
  *     { tag: "overview", targetDoc: "OVERVIEW.md", purpose: "Overview patterns" }
  *   ],
  *   formatOptions: ["full", "list", "summary"],
- *   tagPrefix: "@libar-docs-",
- *   fileOptInTag: "@libar-docs"
+ *   tagPrefix: "@architect-",
+ *   fileOptInTag: "@architect"
  * }
  * ```
  */
@@ -167,10 +167,10 @@ export const TagRegistrySchema = z
     aggregationTags: z.array(AggregationTagDefinitionSchema).max(50),
     /** Valid format options for template placeholders */
     formatOptions: z.array(z.string().max(50)).max(20).default(['full', 'list', 'summary']),
-    /** Prefix used for all delivery-process tags */
-    tagPrefix: z.string().max(50).default('@libar-docs-'),
+    /** Prefix used for all Architect tags */
+    tagPrefix: z.string().max(50).default('@architect-'),
     /** File-level opt-in tag that gates extraction */
-    fileOptInTag: z.string().max(50).default('@libar-docs'),
+    fileOptInTag: z.string().max(50).default('@architect'),
   })
   .strict();
 

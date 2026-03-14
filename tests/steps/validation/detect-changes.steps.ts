@@ -4,7 +4,7 @@
  * BDD step definitions for testing the detectDeliverableChanges function
  * that parses git diff output to identify added, removed, and modified deliverables.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

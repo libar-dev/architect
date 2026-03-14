@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern StringUtilities
- * @libar-docs-status completed
- * @libar-docs-used-by DocExtractor, SectionRenderer
+ * @architect
+ * @architect-core
+ * @architect-pattern StringUtilities
+ * @architect-status completed
+ * @architect-used-by DocExtractor, SectionRenderer
  *
  * ## StringUtilities - Text Transformation Functions
  *
- * Provides shared utilities for string manipulation used across the delivery-process package,
+ * Provides shared utilities for string manipulation used across the Architect package,
  * including slugification for URLs/filenames and Markdown formatting cleanup.
  *
  * ### When to Use

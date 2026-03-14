@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * @libar-docs
- * @libar-docs-cli
- * @libar-docs-lint
- * @libar-docs-pattern LintProcessCLI
- * @libar-docs-status active
- * @libar-docs-uses ProcessGuardModule
- * @libar-docs-extract-shapes ProcessGuardCLIConfig
+ * @architect
+ * @architect-cli
+ * @architect-lint
+ * @architect-pattern LintProcessCLI
+ * @architect-status active
+ * @architect-uses ProcessGuardModule
+ * @architect-extract-shapes ProcessGuardCLIConfig
  *
  * ## LintProcessCLI - Process Guard Linter CLI
  *
@@ -139,10 +139,10 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ProcessGuardC
  */
 export function printHelp(): void {
   console.log(`
-lint-process - Validate changes against delivery process rules
+architect-guard - Validate changes against delivery process rules
 
 Usage:
-  lint-process [options] [files...]
+  architect-guard [options] [files...]
 
 Modes:
   --staged            Validate staged changes (default, for pre-commit)
@@ -173,16 +173,16 @@ Rules Checked:
 
 Examples:
   # Pre-commit hook (default)
-  lint-process --staged
+  architect-guard --staged
 
   # CI/CD pipeline
-  lint-process --all --strict
+  architect-guard --all --strict
 
   # Check specific files
-  lint-process --file path/to/spec.feature
+  architect-guard --file path/to/spec.feature
 
   # Debugging - show derived state
-  lint-process --staged --show-state
+  architect-guard --staged --show-state
   `);
 }
 
@@ -247,7 +247,7 @@ async function main(): Promise<void> {
   const config = parseArgs();
 
   if (config.version) {
-    printVersionAndExit('lint-process');
+    printVersionAndExit('architect-guard');
   }
 
   if (config.help) {

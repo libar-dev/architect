@@ -1,11 +1,11 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern RulesQueryModule
- * @libar-docs-status completed
- * @libar-docs-implements ProcessAPILayeredExtraction
- * @libar-docs-product-area DataAPI
- * @libar-docs-uses BusinessRulesCodec, CodecHelpers
+ * @architect
+ * @architect-core
+ * @architect-pattern RulesQueryModule
+ * @architect-status completed
+ * @architect-implements ProcessAPILayeredExtraction
+ * @architect-product-area DataAPI
+ * @architect-uses BusinessRulesCodec, CodecHelpers
  *
  * ## RulesQueryModule - Business Rules Domain Query
  *

@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:ContentDeduplication
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:ContentDeduplication
+@architect-status:completed
+@architect-product-area:Generation
 Feature: Content Deduplication
 
   **Context:** Multiple sources may extract identical content, leading to

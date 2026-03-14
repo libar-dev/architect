@@ -86,14 +86,11 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
       }
     );
 
-    RuleScenario(
-      'Detect timeline features in delivery-process package',
-      ({ Given, When, Then }) => {
-        Given('the feature file path {string}', givenFeatureFilePath);
-        When('I infer the feature layer', whenInferFeatureLayer);
-        Then('the inferred layer should be {string}', thenInferredLayerShouldBe);
-      }
-    );
+    RuleScenario('Detect timeline features in Architect package', ({ Given, When, Then }) => {
+      Given('the feature file path {string}', givenFeatureFilePath);
+      When('I infer the feature layer', whenInferFeatureLayer);
+      Then('the inferred layer should be {string}', thenInferredLayerShouldBe);
+    });
   });
 
   // ===========================================================================

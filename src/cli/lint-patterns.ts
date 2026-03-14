@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 /**
- * @libar-docs
- * @libar-docs-cli
- * @libar-docs-pattern LintPatternsCLI
- * @libar-docs-status completed
- * @libar-docs-uses LintEngine, LintRules, PatternScanner
- * @libar-docs-extract-shapes LintCLIConfig
+ * @architect
+ * @architect-cli
+ * @architect-pattern LintPatternsCLI
+ * @architect-status completed
+ * @architect-uses LintEngine, LintRules, PatternScanner
+ * @architect-extract-shapes LintCLIConfig
  *
  * ## LintPatternsCLI - Pattern Annotation Quality Checker
  *
@@ -145,10 +145,10 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): LintCLIConfig
  */
 export function printHelp(): void {
   console.log(`
-lint-patterns - Validate pattern annotation quality
+architect-lint-patterns - Validate pattern annotation quality
 
 Usage:
-  lint-patterns [options]
+  architect-lint-patterns [options]
 
 Options:
   -i, --input <pattern>     Glob pattern for TypeScript files (required, repeatable)
@@ -166,24 +166,24 @@ Exit Codes:
   1  Errors found (or warnings with --strict)
 
 Lint Rules:
-  error    missing-pattern-name      Pattern must have @libar-docs-pattern name
+  error    missing-pattern-name      Pattern must have @architect-pattern name
   error    tautological-description  Description should not repeat pattern name
-  warning  missing-status            Pattern should have @libar-docs-status
+  warning  missing-status            Pattern should have @architect-status
   warning  missing-when-to-use       Pattern should have "When to Use" section
-  info     missing-relationships     Consider adding @libar-docs-uses/used-by
+  info     missing-relationships     Consider adding @architect-uses/used-by
 
 Examples:
   # Lint all @libar-dev/platform-* patterns
-  lint-patterns -i "packages/@libar-dev/platform-*/src/**/*.ts"
+  architect-lint-patterns -i "packages/@libar-dev/platform-*/src/**/*.ts"
 
   # Strict mode for CI (fail on warnings)
-  lint-patterns -i "packages/@libar-dev/platform-*/src/**/*.ts" --strict
+  architect-lint-patterns -i "packages/@libar-dev/platform-*/src/**/*.ts" --strict
 
   # JSON output for tooling
-  lint-patterns -i "src/**/*.ts" --format json
+  architect-lint-patterns -i "src/**/*.ts" --format json
 
   # Only show errors
-  lint-patterns -i "src/**/*.ts" --quiet
+  architect-lint-patterns -i "src/**/*.ts" --quiet
   `);
 }
 
@@ -194,7 +194,7 @@ async function main(): Promise<void> {
   const config = parseArgs();
 
   if (config.version) {
-    printVersionAndExit('lint-patterns');
+    printVersionAndExit('architect-lint-patterns');
   }
 
   if (config.help) {
@@ -209,7 +209,7 @@ async function main(): Promise<void> {
   }
 
   try {
-    // Load configuration (discovers delivery-process.config.ts)
+    // Load configuration (discovers architect.config.ts)
     const configResult = await loadConfig(config.baseDir);
     if (!configResult.ok) {
       console.error(formatConfigError(configResult.error));

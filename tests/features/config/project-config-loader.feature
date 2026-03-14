@@ -1,11 +1,11 @@
-@libar-docs
-@libar-docs-pattern:ProjectConfigLoader
-@libar-docs-status:completed
-@libar-docs-product-area:Configuration
+@architect
+@architect-pattern:ProjectConfigLoader
+@architect-status:completed
+@architect-product-area:Configuration
 @behavior @config
 Feature: Project Config Loader - Unified Configuration Loading
   loadProjectConfig loads and resolves configuration from file,
-  supporting both new-style defineConfig and legacy createDeliveryProcess formats.
+  supporting both new-style defineConfig and legacy createArchitect formats.
 
   **Problem:**
   - Two config formats exist (new-style and legacy) that need unified loading
@@ -49,12 +49,12 @@ Feature: Project Config Loader - Unified Configuration Loading
 
   Rule: Legacy config is loaded with backward compatibility
 
-    **Invariant:** A file exporting createDeliveryProcess must be loaded and produce a valid resolved config.
+    **Invariant:** A file exporting createArchitect must be loaded and produce a valid resolved config.
     **Rationale:** Backward compatibility prevents breaking existing consumers during migration to the new config format.
-    **Verified by:** Legacy createDeliveryProcess export loads correctly
+    **Verified by:** Legacy createArchitect export loads correctly
 
     @happy-path
-    Scenario: Legacy createDeliveryProcess export loads correctly
+    Scenario: Legacy createArchitect export loads correctly
       Given a legacy config file with registry and regexBuilders
       When loading project config from temp directory
       Then project config loading should succeed

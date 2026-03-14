@@ -1,15 +1,15 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern PatternsCodec
- * @libar-docs-status completed
- * @libar-docs-arch-role projection
- * @libar-docs-arch-context renderer
- * @libar-docs-arch-layer application
- * @libar-docs-include codec-transformation,pipeline-stages
- * @libar-docs-implements PatternRelationshipModel
- * @libar-docs-convention codec-registry
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-core
+ * @architect-pattern PatternsCodec
+ * @architect-status completed
+ * @architect-arch-role projection
+ * @architect-arch-context renderer
+ * @architect-arch-layer application
+ * @architect-include codec-transformation,pipeline-stages
+ * @architect-implements PatternRelationshipModel
+ * @architect-convention codec-registry
+ * @architect-product-area:Generation
  *
  * ## PatternsDocumentCodec
  *
@@ -565,7 +565,7 @@ function buildSinglePatternDocument(
     }
   }
 
-  // Implementations (files that implement this pattern via @libar-docs-implements)
+  // Implementations (files that implement this pattern via @architect-implements)
   const patternKey = getPatternName(pattern);
   const rel = dataset.relationshipIndex?.[patternKey];
   if (rel?.implementedBy && rel.implementedBy.length > 0) {
@@ -587,7 +587,7 @@ function buildSinglePatternDocument(
     );
   }
 
-  // Extensions (patterns that extend this pattern via @libar-docs-extends)
+  // Extensions (patterns that extend this pattern via @architect-extends)
   if (rel?.extendedBy && rel.extendedBy.length > 0) {
     sections.push(heading(2, 'Extensions'));
     sections.push(

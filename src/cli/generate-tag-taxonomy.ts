@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 /**
- * @libar-docs
- * @libar-docs-cli
- * @libar-docs-pattern TagTaxonomyCLI
- * @libar-docs-status deferred
- * @libar-docs-uses ConfigLoader, TagTaxonomyGenerator
- * @libar-docs-extract-shapes CLIConfig
+ * @architect
+ * @architect-cli
+ * @architect-pattern TagTaxonomyCLI
+ * @architect-status deferred
+ * @architect-uses ConfigLoader, TagTaxonomyGenerator
+ * @architect-extract-shapes CLIConfig
  *
  * ## TagTaxonomyCLI - Tag Registry Documentation Generator
  *
@@ -103,10 +103,10 @@ function parseArgs(argv: string[] = process.argv.slice(2)): CLIConfig {
  */
 function printHelp(): void {
   console.log(`
-generate-tag-taxonomy - Generate TAG_TAXONOMY.md from configuration
+architect-taxonomy - Generate TAG_TAXONOMY.md from configuration
 
 Usage:
-  generate-tag-taxonomy [options]
+  architect-taxonomy [options]
 
 Options:
   -o, --output <path>        Output path for TAG_TAXONOMY.md (default: docs/architecture/TAG_TAXONOMY.md)
@@ -116,18 +116,18 @@ Options:
   -v, --version              Show version number
 
 Configuration:
-  Uses delivery-process.config.ts for taxonomy configuration.
+  Uses architect.config.ts for taxonomy configuration.
   Falls back to libar-generic preset (3 categories) if no config file found.
 
 Examples:
   # Generate using discovered config or default
-  generate-tag-taxonomy
+  architect-taxonomy
 
   # Custom output path
-  generate-tag-taxonomy -o docs/TAG_TAXONOMY.md
+  architect-taxonomy -o docs/TAG_TAXONOMY.md
 
   # Overwrite existing file
-  generate-tag-taxonomy -f
+  architect-taxonomy -f
   `);
 }
 
@@ -138,7 +138,7 @@ async function main(): Promise<void> {
   const config = parseArgs();
 
   if (config.version) {
-    printVersionAndExit('generate-tag-taxonomy');
+    printVersionAndExit('architect-taxonomy');
   }
 
   if (config.help) {
@@ -147,7 +147,7 @@ async function main(): Promise<void> {
   }
 
   // Deprecation warning
-  console.warn('\n⚠️  DEPRECATED: generate-tag-taxonomy is deprecated.');
+  console.warn('\n⚠️  DEPRECATED: architect-taxonomy is deprecated.');
   console.warn('   Use `pnpm docs:taxonomy` instead for codec-based generation.');
   console.warn('   The new approach provides progressive disclosure, domain grouping,');
   console.warn('   and fits the MasterDataset pipeline architecture.\n');
@@ -155,7 +155,7 @@ async function main(): Promise<void> {
   try {
     console.log('Loading configuration...');
 
-    // Load configuration (discovers delivery-process.config.ts)
+    // Load configuration (discovers architect.config.ts)
     const configResult = await loadConfig(config.baseDir);
     if (!configResult.ok) {
       console.error(formatConfigError(configResult.error));

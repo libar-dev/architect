@@ -68,7 +68,7 @@ let state: TestState;
 function resetState(): void {
   state = {
     baseDir: process.cwd(),
-    pocPath: 'delivery-process/specs/doc-generation-proof-of-concept.feature',
+    pocPath: 'architect/specs/doc-generation-proof-of-concept.feature',
     pocContent: null,
     parsedFeature: null,
     decisionContent: null,

@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-validation @libar-docs-core
- * @libar-docs-pattern OutputSchemas
- * @libar-docs-status completed
- * @libar-docs-uses Zod, LintSeveritySchema
- * @libar-docs-used-by LintEngine, ValidatePatternsCLI, Orchestrator
- * @libar-docs-usecase "When serializing lint results to JSON"
- * @libar-docs-usecase "When serializing validation results to JSON"
- * @libar-docs-usecase "When writing registry metadata to JSON"
+ * @architect
+ * @architect-validation @architect-core
+ * @architect-pattern OutputSchemas
+ * @architect-status completed
+ * @architect-uses Zod, LintSeveritySchema
+ * @architect-used-by LintEngine, ValidatePatternsCLI, Orchestrator
+ * @architect-usecase "When serializing lint results to JSON"
+ * @architect-usecase "When serializing validation results to JSON"
+ * @architect-usecase "When writing registry metadata to JSON"
  *
  * ## OutputSchemas - JSON Output Format Schemas
  *

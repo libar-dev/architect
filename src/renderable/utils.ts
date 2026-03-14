@@ -1,8 +1,8 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern RenderableUtils
- * @libar-docs-status completed
+ * @architect
+ * @architect-core
+ * @architect-pattern RenderableUtils
+ * @architect-status completed
  *
  * ## Renderable Utilities
  *

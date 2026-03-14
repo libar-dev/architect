@@ -5,7 +5,7 @@
  * in transformToMasterDataset. This feature infers bounded context from
  * file paths when patterns have archLayer but no explicit archContext.
  *
- * @libar-docs
+ * @architect
  */
 
 import { expect } from 'vitest';

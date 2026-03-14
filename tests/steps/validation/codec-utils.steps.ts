@@ -1,7 +1,7 @@
 /**
- * @libar-docs
- * @libar-docs-implements CodecUtilsTesting
- * @libar-docs-uses CodecUtils
+ * @architect
+ * @architect-implements CodecUtilsTesting
+ * @architect-uses CodecUtils
  *
  * Codec Utils Step Definitions
  *

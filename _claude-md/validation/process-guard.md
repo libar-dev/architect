@@ -2,23 +2,23 @@
 
 Process Guard validates delivery workflow changes at commit time using a Decider pattern.
 
-Query validation rules: `pnpm process:query -- rules --pattern ProcessGuard`
-Query protection levels: `pnpm process:query -- query getProtectionInfo <status>`
+Query validation rules: `pnpm architect:query -- rules --pattern ProcessGuard`
+Query protection levels: `pnpm architect:query -- query getProtectionInfo <status>`
 
 #### CLI Usage
 
 ```bash
 # Pre-commit (default mode)
-lint-process --staged
+architect-guard --staged
 
 # CI pipeline with strict mode
-lint-process --all --strict
+architect-guard --all --strict
 
 # Debug: show derived process state
-lint-process --staged --show-state
+architect-guard --staged --show-state
 
 # Override session scope checking
-lint-process --staged --ignore-session
+architect-guard --staged --ignore-session
 ```
 
 #### Exit Codes

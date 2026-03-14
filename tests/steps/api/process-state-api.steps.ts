@@ -3,7 +3,7 @@
  *
  * BDD step definitions for testing the ProcessStateAPI query interface.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

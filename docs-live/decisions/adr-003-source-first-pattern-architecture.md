@@ -13,7 +13,7 @@
 
 **Context:**
 The original annotation architecture assumed pattern definitions live
-in tier 1 feature specs, with TypeScript code limited to `@libar-docs-implements`.
+in tier 1 feature specs, with TypeScript code limited to `@architect-implements`.
 At scale this creates three problems: tier 1 specs become stale after implementation
 (only 39% of 44 specs have traceability to executable specs), retroactive annotation
 of existing code triggers merge conflicts, and duplicated Rules/Scenarios in tier 1
@@ -39,15 +39,15 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 ### TypeScript source owns pattern identity
 
-**Invariant:** A pattern is defined by `@libar-docs-pattern` in a TypeScript file — either a stub (pre-implementation) or source code (post-implementation).
+**Invariant:** A pattern is defined by `@architect-pattern` in a TypeScript file — either a stub (pre-implementation) or source code (post-implementation).
 
 **Rationale:** If pattern identity lives in tier 1 specs, it becomes stale after implementation and diverges from the code that actually realizes the pattern.
 
-| Phase          | Location                               | Status    |
-| -------------- | -------------------------------------- | --------- |
-| Design         | `delivery-process/stubs/pattern-name/` | roadmap   |
-| Implementation | `src/path/to/module.ts`                | active    |
-| Completed      | `src/path/to/module.ts`                | completed |
+| Phase          | Location                        | Status    |
+| -------------- | ------------------------------- | --------- |
+| Design         | `architect/stubs/pattern-name/` | roadmap   |
+| Implementation | `src/path/to/module.ts`         | active    |
+| Completed      | `src/path/to/module.ts`         | completed |
 
 **Pattern Definition Lifecycle:**
 
@@ -95,14 +95,14 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 ### Implements is UML Realization (many-to-one)
 
-**Invariant:** `@libar-docs-implements` declares a realization relationship. Multiple files can implement the same pattern. One file can implement multiple patterns (CSV format).
+**Invariant:** `@architect-implements` declares a realization relationship. Multiple files can implement the same pattern. One file can implement multiple patterns (CSV format).
 
 **Rationale:** Without many-to-one realization, cross-cutting patterns that span multiple files cannot be traced back to a single canonical definition.
 
-| Relationship | Tag                      | Cardinality             |
-| ------------ | ------------------------ | ----------------------- |
-| Definition   | `@libar-docs-pattern`    | Exactly one per pattern |
-| Realization  | `@libar-docs-implements` | Many-to-one             |
+| Relationship | Tag                     | Cardinality             |
+| ------------ | ----------------------- | ----------------------- |
+| Definition   | `@architect-pattern`    | Exactly one per pattern |
+| Realization  | `@architect-implements` | Many-to-one             |
 
 **Verified by:**
 
@@ -110,7 +110,7 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 ### Single-definition constraint
 
-**Invariant:** `@libar-docs-pattern:X` may appear in exactly one file across the entire codebase. The `mergePatterns()` conflict check in `orchestrator.ts` correctly enforces this.
+**Invariant:** `@architect-pattern:X` may appear in exactly one file across the entire codebase. The `mergePatterns()` conflict check in `orchestrator.ts` correctly enforces this.
 
 **Rationale:** Duplicate pattern definitions cause merge conflicts in the MasterDataset and produce ambiguous ownership in generated documentation.
 
@@ -129,7 +129,7 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 ### Reverse links preferred over forward links
 
-**Invariant:** `@libar-docs-implements` (reverse: "I verify this pattern") is the primary traceability mechanism. `@libar-docs-executable-specs` (forward: "my tests live here") is retained but not required.
+**Invariant:** `@architect-implements` (reverse: "I verify this pattern") is the primary traceability mechanism. `@architect-executable-specs` (forward: "my tests live here") is retained but not required.
 
 **Rationale:** Forward links in tier 1 specs go stale when specs are archived, while reverse links in test files are self-maintaining because the test cannot run without the implementation.
 

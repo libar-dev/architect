@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:ShapeExtractionTypesTesting
-@libar-docs-implements:ReferenceDocShowcase
-@libar-docs-status:completed
-@libar-docs-product-area:Annotation
+@architect
+@architect-pattern:ShapeExtractionTypesTesting
+@architect-implements:ReferenceDocShowcase
+@architect-status:completed
+@architect-product-area:Annotation
 Feature: TypeScript Shape Extraction - Type Extraction
 
   Validates the shape extraction system that extracts TypeScript type

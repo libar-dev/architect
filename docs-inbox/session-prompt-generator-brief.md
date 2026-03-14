@@ -1,7 +1,7 @@
 # Pattern Brief: Session Prompt Generator
 
 > **Status:** Ready for Planning Session
-> **Scope:** New capability for `@libar-dev/delivery-process`
+> **Scope:** New capability for `@libar-dev/architect`
 > **Phase:** TBD (after DataAPIDesignSessionSupport)
 > **Depends on:** DataAPIDesignSessionSupport (completed), ProcessStateAPI (completed)
 
@@ -29,8 +29,8 @@ Generate complete session prompts by composing:
 Expose via a new CLI subcommand:
 
 ```bash
-pnpm process:query -- session-prompt <pattern> --type implement
-pnpm process:query -- session-prompt <pattern> --type design
+pnpm architect:query -- session-prompt <pattern> --type implement
+pnpm architect:query -- session-prompt <pattern> --type design
 ```
 
 ---
@@ -97,33 +97,33 @@ ProcessStateAPI queries -----------------+                                      
 | `formatContextBundle()` | Yes            | Text rendering with `=== SECTION ===` markers      |
 | MasterDataset patterns  | Yes            | Decision records are already extracted as patterns |
 
-**Only truly new piece:** Convention extraction — filter `dataset.patterns` for decision records with `@libar-docs-convention` tags, extract their Rule block content, group by topic.
+**Only truly new piece:** Convention extraction — filter `dataset.patterns` for decision records with `@architect-convention` tags, extract their Rule block content, group by topic.
 
 ---
 
 ## Taxonomy Extension
 
-### Required: `@libar-docs-convention` (csv format)
+### Required: `@architect-convention` (csv format)
 
-Classifies decision records as convention sources. Orthogonal to existing `@libar-docs-adr-category` (which is too coarse — "process" covers both testing policy and FSM rules).
+Classifies decision records as convention sources. Orthogonal to existing `@architect-adr-category` (which is too coarse — "process" covers both testing policy and FSM rules).
 
 **Values:** `testing-policy`, `lint-rules`, `fsm-rules`, `cli-patterns`, `pattern-naming`, `session-workflow`, `output-format`
 
 **Example on existing decision records:**
 
 ```gherkin
-@libar-docs-adr:004
-@libar-docs-convention:testing-policy
+@architect-adr:004
+@architect-convention:testing-policy
 Feature: ADR-004 Gherkin-Only Testing
 ```
 
 ```gherkin
-@libar-docs-adr:008
-@libar-docs-convention:output-format
+@architect-adr:008
+@architect-convention:output-format
 Feature: ADR-008 Text Output Path
 ```
 
-### Deferred: `@libar-docs-session-type` (csv format)
+### Deferred: `@architect-session-type` (csv format)
 
 Filtering conventions by session type. Can be hardcoded initially since the mapping is stable:
 
@@ -139,7 +139,7 @@ Filtering conventions by session type. Can be hardcoded initially since the mapp
 
 If this mapping changes frequently, promote to a taxonomy tag. Until then, YAGNI.
 
-### Not Recommended: `@libar-docs-prompt-section`
+### Not Recommended: `@architect-prompt-section`
 
 Redundant with existing Source Mapping `THIS DECISION (Rule: RuleName)` extraction. The assembler knows prompt structure programmatically — it doesn't need tags to discover it.
 
@@ -176,14 +176,14 @@ CLAUDE.md retains its role as the entry point, but convention sections become **
 
 ### Phase A: Convention Infrastructure
 
-| Deliverable                             | Location                                                              | Tests              |
-| --------------------------------------- | --------------------------------------------------------------------- | ------------------ |
-| Add `convention` tag to taxonomy        | `src/taxonomy/registry-builder.ts`                                    | Yes (unit)         |
-| Tag existing ADRs with convention       | `delivery-process/decisions/adr-004,006,008.feature`                  | No (metadata only) |
-| Create ADR-009 Coding Conventions       | `delivery-process/decisions/adr-009-coding-conventions.feature`       | No (spec only)     |
-| Create ADR-010 CLI Patterns             | `delivery-process/decisions/adr-010-cli-patterns.feature`             | No (spec only)     |
-| Create ADR-011 Pattern Naming           | `delivery-process/decisions/adr-011-pattern-naming.feature`           | No (spec only)     |
-| Create ADR-012 vitest-cucumber Patterns | `delivery-process/decisions/adr-012-vitest-cucumber-patterns.feature` | No (spec only)     |
+| Deliverable                             | Location                                                       | Tests              |
+| --------------------------------------- | -------------------------------------------------------------- | ------------------ |
+| Add `convention` tag to taxonomy        | `src/taxonomy/registry-builder.ts`                             | Yes (unit)         |
+| Tag existing ADRs with convention       | `architect/decisions/adr-004,006,008.feature`                  | No (metadata only) |
+| Create ADR-009 Coding Conventions       | `architect/decisions/adr-009-coding-conventions.feature`       | No (spec only)     |
+| Create ADR-010 CLI Patterns             | `architect/decisions/adr-010-cli-patterns.feature`             | No (spec only)     |
+| Create ADR-011 Pattern Naming           | `architect/decisions/adr-011-pattern-naming.feature`           | No (spec only)     |
+| Create ADR-012 vitest-cucumber Patterns | `architect/decisions/adr-012-vitest-cucumber-patterns.feature` | No (spec only)     |
 
 ### Phase B: Convention Extraction
 
@@ -215,7 +215,7 @@ CLAUDE.md retains its role as the entry point, but convention sections become **
 
 ### DD-2: Convention Tags Over Session-Type Tags
 
-**Decision:** Add `@libar-docs-convention` taxonomy tag. Defer `@libar-docs-session-type` — hardcode the convention-to-session mapping initially.
+**Decision:** Add `@architect-convention` taxonomy tag. Defer `@architect-session-type` — hardcode the convention-to-session mapping initially.
 
 **Rationale:** The convention→session mapping is stable and small (7 conventions x 3 session types). A taxonomy tag adds maintenance burden for a mapping that rarely changes. Promote to a tag if the mapping grows or changes frequently.
 
@@ -223,7 +223,7 @@ CLAUDE.md retains its role as the entry point, but convention sections become **
 
 **Decision:** Conventions live in decision records (ADR/PDR), not in a separate convention format.
 
-**Rationale:** Decision records already exist, are already extracted by the pipeline, already support Rule blocks with structured content, and are already queryable via `pnpm process:query -- decisions`. No new file format or extraction path needed.
+**Rationale:** Decision records already exist, are already extracted by the pipeline, already support Rule blocks with structured content, and are already queryable via `pnpm architect:query -- decisions`. No new file format or extraction path needed.
 
 ### DD-4: Co-located Formatter Pattern
 
@@ -238,7 +238,7 @@ CLAUDE.md retains its role as the entry point, but convention sections become **
 **Rationale:**
 
 - Phase A alone makes conventions queryable via `decisions` command
-- Phase A + B enables `pnpm process:query -- conventions --topic lint-rules`
+- Phase A + B enables `pnpm architect:query -- conventions --topic lint-rules`
 - Phase A + B + C enables the full `session-prompt` subcommand
 
 No phase depends on all previous phases being perfect.
@@ -304,8 +304,8 @@ Pattern: DataAPIDesignSessionSupport | Phase: 44 | Status: active
 
 When this feature is complete, the following should be true:
 
-1. `pnpm process:query -- session-prompt <pattern> --type implement` produces a complete implementation prompt
-2. `pnpm process:query -- session-prompt <pattern> --type design` produces a complete design prompt
+1. `pnpm architect:query -- session-prompt <pattern> --type implement` produces a complete implementation prompt
+2. `pnpm architect:query -- session-prompt <pattern> --type design` produces a complete design prompt
 3. Convention content comes from decision records, not hardcoded strings
 4. Adding a new convention = creating/tagging a decision record (no code changes to prompt generator)
 5. Output uses `=== SECTION ===` text format (ADR-008 aligned)
@@ -318,7 +318,7 @@ When this feature is complete, the following should be true:
 This brief is ready for a **Planning Session** to create the roadmap spec:
 
 ```
-delivery-process/specs/SessionPromptGenerator.feature
+architect/specs/SessionPromptGenerator.feature
 ```
 
 If the design decisions above are accepted, the design session can be skipped (DD-1 through DD-5 cover the major architectural choices). If any decisions need revision, run a design session first to explore alternatives.
@@ -334,8 +334,8 @@ This Brief -> Planning Session -> Implementation Session (Phase A)
 **Context gathering for the planning session:**
 
 ```bash
-pnpm process:query -- overview
-pnpm process:query -- arch coverage
-pnpm process:query -- tags
-pnpm process:query -- decisions DataAPIDesignSessionSupport
+pnpm architect:query -- overview
+pnpm architect:query -- arch coverage
+pnpm architect:query -- tags
+pnpm architect:query -- decisions DataAPIDesignSessionSupport
 ```

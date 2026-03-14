@@ -8,7 +8,7 @@
  * - Scanner results
  * - Result monad validation
  *
- * @libar-docs
+ * @architect
  */
 
 import { expect } from 'vitest';

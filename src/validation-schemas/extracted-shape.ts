@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-pattern ExtractedShapeSchema
- * @libar-docs-status completed
- * @libar-docs-implements ShapeExtraction
+ * @architect
+ * @architect-pattern ExtractedShapeSchema
+ * @architect-status completed
+ * @architect-implements ShapeExtraction
  *
  * ## ExtractedShape Schema
  *
  * Zod schema for TypeScript type definitions extracted from source files
- * via the @libar-docs-extract-shapes tag.
+ * via the @architect-extract-shapes tag.
  *
  * ### When to Use
  *
@@ -103,7 +103,7 @@ export type ThrowsDoc = z.infer<typeof ThrowsDocSchema>;
  * A single extracted shape from TypeScript source.
  *
  * Represents an interface, type alias, enum, function signature, or const
- * that was extracted via @libar-docs-extract-shapes for documentation.
+ * that was extracted via @architect-extract-shapes for documentation.
  */
 export const ExtractedShapeSchema = z.object({
   /** Shape name (interface/type/enum/function name) */
@@ -133,10 +133,10 @@ export const ExtractedShapeSchema = z.object({
   /** Whether this is an exported shape */
   exported: z.boolean().default(true),
 
-  /** DD-5: Optional group name from @libar-docs-shape tag value */
+  /** DD-5: Optional group name from @architect-shape tag value */
   group: z.string().optional(),
 
-  /** DD-3: Cross-cutting document inclusion tags from @libar-docs-include CSV */
+  /** DD-3: Cross-cutting document inclusion tags from @architect-include CSV */
   includes: z.array(z.string().min(1)).readonly().optional(),
 
   /** For interfaces: JSDoc documentation for each property */

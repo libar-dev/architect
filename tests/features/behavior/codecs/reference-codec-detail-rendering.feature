@@ -1,10 +1,10 @@
-@libar-docs
+@architect
 @behavior @reference-codec
-@libar-docs-pattern:ReferenceCodecDetailRendering
-@libar-docs-status:completed
-@libar-docs-unlock-reason:'Split-from-original'
-@libar-docs-implements:ReferenceDocShowcase
-@libar-docs-product-area:Generation
+@architect-pattern:ReferenceCodecDetailRendering
+@architect-status:completed
+@architect-unlock-reason:'Split-from-original'
+@architect-implements:ReferenceDocShowcase
+@architect-product-area:Generation
 Feature: Reference Codec - Detail Level Rendering
 
   Standard detail level behavior, deep behavior rendering with structured

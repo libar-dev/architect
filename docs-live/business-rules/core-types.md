@@ -233,7 +233,7 @@ _- Raw errors lack context (no file path, line number, or pattern name)_
 
 - Errors include structured context
 - No console.warn bypasses error collection
-- Skip feature files without @libar-docs opt-in
+- Skip feature files without @architect opt-in
 
 ---
 

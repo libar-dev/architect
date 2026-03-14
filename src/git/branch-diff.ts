@@ -1,11 +1,11 @@
 /**
- * @libar-docs
- * @libar-docs-pattern GitBranchDiff
- * @libar-docs-status active
- * @libar-docs-arch-role utility
- * @libar-docs-arch-context generator
- * @libar-docs-arch-layer infrastructure
- * @libar-docs-used-by Orchestrator
+ * @architect
+ * @architect-pattern GitBranchDiff
+ * @architect-status active
+ * @architect-arch-role utility
+ * @architect-arch-context generator
+ * @architect-arch-layer infrastructure
+ * @architect-used-by Orchestrator
  *
  * ## GitBranchDiff - Pure Git Change Detection
  *

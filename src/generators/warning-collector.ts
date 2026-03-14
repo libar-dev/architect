@@ -1,8 +1,8 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern WarningCollector
- * @libar-docs-status completed
+ * @architect
+ * @architect-core
+ * @architect-pattern WarningCollector
+ * @architect-status completed
  *
  * ## Warning Collector - Unified Warning Handling
  *

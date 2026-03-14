@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:ComponentDiagramGeneration
-@libar-docs-status:completed
-@libar-docs-implements:ArchitectureDiagramGeneration
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:ComponentDiagramGeneration
+@architect-status:completed
+@architect-implements:ArchitectureDiagramGeneration
+@architect-product-area:Generation
 @architecture
 Feature: Component Diagram Generation
 
@@ -199,5 +199,5 @@ Feature: Component Diagram Generation
       Then the document contains elements:
         | text                        |
         | No Architecture Data        |
-        | @libar-docs-arch-role       |
+        | @architect-arch-role       |
 

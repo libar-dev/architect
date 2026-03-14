@@ -322,7 +322,7 @@ describeFeature(feature, ({ Background, Rule }) => {
           createTestPattern({ name: 'FeaturePattern', filePath: 'specs/handler.feature' }),
           createTestPattern({
             name: 'StubPattern',
-            filePath: 'delivery-process/stubs/handler/stub.ts',
+            filePath: 'architect/stubs/handler/stub.ts',
           })
         );
         buildDataset();

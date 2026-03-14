@@ -5,7 +5,7 @@
  * that the parseFileDirectives function correctly identifies all TypeScript
  * export declaration types.
  *
- * @libar-docs
+ * @architect
  */
 
 import {

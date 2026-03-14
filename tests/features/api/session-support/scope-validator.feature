@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:ScopeValidatorTests
-@libar-docs-status:completed
-@libar-docs-product-area:DataAPI
+@architect
+@architect-pattern:ScopeValidatorTests
+@architect-status:completed
+@architect-product-area:DataAPI
 Feature: Scope Validator - Pre-flight Session Readiness Checks
 
   **Problem:**

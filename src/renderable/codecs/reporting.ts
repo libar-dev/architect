@@ -1,10 +1,10 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern ReportingCodecs
- * @libar-docs-status completed
- * @libar-docs-convention codec-registry
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-core
+ * @architect-pattern ReportingCodecs
+ * @architect-status completed
+ * @architect-convention codec-registry
+ * @architect-product-area:Generation
  *
  * ## ChangelogCodec
  *
@@ -480,7 +480,7 @@ function buildOverviewDocument(
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
 
-  // Architecture overview from @libar-docs-overview patterns
+  // Architecture overview from @architect-overview patterns
   if (options.includeArchitecture) {
     const overviewPatterns = dataset.patterns.filter((p) =>
       p.directive.tags.some(

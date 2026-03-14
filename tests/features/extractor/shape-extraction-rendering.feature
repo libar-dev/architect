@@ -1,9 +1,9 @@
-@libar-docs
-@libar-docs-pattern:ShapeExtractionRenderingTesting
-@libar-docs-implements:ReferenceDocShowcase
-@libar-docs-status:completed
-@libar-docs-unlock-reason:'Split-from-original'
-@libar-docs-product-area:Annotation
+@architect
+@architect-pattern:ShapeExtractionRenderingTesting
+@architect-implements:ReferenceDocShowcase
+@architect-status:completed
+@architect-unlock-reason:'Split-from-original'
+@architect-product-area:Annotation
 Feature: TypeScript Shape Extraction - Rendering and Validation
 
   Validates the shape extraction system that extracts TypeScript type
@@ -160,7 +160,7 @@ Feature: TypeScript Shape Extraction - Rendering and Validation
 
   Rule: Annotation tags are stripped from extracted JSDoc while preserving standard tags
 
-    **Invariant:** Extracted shapes never contain @libar-docs-* annotation lines in their jsDoc field.
+    **Invariant:** Extracted shapes never contain @architect-* annotation lines in their jsDoc field.
 
     **Rationale:** Shape JSDoc is rendered in documentation output. Annotation tags are metadata
     for the extraction pipeline, not user-visible documentation content.
@@ -170,9 +170,9 @@ Feature: TypeScript Shape Extraction - Rendering and Validation
       Given TypeScript source code:
         """
         /**
-         * @libar-docs
-         * @libar-docs-pattern ShapeExtractor
-         * @libar-docs-status completed
+         * @architect
+         * @architect-pattern ShapeExtractor
+         * @architect-status completed
          */
         export interface OnlyTags {
           value: string;
@@ -186,8 +186,8 @@ Feature: TypeScript Shape Extraction - Rendering and Validation
       Given TypeScript source code:
         """
         /**
-         * @libar-docs
-         * @libar-docs-status active
+         * @architect
+         * @architect-status active
          *
          * Configuration for the pipeline.
          *
@@ -202,13 +202,13 @@ Feature: TypeScript Shape Extraction - Rendering and Validation
       Then the shape "MixedTags" jsDoc should contain "Configuration for the pipeline"
       And the shape "MixedTags" jsDoc should contain "@param timeout"
       And the shape "MixedTags" jsDoc should contain "@returns"
-      And the shape "MixedTags" jsDoc should not contain "@libar-docs"
+      And the shape "MixedTags" jsDoc should not contain "@architect"
 
     @acceptance-criteria @unit @edge-case
     Scenario: Single-line annotation-only JSDoc produces no jsDoc
       Given TypeScript source code:
         """
-        /** @libar-docs-shape Foo */
+        /** @architect-shape Foo */
         export interface SingleLine {
           id: string;
         }
@@ -221,8 +221,8 @@ Feature: TypeScript Shape Extraction - Rendering and Validation
       Given TypeScript source code:
         """
         /**
-         * @libar-docs
-         * @libar-docs-status roadmap
+         * @architect
+         * @architect-status roadmap
          *
          *
          * Useful description here.

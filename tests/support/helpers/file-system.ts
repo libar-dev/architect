@@ -4,7 +4,7 @@
  * Provides utilities for managing temporary directories and files
  * during scanner and CLI tests. Ensures proper cleanup after each scenario.
  *
- * @libar-docs
+ * @architect
  */
 
 import * as fs from 'node:fs/promises';
@@ -150,7 +150,7 @@ export async function listFiles(dir: string): Promise<string[]> {
 // =============================================================================
 
 /**
- * Create TypeScript source file content with @libar-docs directive.
+ * Create TypeScript source file content with @architect directive.
  *
  * @example
  * ```typescript
@@ -192,42 +192,42 @@ export function createTsFileWithDirective(options: {
 
   // File-level opt-in
   if (includeFileOptIn) {
-    lines.push('/** @libar-docs */');
+    lines.push('/** @architect */');
     lines.push('');
   }
 
   // Pattern directive
   lines.push('/**');
-  lines.push(` * @libar-docs-${category}`);
+  lines.push(` * @architect-${category}`);
 
   if (patternName) {
-    lines.push(` * @libar-docs-pattern ${patternName}`);
+    lines.push(` * @architect-pattern ${patternName}`);
   }
 
   if (status) {
-    lines.push(` * @libar-docs-status ${status}`);
+    lines.push(` * @architect-status ${status}`);
   }
 
   for (const useCase of useCases) {
-    lines.push(` * @libar-docs-usecase "${useCase}"`);
+    lines.push(` * @architect-usecase "${useCase}"`);
   }
 
   for (const uses_ of uses) {
-    lines.push(` * @libar-docs-uses ${uses_}`);
+    lines.push(` * @architect-uses ${uses_}`);
   }
 
   for (const usedBy_ of usedBy) {
-    lines.push(` * @libar-docs-used-by ${usedBy_}`);
+    lines.push(` * @architect-used-by ${usedBy_}`);
   }
 
   if (archRole) {
-    lines.push(` * @libar-docs-arch-role ${archRole}`);
+    lines.push(` * @architect-arch-role ${archRole}`);
   }
   if (archContext) {
-    lines.push(` * @libar-docs-arch-context ${archContext}`);
+    lines.push(` * @architect-arch-context ${archContext}`);
   }
   if (archLayer) {
-    lines.push(` * @libar-docs-arch-layer ${archLayer}`);
+    lines.push(` * @architect-arch-layer ${archLayer}`);
   }
 
   lines.push(' *');
@@ -244,11 +244,11 @@ export function createTsFileWithDirective(options: {
 }
 
 /**
- * Create a minimal TypeScript file without @libar-docs directive.
+ * Create a minimal TypeScript file without @architect directive.
  */
 export function createTsFileWithoutDirective(): string {
   return `/**
- * A regular TypeScript file without @libar-docs.
+ * A regular TypeScript file without @architect.
  */
 export interface RegularType {
   value: string;
@@ -257,7 +257,7 @@ export interface RegularType {
 }
 
 /**
- * Create a Gherkin feature file with @libar-docs-* tags.
+ * Create a Gherkin feature file with @architect-* tags.
  *
  * @example
  * ```typescript
@@ -292,12 +292,12 @@ export function createFeatureFile(options: {
 
   const lines: string[] = [];
 
-  // Process tags (using @libar-docs-* prefix per PDR-004)
-  lines.push(`@libar-docs-phase:${phase}`);
-  lines.push(`@libar-docs-status:${status}`);
-  lines.push(`@libar-docs-quarter:${quarter}`);
-  lines.push(`@libar-docs-effort:${effort}`);
-  lines.push(`@libar-docs-team:${team}`);
+  // Process tags (using @architect-* prefix per PDR-004)
+  lines.push(`@architect-phase:${phase}`);
+  lines.push(`@architect-status:${status}`);
+  lines.push(`@architect-quarter:${quarter}`);
+  lines.push(`@architect-effort:${effort}`);
+  lines.push(`@architect-team:${team}`);
   lines.push(`Feature: ${name}`);
   lines.push(`  ${description}`);
   lines.push('');

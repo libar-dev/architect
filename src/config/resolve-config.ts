@@ -1,24 +1,24 @@
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-config
- * @libar-docs-pattern ConfigResolver
- * @libar-docs-status active
- * @libar-docs-arch-layer application
- * @libar-docs-arch-context config
- * @libar-docs-arch-role service
- * @libar-docs-uses ProjectConfigTypes, DeliveryProcessFactory, ConfigurationDefaults
- * @libar-docs-used-by ConfigLoader
+ * @architect
+ * @architect-core @architect-config
+ * @architect-pattern ConfigResolver
+ * @architect-status active
+ * @architect-arch-layer application
+ * @architect-arch-context config
+ * @architect-arch-role service
+ * @architect-uses ProjectConfigTypes, ArchitectFactory, ConfigurationDefaults
+ * @architect-used-by ConfigLoader
  *
  * ## Config Resolution
  *
- * Resolves a raw `DeliveryProcessProjectConfig` into a fully-resolved `ResolvedConfig`
+ * Resolves a raw `ArchitectProjectConfig` into a fully-resolved `ResolvedConfig`
  * with all defaults applied, stubs merged into TypeScript sources, and context inference
  * rules prepended to defaults.
  *
  * ### Architecture
  *
  * ```
- * DeliveryProcessProjectConfig (user-authored)
+ * ArchitectProjectConfig (user-authored)
  *     |
  *     v
  * resolveProjectConfig() -- creates instance, merges sources, applies defaults
@@ -36,16 +36,16 @@
 
 import type { ContextInferenceRule } from '../generators/pipeline/context-inference.js';
 import type {
-  DeliveryProcessProjectConfig,
+  ArchitectProjectConfig,
   GeneratorSourceOverride,
   ResolvedConfig,
   ResolvedProjectConfig,
   ResolvedSourcesConfig,
 } from './project-config.js';
-import type { DeliveryProcessInstance } from './types.js';
+import type { ArchitectInstance } from './types.js';
 
 import { DEFAULT_CONTEXT_INFERENCE_RULES } from './defaults.js';
-import { createDeliveryProcess, type CreateDeliveryProcessOptions } from './factory.js';
+import { createArchitect, type CreateArchitectOptions } from './factory.js';
 
 /**
  * Resolves a raw project config into a fully-resolved config with all defaults applied.
@@ -63,11 +63,11 @@ import { createDeliveryProcess, type CreateDeliveryProcessOptions } from './fact
  * @returns Fully resolved configuration ready for use by orchestrator and CLIs
  */
 export function resolveProjectConfig(
-  raw: DeliveryProcessProjectConfig,
+  raw: ArchitectProjectConfig,
   options: { readonly configPath: string }
 ): ResolvedConfig {
   // 1. Create taxonomy instance from preset/override fields
-  const instanceOptions: CreateDeliveryProcessOptions = {};
+  const instanceOptions: CreateArchitectOptions = {};
   if (raw.preset !== undefined) {
     instanceOptions.preset = raw.preset;
   }
@@ -80,7 +80,7 @@ export function resolveProjectConfig(
   if (raw.categories !== undefined) {
     instanceOptions.categories = raw.categories;
   }
-  const instance: DeliveryProcessInstance = createDeliveryProcess(instanceOptions);
+  const instance: ArchitectInstance = createArchitect(instanceOptions);
 
   // 2. Resolve sources — merge stubs into typescript
   const typescript: readonly string[] = [
@@ -148,7 +148,7 @@ export function resolveProjectConfig(
  * @returns A default ResolvedConfig with empty sources and standard defaults
  */
 export function createDefaultResolvedConfig(): ResolvedConfig {
-  const instance: DeliveryProcessInstance = createDeliveryProcess();
+  const instance: ArchitectInstance = createArchitect();
 
   const sources: ResolvedSourcesConfig = {
     typescript: [],

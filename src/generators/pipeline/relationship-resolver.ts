@@ -1,12 +1,12 @@
 /**
- * @libar-docs
- * @libar-docs-pattern RelationshipResolver
- * @libar-docs-status active
- * @libar-docs-arch-role service
- * @libar-docs-arch-context generator
- * @libar-docs-arch-layer application
- * @libar-docs-used-by TransformDataset
- * @libar-docs-uses ExtractedPattern, RelationshipEntry, ImplementationRef, PatternHelpers
+ * @architect
+ * @architect-pattern RelationshipResolver
+ * @architect-status active
+ * @architect-arch-role service
+ * @architect-arch-context generator
+ * @architect-arch-layer application
+ * @architect-used-by TransformDataset
+ * @architect-uses ExtractedPattern, RelationshipEntry, ImplementationRef, PatternHelpers
  *
  * ## RelationshipResolver - Reverse Lookup and Dangling Reference Detection
  *

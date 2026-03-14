@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern PatternIdGenerator
- * @libar-docs-status completed
- * @libar-docs-used-by DocExtractor, GherkinExtractor
+ * @architect
+ * @architect-core
+ * @architect-pattern PatternIdGenerator
+ * @architect-status completed
+ * @architect-used-by DocExtractor, GherkinExtractor
  *
  * ## Pattern ID Generator - Deterministic ID Generation
  *

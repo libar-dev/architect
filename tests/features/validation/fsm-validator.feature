@@ -1,10 +1,10 @@
-@libar-docs
-@libar-docs-implements:PhaseStateMachineValidation
+@architect
+@architect-implements:PhaseStateMachineValidation
 @behavior @fsm-validation
-@libar-docs-pattern:FSMValidatorTesting
-@libar-docs-status:completed
-@libar-docs-product-area:Validation
-@libar-docs-depends-on:FSMTransitions,FSMStates
+@architect-pattern:FSMValidatorTesting
+@architect-status:completed
+@architect-product-area:Validation
+@architect-depends-on:FSMTransitions,FSMStates
 Feature: Phase State Machine Validation
   Pure validation functions for the 4-state FSM defined in PDR-005.
   All validation follows the Decider pattern: no I/O, no side effects.
@@ -146,7 +146,7 @@ Feature: Phase State Machine Validation
       Given a pattern with status "completed"
       When validating completion metadata
       Then validation passes
-      And warnings include "missing @libar-docs-completed date"
+      And warnings include "missing @architect-completed date"
 
     @edge-case
     Scenario: Completed pattern with planned but no actual effort shows warning
@@ -155,7 +155,7 @@ Feature: Phase State Machine Validation
       And the pattern has effort planned "4h"
       When validating completion metadata
       Then validation passes
-      And warnings include "missing @libar-docs-effort-actual"
+      And warnings include "missing @architect-effort-actual"
 
     @happy-path
     Scenario: Non-completed pattern skips metadata validation

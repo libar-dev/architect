@@ -65,7 +65,7 @@ curated content is maintained alongside generated reference material.
 
 ### Master Roadmap: DocsConsolidationStrategy
 
-**Spec:** `delivery-process/specs/docs-consolidation-strategy.feature`
+**Spec:** `architect/specs/docs-consolidation-strategy.feature`
 **Status:** roadmap | **Phase:** 35 | **Depends on:** CodecDrivenReferenceGeneration (completed)
 
 This is the **canonical plan** for the entire consolidation initiative. It defines a
@@ -118,7 +118,7 @@ generated equivalents. Work packages in this gap analysis should map to its phas
 | `reference-doc-showcase.feature`             | ReferenceDocShowcase            | completed | 30    | All 9 content block types across 3 detail levels |
 | `validator-read-model-consolidation.feature` | ValidatorReadModelConsolidation | completed | 100   | MasterDataset as single read model (ADR-006)     |
 
-**Query these specs:** `pnpm process:query -- decisions DocsConsolidationStrategy`
+**Query these specs:** `pnpm architect:query -- decisions DocsConsolidationStrategy`
 
 ### Completed Foundation Work
 
@@ -131,7 +131,7 @@ The following capabilities are already in place and available for new work:
 - **9 content block types** -- headings, paragraphs, tables, code, mermaid, lists, sections,
   metadata, collapsible (all exercised in REFERENCE-SAMPLE.md)
 - **CLI schema extraction** -- `src/cli/cli-schema.ts` drives both help text and doc generation
-- **Convention tag mechanism** -- `@libar-docs-convention` annotations compose into reference docs
+- **Convention tag mechanism** -- `@architect-convention` annotations compose into reference docs
 - **Product area meta with diagram scopes** -- C4Context + graph LR per area
 
 ---
@@ -147,11 +147,11 @@ is defined in DocsConsolidationStrategy Rule 1 and implemented by CodecDrivenRef
 Step 1: Register convention tag value in src/taxonomy/conventions.ts
           e.g., 'codec-registry', 'pipeline-architecture', 'taxonomy-rules'
 
-Step 2: Annotate source files with @libar-docs-convention:<value>
+Step 2: Annotate source files with @architect-convention:<value>
           TypeScript: JSDoc blocks with structured content
           Gherkin: Rule: blocks with Invariant/Rationale markers
 
-Step 3: Add ReferenceDocConfig in delivery-process.config.ts
+Step 3: Add ReferenceDocConfig in architect.config.ts
           {
             title: 'Available Codecs Reference',
             conventionTags: ['codec-registry'],     // <-- matches step 2
@@ -178,7 +178,7 @@ Step 5: Replace manual doc section with pointer to generated output
 | Include tags           | `includeTags`                     | Filter patterns by tag for scoped reference                              |
 | Editorial preamble     | `preamble`                        | Hand-authored SectionBlock[] prepended to output                         |
 
-### Existing Convention Tags (from delivery-process.config.ts)
+### Existing Convention Tags (from architect.config.ts)
 
 | Tag Value               | Used By                | Produces                             |
 | ----------------------- | ---------------------- | ------------------------------------ |
@@ -191,7 +191,7 @@ Step 5: Replace manual doc section with pointer to generated output
 To consolidate a manual doc section, a design session needs to decide:
 
 1. **Which convention tag value** to register (or reuse existing)
-2. **Which source files** to annotate with `@libar-docs-convention:<value>`
+2. **Which source files** to annotate with `@architect-convention:<value>`
 3. **What content structure** the JSDoc/Gherkin annotations should use
 4. **Which ReferenceDocConfig fields** to populate (shapes? diagrams? behaviors?)
 5. **Whether preamble** is needed for editorial context that can't be annotated
@@ -207,7 +207,7 @@ should follow the same recipe.
 ### Directory Layout After Commit 223ace6
 
 ```
-delivery-process/
+architect/
   docs/              11 manual files (~4,985 lines)  -- human-authored reference
   docs-live/         48 generated files (~20,548 lines) -- auto-generated, committed
   docs-generated/    empty after pnpm docs:all       -- gitignored build cache
@@ -268,7 +268,7 @@ sync-content.mjs
     docs/           -> guides/ + reference/     (manual docs)
     docs-live/      -> product-areas/ + decisions/  (generated)
     docs-generated/ -> generated/               (business-rules, taxonomy)
-  output: src/content/docs/delivery-process/
+  output: src/content/docs/architect/
 ```
 
 ### Website Section Structure (from content-manifest.mjs)
@@ -551,7 +551,7 @@ This replaces the manual PROCESS-GUARD.md "Error Messages and Fixes" section.
 
 - Enhance `ValidationRulesCodec` or create separate `ErrorGuideCodec`?
 - Convention tag approach: annotate error-handling code in `src/lint/` with
-  `@libar-docs-convention:process-guard-errors`, or use existing behavior extraction?
+  `@architect-convention:process-guard-errors`, or use existing behavior extraction?
 - Preamble for Husky/CI setup content that can't come from annotations?
 
 ### WP-6: Create CLI Recipe Codec (P2)
@@ -587,7 +587,7 @@ restructure, pending) and Phase 39 (Session workflow module generation, pending 
 blocked on ClaudeModuleGeneration Phase 25). Also relates to Phase 5 (Guide trimming).
 
 **Note on Phase 39:** The session-guides-module-source.feature spec already has
-`@libar-docs-claude-module` and `@libar-docs-claude-section:workflow` tags. Once
+`@architect-claude-module` and `@architect-claude-section:workflow` tags. Once
 Phase 25 ships ClaudeModuleCodec, the CLAUDE.md session section auto-generates.
 This WP addresses the **public-facing** SESSION-GUIDES.md, not the AI context version.
 
@@ -628,7 +628,7 @@ The master spec already decided to keep it. Design session should confirm and de
 
 **Recommendation:** Option 1, with option 2 as enhancement. The philosophy is
 inherently editorial, but encoding core thesis as Rule: blocks would make it
-queryable (`pnpm process:query -- rules --pattern Methodology`) without replacing
+queryable (`pnpm architect:query -- rules --pattern Methodology`) without replacing
 the human-readable prose.
 
 ### WP-9: Quality Polish for Website Publication (P1)

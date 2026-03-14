@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:ProcessApiCliDryRun
-@libar-docs-implements:DataAPICLIErgonomics
-@libar-docs-status:active
-@libar-docs-product-area:DataAPI
+@architect
+@architect-pattern:ProcessApiCliDryRun
+@architect-implements:DataAPICLIErgonomics
+@architect-status:active
+@architect-product-area:DataAPI
 @cli @process-api @dry-run
 Feature: Process API CLI - Dry Run
   Dry-run mode shows pipeline scope without processing data.

@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:DecisionDocCodecTesting
-@libar-docs-implements:DecisionDocCodec
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:DecisionDocCodecTesting
+@architect-implements:DecisionDocCodec
+@architect-status:completed
+@architect-product-area:Generation
 Feature: Decision Document Codec
 
   Validates the Decision Doc Codec that parses decision documents (ADR/PDR
