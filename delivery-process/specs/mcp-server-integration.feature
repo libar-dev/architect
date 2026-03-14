@@ -70,7 +70,7 @@ Feature: MCP Server Integration
       Then the file watcher is stopped
       And the process exits with code 0
 
-    @acceptance-criteria @edge-case @libar-docs-sequence-error
+    @acceptance-criteria @edge-case
     Scenario: Server starts with explicit input globs
       Given the MCP server is started with args "--input src/**/*.ts --features specs/**/*.feature"
       When the client sends an MCP initialize request
@@ -164,7 +164,7 @@ Feature: MCP Server Integration
       Then the server serializes the rebuild work
       And the final in-memory session is the newest rebuilt dataset
 
-    @acceptance-criteria @edge-case @libar-docs-sequence-error
+    @acceptance-criteria @edge-case
     Scenario: Concurrent reads during rebuild use previous dataset
       Given a rebuild is in progress
       When a tool call arrives for "dp_status"

@@ -6,6 +6,7 @@
  * lifecycle, file watcher filtering, CLI parsing, and output formatting.
  *
  * @libar-docs
+ * @libar-docs-uses MCPServerImpl, MCPPipelineSession, MCPToolRegistry, MCPFileWatcher
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

@@ -98,20 +98,26 @@ export async function startMcpServer(options: McpServerOptions = {}): Promise<vo
     fileWatcher.start();
   }
 
-  // Handle shutdown
-  const cleanup = async (): Promise<void> => {
-    log('Shutting down...');
-    if (fileWatcher !== null) {
-      await fileWatcher.stop();
-    }
-    await server.close();
-    log('Shutdown complete');
+  // Handle shutdown — idempotent guard prevents double-close races
+  // when multiple signals/EOF fire concurrently.
+  let cleanupPromise: Promise<void> | null = null;
+  const cleanup = (): Promise<void> => {
+    if (cleanupPromise !== null) return cleanupPromise;
+    cleanupPromise = (async (): Promise<void> => {
+      log('Shutting down...');
+      if (fileWatcher !== null) {
+        await fileWatcher.stop();
+      }
+      await server.close();
+      log('Shutdown complete');
+    })();
+    return cleanupPromise;
   };
 
-  process.on('SIGINT', () => {
+  process.once('SIGINT', () => {
     void cleanup().then(() => process.exit(0));
   });
-  process.on('SIGTERM', () => {
+  process.once('SIGTERM', () => {
     void cleanup().then(() => process.exit(0));
   });
 
@@ -122,7 +128,7 @@ export async function startMcpServer(options: McpServerOptions = {}): Promise<vo
 
   // Tear down file watcher when client disconnects (stdin EOF).
   // Without this, chokidar holds the event loop open indefinitely.
-  process.stdin.on('end', () => {
+  process.stdin.once('end', () => {
     log('Client disconnected (stdin closed)');
     void cleanup().then(() => process.exit(0));
   });

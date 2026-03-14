@@ -4,7 +4,6 @@
  * Shared state and mock infrastructure for MCP server tests.
  *
  * @libar-docs
- * @libar-docs-depends-on MCPServerIntegration
  * @libar-docs-uses MCPPipelineSession, ProcessStateAPI, TagRegistry
  */
 
