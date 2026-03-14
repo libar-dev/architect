@@ -9,7 +9,7 @@
 - Branded nominal types: `Branded<T, Brand>` creates compile-time distinct types from structural TypeScript. Prevents mixing `PatternId` with `CategoryName` even though both are `string` at runtime
 - String transformation consistency: `slugify` produces URL-safe identifiers, `camelCaseToTitleCase` preserves acronyms (e.g., "APIEndpoint" becomes "API Endpoint"), `toKebabCase` handles consecutive uppercase correctly
 
-**Components:** Other (StringUtils, ResultMonad, ErrorFactories, KebabCaseSlugs, ErrorHandlingUnification)
+**Components:** Other (StringUtils, FileCacheTesting, TagRegistryBuilderTesting, ResultMonad, NormalizedStatusTesting, ErrorFactories, DeliverableStatusTaxonomyTesting, KebabCaseSlugs, ErrorHandlingUnification)
 
 #### API Types
 

@@ -5,6 +5,81 @@
 
 ---
 
+## Quick Reference
+
+### Protection Levels
+
+| Status      | Level | Allowed                    | Blocked                               |
+| ----------- | ----- | -------------------------- | ------------------------------------- |
+| `roadmap`   | none  | Full editing               | -                                     |
+| `deferred`  | none  | Full editing               | -                                     |
+| `active`    | scope | Edit existing deliverables | Adding new deliverables               |
+| `completed` | hard  | Nothing                    | Any change without `@*-unlock-reason` |
+
+### Valid Transitions
+
+| From        | To                     | Notes                            |
+| ----------- | ---------------------- | -------------------------------- |
+| `roadmap`   | `active`, `deferred`   | Start work or postpone           |
+| `active`    | `completed`, `roadmap` | Finish or regress if blocked     |
+| `deferred`  | `roadmap`              | Resume planning                  |
+| `completed` | _(none)_               | Terminal -- use unlock to modify |
+
+### Escape Hatches
+
+| Situation                     | Solution                           | Example                                       |
+| ----------------------------- | ---------------------------------- | --------------------------------------------- |
+| Fix bug in completed spec     | Add `@*-unlock-reason:'reason'`    | `@libar-docs-unlock-reason:'Fix typo'`        |
+| Modify outside session scope  | `--ignore-session` flag            | `lint-process --staged --ignore-session`      |
+| CI treats warnings as errors  | `--strict` flag                    | `lint-process --all --strict`                 |
+| Skip workflow (legacy import) | Multiple transitions in one commit | Set `roadmap` then `completed` in same commit |
+
+---
+
+## CLI Usage
+
+```bash
+lint-process [options]
+```
+
+### Modes
+
+| Flag       | Description                       | Use Case           |
+| ---------- | --------------------------------- | ------------------ |
+| `--staged` | Validate staged changes (default) | Pre-commit hooks   |
+| `--all`    | Validate all changes vs main      | CI/CD pipelines    |
+| `--files`  | Validate specific files           | Development checks |
+
+### Options
+
+| Flag                | Description                            |
+| ------------------- | -------------------------------------- |
+| `--strict`          | Treat warnings as errors (exit 1)      |
+| `--ignore-session`  | Skip session scope rules               |
+| `--show-state`      | Debug: show derived process state      |
+| `--format json`     | Machine-readable output                |
+| `-f, --file <path>` | Specific file to validate (repeatable) |
+| `-b, --base-dir`    | Base directory for file resolution     |
+
+### Exit Codes
+
+| Code | Meaning                                      |
+| ---- | -------------------------------------------- |
+| `0`  | No errors (warnings allowed unless --strict) |
+| `1`  | Errors found                                 |
+
+### Examples
+
+```bash
+lint-process --staged                        # Pre-commit hook (recommended)
+lint-process --all --strict                  # CI pipeline with strict mode
+lint-process --file specs/my-feature.feature # Validate specific file
+lint-process --staged --show-state           # Debug: see derived state
+lint-process --staged --ignore-session       # Override session scope
+```
+
+---
+
 ## Pre-commit Setup
 
 Configure Process Guard as a pre-commit hook using Husky.
@@ -26,6 +101,8 @@ npx lint-process --staged
   }
 }
 ```
+
+---
 
 ## Programmatic API
 
@@ -70,6 +147,8 @@ if (hasErrors(result)) {
 | Validate | validateChanges(input)   | Run all validation rules          |
 | Results  | hasErrors(result)        | Check for blocking errors         |
 | Results  | summarizeResult(result)  | Human-readable summary            |
+
+---
 
 ## Architecture
 

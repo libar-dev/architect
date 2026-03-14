@@ -11,10 +11,8 @@
 import { expect } from 'vitest';
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 
-import {
-  transformToMasterDataset,
-  type RuntimeMasterDataset,
-} from '../../../src/generators/pipeline/transform-dataset.js';
+import type { RuntimeMasterDataset } from '../../../src/generators/pipeline/transform-types.js';
+import { transformToMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
 import { createDefaultTagRegistry, createTestPattern } from '../../fixtures/dataset-factories.js';
 import type { DataTableRow } from '../../support/world.js';

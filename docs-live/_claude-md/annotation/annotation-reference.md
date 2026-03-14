@@ -98,6 +98,89 @@ For Zod files, extract the **schema constant** (with `Schema` suffix), not the i
 | `@extract-shapes MasterDataset`          | `@extract-shapes MasterDatasetSchema`     |
 | Shows: `z.infer<typeof ...>` (unhelpful) | Shows: `z.object({...})` (full structure) |
 
+#### Annotation Patterns by File Type
+
+##### Zod Schema Files
+
+```typescript
+/**
+ * @libar-docs
+ * @libar-docs-pattern MasterDataset
+ * @libar-docs-status completed
+ * @libar-docs-extract-shapes MasterDatasetSchema, StatusGroupsSchema, PhaseGroupSchema
+ */
+```
+
+##### Interface / Type Files
+
+```typescript
+/**
+ * @libar-docs
+ * @libar-docs-pattern DocumentGenerator
+ * @libar-docs-status completed
+ * @libar-docs-extract-shapes DocumentGenerator, GeneratorContext, GeneratorOutput
+ */
+```
+
+##### Function / Service Files
+
+```typescript
+/**
+ * @libar-docs
+ * @libar-docs-pattern TransformDataset
+ * @libar-docs-status completed
+ * @libar-docs-arch-context generator
+ * @libar-docs-arch-layer application
+ * @libar-docs-extract-shapes transformToMasterDataset, RuntimeMasterDataset
+ */
+```
+
+##### Gherkin Feature Files
+
+```gherkin
+@libar-docs
+@libar-docs-pattern:ProcessGuardLinter
+@libar-docs-status:roadmap
+@libar-docs-phase:99
+@libar-docs-depends-on:StateMachine,ValidationRules
+Feature: Process Guard Linter
+
+  Background: Deliverables
+    Given the following deliverables:
+      | Deliverable      | Status  | Location             |
+      | State derivation | Pending | src/lint/derive.ts   |
+
+  Rule: Completed specs require unlock reason
+
+    **Invariant:** A completed spec cannot be modified without explicit unlock.
+    **Rationale:** Prevents accidental regression of validated work.
+
+    @acceptance-criteria @happy-path
+    Scenario: Reject modification without unlock
+      Given a spec with status "completed"
+      When I modify a deliverable
+      Then validation fails with "completed-protection"
+```
+
+#### Tag Groups Quick Reference
+
+Tags are organized into 12 functional groups. For the complete reference with all values, see the generated [Taxonomy Reference](../docs-live/TAXONOMY.md).
+
+| Group            | Tags (representative)                                | Format Types              |
+| ---------------- | ---------------------------------------------------- | ------------------------- |
+| **Core**         | `pattern`, `status`, `core`, `brief`                 | value, enum, flag         |
+| **Relationship** | `uses`, `used-by`, `implements`, `depends-on`        | csv, value                |
+| **Process**      | `phase`, `quarter`, `effort`, `team`, `priority`     | number, value, enum       |
+| **PRD**          | `product-area`, `user-role`, `business-value`        | value                     |
+| **ADR**          | `adr`, `adr-status`, `adr-category`, `adr-theme`     | value, enum               |
+| **Hierarchy**    | `level`, `parent`, `title`                           | enum, value, quoted-value |
+| **Traceability** | `executable-specs`, `roadmap-spec`, `behavior-file`  | csv, value                |
+| **Discovery**    | `discovered-gap`, `discovered-improvement`           | value (repeatable)        |
+| **Architecture** | `arch-role`, `arch-context`, `arch-layer`, `include` | enum, value, csv          |
+| **Extraction**   | `extract-shapes`, `shape`                            | csv, value                |
+| **Stub**         | `target`, `since`                                    | value                     |
+| **Convention**   | `convention`                                         | csv (enum values)         |
+
 #### Verification
 
 ##### CLI Commands

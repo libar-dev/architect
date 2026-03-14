@@ -17,7 +17,7 @@ import {
 } from '../../fixtures/dataset-factories.js';
 import type { CodecOptions } from '../../../src/renderable/generate.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
-import type { RuntimeMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
+import type { RuntimeMasterDataset } from '../../../src/generators/pipeline/transform-types.js';
 import type { OutputFile } from '../../../src/renderable/render.js';
 import type { DataTableRow } from '../../support/world.js';
 

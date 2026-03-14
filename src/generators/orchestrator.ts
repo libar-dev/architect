@@ -61,7 +61,7 @@ import type { GeneratorContext } from './types.js';
 import type { Result } from '../types/index.js';
 import { Result as R } from '../types/index.js';
 import { buildMasterDataset } from './pipeline/index.js';
-import { detectBranchChanges, getAllChangedFiles } from '../lint/process-guard/detect-changes.js';
+import { getChangedFilesList } from '../git/index.js';
 import type { CodecOptions } from '../renderable/generate.js';
 import { registerReferenceGenerators } from './built-in/reference-generators.js';
 
@@ -333,10 +333,10 @@ export async function generateDocumentation(
     let changedFiles = options.changedFiles;
 
     if (!changedFiles && options.gitDiffBase) {
-      const detectionResult = detectBranchChanges(baseDir, options.gitDiffBase);
+      const detectionResult = getChangedFilesList(baseDir, options.gitDiffBase);
       if (detectionResult.ok) {
         // Filter for relevant file types (source, tests, specs, features)
-        changedFiles = getAllChangedFiles(detectionResult.value).filter(
+        changedFiles = detectionResult.value.filter(
           (f) =>
             f.endsWith('.ts') ||
             f.endsWith('.tsx') ||

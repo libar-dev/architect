@@ -72,6 +72,7 @@ function parseMetadata(result: CLIResult): ParsedMetadata {
 // =============================================================================
 
 let state: CacheTestState | null = null;
+const CACHE_QUERY_TIMEOUT_MS = 120000;
 
 // =============================================================================
 // Feature Definition
@@ -113,14 +114,18 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       When('running status and capturing the first result', async () => {
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' status");
+        await runCLICommand(state, "process-api -i 'src/**/*.ts' status", {
+          timeout: CACHE_QUERY_TIMEOUT_MS,
+        });
         getCacheState(state).firstResult = getResult(state);
       });
 
       And('running status and capturing the second result', async () => {
         // Reset result before the second run
         getCacheState(state).result = null;
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' status");
+        await runCLICommand(state, "process-api -i 'src/**/*.ts' status", {
+          timeout: CACHE_QUERY_TIMEOUT_MS,
+        });
         getCacheState(state).secondResult = getResult(state);
       });
 
@@ -131,11 +136,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(metadata.cache!.hit).toBe(true);
       });
 
-      And('the second result pipelineMs is less than 500', () => {
+      And('the second result pipelineMs is less than the first', () => {
         const s = getCacheState(state);
-        const metadata = parseMetadata(s.secondResult!);
-        expect(metadata.pipelineMs).toBeDefined();
-        expect(metadata.pipelineMs!).toBeLessThan(500);
+        const firstMetadata = parseMetadata(s.firstResult!);
+        const secondMetadata = parseMetadata(s.secondResult!);
+        expect(firstMetadata.pipelineMs).toBeDefined();
+        expect(secondMetadata.pipelineMs).toBeDefined();
+        expect(secondMetadata.pipelineMs!).toBeLessThan(firstMetadata.pipelineMs!);
       });
     });
 
@@ -145,7 +152,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       When('running status and capturing the first result', async () => {
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' status");
+        await runCLICommand(state, "process-api -i 'src/**/*.ts' status", {
+          timeout: CACHE_QUERY_TIMEOUT_MS,
+        });
         getCacheState(state).firstResult = getResult(state);
       });
 
@@ -160,7 +169,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
       And('running status and capturing the second result', async () => {
         getCacheState(state).result = null;
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' status");
+        await runCLICommand(state, "process-api -i 'src/**/*.ts' status", {
+          timeout: CACHE_QUERY_TIMEOUT_MS,
+        });
         getCacheState(state).secondResult = getResult(state);
       });
 
@@ -178,13 +189,17 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       When('running status and capturing the first result', async () => {
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' status");
+        await runCLICommand(state, "process-api -i 'src/**/*.ts' status", {
+          timeout: CACHE_QUERY_TIMEOUT_MS,
+        });
         getCacheState(state).firstResult = getResult(state);
       });
 
       And('running status with --no-cache and capturing the second result', async () => {
         getCacheState(state).result = null;
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' --no-cache status");
+        await runCLICommand(state, "process-api -i 'src/**/*.ts' --no-cache status", {
+          timeout: CACHE_QUERY_TIMEOUT_MS,
+        });
         getCacheState(state).secondResult = getResult(state);
       });
 

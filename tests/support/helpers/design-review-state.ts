@@ -16,10 +16,8 @@ import type {
 import type { RenderableDocument } from '../../../src/renderable/schema.js';
 import { getSequenceEntry } from '../../../src/api/pattern-helpers.js';
 import { buildSequenceIndexEntry } from '../../../src/generators/pipeline/sequence-utils.js';
-import {
-  transformToMasterDatasetWithValidation,
-  type ValidationSummary,
-} from '../../../src/generators/pipeline/transform-dataset.js';
+import type { ValidationSummary } from '../../../src/generators/pipeline/transform-types.js';
+import { transformToMasterDatasetWithValidation } from '../../../src/generators/pipeline/transform-dataset.js';
 import { createDesignReviewCodec } from '../../../src/renderable/codecs/design-review.js';
 import { renderToMarkdown } from '../../../src/renderable/render.js';
 import { createDefaultTagRegistry } from '../../../src/validation-schemas/tag-registry.js';

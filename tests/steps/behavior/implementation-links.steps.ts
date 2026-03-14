@@ -13,7 +13,7 @@ import { createPatternsCodec, normalizeImplPath } from '../../../src/renderable/
 import { transformToMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
 import { createDefaultTagRegistry } from '../../../src/validation-schemas/tag-registry.js';
 import type { RenderableDocument } from '../../../src/renderable/schema.js';
-import type { RuntimeMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
+import type { RuntimeMasterDataset } from '../../../src/generators/pipeline/transform-types.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
 import { createTestPattern, resetPatternCounter } from '../../fixtures/pattern-factories.js';
 import type { DataTableRow } from '../../support/world.js';

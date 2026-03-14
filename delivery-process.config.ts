@@ -26,6 +26,22 @@ const indexNavigationPreamble = loadPreambleFromMarkdown(
   'docs-sources/index-navigation.md'
 );
 
+const processGuardPreamble = loadPreambleFromMarkdown(
+  'docs-sources/process-guard.md'
+);
+
+const configurationGuidePreamble = loadPreambleFromMarkdown(
+  'docs-sources/configuration-guide.md'
+);
+
+const validationToolsGuidePreamble = loadPreambleFromMarkdown(
+  'docs-sources/validation-tools-guide.md'
+);
+
+const gherkinPatternsPreamble = loadPreambleFromMarkdown(
+  'docs-sources/gherkin-patterns.md'
+);
+
 // DD-2: Document entries configured statically, not via filesystem discovery.
 // All paths are relative to docs-live/ (where INDEX.md is generated).
 const INDEX_DOCUMENT_ENTRIES: readonly DocumentEntry[] = [
@@ -46,6 +62,9 @@ const INDEX_DOCUMENT_ENTRIES: readonly DocumentEntry[] = [
   { title: 'Process Guard Reference', path: 'reference/PROCESS-GUARD-REFERENCE.md', description: 'Pre-commit hooks, error codes, programmatic API', audience: 'Team Leads', topic: 'Reference Guides' },
   { title: 'Architecture Codecs', path: 'reference/ARCHITECTURE-CODECS.md', description: 'All codecs with factory patterns and options', audience: 'Developers', topic: 'Reference Guides' },
   { title: 'Architecture Types', path: 'reference/ARCHITECTURE-TYPES.md', description: 'MasterDataset interface and type shapes', audience: 'Developers', topic: 'Reference Guides' },
+  { title: 'Configuration Guide', path: 'reference/CONFIGURATION-GUIDE.md', description: 'Presets, config files, sources, output, and monorepo setup', audience: 'Users', topic: 'Reference Guides' },
+  { title: 'Validation Tools Guide', path: 'reference/VALIDATION-TOOLS-GUIDE.md', description: 'lint-patterns, lint-steps, lint-process, validate-patterns reference', audience: 'CI/CD', topic: 'Reference Guides' },
+  { title: 'Gherkin Authoring Guide', path: 'reference/GHERKIN-AUTHORING-GUIDE.md', description: 'Roadmap specs, Rule blocks, DataTables, tag conventions', audience: 'Developers', topic: 'Reference Guides' },
   // --- Product Area Details ---
   { title: 'Annotation', path: 'product-areas/ANNOTATION.md', description: 'Annotation product area patterns and statistics', audience: 'Developers', topic: 'Product Area Details' },
   { title: 'Configuration', path: 'product-areas/CONFIGURATION.md', description: 'Configuration product area patterns and statistics', audience: 'Users', topic: 'Product Area Details' },
@@ -84,121 +103,7 @@ export default defineConfig({
       claudeMdSection: 'validation',
       docsFilename: 'PROCESS-GUARD-REFERENCE.md',
       claudeMdFilename: 'process-guard.md',
-      preamble: [
-        // --- Pre-commit Setup ---
-        {
-          type: 'heading' as const,
-          level: 2,
-          text: 'Pre-commit Setup',
-        },
-        {
-          type: 'paragraph' as const,
-          text: 'Configure Process Guard as a pre-commit hook using Husky.',
-        },
-        {
-          type: 'code' as const,
-          language: 'bash',
-          content:
-            '#!/usr/bin/env sh\n. "$(dirname -- "$0")/_/husky.sh"\n\nnpx lint-process --staged',
-        },
-        {
-          type: 'heading' as const,
-          level: 3,
-          text: 'package.json Scripts',
-        },
-        {
-          type: 'code' as const,
-          language: 'json',
-          content: JSON.stringify(
-            {
-              scripts: {
-                'lint:process': 'lint-process --staged',
-                'lint:process:ci': 'lint-process --all --strict',
-              },
-            },
-            null,
-            2
-          ),
-        },
-        // --- Programmatic API ---
-        {
-          type: 'heading' as const,
-          level: 2,
-          text: 'Programmatic API',
-        },
-        {
-          type: 'paragraph' as const,
-          text: 'Use Process Guard programmatically for custom validation workflows.',
-        },
-        {
-          type: 'code' as const,
-          language: 'typescript',
-          content: [
-            "import {",
-            "  deriveProcessState,",
-            "  detectStagedChanges,",
-            "  validateChanges,",
-            "  hasErrors,",
-            "  summarizeResult,",
-            "} from '@libar-dev/delivery-process/lint';",
-            "",
-            "// 1. Derive state from annotations",
-            "const state = (await deriveProcessState({ baseDir: '.' })).value;",
-            "",
-            "// 2. Detect changes",
-            "const changes = detectStagedChanges('.').value;",
-            "",
-            "// 3. Validate",
-            "const { result } = validateChanges({",
-            "  state,",
-            "  changes,",
-            "  options: { strict: false, ignoreSession: false },",
-            "});",
-            "",
-            "// 4. Handle results",
-            "if (hasErrors(result)) {",
-            "  console.log(summarizeResult(result));",
-            "  process.exit(1);",
-            "}",
-          ].join('\n'),
-        },
-        {
-          type: 'heading' as const,
-          level: 3,
-          text: 'API Functions',
-        },
-        {
-          type: 'table' as const,
-          columns: ['Category', 'Function', 'Description'],
-          rows: [
-            ['State', 'deriveProcessState(cfg)', 'Build state from file annotations'],
-            ['Changes', 'detectStagedChanges(dir)', 'Parse staged git diff'],
-            ['Changes', 'detectBranchChanges(dir)', 'Parse all changes vs main'],
-            ['Validate', 'validateChanges(input)', 'Run all validation rules'],
-            ['Results', 'hasErrors(result)', 'Check for blocking errors'],
-            ['Results', 'summarizeResult(result)', 'Human-readable summary'],
-          ],
-        },
-        // --- Architecture ---
-        {
-          type: 'heading' as const,
-          level: 2,
-          text: 'Architecture',
-        },
-        {
-          type: 'paragraph' as const,
-          text: 'Process Guard uses the Decider pattern: pure functions with no I/O.',
-        },
-        {
-          type: 'mermaid' as const,
-          content: [
-            'graph LR',
-            '    A[deriveProcessState] --> C[validateChanges]',
-            '    B[detectChanges] --> C',
-            '    C --> D[ValidationResult]',
-          ].join('\n'),
-        },
-      ],
+      preamble: [...processGuardPreamble],
     },
     {
       title: 'Available Codecs Reference',
@@ -291,6 +196,36 @@ export default defineConfig({
       docsFilename: 'ANNOTATION-REFERENCE.md',
       claudeMdFilename: 'annotation-reference.md',
       preamble: [...annotationGuidePreamble],
+    },
+    {
+      title: 'Configuration Guide',
+      conventionTags: [],
+      shapeSources: [],
+      behaviorCategories: [],
+      claudeMdSection: 'configuration',
+      docsFilename: 'CONFIGURATION-GUIDE.md',
+      claudeMdFilename: 'configuration-guide.md',
+      preamble: [...configurationGuidePreamble],
+    },
+    {
+      title: 'Validation Tools Guide',
+      conventionTags: [],
+      shapeSources: [],
+      behaviorCategories: [],
+      claudeMdSection: 'validation',
+      docsFilename: 'VALIDATION-TOOLS-GUIDE.md',
+      claudeMdFilename: 'validation-tools-guide.md',
+      preamble: [...validationToolsGuidePreamble],
+    },
+    {
+      title: 'Gherkin Authoring Guide',
+      conventionTags: [],
+      shapeSources: [],
+      behaviorCategories: [],
+      claudeMdSection: 'authoring',
+      docsFilename: 'GHERKIN-AUTHORING-GUIDE.md',
+      claudeMdFilename: 'gherkin-authoring-guide.md',
+      preamble: [...gherkinPatternsPreamble],
     },
   ],
   generatorOverrides: {

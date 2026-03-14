@@ -27,6 +27,11 @@
  * - Use in documentation regeneration workflows
  */
 
+// ─── Error Convention ───────────────────────────────────────────────────
+// CLI modules use throw/catch + process.exit(). Pipeline modules use Result<T,E>.
+// See src/cli/error-handler.ts for the unified handler.
+// ────────────────────────────────────────────────────────────────────────
+
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { loadConfig, formatConfigError } from '../config/config-loader.js';

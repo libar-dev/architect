@@ -100,23 +100,6 @@ graph TB
         DataAPICLIErgonomics["DataAPICLIErgonomics"]:::neighbor
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
     end
-    ReplMode -->|uses| PipelineFactory
-    ReplMode -->|uses| ProcessStateAPI
-    ReplMode ..->|implements| DataAPICLIErgonomics
-    ProcessAPICLIImpl -->|uses| ProcessStateAPI
-    ProcessAPICLIImpl -->|uses| MasterDataset
-    ProcessAPICLIImpl -->|uses| PipelineFactory
-    ProcessAPICLIImpl -->|uses| RulesQueryModule
-    ProcessAPICLIImpl -->|uses| PatternSummarizerImpl
-    ProcessAPICLIImpl -->|uses| FuzzyMatcherImpl
-    ProcessAPICLIImpl -->|uses| OutputPipelineImpl
-    ProcessAPICLIImpl ..->|implements| ProcessStateAPICLI
-    OutputPipelineImpl -->|uses| PatternSummarizerImpl
-    OutputPipelineImpl ..->|implements| DataAPIOutputShaping
-    DatasetCache -->|uses| PipelineFactory
-    DatasetCache -->|uses| WorkflowConfigSchema
-    DatasetCache ..->|implements| DataAPICLIErgonomics
-    CLISchema ..->|implements| ProcessApiHybridGeneration
     PatternSummarizerImpl -->|uses| ProcessStateAPI
     PatternSummarizerImpl ..->|implements| DataAPIOutputShaping
     ScopeValidatorImpl -->|uses| ProcessStateAPI
@@ -146,6 +129,23 @@ graph TB
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
+    ReplMode -->|uses| PipelineFactory
+    ReplMode -->|uses| ProcessStateAPI
+    ReplMode ..->|implements| DataAPICLIErgonomics
+    ProcessAPICLIImpl -->|uses| ProcessStateAPI
+    ProcessAPICLIImpl -->|uses| MasterDataset
+    ProcessAPICLIImpl -->|uses| PipelineFactory
+    ProcessAPICLIImpl -->|uses| RulesQueryModule
+    ProcessAPICLIImpl -->|uses| PatternSummarizerImpl
+    ProcessAPICLIImpl -->|uses| FuzzyMatcherImpl
+    ProcessAPICLIImpl -->|uses| OutputPipelineImpl
+    ProcessAPICLIImpl ..->|implements| ProcessStateAPICLI
+    OutputPipelineImpl -->|uses| PatternSummarizerImpl
+    OutputPipelineImpl ..->|implements| DataAPIOutputShaping
+    DatasetCache -->|uses| PipelineFactory
+    DatasetCache -->|uses| WorkflowConfigSchema
+    DatasetCache ..->|implements| DataAPICLIErgonomics
+    CLISchema ..->|implements| ProcessApiHybridGeneration
     StubResolverImpl -->|uses| ProcessStateAPI
     FSMValidator ..->|implements| PhaseStateMachineValidation
     PipelineFactory -->|uses| MasterDataset

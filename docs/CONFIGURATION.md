@@ -1,5 +1,7 @@
 # Configuration Guide
 
+> **Deprecated:** This document is superseded by the auto-generated [Configuration Guide](../docs-live/reference/CONFIGURATION-GUIDE.md). This file is preserved for reference only.
+
 Configure tag prefixes, presets, sources, output, and custom taxonomies for `@libar-dev/delivery-process`.
 
 > **Prerequisites:** See [README.md](../README.md) for installation and basic usage.

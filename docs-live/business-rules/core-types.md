@@ -4,7 +4,7 @@
 
 ---
 
-**22 rules** from 5 features. 22 rules have explicit invariants.
+**34 rules** from 9 features. 34 rules have explicit invariants.
 
 ---
 
@@ -69,6 +69,50 @@ _kebab-case-slugs.feature_
 ---
 
 ## Uncategorized
+
+### Deliverable Status Taxonomy
+
+_The deliverable status module defines the 6 canonical status values for_
+
+---
+
+#### isDeliverableStatusTerminal identifies terminal statuses for DoD validation
+
+> **Invariant:** Only complete, n/a, and superseded are terminal. Deferred is NOT terminal because it implies unfinished work that should block DoD.
+>
+> **Rationale:** Marking a pattern as completed when deliverables are merely deferred creates a hard-locked state with incomplete work, violating delivery process integrity.
+
+**Verified by:**
+
+- Terminal status classification
+
+---
+
+#### Status predicates classify individual deliverable states
+
+> **Invariant:** isDeliverableStatusComplete, isDeliverableStatusInProgress, and isDeliverableStatusPending each match exactly one status value.
+>
+> **Rationale:** Single-value predicates provide type-safe branching for consumers that need to distinguish specific states rather than terminal vs non-terminal groupings.
+
+**Verified by:**
+
+- isDeliverableStatusComplete classification
+- isDeliverableStatusInProgress classification
+- isDeliverableStatusPending classification
+
+---
+
+#### getDeliverableStatusEmoji returns display emoji for all statuses
+
+> **Invariant:** getDeliverableStatusEmoji returns a non-empty string for all 6 canonical statuses. No status value is unmapped.
+>
+> **Rationale:** Missing emoji mappings would cause empty display cells in generated documentation tables, breaking visual consistency.
+
+**Verified by:**
+
+- Emoji mapping for all statuses
+
+_deliverable-status.feature_
 
 ### Error Factories
 
@@ -204,6 +248,98 @@ _- Raw errors lack context (no file path, line number, or pattern name)_
 - handleCliError formats unknown errors
 
 _error-handling.feature_
+
+### File Cache
+
+_The file cache provides request-scoped content caching for generation runs._
+
+---
+
+#### Store and retrieve round-trip preserves content
+
+> **Invariant:** Content stored via set is returned identically by get. No transformation or encoding occurs.
+>
+> **Rationale:** File content must survive caching verbatim; any mutation would cause extraction to produce different results on cache hits vs misses.
+
+**Verified by:**
+
+- Store and retrieve returns same content
+- Non-existent path returns undefined
+
+---
+
+#### has checks membership without affecting stats
+
+> **Invariant:** has returns true for cached paths and false for uncached paths. It does not increment hit or miss counters.
+>
+> **Rationale:** has is used for guard checks before get; double-counting would inflate stats and misrepresent actual cache effectiveness.
+
+**Verified by:**
+
+- has returns true for cached path
+- has returns false for uncached path
+
+---
+
+#### Stats track hits and misses accurately
+
+> **Invariant:** Every get call increments either hits or misses. hitRate is computed as (hits / total) \* 100 with a zero-division guard returning 0 when total is 0.
+>
+> **Rationale:** Accurate stats enable performance analysis of generation runs; incorrect counts would lead to wrong caching decisions.
+
+**Verified by:**
+
+- Stats track hits and misses
+- Hit rate starts at zero for empty cache
+- Hit rate is 100 when all gets are hits
+
+---
+
+#### Clear resets cache and stats
+
+> **Invariant:** clear removes all cached entries and resets hit/miss counters to zero.
+>
+> **Rationale:** Per-run scoping requires a clean slate; stale entries from a previous run would cause the extractor to use outdated content.
+
+**Verified by:**
+
+- Clear resets everything
+
+_file-cache.feature_
+
+### Normalized Status
+
+_The normalized status module maps any status input — raw FSM states (roadmap,_
+
+---
+
+#### normalizeStatus maps raw FSM states to display buckets
+
+> **Invariant:** normalizeStatus must map every raw FSM status to exactly one of three display buckets: completed, active, or planned. Unknown or undefined inputs default to planned.
+>
+> **Rationale:** UI and generated documentation need a simplified status model; the raw 4-state FSM is an implementation detail that should not leak into display logic.
+
+**Verified by:**
+
+- Status normalization
+- normalizeStatus defaults undefined to planned
+- normalizeStatus defaults unknown status to planned
+
+---
+
+#### Pattern status predicates check normalized state
+
+> **Invariant:** isPatternComplete, isPatternActive, and isPatternPlanned are mutually exclusive for any given status input. Exactly one returns true.
+>
+> **Rationale:** Consumers branch on these predicates; overlapping true values would cause double-rendering or contradictory UI states.
+
+**Verified by:**
+
+- isPatternComplete classification
+- isPatternActive classification
+- isPatternPlanned classification
+
+_normalized-status.feature_
 
 ### Result Monad
 
@@ -343,6 +479,52 @@ _String utilities provide consistent text transformations across the codebase._
 - camelCaseToTitleCase handles lowercase word
 
 _string-utils.feature_
+
+### Tag Registry Builder
+
+_The tag registry builder constructs a complete TagRegistry from TypeScript_
+
+---
+
+#### buildRegistry returns a well-formed TagRegistry
+
+> **Invariant:** buildRegistry always returns a TagRegistry with version, categories, metadataTags, aggregationTags, formatOptions, tagPrefix, and fileOptInTag properties.
+>
+> **Rationale:** All downstream consumers (scanner, extractor, validator) depend on registry structure. A malformed registry would cause silent extraction failures across the entire pipeline.
+
+**Verified by:**
+
+- Registry has correct version
+- Registry has expected category count
+- Registry has required metadata tags
+
+---
+
+#### Metadata tags have correct configuration
+
+> **Invariant:** The pattern tag is required, the status tag has a default value, and tags with transforms apply them correctly.
+>
+> **Rationale:** Misconfigured tag metadata would cause the extractor to skip required fields or apply wrong defaults, producing silently corrupt patterns.
+
+**Verified by:**
+
+- Pattern tag is marked as required
+- Status tag has default value
+- Transform functions work correctly
+
+---
+
+#### Registry includes standard prefixes and opt-in tag
+
+> **Invariant:** tagPrefix is the standard annotation prefix and fileOptInTag is the bare opt-in marker. These are non-empty strings.
+>
+> **Rationale:** Changing these values without updating all annotated files would break scanner opt-in detection across the entire monorepo.
+
+**Verified by:**
+
+- Registry has standard tag prefix and opt-in tag
+
+_tag-registry-builder.feature_
 
 ---
 

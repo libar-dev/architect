@@ -1,8 +1,8 @@
 # Gherkin Patterns Guide
 
-Practical patterns for writing Gherkin specs that work with `delivery-process` generators.
+> **Deprecated:** This document is superseded by the auto-generated [Gherkin Authoring Guide](../docs-live/reference/GHERKIN-AUTHORING-GUIDE.md). This file is preserved for reference only. Examples below may be stale and should not be used as templates — refer to the auto-generated guide for current patterns.
 
-> **Tag Reference:** Run `npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f` for the complete tag list. See [TAXONOMY.md](./TAXONOMY.md) for concepts.
+Practical patterns for writing Gherkin specs that work with `delivery-process` generators.
 
 ---
 

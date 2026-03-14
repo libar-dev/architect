@@ -1,5 +1,7 @@
 # Architecture: @libar-dev/delivery-process
 
+> **Deprecated:** Architecture documentation is now auto-generated across multiple reference docs: [Architecture Diagram](../docs-live/ARCHITECTURE.md), [Architecture Codecs](../docs-live/reference/ARCHITECTURE-CODECS.md), and [Architecture Types](../docs-live/reference/ARCHITECTURE-TYPES.md). This file is preserved for reference only.
+
 > **Code-Driven Documentation Generator with Codec-Based Transformation Pipeline**
 
 This document describes the architecture of the `@libar-dev/delivery-process` package, a documentation generator that extracts patterns from TypeScript and Gherkin sources, transforms them through a unified pipeline, and renders them as markdown via typed codecs.

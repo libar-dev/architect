@@ -1,5 +1,7 @@
 # Session Workflow Guides
 
+> **Deprecated:** This document is superseded by the auto-generated [Session Workflow Guide](../docs-live/reference/SESSION-WORKFLOW-GUIDE.md) which includes a Mermaid decision tree, session checklists, and FSM protection reference. This file is preserved for reference only.
+>
 > Quick reference for each session type. For concepts (FSM, two-tier architecture), see [METHODOLOGY.md](./METHODOLOGY.md).
 
 ---

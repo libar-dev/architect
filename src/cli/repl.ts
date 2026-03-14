@@ -22,6 +22,11 @@
  * - `help` — list available subcommands
  */
 
+// ─── Error Convention ───────────────────────────────────────────────────
+// CLI modules use throw/catch + process.exit(). Pipeline modules use Result<T,E>.
+// See src/cli/error-handler.ts for the unified handler.
+// ────────────────────────────────────────────────────────────────────────
+
 import * as readline from 'node:readline/promises';
 import * as path from 'path';
 import {

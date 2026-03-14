@@ -1,5 +1,7 @@
 # Documentation Index
 
+> **Deprecated:** This document is superseded by the auto-generated [Documentation Index](../docs-live/INDEX.md) which includes live statistics, audience-based navigation, and document roles. This file is preserved for reference only.
+
 **Navigate the full documentation set for `@libar-dev/delivery-process`.** Use section links below for targeted reading.
 
 ## Package Metadata

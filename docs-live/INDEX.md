@@ -10,7 +10,7 @@
 | ----------------- | ----------------------------------------------------- |
 | **Package**       | @libar-dev/delivery-process                           |
 | **Purpose**       | Code-first documentation and delivery process toolkit |
-| **Patterns**      | 371 tracked (257 completed, 60 active, 54 planned)    |
+| **Patterns**      | 386 tracked (258 completed, 74 active, 54 planned)    |
 | **Product Areas** | 7                                                     |
 | **License**       | MIT                                                   |
 
@@ -118,15 +118,18 @@
 
 ### Reference Guides
 
-| Document                                                        | Description                                           | Audience   |
-| --------------------------------------------------------------- | ----------------------------------------------------- | ---------- |
-| [Annotation Reference](reference/ANNOTATION-REFERENCE.md)       | Annotation mechanics, shape extraction, tag reference | Developers |
-| [Session Workflow Guide](reference/SESSION-WORKFLOW-GUIDE.md)   | Planning, Design, Implementation session workflows    | AI/Devs    |
-| [Process API Reference](reference/PROCESS-API-REFERENCE.md)     | CLI command reference with flags and examples         | AI/Devs    |
-| [Process API Recipes](reference/PROCESS-API-RECIPES.md)         | CLI workflow recipes and session guides               | AI/Devs    |
-| [Process Guard Reference](reference/PROCESS-GUARD-REFERENCE.md) | Pre-commit hooks, error codes, programmatic API       | Team Leads |
-| [Architecture Codecs](reference/ARCHITECTURE-CODECS.md)         | All codecs with factory patterns and options          | Developers |
-| [Architecture Types](reference/ARCHITECTURE-TYPES.md)           | MasterDataset interface and type shapes               | Developers |
+| Document                                                        | Description                                                          | Audience   |
+| --------------------------------------------------------------- | -------------------------------------------------------------------- | ---------- |
+| [Annotation Reference](reference/ANNOTATION-REFERENCE.md)       | Annotation mechanics, shape extraction, tag reference                | Developers |
+| [Session Workflow Guide](reference/SESSION-WORKFLOW-GUIDE.md)   | Planning, Design, Implementation session workflows                   | AI/Devs    |
+| [Process API Reference](reference/PROCESS-API-REFERENCE.md)     | CLI command reference with flags and examples                        | AI/Devs    |
+| [Process API Recipes](reference/PROCESS-API-RECIPES.md)         | CLI workflow recipes and session guides                              | AI/Devs    |
+| [Process Guard Reference](reference/PROCESS-GUARD-REFERENCE.md) | Pre-commit hooks, error codes, programmatic API                      | Team Leads |
+| [Architecture Codecs](reference/ARCHITECTURE-CODECS.md)         | All codecs with factory patterns and options                         | Developers |
+| [Architecture Types](reference/ARCHITECTURE-TYPES.md)           | MasterDataset interface and type shapes                              | Developers |
+| [Configuration Guide](reference/CONFIGURATION-GUIDE.md)         | Presets, config files, sources, output, and monorepo setup           | Users      |
+| [Validation Tools Guide](reference/VALIDATION-TOOLS-GUIDE.md)   | lint-patterns, lint-steps, lint-process, validate-patterns reference | CI/CD      |
+| [Gherkin Authoring Guide](reference/GHERKIN-AUTHORING-GUIDE.md) | Roadmap specs, Rule blocks, DataTables, tag conventions              | Developers |
 
 ### Product Area Details
 
@@ -148,24 +151,24 @@
 | ------------- | -------- | --------- | ------ | ------- | -------------------------- |
 | Annotation    | 26       | 23        | 2      | 1       | [███████░] 23/26 88%       |
 | Configuration | 11       | 8         | 0      | 3       | [██████░░] 8/11 73%        |
-| CoreTypes     | 7        | 7         | 0      | 0       | [████████] 7/7 100%        |
+| CoreTypes     | 11       | 7         | 4      | 0       | [█████░░░] 7/11 64%        |
 | DataAPI       | 41       | 24        | 14     | 3       | [█████░░░] 24/41 59%       |
-| Generation    | 94       | 81        | 5      | 8       | [███████░] 81/94 86%       |
+| Generation    | 95       | 81        | 6      | 8       | [███████░] 81/95 85%       |
 | Process       | 11       | 4         | 0      | 7       | [███░░░░░] 4/11 36%        |
-| Validation    | 22       | 16        | 0      | 6       | [██████░░] 16/22 73%       |
-| **Total**     | **212**  | **163**   | **21** | **28**  | **[██████░░] 163/212 77%** |
+| Validation    | 25       | 16        | 3      | 6       | [█████░░░] 16/25 64%       |
+| **Total**     | **220**  | **163**   | **29** | **28**  | **[██████░░] 163/220 74%** |
 
 ---
 
 ## Phase Progress
 
-**371** patterns total: **257** completed (69%), **60** active, **54** planned. [██████████████░░░░░░] 257/371
+**386** patterns total: **258** completed (67%), **74** active, **54** planned. [█████████████░░░░░░░] 258/386
 
 | Status    | Count | Percentage |
 | --------- | ----- | ---------- |
-| Completed | 257   | 69%        |
-| Active    | 60    | 16%        |
-| Planned   | 54    | 15%        |
+| Completed | 258   | 67%        |
+| Active    | 74    | 19%        |
+| Planned   | 54    | 14%        |
 
 ### By Phase
 

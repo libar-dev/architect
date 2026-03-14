@@ -25,9 +25,14 @@ export default defineConfig({
     ],
     globals: true,
     environment: 'node',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json-summary', 'lcov'],
+      reportsDirectory: 'coverage',
+      include: ['src/**/*.ts'],
+      exclude: ['src/**/*.d.ts'],
+    },
   },
-  css: false,
   root: path.resolve(__dirname),
   clearScreen: false,
-  plugins: [],
 });

@@ -4,7 +4,7 @@
 
 ---
 
-**300 rules** from 60 features. 300 rules have explicit invariants.
+**303 rules** from 61 features. 303 rules have explicit invariants.
 
 ---
 
@@ -1814,6 +1814,48 @@ _Tests the GeneratorRegistry registration, lookup, and listing capabilities._
 - Available returns sorted list
 
 _registry.feature_
+
+### Git Branch Diff
+
+_The branch diff utility returns changed files relative to a base branch for_
+
+---
+
+#### getChangedFilesList returns only existing changed files
+
+> **Invariant:** Modified and added files are returned, while deleted tracked files are excluded from the final list.
+>
+> **Rationale:** PR-scoped generation only needs files that still exist on the current branch; including deleted paths would force consumers to chase files that cannot be read.
+
+**Verified by:**
+
+- Modified and added files are returned while deleted files are excluded
+
+---
+
+#### Paths with spaces are preserved
+
+> **Invariant:** A filename containing spaces is returned as the exact original path, not split into multiple tokens.
+>
+> **Rationale:** Whitespace splitting corrupts file paths and breaks PR-scoped generation in repositories with descriptive filenames.
+
+**Verified by:**
+
+- File paths with spaces are preserved
+
+---
+
+#### NUL-delimited rename and copy statuses use the new path
+
+> **Invariant:** Rename and copy statuses with similarity scores must record the current path, not the old/source path.
+>
+> **Rationale:** Git emits statuses like R100 and C087 in real diffs; parsing the wrong side of the pair causes generators to scope output to stale paths.
+
+**Verified by:**
+
+- Similarity status maps to the new path
+
+_git-branch-diff.feature_
 
 ### Implementation Link Path Normalization
 

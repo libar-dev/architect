@@ -133,7 +133,7 @@ Feature: Component Diagram Generation
       Then the document contains elements:
         | text                      |
         | ## Overview               |
-        | 3 annotated source files  |
+        | 3 key components          |
         | 2 bounded context         |
 
   Rule: Component diagram includes legend when enabled

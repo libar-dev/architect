@@ -11,7 +11,7 @@
 
 import type { ExtractedPattern } from '../../src/validation-schemas/index.js';
 import type { StatusCounts } from '../../src/validation-schemas/master-dataset.js';
-import type { RuntimeMasterDataset } from '../../src/generators/pipeline/transform-dataset.js';
+import type { RuntimeMasterDataset } from '../../src/generators/pipeline/transform-types.js';
 
 import { transformToMasterDataset } from '../../src/generators/pipeline/transform-dataset.js';
 import { createDefaultTagRegistry } from '../../src/validation-schemas/tag-registry.js';

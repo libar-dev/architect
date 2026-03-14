@@ -4,7 +4,7 @@
 
 ---
 
-**54 rules** from 11 features. 54 rules have explicit invariants.
+**61 rules** from 14 features. 61 rules have explicit invariants.
 
 ---
 
@@ -93,6 +93,42 @@ _- Dependencies in features (should be code-only) cause drift_
 - Violations are grouped by severity
 
 _anti-patterns.feature_
+
+### Codec Utils Validation
+
+_The codec utilities provide factory functions for creating type-safe JSON_
+
+---
+
+#### createJsonInputCodec parses and validates JSON strings
+
+> **Invariant:** createJsonInputCodec returns an ok Result when the input is valid JSON that conforms to the provided Zod schema, and an err Result with a descriptive CodecError otherwise.
+>
+> **Rationale:** Combining JSON parsing and schema validation into a single operation eliminates the class of bugs where parsed-but-invalid data leaks into the application.
+
+**Verified by:**
+
+- Input codec parses valid JSON matching schema
+- Input codec rejects invalid JSON syntax
+- Input codec rejects valid JSON that fails schema validation
+- Input codec includes source in error when provided
+- Input codec safeParse returns value for valid input
+- Input codec safeParse returns undefined for invalid input
+
+---
+
+#### formatCodecError formats errors for display
+
+> **Invariant:** formatCodecError always returns a non-empty string that includes the operation type and message, and appends validation errors when present.
+>
+> **Rationale:** Consistent error formatting across all codec consumers avoids duplicated formatting logic and ensures error messages always contain enough context for debugging.
+
+**Verified by:**
+
+- formatCodecError formats error without validation details
+- formatCodecError formats error with validation details
+
+_codec-utils.feature_
 
 ### Config Schema Validation
 
@@ -853,6 +889,94 @@ _Tests for the detectStatusTransitions function that parses git diff output._
 - Status in docs-living directory is ignored
 
 _status-transition-detection.feature_
+
+### Tag Registry Schemas Validation
+
+_The tag registry configuration module provides schema-validated taxonomy_
+
+---
+
+#### createDefaultTagRegistry produces a valid registry from taxonomy source
+
+> **Invariant:** createDefaultTagRegistry always returns a TagRegistry that passes TagRegistrySchema validation, with non-empty categories, metadataTags, and aggregationTags arrays.
+>
+> **Rationale:** The default registry is the foundation for all pattern extraction. An invalid or empty default registry would silently break extraction for every consumer.
+
+**Verified by:**
+
+- Default registry passes schema validation
+- Default registry has non-empty categories
+- Default registry has non-empty metadata tags
+- Default registry has expected tag prefix
+
+---
+
+#### mergeTagRegistries deep-merges registries by tag
+
+> **Invariant:** mergeTagRegistries merges categories, metadataTags, and aggregationTags by their tag field, with override entries replacing base entries of the same tag and new entries being appended. Scalar fields (version, tagPrefix, fileOptInTag, formatOptions) are fully replaced when provided.
+>
+> **Rationale:** Consumers need to customize the taxonomy without losing default definitions. Tag-based merging prevents accidental duplication while allowing targeted overrides.
+
+**Verified by:**
+
+- Merge overrides a category by tag
+- Merge adds new categories from override
+- Merge replaces scalar fields when provided
+- Merge preserves base when override is empty
+
+_tag-registry-schemas.feature_
+
+### Workflow Config Schemas Validation
+
+_The workflow configuration module defines Zod schemas for validating_
+
+---
+
+#### WorkflowConfigSchema validates workflow configurations
+
+> **Invariant:** WorkflowConfigSchema accepts objects with a name, semver version, at least one status, and at least one phase, and rejects objects missing any required field or with invalid semver format.
+>
+> **Rationale:** Workflow configurations drive FSM validation and phase-based document routing. Malformed configs would cause silent downstream failures in process guard and documentation generation.
+
+**Verified by:**
+
+- Valid workflow config passes schema validation
+- Config without name is rejected
+- Config with invalid semver version is rejected
+- Config without statuses is rejected
+- Config without phases is rejected
+
+---
+
+#### createLoadedWorkflow builds efficient lookup maps
+
+> **Invariant:** createLoadedWorkflow produces a LoadedWorkflow whose statusMap and phaseMap contain all statuses and phases from the config, keyed by lowercase name for case-insensitive lookup.
+>
+> **Rationale:** O(1) status and phase lookup eliminates repeated linear scans during validation and rendering, where each pattern may reference multiple statuses.
+
+**Verified by:**
+
+- Loaded workflow has status lookup map
+- Status lookup is case-insensitive
+- Loaded workflow has phase lookup map
+- Phase lookup is case-insensitive
+
+---
+
+#### isWorkflowConfig type guard validates at runtime
+
+> **Invariant:** isWorkflowConfig returns true only for values that conform to WorkflowConfigSchema and false for all other values including null, undefined, primitives, and partial objects.
+>
+> **Rationale:** Runtime type guards enable safe narrowing in dynamic contexts (config loading, API responses) where TypeScript compile-time types are unavailable.
+
+**Verified by:**
+
+- Type guard accepts valid workflow config
+- Type guard rejects null
+- Type guard rejects partial config
+- Type guard rejects non-object
+
+_workflow-config-schemas.feature_
 
 ---
 

@@ -1,5 +1,7 @@
 # Delivery Process Methodology
 
+> **Editorial Document:** This document contains design philosophy and rationale that cannot be auto-generated from code annotations. It is maintained manually.
+
 > **Git is the event store. Documentation artifacts are projections. Annotated code is the single source of truth.**
 
 This document explains the _why_ behind `@libar-dev/delivery-process`. For _how_, see [README.md](../README.md) and [TAXONOMY.md](./TAXONOMY.md).

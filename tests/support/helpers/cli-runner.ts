@@ -55,6 +55,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 
+function createChildEnv(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+  const childEnv = { ...env, FORCE_COLOR: '0' };
+  delete childEnv.NODE_V8_COVERAGE;
+  return childEnv;
+}
+
 // =============================================================================
 // CLI Runner
 // =============================================================================
@@ -106,7 +112,7 @@ export async function runCLI(
   return new Promise((resolve, reject) => {
     const child = spawn('npx', ['tsx', cliPath, ...args], {
       cwd,
-      env: { ...env, FORCE_COLOR: '0' }, // Disable color codes for easier assertion
+      env: createChildEnv(env),
       shell: true,
     });
 

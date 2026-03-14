@@ -12,7 +12,7 @@ import { expect } from 'vitest';
 import type { GeneratorOutput } from '../../../src/generators/types.js';
 import { createDesignReviewGenerator } from '../../../src/generators/built-in/design-review-generator.js';
 import { createDefaultTagRegistry } from '../../../src/validation-schemas/tag-registry.js';
-import type { RuntimeMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
+import type { RuntimeMasterDataset } from '../../../src/generators/pipeline/transform-types.js';
 import {
   createTempDir,
   writeTempFile,

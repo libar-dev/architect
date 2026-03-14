@@ -29,14 +29,18 @@ export {
   transformToMasterDatasetWithValidation,
   completionPercentage,
   isFullyCompleted,
-  type RawDataset,
-  type RuntimeMasterDataset,
-  type ContextInferenceRule,
-  type ValidationSummary,
-  type MalformedPattern,
-  type DanglingReference,
-  type TransformResult,
 } from './transform-dataset.js';
+
+export type { ContextInferenceRule } from './context-inference.js';
+
+export type {
+  RawDataset,
+  RuntimeMasterDataset,
+  ValidationSummary,
+  MalformedPattern,
+  DanglingReference,
+  TransformResult,
+} from './transform-types.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Merge Patterns

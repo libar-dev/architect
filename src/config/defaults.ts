@@ -26,7 +26,7 @@
  */
 
 import { createRegexBuilders, type RegexBuilders } from './regex-builders.js';
-import type { ContextInferenceRule } from '../generators/pipeline/transform-dataset.js';
+import type { ContextInferenceRule } from '../generators/pipeline/context-inference.js';
 
 /**
  * Default tag prefix for @libar-docs-* annotations.
