@@ -618,12 +618,13 @@ Or use the default export for standard behavior:
 - **component**: System overview with bounded context subgraphs
 - **layered**: Components organized by architectural layer
 
-| Option           | Type                     | Default     | Description                               |
-| ---------------- | ------------------------ | ----------- | ----------------------------------------- |
-| diagramType      | "component" \| "layered" | "component" | Type of diagram to generate               |
-| includeInventory | boolean                  | true        | Include component inventory table         |
-| includeLegend    | boolean                  | true        | Include legend for arrow styles           |
-| filterContexts   | string[]                 | []          | Filter to specific contexts (empty = all) |
+| Option                   | Type                     | Default     | Description                                    |
+| ------------------------ | ------------------------ | ----------- | ---------------------------------------------- |
+| diagramType              | "component" \| "layered" | "component" | Type of diagram to generate                    |
+| includeInventory         | boolean                  | true        | Include component inventory table              |
+| includeLegend            | boolean                  | true        | Include legend for arrow styles                |
+| filterContexts           | string[]                 | []          | Filter to specific contexts (empty = all)      |
+| diagramKeyComponentsOnly | boolean                  | true        | Only show components with archRole in diagrams |
 
 ```typescript
 const codec = createArchitectureCodec({ diagramType: 'component' });

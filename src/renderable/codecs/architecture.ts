@@ -26,6 +26,7 @@
  * | includeInventory | boolean | true | Include component inventory table |
  * | includeLegend | boolean | true | Include legend for arrow styles |
  * | filterContexts | string[] | [] | Filter to specific contexts (empty = all) |
+ * | diagramKeyComponentsOnly | boolean | true | Only show components with archRole in diagrams |
  *
  * ### When to Use
  *
@@ -100,6 +101,14 @@ export interface ArchitectureCodecOptions extends BaseCodecOptions {
 
   /** Filter to specific contexts (default: all contexts) */
   filterContexts?: string[];
+
+  /**
+   * Only include patterns with an explicit archRole in diagrams (default: true).
+   * Patterns without a role (barrel exports, type-only modules, ADRs, test features)
+   * add noise to diagrams without conveying architectural significance.
+   * The component inventory table always shows all patterns regardless.
+   */
+  diagramKeyComponentsOnly?: boolean;
 }
 
 /**
@@ -111,6 +120,7 @@ export const DEFAULT_ARCHITECTURE_OPTIONS: Required<ArchitectureCodecOptions> = 
   includeInventory: true,
   includeLegend: true,
   filterContexts: [],
+  diagramKeyComponentsOnly: true,
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -194,22 +204,27 @@ function buildArchitectureDocument(
   // Apply context filter if specified
   const filteredIndex = applyContextFilter(archIndex, options.filterContexts);
 
-  // 1. Summary section
-  sections.push(...buildSummarySection(filteredIndex));
+  // 2. Filter for diagram: only key components (with archRole) if enabled
+  const diagramIndex = options.diagramKeyComponentsOnly
+    ? filterToKeyComponents(filteredIndex)
+    : filteredIndex;
 
-  // 2. Main diagram based on type
+  // 1. Summary section
+  sections.push(...buildSummarySection(diagramIndex, filteredIndex.all.length));
+
+  // 3. Main diagram based on type
   if (options.diagramType === 'component') {
-    sections.push(...buildComponentDiagram(filteredIndex, dataset));
+    sections.push(...buildComponentDiagram(diagramIndex, dataset));
   } else {
-    sections.push(...buildLayeredDiagram(filteredIndex, dataset));
+    sections.push(...buildLayeredDiagram(diagramIndex, dataset));
   }
 
-  // 3. Legend (if enabled)
+  // 4. Legend (if enabled)
   if (options.includeLegend) {
     sections.push(...buildLegendSection());
   }
 
-  // 4. Component inventory (if enabled)
+  // 5. Component inventory (if enabled) — uses full filteredIndex, not diagramIndex
   if (options.includeInventory) {
     sections.push(...buildInventorySection(filteredIndex));
   }
@@ -289,6 +304,51 @@ function applyContextFilter(
   };
 }
 
+/**
+ * Filter architecture index to only include patterns with an explicit archRole.
+ * Patterns without a role (barrel exports, type modules, ADRs, test features)
+ * are excluded from diagrams but remain in the component inventory.
+ */
+function filterToKeyComponents(
+  archIndex: NonNullable<MasterDataset['archIndex']>
+): NonNullable<MasterDataset['archIndex']> {
+  const hasRole = (p: ExtractedPattern): boolean => p.archRole !== undefined;
+
+  const filteredAll = archIndex.all.filter(hasRole);
+
+  const filteredByContext: Record<string, ExtractedPattern[]> = {};
+  for (const [ctx, patterns] of Object.entries(archIndex.byContext)) {
+    const filtered = patterns.filter(hasRole);
+    if (filtered.length > 0) {
+      filteredByContext[ctx] = filtered;
+    }
+  }
+
+  const filteredByRole: Record<string, ExtractedPattern[]> = {};
+  for (const [role, patterns] of Object.entries(archIndex.byRole)) {
+    const filtered = patterns.filter(hasRole);
+    if (filtered.length > 0) {
+      filteredByRole[role] = filtered;
+    }
+  }
+
+  const filteredByLayer: Record<string, ExtractedPattern[]> = {};
+  for (const [layer, patterns] of Object.entries(archIndex.byLayer)) {
+    const filtered = patterns.filter(hasRole);
+    if (filtered.length > 0) {
+      filteredByLayer[layer] = filtered;
+    }
+  }
+
+  return {
+    byContext: filteredByContext,
+    byRole: filteredByRole,
+    byLayer: filteredByLayer,
+    byView: archIndex.byView,
+    all: filteredAll,
+  };
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Section Builders
 // ═══════════════════════════════════════════════════════════════════════════
@@ -296,25 +356,31 @@ function applyContextFilter(
 /**
  * Build summary section with component counts
  */
-function buildSummarySection(archIndex: NonNullable<MasterDataset['archIndex']>): SectionBlock[] {
-  const contextCount = Object.keys(archIndex.byContext).length;
-  const roleCount = Object.keys(archIndex.byRole).length;
-  const totalComponents = archIndex.all.length;
+function buildSummarySection(
+  diagramIndex: NonNullable<MasterDataset['archIndex']>,
+  totalAnnotated: number
+): SectionBlock[] {
+  const contextCount = Object.keys(diagramIndex.byContext).length;
+  const roleCount = Object.keys(diagramIndex.byRole).length;
+  const diagramComponents = diagramIndex.all.length;
+
+  const rows: string[][] = [
+    ['Diagram Components', String(diagramComponents)],
+    ['Bounded Contexts', String(contextCount)],
+    ['Component Roles', String(roleCount)],
+  ];
+
+  if (totalAnnotated !== diagramComponents) {
+    rows.push(['Total Annotated', String(totalAnnotated)]);
+  }
 
   return [
     heading(2, 'Overview'),
     paragraph(
-      `This diagram was auto-generated from ${totalComponents} annotated source files ` +
+      `This diagram shows ${diagramComponents} key components with explicit architectural roles ` +
         `across ${contextCount} bounded context${contextCount !== 1 ? 's' : ''}.`
     ),
-    table(
-      ['Metric', 'Count'],
-      [
-        ['Total Components', String(totalComponents)],
-        ['Bounded Contexts', String(contextCount)],
-        ['Component Roles', String(roleCount)],
-      ]
-    ),
+    table(['Metric', 'Count'], rows),
     separator(),
   ];
 }

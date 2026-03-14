@@ -404,7 +404,6 @@ graph LR
     end
     TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
     loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
-    CLISchema ..->|implements| ProcessApiHybridGeneration
     ProjectConfigTypes -->|uses| ConfigurationTypes
     ProjectConfigTypes -->|uses| ConfigurationPresets
     ConfigurationPresets -->|uses| ConfigurationTypes
@@ -412,6 +411,7 @@ graph LR
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
+    CLISchema ..->|implements| ProcessApiHybridGeneration
     FSMTransitions ..->|implements| PhaseStateMachineValidation
     FSMStates ..->|implements| PhaseStateMachineValidation
     ProcessStateAPI -->|uses| MasterDataset

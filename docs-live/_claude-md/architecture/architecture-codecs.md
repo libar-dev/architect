@@ -151,11 +151,12 @@
 
 #### ArchitectureDocumentCodec
 
-| Option           | Type                     | Default     | Description                               |
-| ---------------- | ------------------------ | ----------- | ----------------------------------------- |
-| diagramType      | "component" \| "layered" | "component" | Type of diagram to generate               |
-| includeInventory | boolean                  | true        | Include component inventory table         |
-| includeLegend    | boolean                  | true        | Include legend for arrow styles           |
-| filterContexts   | string[]                 | []          | Filter to specific contexts (empty = all) |
+| Option                   | Type                     | Default     | Description                                    |
+| ------------------------ | ------------------------ | ----------- | ---------------------------------------------- |
+| diagramType              | "component" \| "layered" | "component" | Type of diagram to generate                    |
+| includeInventory         | boolean                  | true        | Include component inventory table              |
+| includeLegend            | boolean                  | true        | Include legend for arrow styles                |
+| filterContexts           | string[]                 | []          | Filter to specific contexts (empty = all)      |
+| diagramKeyComponentsOnly | boolean                  | true        | Only show components with archRole in diagrams |
 
 #### AdrDocumentCodec

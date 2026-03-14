@@ -122,5 +122,5 @@ Feature: Layered Architecture Diagram Generation
       Then the document contains elements:
         | text                       |
         | ## Overview                |
-        | 2 annotated source files   |
+        | 2 key components           |
 
