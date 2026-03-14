@@ -19,7 +19,7 @@ Feature: Process API CLI - Response Metadata
     **Invariant:** Every JSON response envelope must include a metadata.validation object with danglingReferenceCount, malformedPatternCount, unknownStatusCount, and warningCount fields, plus a numeric pipelineMs timing.
     **Rationale:** Consumers use validation counts to detect annotation quality degradation without running a separate validation pass. Pipeline timing enables performance regression detection in CI.
 
-    @happy-path
+    @acceptance-criteria @happy-path
     Scenario: Validation summary in response metadata
       Given TypeScript files with pattern annotations
       When running "process-api -i 'src/**/*.ts' status"

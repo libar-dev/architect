@@ -24,6 +24,7 @@ Feature: Process API CLI - Per-Subcommand Help
       When running "process-api context --help"
       Then exit code is 0
       And stdout contains context usage and session flag
+      And stdout contains "Usage:"
 
     @happy-path
     Scenario: Global help still works

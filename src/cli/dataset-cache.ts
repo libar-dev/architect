@@ -107,14 +107,15 @@ export async function computeCacheKey(opts: PipelineOptions): Promise<string> {
     }
   }
 
-  // Also include config file mtime if it exists
-  const configPath = path.join(baseDir, 'delivery-process.config.ts');
-  try {
-    const configStat = await fsp.stat(configPath);
-    fileMtimes.push(`${configPath}:${configStat.mtimeMs}`);
-  } catch {
-    // No config file — include sentinel
-    fileMtimes.push(`${configPath}:absent`);
+  // Also include config file mtime if it exists (.ts or .js)
+  for (const configName of ['delivery-process.config.ts', 'delivery-process.config.js']) {
+    const configPath = path.join(baseDir, configName);
+    try {
+      const configStat = await fsp.stat(configPath);
+      fileMtimes.push(`${configPath}:${configStat.mtimeMs}`);
+    } catch {
+      fileMtimes.push(`${configPath}:absent`);
+    }
   }
 
   hash.update(fileMtimes.join('\n'));
@@ -200,7 +201,7 @@ export async function writeCache(
     };
 
     const cachePath = path.join(cacheDir, 'dataset.json');
-    const tmpPath = `${cachePath}.tmp`;
+    const tmpPath = `${cachePath}.${process.pid}.${Date.now()}.tmp`;
 
     await fsp.writeFile(tmpPath, JSON.stringify(cacheData), 'utf-8');
     await fsp.rename(tmpPath, cachePath);

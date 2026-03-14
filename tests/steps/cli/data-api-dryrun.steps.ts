@@ -72,10 +72,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(getResult(state).exitCode).toBe(code);
       });
 
-      And('stdout contains dry run marker and file counts', () => {
+      And('stdout contains dry run marker, file counts, config, and cache status', () => {
         const stdout = getResult(state).stdout;
         expect(stdout).toContain('DRY RUN');
         expect(stdout).toContain('TypeScript files:');
+        expect(stdout).toContain('Config:');
+        expect(stdout).toContain('Cache:');
       });
 
       And('stdout does not contain {string}', (_ctx: unknown, text: string) => {

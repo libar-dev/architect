@@ -112,8 +112,12 @@ export async function runCLI(
 
     // Pipe stdin data if provided, then close stdin
     if (stdinData !== undefined) {
-      child.stdin.write(stdinData);
-      child.stdin.end();
+      child.stdin.on('error', (error: NodeJS.ErrnoException) => {
+        if (error.code !== 'EPIPE') {
+          reject(error);
+        }
+      });
+      child.stdin.end(stdinData);
     }
 
     let stdout = '';

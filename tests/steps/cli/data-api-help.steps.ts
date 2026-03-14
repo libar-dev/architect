@@ -72,6 +72,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(stdout).toContain('context');
         expect(stdout).toContain('--session');
       });
+
+      And('stdout contains {string}', (_ctx: unknown, text: string) => {
+        expect(getResult(state).stdout).toContain(text);
+      });
     });
 
     RuleScenario('Global help still works', ({ When, Then, And }) => {

@@ -134,7 +134,10 @@ function dispatchCommand(line: string, state: ReplState, opts: ReplOptions): str
       const depthIdx = subArgs.indexOf('--depth');
       const depthVal = depthIdx !== -1 ? subArgs[depthIdx + 1] : undefined;
       if (depthVal !== undefined) {
-        depth = parseInt(depthVal, 10);
+        const parsed = parseInt(depthVal, 10);
+        if (!isNaN(parsed) && parsed > 0) {
+          depth = parsed;
+        }
       }
       const tree = buildDepTree(state.dataset, {
         pattern: patternArg,

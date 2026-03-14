@@ -24,5 +24,5 @@ Feature: Process API CLI - Dry Run
       Given TypeScript files with pattern annotations
       When running "process-api -i 'src/**/*.ts' --dry-run status"
       Then exit code is 0
-      And stdout contains dry run marker and file counts
+      And stdout contains dry run marker, file counts, config, and cache status
       And stdout does not contain "success"
