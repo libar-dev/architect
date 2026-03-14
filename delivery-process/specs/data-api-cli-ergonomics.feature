@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:DataAPICLIErgonomics
-@libar-docs-status:roadmap
+@libar-docs-status:completed
+@libar-docs-unlock-reason:Final-deliverable-status-update
 @libar-docs-phase:25d
 @libar-docs-product-area:DataAPI
 @libar-docs-effort:2d
@@ -35,12 +36,12 @@ Feature: Data API CLI Ergonomics - Performance and Interactive Mode
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | MasterDataset cache with mtime invalidation | pending | src/cli/dataset-cache.ts | Yes | unit |
-      | REPL mode handler | pending | src/cli/repl.ts | Yes | integration |
+      | MasterDataset cache with mtime invalidation | complete | src/cli/dataset-cache.ts | Yes | unit |
+      | REPL mode handler | complete | src/cli/repl.ts | Yes | integration |
       | FSM short-circuit for static queries | complete | src/cli/process-api.ts | Yes | unit |
-      | Per-subcommand help system | pending | src/cli/process-api.ts | Yes | integration |
-      | Dry-run mode | pending | src/cli/process-api.ts | Yes | integration |
-      | Validation summary in metadata | pending | src/cli/process-api.ts | Yes | unit |
+      | Per-subcommand help system | complete | src/cli/process-api.ts | Yes | integration |
+      | Dry-run mode | complete | src/cli/process-api.ts | Yes | integration |
+      | Validation summary in metadata | complete | src/cli/process-api.ts | Yes | unit |
 
   # ============================================================================
   # RULE 1: Pipeline Caching
