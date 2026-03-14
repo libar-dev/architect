@@ -57,11 +57,8 @@ import {
 } from './transform-dataset.js';
 import { Result } from '../../types/result.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
-import type {
-  RuntimeMasterDataset,
-  ValidationSummary,
-  ContextInferenceRule,
-} from './transform-dataset.js';
+import type { RuntimeMasterDataset, ValidationSummary } from './transform-types.js';
+import type { ContextInferenceRule } from './context-inference.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Types

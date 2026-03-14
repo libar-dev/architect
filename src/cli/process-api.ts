@@ -34,6 +34,11 @@
  * - **Output Shaping**: 594KB -> 4KB via summarization and modifiers
  */
 
+// ─── Error Convention ───────────────────────────────────────────────────
+// CLI modules use throw/catch + process.exit(). Pipeline modules use Result<T,E>.
+// See src/cli/error-handler.ts for the unified handler.
+// ────────────────────────────────────────────────────────────────────────
+
 import * as path from 'path';
 import * as fs from 'fs';
 import { applyProjectSourceDefaults } from '../config/config-loader.js';
@@ -159,157 +164,207 @@ interface ProcessAPICLIConfig {
 // Argument Parsing
 // =============================================================================
 
-function parseArgs(argv: string[] = process.argv.slice(2)): ProcessAPICLIConfig {
-  const config: ProcessAPICLIConfig = {
-    input: [],
-    features: [],
-    baseDir: process.cwd(),
-    workflowPath: null,
-    subcommand: null,
-    subArgs: [],
-    help: false,
-    version: false,
-    modifiers: { ...DEFAULT_OUTPUT_MODIFIERS },
-    format: 'json',
-    sessionType: null,
-    noCache: false,
-    dryRun: false,
-    subcommandHelp: null,
-  };
+/** Mutable state accumulated during argument parsing. */
+interface ParseState {
+  readonly config: ProcessAPICLIConfig;
+  namesOnly: boolean;
+  count: boolean;
+  fields: string[] | null;
+  full: boolean;
+  parsingFlags: boolean;
+}
 
-  // Mutable modifiers for parsing
-  let namesOnly = false;
-  let count = false;
-  let fields: string[] | null = null;
-  let full = false;
-  let parsingFlags = true;
+/**
+ * Handle position-independent flags (help, version, cache, dry-run, modifiers, format).
+ * These work regardless of position — before or after the subcommand.
+ *
+ * @returns Number of additional args consumed (0 for booleans, 1 for --value flags).
+ *          Returns -1 if the arg is not a position-independent flag.
+ */
+function handlePositionIndependentFlag(
+  state: ParseState,
+  arg: string,
+  nextArg: string | undefined
+): number {
+  switch (arg) {
+    case '-h':
+    case '--help':
+      if (state.config.subcommand !== null) {
+        state.config.subcommandHelp = state.config.subcommand;
+      } else {
+        state.config.help = true;
+      }
+      return 0;
+
+    case '-v':
+    case '--version':
+      state.config.version = true;
+      return 0;
+
+    case '--no-cache':
+      state.config.noCache = true;
+      return 0;
+
+    case '--dry-run':
+      state.config.dryRun = true;
+      return 0;
+
+    case '--names-only':
+      state.namesOnly = true;
+      return 0;
+
+    case '--count':
+      state.count = true;
+      return 0;
+
+    case '--fields':
+      if (!nextArg || nextArg.startsWith('-')) {
+        throw new Error(`${arg} requires a value (comma-separated field names)`);
+      }
+      state.fields = nextArg.split(',').map((f) => f.trim());
+      return 1;
+
+    case '--full':
+      state.full = true;
+      return 0;
+
+    case '--format':
+      if (nextArg !== 'json' && nextArg !== 'compact') {
+        throw new Error(`${arg} must be "json" or "compact"`);
+      }
+      state.config.format = nextArg;
+      return 1;
+
+    default:
+      return -1;
+  }
+}
+
+/**
+ * Handle position-dependent global flags (input, features, base-dir, workflow, session).
+ * These only apply before the subcommand is detected.
+ *
+ * @returns Number of additional args consumed (always 1 for these flags).
+ * @throws On unknown flag.
+ */
+function handleGlobalFlag(state: ParseState, arg: string, nextArg: string | undefined): number {
+  switch (arg) {
+    case '-i':
+    case '--input':
+      if (!nextArg || nextArg.startsWith('-')) {
+        throw new Error(`${arg} requires a value`);
+      }
+      state.config.input.push(nextArg);
+      return 1;
+
+    case '-f':
+    case '--features':
+      if (!nextArg || nextArg.startsWith('-')) {
+        throw new Error(`${arg} requires a value`);
+      }
+      state.config.features.push(nextArg);
+      return 1;
+
+    case '-b':
+    case '--base-dir':
+      if (!nextArg || nextArg.startsWith('-')) {
+        throw new Error(`${arg} requires a value`);
+      }
+      state.config.baseDir = nextArg;
+      return 1;
+
+    case '-w':
+    case '--workflow':
+      if (!nextArg || nextArg.startsWith('-')) {
+        throw new Error(`${arg} requires a value`);
+      }
+      state.config.workflowPath = nextArg;
+      return 1;
+
+    case '--session':
+      if (!nextArg || !isValidSessionType(nextArg)) {
+        throw new Error(`${arg} must be "planning", "design", or "implement"`);
+      }
+      state.config.sessionType = nextArg;
+      return 1;
+
+    default:
+      throw new Error(`Unknown option: ${arg}`);
+  }
+}
+
+/**
+ * Handle positional args: first becomes subcommand, rest become subArgs.
+ */
+function handlePositionalArg(state: ParseState, arg: string): void {
+  if (state.config.subcommand === null) {
+    state.config.subcommand = arg;
+    state.parsingFlags = false;
+  } else {
+    state.config.subArgs.push(arg);
+  }
+}
+
+function parseArgs(argv: string[] = process.argv.slice(2)): ProcessAPICLIConfig {
+  const state: ParseState = {
+    config: {
+      input: [],
+      features: [],
+      baseDir: process.cwd(),
+      workflowPath: null,
+      subcommand: null,
+      subArgs: [],
+      help: false,
+      version: false,
+      modifiers: { ...DEFAULT_OUTPUT_MODIFIERS },
+      format: 'json',
+      sessionType: null,
+      noCache: false,
+      dryRun: false,
+      subcommandHelp: null,
+    },
+    namesOnly: false,
+    count: false,
+    fields: null,
+    full: false,
+    parsingFlags: true,
+  };
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
+    if (arg === undefined) continue;
     const nextArg = argv[i + 1];
 
     // pnpm passes '--' as a literal arg separator — skip it
     if (arg === '--') {
-      parsingFlags = false;
+      state.parsingFlags = false;
       continue;
     }
 
-    // Handle --help and --version regardless of position
-    if (arg === '-h' || arg === '--help') {
-      // If a subcommand was already parsed, this is per-subcommand help
-      if (config.subcommand !== null) {
-        config.subcommandHelp = config.subcommand;
-      } else {
-        config.help = true;
-      }
-      continue;
-    }
-    if (arg === '-v' || arg === '--version') {
-      config.version = true;
+    // Position-independent flags (work before and after subcommand)
+    const piConsumed = handlePositionIndependentFlag(state, arg, nextArg);
+    if (piConsumed >= 0) {
+      i += piConsumed;
       continue;
     }
 
-    // Handle cache and diagnostic flags regardless of position
-    if (arg === '--no-cache') {
-      config.noCache = true;
-      continue;
-    }
-    if (arg === '--dry-run') {
-      config.dryRun = true;
+    // Position-dependent global flags (only before subcommand)
+    if (state.parsingFlags && arg.startsWith('-')) {
+      i += handleGlobalFlag(state, arg, nextArg);
       continue;
     }
 
-    // Handle output modifiers regardless of position (before or after subcommand)
-    if (arg === '--names-only') {
-      namesOnly = true;
-      continue;
-    }
-    if (arg === '--count') {
-      count = true;
-      continue;
-    }
-    if (arg === '--fields') {
-      if (!nextArg || nextArg.startsWith('-')) {
-        throw new Error(`${arg} requires a value (comma-separated field names)`);
-      }
-      fields = nextArg.split(',').map((f) => f.trim());
-      i++;
-      continue;
-    }
-    if (arg === '--full') {
-      full = true;
-      continue;
-    }
-    if (arg === '--format') {
-      if (nextArg !== 'json' && nextArg !== 'compact') {
-        throw new Error(`${arg} must be "json" or "compact"`);
-      }
-      config.format = nextArg;
-      i++;
-      continue;
-    }
-
-    if (parsingFlags && arg?.startsWith('-') === true) {
-      switch (arg) {
-        case '-i':
-        case '--input':
-          if (!nextArg || nextArg.startsWith('-')) {
-            throw new Error(`${arg} requires a value`);
-          }
-          config.input.push(nextArg);
-          i++;
-          break;
-
-        case '-f':
-        case '--features':
-          if (!nextArg || nextArg.startsWith('-')) {
-            throw new Error(`${arg} requires a value`);
-          }
-          config.features.push(nextArg);
-          i++;
-          break;
-
-        case '-b':
-        case '--base-dir':
-          if (!nextArg || nextArg.startsWith('-')) {
-            throw new Error(`${arg} requires a value`);
-          }
-          config.baseDir = nextArg;
-          i++;
-          break;
-
-        case '-w':
-        case '--workflow':
-          if (!nextArg || nextArg.startsWith('-')) {
-            throw new Error(`${arg} requires a value`);
-          }
-          config.workflowPath = nextArg;
-          i++;
-          break;
-
-        case '--session':
-          if (!nextArg || !isValidSessionType(nextArg)) {
-            throw new Error(`${arg} must be "planning", "design", or "implement"`);
-          }
-          config.sessionType = nextArg;
-          i++;
-          break;
-
-        default:
-          throw new Error(`Unknown option: ${arg}`);
-      }
-    } else if (arg !== undefined) {
-      if (config.subcommand === null) {
-        config.subcommand = arg;
-        parsingFlags = false;
-      } else {
-        config.subArgs.push(arg);
-      }
-    }
+    // Positional: subcommand or subArg
+    handlePositionalArg(state, arg);
   }
 
-  config.modifiers = { namesOnly, count, fields, full };
-  return config;
+  state.config.modifiers = {
+    namesOnly: state.namesOnly,
+    count: state.count,
+    fields: state.fields,
+    full: state.full,
+  };
+  return state.config;
 }
 
 // =============================================================================
@@ -813,6 +868,67 @@ const API_METHODS = [
   'getMasterDataset',
 ] as const satisfies ReadonlyArray<keyof ProcessStateAPI>;
 
+type ApiMethodName = (typeof API_METHODS)[number];
+
+/**
+ * Typed dispatch map: each entry invokes the API method with correct parameter types.
+ * The Record<ApiMethodName, ...> type ensures compile-time completeness — adding a
+ * method to API_METHODS without a dispatch entry causes a type error.
+ */
+const API_DISPATCH: Record<
+  ApiMethodName,
+  (api: ProcessStateAPI, args: ReadonlyArray<string | number>) => unknown
+> = {
+  // Status queries
+  getPatternsByNormalizedStatus: (api, args) =>
+    api.getPatternsByNormalizedStatus(String(args[0]) as 'completed' | 'active' | 'planned'),
+  getPatternsByStatus: (api, args) =>
+    api.getPatternsByStatus(String(args[0]) as ProcessStatusValue),
+  getStatusCounts: (api) => api.getStatusCounts(),
+  getStatusDistribution: (api) => api.getStatusDistribution(),
+  getCompletionPercentage: (api) => api.getCompletionPercentage(),
+
+  // Phase queries
+  getPatternsByPhase: (api, args) => api.getPatternsByPhase(Number(args[0])),
+  getPhaseProgress: (api, args) => api.getPhaseProgress(Number(args[0])),
+  getActivePhases: (api) => api.getActivePhases(),
+  getAllPhases: (api) => api.getAllPhases(),
+
+  // FSM queries
+  isValidTransition: (api, args) =>
+    api.isValidTransition(
+      String(args[0]) as ProcessStatusValue,
+      String(args[1]) as ProcessStatusValue
+    ),
+  checkTransition: (api, args) => api.checkTransition(String(args[0]), String(args[1])),
+  getValidTransitionsFrom: (api, args) =>
+    api.getValidTransitionsFrom(String(args[0]) as ProcessStatusValue),
+  getProtectionInfo: (api, args) => api.getProtectionInfo(String(args[0]) as ProcessStatusValue),
+
+  // Pattern queries
+  getPattern: (api, args) => api.getPattern(String(args[0])),
+  getPatternDependencies: (api, args) => api.getPatternDependencies(String(args[0])),
+  getPatternRelationships: (api, args) => api.getPatternRelationships(String(args[0])),
+  getRelatedPatterns: (api, args) => api.getRelatedPatterns(String(args[0])),
+  getApiReferences: (api, args) => api.getApiReferences(String(args[0])),
+  getPatternDeliverables: (api, args) => api.getPatternDeliverables(String(args[0])),
+  getPatternsByCategory: (api, args) => api.getPatternsByCategory(String(args[0])),
+  getCategories: (api) => api.getCategories(),
+
+  // Timeline queries
+  getPatternsByQuarter: (api, args) => api.getPatternsByQuarter(String(args[0])),
+  getQuarters: (api) => api.getQuarters(),
+  getCurrentWork: (api) => api.getCurrentWork(),
+  getRoadmapItems: (api) => api.getRoadmapItems(),
+  getRecentlyCompleted: (api, args) => {
+    const limit = args[0] !== undefined ? Number(args[0]) : undefined;
+    return api.getRecentlyCompleted(limit);
+  },
+
+  // Raw access
+  getMasterDataset: (api) => api.getMasterDataset(),
+};
+
 function handleQuery(
   api: ProcessStateAPI,
   args: string[]
@@ -825,21 +941,16 @@ function handleQuery(
     );
   }
 
-  if (!API_METHODS.includes(methodName as (typeof API_METHODS)[number])) {
+  if (!API_METHODS.includes(methodName as ApiMethodName)) {
     throw new QueryApiError(
       'UNKNOWN_METHOD',
       `Unknown API method: ${methodName}\nAvailable: ${API_METHODS.join(', ')}`
     );
   }
 
-  // Safe to cast: we validated methodName is in API_METHODS above
-  const apiRecord = api as unknown as Record<string, (...a: unknown[]) => unknown>;
-  const method = apiRecord[methodName];
-  if (method === undefined) {
-    throw new QueryApiError('UNKNOWN_METHOD', `Method not found on API: ${methodName}`);
-  }
+  const dispatch = API_DISPATCH[methodName as ApiMethodName];
   const coercedArgs = args.slice(1).map(coerceArg);
-  return { methodName, result: method.apply(api, coercedArgs) };
+  return { methodName, result: dispatch(api, coercedArgs) };
 }
 
 function handlePattern(api: ProcessStateAPI, args: string[]): unknown {

@@ -26,6 +26,11 @@
  * - Strict mode (`--strict`) for production readiness checks
  */
 
+// ─── Error Convention ───────────────────────────────────────────────────
+// CLI modules use throw/catch + process.exit(). Pipeline modules use Result<T,E>.
+// See src/cli/error-handler.ts for the unified handler.
+// ────────────────────────────────────────────────────────────────────────
+
 import { printVersionAndExit } from './version.js';
 import { handleCliError } from './error-handler.js';
 import { getPatternName } from '../api/pattern-helpers.js';

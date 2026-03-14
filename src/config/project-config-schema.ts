@@ -28,6 +28,7 @@
 import { z } from 'zod';
 import type { DeliveryProcessProjectConfig } from './project-config.js';
 import type { DeliveryProcessInstance } from './types.js';
+// Cross-layer: config → renderable (see comment in project-config.ts)
 import { DIAGRAM_SOURCE_VALUES } from '../renderable/codecs/reference.js';
 import { SectionBlockSchema } from '../renderable/schema.js';
 

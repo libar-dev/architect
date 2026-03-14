@@ -34,7 +34,7 @@
  * - `createDefaultResolvedConfig()` provides a fallback when no config file exists
  */
 
-import type { ContextInferenceRule } from '../generators/pipeline/transform-dataset.js';
+import type { ContextInferenceRule } from '../generators/pipeline/context-inference.js';
 import type {
   DeliveryProcessProjectConfig,
   GeneratorSourceOverride,

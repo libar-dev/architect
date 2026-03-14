@@ -8,6 +8,11 @@
  * cause cryptic runtime failures.
  */
 
+// ─── Error Convention ───────────────────────────────────────────────────
+// CLI modules use throw/catch + process.exit(). Pipeline modules use Result<T,E>.
+// See src/cli/error-handler.ts for the unified handler.
+// ────────────────────────────────────────────────────────────────────────
+
 import { printVersionAndExit } from './version.js';
 import { handleCliError } from './error-handler.js';
 import { runStepLint } from '../lint/steps/index.js';

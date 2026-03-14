@@ -21,6 +21,7 @@ Thumbs.db
 # Test output directories
 docs/test-decider/
 docs/test-progressive/
+coverage/
 
 # Generated CLAUDE.md layers
 .claude-layers/

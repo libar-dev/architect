@@ -21,7 +21,7 @@ import {
   findUnusedTaxonomy,
   type UnusedTaxonomyReport,
 } from '../../../../src/api/coverage-analyzer.js';
-import type { RuntimeMasterDataset } from '../../../../src/generators/pipeline/transform-dataset.js';
+import type { RuntimeMasterDataset } from '../../../../src/generators/pipeline/transform-types.js';
 import type { ExtractedPattern } from '../../../../src/validation-schemas/index.js';
 import {
   createTestPattern,

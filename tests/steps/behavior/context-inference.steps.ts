@@ -11,11 +11,9 @@
 import { expect } from 'vitest';
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 
-import {
-  transformToMasterDataset,
-  type RuntimeMasterDataset,
-  type ContextInferenceRule,
-} from '../../../src/generators/pipeline/transform-dataset.js';
+import type { RuntimeMasterDataset } from '../../../src/generators/pipeline/transform-types.js';
+import type { ContextInferenceRule } from '../../../src/generators/pipeline/context-inference.js';
+import { transformToMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
 import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../../../src/config/defaults.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
 import { createDefaultTagRegistry } from '../../../src/validation-schemas/tag-registry.js';

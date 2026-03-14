@@ -6,12 +6,14 @@
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
+import type {
+  RuntimeMasterDataset,
+  RawDataset,
+} from '../../../src/generators/pipeline/transform-types.js';
 import {
   transformToMasterDataset,
   completionPercentage,
   isFullyCompleted,
-  type RuntimeMasterDataset,
-  type RawDataset,
 } from '../../../src/generators/pipeline/transform-dataset.js';
 import type { StatusCounts } from '../../../src/validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';

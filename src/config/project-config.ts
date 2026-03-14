@@ -36,7 +36,15 @@
 
 import type { PresetName } from './presets.js';
 import type { DeliveryProcessConfig, DeliveryProcessInstance } from './types.js';
-import type { ContextInferenceRule } from '../generators/pipeline/transform-dataset.js';
+import type { ContextInferenceRule } from '../generators/pipeline/context-inference.js';
+// ═══ Cross-Layer Imports: config → renderable ═══════════════════════════════
+// Project configuration declares which reference documents to generate,
+// requiring knowledge of renderer capability types (ReferenceDocConfig,
+// CodecOptions). This is intentional — moving these types to a shared location
+// would force renderable to import its own types from config (worse direction).
+// See also: src/config/project-config-schema.ts (Zod schema uses
+// DIAGRAM_SOURCE_VALUES and SectionBlockSchema from renderable).
+// ═════════════════════════════════════════════════════════════════════════════
 import type { ReferenceDocConfig } from '../renderable/codecs/reference.js';
 import type { CodecOptions } from '../renderable/generate.js';
 

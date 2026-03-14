@@ -12,7 +12,7 @@ import { expect } from 'vitest';
 import { createPatternsCodec } from '../../../src/renderable/codecs/patterns.js';
 import { renderToMarkdown } from '../../../src/renderable/render.js';
 import type { RenderableDocument } from '../../../src/renderable/schema.js';
-import type { RuntimeMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
+import type { RuntimeMasterDataset } from '../../../src/generators/pipeline/transform-types.js';
 import { transformToMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
 import { createDefaultTagRegistry } from '../../../src/validation-schemas/tag-registry.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';

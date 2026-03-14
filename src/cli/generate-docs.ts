@@ -27,6 +27,11 @@
  * - **Explicit Registration**: Generators must be registered before use
  */
 
+// ─── Error Convention ───────────────────────────────────────────────────
+// CLI modules use throw/catch + process.exit(). Pipeline modules use Result<T,E>.
+// See src/cli/error-handler.ts for the unified handler.
+// ────────────────────────────────────────────────────────────────────────
+
 import * as path from 'path';
 import { generatorRegistry } from '../generators/registry.js';
 import { generateDocumentation, generateFromConfig } from '../generators/orchestrator.js';

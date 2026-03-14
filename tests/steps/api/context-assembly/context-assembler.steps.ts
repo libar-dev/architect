@@ -21,7 +21,7 @@ import {
 import { QueryApiError } from '../../../../src/api/types.js';
 import { createProcessStateAPI } from '../../../../src/api/process-state.js';
 import type { ProcessStateAPI } from '../../../../src/api/process-state.js';
-import type { RuntimeMasterDataset } from '../../../../src/generators/pipeline/transform-dataset.js';
+import type { RuntimeMasterDataset } from '../../../../src/generators/pipeline/transform-types.js';
 import type { ExtractedPattern } from '../../../../src/validation-schemas/index.js';
 import {
   createTestPattern,
