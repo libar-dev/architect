@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:GenerateDocsCli
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:DataAPI
 @architect-implements:CliBehaviorTesting
 @cli @generate-docs

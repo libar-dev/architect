@@ -2,6 +2,7 @@
 @architect-pattern:PrChangesCodecRenderingTesting
 @architect-implements:PrChangesCodec
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 @behavior @pr-changes-codec
 Feature: PR Changes Codec - Core Rendering

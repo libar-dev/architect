@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:DeclarationLevelShapeTaggingTesting
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-implements:DeclarationLevelShapeTagging
 @architect-product-area:Annotation
 Feature: Declaration-Level Shape Tagging - Extraction

@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:LinterValidationTesting
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-implements:PatternRelationshipModel
 @architect-product-area:Validation
 Feature: Linter Rules for Relationship Validation

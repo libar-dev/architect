@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:ContextInference
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Annotation
 @behavior @context-inference
 Feature: Context Auto-Inference from File Paths

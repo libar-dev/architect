@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:DocumentationOrchestrator
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 @architect-implements:GeneratorInfrastructureTesting
 Feature: Documentation Generation Orchestrator

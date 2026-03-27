@@ -2,6 +2,7 @@
 @lint @architect-pattern:LintEngineTesting
 @architect-implements:LintEngine
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Validation
 @architect-depends-on:LintRules
 Feature: Lint Engine

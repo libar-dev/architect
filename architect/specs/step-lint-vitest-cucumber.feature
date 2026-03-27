@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:StepLintVitestCucumber
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-phase:50
 @architect-effort:1d
 @architect-product-area:Validation

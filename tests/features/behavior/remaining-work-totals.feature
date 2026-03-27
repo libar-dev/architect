@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:RemainingWorkSummaryAccuracy
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 Feature: Remaining Work Summary Accuracy
 

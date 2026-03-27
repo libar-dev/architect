@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:ComponentDiagramGeneration
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-implements:ArchitectureDiagramGeneration
 @architect-product-area:Generation
 @architecture

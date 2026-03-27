@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:ShapeSelectorTesting
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-implements:ReferenceDocShowcase,DeclarationLevelShapeTagging
 @architect-product-area:Generation
 Feature: Shape Selector Filtering

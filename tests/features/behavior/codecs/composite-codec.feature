@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:CompositeCodecTesting
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-implements:ReferenceDocShowcase
 @architect-product-area:Generation
 Feature: Composite Codec

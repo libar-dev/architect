@@ -4,6 +4,7 @@
 @architect-adr-category:architecture
 @architect-pattern:ADR005CodecBasedMarkdownRendering
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-completed:2025-12-15
 @architect-product-area:Generation
 @architect-include:reference-sample

@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:PatternTagExtraction
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Annotation
 @behavior @scanner @pattern-tags
 Feature: Pattern Tag Extraction from Gherkin Feature Tags

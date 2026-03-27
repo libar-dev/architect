@@ -2,6 +2,7 @@
 @architect-pattern:ValidationRulesCodecTesting
 @architect-implements:ValidationRulesCodec
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 Feature: Validation Rules Document Codec
 

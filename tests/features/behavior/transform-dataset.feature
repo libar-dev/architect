@@ -2,6 +2,7 @@
 @architect-pattern:TransformDatasetTesting
 @architect-implements:TransformDataset
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 @behavior @transform-dataset
 Feature: Transform Dataset Pipeline

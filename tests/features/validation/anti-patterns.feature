@@ -3,6 +3,7 @@
 @architect-pattern:AntiPatternDetectorTesting
 @architect-implements:AntiPatternDetector
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Validation
 @architect-depends-on:DoDValidationTypes
 Feature: Anti-Pattern Detection

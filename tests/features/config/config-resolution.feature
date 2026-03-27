@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:ConfigResolution
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Configuration
 @behavior @config
 Feature: Config Resolution - Defaults and Merging

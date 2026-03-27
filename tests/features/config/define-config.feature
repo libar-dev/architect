@@ -2,6 +2,7 @@
 @architect-pattern:DefineConfigTesting
 @architect-implements:DefineConfig
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Configuration
 @behavior @config
 Feature: Define Config - Schema Validation and Type Guards

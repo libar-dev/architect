@@ -1,6 +1,7 @@
 @architect
 @scanner @architect-pattern:FileDiscovery @unit
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Annotation
 Feature: File Discovery
   The file discovery system uses glob patterns to find TypeScript files

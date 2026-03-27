@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:ZodCodecMigration
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 @behavior @codec
 Feature: Zod Codec Migration

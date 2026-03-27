@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:DescriptionHeaderNormalization
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 Feature: Description Header Normalization
 

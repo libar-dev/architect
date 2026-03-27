@@ -3,6 +3,7 @@
 @behavior @fsm-validation
 @architect-pattern:FSMValidatorTesting
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Validation
 @architect-depends-on:FSMTransitions,FSMStates
 Feature: Phase State Machine Validation

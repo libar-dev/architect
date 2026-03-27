@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:RuleKeywordPoC
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 @poc @rule-keyword
 Feature: PoC - Rule Keyword Support

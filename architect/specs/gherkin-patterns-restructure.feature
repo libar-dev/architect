@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:GherkinPatternsRestructure
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-phase:41
 @architect-effort:0.5d
 @architect-product-area:Generation

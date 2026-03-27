@@ -2,6 +2,7 @@
 @architect-pattern:TaxonomyCodecTesting
 @architect-implements:TaxonomyCodec
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 Feature: Taxonomy Document Codec
 

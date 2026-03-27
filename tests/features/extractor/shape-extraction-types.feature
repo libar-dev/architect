@@ -2,6 +2,7 @@
 @architect-pattern:ShapeExtractionTypesTesting
 @architect-implements:ReferenceDocShowcase
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Annotation
 Feature: TypeScript Shape Extraction - Type Extraction
 

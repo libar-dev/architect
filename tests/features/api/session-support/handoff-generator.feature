@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:HandoffGeneratorTests
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:DataAPI
 Feature: Handoff Generator - Session-End State Summary
 

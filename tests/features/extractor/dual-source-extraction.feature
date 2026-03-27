@@ -3,6 +3,7 @@
 @architect-pattern:DualSourceExtractorTesting
 @architect-implements:DualSourceExtractor
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Annotation
 Feature: Dual-Source Extraction
   Extracts and combines pattern metadata from both TypeScript code stubs

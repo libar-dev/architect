@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:ErrorHandlingUnification
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:CoreTypes
 @architect-include:core-types
 @architect-depends-on:ResultMonad,ErrorFactories

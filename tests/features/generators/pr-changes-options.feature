@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:PrChangesOptions
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 @architect-implements:GeneratorInfrastructureTesting
 Feature: PR Changes Options

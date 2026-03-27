@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:GeneratedDocQuality
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-phase:38
 @architect-effort:2d
 @architect-product-area:Generation

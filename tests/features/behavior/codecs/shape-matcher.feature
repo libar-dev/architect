@@ -2,6 +2,7 @@
 @behavior @shape-matcher
 @architect-pattern:ShapeMatcherTesting
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-implements:ReferenceDocShowcase,DeclarationLevelShapeTagging
 @architect-product-area:Generation
 Feature: Shape Source Pattern Matching

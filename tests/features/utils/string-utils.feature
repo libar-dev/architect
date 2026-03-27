@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:StringUtils
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:CoreTypes
 @architect-include:core-types
 @utils @strings

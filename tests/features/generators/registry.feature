@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:GeneratorRegistryTesting
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 @architect-implements:GeneratorRegistry,GeneratorInfrastructureTesting
 Feature: Generator Registry

@@ -2,6 +2,7 @@
 @behavior @reference-generators
 @architect-pattern:ReferenceGeneratorTesting
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-implements:ReferenceDocShowcase
 @architect-product-area:Generation
 Feature: Reference Document Generator Registration

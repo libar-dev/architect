@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:ImplementsTagProcessing
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-implements:PatternRelationshipModel
 @architect-product-area:Annotation
 Feature: Implements Tag Extraction and Processing

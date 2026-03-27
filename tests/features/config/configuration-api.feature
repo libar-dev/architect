@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:ConfigurationAPI
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Configuration
 @behavior @configuration
 Feature: Configuration API for Open-Sourcing

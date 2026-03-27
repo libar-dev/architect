@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:SessionCodecTesting
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 @architect-implements:CodecBehaviorTesting
 @behavior @session-codecs

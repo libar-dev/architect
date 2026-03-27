@@ -28,6 +28,7 @@
 
 import { printVersionAndExit } from './version.js';
 import { handleCliError } from './error-handler.js';
+import { formatConfigError, loadProjectConfig } from '../config/config-loader.js';
 import {
   deriveProcessState,
   detectStagedChanges,
@@ -259,8 +260,22 @@ async function main(): Promise<void> {
     console.log(`Process Guard: validating ${config.mode} changes...`);
     console.log(`  Base directory: ${config.baseDir}`);
 
+    const configResult = await loadProjectConfig(config.baseDir);
+    if (!configResult.ok) {
+      throw new Error(formatConfigError(configResult.error));
+    }
+
+    const projectConfig = configResult.value;
+    const featurePatterns =
+      projectConfig.project.sources.features.length > 0
+        ? projectConfig.project.sources.features
+        : undefined;
+
     // Derive process state
-    const stateResult = await deriveProcessState({ baseDir: config.baseDir });
+    const stateResult = await deriveProcessState({
+      baseDir: config.baseDir,
+      ...(featurePatterns ? { specPatterns: featurePatterns } : {}),
+    });
     if (!stateResult.ok) {
       throw stateResult.error;
     }
@@ -287,10 +302,16 @@ async function main(): Promise<void> {
     let changesResult;
     switch (config.mode) {
       case 'staged':
-        changesResult = detectStagedChanges(config.baseDir);
+        changesResult = detectStagedChanges(config.baseDir, {
+          registry: projectConfig.instance.registry,
+          ...(featurePatterns ? { featurePatterns } : {}),
+        });
         break;
       case 'all':
-        changesResult = detectBranchChanges(config.baseDir);
+        changesResult = detectBranchChanges(config.baseDir, 'main', {
+          registry: projectConfig.instance.registry,
+          ...(featurePatterns ? { featurePatterns } : {}),
+        });
         break;
       case 'files':
         if (config.files.length === 0) {
@@ -298,7 +319,10 @@ async function main(): Promise<void> {
           printHelp();
           process.exit(1);
         }
-        changesResult = detectFileChanges(config.baseDir, config.files);
+        changesResult = detectFileChanges(config.baseDir, config.files, {
+          registry: projectConfig.instance.registry,
+          ...(featurePatterns ? { featurePatterns } : {}),
+        });
         break;
     }
 

@@ -2,6 +2,7 @@
 @architect-pattern:WarningCollectorTesting
 @architect-implements:WarningCollector
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 Feature: Warning Collector
 

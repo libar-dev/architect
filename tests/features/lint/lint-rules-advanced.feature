@@ -2,6 +2,7 @@
 @lint @architect-pattern:LintRuleAdvancedTesting
 @architect-implements:LintRules
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Validation
 Feature: Pattern Annotation Lint Rules - Advanced Rule Logic
   Complex lint rule logic and collection-level behavior.

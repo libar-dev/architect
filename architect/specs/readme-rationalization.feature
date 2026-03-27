@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:ReadmeRationalization
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-phase:42
 @architect-effort:0.5d
 @architect-product-area:Generation

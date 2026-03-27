@@ -2,6 +2,7 @@
 @behavior @status-transitions @architect-pattern:StatusTransitionDetectionTesting
 @architect-implements:DetectChanges
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Validation
 Feature: Status Transition Detection from Git Diff
   Tests for the detectStatusTransitions function that parses git diff output.

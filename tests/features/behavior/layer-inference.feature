@@ -2,6 +2,7 @@
 @architect-pattern:LayerInferenceTesting
 @architect-implements:LayerInference
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Annotation
 @behavior
 Feature: Layer Inference from Feature File Paths

@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:ProjectConfigLoader
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Configuration
 @behavior @config
 Feature: Project Config Loader - Unified Configuration Loading

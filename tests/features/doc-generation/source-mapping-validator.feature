@@ -2,6 +2,7 @@
 @architect-pattern:SourceMappingValidatorTesting
 @architect-implements:SourceMappingValidator
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 Feature: Source Mapping Validator
 

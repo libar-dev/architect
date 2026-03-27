@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:DirectiveDetection
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Annotation
 @behavior @directive-detection
 Feature: Directive Detection

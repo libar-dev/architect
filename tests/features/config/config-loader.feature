@@ -2,6 +2,7 @@
 @architect-pattern:ConfigLoaderTesting
 @architect-implements:ConfigLoader
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Configuration
 @behavior @config
 Feature: Config Loader - TypeScript Configuration Discovery

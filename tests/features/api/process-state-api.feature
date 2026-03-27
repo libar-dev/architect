@@ -1,6 +1,7 @@
 @architect
 @architect-implements:ProcessStateAPICLI
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @behavior @process-state-api
 @architect-pattern:ProcessStateAPITesting
 @architect-product-area:DataAPI

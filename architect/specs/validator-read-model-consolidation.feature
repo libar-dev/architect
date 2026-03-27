@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:ValidatorReadModelConsolidation
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-phase:100
 @architect-effort:3d
 @architect-product-area:Validation

@@ -58,10 +58,10 @@ export interface DeriveStateConfig {
 }
 
 /** Default spec patterns - generic defaults that work for package-level usage */
-const DEFAULT_SPEC_PATTERNS = [
+export const DEFAULT_PROCESS_GUARD_SPEC_PATTERNS = [
   'architect/**/*.feature',
   'specs/**/*.feature', // For consumers
-];
+] as const;
 
 // =============================================================================
 // Core Functions
@@ -90,7 +90,7 @@ const DEFAULT_SPEC_PATTERNS = [
  * ```
  */
 export async function deriveProcessState(config: DeriveStateConfig): Promise<Result<ProcessState>> {
-  const specPatterns = config.specPatterns ?? DEFAULT_SPEC_PATTERNS;
+  const specPatterns = config.specPatterns ?? DEFAULT_PROCESS_GUARD_SPEC_PATTERNS;
   const sessionsDir = config.sessionsDir ?? path.join(config.baseDir, 'sessions');
 
   // Derive file states

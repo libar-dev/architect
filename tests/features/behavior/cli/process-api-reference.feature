@@ -2,6 +2,7 @@
 @architect-pattern:ProcessApiReferenceTests
 @architect-implements:ProcessApiHybridGeneration
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:DataAPI
 @behavior @cli @process-api-reference
 Feature: Process API CLI Reference Generation

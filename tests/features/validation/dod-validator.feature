@@ -3,6 +3,7 @@
 @behavior @dod-validation
 @architect-pattern:DoDValidatorTesting
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Validation
 @architect-depends-on:AntiPatternDetector
 Feature: Definition of Done (DoD) Validation

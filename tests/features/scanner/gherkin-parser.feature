@@ -1,6 +1,7 @@
 @architect
 @scanner @architect-pattern:GherkinAstParser @unit
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Annotation
 Feature: Gherkin AST Parser
   The Gherkin AST parser extracts feature metadata, scenarios, and steps

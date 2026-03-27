@@ -2,6 +2,7 @@
 @behavior @detect-changes @architect-pattern:DetectChangesTesting
 @architect-implements:DetectChanges
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Validation
 Feature: Deliverable Change Detection from Git Diff
   Tests for the detectDeliverableChanges function that parses git diff output.

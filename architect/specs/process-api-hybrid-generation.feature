@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:ProcessApiHybridGeneration
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-phase:43
 @architect-effort:1d
 @architect-product-area:Generation

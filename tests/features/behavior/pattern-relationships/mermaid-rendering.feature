@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:MermaidRelationshipRendering
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-implements:PatternRelationshipModel
 @architect-product-area:Generation
 Feature: Mermaid Graph Rendering for Relationships

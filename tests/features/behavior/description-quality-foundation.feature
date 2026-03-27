@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:DescriptionQualityFoundation
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 @behavior @description-quality
 Feature: Description Quality Foundation

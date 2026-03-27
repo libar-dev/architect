@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:PublishingRelocation
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-phase:40
 @architect-effort:0.25d
 @architect-product-area:Generation

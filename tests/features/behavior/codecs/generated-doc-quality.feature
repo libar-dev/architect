@@ -2,6 +2,7 @@
 @behavior @reference-codec
 @architect-pattern:GeneratedDocQualityTests
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-implements:GeneratedDocQuality
 @architect-product-area:Generation
 Feature: Generated Documentation Quality Improvements

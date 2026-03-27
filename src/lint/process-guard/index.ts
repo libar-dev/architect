@@ -54,6 +54,7 @@ export type {
 // Derive State
 export {
   deriveProcessState,
+  DEFAULT_PROCESS_GUARD_SPEC_PATTERNS,
   getFileState,
   getFilesByProtection,
   isInSessionScope,

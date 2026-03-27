@@ -2,6 +2,7 @@
 @architect-pattern:DecisionDocGeneratorTesting
 @architect-implements:DecisionDocGenerator
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 Feature: Decision Document Generator
 

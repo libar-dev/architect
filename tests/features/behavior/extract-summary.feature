@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:ExtractSummary
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 @renderable @utils
 Feature: Extract Summary from Pattern Descriptions

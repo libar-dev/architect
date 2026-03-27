@@ -2,6 +2,7 @@
 @architect-pattern:DecisionDocCodecTesting
 @architect-implements:DecisionDocCodec
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 Feature: Decision Document Codec
 

@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:RemainingWorkEnhancement
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 @behavior @remaining-work
 Feature: Remaining Work Enhancement

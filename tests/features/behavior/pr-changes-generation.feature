@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:PrChangesGeneration
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 @behavior @pr-changes
 Feature: PR Changes Generation

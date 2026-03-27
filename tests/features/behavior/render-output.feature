@@ -2,6 +2,7 @@
 @architect-pattern:RendererOutputFormats
 @architect-implements:UniversalMarkdownRenderer
 @architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 @behavior @render
 Feature: Universal Markdown Renderer - Output Formats
