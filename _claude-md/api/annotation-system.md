@@ -47,4 +47,3 @@ export class MyClass { ... }
 | `architect-lint-patterns` | Validate annotation quality (missing tags, invalid status) |
 | `architect-guard`         | FSM validation for architect process                       |
 | `architect-validate`      | Cross-source validation with DoD checks                    |
-| `architect-taxonomy`      | Generate tag reference from TypeScript                     |

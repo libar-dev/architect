@@ -4,7 +4,7 @@
 
 How to annotate TypeScript and Gherkin files for pattern extraction, documentation generation, and architecture diagrams.
 
-For the **complete tag reference** (all 50+ tags with formats, values, and examples), generate the taxonomy: `npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f` or see [TAXONOMY.md](./TAXONOMY.md) for the taxonomy architecture.
+For the **complete tag reference** (all 50+ tags with formats, values, and examples), generate the taxonomy: `pnpm docs:taxonomy` or see [TAXONOMY.md](./TAXONOMY.md) for the taxonomy architecture.
 
 ---
 
@@ -51,7 +51,7 @@ The tag prefix is configurable via presets. All examples in this guide use the d
 | ------------------------- | ------------- | ---------- | ----------------------------- |
 | `libar-generic` (default) | `@architect-` | 3          | Simple projects               |
 | `ddd-es-cqrs`             | `@architect-` | 21         | DDD/Event Sourcing monorepos  |
-| `generic`                 | `@docs-`      | 3          | Simple projects, short prefix |
+| `generic`                 | `@architect-` | 3          | Simple projects, short prefix |
 
 See [CONFIGURATION.md](./CONFIGURATION.md) for preset details and custom configuration.
 
@@ -196,7 +196,7 @@ Feature: Process Guard Linter
 
 > For the complete tag reference with all values, see the [generated Taxonomy Reference](../docs-live/TAXONOMY.md).
 
-Tags are organized into 12 functional groups. This table shows representative tags per group — for the **complete reference** with all formats, values, and examples, run `npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f`.
+Tags are organized into 12 functional groups. This table shows representative tags per group — for the **complete reference** with all formats, values, and examples, run `pnpm docs:taxonomy`.
 
 | Group            | Tags (representative)                                | Format Types              |
 | ---------------- | ---------------------------------------------------- | ------------------------- |
@@ -244,7 +244,7 @@ pnpm architect:query -- sources
 pnpm architect:query -- query getPattern MyPattern
 
 # Generate complete tag reference
-npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f
+pnpm docs:taxonomy
 ```
 
 ### Common Issues

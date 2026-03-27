@@ -41,7 +41,7 @@ import { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG } from '../config/defaults.
  * TagRegistry interface (matches schema from validation-schemas/tag-registry.ts)
  */
 export interface TagRegistry {
-  /** Schema version for forward/backward compatibility checking */
+  /** Schema version for registry versioning */
   version: string;
   /** Category definitions for classifying patterns by domain (e.g., core, api, ddd) */
   categories: readonly CategoryDefinitionForRegistry[];

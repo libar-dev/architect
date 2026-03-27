@@ -197,7 +197,7 @@ export const ScannedGherkinFileSchema = z
     background: GherkinBackgroundSchema.optional(),
     /** Rules in this feature (Gherkin v6+ business rule groupings) */
     rules: z.array(GherkinRuleSchema).readonly().optional(),
-    /** Scenarios in this feature (includes those flattened from Rules for backward compat) */
+    /** Scenarios in this feature (includes those flattened from Rules) */
     scenarios: z.array(GherkinScenarioSchema).readonly(),
   })
   .strict();

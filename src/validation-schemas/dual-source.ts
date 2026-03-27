@@ -53,7 +53,7 @@ export type ProcessStatus = ProcessStatusValue;
  * - **phase**: Standard work units (2-5 days)
  * - **task**: Fine-grained session-level work (1-4 hours)
  *
- * Default is "phase" for backward compatibility with existing feature files.
+ * Default is "phase".
  *
  * @see architect/src/taxonomy/hierarchy-levels.ts
  */
@@ -83,7 +83,7 @@ export const ProcessMetadataSchema = z
     phase: z.number().int().positive(),
     /** Process status */
     status: ProcessStatusSchema,
-    /** Hierarchy level (default: "phase" for backward compatibility) */
+    /** Hierarchy level (default: "phase") */
     level: HierarchyLevelSchema.default('phase'),
     /** Parent pattern name for hierarchy (from @architect-parent tag) */
     parent: z.string().optional(),

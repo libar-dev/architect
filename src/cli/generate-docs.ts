@@ -314,7 +314,7 @@ async function main(): Promise<void> {
   let result;
 
   if (input.length > 0) {
-    // CLI flags provided — use legacy path (explicit overrides)
+    // CLI flags provided — explicit overrides take precedence over config
     console.log('Scanning source files...');
 
     result = await generateDocumentation({

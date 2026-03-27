@@ -137,7 +137,7 @@ export interface ParsedFeatureFile {
   readonly background?: GherkinBackground;
   /** Rules with their nested scenarios (Gherkin v6+) */
   readonly rules?: readonly GherkinRule[];
-  /** All scenarios (including those flattened from Rules for backward compat) */
+  /** All scenarios (including those flattened from Rules for convenience) */
   readonly scenarios: readonly GherkinScenario[];
 }
 
@@ -317,7 +317,7 @@ export function parseFeatureFile(
     // Extract rules (Gherkin v6+ business rule groupings)
     const rules: GherkinRule[] = [];
 
-    // Extract scenarios (including those nested inside Rules for backward compat)
+    // Extract scenarios (including those nested inside Rules)
     const scenarios: GherkinScenario[] = [];
 
     for (const child of cucumberFeature.children) {
@@ -372,7 +372,7 @@ export function parseFeatureFile(
             // Add to rule's scenarios
             ruleScenarios.push(parsedScenario);
 
-            // Also add to flat scenarios for backward compat
+            // Also add to flat list for consumer convenience
             // Include rule context in scenario tags for traceability
             const ruleNameTag = `rule:${cucumberRule.name.replace(/\s+/g, '-')}`;
             scenarios.push({

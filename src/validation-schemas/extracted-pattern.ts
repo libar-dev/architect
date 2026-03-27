@@ -282,7 +282,7 @@ export const ExtractedPatternSchema = z
      * - **phase**: Standard work units (2-5 days) - DEFAULT
      * - **task**: Fine-grained session-level work (1-4 hours)
      *
-     * Defaults to "phase" for backward compatibility with existing feature files.
+     * Defaults to "phase".
      */
     level: HierarchyLevelSchema.optional(),
 

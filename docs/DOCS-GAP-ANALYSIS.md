@@ -169,14 +169,14 @@ Step 5: Replace manual doc section with pointer to generated output
 
 ### Content Sources Available in ReferenceDocConfig
 
-| Source                 | Config Field                      | What It Produces                                                         |
-| ---------------------- | --------------------------------- | ------------------------------------------------------------------------ |
-| Convention annotations | `conventionTags`                  | Structured prose from JSDoc/Gherkin                                      |
-| Type shapes            | `shapeSelectors` / `shapeSources` | TypeScript type definitions with field docs                              |
-| Behavior specs         | `behaviorCategories`              | Rule invariants, scenarios, acceptance criteria                          |
-| Diagrams               | `diagramScopes`                   | Mermaid C4Context, graph LR, classDiagram, stateDiagram, sequenceDiagram |
-| Include tags           | `includeTags`                     | Filter patterns by tag for scoped reference                              |
-| Editorial preamble     | `preamble`                        | Hand-authored SectionBlock[] prepended to output                         |
+| Source                 | Config Field         | What It Produces                                                         |
+| ---------------------- | -------------------- | ------------------------------------------------------------------------ |
+| Convention annotations | `conventionTags`     | Structured prose from JSDoc/Gherkin                                      |
+| Type shapes            | `shapeSelectors`     | TypeScript type definitions with field docs                              |
+| Behavior specs         | `behaviorCategories` | Rule invariants, scenarios, acceptance criteria                          |
+| Diagrams               | `diagramScopes`      | Mermaid C4Context, graph LR, classDiagram, stateDiagram, sequenceDiagram |
+| Include tags           | `includeTags`        | Filter patterns by tag for scoped reference                              |
+| Editorial preamble     | `preamble`           | Hand-authored SectionBlock[] prepended to output                         |
 
 ### Existing Convention Tags (from architect.config.ts)
 
@@ -275,7 +275,7 @@ sync-content.mjs
 
 | Section                | Directory      | Source                                     | Collapsed |
 | ---------------------- | -------------- | ------------------------------------------ | --------- |
-| Tutorial               | tutorial/      | architect-tutorials repo            | No        |
+| Tutorial               | tutorial/      | architect-tutorials repo                   | No        |
 | Guides                 | guides/        | docs/ manual (5 files)                     | No        |
 | Reference              | reference/     | docs/ manual (5 files)                     | No        |
 | Product Areas          | product-areas/ | docs-live/product-areas/                   | No        |

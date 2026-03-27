@@ -72,7 +72,7 @@ export const ScenarioRefSchema = z
     semanticTags: z.array(z.string()).readonly(),
     /** All tags on the scenario (excluding @pattern:*) */
     tags: z.array(z.string()).readonly(),
-    /** Scenario steps with Given/When/Then (optional for backward compatibility) */
+    /** Scenario steps with Given/When/Then (optional; not all extractors populate steps) */
     steps: z.array(ScenarioStepSchema).readonly().optional(),
     /** Inferred feature layer based on directory path (timeline, domain, integration, e2e, component) */
     layer: z.enum(LAYER_TYPES).optional(),

@@ -33,7 +33,7 @@ This document describes the architecture of the `@libar-dev/architect` package, 
 
 The `@libar-dev/architect` package generates LLM-optimized documentation from dual sources:
 
-- **TypeScript code** with configurable JSDoc annotations (e.g., `@docs-*` or `@architect-*`)
+- **TypeScript code** with configurable JSDoc annotations (e.g., `@architect-*`)
 - **Gherkin feature files** with matching tags
 
 The tag prefix is configurable via presets or custom configuration (see [Configuration Architecture](#configuration-architecture)).
@@ -488,18 +488,16 @@ The Architect package uses a codec-based architecture for document generation:
 
 ```
 MasterDataset → Codec.decode() → RenderableDocument ─┬→ renderToMarkdown       → Markdown Files
-                                                      ├→ renderToClaudeMdModule → Modular Claude.md
-                                                      └→ renderToClaudeContext  → Token-efficient text
+                                                      └→ renderToClaudeMdModule → Modular Claude.md
 ```
 
-| Component                  | Description                                                                                    |
-| -------------------------- | ---------------------------------------------------------------------------------------------- |
-| **MasterDataset**          | Aggregated view of all extracted patterns with indexes by category, phase, status              |
-| **Codec**                  | Zod 4 codec that transforms MasterDataset into RenderableDocument                              |
-| **RenderableDocument**     | Universal intermediate format with typed section blocks                                        |
-| **renderToMarkdown**       | Domain-agnostic markdown renderer for human documentation                                      |
-| **renderToClaudeMdModule** | Modular-claude-md renderer (H3-rooted headings, omits Mermaid/link-outs)                       |
-| **renderToClaudeContext**  | LLM-optimized renderer (~20-40% fewer tokens, omits Mermaid, flattens collapsibles) _(legacy)_ |
+| Component                  | Description                                                                       |
+| -------------------------- | --------------------------------------------------------------------------------- |
+| **MasterDataset**          | Aggregated view of all extracted patterns with indexes by category, phase, status |
+| **Codec**                  | Zod 4 codec that transforms MasterDataset into RenderableDocument                 |
+| **RenderableDocument**     | Universal intermediate format with typed section blocks                           |
+| **renderToMarkdown**       | Domain-agnostic markdown renderer for human documentation                         |
+| **renderToClaudeMdModule** | Modular-claude-md renderer (H3-rooted headings, omits Mermaid/link-outs)          |
 
 ### Block Vocabulary (9 Types)
 
@@ -819,7 +817,7 @@ const doc = codec.decode(dataset);
 
 1. **Convention content** — Extracted from `@architect-convention`-tagged patterns (rules, invariants, tables)
 2. **Scoped diagrams** — Mermaid diagrams filtered by `archContext`, `archLayer`, `patterns`, or `archView`
-3. **TypeScript shapes** — API surfaces from `shapeSources` globs or `shapeSelectors` (declaration-level filtering)
+3. **TypeScript shapes** — API surfaces from `shapeSelectors` (declaration-level filtering)
 4. **Behavior content** — Gherkin-sourced patterns from `behaviorCategories`
 
 **Diagram Types (via `DiagramScope.diagramType`):**
@@ -836,9 +834,7 @@ const doc = codec.decode(dataset);
 
 | Option               | Type              | Description                                    |
 | -------------------- | ----------------- | ---------------------------------------------- |
-| `diagramScope`       | `DiagramScope`    | Single diagram configuration                   |
 | `diagramScopes`      | `DiagramScope[]`  | Multiple diagrams (takes precedence)           |
-| `shapeSources`       | `string[]`        | Glob patterns for shape extraction             |
 | `shapeSelectors`     | `ShapeSelector[]` | Fine-grained declaration-level shape filtering |
 | `behaviorCategories` | `string[]`        | Category tags for behavior pattern content     |
 | `conventionTags`     | `string[]`        | Convention tag values to include               |

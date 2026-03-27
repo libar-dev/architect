@@ -12,8 +12,8 @@
 Feature: CLI Behavior Testing
 
   **Problem:**
-  All 5 CLI commands (generate-docs, lint-patterns, lint-process, validate-patterns,
-  generate-tag-taxonomy) have zero behavior specs. These are user-facing interfaces
+  All 4 CLI commands (generate-docs, lint-patterns, lint-process, validate-patterns)
+  have zero behavior specs. These are user-facing interfaces
   that need comprehensive testing for argument parsing, error handling, and output formats.
 
   **Solution:**
@@ -36,7 +36,6 @@ Feature: CLI Behavior Testing
       | lint-patterns CLI tests | pending | Yes | integration | tests/features/cli/lint-patterns.feature |
       | lint-process CLI tests | pending | Yes | integration | tests/features/cli/lint-process.feature |
       | validate-patterns CLI tests | pending | Yes | integration | tests/features/cli/validate-patterns.feature |
-      | generate-tag-taxonomy CLI tests | pending | Yes | unit | tests/features/cli/generate-tag-taxonomy.feature |
       | CLI test step definitions | pending | Yes | - | tests/steps/cli/ |
 
   # ============================================================================

@@ -206,7 +206,7 @@ pnpm architect:query -- sources
 pnpm architect:query -- query getPattern MyPattern
 
 # Generate complete tag reference
-npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f
+pnpm docs:taxonomy
 ```
 
 ---

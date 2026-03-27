@@ -509,7 +509,7 @@ ArchIndexSchema = z.object({
 
 ## Business Rules
 
-39 patterns, 151 rules with invariants (151 total)
+38 patterns, 146 rules with invariants (146 total)
 
 ### Arch Queries Test
 
@@ -623,16 +623,6 @@ ArchIndexSchema = z.object({
 | CLI lists available generators                | The --list-generators flag must display all registered generator names without performing any generation.                        | Users need to discover available generators before specifying --generator — listing them avoids trial-and-error with invalid generator names.                                     |
 | CLI generates documentation from source files | Given valid input patterns and a generator name, the CLI must scan sources, extract patterns, and produce markdown output files. | This is the core pipeline — the CLI is the primary entry point for transforming annotated source code into generated documentation.                                               |
 | CLI rejects unknown options                   | Unrecognized CLI flags must cause an error with a descriptive message rather than being silently ignored.                        | Silent flag ignoring hides typos and misconfigurations — users typing --ouput instead of --output would get unexpected default behavior without realizing their flag was ignored. |
-
-### Generate Tag Taxonomy Cli
-
-| Rule                                            | Invariant                                                                                                                                                                        | Rationale                                                                                                                                                                 |
-| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CLI displays help and version information       | The --help/-h and --version/-v flags must produce usage/version output and exit successfully without requiring other arguments.                                                  | Help and version are universal CLI conventions — both short and long flag forms must work for discoverability and scripting compatibility.                                |
-| CLI generates taxonomy at specified output path | The taxonomy generator must write output to the specified path, creating parent directories if they do not exist, and defaulting to a standard path when no output is specified. | Flexible output paths support both default conventions and custom layouts — auto-creating directories prevents "ENOENT" errors on first run.                              |
-| CLI respects overwrite flag for existing files  | The CLI must refuse to overwrite existing output files unless the --overwrite or -f flag is explicitly provided.                                                                 | Overwrite protection prevents accidental destruction of hand-edited taxonomy files — requiring an explicit flag makes destructive operations intentional.                 |
-| Generated taxonomy contains expected sections   | The generated taxonomy file must include category documentation and statistics sections reflecting the configured tag registry.                                                  | The taxonomy is a reference document — incomplete output missing categories or statistics would leave developers without the information they need to annotate correctly. |
-| CLI warns about unknown flags                   | Unrecognized CLI flags must produce a warning message but allow execution to continue.                                                                                           | Taxonomy generation is non-destructive — warning without failing is more user-friendly than hard errors for minor flag typos, while still surfacing the issue.            |
 
 ### Handoff Generator Tests
 

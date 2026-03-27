@@ -78,7 +78,7 @@ function isKnownStatus(status: string | undefined): boolean {
  * - Aggregate statistics (counts, phase count, category count)
  * - Optional relationship index
  *
- * For backward compatibility, this function returns just the dataset.
+ * Convenience wrapper that returns just the dataset.
  * Use `transformToMasterDatasetWithValidation` to get validation summary.
  *
  * @param raw - Raw dataset with patterns, registry, and optional workflow

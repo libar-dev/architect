@@ -97,9 +97,9 @@ graph TB
         CliRecipeCodec["CliRecipeCodec"]:::neighbor
         ContextInference["ContextInference"]:::neighbor
     end
+    loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
     GitModule -->|uses| GitBranchDiff
     GitModule -->|uses| GitHelpers
-    loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
     SourceMapper -.->|depends on| DecisionDocCodec
     SourceMapper -.->|depends on| ShapeExtractor
     SourceMapper -.->|depends on| GherkinASTParser
@@ -271,7 +271,7 @@ type CollapsibleBlock = {
  * - Aggregate statistics (counts, phase count, category count)
  * - Optional relationship index
  *
- * For backward compatibility, this function returns just the dataset.
+ * Convenience wrapper that returns just the dataset.
  * Use `transformToMasterDatasetWithValidation` to get validation summary.
  *
  * @param raw - Raw dataset with patterns, registry, and optional workflow

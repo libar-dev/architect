@@ -225,7 +225,7 @@ export function buildPattern(
       }
     }
   } else if (directive.extractShapes !== undefined && directive.extractShapes.length > 0) {
-    // Non-TS file with extract-shapes tag — legacy path
+    // Non-TS file with extract-shapes tag — non-TS extraction path
     try {
       const sourceContent = fs.readFileSync(filePath, 'utf-8');
       const shapeResult = processExtractShapesTag(

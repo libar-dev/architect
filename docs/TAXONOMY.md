@@ -58,11 +58,11 @@ const registry = buildRegistry();
 
 ### Presets Select Taxonomy Subsets
 
-| Preset                    | Categories | Tag Prefix    | Use Case                           |
-| ------------------------- | ---------- | ------------- | ---------------------------------- |
-| `libar-generic` (default) | 3          | `@architect-` | Simple projects (this package)     |
-| `ddd-es-cqrs`             | 21         | `@architect-` | DDD/Event Sourcing architectures   |
-| `generic`                 | 3          | `@docs-`      | Simple projects with @docs- prefix |
+| Preset                    | Categories | Tag Prefix    | Use Case                                |
+| ------------------------- | ---------- | ------------- | --------------------------------------- |
+| `libar-generic` (default) | 3          | `@architect-` | Simple projects (this package)          |
+| `ddd-es-cqrs`             | 21         | `@architect-` | DDD/Event Sourcing architectures        |
+| `generic`                 | 3          | `@architect-` | Simple projects with @architect- prefix |
 
 The preset determines which categories are available. All presets share the same status values and format types.
 
@@ -72,14 +72,14 @@ The preset determines which categories are available. All presets share the same
 
 Tags have different value formats:
 
-| Format         | Example                    | Parsing                        |
-| -------------- | -------------------------- | ------------------------------ |
-| `flag`         | `@docs-core`               | Boolean presence (no value)    |
-| `value`        | `@docs-pattern MyPattern`  | Simple string                  |
-| `enum`         | `@docs-status completed`   | Constrained to predefined list |
-| `csv`          | `@docs-uses A, B, C`       | Comma-separated values         |
-| `number`       | `@docs-phase 15`           | Numeric value                  |
-| `quoted-value` | `@docs-brief:'Multi word'` | Preserves spaces               |
+| Format         | Example                         | Parsing                        |
+| -------------- | ------------------------------- | ------------------------------ |
+| `flag`         | `@architect-core`               | Boolean presence (no value)    |
+| `value`        | `@architect-pattern MyPattern`  | Simple string                  |
+| `enum`         | `@architect-status completed`   | Constrained to predefined list |
+| `csv`          | `@architect-uses A, B, C`       | Comma-separated values         |
+| `number`       | `@architect-phase 15`           | Numeric value                  |
+| `quoted-value` | `@architect-brief:'Multi word'` | Preserves spaces               |
 
 ---
 
@@ -92,7 +92,7 @@ Generate a human-readable taxonomy reference from the TypeScript taxonomy source
 npx generate-docs -g taxonomy -i "src/**/*.ts" -o docs -f
 
 # Flat single-file reference (deprecated — use generate-docs instead)
-npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f
+pnpm docs:taxonomy
 ```
 
 The generated output reflects every tag the system supports — including all 21 categories available with the `ddd-es-cqrs` preset.

@@ -19,6 +19,6 @@ export const HIERARCHY_LEVELS = ['epic', 'phase', 'task'] as const;
 export type HierarchyLevel = (typeof HIERARCHY_LEVELS)[number];
 
 /**
- * Default hierarchy level (for backward compatibility)
+ * Default hierarchy level
  */
 export const DEFAULT_HIERARCHY_LEVEL: HierarchyLevel = 'phase';

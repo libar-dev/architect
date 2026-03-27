@@ -10,7 +10,7 @@
 | ----------------- | ------------------------------------------------------ |
 | **Package**       | @libar-dev/architect                                   |
 | **Purpose**       | Context engineering platform for AI-assisted codebases |
-| **Patterns**      | 396 tracked (262 completed, 81 active, 53 planned)     |
+| **Patterns**      | 394 tracked (261 completed, 81 active, 52 planned)     |
 | **Product Areas** | 7                                                      |
 | **License**       | MIT                                                    |
 
@@ -152,23 +152,23 @@
 | Annotation    | 26       | 23        | 2      | 1       | [███████░] 23/26 88%       |
 | Configuration | 11       | 8         | 0      | 3       | [██████░░] 8/11 73%        |
 | CoreTypes     | 11       | 7         | 4      | 0       | [█████░░░] 7/11 64%        |
-| DataAPI       | 41       | 24        | 15     | 2       | [█████░░░] 24/41 59%       |
+| DataAPI       | 40       | 23        | 15     | 2       | [█████░░░] 23/40 57%       |
 | Generation    | 95       | 81        | 6      | 8       | [███████░] 81/95 85%       |
 | Process       | 11       | 4         | 0      | 7       | [███░░░░░] 4/11 36%        |
 | Validation    | 25       | 16        | 3      | 6       | [█████░░░] 16/25 64%       |
-| **Total**     | **220**  | **163**   | **30** | **27**  | **[██████░░] 163/220 74%** |
+| **Total**     | **219**  | **162**   | **30** | **27**  | **[██████░░] 162/219 74%** |
 
 ---
 
 ## Phase Progress
 
-**396** patterns total: **262** completed (66%), **81** active, **53** planned. [█████████████░░░░░░░] 262/396
+**394** patterns total: **261** completed (66%), **81** active, **52** planned. [█████████████░░░░░░░] 261/394
 
 | Status    | Count | Percentage |
 | --------- | ----- | ---------- |
-| Completed | 262   | 66%        |
-| Active    | 81    | 20%        |
-| Planned   | 53    | 13%        |
+| Completed | 261   | 66%        |
+| Active    | 81    | 21%        |
+| Planned   | 52    | 13%        |
 
 ### By Phase
 

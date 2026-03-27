@@ -51,7 +51,7 @@ Validation is the enforcement boundary — it ensures that every change to annot
 
 The Data API provides direct terminal access to project state. It replaces reading generated markdown or launching explore agents — targeted queries use 5-10x less context. The `context` command assembles curated bundles tailored to session type (planning, design, implement).
 
-**41 patterns** — 24 completed, 15 active, 2 planned
+**40 patterns** — 23 completed, 15 active, 2 planned
 
 **Key patterns:** DataAPIContextAssembly, ProcessStateAPICLI, DataAPIDesignSessionSupport, DataAPIRelationshipGraph, DataAPIOutputShaping
 
@@ -85,10 +85,10 @@ Process defines the USDP-inspired session workflow that governs how work moves t
 | [Configuration](product-areas/CONFIGURATION.md) | 11       | 8         | 0      | 3       |
 | [Generation](product-areas/GENERATION.md)       | 95       | 81        | 6      | 8       |
 | [Validation](product-areas/VALIDATION.md)       | 25       | 16        | 3      | 6       |
-| [DataAPI](product-areas/DATA-API.md)            | 41       | 24        | 15     | 2       |
+| [DataAPI](product-areas/DATA-API.md)            | 40       | 23        | 15     | 2       |
 | [CoreTypes](product-areas/CORE-TYPES.md)        | 11       | 7         | 4      | 0       |
 | [Process](product-areas/PROCESS.md)             | 11       | 4         | 0      | 7       |
-| **Total**                                       | **220**  | **163**   | **30** | **27**  |
+| **Total**                                       | **219**  | **162**   | **30** | **27**  |
 
 ---
 

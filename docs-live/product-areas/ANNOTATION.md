@@ -106,7 +106,7 @@ graph LR
 
 ```typescript
 interface TagRegistry {
-  /** Schema version for forward/backward compatibility checking */
+  /** Schema version for registry versioning */
   version: string;
   /** Category definitions for classifying patterns by domain (e.g., core, api, ddd) */
   categories: readonly CategoryDefinitionForRegistry[];
@@ -125,7 +125,7 @@ interface TagRegistry {
 
 | Property        | Description                                                                    |
 | --------------- | ------------------------------------------------------------------------------ |
-| version         | Schema version for forward/backward compatibility checking                     |
+| version         | Schema version for registry versioning                                         |
 | categories      | Category definitions for classifying patterns by domain (e.g., core, api, ddd) |
 | metadataTags    | Metadata tag definitions with format, purpose, and validation rules            |
 | aggregationTags | Aggregation tag definitions for document-level grouping                        |

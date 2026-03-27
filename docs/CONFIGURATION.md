@@ -5,17 +5,17 @@
 Configure tag prefixes, presets, sources, output, and custom taxonomies for `@libar-dev/architect`.
 
 > **Prerequisites:** See [README.md](../README.md) for installation and basic usage.
-> **Tag Reference:** Run `npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f` for a complete tag list. See [TAXONOMY.md](./TAXONOMY.md) for concepts.
+> **Tag Reference:** Run `pnpm docs:taxonomy` for a complete tag list. See [TAXONOMY.md](./TAXONOMY.md) for concepts.
 
 ---
 
 ## Quick Reference
 
-| Preset                        | Tag Prefix    | Categories | Use Case                             |
-| ----------------------------- | ------------- | ---------- | ------------------------------------ |
-| **`libar-generic`** (default) | `@architect-` | 3          | Simple projects (this package)       |
-| `generic`                     | `@docs-`      | 3          | Simple projects with `@docs-` prefix |
-| `ddd-es-cqrs`                 | `@architect-` | 21         | DDD/Event Sourcing architectures     |
+| Preset                        | Tag Prefix    | Categories | Use Case                                  |
+| ----------------------------- | ------------- | ---------- | ----------------------------------------- |
+| **`libar-generic`** (default) | `@architect-` | 3          | Simple projects (this package)            |
+| `generic`                     | `@architect-` | 3          | Simple projects with `@architect-` prefix |
+| `ddd-es-cqrs`                 | `@architect-` | 21         | DDD/Event Sourcing architectures          |
 
 ```typescript
 // architect.config.ts
@@ -42,7 +42,7 @@ export default defineConfig({
   output: { directory: 'docs-living', overwrite: true },
 });
 
-// Generic preset (simple taxonomy with @docs- prefix)
+// Generic preset (simple taxonomy with @architect- prefix)
 export default defineConfig({
   preset: 'generic',
   sources: { typescript: ['src/**/*.ts'] },
@@ -108,21 +108,21 @@ export function scanPatterns(config: ScanConfig): Promise<ScanResult> { ... }
 
 ### Generic Preset
 
-Same 3 categories as `libar-generic` but with `@docs-` prefix. Use when you prefer shorter tag names.
+Same 3 categories as `libar-generic` but with `@architect-` prefix. Use when you prefer shorter tag names.
 
 | Property        | Value                |
 | --------------- | -------------------- |
-| **Tag Prefix**  | `@docs-`             |
-| **File Opt-In** | `@docs`              |
+| **Tag Prefix**  | `@architect-`        |
+| **File Opt-In** | `@architect`         |
 | **Categories**  | 3 (core, api, infra) |
 
 ```typescript
 /**
- * @docs
- * @docs-pattern PatternScanner
- * @docs-status completed
- * @docs-core
- * @docs-uses FileDiscovery, ASTParser
+ * @architect
+ * @architect-pattern PatternScanner
+ * @architect-status completed
+ * @architect-core
+ * @architect-uses FileDiscovery, ASTParser
  */
 export function scanPatterns(config: ScanConfig): Promise<ScanResult> { ... }
 ```
@@ -149,7 +149,7 @@ Full taxonomy for domain-driven architectures with 21 categories.
 export function transformToMasterDataset(input: TransformInput): MasterDataset { ... }
 ```
 
-> **Category Reference:** Run `npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f` for the complete list. See [TAXONOMY.md](./TAXONOMY.md) for concepts.
+> **Category Reference:** Run `pnpm docs:taxonomy` for the complete list. See [TAXONOMY.md](./TAXONOMY.md) for concepts.
 
 ---
 
@@ -273,8 +273,8 @@ Define your own taxonomy:
 
 ```typescript
 export default defineConfig({
-  tagPrefix: '@docs-',
-  fileOptInTag: '@docs',
+  tagPrefix: '@architect-',
+  fileOptInTag: '@architect',
   categories: [
     { tag: 'scanner', domain: 'Scanner', priority: 1, description: 'File scanning', aliases: [] },
     {

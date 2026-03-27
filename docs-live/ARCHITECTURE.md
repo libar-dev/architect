@@ -14,7 +14,7 @@ This diagram shows 65 key components with explicit architectural roles across 10
 | Diagram Components | 65    |
 | Bounded Contexts   | 10    |
 | Component Roles    | 5     |
-| Total Annotated    | 169   |
+| Total Annotated    | 168   |
 
 ---
 
@@ -111,16 +111,8 @@ graph TB
     subgraph shared["Shared Infrastructure"]
         Convention_Annotation_Example___DD_3_Decision["Convention Annotation Example — DD-3 Decision[decider]"]
     end
-    GherkinScanner --> GherkinASTParser
     DoDValidator --> DualSourceExtractor
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> GherkinASTParser
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    LintEngine --> LintRules
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
+    GherkinScanner --> GherkinASTParser
     MCPToolRegistry --> ProcessStateAPI
     MCPToolRegistry --> MCPPipelineSession
     MCPServerImpl --> MCPPipelineSession
@@ -132,9 +124,14 @@ graph TB
     MCPModule --> MCPPipelineSession
     MCPModule --> MCPFileWatcher
     MCPModule --> MCPToolRegistry
-    ConfigResolver --> ArchitectFactory
-    ArchitectFactory --> RegexBuilders
-    ConfigLoader --> ArchitectFactory
+    LintEngine --> LintRules
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> GherkinASTParser
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
     ReplMode --> ProcessStateAPI
     ProcessAPICLIImpl --> ProcessStateAPI
     ProcessAPICLIImpl --> MasterDataset
@@ -143,6 +140,9 @@ graph TB
     ProcessAPICLIImpl --> OutputPipelineImpl
     OutputPipelineImpl --> PatternSummarizerImpl
     MCPServerBin --> MCPServerImpl
+    ConfigResolver --> ArchitectFactory
+    ArchitectFactory --> RegexBuilders
+    ConfigLoader --> ArchitectFactory
     PatternSummarizerImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
     ScopeValidatorImpl --> MasterDataset
@@ -164,13 +164,13 @@ graph TB
     FSMValidator --> FSMStates
     DesignReviewCodec --> MasterDataset
     ArchitectureCodec --> MasterDataset
+    ProcessGuardDecider --> FSMValidator
     TransformDataset --> MasterDataset
     SequenceTransformUtils --> MasterDataset
     DesignReviewGenerator --> DesignReviewCodec
     DesignReviewGenerator --> MasterDataset
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
-    ProcessGuardDecider --> FSMValidator
 ```
 
 ---
@@ -352,7 +352,6 @@ All components with architecture annotations:
 | ✅ String Utils                                                   | -          | -              | -              | tests/features/utils/string-utils.feature                             |
 | 🚧 Stub Resolver Impl                                             | -          | -              | -              | src/api/stub-resolver.ts                                              |
 | 🚧 Tag Registry Builder Testing                                   | -          | -              | -              | tests/features/types/tag-registry-builder.feature                     |
-| ⏸️ Tag Taxonomy CLI                                               | -          | -              | -              | src/cli/generate-tag-taxonomy.ts                                      |
 | ✅ Taxonomy Codec                                                 | -          | -              | -              | src/renderable/codecs/taxonomy.ts                                     |
 | ✅ Timeline Codec                                                 | -          | -              | -              | src/renderable/codecs/timeline.ts                                     |
 | ✅ Validate Patterns CLI                                          | -          | -              | -              | src/cli/validate-patterns.ts                                          |

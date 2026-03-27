@@ -285,7 +285,7 @@ Feature: Architecture Document Refactoring
       Given the annotation format examples from Source Systems (L598-631)
       When the Source Systems section is absorbed
       Then the annotation format examples appear in the Four-Stage Pipeline section
-      And the examples explain how to read and write libar-docs tags
+      And the examples explain how to read and write architect tags
 
   Rule: MasterDataset shapes generate a dedicated ARCHITECTURE-TYPES reference document
 
