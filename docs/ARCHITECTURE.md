@@ -133,7 +133,7 @@ defineConfig(userConfig)
 | `src/config/merge-sources.ts`         | `mergeSourcesForGenerator()` — per-generator sources       |
 | `src/config/config-loader.ts`         | `loadProjectConfig()` — file discovery + loading           |
 | `src/config/factory.ts`               | `createArchitect()` — taxonomy factory (internal)          |
-| `src/config/presets.ts`               | GENERIC_PRESET, LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET   |
+| `src/config/presets.ts`               | LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET                   |
 
 > **See:** [CONFIGURATION.md](./CONFIGURATION.md) for usage examples and API reference.
 
@@ -1556,13 +1556,13 @@ generatorRegistry.register(new MyCustomGenerator());
 
 ```bash
 # Single generator
-generate-docs -i "src/**/*.ts" -g patterns -o docs
+pnpm exec architect-generate -i "src/**/*.ts" -g patterns -o docs
 
 # Multiple generators
-generate-docs -i "src/**/*.ts" -g patterns -g roadmap -g session -o docs
+pnpm exec architect-generate -i "src/**/*.ts" -g patterns -g roadmap -g session -o docs
 
 # List available generators
-generate-docs --list-generators
+pnpm exec architect-generate --list-generators
 ```
 
 ### Common Filter Patterns

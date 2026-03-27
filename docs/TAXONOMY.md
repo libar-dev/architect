@@ -17,7 +17,7 @@ A **taxonomy** is a classification system. In `@libar-dev/architect`, the taxono
 | **Format Types** | How tag values are parsed (`flag`, `csv`, `enum`)         |
 | **Hierarchy**    | Work item levels (`epic`, `phase`, `task`)                |
 
-The taxonomy is NOT a fixed schema. Presets (`libar-generic`, `generic`, `ddd-es-cqrs`) select different subsets, and you can define custom categories.
+The taxonomy is NOT a fixed schema. Presets (`libar-generic`, `ddd-es-cqrs`) select different subsets, and you can define custom categories.
 
 ---
 
@@ -58,11 +58,10 @@ const registry = buildRegistry();
 
 ### Presets Select Taxonomy Subsets
 
-| Preset                    | Categories | Tag Prefix    | Use Case                                |
-| ------------------------- | ---------- | ------------- | --------------------------------------- |
-| `libar-generic` (default) | 3          | `@architect-` | Simple projects (this package)          |
-| `ddd-es-cqrs`             | 21         | `@architect-` | DDD/Event Sourcing architectures        |
-| `generic`                 | 3          | `@architect-` | Simple projects with @architect- prefix |
+| Preset                    | Categories | Tag Prefix    | Use Case                         |
+| ------------------------- | ---------- | ------------- | -------------------------------- |
+| `libar-generic` (default) | 3          | `@architect-` | Simple projects (this package)   |
+| `ddd-es-cqrs`             | 21         | `@architect-` | DDD/Event Sourcing architectures |
 
 The preset determines which categories are available. All presets share the same status values and format types.
 
@@ -88,11 +87,11 @@ Tags have different value formats:
 Generate a human-readable taxonomy reference from the TypeScript taxonomy source:
 
 ```bash
-# Via the docs generator (recommended)
-npx generate-docs -g taxonomy -i "src/**/*.ts" -o docs -f
-
-# Flat single-file reference (deprecated — use generate-docs instead)
+# Via the docs script (recommended)
 pnpm docs:taxonomy
+
+# Direct CLI equivalent
+pnpm exec architect-generate -g taxonomy -i "src/**/*.ts" -o docs -f
 ```
 
 The generated output reflects every tag the system supports — including all 21 categories available with the `ddd-es-cqrs` preset.

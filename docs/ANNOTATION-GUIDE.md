@@ -47,11 +47,10 @@ Feature: My Pattern
 
 The tag prefix is configurable via presets. All examples in this guide use the default `@architect-` prefix.
 
-| Preset                    | Prefix        | Categories | Use Case                      |
-| ------------------------- | ------------- | ---------- | ----------------------------- |
-| `libar-generic` (default) | `@architect-` | 3          | Simple projects               |
-| `ddd-es-cqrs`             | `@architect-` | 21         | DDD/Event Sourcing monorepos  |
-| `generic`                 | `@architect-` | 3          | Simple projects, short prefix |
+| Preset                    | Prefix        | Categories | Use Case                     |
+| ------------------------- | ------------- | ---------- | ---------------------------- |
+| `libar-generic` (default) | `@architect-` | 3          | Simple projects              |
+| `ddd-es-cqrs`             | `@architect-` | 21         | DDD/Event Sourcing monorepos |
 
 See [CONFIGURATION.md](./CONFIGURATION.md) for preset details and custom configuration.
 

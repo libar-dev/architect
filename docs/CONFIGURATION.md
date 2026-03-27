@@ -11,11 +11,10 @@ Configure tag prefixes, presets, sources, output, and custom taxonomies for `@li
 
 ## Quick Reference
 
-| Preset                        | Tag Prefix    | Categories | Use Case                                  |
-| ----------------------------- | ------------- | ---------- | ----------------------------------------- |
-| **`libar-generic`** (default) | `@architect-` | 3          | Simple projects (this package)            |
-| `generic`                     | `@architect-` | 3          | Simple projects with `@architect-` prefix |
-| `ddd-es-cqrs`                 | `@architect-` | 21         | DDD/Event Sourcing architectures          |
+| Preset                        | Tag Prefix    | Categories | Use Case                         |
+| ----------------------------- | ------------- | ---------- | -------------------------------- |
+| **`libar-generic`** (default) | `@architect-` | 3          | Simple projects (this package)   |
+| `ddd-es-cqrs`                 | `@architect-` | 21         | DDD/Event Sourcing architectures |
 
 ```typescript
 // architect.config.ts
@@ -42,12 +41,6 @@ export default defineConfig({
   output: { directory: 'docs-living', overwrite: true },
 });
 
-// Generic preset (simple taxonomy with @architect- prefix)
-export default defineConfig({
-  preset: 'generic',
-  sources: { typescript: ['src/**/*.ts'] },
-});
-
 // Custom prefix with any taxonomy
 export default defineConfig({
   preset: 'libar-generic',
@@ -63,11 +56,10 @@ When using a preset, the preset's categories **replace** the base taxonomy categ
 
 | Preset          | Categories        | Count |
 | --------------- | ----------------- | ----- |
-| `generic`       | core, api, infra  | 3     |
 | `libar-generic` | core, api, infra  | 3     |
 | `ddd-es-cqrs`   | Full DDD taxonomy | 21    |
 
-**Design decision:** If you need DDD categories (ddd, event-sourcing, cqrs, saga, projection, decider, etc.), use the `ddd-es-cqrs` preset. The `generic` and `libar-generic` presets provide a simpler 3-category taxonomy.
+**Design decision:** If you need DDD categories (ddd, event-sourcing, cqrs, saga, projection, decider, etc.), use the `ddd-es-cqrs` preset. The `libar-generic` preset provides a simpler 3-category taxonomy.
 
 ### Default Preset Selection
 
@@ -87,7 +79,7 @@ All entry points use the same default:
 
 ### Libar-Generic Preset (Default)
 
-The default preset used by this package. Same 3 categories as `generic` but with `@architect-` prefix.
+The default preset used by this package. It uses the `@architect-` prefix with the simple 3-category taxonomy.
 
 | Property        | Value                |
 | --------------- | -------------------- |
@@ -161,7 +153,7 @@ The `defineConfig()` function centralizes taxonomy, sources, output, and generat
 
 1. Current directory: check `architect.config.ts`, then `.js`
 2. Walk up to repo root (`.git` folder), checking each directory
-3. Fall back to libar-generic preset (3 categories, `@architect-` prefix)
+3. Fall back to the libar-generic preset (3 categories, `@architect-` prefix)
 
 ### Config File Format
 
@@ -240,7 +232,7 @@ my-monorepo/
 ├── architect.config.ts          # Repo: ddd-es-cqrs
 └── packages/
     └── my-package/
-        └── architect.config.ts  # Package: generic
+        └── architect.config.ts  # Package: libar-generic
 ```
 
 CLI tools use the nearest config file to the working directory.

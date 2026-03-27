@@ -72,7 +72,7 @@
 | Quick Start               | 52-109  | Install, annotate, generate, lint             |
 | How It Works              | 111-165 | Annotation examples, pipeline one-liner       |
 | What Gets Generated       | 167-184 | Content block types, config-driven generation |
-| CLI Commands              | 186-254 | generate-docs, process-api                    |
+| CLI Commands              | 186-254 | architect-generate, architect:query           |
 | Proven at Scale           | 256-303 | Discovery, real results, 3-session MVP        |
 | FSM-Enforced Workflow     | 305-337 | State diagram, protection levels              |
 | Data API CLI              | 339-365 | CLI example, context cost comparison          |
@@ -253,7 +253,7 @@
 | Concept               | 7-18    | What taxonomy defines, FSM states            |
 | Architecture          | 22-65   | File structure, TagRegistry, presets         |
 | Format Types          | 69-80   | flag, value, enum, csv, number, quoted-value |
-| Generating Reference  | 84-96   | generate-docs (preferred), deprecated CLI    |
+| Generating Reference  | 84-96   | docs:taxonomy, architect-generate            |
 | Related Documentation | 100-105 | Links to CONFIGURATION, METHODOLOGY          |
 
 ---
