@@ -438,7 +438,7 @@ function extractShape(
   let jsDoc: string | undefined;
   if (options.includeJsDoc) {
     const rawJsDoc = extractPrecedingJsDoc(sourceCode, node, comments);
-    jsDoc = rawJsDoc !== undefined ? stripLibarDocsTags(rawJsDoc) : undefined;
+    jsDoc = rawJsDoc !== undefined ? stripArchitectTags(rawJsDoc) : undefined;
   }
 
   // DD-3: Parse @param/@returns/@throws from JSDoc for function shapes
@@ -538,7 +538,7 @@ function extractJsDocLineContent(line: string): string {
     .trim();
 }
 
-function stripLibarDocsTags(jsDoc: string): string | undefined {
+function stripArchitectTags(jsDoc: string): string | undefined {
   const lines = jsDoc.split('\n');
   const filtered = lines.filter((line) => !extractJsDocLineContent(line).startsWith('@architect'));
 
@@ -1195,11 +1195,3 @@ export function discoverTaggedShapes(
 
   return Result.ok({ shapes, warnings });
 }
-
-// =============================================================================
-// Re-export Rendering Helper (moved to codec layer)
-// =============================================================================
-
-// Re-export renderShapesAsMarkdown from the codec helpers where it belongs
-// This maintains backwards compatibility for existing imports
-export { renderShapesAsMarkdown } from '../renderable/codecs/helpers.js';

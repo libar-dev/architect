@@ -15,7 +15,10 @@ import { expect } from 'vitest';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
-import { buildRegistry, type TagDefinition } from '../../../../src/taxonomy/registry-builder.js';
+import {
+  buildRegistry,
+  type MetadataTagDefinitionForRegistry,
+} from '../../../../src/taxonomy/registry-builder.js';
 import {
   parseFeatureFile,
   extractPatternTags,
@@ -43,7 +46,7 @@ const feature = await loadFeature(
 
 interface DependsOnTagState {
   tagRegistry: ReturnType<typeof buildRegistry>;
-  foundTag: TagDefinition | undefined;
+  foundTag: MetadataTagDefinitionForRegistry | undefined;
   gherkinContent: string;
   extractedMetadata: {
     pattern?: string;
@@ -118,7 +121,7 @@ describeFeature(feature, ({ Rule }) => {
 
       When('querying for tag "depends-on"', () => {
         state!.foundTag = state!.tagRegistry.metadataTags.find(
-          (t: TagDefinition) => t.tag === 'depends-on'
+          (t: MetadataTagDefinitionForRegistry) => t.tag === 'depends-on'
         );
       });
 
@@ -144,7 +147,7 @@ describeFeature(feature, ({ Rule }) => {
 
       When('querying for tag "enables"', () => {
         state!.foundTag = state!.tagRegistry.metadataTags.find(
-          (t: TagDefinition) => t.tag === 'enables'
+          (t: MetadataTagDefinitionForRegistry) => t.tag === 'enables'
         );
       });
 

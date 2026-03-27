@@ -16,7 +16,10 @@ import { expect } from 'vitest';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
-import { buildRegistry, type TagDefinition } from '../../../../src/taxonomy/registry-builder.js';
+import {
+  buildRegistry,
+  type MetadataTagDefinitionForRegistry,
+} from '../../../../src/taxonomy/registry-builder.js';
 import {
   parseFeatureFile,
   extractPatternTags,
@@ -41,7 +44,7 @@ const feature = await loadFeature(
 
 interface ExtendsTagState {
   tagRegistry: ReturnType<typeof buildRegistry>;
-  foundTag: TagDefinition | undefined;
+  foundTag: MetadataTagDefinitionForRegistry | undefined;
   gherkinContent: string;
   extractedPattern: ExtractedPattern | null;
   patterns: ExtractedPattern[];
@@ -153,7 +156,7 @@ describeFeature(feature, ({ Rule }) => {
 
       When('querying for tag "extends"', () => {
         state!.foundTag = state!.tagRegistry.metadataTags.find(
-          (t: TagDefinition) => t.tag === 'extends'
+          (t: MetadataTagDefinitionForRegistry) => t.tag === 'extends'
         );
       });
 

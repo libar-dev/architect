@@ -39,6 +39,7 @@ export {
 export {
   extractShapes,
   processExtractShapesTag,
-  renderShapesAsMarkdown,
   type ProcessExtractShapesResult,
 } from './shape-extractor.js';
+
+export { renderShapesAsMarkdown } from '../renderable/codecs/helpers.js';

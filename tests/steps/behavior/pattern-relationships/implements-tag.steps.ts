@@ -16,7 +16,10 @@ import { expect } from 'vitest';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
-import { buildRegistry, type TagDefinition } from '../../../../src/taxonomy/registry-builder.js';
+import {
+  buildRegistry,
+  type MetadataTagDefinitionForRegistry,
+} from '../../../../src/taxonomy/registry-builder.js';
 import { parseFileDirectives } from '../../../../src/scanner/ast-parser.js';
 import { Result } from '../../../../src/types/result.js';
 import {
@@ -45,7 +48,7 @@ const feature = await loadFeature(
 
 interface ImplementsTagState {
   tagRegistry: ReturnType<typeof buildRegistry>;
-  foundTag: TagDefinition | undefined;
+  foundTag: MetadataTagDefinitionForRegistry | undefined;
   sourceCode: string;
   extractedDirective: DocDirective | null;
   extractedPattern: ExtractedPattern | null;
@@ -115,7 +118,7 @@ describeFeature(feature, ({ Rule }) => {
 
       When('querying for tag "implements"', () => {
         state!.foundTag = state!.tagRegistry.metadataTags.find(
-          (t: TagDefinition) => t.tag === 'implements'
+          (t: MetadataTagDefinitionForRegistry) => t.tag === 'implements'
         );
       });
 

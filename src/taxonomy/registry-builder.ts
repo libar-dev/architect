@@ -7,7 +7,7 @@
  * @architect-arch-context taxonomy
  * @architect-arch-layer domain
  * @architect-implements TypeScriptTaxonomyImplementation
- * @architect-extract-shapes TagRegistry, MetadataTagDefinitionForRegistry, TagDefinition, buildRegistry, METADATA_TAGS_BY_GROUP
+ * @architect-extract-shapes TagRegistry, MetadataTagDefinitionForRegistry, buildRegistry, METADATA_TAGS_BY_GROUP
  *
  * ## Tag Registry Builder
  *
@@ -92,9 +92,6 @@ export interface MetadataTagDefinitionForRegistry {
   /** Post-parse value transformer applied after format-based parsing */
   transform?: (value: string) => string;
 }
-
-// Type alias for consumers (backwards compatible)
-export type TagDefinition = MetadataTagDefinitionForRegistry;
 
 interface AggregationTagDefinitionForRegistry {
   /** Aggregation tag name (e.g., "overview", "decision", "intro") */
