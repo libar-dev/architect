@@ -1,9 +1,9 @@
-@libar-docs
-@libar-docs-pattern:ProcessApiCliModifiersAndRules
-@libar-docs-implements:ProcessApiCli
-@libar-docs-status:completed
-@libar-docs-unlock-reason:'Split-from-original'
-@libar-docs-product-area:DataAPI
+@architect
+@architect-pattern:ProcessApiCliModifiersAndRules
+@architect-implements:ProcessApiCli
+@architect-status:completed
+@architect-unlock-reason:'Split-from-original'
+@architect-product-area:DataAPI
 @cli @process-api
 Feature: Process API CLI - Output Modifiers and Rules
   Output modifiers, arch health, and rules subcommand.

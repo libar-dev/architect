@@ -2,7 +2,7 @@
  * Convention tag values for reference document generation.
  *
  * Each value maps to a convention domain that can be used to tag
- * decision records with `@libar-docs-convention:value1,value2`.
+ * decision records with `@architect-convention:value1,value2`.
  * Values correspond to convention domains extracted from the former
  * recipe .feature files, plus `codec-registry` for auto-generated codec docs.
  *

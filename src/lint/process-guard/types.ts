@@ -1,11 +1,11 @@
 /**
- * @libar-docs
- * @libar-docs-lint
- * @libar-docs-pattern ProcessGuardTypes
- * @libar-docs-status active
- * @libar-docs-implements ProcessGuardLinter
- * @libar-docs-depends-on:FSMValidator
- * @libar-docs-extract-shapes ProcessGuardRule, DeciderInput, ValidationResult, ProcessViolation, FileState
+ * @architect
+ * @architect-lint
+ * @architect-pattern ProcessGuardTypes
+ * @architect-status active
+ * @architect-implements ProcessGuardLinter
+ * @architect-depends-on:FSMValidator
+ * @architect-extract-shapes ProcessGuardRule, DeciderInput, ValidationResult, ProcessViolation, FileState
  *
  * ## ProcessGuardTypes - Type Definitions for Process Guard Linter
  *
@@ -50,14 +50,14 @@ export interface ProcessState {
 }
 
 /**
- * State for a single file derived from its @libar-docs-* annotations.
+ * State for a single file derived from its @architect-* annotations.
  */
 export interface FileState {
   /** Absolute file path */
   readonly path: string;
   /** Relative path from project root */
   readonly relativePath: string;
-  /** Status from @libar-docs-status annotation */
+  /** Status from @architect-status annotation */
   readonly status: ProcessStatusValue;
   /** Normalized status for display */
   readonly normalizedStatus: NormalizedStatus;
@@ -65,7 +65,7 @@ export interface FileState {
   readonly protection: ProtectionLevel;
   /** Deliverable names from Background table */
   readonly deliverables: readonly string[];
-  /** Whether file has @libar-docs-unlock-reason */
+  /** Whether file has @architect-unlock-reason */
   readonly hasUnlockReason: boolean;
   /** The unlock reason text if present */
   readonly unlockReason?: string;
@@ -82,7 +82,7 @@ export type SessionStatus = 'draft' | 'active' | 'closed';
  * State for a work session that scopes modifications.
  */
 export interface SessionState {
-  /** Session identifier from @libar-docs-session-id */
+  /** Session identifier from @architect-session-id */
   readonly id: string;
   /** Session lifecycle status */
   readonly status: SessionStatus;

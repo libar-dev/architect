@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern CollectionUtilities
- * @libar-docs-status completed
- * @libar-docs-used-by SectionRenderer, DocExtractor
+ * @architect
+ * @architect-core
+ * @architect-pattern CollectionUtilities
+ * @architect-status completed
+ * @architect-used-by SectionRenderer, DocExtractor
  *
  * ## CollectionUtilities - Array and Map Operations
  *

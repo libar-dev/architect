@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:CompositeCodecTesting
-@libar-docs-status:completed
-@libar-docs-implements:ReferenceDocShowcase
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:CompositeCodecTesting
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-implements:ReferenceDocShowcase
+@architect-product-area:Generation
 Feature: Composite Codec
 
   Assembles reference documents from multiple codec outputs by

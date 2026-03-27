@@ -82,7 +82,7 @@ describeFeature(feature, ({ Rule }) => {
         });
         const stub = createTestPattern({
           name: 'MyStub',
-          filePath: 'delivery-process/stubs/MyPattern/my-stub.ts',
+          filePath: 'architect/stubs/MyPattern/my-stub.ts',
           status: 'roadmap',
           implementsPatterns: ['MyPattern'],
           targetPath: 'src/api/my-impl.ts',

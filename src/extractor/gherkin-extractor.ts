@@ -1,14 +1,14 @@
 /**
- * @libar-docs
- * @libar-docs-extractor
- * @libar-docs-pattern GherkinExtractor
- * @libar-docs-status completed
- * @libar-docs-implements GherkinRulesSupport
- * @libar-docs-uses GherkinTypes, GherkinASTParser
- * @libar-docs-used-by DualSourceExtractor, Orchestrator
- * @libar-docs-arch-role service
- * @libar-docs-arch-context extractor
- * @libar-docs-arch-layer application
+ * @architect
+ * @architect-extractor
+ * @architect-pattern GherkinExtractor
+ * @architect-status completed
+ * @architect-implements GherkinRulesSupport
+ * @architect-uses GherkinTypes, GherkinASTParser
+ * @architect-used-by DualSourceExtractor, Orchestrator
+ * @architect-arch-role service
+ * @architect-arch-context extractor
+ * @architect-arch-layer application
  *
  * ## GherkinExtractor - Convert Feature Files to Pattern Documentation
  *
@@ -34,7 +34,11 @@
 // or deferred to CLI-layer orchestration. See PR-79 comment #042.
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type { ScannedGherkinFile } from '../validation-schemas/feature.js';
+import type {
+  ScannedGherkinFile,
+  GherkinScenario,
+  GherkinRule,
+} from '../validation-schemas/feature.js';
 import {
   ExtractedPatternSchema,
   type ExtractedPattern,
@@ -44,7 +48,7 @@ import type { DirectiveTag } from '../types/branded.js';
 import { extractPatternTags } from '../scanner/gherkin-ast-parser.js';
 import { asPatternId, asCategoryName, asSourceFilePath, asDirectiveTag } from '../types/branded.js';
 import { inferFeatureLayer } from './layer-inference.js';
-import { extractDeliverables } from './dual-source-extractor.js';
+import { extractDeliverables, type Deliverable } from './dual-source-extractor.js';
 import {
   createGherkinPatternValidationError,
   type GherkinPatternValidationError,
@@ -101,6 +105,161 @@ function assignIfNonEmpty(
   if (arr && arr.length > 0) {
     obj[key] = arr;
   }
+}
+
+/**
+ * Shared Gherkin raw-pattern builder.
+ *
+ * Keeps the sync and async extraction paths aligned so metadata fields
+ * do not drift when one path is updated independently.
+ */
+function buildGherkinRawPattern(input: {
+  relativePath: string;
+  filePath: string;
+  patternId: string;
+  patternName: string;
+  primaryCategory: string;
+  feature: ScannedGherkinFile['feature'];
+  metadata: ReturnType<typeof extractPatternTags>;
+  whenToUse: readonly string[];
+  scenarios: readonly GherkinScenario[];
+  rules: readonly GherkinRule[] | undefined;
+  deliverables: readonly Deliverable[];
+  behaviorFile: string | undefined;
+  behaviorFileVerified: boolean | undefined;
+}): Record<string, unknown> {
+  const {
+    relativePath,
+    filePath,
+    patternId,
+    patternName,
+    primaryCategory,
+    feature,
+    metadata,
+    whenToUse,
+    scenarios,
+    rules,
+    deliverables,
+    behaviorFile,
+    behaviorFileVerified,
+  } = input;
+
+  const rawPattern: Record<string, unknown> = {
+    id: patternId,
+    name: patternName,
+    category: asCategoryName(primaryCategory),
+    directive: {
+      tags: feature.tags.map((tag) =>
+        asDirectiveTag(`@architect-${tag}`)
+      ) as readonly DirectiveTag[],
+      description: feature.description,
+      examples: [],
+      position: { startLine: feature.line, endLine: feature.line },
+      status: metadata.status,
+      phase: metadata.phase,
+    },
+    code: '',
+    source: {
+      file: asSourceFilePath(relativePath),
+      lines: [feature.line, feature.line] as const,
+    },
+    exports: [],
+    extractedAt: new Date().toISOString(),
+  };
+
+  assignIfDefined(rawPattern, 'patternName', metadata.pattern);
+  assignIfDefined(rawPattern, 'status', metadata.status);
+  assignIfDefined(rawPattern, 'phase', metadata.phase);
+  assignIfDefined(rawPattern, 'release', metadata.release);
+  assignIfDefined(rawPattern, 'brief', metadata.brief);
+  assignIfNonEmpty(rawPattern, 'dependsOn', metadata.dependsOn);
+  assignIfNonEmpty(rawPattern, 'enables', metadata.enables);
+  assignIfNonEmpty(rawPattern, 'implementsPatterns', metadata.implementsPatterns);
+  assignIfDefined(rawPattern, 'extendsPattern', metadata.extendsPattern);
+  assignIfDefined(rawPattern, 'targetPath', metadata.target);
+  assignIfDefined(rawPattern, 'since', metadata.since);
+  assignIfDefined(rawPattern, 'quarter', metadata.quarter);
+  assignIfDefined(rawPattern, 'completed', metadata.completed);
+  assignIfDefined(rawPattern, 'effort', metadata.effort);
+  assignIfDefined(rawPattern, 'effortActual', metadata.effortActual);
+  assignIfDefined(rawPattern, 'team', metadata.team);
+  assignIfDefined(rawPattern, 'workflow', metadata.workflow);
+  assignIfDefined(rawPattern, 'risk', metadata.risk);
+  assignIfDefined(rawPattern, 'priority', metadata.priority);
+  assignIfDefined(rawPattern, 'productArea', metadata.productArea);
+  assignIfDefined(rawPattern, 'userRole', metadata.userRole);
+  assignIfDefined(rawPattern, 'businessValue', metadata.businessValue);
+  assignIfDefined(rawPattern, 'level', metadata.level);
+  assignIfDefined(rawPattern, 'parent', metadata.parent);
+  assignIfNonEmpty(rawPattern, 'discoveredGaps', metadata.discoveredGaps);
+  assignIfNonEmpty(rawPattern, 'discoveredImprovements', metadata.discoveredImprovements);
+  assignIfNonEmpty(rawPattern, 'discoveredRisks', metadata.discoveredRisks);
+  assignIfNonEmpty(rawPattern, 'discoveredLearnings', metadata.discoveredLearnings);
+  assignIfNonEmpty(rawPattern, 'constraints', metadata.constraints);
+  assignIfDefined(rawPattern, 'adr', metadata.adr);
+  assignIfDefined(rawPattern, 'adrStatus', metadata.adrStatus);
+  assignIfDefined(rawPattern, 'adrCategory', metadata.adrCategory);
+  assignIfDefined(rawPattern, 'adrSupersedes', metadata.adrSupersedes);
+  assignIfDefined(rawPattern, 'adrSupersededBy', metadata.adrSupersededBy);
+  assignIfDefined(rawPattern, 'adrTheme', metadata.adrTheme);
+  assignIfDefined(rawPattern, 'adrLayer', metadata.adrLayer);
+  assignIfNonEmpty(rawPattern, 'convention', metadata.convention);
+  assignIfNonEmpty(rawPattern, 'include', metadata.include);
+  assignIfDefined(rawPattern, 'claudeModule', metadata.claudeModule);
+  assignIfDefined(rawPattern, 'claudeSection', metadata.claudeSection);
+  assignIfNonEmpty(rawPattern, 'claudeTags', metadata.claudeTags);
+  assignIfDefined(rawPattern, 'sequenceOrchestrator', metadata.sequenceOrchestrator);
+  assignIfNonEmpty(rawPattern, 'whenToUse', whenToUse);
+  assignIfNonEmpty(rawPattern, 'deliverables', deliverables);
+
+  if (scenarios.length > 0) {
+    rawPattern['scenarios'] = scenarios.map((scenario) => {
+      const scenarioRef: Record<string, unknown> = {
+        featureFile: relativePath,
+        featureName: feature.name,
+        featureDescription: feature.description,
+        scenarioName: scenario.name,
+        semanticTags: scenario.tags.filter((tag) =>
+          (SEMANTIC_SCENARIO_TAGS as readonly string[]).includes(tag)
+        ),
+        tags: scenario.tags,
+        layer: inferFeatureLayer(filePath),
+        line: scenario.line,
+      };
+      if (scenario.steps.length > 0) {
+        scenarioRef['steps'] = scenario.steps.map((step) => {
+          const stepObj: Record<string, unknown> = { keyword: step.keyword, text: step.text };
+          assignIfDefined(stepObj, 'dataTable', step.dataTable);
+          assignIfDefined(stepObj, 'docString', step.docString);
+          return stepObj;
+        });
+      }
+      return scenarioRef;
+    });
+  }
+
+  assignIfDefined(rawPattern, 'behaviorFile', behaviorFile);
+  if (behaviorFileVerified !== undefined) {
+    rawPattern['behaviorFileVerified'] = behaviorFileVerified;
+  }
+
+  if (rules && rules.length > 0) {
+    rawPattern['rules'] = rules.map((rule) => {
+      const errorNames = rule.scenarios
+        .filter((s) => s.tags.some((t) => t === 'sequence-error'))
+        .map((s) => s.name);
+      return {
+        name: rule.name,
+        description: rule.description,
+        scenarioCount: rule.scenarios.length,
+        scenarioNames: rule.scenarios.map((s) => s.name),
+        ...(rule.tags.length > 0 && { tags: rule.tags }),
+        ...(errorNames.length > 0 && { errorScenarioNames: errorNames }),
+      };
+    });
+  }
+
+  return rawPattern;
 }
 
 /**
@@ -174,9 +333,9 @@ export function extractPatternsFromGherkin(
     // Extract pattern metadata from feature tags
     const metadata = extractPatternTags(feature.tags);
 
-    // Skip if no @libar-docs opt-in marker (consistent with TypeScript requirement)
-    // The marker normalizes to 'libar-docs' after stripping the @ prefix
-    const hasOptIn = feature.tags.some((tag) => tag === 'libar-docs' || tag === '@libar-docs');
+    // Skip if no @architect opt-in marker (consistent with TypeScript requirement)
+    // The marker normalizes to 'architect' after stripping the @ prefix
+    const hasOptIn = feature.tags.some((tag) => tag === 'architect');
     if (!hasOptIn) {
       continue;
     }
@@ -235,174 +394,21 @@ export function extractPatternsFromGherkin(
       behaviorFileVerified = fileExistsSync(absolutePath);
     }
 
-    // Build raw pattern object using explicit property assignment for performance
-    // This avoids ~50 intermediate objects created by conditional spreads
-    const directive: Record<string, unknown> = {
-      // Preserve ALL tags (including value tags like claude-md-section:validation)
-      // Tags are stored as @libar-docs-{tag} to match TypeScript directive format
-      tags: feature.tags.map((tag) =>
-        asDirectiveTag(`@libar-docs-${tag}`)
-      ) as readonly DirectiveTag[],
-      description: feature.description,
-      examples: [],
-      position: {
-        startLine: feature.line,
-        endLine: feature.line,
-      },
-      status: metadata.status,
-      phase: metadata.phase,
-    };
-    // Directive optional fields
-    assignIfDefined(directive, 'patternName', metadata.pattern);
-    assignIfDefined(directive, 'brief', metadata.brief);
-    assignIfNonEmpty(directive, 'dependsOn', metadata.dependsOn);
-    assignIfNonEmpty(directive, 'enables', metadata.enables);
-    assignIfDefined(directive, 'quarter', metadata.quarter);
-    assignIfDefined(directive, 'completed', metadata.completed);
-    assignIfDefined(directive, 'effort', metadata.effort);
-    assignIfDefined(directive, 'team', metadata.team);
-    assignIfDefined(directive, 'workflow', metadata.workflow);
-    assignIfDefined(directive, 'risk', metadata.risk);
-    assignIfDefined(directive, 'priority', metadata.priority);
-    // Claude module generation fields
-    assignIfDefined(directive, 'claudeModule', metadata.claudeModule);
-    assignIfDefined(directive, 'claudeSection', metadata.claudeSection);
-    assignIfNonEmpty(directive, 'claudeTags', metadata.claudeTags);
-
-    const rawPattern: Record<string, unknown> = {
-      id: patternId,
-      name: patternName,
-      category: asCategoryName(primaryCategory),
-      directive,
-      code: '', // No code for Gherkin-sourced patterns
-      source: {
-        file: asSourceFilePath(relativePath),
-        lines: [feature.line, feature.line] as const,
-      },
-      exports: [],
-      extractedAt: new Date().toISOString(),
+    const rawPattern = buildGherkinRawPattern({
+      relativePath,
+      filePath,
+      patternId,
       patternName,
-      status: metadata.status,
-    };
-
-    // Pattern-level optional fields (explicit assignment avoids intermediate objects)
-    if (metadata.phase !== undefined) rawPattern['phase'] = metadata.phase;
-    assignIfDefined(rawPattern, 'release', metadata.release);
-    assignIfDefined(rawPattern, 'brief', metadata.brief);
-    assignIfNonEmpty(rawPattern, 'dependsOn', metadata.dependsOn);
-    assignIfNonEmpty(rawPattern, 'enables', metadata.enables);
-    // UML-inspired relationship fields (PatternRelationshipModel)
-    assignIfNonEmpty(rawPattern, 'implementsPatterns', metadata.implementsPatterns);
-    assignIfDefined(rawPattern, 'extendsPattern', metadata.extendsPattern);
-    // Design session stub metadata
-    assignIfDefined(rawPattern, 'targetPath', metadata.target);
-    assignIfDefined(rawPattern, 'since', metadata.since);
-    assignIfDefined(rawPattern, 'quarter', metadata.quarter);
-    assignIfDefined(rawPattern, 'completed', metadata.completed);
-    assignIfDefined(rawPattern, 'effort', metadata.effort);
-    assignIfDefined(rawPattern, 'effortActual', metadata.effortActual);
-    assignIfDefined(rawPattern, 'team', metadata.team);
-    assignIfDefined(rawPattern, 'workflow', metadata.workflow);
-    assignIfDefined(rawPattern, 'risk', metadata.risk);
-    assignIfDefined(rawPattern, 'priority', metadata.priority);
-    assignIfDefined(rawPattern, 'productArea', metadata.productArea);
-    assignIfDefined(rawPattern, 'userRole', metadata.userRole);
-    assignIfDefined(rawPattern, 'businessValue', metadata.businessValue);
-
-    // Hierarchy support (epic/phase/task)
-    assignIfDefined(rawPattern, 'level', metadata.level);
-    assignIfDefined(rawPattern, 'parent', metadata.parent);
-
-    // Discovery findings from retrospective tags
-    assignIfNonEmpty(rawPattern, 'discoveredGaps', metadata.discoveredGaps);
-    assignIfNonEmpty(rawPattern, 'discoveredImprovements', metadata.discoveredImprovements);
-    assignIfNonEmpty(rawPattern, 'discoveredRisks', metadata.discoveredRisks);
-    assignIfNonEmpty(rawPattern, 'discoveredLearnings', metadata.discoveredLearnings);
-
-    // Technical constraints from @libar-docs-constraint tags
-    assignIfNonEmpty(rawPattern, 'constraints', metadata.constraints);
-
-    // ADR (Architecture Decision Record) fields
-    assignIfDefined(rawPattern, 'adr', metadata.adr);
-    assignIfDefined(rawPattern, 'adrStatus', metadata.adrStatus);
-    assignIfDefined(rawPattern, 'adrCategory', metadata.adrCategory);
-    assignIfDefined(rawPattern, 'adrSupersedes', metadata.adrSupersedes);
-    assignIfDefined(rawPattern, 'adrSupersededBy', metadata.adrSupersededBy);
-    assignIfDefined(rawPattern, 'adrTheme', metadata.adrTheme);
-    assignIfDefined(rawPattern, 'adrLayer', metadata.adrLayer);
-    // Convention tags for reference document generation
-    assignIfNonEmpty(rawPattern, 'convention', metadata.convention);
-    // Cross-cutting document inclusion tags
-    assignIfNonEmpty(rawPattern, 'include', metadata.include);
-    // Claude module generation fields
-    assignIfDefined(rawPattern, 'claudeModule', metadata.claudeModule);
-    assignIfDefined(rawPattern, 'claudeSection', metadata.claudeSection);
-    assignIfNonEmpty(rawPattern, 'claudeTags', metadata.claudeTags);
-    // Sequence diagram annotation fields
-    assignIfDefined(rawPattern, 'sequenceOrchestrator', metadata.sequenceOrchestrator);
-    // NOTE: ADR content is now derived from Gherkin Rule: keywords
-    // (Context, Decision, Consequences) instead of parsed markdown.
-    // The rules array is populated below and rendered by the ADR codec.
-
-    // When to use
-    assignIfNonEmpty(rawPattern, 'whenToUse', whenToUse);
-
-    // Map scenarios to scenario refs with full structure including steps
-    if (scenarios.length > 0) {
-      rawPattern['scenarios'] = scenarios.map((scenario) => {
-        const scenarioRef: Record<string, unknown> = {
-          featureFile: relativePath,
-          featureName: feature.name,
-          featureDescription: feature.description,
-          scenarioName: scenario.name,
-          semanticTags: scenario.tags.filter((tag) =>
-            (SEMANTIC_SCENARIO_TAGS as readonly string[]).includes(tag)
-          ),
-          tags: scenario.tags,
-          layer: inferFeatureLayer(filePath),
-          line: scenario.line,
-        };
-        // Include full step data for enhanced acceptance criteria rendering
-        if (scenario.steps.length > 0) {
-          scenarioRef['steps'] = scenario.steps.map((step) => {
-            const stepObj: Record<string, unknown> = {
-              keyword: step.keyword,
-              text: step.text,
-            };
-            assignIfDefined(stepObj, 'dataTable', step.dataTable);
-            assignIfDefined(stepObj, 'docString', step.docString);
-            return stepObj;
-          });
-        }
-        return scenarioRef;
-      });
-    }
-
-    // Add deliverables if present (from Background table)
-    assignIfNonEmpty(rawPattern, 'deliverables', deliverables);
-
-    // Add behavior file traceability fields
-    assignIfDefined(rawPattern, 'behaviorFile', behaviorFile);
-    if (behaviorFileVerified !== undefined) {
-      rawPattern['behaviorFileVerified'] = behaviorFileVerified;
-    }
-
-    // Add rules if present (Gherkin v6+ business rule groupings)
-    if (rules && rules.length > 0) {
-      rawPattern['rules'] = rules.map((rule) => {
-        const errorNames = rule.scenarios
-          .filter((s) => s.tags.some((t) => t === 'sequence-error'))
-          .map((s) => s.name);
-        return {
-          name: rule.name,
-          description: rule.description,
-          scenarioCount: rule.scenarios.length,
-          scenarioNames: rule.scenarios.map((s) => s.name),
-          ...(rule.tags.length > 0 && { tags: rule.tags }),
-          ...(errorNames.length > 0 && { errorScenarioNames: errorNames }),
-        };
-      });
-    }
+      primaryCategory,
+      feature,
+      metadata,
+      whenToUse,
+      scenarios,
+      rules,
+      deliverables,
+      behaviorFile,
+      behaviorFileVerified,
+    });
 
     // Validate against schema (schema-first enforcement)
     const validation = ExtractedPatternSchema.safeParse(rawPattern);
@@ -526,8 +532,9 @@ export async function extractPatternsFromGherkinAsync(
     const relativePath = path.relative(baseDir, filePath);
     const metadata = extractPatternTags(feature.tags);
 
-    // Skip if no @libar-docs opt-in marker (consistent with TypeScript requirement)
-    const hasOptIn = feature.tags.some((tag) => tag === 'libar-docs' || tag === '@libar-docs');
+    // Skip if no @architect opt-in marker (consistent with TypeScript requirement)
+    // The marker normalizes to 'architect' after stripping the @ prefix
+    const hasOptIn = feature.tags.some((tag) => tag === 'architect');
     if (!hasOptIn) continue;
 
     // Skip if no pattern or status tag
@@ -563,131 +570,21 @@ export async function extractPatternsFromGherkinAsync(
       behaviorPathToVerify = path.join(baseDir, behaviorFile);
     }
 
-    // Build pattern object (same as sync version but without behaviorFileVerified)
-    const directive: Record<string, unknown> = {
-      // Preserve ALL tags (including value tags like claude-md-section:validation)
-      tags: feature.tags.map((tag) =>
-        asDirectiveTag(`@libar-docs-${tag}`)
-      ) as readonly DirectiveTag[],
-      description: feature.description,
-      examples: [],
-      position: { startLine: feature.line, endLine: feature.line },
-      status: metadata.status,
-      phase: metadata.phase,
-    };
-    assignIfDefined(directive, 'patternName', metadata.pattern);
-    assignIfDefined(directive, 'brief', metadata.brief);
-    assignIfNonEmpty(directive, 'dependsOn', metadata.dependsOn);
-    assignIfNonEmpty(directive, 'enables', metadata.enables);
-    assignIfDefined(directive, 'quarter', metadata.quarter);
-    assignIfDefined(directive, 'completed', metadata.completed);
-    assignIfDefined(directive, 'effort', metadata.effort);
-    assignIfDefined(directive, 'team', metadata.team);
-    assignIfDefined(directive, 'workflow', metadata.workflow);
-    assignIfDefined(directive, 'risk', metadata.risk);
-    assignIfDefined(directive, 'priority', metadata.priority);
-
-    const rawPattern: Record<string, unknown> = {
-      id: patternId,
-      name: patternName,
-      category: asCategoryName(primaryCategory),
-      directive,
-      code: '',
-      source: {
-        file: asSourceFilePath(relativePath),
-        lines: [feature.line, feature.line] as const,
-      },
-      exports: [],
-      extractedAt: new Date().toISOString(),
+    const rawPattern = buildGherkinRawPattern({
+      relativePath,
+      filePath,
+      patternId,
       patternName,
-      status: metadata.status,
-    };
-
-    if (metadata.phase !== undefined) rawPattern['phase'] = metadata.phase;
-    assignIfDefined(rawPattern, 'release', metadata.release);
-    assignIfDefined(rawPattern, 'brief', metadata.brief);
-    assignIfNonEmpty(rawPattern, 'dependsOn', metadata.dependsOn);
-    assignIfNonEmpty(rawPattern, 'enables', metadata.enables);
-    // UML-inspired relationship fields (PatternRelationshipModel)
-    assignIfNonEmpty(rawPattern, 'implementsPatterns', metadata.implementsPatterns);
-    assignIfDefined(rawPattern, 'extendsPattern', metadata.extendsPattern);
-    // Design session stub metadata
-    assignIfDefined(rawPattern, 'targetPath', metadata.target);
-    assignIfDefined(rawPattern, 'since', metadata.since);
-    assignIfDefined(rawPattern, 'quarter', metadata.quarter);
-    assignIfDefined(rawPattern, 'completed', metadata.completed);
-    assignIfDefined(rawPattern, 'effort', metadata.effort);
-    assignIfDefined(rawPattern, 'team', metadata.team);
-    assignIfDefined(rawPattern, 'workflow', metadata.workflow);
-    assignIfDefined(rawPattern, 'risk', metadata.risk);
-    assignIfDefined(rawPattern, 'priority', metadata.priority);
-    assignIfDefined(rawPattern, 'productArea', metadata.productArea);
-    assignIfDefined(rawPattern, 'userRole', metadata.userRole);
-    assignIfDefined(rawPattern, 'businessValue', metadata.businessValue);
-    assignIfDefined(rawPattern, 'level', metadata.level);
-    assignIfDefined(rawPattern, 'parent', metadata.parent);
-    assignIfNonEmpty(rawPattern, 'discoveredGaps', metadata.discoveredGaps);
-    assignIfNonEmpty(rawPattern, 'discoveredImprovements', metadata.discoveredImprovements);
-    assignIfNonEmpty(rawPattern, 'discoveredRisks', metadata.discoveredRisks);
-    assignIfNonEmpty(rawPattern, 'discoveredLearnings', metadata.discoveredLearnings);
-    assignIfNonEmpty(rawPattern, 'constraints', metadata.constraints);
-    assignIfDefined(rawPattern, 'adr', metadata.adr);
-    assignIfDefined(rawPattern, 'adrStatus', metadata.adrStatus);
-    assignIfDefined(rawPattern, 'adrCategory', metadata.adrCategory);
-    assignIfDefined(rawPattern, 'adrSupersedes', metadata.adrSupersedes);
-    assignIfDefined(rawPattern, 'adrSupersededBy', metadata.adrSupersededBy);
-    assignIfNonEmpty(rawPattern, 'convention', metadata.convention);
-    // Cross-cutting document inclusion tags
-    assignIfNonEmpty(rawPattern, 'include', metadata.include);
-    // Sequence diagram annotation fields
-    assignIfDefined(rawPattern, 'sequenceOrchestrator', metadata.sequenceOrchestrator);
-    // NOTE: ADR content derived from Gherkin Rule: keywords, not parsed markdown
-    assignIfNonEmpty(rawPattern, 'whenToUse', whenToUse);
-
-    if (scenarios.length > 0) {
-      rawPattern['scenarios'] = scenarios.map((scenario) => {
-        const scenarioRef: Record<string, unknown> = {
-          featureFile: relativePath,
-          featureName: feature.name,
-          featureDescription: feature.description,
-          scenarioName: scenario.name,
-          semanticTags: scenario.tags.filter((tag) =>
-            (SEMANTIC_SCENARIO_TAGS as readonly string[]).includes(tag)
-          ),
-          tags: scenario.tags,
-          layer: inferFeatureLayer(filePath),
-          line: scenario.line,
-        };
-        if (scenario.steps.length > 0) {
-          scenarioRef['steps'] = scenario.steps.map((step) => {
-            const stepObj: Record<string, unknown> = { keyword: step.keyword, text: step.text };
-            assignIfDefined(stepObj, 'dataTable', step.dataTable);
-            assignIfDefined(stepObj, 'docString', step.docString);
-            return stepObj;
-          });
-        }
-        return scenarioRef;
-      });
-    }
-
-    assignIfNonEmpty(rawPattern, 'deliverables', deliverables);
-    assignIfDefined(rawPattern, 'behaviorFile', behaviorFile);
-
-    if (rules && rules.length > 0) {
-      rawPattern['rules'] = rules.map((rule) => {
-        const errorNames = rule.scenarios
-          .filter((s) => s.tags.some((t) => t === 'sequence-error'))
-          .map((s) => s.name);
-        return {
-          name: rule.name,
-          description: rule.description,
-          scenarioCount: rule.scenarios.length,
-          scenarioNames: rule.scenarios.map((s) => s.name),
-          ...(rule.tags.length > 0 && { tags: rule.tags }),
-          ...(errorNames.length > 0 && { errorScenarioNames: errorNames }),
-        };
-      });
-    }
+      primaryCategory,
+      feature,
+      metadata,
+      whenToUse,
+      scenarios,
+      rules,
+      deliverables,
+      behaviorFile,
+      behaviorFileVerified: undefined,
+    });
 
     const validation = ExtractedPatternSchema.safeParse(rawPattern);
     if (!validation.success) {

@@ -1,10 +1,10 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern ResultMonadTypes
- * @libar-docs-status completed
- * @libar-docs-implements ResultMonad
- * @libar-docs-product-area CoreTypes
+ * @architect
+ * @architect-core
+ * @architect-pattern ResultMonadTypes
+ * @architect-status completed
+ * @architect-implements ResultMonad
+ * @architect-product-area CoreTypes
  *
  * ## Result Monad - Type Definitions
  *
@@ -27,8 +27,8 @@ export type Err<E> = { ok: false; error: E };
 /**
  * Result type representing either success (Ok) or failure (Err)
  *
- * @libar-docs-shape
- * @libar-docs-include core-types
+ * @architect-shape
+ * @architect-include core-types
  * @typeParam T - The success value type
  * @typeParam E - The error type (defaults to Error)
  */

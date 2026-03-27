@@ -89,7 +89,7 @@ describeFeature(feature, ({ Rule }) => {
               name,
               status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
               phase,
-              filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+              filePath: `architect/specs/${name.toLowerCase()}.feature`,
               deliverables: [
                 { name: 'API design', status: 'pending', tests: 0, location: 'src/api/design.ts' },
                 {
@@ -141,7 +141,7 @@ describeFeature(feature, ({ Rule }) => {
             createTestPattern({
               name: 'OrderSagaStub',
               status: 'roadmap',
-              filePath: 'delivery-process/stubs/order-saga/saga.ts',
+              filePath: 'architect/stubs/order-saga/saga.ts',
               implementsPatterns: ['OrderSaga'],
               targetPath: 'src/domain/order-saga.ts',
             })
@@ -222,7 +222,7 @@ describeFeature(feature, ({ Rule }) => {
                 name,
                 status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
                 phase,
-                filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+                filePath: `architect/specs/${name.toLowerCase()}.feature`,
               })
             );
           }
@@ -286,7 +286,7 @@ describeFeature(feature, ({ Rule }) => {
                 name,
                 status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
                 phase,
-                filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+                filePath: `architect/specs/${name.toLowerCase()}.feature`,
                 deliverables: [
                   { name: 'Core types', status: 'complete', tests: 1, location: 'src/types.ts' },
                   { name: 'Validation', status: 'pending', tests: 0, location: 'src/validate.ts' },
@@ -354,7 +354,7 @@ describeFeature(feature, ({ Rule }) => {
                 name,
                 status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
                 phase,
-                filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+                filePath: `architect/specs/${name.toLowerCase()}.feature`,
                 dependsOn: [dep],
               })
             );
@@ -369,7 +369,7 @@ describeFeature(feature, ({ Rule }) => {
                 name,
                 status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
                 phase,
-                filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+                filePath: `architect/specs/${name.toLowerCase()}.feature`,
                 dependsOn: [dep],
               })
             );
@@ -459,7 +459,7 @@ describeFeature(feature, ({ Rule }) => {
             name,
             status: 'roadmap',
             phase: 22,
-            filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+            filePath: `architect/specs/${name.toLowerCase()}.feature`,
           });
           state.patterns.push({
             ...base,
@@ -504,7 +504,7 @@ describeFeature(feature, ({ Rule }) => {
             name,
             status: 'roadmap',
             phase: 22,
-            filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+            filePath: `architect/specs/${name.toLowerCase()}.feature`,
           });
           state.patterns.push({
             ...base,
@@ -826,7 +826,7 @@ describeFeature(feature, ({ Rule }) => {
           createTestPattern({
             name,
             status: 'roadmap',
-            filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+            filePath: `architect/specs/${name.toLowerCase()}.feature`,
             dependsOn: ['CompletedDep', 'RoadmapDep'],
           }),
           createTestPattern({
@@ -837,7 +837,7 @@ describeFeature(feature, ({ Rule }) => {
           createTestPattern({
             name: 'RoadmapDep',
             status: 'roadmap',
-            filePath: 'delivery-process/specs/roadmap-dep.feature',
+            filePath: 'architect/specs/roadmap-dep.feature',
           }),
         ];
         buildDatasetAndApi(state.patterns);
@@ -872,15 +872,15 @@ describeFeature(feature, ({ Rule }) => {
               createTestPattern({
                 name,
                 status: 'roadmap',
-                filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+                filePath: `architect/specs/${name.toLowerCase()}.feature`,
                 dependsOn: [dep],
               }),
               createTestPattern({
                 name: dep,
                 status: 'completed',
-                filePath: `delivery-process/specs/${dep.toLowerCase()}.feature`,
+                filePath: `architect/specs/${dep.toLowerCase()}.feature`,
               }),
-              // Implementation pattern that declares @libar-docs-implements CompletedLib
+              // Implementation pattern that declares @architect-implements CompletedLib
               createTestPattern({
                 name: `${dep}Impl`,
                 status: 'completed',
@@ -922,7 +922,7 @@ describeFeature(feature, ({ Rule }) => {
           createTestPattern({
             name,
             status: 'roadmap',
-            filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+            filePath: `architect/specs/${name.toLowerCase()}.feature`,
             dependsOn: ['SomeDep'],
           }),
           createTestPattern({

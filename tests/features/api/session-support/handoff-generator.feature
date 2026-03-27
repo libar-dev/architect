@@ -1,7 +1,8 @@
-@libar-docs
-@libar-docs-pattern:HandoffGeneratorTests
-@libar-docs-status:completed
-@libar-docs-product-area:DataAPI
+@architect
+@architect-pattern:HandoffGeneratorTests
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:DataAPI
 Feature: Handoff Generator - Session-End State Summary
 
   **Problem:**

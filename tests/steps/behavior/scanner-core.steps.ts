@@ -5,7 +5,7 @@
  * orchestrates file discovery, directive detection, and AST parsing
  * to extract documentation directives from TypeScript files.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -462,7 +462,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     );
 
     RuleScenario(
-      'Skip files without @libar-docs file-level opt-in',
+      'Skip files without @architect file-level opt-in',
       ({ Given, When, Then, And }) => {
         Given(
           'a file {string} with content:',
@@ -499,7 +499,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     );
 
     RuleScenario(
-      'Not confuse @libar-docs-* with @libar-docs opt-in',
+      'Not confuse @architect-* with @architect opt-in',
       ({ Given, When, Then, And }) => {
         Given(
           'a file {string} with content:',
@@ -524,7 +524,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     );
 
     RuleScenario(
-      'Detect @libar-docs opt-in combined with section tags',
+      'Detect @architect opt-in combined with section tags',
       ({ Given, When, Then, And }) => {
         Given(
           'a file {string} with content:',

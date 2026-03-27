@@ -5,7 +5,7 @@
  * Tests parseFeatureFile function for extracting feature metadata,
  * scenarios, and steps from .feature files.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

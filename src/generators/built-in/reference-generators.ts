@@ -1,8 +1,8 @@
 /**
- * @libar-docs
- * @libar-docs-pattern ReferenceGeneratorRegistration
- * @libar-docs-status active
- * @libar-docs-implements CodecDrivenReferenceGeneration
+ * @architect
+ * @architect-pattern ReferenceGeneratorRegistration
+ * @architect-status active
+ * @architect-implements CodecDrivenReferenceGeneration
  *
  * ## Reference Generator Registrations
  *
@@ -66,7 +66,7 @@ export interface ProductAreaConfigOptions {
  *
  * Each config uses `productArea` as the primary filter — the codec
  * auto-derives all content sources from the filtered pattern set.
- * Explicit `conventionTags`, `shapeSources`, and `behaviorCategories`
+ * Explicit `conventionTags`, `shapeSelectors`, and `behaviorCategories`
  * are left empty because the product-area decode path ignores them.
  *
  * @param options - Optional customization for output filenames
@@ -79,7 +79,6 @@ export function createProductAreaConfigs(options?: ProductAreaConfigOptions): Re
       title: `${area} Overview`,
       productArea: area,
       conventionTags: [],
-      shapeSources: [],
       shapeSelectors: [],
       behaviorCategories: [],
       claudeMdSection: kebab,

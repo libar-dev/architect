@@ -3,8 +3,8 @@
  *
  * Covers orphan cleanup for stale design-review markdown files.
  *
- * @libar-docs
- * @libar-docs-uses DesignReviewGenerator
+ * @architect
+ * @architect-uses DesignReviewGenerator
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -75,7 +75,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
             const pattern = createTestPattern({
               name: patternName,
               status: 'active',
-              filePath: 'delivery-process/specs/test-pattern.feature',
+              filePath: 'architect/specs/test-pattern.feature',
               sequenceOrchestrator: 'orch',
               rules: [
                 createSequenceRule({

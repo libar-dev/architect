@@ -4,7 +4,7 @@
  * BDD step definitions for testing the Phase State Machine validation
  * functions that validate status values and transitions per PDR-005.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -276,9 +276,9 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
         expect(state!.completionResult!.valid).toBe(true);
       });
 
-      And('warnings include "missing @libar-docs-completed date"', () => {
+      And('warnings include "missing @architect-completed date"', () => {
         expect(
-          state!.completionResult!.warnings.some((w) => w.includes('@libar-docs-completed'))
+          state!.completionResult!.warnings.some((w) => w.includes('@architect-completed'))
         ).toBe(true);
       });
     });
@@ -307,9 +307,9 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
           expect(state!.completionResult!.valid).toBe(true);
         });
 
-        And('warnings include "missing @libar-docs-effort-actual"', () => {
+        And('warnings include "missing @architect-effort-actual"', () => {
           expect(
-            state!.completionResult!.warnings.some((w) => w.includes('@libar-docs-effort-actual'))
+            state!.completionResult!.warnings.some((w) => w.includes('@architect-effort-actual'))
           ).toBe(true);
         });
       }

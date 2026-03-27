@@ -65,7 +65,7 @@ curated content is maintained alongside generated reference material.
 
 ### Master Roadmap: DocsConsolidationStrategy
 
-**Spec:** `delivery-process/specs/docs-consolidation-strategy.feature`
+**Spec:** `architect/specs/docs-consolidation-strategy.feature`
 **Status:** roadmap | **Phase:** 35 | **Depends on:** CodecDrivenReferenceGeneration (completed)
 
 This is the **canonical plan** for the entire consolidation initiative. It defines a
@@ -118,7 +118,7 @@ generated equivalents. Work packages in this gap analysis should map to its phas
 | `reference-doc-showcase.feature`             | ReferenceDocShowcase            | completed | 30    | All 9 content block types across 3 detail levels |
 | `validator-read-model-consolidation.feature` | ValidatorReadModelConsolidation | completed | 100   | MasterDataset as single read model (ADR-006)     |
 
-**Query these specs:** `pnpm process:query -- decisions DocsConsolidationStrategy`
+**Query these specs:** `pnpm architect:query -- decisions DocsConsolidationStrategy`
 
 ### Completed Foundation Work
 
@@ -131,7 +131,7 @@ The following capabilities are already in place and available for new work:
 - **9 content block types** -- headings, paragraphs, tables, code, mermaid, lists, sections,
   metadata, collapsible (all exercised in REFERENCE-SAMPLE.md)
 - **CLI schema extraction** -- `src/cli/cli-schema.ts` drives both help text and doc generation
-- **Convention tag mechanism** -- `@libar-docs-convention` annotations compose into reference docs
+- **Convention tag mechanism** -- `@architect-convention` annotations compose into reference docs
 - **Product area meta with diagram scopes** -- C4Context + graph LR per area
 
 ---
@@ -147,11 +147,11 @@ is defined in DocsConsolidationStrategy Rule 1 and implemented by CodecDrivenRef
 Step 1: Register convention tag value in src/taxonomy/conventions.ts
           e.g., 'codec-registry', 'pipeline-architecture', 'taxonomy-rules'
 
-Step 2: Annotate source files with @libar-docs-convention:<value>
+Step 2: Annotate source files with @architect-convention:<value>
           TypeScript: JSDoc blocks with structured content
           Gherkin: Rule: blocks with Invariant/Rationale markers
 
-Step 3: Add ReferenceDocConfig in delivery-process.config.ts
+Step 3: Add ReferenceDocConfig in architect.config.ts
           {
             title: 'Available Codecs Reference',
             conventionTags: ['codec-registry'],     // <-- matches step 2
@@ -169,16 +169,16 @@ Step 5: Replace manual doc section with pointer to generated output
 
 ### Content Sources Available in ReferenceDocConfig
 
-| Source                 | Config Field                      | What It Produces                                                         |
-| ---------------------- | --------------------------------- | ------------------------------------------------------------------------ |
-| Convention annotations | `conventionTags`                  | Structured prose from JSDoc/Gherkin                                      |
-| Type shapes            | `shapeSelectors` / `shapeSources` | TypeScript type definitions with field docs                              |
-| Behavior specs         | `behaviorCategories`              | Rule invariants, scenarios, acceptance criteria                          |
-| Diagrams               | `diagramScopes`                   | Mermaid C4Context, graph LR, classDiagram, stateDiagram, sequenceDiagram |
-| Include tags           | `includeTags`                     | Filter patterns by tag for scoped reference                              |
-| Editorial preamble     | `preamble`                        | Hand-authored SectionBlock[] prepended to output                         |
+| Source                 | Config Field         | What It Produces                                                         |
+| ---------------------- | -------------------- | ------------------------------------------------------------------------ |
+| Convention annotations | `conventionTags`     | Structured prose from JSDoc/Gherkin                                      |
+| Type shapes            | `shapeSelectors`     | TypeScript type definitions with field docs                              |
+| Behavior specs         | `behaviorCategories` | Rule invariants, scenarios, acceptance criteria                          |
+| Diagrams               | `diagramScopes`      | Mermaid C4Context, graph LR, classDiagram, stateDiagram, sequenceDiagram |
+| Include tags           | `includeTags`        | Filter patterns by tag for scoped reference                              |
+| Editorial preamble     | `preamble`           | Hand-authored SectionBlock[] prepended to output                         |
 
-### Existing Convention Tags (from delivery-process.config.ts)
+### Existing Convention Tags (from architect.config.ts)
 
 | Tag Value               | Used By                | Produces                             |
 | ----------------------- | ---------------------- | ------------------------------------ |
@@ -191,7 +191,7 @@ Step 5: Replace manual doc section with pointer to generated output
 To consolidate a manual doc section, a design session needs to decide:
 
 1. **Which convention tag value** to register (or reuse existing)
-2. **Which source files** to annotate with `@libar-docs-convention:<value>`
+2. **Which source files** to annotate with `@architect-convention:<value>`
 3. **What content structure** the JSDoc/Gherkin annotations should use
 4. **Which ReferenceDocConfig fields** to populate (shapes? diagrams? behaviors?)
 5. **Whether preamble** is needed for editorial context that can't be annotated
@@ -207,7 +207,7 @@ should follow the same recipe.
 ### Directory Layout After Commit 223ace6
 
 ```
-delivery-process/
+architect/
   docs/              11 manual files (~4,985 lines)  -- human-authored reference
   docs-live/         48 generated files (~20,548 lines) -- auto-generated, committed
   docs-generated/    empty after pnpm docs:all       -- gitignored build cache
@@ -268,14 +268,14 @@ sync-content.mjs
     docs/           -> guides/ + reference/     (manual docs)
     docs-live/      -> product-areas/ + decisions/  (generated)
     docs-generated/ -> generated/               (business-rules, taxonomy)
-  output: src/content/docs/delivery-process/
+  output: src/content/docs/architect/
 ```
 
 ### Website Section Structure (from content-manifest.mjs)
 
 | Section                | Directory      | Source                                     | Collapsed |
 | ---------------------- | -------------- | ------------------------------------------ | --------- |
-| Tutorial               | tutorial/      | delivery-process-tutorials repo            | No        |
+| Tutorial               | tutorial/      | architect-tutorials repo                   | No        |
 | Guides                 | guides/        | docs/ manual (5 files)                     | No        |
 | Reference              | reference/     | docs/ manual (5 files)                     | No        |
 | Product Areas          | product-areas/ | docs-live/product-areas/                   | No        |
@@ -475,7 +475,7 @@ the sync script should be updated to read from `docs-live/` instead of `docs/`:
 **Scope:** libar-dev-website repo
 **Effort:** Small (1 session)
 **Spec alignment:** Consequence of DocsLiveConsolidation (Phase 37, completed).
-No new delivery-process spec needed -- this is a website-repo fix.
+No new architect spec needed -- this is a website-repo fix.
 
 Update `sync-content.mjs` and `content-manifest.mjs` to:
 
@@ -492,7 +492,7 @@ Update `sync-content.mjs` and `content-manifest.mjs` to:
 ### WP-2: Enhance Generated Index (P1)
 
 **Type:** Design + Implementation
-**Scope:** delivery-process repo
+**Scope:** architect repo
 **Effort:** Small (1-2 sessions)
 **Spec alignment:** Maps to DocsConsolidationStrategy Phase 6 (Index navigation update, pending).
 Update the existing deliverable status when implementing.
@@ -510,7 +510,7 @@ to generate audience-appropriate navigation.
 ### WP-3: Add Architecture Generator to docs:all (P1)
 
 **Type:** Implementation session
-**Scope:** delivery-process repo
+**Scope:** architect repo
 **Effort:** Small (1 session)
 **Spec alignment:** Extends Phase 4 (Architecture decomposition, complete). Phase 4
 decomposed the manual ARCHITECTURE.md; this adds the generated Mermaid equivalent.
@@ -522,7 +522,7 @@ that partially replace the manual ARCHITECTURE.md data flow diagrams.
 ### WP-4: Add Changelog Generator to docs:all (P2)
 
 **Type:** Implementation session
-**Scope:** delivery-process repo
+**Scope:** architect repo
 **Effort:** Small (1 session)
 **Spec alignment:** New work, not covered by DocsConsolidationStrategy. Consider
 adding as a new deliverable if a spec is created.
@@ -533,7 +533,7 @@ New content for the website (no manual equivalent to replace).
 ### WP-5: Create Error Guide Codec (P2)
 
 **Type:** Design + Implementation
-**Scope:** delivery-process repo
+**Scope:** architect repo
 **Effort:** Medium (2-3 sessions)
 **Spec alignment:** Maps to DocsConsolidationStrategy Phase 3 (Process Guard
 consolidation, pending). The spec says "enhanced ValidationRulesCodec" -- design
@@ -551,13 +551,13 @@ This replaces the manual PROCESS-GUARD.md "Error Messages and Fixes" section.
 
 - Enhance `ValidationRulesCodec` or create separate `ErrorGuideCodec`?
 - Convention tag approach: annotate error-handling code in `src/lint/` with
-  `@libar-docs-convention:process-guard-errors`, or use existing behavior extraction?
+  `@architect-convention:process-guard-errors`, or use existing behavior extraction?
 - Preamble for Husky/CI setup content that can't come from annotations?
 
 ### WP-6: Create CLI Recipe Codec (P2)
 
 **Type:** Design + Implementation
-**Scope:** delivery-process repo
+**Scope:** architect repo
 **Effort:** Medium (2-3 sessions)
 **Spec alignment:** Extends ProcessApiHybridGeneration (Phase 43, completed). Phase 43
 generated reference tables from CLI schema; this adds recipe/guide content. The manual
@@ -580,14 +580,14 @@ This replaces manual PROCESS-API.md "Common Recipes" and "Session Workflow Comma
 ### WP-7: Create Procedural Guide Codec (P3)
 
 **Type:** Design + Implementation
-**Scope:** delivery-process repo
+**Scope:** architect repo
 **Effort:** Large (3-5 sessions)
 **Spec alignment:** Maps to DocsConsolidationStrategy Phase 41 (GHERKIN-PATTERNS.md
 restructure, pending) and Phase 39 (Session workflow module generation, pending --
 blocked on ClaudeModuleGeneration Phase 25). Also relates to Phase 5 (Guide trimming).
 
 **Note on Phase 39:** The session-guides-module-source.feature spec already has
-`@libar-docs-claude-module` and `@libar-docs-claude-section:workflow` tags. Once
+`@architect-claude-module` and `@architect-claude-section:workflow` tags. Once
 Phase 25 ships ClaudeModuleCodec, the CLAUDE.md session section auto-generates.
 This WP addresses the **public-facing** SESSION-GUIDES.md, not the AI context version.
 
@@ -612,7 +612,7 @@ GHERKIN-PATTERNS.md (366 lines of authoring guidance) have no generation source.
 ### WP-8: Decide Methodology Page Disposition (P3)
 
 **Type:** Design session
-**Scope:** delivery-process repo
+**Scope:** architect repo
 **Effort:** Small (1 session)
 **Spec alignment:** DocsConsolidationStrategy explicitly says "Keep: philosophy and
 core thesis" for METHODOLOGY.md. The master spec already decided this stays manual.
@@ -628,7 +628,7 @@ The master spec already decided to keep it. Design session should confirm and de
 
 **Recommendation:** Option 1, with option 2 as enhancement. The philosophy is
 inherently editorial, but encoding core thesis as Rule: blocks would make it
-queryable (`pnpm process:query -- rules --pattern Methodology`) without replacing
+queryable (`pnpm architect:query -- rules --pattern Methodology`) without replacing
 the human-readable prose.
 
 ### WP-9: Quality Polish for Website Publication (P1)
@@ -711,7 +711,7 @@ manual maintenance burden while preserving irreducibly editorial content.
 
 ## 10.5. Spec Coverage Status
 
-Maps each WP to its delivery-process spec, design status, and code stubs.
+Maps each WP to its architect spec, design status, and code stubs.
 
 | WP   | Pattern                    | Spec Status  | Design Status                                | Stubs   |
 | ---- | -------------------------- | ------------ | -------------------------------------------- | ------- |

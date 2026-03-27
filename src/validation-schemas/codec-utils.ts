@@ -1,12 +1,12 @@
 /**
- * @libar-docs
- * @libar-docs-validation @libar-docs-core
- * @libar-docs-pattern CodecUtils
- * @libar-docs-status completed
- * @libar-docs-uses Zod
- * @libar-docs-used-by WorkflowLoader, Orchestrator
- * @libar-docs-usecase "When loading JSON config files with type-safe validation"
- * @libar-docs-usecase "When serializing typed objects to formatted JSON"
+ * @architect
+ * @architect-validation @architect-core
+ * @architect-pattern CodecUtils
+ * @architect-status completed
+ * @architect-uses Zod
+ * @architect-used-by WorkflowLoader, Orchestrator
+ * @architect-usecase "When loading JSON config files with type-safe validation"
+ * @architect-usecase "When serializing typed objects to formatted JSON"
  *
  * ## CodecUtils - Type-Safe JSON Codec Factories
  *

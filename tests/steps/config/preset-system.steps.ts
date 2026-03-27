@@ -2,29 +2,25 @@
  * Preset System Step Definitions
  *
  * BDD step definitions for testing the preset system including
- * GENERIC_PRESET, DDD_ES_CQRS_PRESET, and PRESETS lookup.
+ * LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, and PRESETS lookup.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
-import {
-  GENERIC_PRESET,
-  LIBAR_GENERIC_PRESET,
-  DDD_ES_CQRS_PRESET,
-  PRESETS,
-  type PresetName,
-} from '../../../src/config/presets.js';
-import type { DeliveryProcessConfig } from '../../../src/config/types.js';
+import { LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PRESETS } from '../../../src/config/presets.js';
+import type { PresetName as PackagePresetName } from '../../../src/index.js';
+import type { PresetName as ConfigPresetName } from '../../../src/config/index.js';
+import type { ArchitectConfig } from '../../../src/config/types.js';
 
 // =============================================================================
 // Type Definitions
 // =============================================================================
 
 interface PresetTestState {
-  preset: DeliveryProcessConfig | null;
-  presetFromMap: DeliveryProcessConfig | null;
+  preset: ArchitectConfig | null;
+  presetFromMap: ArchitectConfig | null;
 }
 
 // =============================================================================
@@ -52,73 +48,6 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
   });
 
   // ===========================================================================
-  // Generic Preset
-  // ===========================================================================
-
-  Rule('Generic preset provides minimal taxonomy', ({ RuleScenario }) => {
-    RuleScenario('Generic preset has correct prefix configuration', ({ Given, Then, And }) => {
-      Given('the generic preset', () => {
-        state = initState();
-        state.preset = GENERIC_PRESET;
-      });
-
-      Then('it should have tagPrefix "@docs-"', () => {
-        expect(state!.preset!.tagPrefix).toBe('@docs-');
-      });
-
-      And('it should have fileOptInTag "@docs"', () => {
-        expect(state!.preset!.fileOptInTag).toBe('@docs');
-      });
-    });
-
-    RuleScenario('Generic preset has core categories only', ({ Given, Then, And }) => {
-      Given('the generic preset', () => {
-        state = initState();
-        state.preset = GENERIC_PRESET;
-      });
-
-      Then('it should include category "core"', () => {
-        const categoryTags = state!.preset!.categories.map((c) => c.tag);
-        expect(categoryTags).toContain('core');
-      });
-
-      And('it should include category "api"', () => {
-        const categoryTags = state!.preset!.categories.map((c) => c.tag);
-        expect(categoryTags).toContain('api');
-      });
-
-      And('it should include category "infra"', () => {
-        const categoryTags = state!.preset!.categories.map((c) => c.tag);
-        expect(categoryTags).toContain('infra');
-      });
-
-      And('it should NOT include category "ddd"', () => {
-        const categoryTags = state!.preset!.categories.map((c) => c.tag);
-        expect(categoryTags).not.toContain('ddd');
-      });
-
-      And('it should NOT include category "event-sourcing"', () => {
-        const categoryTags = state!.preset!.categories.map((c) => c.tag);
-        expect(categoryTags).not.toContain('event-sourcing');
-      });
-
-      And('it should NOT include category "cqrs"', () => {
-        const categoryTags = state!.preset!.categories.map((c) => c.tag);
-        expect(categoryTags).not.toContain('cqrs');
-      });
-
-      And('it should NOT include category "saga"', () => {
-        const categoryTags = state!.preset!.categories.map((c) => c.tag);
-        expect(categoryTags).not.toContain('saga');
-      });
-
-      And('it should have exactly 3 categories', () => {
-        expect(state!.preset!.categories).toHaveLength(3);
-      });
-    });
-  });
-
-  // ===========================================================================
   // Libar Generic Preset
   // ===========================================================================
 
@@ -131,12 +60,12 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
           state.preset = LIBAR_GENERIC_PRESET;
         });
 
-        Then('it should have tagPrefix "@libar-docs-"', () => {
-          expect(state!.preset!.tagPrefix).toBe('@libar-docs-');
+        Then('it should have tagPrefix "@architect-"', () => {
+          expect(state!.preset!.tagPrefix).toBe('@architect-');
         });
 
-        And('it should have fileOptInTag "@libar-docs"', () => {
-          expect(state!.preset!.fileOptInTag).toBe('@libar-docs');
+        And('it should have fileOptInTag "@architect"', () => {
+          expect(state!.preset!.fileOptInTag).toBe('@architect');
         });
       }
     );
@@ -199,12 +128,12 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
         state.preset = DDD_ES_CQRS_PRESET;
       });
 
-      Then('it should have tagPrefix "@libar-docs-"', () => {
-        expect(state!.preset!.tagPrefix).toBe('@libar-docs-');
+      Then('it should have tagPrefix "@architect-"', () => {
+        expect(state!.preset!.tagPrefix).toBe('@architect-');
       });
 
-      And('it should have fileOptInTag "@libar-docs"', () => {
-        expect(state!.preset!.fileOptInTag).toBe('@libar-docs');
+      And('it should have fileOptInTag "@architect"', () => {
+        expect(state!.preset!.fileOptInTag).toBe('@architect');
       });
     });
 
@@ -309,36 +238,51 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
   // ===========================================================================
 
   Rule('Presets can be accessed by name', ({ RuleScenario }) => {
-    RuleScenario('Generic preset accessible via PRESETS map', ({ When, Then }) => {
-      When('I access PRESETS with key "generic"', () => {
-        state = initState();
-        state.presetFromMap = PRESETS['generic' as PresetName];
-      });
-
-      Then('the preset tagPrefix should be "@docs-"', () => {
-        expect(state!.presetFromMap!.tagPrefix).toBe('@docs-');
-      });
-    });
-
     RuleScenario('DDD preset accessible via PRESETS map', ({ When, Then }) => {
       When('I access PRESETS with key "ddd-es-cqrs"', () => {
         state = initState();
-        state.presetFromMap = PRESETS['ddd-es-cqrs' as PresetName];
+        state.presetFromMap = PRESETS['ddd-es-cqrs'];
       });
 
-      Then('the preset tagPrefix should be "@libar-docs-"', () => {
-        expect(state!.presetFromMap!.tagPrefix).toBe('@libar-docs-');
+      Then('the preset tagPrefix should be "@architect-"', () => {
+        expect(state!.presetFromMap!.tagPrefix).toBe('@architect-');
       });
     });
 
     RuleScenario('Libar generic preset accessible via PRESETS map', ({ When, Then }) => {
       When('I access PRESETS with key "libar-generic"', () => {
         state = initState();
-        state.presetFromMap = PRESETS['libar-generic' as PresetName];
+        state.presetFromMap = PRESETS['libar-generic'];
       });
 
-      Then('the preset tagPrefix should be "@libar-docs-"', () => {
-        expect(state!.presetFromMap!.tagPrefix).toBe('@libar-docs-');
+      Then('the preset tagPrefix should be "@architect-"', () => {
+        expect(state!.presetFromMap!.tagPrefix).toBe('@architect-');
+      });
+    });
+  });
+
+  Rule('PresetName type is exported from public entrypoints', ({ RuleScenario }) => {
+    RuleScenario('Package entrypoint exports PresetName type', ({ When, Then }) => {
+      When('I use the package entrypoint PresetName type with key "libar-generic"', () => {
+        state = initState();
+        const presetName: PackagePresetName = 'libar-generic';
+        state.presetFromMap = PRESETS[presetName];
+      });
+
+      Then('the preset tagPrefix should be "@architect-"', () => {
+        expect(state!.presetFromMap!.tagPrefix).toBe('@architect-');
+      });
+    });
+
+    RuleScenario('Config entrypoint exports PresetName type', ({ When, Then }) => {
+      When('I use the config entrypoint PresetName type with key "ddd-es-cqrs"', () => {
+        state = initState();
+        const presetName: ConfigPresetName = 'ddd-es-cqrs';
+        state.presetFromMap = PRESETS[presetName];
+      });
+
+      Then('the preset tagPrefix should be "@architect-"', () => {
+        expect(state!.presetFromMap!.tagPrefix).toBe('@architect-');
       });
     });
   });

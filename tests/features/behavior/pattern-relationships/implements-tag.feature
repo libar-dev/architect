@@ -1,11 +1,12 @@
-@libar-docs
-@libar-docs-pattern:ImplementsTagProcessing
-@libar-docs-status:completed
-@libar-docs-implements:PatternRelationshipModel
-@libar-docs-product-area:Annotation
+@architect
+@architect-pattern:ImplementsTagProcessing
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-implements:PatternRelationshipModel
+@architect-product-area:Annotation
 Feature: Implements Tag Extraction and Processing
 
-  Tests for the @libar-docs-implements tag which links implementation files
+  Tests for the @architect-implements tag which links implementation files
   to their corresponding roadmap pattern specifications.
 
   # ===========================================================================
@@ -44,9 +45,9 @@ Feature: Implements Tag Extraction and Processing
       Given a TypeScript file with content:
         """typescript
         /**
-         * @libar-docs
-         * @libar-docs-implements EventStoreDurability
-         * @libar-docs-status roadmap
+         * @architect
+         * @architect-implements EventStoreDurability
+         * @architect-status roadmap
          */
         export function outbox() {}
         """
@@ -74,8 +75,8 @@ Feature: Implements Tag Extraction and Processing
       Given a TypeScript file with content:
         """typescript
         /**
-         * @libar-docs
-         * @libar-docs-implements EventStoreDurability, IdempotentAppend
+         * @architect
+         * @architect-implements EventStoreDurability, IdempotentAppend
          */
         export function durabilityPrimitive() {}
         """

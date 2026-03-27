@@ -1,14 +1,14 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern PatternSummarizerImpl
- * @libar-docs-status active
- * @libar-docs-implements DataAPIOutputShaping
- * @libar-docs-uses ProcessStateAPI
- * @libar-docs-used-by OutputPipeline, ProcessAPICLIImpl
- * @libar-docs-arch-role service
- * @libar-docs-arch-context api
- * @libar-docs-arch-layer application
+ * @architect
+ * @architect-core
+ * @architect-pattern PatternSummarizerImpl
+ * @architect-status active
+ * @architect-implements DataAPIOutputShaping
+ * @architect-uses ProcessStateAPI
+ * @architect-used-by OutputPipeline, ProcessAPICLIImpl
+ * @architect-arch-role service
+ * @architect-arch-context api
+ * @architect-arch-layer application
  *
  * ## PatternSummarizer — Compact Pattern Projection
  *
@@ -78,7 +78,7 @@ export function deriveSource(filePath: string): 'typescript' | 'gherkin' {
 /**
  * Project an ExtractedPattern to a compact PatternSummary.
  *
- * - `patternName` prefers explicit @libar-docs-pattern tag, falls back to `name`
+ * - `patternName` prefers explicit @architect-pattern tag, falls back to `name`
  * - `source` is derived from file extension (.feature -> gherkin, else typescript)
  * - Optional fields (status, phase) are included when present, omitted when undefined
  *

@@ -1,13 +1,16 @@
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright (c) 2026 EBIZ d.o.o. All rights reserved.
+
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern MCPPipelineSession
- * @libar-docs-status active
- * @libar-docs-arch-role service
- * @libar-docs-arch-context api
- * @libar-docs-arch-layer application
- * @libar-docs-uses PipelineFactory, ProcessStateAPI, ConfigLoader
- * @libar-docs-implements MCPServerIntegration
+ * @architect
+ * @architect-core
+ * @architect-pattern MCPPipelineSession
+ * @architect-status active
+ * @architect-arch-role service
+ * @architect-arch-context api
+ * @architect-arch-layer application
+ * @architect-uses PipelineFactory, ProcessStateAPI, ConfigLoader
+ * @architect-implements MCPServerIntegration
  *
  * ## MCP Pipeline Session Manager
  *
@@ -78,7 +81,7 @@ export class PipelineSessionManager {
 
     if (input.length === 0) {
       throw new Error(
-        'No TypeScript source globs found. Provide --input or create delivery-process.config.ts'
+        'No TypeScript source globs found. Provide --input or create architect.config.ts'
       );
     }
 
@@ -186,25 +189,25 @@ export class PipelineSessionManager {
     features: string[];
   }): void {
     if (config.input.length === 0) {
-      const tsConfigPath = path.join(config.baseDir, 'delivery-process.config.ts');
-      const jsConfigPath = path.join(config.baseDir, 'delivery-process.config.js');
+      const tsConfigPath = path.join(config.baseDir, 'architect.config.ts');
+      const jsConfigPath = path.join(config.baseDir, 'architect.config.js');
       if (fs.existsSync(tsConfigPath) || fs.existsSync(jsConfigPath)) {
         config.input.push('src/**/*.ts');
-        const stubsDir = path.join(config.baseDir, 'delivery-process', 'stubs');
+        const stubsDir = path.join(config.baseDir, 'architect', 'stubs');
         if (fs.existsSync(stubsDir)) {
-          config.input.push('delivery-process/stubs/**/*.ts');
+          config.input.push('architect/stubs/**/*.ts');
         }
       }
     }
 
     if (config.features.length === 0) {
-      const specsDir = path.join(config.baseDir, 'delivery-process', 'specs');
+      const specsDir = path.join(config.baseDir, 'architect', 'specs');
       if (fs.existsSync(specsDir)) {
-        config.features.push('delivery-process/specs/*.feature');
+        config.features.push('architect/specs/*.feature');
       }
-      const releasesDir = path.join(config.baseDir, 'delivery-process', 'releases');
+      const releasesDir = path.join(config.baseDir, 'architect', 'releases');
       if (fs.existsSync(releasesDir)) {
-        config.features.push('delivery-process/releases/*.feature');
+        config.features.push('architect/releases/*.feature');
       }
     }
   }

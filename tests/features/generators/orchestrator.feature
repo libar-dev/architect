@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:DocumentationOrchestrator
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
-@libar-docs-implements:GeneratorInfrastructureTesting
+@architect
+@architect-pattern:DocumentationOrchestrator
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Generation
+@architect-implements:GeneratorInfrastructureTesting
 Feature: Documentation Generation Orchestrator
 
   Tests the orchestrator's pattern merging, conflict detection, and generator

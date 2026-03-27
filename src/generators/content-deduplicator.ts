@@ -1,11 +1,11 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern ContentDeduplicator
- * @libar-docs-status completed
- * @libar-docs-arch-role infrastructure
- * @libar-docs-arch-context generator
- * @libar-docs-arch-layer infrastructure
+ * @architect
+ * @architect-core
+ * @architect-pattern ContentDeduplicator
+ * @architect-status completed
+ * @architect-arch-role infrastructure
+ * @architect-arch-context generator
+ * @architect-arch-layer infrastructure
  *
  * ## Content Deduplicator - Duplicate Content Detection and Merging
  *

@@ -1,18 +1,18 @@
 /**
- * @libar-docs
- * @libar-docs-lint
- * @libar-docs-pattern LintEngine
- * @libar-docs-status completed
- * @libar-docs-uses LintRules, CodecUtils
- * @libar-docs-used-by LintPatternsCLI
- * @libar-docs-arch-role service
- * @libar-docs-arch-context lint
- * @libar-docs-arch-layer application
+ * @architect
+ * @architect-lint
+ * @architect-pattern LintEngine
+ * @architect-status completed
+ * @architect-uses LintRules, CodecUtils
+ * @architect-used-by LintPatternsCLI
+ * @architect-arch-role service
+ * @architect-arch-context lint
+ * @architect-arch-layer application
  *
  * ## LintEngine - Rule Execution Orchestrator
  *
  * Orchestrates lint rule execution against parsed directives.
- * Takes scanned @libar-docs-* directives and runs quality rules against them,
+ * Takes scanned @architect-* directives and runs quality rules against them,
  * collecting violations and computing summary statistics for CI enforcement.
  *
  * ### When to Use

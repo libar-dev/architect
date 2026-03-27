@@ -1,9 +1,9 @@
-@libar-docs
-@libar-docs-pattern:TestContentBlocks
-@libar-docs-status:roadmap
-@libar-docs-phase:99
-@libar-docs-product-area:Generation
-@libar-docs-business-value:test-what-generators-capture
+@architect
+@architect-pattern:TestContentBlocks
+@architect-status:roadmap
+@architect-phase:99
+@architect-product-area:Generation
+@architect-business-value:test-what-generators-capture
 Feature: Test Content Blocks
 
   This feature demonstrates what content blocks are captured and rendered

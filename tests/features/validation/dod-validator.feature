@@ -1,10 +1,11 @@
-@libar-docs
-@libar-docs-implements:DoDValidation
+@architect
+@architect-implements:DoDValidation
 @behavior @dod-validation
-@libar-docs-pattern:DoDValidatorTesting
-@libar-docs-status:completed
-@libar-docs-product-area:Validation
-@libar-docs-depends-on:AntiPatternDetector
+@architect-pattern:DoDValidatorTesting
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Validation
+@architect-depends-on:AntiPatternDetector
 Feature: Definition of Done (DoD) Validation
   Validates that completed phases meet Definition of Done criteria:
   1. All deliverables must have "complete" status

@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-cli
- * @libar-docs-pattern ReplMode
- * @libar-docs-status active
- * @libar-docs-implements DataAPICLIErgonomics
- * @libar-docs-arch-role service
- * @libar-docs-arch-context cli
- * @libar-docs-arch-layer application
- * @libar-docs-uses PipelineFactory, ProcessStateAPI
+ * @architect
+ * @architect-cli
+ * @architect-pattern ReplMode
+ * @architect-status active
+ * @architect-implements DataAPICLIErgonomics
+ * @architect-arch-role service
+ * @architect-arch-context cli
+ * @architect-arch-layer application
+ * @architect-uses PipelineFactory, ProcessStateAPI
  *
  * ## REPL Mode - Interactive Multi-Query Pipeline Session
  *
@@ -217,7 +217,7 @@ async function runInteractiveRepl(state: ReplState, opts: ReplOptions): Promise<
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stderr,
-    prompt: 'process-api> ',
+    prompt: 'architect> ',
   });
 
   rl.prompt();

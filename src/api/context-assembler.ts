@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-pattern ContextAssemblerImpl
- * @libar-docs-status active
- * @libar-docs-implements DataAPIContextAssembly
- * @libar-docs-uses ProcessStateAPI, MasterDataset, PatternSummarizerImpl, FuzzyMatcherImpl, StubResolverImpl
- * @libar-docs-used-by ProcessAPICLIImpl, ContextFormatterImpl
- * @libar-docs-arch-role service
- * @libar-docs-arch-context api
- * @libar-docs-arch-layer application
+ * @architect
+ * @architect-pattern ContextAssemblerImpl
+ * @architect-status active
+ * @architect-implements DataAPIContextAssembly
+ * @architect-uses ProcessStateAPI, MasterDataset, PatternSummarizerImpl, FuzzyMatcherImpl, StubResolverImpl
+ * @architect-used-by ProcessAPICLIImpl, ContextFormatterImpl
+ * @architect-arch-role service
+ * @architect-arch-context api
+ * @architect-arch-layer application
  *
  * ## ContextAssembler — Session-Oriented Context Bundle Builder
  *

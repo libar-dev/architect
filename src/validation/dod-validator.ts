@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-validation
- * @libar-docs-pattern DoDValidator
- * @libar-docs-status completed
- * @libar-docs-arch-role service
- * @libar-docs-arch-context validation
- * @libar-docs-arch-layer application
- * @libar-docs-uses DoDValidationTypes, GherkinTypes, DualSourceExtractor
- * @libar-docs-extract-shapes isDeliverableComplete, hasAcceptanceCriteria, extractAcceptanceCriteriaScenarios, validateDoDForPhase, validateDoD, formatDoDSummary
+ * @architect
+ * @architect-validation
+ * @architect-pattern DoDValidator
+ * @architect-status completed
+ * @architect-arch-role service
+ * @architect-arch-context validation
+ * @architect-arch-layer application
+ * @architect-uses DoDValidationTypes, GherkinTypes, DualSourceExtractor
+ * @architect-extract-shapes isDeliverableComplete, hasAcceptanceCriteria, extractAcceptanceCriteriaScenarios, validateDoDForPhase, validateDoD, formatDoDSummary
  *
  * ## DoDValidator - Definition of Done Validation
  *

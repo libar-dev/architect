@@ -1,12 +1,15 @@
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright (c) 2026 EBIZ d.o.o. All rights reserved.
+
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern MCPModule
- * @libar-docs-status active
- * @libar-docs-arch-role infrastructure
- * @libar-docs-arch-context api
- * @libar-docs-arch-layer application
- * @libar-docs-uses MCPServerImpl, MCPPipelineSession, MCPFileWatcher, MCPToolRegistry
+ * @architect
+ * @architect-core
+ * @architect-pattern MCPModule
+ * @architect-status active
+ * @architect-arch-role infrastructure
+ * @architect-arch-context api
+ * @architect-arch-layer application
+ * @architect-uses MCPServerImpl, MCPPipelineSession, MCPFileWatcher, MCPToolRegistry
  *
  * ## MCP Module Exports
  *

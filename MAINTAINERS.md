@@ -1,6 +1,6 @@
 # Maintainer Guide
 
-This guide covers how to publish `@libar-dev/delivery-process` to npm.
+This guide covers how to publish `@libar-dev/architect` to npm.
 
 ## Prerequisites
 
@@ -12,10 +12,10 @@ This guide covers how to publish `@libar-dev/delivery-process` to npm.
 
 We use semantic versioning with pre-release tags:
 
-| Tag      | Purpose                  | Install Command                         |
-| -------- | ------------------------ | --------------------------------------- |
-| `latest` | Stable releases          | `npm i @libar-dev/delivery-process`     |
-| `pre`    | Pre-releases (1.0.0-pre) | `npm i @libar-dev/delivery-process@pre` |
+| Tag      | Purpose                  | Install Command                  |
+| -------- | ------------------------ | -------------------------------- |
+| `latest` | Stable releases          | `npm i @libar-dev/architect`     |
+| `pre`    | Pre-releases (1.0.0-pre) | `npm i @libar-dev/architect@pre` |
 
 ## Publishing Workflow
 
@@ -50,7 +50,7 @@ npm publish --tag pre --access public
 1. Remove `"tag": "pre"` from `publishConfig` (or change to `"tag": "latest"`)
 2. Verify with `npm publish --dry-run --access public` (should show tag `latest`, not `pre`)
 
-If you skip this step, stable versions will be published under the `pre` dist-tag and users running `npm install @libar-dev/delivery-process` won't get them.
+If you skip this step, stable versions will be published under the `pre` dist-tag and users running `npm install @libar-dev/architect` won't get them.
 
 ```bash
 # Patch release (1.0.0 → 1.0.1)
@@ -114,15 +114,15 @@ After publishing, verify the package:
 
 ```bash
 # Check npm registry
-npm view @libar-dev/delivery-process
+npm view @libar-dev/architect
 
 # Check dist-tags
-npm view @libar-dev/delivery-process dist-tags
+npm view @libar-dev/architect dist-tags
 
 # Install in a test project
 mkdir /tmp/test-install && cd /tmp/test-install
 npm init -y
-npm install @libar-dev/delivery-process@pre
+npm install @libar-dev/architect@pre
 ```
 
 ## Troubleshooting
@@ -140,5 +140,5 @@ npm can take a few minutes to propagate. If still not found:
 
 ```bash
 npm cache clean --force
-npm view @libar-dev/delivery-process
+npm view @libar-dev/architect
 ```

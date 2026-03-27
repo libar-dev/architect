@@ -1,14 +1,14 @@
 /**
- * @libar-docs
- * @libar-docs-scanner
- * @libar-docs-pattern GherkinASTParser
- * @libar-docs-status completed
- * @libar-docs-implements GherkinRulesSupport
- * @libar-docs-uses GherkinTypes
- * @libar-docs-used-by GherkinScanner
- * @libar-docs-arch-role infrastructure
- * @libar-docs-arch-context scanner
- * @libar-docs-arch-layer infrastructure
+ * @architect
+ * @architect-scanner
+ * @architect-pattern GherkinASTParser
+ * @architect-status completed
+ * @architect-implements GherkinRulesSupport
+ * @architect-uses GherkinTypes
+ * @architect-used-by GherkinScanner
+ * @architect-arch-role infrastructure
+ * @architect-arch-context scanner
+ * @architect-arch-layer infrastructure
  *
  * ## GherkinASTParser - Parse Feature Files Using Cucumber Gherkin
  *
@@ -100,17 +100,17 @@ function kebabToCamel(s: string): string {
  * Removes `@` prefix and then the configured tag prefix (from registry)
  * to produce a canonical tag name.
  *
- * @param tag - Tag string to normalize (e.g., "@libar-docs-pattern:MyPattern")
+ * @param tag - Tag string to normalize (e.g., "@architect-pattern:MyPattern")
  * @param registry - Optional TagRegistry for custom prefix configuration
  * @returns Normalized tag name (e.g., "pattern:MyPattern")
  *
  * @example
- * normalizeTag("@libar-docs-pattern:MyPattern") // "pattern:MyPattern"
+ * normalizeTag("@architect-pattern:MyPattern") // "pattern:MyPattern"
  * normalizeTag("@acceptance-criteria")          // "acceptance-criteria"
  *
  * // With custom registry
- * const registry = { tagPrefix: "@docs-", fileOptInTag: "@docs", ... };
- * normalizeTag("@docs-pattern:MyPattern", registry) // "pattern:MyPattern"
+ * const registry = { tagPrefix: "@acme-", fileOptInTag: "@acme", ... };
+ * normalizeTag("@acme-pattern:MyPattern", registry) // "pattern:MyPattern"
  */
 function normalizeTag(tag: string, registry?: TagRegistry): string {
   // Use registry-based builders if provided, otherwise use defaults
@@ -137,7 +137,7 @@ export interface ParsedFeatureFile {
   readonly background?: GherkinBackground;
   /** Rules with their nested scenarios (Gherkin v6+) */
   readonly rules?: readonly GherkinRule[];
-  /** All scenarios (including those flattened from Rules for backward compat) */
+  /** All scenarios (including those flattened from Rules for convenience) */
   readonly scenarios: readonly GherkinScenario[];
 }
 
@@ -317,7 +317,7 @@ export function parseFeatureFile(
     // Extract rules (Gherkin v6+ business rule groupings)
     const rules: GherkinRule[] = [];
 
-    // Extract scenarios (including those nested inside Rules for backward compat)
+    // Extract scenarios (including those nested inside Rules)
     const scenarios: GherkinScenario[] = [];
 
     for (const child of cucumberFeature.children) {
@@ -372,7 +372,7 @@ export function parseFeatureFile(
             // Add to rule's scenarios
             ruleScenarios.push(parsedScenario);
 
-            // Also add to flat scenarios for backward compat
+            // Also add to flat list for consumer convenience
             // Include rule context in scenario tags for traceability
             const ruleNameTag = `rule:${cucumberRule.name.replace(/\s+/g, '-')}`;
             scenarios.push({
@@ -596,7 +596,7 @@ export function extractPatternTags(tags: readonly string[]): {
       if (
         normalized !== 'acceptance-criteria' &&
         !normalized.startsWith('happy-path') &&
-        normalized !== 'libar-docs'
+        normalized !== 'architect'
       ) {
         const existing = metadata['categories'] as string[] | undefined;
         metadata['categories'] = [...(existing ?? []), normalized];

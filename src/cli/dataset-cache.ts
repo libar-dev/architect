@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-cli
- * @libar-docs-pattern DatasetCache
- * @libar-docs-status active
- * @libar-docs-implements DataAPICLIErgonomics
- * @libar-docs-arch-role infrastructure
- * @libar-docs-arch-context cli
- * @libar-docs-arch-layer infrastructure
- * @libar-docs-uses PipelineFactory, WorkflowConfigSchema
+ * @architect
+ * @architect-cli
+ * @architect-pattern DatasetCache
+ * @architect-status active
+ * @architect-implements DataAPICLIErgonomics
+ * @architect-arch-role infrastructure
+ * @architect-arch-context cli
+ * @architect-arch-layer infrastructure
+ * @architect-uses PipelineFactory, WorkflowConfigSchema
  *
  * ## Dataset Cache - MasterDataset Persistence with mtime Invalidation
  *
@@ -18,7 +18,7 @@
  * ### Design Decisions
  *
  * - DD-1: Excludes LoadedWorkflow (contains Maps), reconstructs on load via createLoadedWorkflow()
- * - DD-2: Cache at node_modules/.cache/delivery-process/dataset.json
+ * - DD-2: Cache at node_modules/.cache/architect/dataset.json
  * - DD-3: Cache key = sha256(sorted file mtimes + pipeline options hash)
  * - DD-4: All errors produce cache miss (never throw)
  */
@@ -63,7 +63,7 @@ const CACHE_VERSION = '1';
  * Resolve the cache directory for a given base directory.
  */
 export function getCacheDir(baseDir: string): string {
-  return path.join(path.resolve(baseDir), 'node_modules', '.cache', 'delivery-process');
+  return path.join(path.resolve(baseDir), 'node_modules', '.cache', 'architect');
 }
 
 /**
@@ -108,7 +108,7 @@ export async function computeCacheKey(opts: PipelineOptions): Promise<string> {
   }
 
   // Also include config file mtime if it exists (.ts or .js)
-  for (const configName of ['delivery-process.config.ts', 'delivery-process.config.js']) {
+  for (const configName of ['architect.config.ts', 'architect.config.js']) {
     const configPath = path.join(baseDir, configName);
     try {
       const configStat = await fsp.stat(configPath);

@@ -1,15 +1,15 @@
 /**
- * @libar-docs
- * @libar-docs-lint
- * @libar-docs-pattern DeriveProcessState
- * @libar-docs-status active
- * @libar-docs-implements ProcessGuardLinter
- * @libar-docs-uses GherkinScanner, FSMValidator
- * @libar-docs-depends-on:GherkinScanner,FSMValidator
+ * @architect
+ * @architect-lint
+ * @architect-pattern DeriveProcessState
+ * @architect-status active
+ * @architect-implements ProcessGuardLinter
+ * @architect-uses GherkinScanner, FSMValidator
+ * @architect-depends-on:GherkinScanner,FSMValidator
  *
  * ## DeriveProcessState - Extract Process State from File Annotations
  *
- * Derives process state from @libar-docs-* annotations in files.
+ * Derives process state from @architect-* annotations in files.
  * State is computed on-demand, not stored separately.
  *
  * ### Design Principles
@@ -58,10 +58,10 @@ export interface DeriveStateConfig {
 }
 
 /** Default spec patterns - generic defaults that work for package-level usage */
-const DEFAULT_SPEC_PATTERNS = [
-  'delivery-process/**/*.feature',
+export const DEFAULT_PROCESS_GUARD_SPEC_PATTERNS = [
+  'architect/**/*.feature',
   'specs/**/*.feature', // For consumers
-];
+] as const;
 
 // =============================================================================
 // Core Functions
@@ -71,7 +71,7 @@ const DEFAULT_SPEC_PATTERNS = [
  * Derive complete process state from file annotations.
  *
  * Scans spec files and extracts:
- * - Status from @libar-docs-status tags
+ * - Status from @architect-status tags
  * - Deliverables from Background tables
  * - Session state from active session files
  *
@@ -90,7 +90,7 @@ const DEFAULT_SPEC_PATTERNS = [
  * ```
  */
 export async function deriveProcessState(config: DeriveStateConfig): Promise<Result<ProcessState>> {
-  const specPatterns = config.specPatterns ?? DEFAULT_SPEC_PATTERNS;
+  const specPatterns = config.specPatterns ?? DEFAULT_PROCESS_GUARD_SPEC_PATTERNS;
   const sessionsDir = config.sessionsDir ?? path.join(config.baseDir, 'sessions');
 
   // Derive file states
@@ -178,7 +178,7 @@ async function deriveFileStates(
  */
 function extractStatusFromTags(tags: readonly string[]): ProcessStatusValue {
   for (const tag of tags) {
-    // Handle @libar-docs-status:value format
+    // Handle @architect-status:value format
     if (tag.includes('status:')) {
       const match = /status:(\w+)/.exec(tag);
       if (match?.[1]) {

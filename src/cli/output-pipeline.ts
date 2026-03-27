@@ -1,14 +1,14 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern OutputPipelineImpl
- * @libar-docs-status active
- * @libar-docs-implements DataAPIOutputShaping
- * @libar-docs-uses PatternSummarizerImpl
- * @libar-docs-used-by ProcessAPICLIImpl
- * @libar-docs-arch-role service
- * @libar-docs-arch-context cli
- * @libar-docs-arch-layer application
+ * @architect
+ * @architect-core
+ * @architect-pattern OutputPipelineImpl
+ * @architect-status active
+ * @architect-implements DataAPIOutputShaping
+ * @architect-uses PatternSummarizerImpl
+ * @architect-used-by ProcessAPICLIImpl
+ * @architect-arch-role service
+ * @architect-arch-context cli
+ * @architect-arch-layer application
  *
  * ## OutputPipeline — CLI Output Shaping and Formatting
  *
@@ -72,9 +72,9 @@ export interface ListFilters {
   readonly category: string | null;
   /** Filter by source type */
   readonly source: 'typescript' | 'gherkin' | null;
-  /** Filter by architecture context (@libar-docs-arch-context) */
+  /** Filter by architecture context (@architect-arch-context) */
   readonly archContext: string | null;
-  /** Filter by product area (@libar-docs-product-area) */
+  /** Filter by product area (@architect-product-area) */
   readonly productArea: string | null;
   /** Maximum number of results */
   readonly limit: number | null;

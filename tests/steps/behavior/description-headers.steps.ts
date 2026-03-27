@@ -5,7 +5,7 @@
  * Tests the stripLeadingHeaders utility and its integration with pattern
  * detail document generation.
  *
- * @libar-docs
+ * @architect
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';

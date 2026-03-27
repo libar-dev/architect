@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:PatternHelpersTests
-@libar-docs-status:active
-@libar-docs-phase:25a
-@libar-docs-product-area:DataAPI
+@architect
+@architect-pattern:PatternHelpersTests
+@architect-status:active
+@architect-phase:25a
+@architect-product-area:DataAPI
 Feature: Pattern Helpers — Shared Lookup Utilities
 
   Rule: getPatternName uses patternName tag when available

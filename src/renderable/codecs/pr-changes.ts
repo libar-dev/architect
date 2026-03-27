@@ -1,10 +1,10 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern PrChangesCodec
- * @libar-docs-status completed
- * @libar-docs-convention codec-registry
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-core
+ * @architect-pattern PrChangesCodec
+ * @architect-status completed
+ * @architect-convention codec-registry
+ * @architect-product-area:Generation
  *
  * ## PrChangesCodec
  *

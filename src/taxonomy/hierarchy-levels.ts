@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-pattern HierarchyLevels
- * @libar-docs-status completed
- * @libar-docs-core
- * @libar-docs-extract-shapes HIERARCHY_LEVELS, HierarchyLevel, DEFAULT_HIERARCHY_LEVEL
+ * @architect
+ * @architect-pattern HierarchyLevels
+ * @architect-status completed
+ * @architect-core
+ * @architect-extract-shapes HIERARCHY_LEVELS, HierarchyLevel, DEFAULT_HIERARCHY_LEVEL
  *
  * ## Hierarchy Levels for Work Item Breakdown
  *
@@ -19,6 +19,6 @@ export const HIERARCHY_LEVELS = ['epic', 'phase', 'task'] as const;
 export type HierarchyLevel = (typeof HIERARCHY_LEVELS)[number];
 
 /**
- * Default hierarchy level (for backward compatibility)
+ * Default hierarchy level
  */
 export const DEFAULT_HIERARCHY_LEVEL: HierarchyLevel = 'phase';

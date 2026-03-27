@@ -58,7 +58,7 @@ export {
 export type { Position } from '../validation-schemas/doc-directive.js';
 
 /**
- * Parsed @libar-docs-* directive from JSDoc comment
+ * Parsed @architect-* directive from JSDoc comment
  * Schema: validation-schemas/doc-directive.ts
  */
 export type { DocDirective } from '../validation-schemas/doc-directive.js';

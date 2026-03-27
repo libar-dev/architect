@@ -1,8 +1,8 @@
 /**
  * Implements Tag Step Definitions
  *
- * BDD step definitions for testing @libar-docs-implements tag extraction
- * and processing through the delivery-process pipeline.
+ * BDD step definitions for testing @architect-implements tag extraction
+ * and processing through the Architect pipeline.
  *
  * These step definitions test:
  * 1. Tag registry definition (data-driven extraction)
@@ -16,7 +16,10 @@ import { expect } from 'vitest';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
-import { buildRegistry, type TagDefinition } from '../../../../src/taxonomy/registry-builder.js';
+import {
+  buildRegistry,
+  type MetadataTagDefinitionForRegistry,
+} from '../../../../src/taxonomy/registry-builder.js';
 import { parseFileDirectives } from '../../../../src/scanner/ast-parser.js';
 import { Result } from '../../../../src/types/result.js';
 import {
@@ -45,7 +48,7 @@ const feature = await loadFeature(
 
 interface ImplementsTagState {
   tagRegistry: ReturnType<typeof buildRegistry>;
-  foundTag: TagDefinition | undefined;
+  foundTag: MetadataTagDefinitionForRegistry | undefined;
   sourceCode: string;
   extractedDirective: DocDirective | null;
   extractedPattern: ExtractedPattern | null;
@@ -115,7 +118,7 @@ describeFeature(feature, ({ Rule }) => {
 
       When('querying for tag "implements"', () => {
         state!.foundTag = state!.tagRegistry.metadataTags.find(
-          (t: TagDefinition) => t.tag === 'implements'
+          (t: MetadataTagDefinitionForRegistry) => t.tag === 'implements'
         );
       });
 
@@ -209,8 +212,8 @@ describeFeature(feature, ({ Rule }) => {
     RuleScenario('CSV values are trimmed', ({ Given, When, Then }) => {
       Given('a TypeScript file with implements " Pattern1 , Pattern2 "', () => {
         state!.sourceCode = `/**
-         * @libar-docs
-         * @libar-docs-implements  Pattern1 , Pattern2
+         * @architect
+         * @architect-implements  Pattern1 , Pattern2
          */
         export function test() {}`;
       });

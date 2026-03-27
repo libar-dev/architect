@@ -66,7 +66,7 @@ describeFeature(feature, ({ Rule }) => {
         state = initState();
         const stubPattern = createTestPattern({
           name: 'StubA',
-          filePath: 'delivery-process/stubs/my-feature/stub-a.ts',
+          filePath: 'architect/stubs/my-feature/stub-a.ts',
           status: 'roadmap',
         });
         const normalPattern = createTestPattern({
@@ -124,14 +124,14 @@ describeFeature(feature, ({ Rule }) => {
         state.patterns = [
           createTestPattern({
             name: 'ResolvedStub',
-            filePath: 'delivery-process/stubs/feat/resolved.ts',
+            filePath: 'architect/stubs/feat/resolved.ts',
             targetPath: 'src/api/resolved.ts',
             since: 'DS-A',
             implementsPatterns: ['FeatureA'],
           }),
           createTestPattern({
             name: 'UnresolvedStub',
-            filePath: 'delivery-process/stubs/feat/unresolved.ts',
+            filePath: 'architect/stubs/feat/unresolved.ts',
             targetPath: 'src/api/unresolved.ts',
             since: 'DS-A',
             implementsPatterns: ['FeatureA'],

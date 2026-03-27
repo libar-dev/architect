@@ -4,8 +4,8 @@
  * BDD step definitions for testing the process-api CLI
  * output modifiers, arch health, and rules subcommand.
  *
- * @libar-docs
- * @libar-docs-implements ProcessStateAPICLI
+ * @architect
+ * @architect-implements ProcessStateAPICLI
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

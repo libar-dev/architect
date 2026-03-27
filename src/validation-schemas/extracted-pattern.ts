@@ -1,10 +1,10 @@
 /**
- * @libar-docs
- * @libar-docs-validation
- * @libar-docs-pattern ExtractedPatternSchema
- * @libar-docs-status completed
- * @libar-docs-uses DocDirectiveSchema
- * @libar-docs-used-by Generators, SectionRenderers
+ * @architect
+ * @architect-validation
+ * @architect-pattern ExtractedPatternSchema
+ * @architect-status completed
+ * @architect-uses DocDirectiveSchema
+ * @architect-used-by Generators, SectionRenderers
  *
  * ## ExtractedPatternSchema - Complete Pattern Validation
  *
@@ -52,9 +52,9 @@ export const BusinessRuleSchema = z.object({
   scenarioCount: z.number().int().nonnegative(),
   /** Scenario names under this rule */
   scenarioNames: z.array(z.string()).readonly(),
-  /** Tags applied to this rule (from @libar-docs-* tags on Rule: keyword) */
+  /** Tags applied to this rule (from @architect-* tags on Rule: keyword) */
   tags: z.array(z.string()).readonly().optional(),
-  /** Scenario names tagged with @libar-docs-sequence-error (for design review diagrams) */
+  /** Scenario names tagged with @architect-sequence-error (for design review diagrams) */
   errorScenarioNames: z.array(z.string()).readonly().optional(),
 });
 
@@ -168,86 +168,89 @@ export const ExtractedPatternSchema = z
     /** Timestamp of extraction (ISO 8601 format) */
     extractedAt: z.iso.datetime({ error: 'Must be valid ISO 8601 timestamp' }),
 
-    /** Explicit pattern name from @libar-docs-pattern tag (overrides inferred name) */
+    /** Explicit pattern name from @architect-pattern tag (overrides inferred name) */
     patternName: z.string().optional(),
 
-    /** Implementation status from @libar-docs-status tag */
+    /** Implementation status from @architect-status tag */
     status: PatternStatusSchema.optional(),
 
-    /** Whether this is a core/essential pattern from @libar-docs-core tag */
+    /** Whether this is a core/essential pattern from @architect-core tag */
     isCore: z.boolean().optional(),
 
-    /** Use cases this pattern applies to from @libar-docs-usecase tags */
+    /** Use cases this pattern applies to from @architect-usecase tags */
     useCases: z.array(z.string()).readonly().optional(),
 
     /** "When to use" bullet points extracted from description */
     whenToUse: z.array(z.string()).readonly().optional(),
 
-    /** Patterns this pattern uses (from @libar-docs-uses tag) */
+    /** Patterns this pattern uses (from @architect-uses tag) */
     uses: z.array(z.string()).readonly().optional(),
 
-    /** Patterns that use this pattern (from @libar-docs-used-by tag) */
+    /** Patterns that use this pattern (from @architect-used-by tag) */
     usedBy: z.array(z.string()).readonly().optional(),
 
     /** Related Gherkin scenarios from @pattern:* tags in feature files */
     scenarios: z.array(ScenarioRefSchema).readonly().optional(),
 
-    /** Roadmap phase number (from @libar-docs-phase tag) */
+    /** Roadmap phase number (from @architect-phase tag) */
     phase: z.number().int().positive().optional(),
 
-    /** Release version (from @libar-docs-release tag, e.g., "v0.1.0" or "vNEXT") */
+    /** Release version (from @architect-release tag, e.g., "v0.1.0" or "vNEXT") */
     release: z.string().optional(),
 
-    /** Path to pattern brief markdown file (from @libar-docs-brief tag) */
+    /** Path to pattern brief markdown file (from @architect-brief tag) */
     brief: z.string().optional(),
 
-    /** Patterns this pattern depends on for roadmap planning (from @libar-docs-depends-on tag) */
+    /** Patterns this pattern depends on for roadmap planning (from @architect-depends-on tag) */
     dependsOn: z.array(z.string()).readonly().optional(),
 
-    /** Patterns this pattern enables/unlocks (from @libar-docs-enables tag) */
+    /** Patterns this pattern enables/unlocks (from @architect-enables tag) */
     enables: z.array(z.string()).readonly().optional(),
 
-    /** Patterns this code implements (realization relationship from @libar-docs-implements) */
+    /** Patterns this code implements (realization relationship from @architect-implements) */
     implementsPatterns: z.array(z.string()).readonly().optional(),
 
-    /** Pattern this extends (generalization relationship from @libar-docs-extends) */
+    /** Pattern this extends (generalization relationship from @architect-extends) */
     extendsPattern: z.string().optional(),
 
-    /** Target implementation path for stub files (from @libar-docs-target tag) */
+    /** Target implementation path for stub files (from @architect-target tag) */
     targetPath: z.string().optional(),
 
-    /** Design session that created this pattern (from @libar-docs-since tag) */
+    /** Design session that created this pattern (from @architect-since tag) */
     since: z.string().optional(),
 
-    /** Convention domains for reference document generation (from @libar-docs-convention CSV tag) */
+    /** Convention domains for reference document generation (from @architect-convention CSV tag) */
     convention: z.array(z.string()).readonly().optional(),
 
-    /** Related patterns for cross-reference without dependency (from @libar-docs-see-also tag) */
+    /** Related patterns for cross-reference without dependency (from @architect-see-also tag) */
     seeAlso: z.array(z.string()).readonly().optional(),
 
-    /** File paths to implementation APIs (from @libar-docs-api-ref tag) */
+    /** File paths to implementation APIs (from @architect-api-ref tag) */
     apiRef: z.array(z.string()).readonly().optional(),
 
-    // Process metadata from Gherkin @libar-docs-* tags
-    /** Quarter assignment (from @libar-docs-quarter tag, e.g., "Q1-2025") */
+    // Process metadata from Gherkin @architect-* tags
+    /** Quarter assignment (from @architect-quarter tag, e.g., "Q1-2025") */
     quarter: z.string().optional(),
 
-    /** Completion date (from @libar-docs-completed tag, ISO format) */
+    /** Completion date (from @architect-completed tag, ISO format) */
     completed: z.string().optional(),
 
-    /** Effort estimate (from @libar-docs-effort tag, e.g., "2w", "4d") */
+    /** Effort estimate (from @architect-effort tag, e.g., "2w", "4d") */
     effort: z.string().optional(),
 
-    /** Team assignment (from @libar-docs-team tag) */
+    /** Actual effort recorded after delivery (from @architect-effort-actual tag) */
+    effortActual: z.string().optional(),
+
+    /** Team assignment (from @architect-team tag) */
     team: z.string().optional(),
 
-    /** Product area for PRD grouping (from @libar-docs-product-area tag) */
+    /** Product area for PRD grouping (from @architect-product-area tag) */
     productArea: z.string().optional(),
 
-    /** Target user persona (from @libar-docs-user-role tag) */
+    /** Target user persona (from @architect-user-role tag) */
     userRole: z.string().optional(),
 
-    /** Business value statement (from @libar-docs-business-value tag) */
+    /** Business value statement (from @architect-business-value tag) */
     businessValue: z.string().optional(),
 
     /**
@@ -259,13 +262,13 @@ export const ExtractedPatternSchema = z
      */
     deliverables: z.array(DeliverableSchema).readonly().optional(),
 
-    /** Workflow type for process tracking (from @libar-docs-workflow tag) */
+    /** Workflow type for process tracking (from @architect-workflow tag) */
     workflow: z.string().optional(),
 
-    /** Risk level for process tracking (from @libar-docs-risk tag) */
+    /** Risk level for process tracking (from @architect-risk tag) */
     risk: z.string().optional(),
 
-    /** Priority level for process tracking (from @libar-docs-priority tag) */
+    /** Priority level for process tracking (from @architect-priority tag) */
     priority: z.string().optional(),
 
     // NOTE: Release version is tracked at BOTH pattern level (above) AND deliverable level
@@ -275,19 +278,19 @@ export const ExtractedPatternSchema = z
     // Hierarchy support for multi-level organization (epic/phase/task)
 
     /**
-     * Hierarchy level for this pattern (from @libar-docs-level tag)
+     * Hierarchy level for this pattern (from @architect-level tag)
      *
      * Three-level hierarchy:
      * - **epic**: Multi-quarter strategic initiatives
      * - **phase**: Standard work units (2-5 days) - DEFAULT
      * - **task**: Fine-grained session-level work (1-4 hours)
      *
-     * Defaults to "phase" for backward compatibility with existing feature files.
+     * Defaults to "phase".
      */
     level: HierarchyLevelSchema.optional(),
 
     /**
-     * Parent pattern name for hierarchy navigation (from @libar-docs-parent tag)
+     * Parent pattern name for hierarchy navigation (from @architect-parent tag)
      *
      * Links this pattern to its parent in the hierarchy, enabling:
      * - Epic → Phase → Task navigation
@@ -300,70 +303,76 @@ export const ExtractedPatternSchema = z
      * Child pattern names (computed from parent references)
      *
      * Auto-populated by the extractor from patterns that reference this one
-     * via their @libar-docs-parent tag. Not set directly in feature files.
+     * via their @architect-parent tag. Not set directly in feature files.
      */
     children: z.array(z.string()).readonly().optional(),
 
-    // Discovery findings from Gherkin @libar-docs-discovered-* tags (Retrospective phase)
+    // Discovery findings from Gherkin @architect-discovered-* tags (Retrospective phase)
 
     /**
-     * Gaps identified during implementation (from @libar-docs-discovered-gap tags)
+     * Gaps identified during implementation (from @architect-discovered-gap tags)
      * Missing features or capabilities that were not anticipated.
      */
     discoveredGaps: z.array(z.string()).readonly().optional(),
 
     /**
-     * Improvements identified during implementation (from @libar-docs-discovered-improvement tags)
+     * Improvements identified during implementation (from @architect-discovered-improvement tags)
      * Better approaches or optimizations discovered while working.
      */
     discoveredImprovements: z.array(z.string()).readonly().optional(),
 
     /**
-     * Risks identified during implementation (from @libar-docs-discovered-risk tags)
+     * Risks identified during implementation (from @architect-discovered-risk tags)
      * Technical debt, architectural concerns, or potential issues discovered.
      */
     discoveredRisks: z.array(z.string()).readonly().optional(),
 
     /**
-     * Learnings captured during implementation (from @libar-docs-discovered-learning tags)
+     * Learnings captured during implementation (from @architect-discovered-learning tags)
      * Key insights, patterns, or institutional knowledge gained.
      */
     discoveredLearnings: z.array(z.string()).readonly().optional(),
 
     /**
-     * Technical constraints affecting feature implementation (from @libar-docs-constraint tags)
+     * Technical constraints affecting feature implementation (from @architect-constraint tags)
      * Documents requirements, assumptions, and boundaries for implementation.
      */
     constraints: z.array(z.string()).readonly().optional(),
 
-    // ADR (Architecture Decision Record) fields from @libar-docs-adr-* tags
+    // ADR (Architecture Decision Record) fields from @architect-adr-* tags
 
     /**
-     * ADR number (from @libar-docs-adr tag, e.g., "001", "002")
+     * ADR number (from @architect-adr tag, e.g., "001", "002")
      * Used to identify and reference architecture decisions.
      */
     adr: z.string().optional(),
 
     /**
-     * ADR decision status (from @libar-docs-adr-status tag)
+     * ADR decision status (from @architect-adr-status tag)
      * Tracks the lifecycle of architecture decisions (from taxonomy).
      */
     adrStatus: z.enum(ADR_STATUS_VALUES).optional(),
 
     /**
-     * ADR category (from @libar-docs-adr-category tag)
+     * ADR category (from @architect-adr-category tag)
      * Groups decisions by domain (architecture, process, testing, tooling).
      */
     adrCategory: z.string().optional(),
 
+    /** ADR theme grouping (from @architect-adr-theme tag) */
+    adrTheme: z.string().optional(),
+
+    /** ADR layer grouping (from @architect-adr-layer tag) */
+    adrLayer: z.string().optional(),
+
     /**
-     * ADR number this decision supersedes (from @libar-docs-adr-supersedes tag)
+     * ADR number this decision supersedes (from @architect-adr-supersedes tag)
      * Links to the previous decision being replaced.
      */
     adrSupersedes: z.string().optional(),
 
     /**
-     * ADR number that supersedes this decision (from @libar-docs-adr-superseded-by tag)
+     * ADR number that supersedes this decision (from @architect-adr-superseded-by tag)
      * Links to the newer decision that replaces this one.
      */
     adrSupersededBy: z.string().optional(),
@@ -373,10 +382,10 @@ export const ExtractedPatternSchema = z
     // Rules named "Context - ...", "Decision - ...", "Consequences - ..." are
     // semantically detected and rendered by the ADR codec.
 
-    // Display and traceability fields (from @libar-docs-title, @libar-docs-behavior-file)
+    // Display and traceability fields (from @architect-title, @architect-behavior-file)
 
     /**
-     * Explicit human-readable title for display (from @libar-docs-title tag)
+     * Explicit human-readable title for display (from @architect-title tag)
      *
      * Overrides the auto-transformation of CamelCase patternName.
      * Use for edge cases like "OAuth 2.0 Integration" where auto-transform
@@ -384,13 +393,13 @@ export const ExtractedPatternSchema = z
      *
      * @example
      * ```gherkin
-     * @libar-docs-title:"OAuth 2.0 Integration"
+     * @architect-title:"OAuth 2.0 Integration"
      * ```
      */
     title: z.string().optional(),
 
     /**
-     * Path to corresponding behavior feature file (from @libar-docs-behavior-file tag)
+     * Path to corresponding behavior feature file (from @architect-behavior-file tag)
      *
      * Enables traceability from timeline phases to their behavioral tests.
      * If not specified, convention-based matching is used:
@@ -398,7 +407,7 @@ export const ExtractedPatternSchema = z
      *
      * @example
      * ```gherkin
-     * @libar-docs-behavior-file:tests/features/behavior/remaining-work-enhancement.feature
+     * @architect-behavior-file:tests/features/behavior/remaining-work-enhancement.feature
      * ```
      */
     behaviorFile: z.string().optional(),
@@ -409,7 +418,7 @@ export const ExtractedPatternSchema = z
      * Set during extraction when inferring behavior file from convention:
      * - `true` = file was found at inferred path
      * - `false` = file not found at inferred path
-     * - `undefined` = explicit @libar-docs-behavior-file tag used (trust it)
+     * - `undefined` = explicit @architect-behavior-file tag used (trust it)
      *
      * Used by TraceabilitySection to determine coverage without filesystem access.
      */
@@ -441,10 +450,10 @@ export const ExtractedPatternSchema = z
      */
     rules: z.array(BusinessRuleSchema).readonly().optional(),
 
-    // Architecture diagram generation fields (from @libar-docs-arch-* tags)
+    // Architecture diagram generation fields (from @architect-arch-* tags)
 
     /**
-     * Architectural role for diagram generation (from @libar-docs-arch-role tag)
+     * Architectural role for diagram generation (from @architect-arch-role tag)
      *
      * Identifies the component type for architecture diagram visualization:
      * - bounded-context: Physical BC isolation (Convex component)
@@ -474,17 +483,17 @@ export const ExtractedPatternSchema = z
       .optional(),
 
     /**
-     * Bounded context this component belongs to (from @libar-docs-arch-context tag)
+     * Bounded context this component belongs to (from @architect-arch-context tag)
      *
      * Used for grouping components into Mermaid subgraphs by BC.
      * Components without arch-context are rendered at the top level (shared infrastructure).
      *
-     * @example "@libar-docs-arch-context orders"
+     * @example "@architect-arch-context orders"
      */
     archContext: z.string().optional(),
 
     /**
-     * Architectural layer (from @libar-docs-arch-layer tag)
+     * Architectural layer (from @architect-arch-layer tag)
      *
      * Identifies which layer in a layered architecture diagram:
      * - domain: Pure business logic (deciders, value objects)
@@ -493,13 +502,13 @@ export const ExtractedPatternSchema = z
      */
     archLayer: z.enum(['domain', 'application', 'infrastructure']).optional(),
 
-    /** Cross-cutting document inclusion for content routing and diagram scoping (from @libar-docs-include CSV tag) */
+    /** Cross-cutting document inclusion for content routing and diagram scoping (from @architect-include CSV tag) */
     include: z.array(z.string().min(1)).readonly().optional(),
 
     // Shape extraction for documentation generation (ADR-021)
 
     /**
-     * TypeScript shapes extracted via @libar-docs-extract-shapes tag
+     * TypeScript shapes extracted via @architect-extract-shapes tag
      *
      * Contains interfaces, type aliases, enums, and function signatures
      * extracted from the source file for documentation generation.
@@ -507,26 +516,26 @@ export const ExtractedPatternSchema = z
      *
      * @example
      * ```typescript
-     * // @libar-docs-extract-shapes DeciderInput, ValidationResult
+     * // @architect-extract-shapes DeciderInput, ValidationResult
      * // Results in extractedShapes containing both shapes in that order
      * ```
      */
     extractedShapes: z.array(ExtractedShapeSchema).readonly().optional(),
 
-    // Claude module generation fields (from @libar-docs-claude-* tags)
+    // Claude module generation fields (from @architect-claude-* tags)
 
-    /** Module identifier for CLAUDE.md generation (from @libar-docs-claude-module tag) */
+    /** Module identifier for CLAUDE.md generation (from @architect-claude-module tag) */
     claudeModule: z.string().optional(),
 
-    /** Target section directory in _claude-md/ (from @libar-docs-claude-section tag) */
+    /** Target section directory in _claude-md/ (from @architect-claude-section tag) */
     claudeSection: z.enum(CLAUDE_SECTION_VALUES).optional(),
 
-    /** Variation filtering tags for modular-claude-md (from @libar-docs-claude-tags CSV tag) */
+    /** Variation filtering tags for modular-claude-md (from @architect-claude-tags CSV tag) */
     claudeTags: z.array(z.string()).readonly().optional(),
 
-    // Sequence diagram annotation fields (from @libar-docs-sequence-* tags)
+    // Sequence diagram annotation fields (from @architect-sequence-* tags)
 
-    /** Sequence diagram orchestrator module identifier (from @libar-docs-sequence-orchestrator tag) */
+    /** Sequence diagram orchestrator module identifier (from @architect-sequence-orchestrator tag) */
     sequenceOrchestrator: z.string().optional(),
   })
   .strict();

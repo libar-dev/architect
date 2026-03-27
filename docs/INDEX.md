@@ -2,13 +2,13 @@
 
 > **Deprecated:** This document is superseded by the auto-generated [Documentation Index](../docs-live/INDEX.md) which includes live statistics, audience-based navigation, and document roles. This file is preserved for reference only.
 
-**Navigate the full documentation set for `@libar-dev/delivery-process`.** Use section links below for targeted reading.
+**Navigate the full documentation set for `@libar-dev/architect`.** Use section links below for targeted reading.
 
 ## Package Metadata
 
 | Field            | Value                                                |
 | ---------------- | ---------------------------------------------------- |
-| **Package**      | @libar-dev/delivery-process                          |
+| **Package**      | @libar-dev/architect                                 |
 | **Version**      | 1.0.0-pre.0                                          |
 | **Purpose**      | Context engineering for AI-assisted codebases        |
 | **Key Features** | Living docs, FSM enforcement, AI-native Data API CLI |
@@ -19,22 +19,22 @@
 
 ## Quick Navigation
 
-| If you want to...              | Read this                                    | Lines  |
-| ------------------------------ | -------------------------------------------- | ------ |
-| Get started quickly            | [README.md](../README.md)                    | 1-504  |
-| Configure presets and tags     | [CONFIGURATION.md](./CONFIGURATION.md)       | 1-357  |
-| Understand the "why"           | [METHODOLOGY.md](./METHODOLOGY.md)           | 1-238  |
-| Learn the architecture         | [ARCHITECTURE.md](./ARCHITECTURE.md)         | 1-1638 |
-| Run AI coding sessions         | [SESSION-GUIDES.md](./SESSION-GUIDES.md)     | 1-389  |
-| Write Gherkin specs            | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | 1-515  |
-| Enforce delivery process rules | [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | 1-341  |
-| Validate annotation quality    | [VALIDATION.md](./VALIDATION.md)             | 1-281  |
-| Query process state via CLI    | [PROCESS-API.md](./PROCESS-API.md)           | 1-507  |
-| Understand the taxonomy        | [TAXONOMY.md](./TAXONOMY.md)                 | 1-105  |
-| Publish to npm                 | [MAINTAINERS.md](../MAINTAINERS.md)          | —      |
-| Learn annotation patterns      | [ANNOTATION-GUIDE.md](./ANNOTATION-GUIDE.md) | 1-268  |
-| Review the changelog           | [CHANGELOG.md](../CHANGELOG.md)              | 1-26   |
-| Security policy                | [SECURITY.md](../SECURITY.md)                | 1-21   |
+| If you want to...           | Read this                                    | Lines  |
+| --------------------------- | -------------------------------------------- | ------ |
+| Get started quickly         | [README.md](../README.md)                    | 1-504  |
+| Configure presets and tags  | [CONFIGURATION.md](./CONFIGURATION.md)       | 1-357  |
+| Understand the "why"        | [METHODOLOGY.md](./METHODOLOGY.md)           | 1-238  |
+| Learn the architecture      | [ARCHITECTURE.md](./ARCHITECTURE.md)         | 1-1638 |
+| Run AI coding sessions      | [SESSION-GUIDES.md](./SESSION-GUIDES.md)     | 1-389  |
+| Write Gherkin specs         | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | 1-515  |
+| Enforce process rules       | [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | 1-341  |
+| Validate annotation quality | [VALIDATION.md](./VALIDATION.md)             | 1-281  |
+| Query process state via CLI | [PROCESS-API.md](./PROCESS-API.md)           | 1-507  |
+| Understand the taxonomy     | [TAXONOMY.md](./TAXONOMY.md)                 | 1-105  |
+| Publish to npm              | [MAINTAINERS.md](../MAINTAINERS.md)          | —      |
+| Learn annotation patterns   | [ANNOTATION-GUIDE.md](./ANNOTATION-GUIDE.md) | 1-268  |
+| Review the changelog        | [CHANGELOG.md](../CHANGELOG.md)              | 1-26   |
+| Security policy             | [SECURITY.md](../SECURITY.md)                | 1-21   |
 
 ---
 
@@ -65,39 +65,38 @@
 
 ### README.md (Lines 1-504)
 
-| Section                   | Lines   | Key Topics                                        |
-| ------------------------- | ------- | ------------------------------------------------- |
-| Why This Exists           | 17-31   | AI context failure, code as source of truth       |
-| Built for AI-Assisted Dev | 33-50   | Data API CLI typed queries                        |
-| Quick Start               | 52-109  | Install, annotate, generate, lint                 |
-| How It Works              | 111-165 | Annotation examples, pipeline one-liner           |
-| What Gets Generated       | 167-184 | Content block types, config-driven generation     |
-| CLI Commands              | 186-254 | generate-docs, process-api, generate-tag-taxonomy |
-| Proven at Scale           | 256-303 | Discovery, real results, 3-session MVP            |
-| FSM-Enforced Workflow     | 305-337 | State diagram, protection levels                  |
-| Data API CLI              | 339-365 | CLI example, context cost comparison              |
-| Rich Relationship Model   | 367-390 | Dependency tags, Mermaid graph                    |
-| How It Compares           | 392-414 | Comparison with Backstage, Mintlify, etc.         |
-| Design-First Development  | 416-420 | Stub pattern summary + link                       |
-| Document Durability Model | 422-426 | Durability hierarchy summary + link               |
-| Use Cases                 | 428-439 | Multi-phase roadmaps, AI sessions, validation     |
-| Configuration             | 441-475 | Presets table, custom config                      |
-| Documentation             | 477-500 | Doc links table                                   |
-| License                   | 502-504 | MIT license                                       |
+| Section                   | Lines   | Key Topics                                    |
+| ------------------------- | ------- | --------------------------------------------- |
+| Why This Exists           | 17-31   | AI context failure, code as source of truth   |
+| Built for AI-Assisted Dev | 33-50   | Data API CLI typed queries                    |
+| Quick Start               | 52-109  | Install, annotate, generate, lint             |
+| How It Works              | 111-165 | Annotation examples, pipeline one-liner       |
+| What Gets Generated       | 167-184 | Content block types, config-driven generation |
+| CLI Commands              | 186-254 | architect-generate, architect:query           |
+| Proven at Scale           | 256-303 | Discovery, real results, 3-session MVP        |
+| FSM-Enforced Workflow     | 305-337 | State diagram, protection levels              |
+| Data API CLI              | 339-365 | CLI example, context cost comparison          |
+| Rich Relationship Model   | 367-390 | Dependency tags, Mermaid graph                |
+| How It Compares           | 392-414 | Comparison with Backstage, Mintlify, etc.     |
+| Design-First Development  | 416-420 | Stub pattern summary + link                   |
+| Document Durability Model | 422-426 | Durability hierarchy summary + link           |
+| Use Cases                 | 428-439 | Multi-phase roadmaps, AI sessions, validation |
+| Configuration             | 441-475 | Presets table, custom config                  |
+| Documentation             | 477-500 | Doc links table                               |
+| License                   | 502-504 | MIT license                                   |
 
 ---
 
 ### CONFIGURATION.md (Lines 1-357)
 
-| Section                | Lines   | Key Topics                                      |
-| ---------------------- | ------- | ----------------------------------------------- |
-| Quick Reference        | 10-56   | Preset comparison, defineConfig() examples      |
-| Presets                | 84-151  | Generic vs DDD-ES-CQRS preset details           |
-| Unified Config File    | 154-244 | defineConfig(), sources, output, gen overrides  |
-| Custom Configuration   | 248-295 | Custom tag prefix, custom categories            |
-| Programmatic Config    | 299-331 | loadProjectConfig(), mergeSourcesForGenerator() |
-| Backward Compatibility | 336-346 | Legacy createDeliveryProcess() support          |
-| Related Documentation  | 350-357 | Links to README, TAXONOMY, ARCHITECTURE         |
+| Section               | Lines   | Key Topics                                      |
+| --------------------- | ------- | ----------------------------------------------- |
+| Quick Reference       | 10-56   | Preset comparison, defineConfig() examples      |
+| Presets               | 84-151  | Generic vs DDD-ES-CQRS preset details           |
+| Unified Config File   | 154-244 | defineConfig(), sources, output, gen overrides  |
+| Custom Configuration  | 248-295 | Custom tag prefix, custom categories            |
+| Programmatic Config   | 299-331 | loadProjectConfig(), mergeSourcesForGenerator() |
+| Related Documentation | 350-357 | Links to README, TAXONOMY, ARCHITECTURE         |
 
 ---
 
@@ -254,7 +253,7 @@
 | Concept               | 7-18    | What taxonomy defines, FSM states            |
 | Architecture          | 22-65   | File structure, TagRegistry, presets         |
 | Format Types          | 69-80   | flag, value, enum, csv, number, quoted-value |
-| Generating Reference  | 84-96   | generate-docs (preferred), deprecated CLI    |
+| Generating Reference  | 84-96   | docs:taxonomy, architect-generate            |
 | Related Documentation | 100-105 | Links to CONFIGURATION, METHODOLOGY          |
 
 ---
@@ -305,10 +304,10 @@ It queries annotated sources in real time — not generated snapshots.
 See [PROCESS-API.md](./PROCESS-API.md).
 
 ```bash
-pnpm process:query -- scope-validate MyPattern implement      # ALWAYS run first
-pnpm process:query -- context MyPattern --session implement    # Curated context bundle
-pnpm process:query -- files MyPattern --related                # Implementation paths
-pnpm process:query -- handoff --pattern MyPattern              # Capture session end state
+pnpm architect:query -- scope-validate MyPattern implement      # ALWAYS run first
+pnpm architect:query -- context MyPattern --session implement    # Curated context bundle
+pnpm architect:query -- files MyPattern --related                # Implementation paths
+pnpm architect:query -- handoff --pattern MyPattern              # Capture session end state
 ```
 
 ---

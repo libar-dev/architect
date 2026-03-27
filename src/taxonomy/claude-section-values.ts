@@ -4,13 +4,13 @@
  * Each value maps to a subdirectory under `_claude-md/` where
  * generated modules are written.
  *
- * @libar-docs
+ * @architect
  * @see ClaudeModuleGeneration spec (Phase 25)
  */
 
 export const CLAUDE_SECTION_VALUES = [
   'core',
-  'delivery-process',
+  'process',
   'testing',
   'infrastructure',
   'workflow',

@@ -5,12 +5,12 @@
 
 ---
 
-**How do I configure the tool?** Configuration is the entry boundary — it transforms a user-authored `delivery-process.config.ts` file into a fully resolved `DeliveryProcessInstance` that powers the entire pipeline. The flow is: `defineConfig()` provides type-safe authoring (Vite convention, zero validation), `ConfigLoader` discovers and loads the file, `ProjectConfigSchema` validates via Zod, `ConfigResolver` applies defaults and merges stubs into sources, and `DeliveryProcessFactory` builds the final instance with `TagRegistry` and `RegexBuilders`. Three presets define escalating taxonomy complexity — from 3 categories (`generic`, `libar-generic`) to 21 (`ddd-es-cqrs`). `SourceMerger` computes per-generator source overrides, enabling generators like changelog to pull from different feature sets than the base config.
+**How do I configure the tool?** Configuration is the entry boundary — it transforms a user-authored `architect.config.ts` file into a fully resolved `ArchitectInstance` that powers the entire pipeline. The flow is: `defineConfig()` provides type-safe authoring (Vite convention, zero validation), `ConfigLoader` discovers and loads the file, `ProjectConfigSchema` validates via Zod, `ConfigResolver` applies defaults and merges stubs into sources, and `ArchitectFactory` builds the final instance with `TagRegistry` and `RegexBuilders`. Two presets define escalating taxonomy complexity — from 3 categories (`libar-generic`) to 21 (`ddd-es-cqrs`). `SourceMerger` computes per-generator source overrides, enabling generators like changelog to pull from different feature sets than the base config.
 
 ## Key Invariants
 
-- Preset-based taxonomy: `generic` (3 categories, `@docs-`), `libar-generic` (3 categories, `@libar-docs-`), `ddd-es-cqrs` (21 categories, full DDD). Presets replace base categories entirely — they define prefix, categories, and metadata tags as a unit
-- Resolution pipeline: defineConfig() → ConfigLoader → ProjectConfigSchema (Zod) → ConfigResolver → DeliveryProcessFactory → DeliveryProcessInstance. Each stage has a single responsibility
+- Preset-based taxonomy: `libar-generic` (3 categories, `@architect-`) and `ddd-es-cqrs` (21 categories, full DDD). Presets replace base categories entirely — they define prefix, categories, and metadata tags as a unit
+- Resolution pipeline: defineConfig() → ConfigLoader → ProjectConfigSchema (Zod) → ConfigResolver → ArchitectFactory → ArchitectInstance. Each stage has a single responsibility
 - Stubs merged at resolution time: Stub directory globs are appended to typescript sources, making stubs transparent to the downstream pipeline
 - Source override composition: SourceMerger applies per-generator overrides (`replaceFeatures`, `additionalFeatures`, `additionalInput`) to base sources. Exclude is always inherited from base
 
@@ -42,7 +42,7 @@ C4Context
         System(ProjectConfigSchema, "ProjectConfigSchema")
         System(ConfigurationPresets, "ConfigurationPresets")
         System(SourceMerger, "SourceMerger")
-        System(DeliveryProcessFactory, "DeliveryProcessFactory")
+        System(ArchitectFactory, "ArchitectFactory")
         System(DefineConfig, "DefineConfig")
         System(ConfigurationDefaults, "ConfigurationDefaults")
         System(ConfigLoader, "ConfigLoader")
@@ -52,7 +52,7 @@ C4Context
     Rel(WorkflowLoader, WorkflowConfigSchema, "uses")
     Rel(WorkflowLoader, CodecUtils, "uses")
     Rel(ConfigResolver, ProjectConfigTypes, "uses")
-    Rel(ConfigResolver, DeliveryProcessFactory, "uses")
+    Rel(ConfigResolver, ArchitectFactory, "uses")
     Rel(ConfigResolver, ConfigurationDefaults, "uses")
     Rel(RegexBuilders, ConfigurationTypes, "uses")
     Rel(ProjectConfigTypes, ConfigurationTypes, "uses")
@@ -60,11 +60,11 @@ C4Context
     Rel(ProjectConfigSchema, ProjectConfigTypes, "uses")
     Rel(ConfigurationPresets, ConfigurationTypes, "uses")
     Rel(SourceMerger, ProjectConfigTypes, "uses")
-    Rel(DeliveryProcessFactory, ConfigurationTypes, "uses")
-    Rel(DeliveryProcessFactory, ConfigurationPresets, "uses")
-    Rel(DeliveryProcessFactory, RegexBuilders, "uses")
+    Rel(ArchitectFactory, ConfigurationTypes, "uses")
+    Rel(ArchitectFactory, ConfigurationPresets, "uses")
+    Rel(ArchitectFactory, RegexBuilders, "uses")
     Rel(DefineConfig, ProjectConfigTypes, "uses")
-    Rel(ConfigLoader, DeliveryProcessFactory, "uses")
+    Rel(ConfigLoader, ArchitectFactory, "uses")
     Rel(ConfigLoader, ConfigurationTypes, "uses")
 ```
 
@@ -85,7 +85,7 @@ graph LR
         ProjectConfigSchema[/"ProjectConfigSchema"/]
         ConfigurationPresets["ConfigurationPresets"]
         SourceMerger("SourceMerger")
-        DeliveryProcessFactory("DeliveryProcessFactory")
+        ArchitectFactory("ArchitectFactory")
         DefineConfig[/"DefineConfig"/]
         ConfigurationDefaults["ConfigurationDefaults"]
         ConfigLoader[/"ConfigLoader"/]
@@ -97,7 +97,7 @@ graph LR
     WorkflowLoader -->|uses| WorkflowConfigSchema
     WorkflowLoader -->|uses| CodecUtils
     ConfigResolver -->|uses| ProjectConfigTypes
-    ConfigResolver -->|uses| DeliveryProcessFactory
+    ConfigResolver -->|uses| ArchitectFactory
     ConfigResolver -->|uses| ConfigurationDefaults
     RegexBuilders -->|uses| ConfigurationTypes
     ProjectConfigTypes -->|uses| ConfigurationTypes
@@ -105,11 +105,11 @@ graph LR
     ProjectConfigSchema -->|uses| ProjectConfigTypes
     ConfigurationPresets -->|uses| ConfigurationTypes
     SourceMerger -->|uses| ProjectConfigTypes
-    DeliveryProcessFactory -->|uses| ConfigurationTypes
-    DeliveryProcessFactory -->|uses| ConfigurationPresets
-    DeliveryProcessFactory -->|uses| RegexBuilders
+    ArchitectFactory -->|uses| ConfigurationTypes
+    ArchitectFactory -->|uses| ConfigurationPresets
+    ArchitectFactory -->|uses| RegexBuilders
     DefineConfig -->|uses| ProjectConfigTypes
-    ConfigLoader -->|uses| DeliveryProcessFactory
+    ConfigLoader -->|uses| ArchitectFactory
     ConfigLoader -->|uses| ConfigurationTypes
     classDef neighbor stroke-dasharray: 5 5
 ```
@@ -118,20 +118,20 @@ graph LR
 
 ## API Types
 
-### DeliveryProcessConfig (interface)
+### ArchitectConfig (interface)
 
 ```typescript
 /**
- * Configuration for creating a delivery process instance.
+ * Configuration for creating an Architect instance.
  * Uses generics to preserve literal types from presets.
  */
 ```
 
 ````typescript
-interface DeliveryProcessConfig {
-  /** Tag prefix for directives (e.g., "@docs-" or "@libar-docs-") */
+interface ArchitectConfig {
+  /** Tag prefix for directives (e.g., "@architect-") */
   readonly tagPrefix: string;
-  /** File-level opt-in tag (e.g., "@docs" or "@libar-docs") */
+  /** File-level opt-in tag (e.g., "@architect") */
   readonly fileOptInTag: string;
   /** Category definitions for pattern classification */
   readonly categories: readonly CategoryDefinition[];
@@ -157,22 +157,22 @@ interface DeliveryProcessConfig {
 
 | Property              | Description                                                                                                                                                                                                                                                                                                                                                                                       |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| tagPrefix             | Tag prefix for directives (e.g., "@docs-" or "@libar-docs-")                                                                                                                                                                                                                                                                                                                                      |
-| fileOptInTag          | File-level opt-in tag (e.g., "@docs" or "@libar-docs")                                                                                                                                                                                                                                                                                                                                            |
+| tagPrefix             | Tag prefix for directives (e.g., "@architect-")                                                                                                                                                                                                                                                                                                                                                   |
+| fileOptInTag          | File-level opt-in tag (e.g., "@architect")                                                                                                                                                                                                                                                                                                                                                        |
 | categories            | Category definitions for pattern classification                                                                                                                                                                                                                                                                                                                                                   |
 | metadataTags          | Optional metadata tag definitions                                                                                                                                                                                                                                                                                                                                                                 |
 | contextInferenceRules | Optional context inference rules for auto-inferring bounded context from file paths. When provided, these rules are merged with the default rules. User-provided rules take precedence over defaults (applied first in the rule list). `typescript contextInferenceRules: [ { pattern: 'packages/orders/**', context: 'orders' }, { pattern: 'packages/inventory/**', context: 'inventory' }, ] ` |
 
-### DeliveryProcessInstance (interface)
+### ArchitectInstance (interface)
 
 ```typescript
 /**
- * Instance returned by createDeliveryProcess with configured registry
+ * Instance returned by createArchitect with configured registry
  */
 ```
 
 ```typescript
-interface DeliveryProcessInstance {
+interface ArchitectInstance {
   /** The fully configured tag registry */
   readonly registry: TagRegistry;
   /** Regex builders for tag detection */
@@ -198,43 +198,43 @@ interface DeliveryProcessInstance {
 
 ```typescript
 interface RegexBuilders {
-  /** Pattern to match file-level opt-in (e.g., /** @docs *\/) */
+  /** Pattern to match file-level opt-in (e.g., /** @architect *\/) */
   readonly fileOptInPattern: RegExp;
-  /** Pattern to match directives (e.g., @docs-pattern, @docs-status) */
+  /** Pattern to match directives (e.g., @architect-pattern, @architect-status) */
   readonly directivePattern: RegExp;
   /** Check if content has the file-level opt-in marker */
   hasFileOptIn(content: string): boolean;
   /** Check if content has any doc directives */
   hasDocDirectives(content: string): boolean;
-  /** Normalize a tag by removing @ and prefix (e.g., "@docs-pattern" -> "pattern") */
+  /** Normalize a tag by removing @ and prefix (e.g., "@architect-pattern" -> "pattern") */
   normalizeTag(tag: string): string;
 }
 ```
 
-| Property         | Description                                                     |
-| ---------------- | --------------------------------------------------------------- |
-| fileOptInPattern | Pattern to match file-level opt-in (e.g., /\*_ @docs _\/)       |
-| directivePattern | Pattern to match directives (e.g., @docs-pattern, @docs-status) |
+| Property         | Description                                                               |
+| ---------------- | ------------------------------------------------------------------------- |
+| fileOptInPattern | Pattern to match file-level opt-in (e.g., /\*_ @architect _\/)            |
+| directivePattern | Pattern to match directives (e.g., @architect-pattern, @architect-status) |
 
-### DeliveryProcessProjectConfig (interface)
+### ArchitectProjectConfig (interface)
 
 ````typescript
 /**
- * Unified project configuration for delivery-process.
+ * Unified project configuration for Architect.
  *
- * This is the shape users provide in `delivery-process.config.ts`.
+ * This is the shape users provide in `architect.config.ts` or `architect.config.js`.
  * `defineConfig()` is an identity function providing type safety.
  *
  * @example
  * ```typescript
- * import { defineConfig } from '@libar-dev/delivery-process/config';
+ * import { defineConfig } from '@libar-dev/architect/config';
  *
  * export default defineConfig({
  *   preset: 'ddd-es-cqrs',
  *   sources: {
  *     typescript: ['packages/* /src/** /*.ts'],
- *     features: ['delivery-process/specs/** /*.feature'],
- *     stubs: ['delivery-process/stubs/** /*.ts'],
+ *     features: ['architect/specs/** /*.feature'],
+ *     stubs: ['architect/stubs/** /*.ts'],
  *   },
  *   output: { directory: 'docs-living', overwrite: true },
  * });
@@ -243,20 +243,20 @@ interface RegexBuilders {
 ````
 
 ```typescript
-interface DeliveryProcessProjectConfig {
+interface ArchitectProjectConfig {
   // --- Taxonomy ---
 
   /** Use a preset taxonomy configuration */
   readonly preset?: PresetName;
 
-  /** Custom tag prefix (overrides preset, e.g., '@docs-') */
+  /** Custom tag prefix (overrides preset, e.g., '@architect-') */
   readonly tagPrefix?: string;
 
-  /** Custom file opt-in tag (overrides preset, e.g., '@docs') */
+  /** Custom file opt-in tag (overrides preset, e.g., '@architect') */
   readonly fileOptInTag?: string;
 
   /** Custom categories (replaces preset categories entirely) */
-  readonly categories?: DeliveryProcessConfig['categories'];
+  readonly categories?: ArchitectConfig['categories'];
 
   // --- Sources ---
 
@@ -298,7 +298,7 @@ interface DeliveryProcessProjectConfig {
   /**
    * Reference document configurations for convention-based doc generation.
    * Each config defines one reference document's content composition via
-   * convention tags, shape sources, behavior categories, and diagram scopes.
+   * convention tags, shape selectors, behavior categories, and diagram scopes.
    *
    * When not specified, no reference generators are registered.
    * Import `LIBAR_REFERENCE_CONFIGS` from the generators module
@@ -308,20 +308,20 @@ interface DeliveryProcessProjectConfig {
 }
 ```
 
-| Property              | Description                                                                                                                                                                                                                                                                                                                                                           |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| preset                | Use a preset taxonomy configuration                                                                                                                                                                                                                                                                                                                                   |
-| tagPrefix             | Custom tag prefix (overrides preset, e.g., '@docs-')                                                                                                                                                                                                                                                                                                                  |
-| fileOptInTag          | Custom file opt-in tag (overrides preset, e.g., '@docs')                                                                                                                                                                                                                                                                                                              |
-| categories            | Custom categories (replaces preset categories entirely)                                                                                                                                                                                                                                                                                                               |
-| sources               | Source file glob configuration                                                                                                                                                                                                                                                                                                                                        |
-| output                | Output configuration for generated docs                                                                                                                                                                                                                                                                                                                               |
-| generators            | Default generator names to run when CLI doesn't specify --generators                                                                                                                                                                                                                                                                                                  |
-| generatorOverrides    | Per-generator source and output overrides                                                                                                                                                                                                                                                                                                                             |
-| contextInferenceRules | Rules for auto-inferring bounded context from file paths                                                                                                                                                                                                                                                                                                              |
-| workflowPath          | Path to custom workflow config JSON (relative to config file)                                                                                                                                                                                                                                                                                                         |
-| codecOptions          | Per-codec options for fine-tuning document generation. Keys match codec names (e.g., 'business-rules', 'patterns'). Passed through to codec factories at generation time.                                                                                                                                                                                             |
-| referenceDocConfigs   | Reference document configurations for convention-based doc generation. Each config defines one reference document's content composition via convention tags, shape sources, behavior categories, and diagram scopes. When not specified, no reference generators are registered. Import `LIBAR_REFERENCE_CONFIGS` from the generators module to use the built-in set. |
+| Property              | Description                                                                                                                                                                                                                                                                                                                                                             |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| preset                | Use a preset taxonomy configuration                                                                                                                                                                                                                                                                                                                                     |
+| tagPrefix             | Custom tag prefix (overrides preset, e.g., '@architect-')                                                                                                                                                                                                                                                                                                               |
+| fileOptInTag          | Custom file opt-in tag (overrides preset, e.g., '@architect')                                                                                                                                                                                                                                                                                                           |
+| categories            | Custom categories (replaces preset categories entirely)                                                                                                                                                                                                                                                                                                                 |
+| sources               | Source file glob configuration                                                                                                                                                                                                                                                                                                                                          |
+| output                | Output configuration for generated docs                                                                                                                                                                                                                                                                                                                                 |
+| generators            | Default generator names to run when CLI doesn't specify --generators                                                                                                                                                                                                                                                                                                    |
+| generatorOverrides    | Per-generator source and output overrides                                                                                                                                                                                                                                                                                                                               |
+| contextInferenceRules | Rules for auto-inferring bounded context from file paths                                                                                                                                                                                                                                                                                                                |
+| workflowPath          | Path to custom workflow config JSON (relative to config file)                                                                                                                                                                                                                                                                                                           |
+| codecOptions          | Per-codec options for fine-tuning document generation. Keys match codec names (e.g., 'business-rules', 'patterns'). Passed through to codec factories at generation time.                                                                                                                                                                                               |
+| referenceDocConfigs   | Reference document configurations for convention-based doc generation. Each config defines one reference document's content composition via convention tags, shape selectors, behavior categories, and diagram scopes. When not specified, no reference generators are registered. Import `LIBAR_REFERENCE_CONFIGS` from the generators module to use the built-in set. |
 
 ### SourcesConfig (interface)
 
@@ -345,7 +345,7 @@ interface SourcesConfig {
 
   /**
    * Glob patterns for design stub files.
-   * Stubs are TypeScript files that live outside `src/` (e.g., `delivery-process/stubs/`).
+   * Stubs are TypeScript files that live outside `src/` (e.g., `architect/stubs/`).
    * Merged into TypeScript sources at resolution time.
    */
   readonly stubs?: readonly string[];
@@ -355,12 +355,12 @@ interface SourcesConfig {
 }
 ```
 
-| Property   | Description                                                                                                                                                                    |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| typescript | Glob patterns for TypeScript source files (replaces --input)                                                                                                                   |
-| features   | Glob patterns for Gherkin feature files (replaces --features). Includes both `.feature` and `.feature.md` files.                                                               |
-| stubs      | Glob patterns for design stub files. Stubs are TypeScript files that live outside `src/` (e.g., `delivery-process/stubs/`). Merged into TypeScript sources at resolution time. |
-| exclude    | Glob patterns to exclude from all scanning                                                                                                                                     |
+| Property   | Description                                                                                                                                                             |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| typescript | Glob patterns for TypeScript source files (replaces --input)                                                                                                            |
+| features   | Glob patterns for Gherkin feature files (replaces --features). Includes both `.feature` and `.feature.md` files.                                                        |
+| stubs      | Glob patterns for design stub files. Stubs are TypeScript files that live outside `src/` (e.g., `architect/stubs/`). Merged into TypeScript sources at resolution time. |
+| exclude    | Glob patterns to exclude from all scanning                                                                                                                              |
 
 ### OutputConfig (interface)
 
@@ -502,16 +502,16 @@ interface ResolvedSourcesConfig {
 | features   | Gherkin feature file globs                      |
 | exclude    | Glob patterns to exclude from scanning          |
 
-### CreateDeliveryProcessOptions (interface)
+### CreateArchitectOptions (interface)
 
 ```typescript
 /**
- * Options for creating a delivery process instance
+ * Options for creating an Architect instance
  */
 ```
 
 ```typescript
-interface CreateDeliveryProcessOptions {
+interface CreateArchitectOptions {
   /** Use a preset configuration */
   preset?: PresetName;
   /** Custom tag prefix (overrides preset) */
@@ -519,7 +519,7 @@ interface CreateDeliveryProcessOptions {
   /** Custom file opt-in tag (overrides preset) */
   fileOptInTag?: string;
   /** Custom categories (replaces preset categories entirely) */
-  categories?: DeliveryProcessConfig['categories'];
+  categories?: ArchitectConfig['categories'];
 }
 ```
 
@@ -545,7 +545,7 @@ interface ConfigDiscoveryResult {
   /** Absolute path to the config file (if found) */
   path?: string;
   /** The loaded configuration instance */
-  instance: DeliveryProcessInstance;
+  instance: ArchitectInstance;
   /** Whether the default configuration was used */
   isDefault: boolean;
 }
@@ -605,7 +605,7 @@ interface ConfigLoadError {
 type ResolvedConfig =
   | {
       /** The taxonomy instance (registry + regexBuilders) */
-      readonly instance: DeliveryProcessInstance;
+      readonly instance: ArchitectInstance;
       /** The resolved project config with defaults applied */
       readonly project: ResolvedProjectConfig;
       /** Config was generated from defaults (no config file found) */
@@ -615,7 +615,7 @@ type ResolvedConfig =
     }
   | {
       /** The taxonomy instance (registry + regexBuilders) */
-      readonly instance: DeliveryProcessInstance;
+      readonly instance: ArchitectInstance;
       /** The resolved project config with defaults applied */
       readonly project: ResolvedProjectConfig;
       /** Config was loaded from a file */
@@ -634,7 +634,7 @@ type ResolvedConfig =
 ```
 
 ```typescript
-type PresetName = 'generic' | 'libar-generic' | 'ddd-es-cqrs';
+type PresetName = 'libar-generic' | 'ddd-es-cqrs';
 ```
 
 ### ConfigLoadResult (type)
@@ -668,21 +668,21 @@ type ConfigLoadResult =
  * Creates type-safe regex builders for a given tag prefix configuration.
  * These are used throughout the scanner and validation pipeline.
  *
- * @param tagPrefix - The tag prefix (e.g., "@docs-" or "@libar-docs-")
- * @param fileOptInTag - The file opt-in tag (e.g., "@docs" or "@libar-docs")
+ * @param tagPrefix - The tag prefix (e.g., "@architect-")
+ * @param fileOptInTag - The file opt-in tag (e.g., "@architect")
  * @returns RegexBuilders instance with pattern matching methods
  *
  * @example
  * ```typescript
- * const builders = createRegexBuilders("@docs-", "@docs");
+ * const builders = createRegexBuilders("@architect-", "@architect");
  *
  * // Check for file opt-in
  * if (builders.hasFileOptIn(sourceCode)) {
- *   console.log("File has @docs marker");
+ *   console.log("File has @architect marker");
  * }
  *
  * // Normalize a tag
- * const normalized = builders.normalizeTag("@docs-pattern");
+ * const normalized = builders.normalizeTag("@architect-pattern");
  * // Returns: "pattern"
  * ```
  */
@@ -692,18 +692,18 @@ type ConfigLoadResult =
 function createRegexBuilders(tagPrefix: string, fileOptInTag: string): RegexBuilders;
 ```
 
-| Parameter    | Type | Description                                          |
-| ------------ | ---- | ---------------------------------------------------- |
-| tagPrefix    |      | The tag prefix (e.g., "@docs-" or "@libar-docs-")    |
-| fileOptInTag |      | The file opt-in tag (e.g., "@docs" or "@libar-docs") |
+| Parameter    | Type | Description                              |
+| ------------ | ---- | ---------------------------------------- |
+| tagPrefix    |      | The tag prefix (e.g., "@architect-")     |
+| fileOptInTag |      | The file opt-in tag (e.g., "@architect") |
 
 **Returns:** RegexBuilders instance with pattern matching methods
 
-### createDeliveryProcess (function)
+### createArchitect (function)
 
 ````typescript
 /**
- * Creates a configured delivery process instance.
+ * Creates a configured Architect instance.
  *
  * Configuration resolution order:
  * 1. Start with preset (or libar-generic default)
@@ -716,18 +716,18 @@ function createRegexBuilders(tagPrefix: string, fileOptInTag: string): RegexBuil
  * Categories from the preset replace base categories entirely.
  *
  * @param options - Configuration options
- * @returns Configured delivery process instance
+ * @returns Configured Architect instance
  *
  * @example
  * ```typescript
- * // Use generic preset
- * const dp = createDeliveryProcess({ preset: "generic" });
+ * // Use the default preset
+ * const dp = createArchitect();
  * ```
  *
  * @example
  * ```typescript
  * // Custom prefix with DDD taxonomy
- * const dp = createDeliveryProcess({
+ * const dp = createArchitect({
  *   preset: "ddd-es-cqrs",
  *   tagPrefix: "@my-project-",
  *   fileOptInTag: "@my-project"
@@ -737,20 +737,20 @@ function createRegexBuilders(tagPrefix: string, fileOptInTag: string): RegexBuil
  * @example
  * ```typescript
  * // Default (libar-generic preset with 3 categories)
- * const dp = createDeliveryProcess();
+ * const dp = createArchitect();
  * ```
  */
 ````
 
 ```typescript
-function createDeliveryProcess(options: CreateDeliveryProcessOptions = {}): DeliveryProcessInstance;
+function createArchitect(options: CreateArchitectOptions = {}): ArchitectInstance;
 ```
 
 | Parameter | Type | Description           |
 | --------- | ---- | --------------------- |
 | options   |      | Configuration options |
 
-**Returns:** Configured delivery process instance
+**Returns:** Configured Architect instance
 
 ### findConfigFile (function)
 
@@ -780,7 +780,7 @@ async function findConfigFile(startDir: string): Promise<string | null>;
  * Load configuration from file or use defaults.
  *
  * Delegates to {@link loadProjectConfig} for file discovery and parsing,
- * then maps the result to the legacy {@link ConfigDiscoveryResult} shape.
+ * then maps the result to the {@link ConfigDiscoveryResult} shape.
  *
  * @param baseDir - Directory to start searching from (usually cwd or project root)
  * @returns Result with loaded configuration or error
@@ -835,81 +835,29 @@ function formatConfigError(error: ConfigLoadError): string;
 
 **Returns:** Formatted error message
 
-### GENERIC_PRESET (const)
-
-````typescript
-/**
- * Generic preset for non-DDD projects.
- *
- * Minimal categories with @docs- prefix. Suitable for:
- * - Simple documentation needs
- * - Non-DDD architectures
- * - Projects that want basic pattern tracking
- *
- * @example
- * ```typescript
- * import { createDeliveryProcess, GENERIC_PRESET } from '@libar-dev/delivery-process';
- *
- * const dp = createDeliveryProcess({ preset: "generic" });
- * // Uses @docs-, @docs-pattern, @docs-status, etc.
- * ```
- */
-````
-
-```typescript
-GENERIC_PRESET = {
-  tagPrefix: '@docs-',
-  fileOptInTag: '@docs',
-  categories: [
-    {
-      tag: 'core',
-      domain: 'Core',
-      priority: 1,
-      description: 'Core patterns',
-      aliases: [],
-    },
-    {
-      tag: 'api',
-      domain: 'API',
-      priority: 2,
-      description: 'Public APIs',
-      aliases: [],
-    },
-    {
-      tag: 'infra',
-      domain: 'Infrastructure',
-      priority: 3,
-      description: 'Infrastructure',
-      aliases: ['infrastructure'],
-    },
-  ] as const satisfies readonly CategoryDefinition[],
-} as const satisfies DeliveryProcessConfig;
-```
-
 ### LIBAR_GENERIC_PRESET (const)
 
 ````typescript
 /**
- * Generic preset with @libar-docs- prefix.
+ * Default libar-generic preset with @architect- prefix.
  *
- * Same minimal categories as GENERIC_PRESET but with @libar-docs- prefix.
- * This is the universal default preset for both `createDeliveryProcess()` and
+ * This is the universal default preset for both `createArchitect()` and
  * `loadConfig()` fallback.
  *
  * Suitable for:
  * - Most projects (default choice)
- * - Projects already using @libar-docs- tags
- * - Package-level configuration (simplified categories, same prefix)
+ * - Projects already using @architect- tags
+ * - Package-level configuration with a compact three-category taxonomy
  * - Gradual adoption without tag migration
  *
  * @example
  * ```typescript
- * import { createDeliveryProcess } from '@libar-dev/delivery-process';
+ * import { createArchitect } from '@libar-dev/architect';
  *
  * // Default preset (libar-generic):
- * const dp = createDeliveryProcess();
- * // Uses @libar-docs-, @libar-docs-pattern, @libar-docs-status, etc.
- * // With 3 category tags: @libar-docs-core, @libar-docs-api, @libar-docs-infra
+ * const dp = createArchitect();
+ * // Uses @architect-, @architect-pattern, @architect-status, etc.
+ * // With 3 category tags: @architect-core, @architect-api, @architect-infra
  * ```
  */
 ````
@@ -941,7 +889,7 @@ LIBAR_GENERIC_PRESET = {
       aliases: ['infrastructure'],
     },
   ] as const satisfies readonly CategoryDefinition[],
-} as const satisfies DeliveryProcessConfig;
+} as const satisfies ArchitectConfig;
 ```
 
 ### DDD_ES_CQRS_PRESET (const)
@@ -950,7 +898,7 @@ LIBAR_GENERIC_PRESET = {
 /**
  * Full DDD/ES/CQRS preset (current @libar-dev taxonomy).
  *
- * Complete 21-category taxonomy with @libar-docs- prefix. Suitable for:
+ * Complete 21-category taxonomy with @architect- prefix. Suitable for:
  * - DDD architectures
  * - Event sourcing projects
  * - CQRS implementations
@@ -958,9 +906,9 @@ LIBAR_GENERIC_PRESET = {
  *
  * @example
  * ```typescript
- * import { createDeliveryProcess, DDD_ES_CQRS_PRESET } from '@libar-dev/delivery-process';
+ * import { createArchitect, DDD_ES_CQRS_PRESET } from '@libar-dev/architect';
  *
- * const dp = createDeliveryProcess({ preset: "ddd-es-cqrs" });
+ * const dp = createArchitect({ preset: "ddd-es-cqrs" });
  * ```
  */
 ````
@@ -971,7 +919,7 @@ DDD_ES_CQRS_PRESET = {
   fileOptInTag: DEFAULT_FILE_OPT_IN_TAG,
   categories: CATEGORIES,
   metadataTags: buildRegistry().metadataTags,
-} as const satisfies DeliveryProcessConfig;
+} as const satisfies ArchitectConfig;
 ```
 
 ### PRESETS (const)
@@ -982,7 +930,7 @@ DDD_ES_CQRS_PRESET = {
  *
  * @example
  * ```typescript
- * import { PRESETS, type PresetName } from '@libar-dev/delivery-process';
+ * import { PRESETS, type PresetName } from '@libar-dev/architect';
  *
  * function getPreset(name: PresetName) {
  *   return PRESETS[name];
@@ -992,14 +940,14 @@ DDD_ES_CQRS_PRESET = {
 ````
 
 ```typescript
-const PRESETS: Record<PresetName, DeliveryProcessConfig>;
+const PRESETS: Record<PresetName, ArchitectConfig>;
 ```
 
 ---
 
 ## Business Rules
 
-10 patterns, 47 rules with invariants (47 total)
+10 patterns, 46 rules with invariants (46 total)
 
 ### Config Based Workflow Definition
 
@@ -1042,12 +990,12 @@ const PRESETS: Record<PresetName, DeliveryProcessConfig>;
 
 ### Define Config Testing
 
-| Rule                                    | Invariant                                                                                                                                                                      | Rationale                                                                                                                                                              |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| defineConfig is an identity function    | The defineConfig helper must return its input unchanged, serving only as a type annotation aid for IDE autocomplete.                                                           | defineConfig exists for TypeScript type inference in config files — any transformation would surprise users who expect their config object to pass through unmodified. |
-| Schema validates correct configurations | Valid configuration objects (both minimal and fully-specified) must pass schema validation without errors.                                                                     | The schema must accept all legitimate configuration shapes — rejecting valid configs would block users from using supported features.                                  |
-| Schema rejects invalid configurations   | The configuration schema must reject invalid values including empty globs, directory traversal patterns, mutually exclusive options, invalid preset names, and unknown fields. | Schema validation is the first line of defense against misconfiguration — permissive validation lets invalid configs produce confusing downstream errors.              |
-| Type guards distinguish config formats  | The isProjectConfig and isLegacyInstance type guards must correctly distinguish between new-style project configs and legacy configuration instances.                          | The codebase supports both config formats during migration — incorrect type detection would apply the wrong loading path and produce runtime errors.                   |
+| Rule                                    | Invariant                                                                                                                                                                                                     | Rationale                                                                                                                                                              |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| defineConfig is an identity function    | The defineConfig helper must return its input unchanged, serving only as a type annotation aid for IDE autocomplete.                                                                                          | defineConfig exists for TypeScript type inference in config files — any transformation would surprise users who expect their config object to pass through unmodified. |
+| Schema validates correct configurations | Valid configuration objects (both minimal and fully-specified) must pass schema validation without errors.                                                                                                    | The schema must accept all legitimate configuration shapes — rejecting valid configs would block users from using supported features.                                  |
+| Schema rejects invalid configurations   | The configuration schema must reject invalid values including empty globs, directory traversal patterns, mutually exclusive options, invalid preset names, removed compatibility aliases, and unknown fields. | Schema validation is the first line of defense against misconfiguration — permissive validation lets invalid configs produce confusing downstream errors.              |
+| Type guard validates config format      | The isProjectConfig type guard must correctly identify valid project configs.                                                                                                                                 | Config loading relies on type detection to apply the correct parsing path.                                                                                             |
 
 ### Monorepo Support
 
@@ -1061,32 +1009,31 @@ const PRESETS: Record<PresetName, DeliveryProcessConfig>;
 
 ### Preset System
 
-| Rule                                                             | Invariant                                                                                         | Rationale                                                                                                           |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Generic preset provides minimal taxonomy                         | The generic preset must provide exactly 3 categories (core, api, infra) with @docs- prefix.       | Simple projects need minimal configuration without DDD-specific categories cluttering the taxonomy.                 |
-| Libar generic preset provides minimal taxonomy with libar prefix | The libar-generic preset must provide exactly 3 categories with @libar-docs- prefix.              | This package uses @libar-docs- prefix to avoid collisions with consumer projects' annotations.                      |
-| DDD-ES-CQRS preset provides full taxonomy                        | The DDD preset must provide all 21 categories spanning DDD, ES, CQRS, and infrastructure domains. | DDD architectures require fine-grained categorization to distinguish bounded contexts, aggregates, and projections. |
-| Presets can be accessed by name                                  | All preset instances must be accessible via the PRESETS map using their canonical string key.     | Programmatic access enables config files to reference presets by name instead of importing instances.               |
+| Rule                                                             | Invariant                                                                                                                                                                            | Rationale                                                                                                           |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| Libar generic preset provides minimal taxonomy with libar prefix | The libar-generic preset must provide exactly 3 categories with @architect- prefix.                                                                                                  | This package uses @architect- prefix to avoid collisions with consumer projects' annotations.                       |
+| DDD-ES-CQRS preset provides full taxonomy                        | The DDD preset must provide all 21 categories spanning DDD, ES, CQRS, and infrastructure domains.                                                                                    | DDD architectures require fine-grained categorization to distinguish bounded contexts, aggregates, and projections. |
+| Presets can be accessed by name                                  | All preset instances must be accessible via the PRESETS map using their canonical string key.                                                                                        | Programmatic access enables config files to reference presets by name instead of importing instances.               |
+| PresetName type is exported from public entrypoints              | The `PresetName` type must remain available from both package entrypoints so downstream configs and helper functions can reference preset keys without reaching into internal files. | Removing a documented type export is a breaking API change even when runtime behavior is unchanged.                 |
 
 ### Project Config Loader
 
-| Rule                                                | Invariant                                                                                                | Rationale                                                                                                          |
-| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Missing config returns defaults                     | When no config file exists, loadProjectConfig must return a default resolved config with isDefault=true. | Graceful fallback enables zero-config usage — new projects work without requiring config file creation.            |
-| New-style config is loaded and resolved             | A file exporting defineConfig must be loaded, validated, and resolved with correct preset categories.    | defineConfig is the primary config format — correct loading is the critical path for all documentation generation. |
-| Legacy config is loaded with backward compatibility | A file exporting createDeliveryProcess must be loaded and produce a valid resolved config.               | Backward compatibility prevents breaking existing consumers during migration to the new config format.             |
-| Invalid configs produce clear errors                | Config files without a default export or with invalid data must produce descriptive error messages.      | Actionable error messages reduce debugging time — users need to know what to fix, not just that something failed.  |
+| Rule                                    | Invariant                                                                                                | Rationale                                                                                                          |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Missing config returns defaults         | When no config file exists, loadProjectConfig must return a default resolved config with isDefault=true. | Graceful fallback enables zero-config usage — new projects work without requiring config file creation.            |
+| New-style config is loaded and resolved | A file exporting defineConfig must be loaded, validated, and resolved with correct preset categories.    | defineConfig is the primary config format — correct loading is the critical path for all documentation generation. |
+| Invalid configs produce clear errors    | Config files without a default export or with invalid data must produce descriptive error messages.      | Actionable error messages reduce debugging time — users need to know what to fix, not just that something failed.  |
 
 ### Setup Command
 
-| Rule                                                                      | Invariant                                                                                                                                                                                                                                                                                                                                                                                                  | Rationale                                                                                                                                                                                         |
-| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Init detects existing project context before making changes               | The init command reads the target directory for package.json, tsconfig.json, delivery-process.config.ts (or .js), and monorepo markers before prompting or generating any files. Detection results determine which steps are skipped.                                                                                                                                                                      | Blindly generating files overwrites user configuration and breaks working setups. Context detection enables safe adoption into existing projects by skipping steps that are already complete.     |
-| Interactive prompts configure preset and source paths with smart defaults | The init command prompts for preset selection from the three available presets (generic, libar-generic, ddd-es-cqrs) with descriptions, and for source glob paths with defaults inferred from project structure. The --yes flag skips non-destructive selection prompts and uses defaults. Destructive overwrites require an explicit --force flag; otherwise init exits without modifying existing files. | New users do not know which preset to choose or what glob patterns to use. Smart defaults reduce decisions to confirmations. The --yes flag enables scripted adoption in CI.                      |
-| Generated config file uses defineConfig with correct imports              | The generated delivery-process.config.ts (or .js) imports defineConfig from the correct path, uses the selected preset, and includes configured source globs. An existing config file is never overwritten without confirmation.                                                                                                                                                                           | The config file is the most important artifact. An incorrect import path or malformed glob causes every subsequent command to fail. The overwrite guard prevents destroying custom configuration. |
-| Npm scripts are injected using bin command names                          | Injected scripts reference bin names (process-api, generate-docs) resolved via node_modules/.bin, not dist paths. Existing scripts are preserved. The package.json "type" field is preserved. ESM migration is an explicit opt-in via --esm flag.                                                                                                                                                          | The tutorial uses long fragile dist paths. Bin commands are the stable public API. Setting type:module ensures ESM imports work for the config.                                                   |
-| Directory structure and example annotation enable immediate first run     | The init command creates directories for configured source globs and generates one example annotated TypeScript file with the minimum annotation set (opt-in marker, pattern tag, status, category, description).                                                                                                                                                                                          | Empty source globs produce a confusing "0 patterns" result. An example file proves the pipeline works and teaches annotation syntax by example.                                                   |
-| Init validates the complete setup by running the pipeline                 | After all files are generated, init runs process-api overview and reports whether the pipeline detected the example pattern. Success prints a summary and next steps. Failure prints diagnostic information.                                                                                                                                                                                               | Generating files without verification produces false confidence. Running the pipeline as the final step proves config, globs, directories, and the example annotation all work together.          |
+| Rule                                                                      | Invariant                                                                                                                                                                                                                                                                                                                                                                                       | Rationale                                                                                                                                                                                         |
+| ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Init detects existing project context before making changes               | The init command reads the target directory for package.json, tsconfig.json, architect.config.ts (or .js), and monorepo markers before prompting or generating any files. Detection results determine which steps are skipped.                                                                                                                                                                  | Blindly generating files overwrites user configuration and breaks working setups. Context detection enables safe adoption into existing projects by skipping steps that are already complete.     |
+| Interactive prompts configure preset and source paths with smart defaults | The init command prompts for preset selection from the two available presets (libar-generic, ddd-es-cqrs) with descriptions, and for source glob paths with defaults inferred from project structure. The --yes flag skips non-destructive selection prompts and uses defaults. Destructive overwrites require an explicit --force flag; otherwise init exits without modifying existing files. | New users do not know which preset to choose or what glob patterns to use. Smart defaults reduce decisions to confirmations. The --yes flag enables scripted adoption in CI.                      |
+| Generated config file uses defineConfig with correct imports              | The generated architect.config.ts (or .js) imports defineConfig from the correct path, uses the selected preset, and includes configured source globs. An existing config file is never overwritten without confirmation.                                                                                                                                                                       | The config file is the most important artifact. An incorrect import path or malformed glob causes every subsequent command to fail. The overwrite guard prevents destroying custom configuration. |
+| Npm scripts are injected using bin command names                          | Injected scripts reference bin names (process-api, generate-docs) resolved via node_modules/.bin, not dist paths. Existing scripts are preserved. The package.json "type" field is preserved. ESM migration is an explicit opt-in via --esm flag.                                                                                                                                               | The tutorial uses long fragile dist paths. Bin commands are the stable public API. Setting type:module ensures ESM imports work for the config.                                                   |
+| Directory structure and example annotation enable immediate first run     | The init command creates directories for configured source globs and generates one example annotated TypeScript file with the minimum annotation set (opt-in marker, pattern tag, status, category, description).                                                                                                                                                                               | Empty source globs produce a confusing "0 patterns" result. An example file proves the pipeline works and teaches annotation syntax by example.                                                   |
+| Init validates the complete setup by running the pipeline                 | After all files are generated, init runs process-api overview and reports whether the pipeline detected the example pattern. Success prints a summary and next steps. Failure prints diagnostic information.                                                                                                                                                                                    | Generating files without verification produces false confidence. Running the pipeline as the final step proves config, globs, directories, and the example annotation all work together.          |
 
 ### Source Merging
 

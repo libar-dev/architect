@@ -337,20 +337,20 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
   });
 
   // ──────────────────────────────────────────────────────────────────────
-  // Rule: Shape sources are extracted from matching patterns
+  // Rule: Source selectors are extracted from matching patterns
   // ──────────────────────────────────────────────────────────────────────
 
-  Rule('Shape sources are extracted from matching patterns', ({ RuleScenario }) => {
+  Rule('Source selectors are extracted from matching patterns', ({ RuleScenario }) => {
     RuleScenario(
-      'Shapes appear when source file matches shapeSources glob',
+      'Shapes appear when source file matches source selector glob',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with shapeSources {string}',
-          (_ctx: unknown, shapeSources: string) => {
+          'a reference config with source selector {string}',
+          (_ctx: unknown, shapeSource: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: shapeSources.split(',').map((s) => s.trim()),
+              shapeSelectors: [{ source: shapeSource }],
               behaviorCategories: [],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
@@ -417,12 +417,12 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Summary level shows shapes as a compact table', ({ Given, And, When, Then }) => {
       Given(
-        'a reference config with shapeSources {string}',
-        (_ctx: unknown, shapeSources: string) => {
+        'a reference config with source selector {string}',
+        (_ctx: unknown, shapeSource: string) => {
           state!.config = {
             title: 'Test Reference Document',
             conventionTags: [],
-            shapeSources: shapeSources.split(',').map((s) => s.trim()),
+            shapeSelectors: [{ source: shapeSource }],
             behaviorCategories: [],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
@@ -475,12 +475,12 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('No shapes when source file does not match glob', ({ Given, And, When, Then }) => {
       Given(
-        'a reference config with shapeSources {string}',
-        (_ctx: unknown, shapeSources: string) => {
+        'a reference config with source selector {string}',
+        (_ctx: unknown, shapeSource: string) => {
           state!.config = {
             title: 'Test Reference Document',
             conventionTags: [],
-            shapeSources: shapeSources.split(',').map((s) => s.trim()),
+            shapeSelectors: [{ source: shapeSource }],
             behaviorCategories: [],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
@@ -605,7 +605,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: ['fsm-rules'],
-              shapeSources: ['src/lint/*.ts'],
+              shapeSelectors: [{ source: 'src/lint/*.ts' }],
               behaviorCategories: ['process-guard'],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',

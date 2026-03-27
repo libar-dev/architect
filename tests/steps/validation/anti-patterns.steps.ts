@@ -4,7 +4,7 @@
  * BDD step definitions for testing anti-pattern detection functions
  * that enforce dual-source documentation architecture.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -98,7 +98,7 @@ function createMockScannedFile(tags: string[]): ScannedFile {
     directives: [
       {
         directive: {
-          tags: tags as ReadonlyArray<`@libar-docs-${string}`>,
+          tags: tags as ReadonlyArray<`@architect-${string}`>,
           description: 'Test directive',
           examples: [],
           position: { startLine: 1, endLine: 10 },
@@ -207,7 +207,7 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
         ({ Given, When, Then, And }, variables: { process_tag: string }) => {
           Given('a TypeScript file with process tag {string}', () => {
             state = initState();
-            state.scannedFiles = [createMockScannedFile(['@libar-docs', variables.process_tag])];
+            state.scannedFiles = [createMockScannedFile(['@architect', variables.process_tag])];
           });
 
           When('detecting process-in-code anti-patterns', () => {

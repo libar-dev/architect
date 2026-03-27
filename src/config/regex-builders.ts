@@ -1,14 +1,14 @@
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-config
- * @libar-docs-pattern RegexBuilders
- * @libar-docs-status completed
- * @libar-docs-arch-layer infrastructure
- * @libar-docs-arch-context config
- * @libar-docs-arch-role infrastructure
- * @libar-docs-uses ConfigurationTypes
- * @libar-docs-used-by DeliveryProcessFactory
- * @libar-docs-extract-shapes createRegexBuilders
+ * @architect
+ * @architect-core @architect-config
+ * @architect-pattern RegexBuilders
+ * @architect-status completed
+ * @architect-arch-layer infrastructure
+ * @architect-arch-context config
+ * @architect-arch-role infrastructure
+ * @architect-uses ConfigurationTypes
+ * @architect-used-by ArchitectFactory
+ * @architect-extract-shapes createRegexBuilders
  *
  * ## Regex Builders
  *
@@ -17,7 +17,7 @@
  *
  * ### When to Use
  *
- * - When creating a new delivery process instance
+ * - When creating a new Architect instance
  * - When detecting doc directives in source code
  * - When normalizing tags for comparison
  */
@@ -41,21 +41,21 @@ function escapeRegex(str: string): string {
  * Creates type-safe regex builders for a given tag prefix configuration.
  * These are used throughout the scanner and validation pipeline.
  *
- * @param tagPrefix - The tag prefix (e.g., "@docs-" or "@libar-docs-")
- * @param fileOptInTag - The file opt-in tag (e.g., "@docs" or "@libar-docs")
+ * @param tagPrefix - The tag prefix (e.g., "@architect-")
+ * @param fileOptInTag - The file opt-in tag (e.g., "@architect")
  * @returns RegexBuilders instance with pattern matching methods
  *
  * @example
  * ```typescript
- * const builders = createRegexBuilders("@docs-", "@docs");
+ * const builders = createRegexBuilders("@architect-", "@architect");
  *
  * // Check for file opt-in
  * if (builders.hasFileOptIn(sourceCode)) {
- *   console.log("File has @docs marker");
+ *   console.log("File has @architect marker");
  * }
  *
  * // Normalize a tag
- * const normalized = builders.normalizeTag("@docs-pattern");
+ * const normalized = builders.normalizeTag("@architect-pattern");
  * // Returns: "pattern"
  * ```
  */
@@ -63,11 +63,11 @@ export function createRegexBuilders(tagPrefix: string, fileOptInTag: string): Re
   const escapedPrefix = escapeRegex(tagPrefix);
   const escapedOptIn = escapeRegex(fileOptInTag);
 
-  // Match file-level opt-in: /** @docs */ (not followed by -)
-  // This ensures @docs is not confused with @docs-pattern
+  // Match file-level opt-in: /** @architect */ (not followed by -)
+  // This ensures @architect is not confused with @architect-pattern
   const fileOptInPattern = new RegExp(`\\/\\*\\*[\\s\\S]*?${escapedOptIn}(?!-)[\\s\\S]*?\\*\\/`);
 
-  // Match directives: @docs-pattern, @docs-status, etc.
+  // Match directives: @architect-pattern, @architect-status, etc.
   const directivePattern = new RegExp(`${escapedPrefix}[\\w-]+`, 'g');
 
   // For normalizing tags - remove @ and prefix

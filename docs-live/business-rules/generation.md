@@ -4,7 +4,7 @@
 
 ---
 
-**303 rules** from 61 features. 303 rules have explicit invariants.
+**302 rules** from 61 features. 302 rules have explicit invariants.
 
 ---
 
@@ -322,7 +322,7 @@ _Validates that ARCHITECTURE.md retains its full reference content and that_
 
 #### Four-Stage Pipeline section retains annotation format examples
 
-> **Invariant:** The Four-Stage Pipeline section contains annotation format examples (e.g., @libar-docs-shape, extract-shapes) and appears before the Source Systems section in document order.
+> **Invariant:** The Four-Stage Pipeline section contains annotation format examples (e.g., @architect-shape, extract-shapes) and appears before the Source Systems section in document order.
 >
 > **Rationale:** Annotation format examples in the pipeline section demonstrate the source-first architecture. Their ordering establishes the conceptual flow: pipeline stages first, then the source systems that feed them.
 
@@ -1239,6 +1239,7 @@ _The Decision Doc Generator orchestrates the full documentation generation_
 
 - Generate both compact and detailed outputs
 - Pattern name falls back to pattern.name
+- Pattern claude section routes compact output
 
 ---
 
@@ -2813,9 +2814,9 @@ _Tests the Implementations section rendering in pattern documents._
 
 ---
 
-#### Implementation files appear in pattern docs via @libar-docs-implements
+#### Implementation files appear in pattern docs via @architect-implements
 
-> **Invariant:** Any TypeScript file with a matching @libar-docs-implements tag must appear in the pattern document's Implementations section with a working file link.
+> **Invariant:** Any TypeScript file with a matching @architect-implements tag must appear in the pattern document's Implementations section with a working file link.
 >
 > **Rationale:** Implementation discovery relies on tag-based linking — missing entries break traceability between specs and code.
 
@@ -2918,15 +2919,15 @@ _Parameterized codec factory that creates reference document codecs_
 
 ---
 
-#### Shape sources are extracted from matching patterns
+#### Source selectors are extracted from matching patterns
 
-> **Invariant:** Only shapes from patterns whose file path matches the configured shapeSources glob may appear in the API Types section.
+> **Invariant:** Only shapes from patterns whose file path matches the configured source selector glob may appear in the API Types section.
 >
 > **Rationale:** Including shapes from unrelated source paths would pollute the API Types section with irrelevant type definitions, breaking the scoped documentation contract.
 
 **Verified by:**
 
-- Shapes appear when source file matches shapeSources glob
+- Shapes appear when source file matches source selector glob
 - Summary level shows shapes as a compact table
 - No shapes when source file does not match glob
 
@@ -3081,25 +3082,25 @@ _reference-codec-detail-rendering.feature_
 
 ### Reference Codec Diagram
 
-_Scoped diagram generation from diagramScope and diagramScopes config,_
+_Scoped diagram generation from diagramScopes config, including archContext,_
 
 ---
 
-#### Scoped diagrams are generated from diagramScope config
+#### Scoped diagrams are generated from diagramScopes config
 
-> **Invariant:** Diagram content is determined exclusively by diagramScope filters (archContext, include, archLayer, patterns), and filters compose via OR — a pattern matching any single filter appears in the diagram.
+> **Invariant:** Diagram content is determined exclusively by diagramScopes filters (archContext, include, archLayer, patterns), and filters compose via OR — a pattern matching any single filter appears in the diagram.
 >
 > **Rationale:** Without filter-driven scoping, diagrams would include all patterns regardless of relevance, producing unreadable visualizations that obscure architectural boundaries.
 
 **Verified by:**
 
-- Config with diagramScope produces mermaid block at detailed level
+- Config with diagramScopes produces mermaid block at detailed level
 - Neighbor patterns appear in diagram with distinct style
 - include filter selects patterns by include tag membership
 - Self-contained scope produces no Related subgraph
 - Multiple filter dimensions OR together
 - Explicit pattern names filter selects named patterns
-- Config without diagramScope produces no diagram section
+- Config without diagramScopes produces no diagram section
 - archLayer filter selects patterns by architectural layer
 - archLayer and archContext compose via OR
 - Summary level omits scoped diagram
@@ -3121,15 +3122,14 @@ _Scoped diagram generation from diagramScope and diagramScopes config,_
 
 #### Multiple diagram scopes produce multiple mermaid blocks
 
-> **Invariant:** Each entry in the diagramScopes array produces an independent Mermaid block with its own title and direction, and legacy singular diagramScope remains supported as a fallback.
+> **Invariant:** Each entry in the diagramScopes array produces an independent Mermaid block with its own title and direction.
 >
-> **Rationale:** Product areas require multiple architectural views (e.g., system overview and data flow) from a single configuration, and breaking backward compatibility with the singular diagramScope would silently remove diagrams from existing consumers.
+> **Rationale:** Product areas require multiple architectural views (e.g., system overview and data flow) from a single configuration.
 
 **Verified by:**
 
 - Config with diagramScopes array produces multiple diagrams
 - Diagram direction is reflected in mermaid output
-- Legacy diagramScope still works when diagramScopes is absent
 
 _reference-codec-diagrams.feature_
 
@@ -3547,24 +3547,6 @@ _The universal renderer converts RenderableDocument to markdown._
 
 ---
 
-#### Claude context renderer produces compact AI-optimized output
-
-> **Invariant:** Claude context replaces markdown syntax with section markers, omits visual-only blocks (mermaid, separators), flattens collapsible content, and produces shorter output than markdown.
->
-> **Rationale:** LLM context windows are token-limited; visual-only blocks waste tokens without adding semantic value, and verbose markdown syntax inflates context size unnecessarily.
-
-**Verified by:**
-
-- Claude context renders title and headings as section markers
-- Claude context renders sub-headings with different markers
-- Claude context omits mermaid blocks
-- Claude context flattens collapsible blocks
-- Claude context renders link-out as plain text
-- Claude context omits separator tokens
-- Claude context produces fewer characters than markdown
-
----
-
 #### Claude MD module renderer produces modular-claude-md compatible output
 
 > **Invariant:** Title renders as H3 (offset +2), section headings are offset by +2 clamped at H6, frontmatter is omitted, mermaid blocks are omitted, link-out blocks are omitted, and collapsible blocks are flattened to headings.
@@ -3927,15 +3909,15 @@ _Matches file paths against glob patterns for TypeScript shape extraction._
 
 ---
 
-#### Dataset shape extraction deduplicates by name
+#### Source selectors deduplicate matching shapes by name
 
-> **Invariant:** When multiple patterns match a source glob, the returned shapes must be deduplicated by name so each shape appears at most once.
+> **Invariant:** When multiple patterns match a source selector, the returned shapes must be deduplicated by name so each shape appears at most once.
 >
 > **Rationale:** Duplicate shape names in generated documentation confuse readers and inflate type registries.
 
 **Verified by:**
 
-- Shapes are extracted from matching patterns
+- Shapes are selected from matching source glob patterns
 - Duplicate shape names are deduplicated
 - No shapes returned when glob does not match
 
@@ -3958,11 +3940,10 @@ _Tests the filterShapesBySelectors function that provides fine-grained_
 - Select specific shapes by source and names
 - Select all shapes in a group
 - Select all tagged shapes from a source file
-- shapeSources without shapeSelectors returns all shapes
+- Source-only selector returns all matching shapes
 - Select by source and names
 - Select by group
 - Select by source alone
-- shapeSources backward compatibility preserved
 
 _shape-selector.feature_
 
@@ -4220,7 +4201,7 @@ _Validates the Taxonomy Codec that transforms MasterDataset into a_
 
 > **Invariant:** When groupByDomain is enabled, metadata tags must be organized into domain-specific subsections; when disabled, a single flat table must be rendered.
 >
-> **Rationale:** Domain grouping improves scannability for large tag sets (21 categories in ddd-es-cqrs) while flat mode is simpler for small presets (3 categories in generic).
+> **Rationale:** Domain grouping improves scannability for large tag sets (21 categories in ddd-es-cqrs) while flat mode is simpler for small presets (3 categories in libar-generic).
 
 **Verified by:**
 

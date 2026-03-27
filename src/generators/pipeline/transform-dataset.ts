@@ -1,18 +1,18 @@
 /**
- * @libar-docs
- * @libar-docs-generator @libar-docs-core
- * @libar-docs-pattern TransformDataset
- * @libar-docs-status completed
- * @libar-docs-implements PatternRelationshipModel
- * @libar-docs-arch-role service
- * @libar-docs-arch-context generator
- * @libar-docs-arch-layer application
- * @libar-docs-include pipeline-stages
- * @libar-docs-uses MasterDataset, ExtractedPattern, TagRegistry, NormalizeStatus
- * @libar-docs-used-by Orchestrator
- * @libar-docs-usecase "When computing all pattern views in a single pass"
- * @libar-docs-usecase "When transforming raw extracted data for generators"
- * @libar-docs-extract-shapes RuntimeMasterDataset, RawDataset, transformToMasterDataset
+ * @architect
+ * @architect-generator @architect-core
+ * @architect-pattern TransformDataset
+ * @architect-status completed
+ * @architect-implements PatternRelationshipModel
+ * @architect-arch-role service
+ * @architect-arch-context generator
+ * @architect-arch-layer application
+ * @architect-include pipeline-stages
+ * @architect-uses MasterDataset, ExtractedPattern, TagRegistry, NormalizeStatus
+ * @architect-used-by Orchestrator
+ * @architect-usecase "When computing all pattern views in a single pass"
+ * @architect-usecase "When transforming raw extracted data for generators"
+ * @architect-extract-shapes RuntimeMasterDataset, RawDataset, transformToMasterDataset
  *
  * ## TransformDataset - Single-Pass Pattern Transformation
  *
@@ -78,7 +78,7 @@ function isKnownStatus(status: string | undefined): boolean {
  * - Aggregate statistics (counts, phase count, category count)
  * - Optional relationship index
  *
- * For backward compatibility, this function returns just the dataset.
+ * Convenience wrapper that returns just the dataset.
  * Use `transformToMasterDatasetWithValidation` to get validation summary.
  *
  * @param raw - Raw dataset with patterns, registry, and optional workflow
@@ -289,7 +289,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
           malformedPatterns.push({
             patternId: patternKey,
             issues: [
-              'Has @libar-docs-sequence-orchestrator but no rules with @libar-docs-sequence-step tags',
+              'Has @architect-sequence-orchestrator but no rules with @architect-sequence-step tags',
             ],
           });
         }
@@ -297,7 +297,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
         malformedPatterns.push({
           patternId: patternKey,
           issues: [
-            'Has @libar-docs-sequence-orchestrator but no Rule: blocks to extract sequence steps from',
+            'Has @architect-sequence-orchestrator but no Rule: blocks to extract sequence steps from',
           ],
         });
       }

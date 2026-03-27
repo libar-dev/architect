@@ -1,14 +1,14 @@
 /**
- * @libar-docs
- * @libar-docs-extract-shapes PROTECTION_LEVELS, ProtectionLevel, getProtectionLevel, isTerminalState, isFullyEditable, isScopeLocked
- * @libar-docs-validation
- * @libar-docs-pattern FSMStates
- * @libar-docs-status active
- * @libar-docs-implements PhaseStateMachineValidation
- * @libar-docs-depends-on:PDR005MvpWorkflow
- * @libar-docs-arch-role read-model
- * @libar-docs-arch-context validation
- * @libar-docs-arch-layer domain
+ * @architect
+ * @architect-extract-shapes PROTECTION_LEVELS, ProtectionLevel, getProtectionLevel, isTerminalState, isFullyEditable, isScopeLocked
+ * @architect-validation
+ * @architect-pattern FSMStates
+ * @architect-status active
+ * @architect-implements PhaseStateMachineValidation
+ * @architect-depends-on:PDR005MvpWorkflow
+ * @architect-arch-role read-model
+ * @architect-arch-context validation
+ * @architect-arch-layer domain
  *
  * ## FSM States - Process Status States and Protection Levels
  *

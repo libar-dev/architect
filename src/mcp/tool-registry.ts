@@ -1,19 +1,22 @@
+// SPDX-License-Identifier: BUSL-1.1
+// Copyright (c) 2026 EBIZ d.o.o. All rights reserved.
+
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern MCPToolRegistry
- * @libar-docs-status active
- * @libar-docs-arch-role service
- * @libar-docs-arch-context api
- * @libar-docs-arch-layer application
- * @libar-docs-uses ProcessStateAPI, MCPPipelineSession
- * @libar-docs-implements MCPServerIntegration
+ * @architect
+ * @architect-core
+ * @architect-pattern MCPToolRegistry
+ * @architect-status active
+ * @architect-arch-role service
+ * @architect-arch-context api
+ * @architect-arch-layer application
+ * @architect-uses ProcessStateAPI, MCPPipelineSession
+ * @architect-implements MCPServerIntegration
  *
  * ## MCP Tool Registry
  *
  * Defines all MCP tools with Zod input schemas and handler functions.
  * Each tool wraps a ProcessStateAPI method or CLI subcommand.
- * Tool names use "dp_" prefix to avoid collisions with other MCP servers.
+ * Tool names use "architect_" prefix to avoid collisions with other MCP servers.
  *
  * ### When to Use
  *
@@ -108,7 +111,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   // ---------------------------------------------------------------------------
 
   server.registerTool(
-    'dp_overview',
+    'architect_overview',
     {
       title: 'Project Overview',
       description:
@@ -123,7 +126,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_context',
+    'architect_context',
     {
       title: 'Pattern Context',
       description:
@@ -150,7 +153,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_files',
+    'architect_files',
     {
       title: 'File Reading List',
       description:
@@ -167,7 +170,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_dep_tree',
+    'architect_dep_tree',
     {
       title: 'Dependency Tree',
       description:
@@ -189,7 +192,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_scope_validate',
+    'architect_scope_validate',
     {
       title: 'Scope Validation',
       description:
@@ -211,7 +214,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_handoff',
+    'architect_handoff',
     {
       title: 'Session Handoff',
       description:
@@ -239,7 +242,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   // ---------------------------------------------------------------------------
 
   server.registerTool(
-    'dp_status',
+    'architect_status',
     {
       title: 'Status Counts',
       description:
@@ -256,7 +259,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_pattern',
+    'architect_pattern',
     {
       title: 'Pattern Detail',
       description:
@@ -282,7 +285,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_list',
+    'architect_list',
     {
       title: 'List Patterns',
       description:
@@ -323,7 +326,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_search',
+    'architect_search',
     {
       title: 'Search Patterns',
       description:
@@ -341,7 +344,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_rules',
+    'architect_rules',
     {
       title: 'Business Rules',
       description:
@@ -381,7 +384,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_tags',
+    'architect_tags',
     {
       title: 'Tag Usage Report',
       description: 'Get tag inventory: counts per tag and value across all annotated sources.',
@@ -394,7 +397,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_sources',
+    'architect_sources',
     {
       title: 'Source Inventory',
       description:
@@ -408,7 +411,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_stubs',
+    'architect_stubs',
     {
       title: 'Design Stubs',
       description:
@@ -434,7 +437,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_decisions',
+    'architect_decisions',
     {
       title: 'Design Decisions',
       description: 'Extract design decisions (AD-N / DD-N) from pattern descriptions.',
@@ -473,7 +476,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   // ---------------------------------------------------------------------------
 
   server.registerTool(
-    'dp_arch_context',
+    'architect_arch_context',
     {
       title: 'Architecture Contexts',
       description:
@@ -502,7 +505,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_arch_layer',
+    'architect_arch_layer',
     {
       title: 'Architecture Layers',
       description:
@@ -531,7 +534,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_arch_neighborhood',
+    'architect_arch_neighborhood',
     {
       title: 'Pattern Neighborhood',
       description:
@@ -547,7 +550,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_arch_blocking',
+    'architect_arch_blocking',
     {
       title: 'Blocked Patterns',
       description:
@@ -562,7 +565,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_arch_dangling',
+    'architect_arch_dangling',
     {
       title: 'Dangling References',
       description: 'Find broken references to nonexistent pattern names in relationship tags.',
@@ -591,7 +594,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_arch_coverage',
+    'architect_arch_coverage',
     {
       title: 'Annotation Coverage',
       description:
@@ -621,11 +624,11 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_unannotated',
+    'architect_unannotated',
     {
       title: 'Unannotated Files',
       description:
-        'Find TypeScript files missing @libar-docs annotations. Optionally filter by directory.',
+        'Find TypeScript files missing @architect annotations. Optionally filter by directory.',
       inputSchema: z.object({
         path: z.string().optional().describe('Filter to a specific directory path'),
       }),
@@ -647,7 +650,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   // ---------------------------------------------------------------------------
 
   server.registerTool(
-    'dp_rebuild',
+    'architect_rebuild',
     {
       title: 'Rebuild Dataset',
       description:
@@ -663,7 +666,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_config',
+    'architect_config',
     {
       title: 'Current Configuration',
       description:
@@ -684,7 +687,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
   );
 
   server.registerTool(
-    'dp_help',
+    'architect_help',
     {
       title: 'MCP Tools Help',
       description:
@@ -693,33 +696,33 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
     },
     safeHandler(() => {
       const tools = [
-        'dp_overview         - Project health summary (start here)',
-        'dp_context           - Session-aware context bundle for a pattern',
-        'dp_pattern           - Full pattern metadata',
-        'dp_list              - List patterns with filters',
-        'dp_search            - Fuzzy search patterns',
-        'dp_status            - Status counts and completion %',
-        'dp_files             - File reading list for a pattern',
-        'dp_dep_tree          - Dependency chain with status',
-        'dp_scope_validate    - Pre-flight check for implementation',
-        'dp_handoff           - Session-end state for continuity',
-        'dp_rules             - Business rules and invariants',
-        'dp_tags              - Tag usage report',
-        'dp_sources           - Source file inventory',
-        'dp_stubs             - Design stubs with resolution status',
-        'dp_decisions         - Design decisions from stubs',
-        'dp_arch_context      - Bounded contexts with members',
-        'dp_arch_layer        - Architecture layers with members',
-        'dp_arch_neighborhood - Pattern uses/used-by/peers',
-        'dp_arch_blocking     - Patterns blocked by dependencies',
-        'dp_arch_dangling     - Broken pattern references',
-        'dp_arch_coverage     - Annotation coverage analysis',
-        'dp_unannotated       - Files missing @libar-docs',
-        'dp_rebuild           - Force dataset rebuild',
-        'dp_config            - Show current configuration',
-        'dp_help              - This help text',
+        'architect_overview         - Project health summary (start here)',
+        'architect_context           - Session-aware context bundle for a pattern',
+        'architect_pattern           - Full pattern metadata',
+        'architect_list              - List patterns with filters',
+        'architect_search            - Fuzzy search patterns',
+        'architect_status            - Status counts and completion %',
+        'architect_files             - File reading list for a pattern',
+        'architect_dep_tree          - Dependency chain with status',
+        'architect_scope_validate    - Pre-flight check for implementation',
+        'architect_handoff           - Session-end state for continuity',
+        'architect_rules             - Business rules and invariants',
+        'architect_tags              - Tag usage report',
+        'architect_sources           - Source file inventory',
+        'architect_stubs             - Design stubs with resolution status',
+        'architect_decisions         - Design decisions from stubs',
+        'architect_arch_context      - Bounded contexts with members',
+        'architect_arch_layer        - Architecture layers with members',
+        'architect_arch_neighborhood - Pattern uses/used-by/peers',
+        'architect_arch_blocking     - Patterns blocked by dependencies',
+        'architect_arch_dangling     - Broken pattern references',
+        'architect_arch_coverage     - Annotation coverage analysis',
+        'architect_unannotated       - Files missing @architect',
+        'architect_rebuild           - Force dataset rebuild',
+        'architect_config            - Show current configuration',
+        'architect_help              - This help text',
       ];
-      return textResult(`delivery-process MCP Server — Available Tools\n\n${tools.join('\n')}`);
+      return textResult(`Architect MCP Server — Available Tools\n\n${tools.join('\n')}`);
     })
   );
 }

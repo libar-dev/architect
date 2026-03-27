@@ -1,15 +1,15 @@
 /**
- * @libar-docs
- * @libar-docs-pattern DeliverableStatusTaxonomy
- * @libar-docs-status active
- * @libar-docs-core
- * @libar-docs-extract-shapes DELIVERABLE_STATUS_VALUES, DeliverableStatus, VALID_DELIVERABLE_STATUS_SET, DEFAULT_DELIVERABLE_STATUS, isDeliverableStatusComplete, isDeliverableStatusInProgress, isDeliverableStatusPending, isDeliverableStatusTerminal, getDeliverableStatusEmoji
+ * @architect
+ * @architect-pattern DeliverableStatusTaxonomy
+ * @architect-status active
+ * @architect-core
+ * @architect-extract-shapes DELIVERABLE_STATUS_VALUES, DeliverableStatus, VALID_DELIVERABLE_STATUS_SET, DEFAULT_DELIVERABLE_STATUS, isDeliverableStatusComplete, isDeliverableStatusInProgress, isDeliverableStatusPending, isDeliverableStatusTerminal, getDeliverableStatusEmoji
  *
  * ## Deliverable Status Taxonomy
  *
  * Canonical status values for deliverables in Gherkin Background tables.
  *
- * The delivery-process system uses two distinct status domains:
+ * The Architect system uses two distinct status domains:
  *
  * 1. Pattern status (FSM-governed, 4 values in status-values.ts):
  *    roadmap, active, completed, deferred — validated by ProcessStatusSchema
@@ -39,7 +39,7 @@
  * - superseded: Replaced by another deliverable
  * - n/a: Not applicable
  *
- * @libar-docs-shape reference-sample
+ * @architect-shape reference-sample
  */
 export const DELIVERABLE_STATUS_VALUES = [
   'complete',

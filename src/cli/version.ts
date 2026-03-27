@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-cli
- * @libar-docs-pattern CLIVersionHelper
- * @libar-docs-status completed
- * @libar-docs-used-by DocumentationGeneratorCLI, LintPatternsCLI, TagTaxonomyCLI, ValidatePatternsCLI
+ * @architect
+ * @architect-cli
+ * @architect-pattern CLIVersionHelper
+ * @architect-status completed
+ * @architect-used-by DocumentationGeneratorCLI, LintPatternsCLI, TagTaxonomyCLI, ValidatePatternsCLI
  *
  * ## CLIVersionHelper - Package Version Reader
  *
@@ -44,7 +44,7 @@ export function getPackageVersion(): string {
 /**
  * Get the package name from package.json
  *
- * @returns Package name (e.g., "@libar-dev/delivery-process")
+ * @returns Package name (e.g., "@libar-dev/architect")
  */
 export function getPackageName(): string {
   try {
@@ -55,16 +55,16 @@ export function getPackageName(): string {
     const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8')) as {
       name?: string;
     };
-    return packageJson.name ?? 'delivery-process';
+    return packageJson.name ?? 'architect';
   } catch {
-    return 'delivery-process';
+    return 'architect';
   }
 }
 
 /**
  * Print version information and exit
  *
- * @param cliName - Name of the CLI command (e.g., "generate-docs")
+ * @param cliName - Name of the CLI command (e.g., "architect-generate")
  */
 export function printVersionAndExit(cliName: string): never {
   console.log(`${cliName} (${getPackageName()}) v${getPackageVersion()}`);

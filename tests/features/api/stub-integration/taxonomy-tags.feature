@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:StubTaxonomyTagTests
-@libar-docs-status:active
-@libar-docs-product-area:DataAPI
+@architect
+@architect-pattern:StubTaxonomyTagTests
+@architect-status:active
+@architect-product-area:DataAPI
 Feature: Stub Integration Taxonomy Tags
 
   **Problem:**
@@ -9,7 +9,7 @@ Feature: Stub Integration Taxonomy Tags
   in JSDoc descriptions, invisible to structured queries.
 
   **Solution:**
-  Register libar-docs-target and libar-docs-since as taxonomy tags
+  Register architect-target and architect-since as taxonomy tags
   so they flow through the extraction pipeline as structured fields.
 
   Rule: Taxonomy tags are registered in the registry

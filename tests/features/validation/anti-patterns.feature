@@ -1,10 +1,11 @@
-@libar-docs
+@architect
 @behavior @anti-patterns
-@libar-docs-pattern:AntiPatternDetectorTesting
-@libar-docs-implements:AntiPatternDetector
-@libar-docs-status:completed
-@libar-docs-product-area:Validation
-@libar-docs-depends-on:DoDValidationTypes
+@architect-pattern:AntiPatternDetectorTesting
+@architect-implements:AntiPatternDetector
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Validation
+@architect-depends-on:DoDValidationTypes
 Feature: Anti-Pattern Detection
   Detects violations of the dual-source documentation architecture and
   process hygiene issues that lead to documentation drift.
@@ -27,7 +28,7 @@ Feature: Anti-Pattern Detection
 
   Rule: Process metadata should not appear in TypeScript code
 
-    **Invariant:** Process metadata tags (@libar-docs-status, @libar-docs-phase, etc.) must only appear in Gherkin feature files, never in TypeScript source code.
+    **Invariant:** Process metadata tags (@architect-status, @architect-phase, etc.) must only appear in Gherkin feature files, never in TypeScript source code.
     **Rationale:** TypeScript owns runtime behavior while Gherkin owns delivery process metadata — mixing them creates dual-source conflicts and validation ambiguity.
     **Verified by:** Code without process tags passes, Feature-only process tags in code are flagged
 
@@ -35,10 +36,10 @@ Feature: Anti-Pattern Detection
     Scenario: Code without process tags passes
       Given a TypeScript file with directive tags:
         | tag                        |
-        | @libar-docs                |
-        | @libar-docs-pattern        |
-        | @libar-docs-status         |
-        | @libar-docs-depends-on     |
+        | @architect                |
+        | @architect-pattern        |
+        | @architect-status         |
+        | @architect-depends-on     |
       When detecting process-in-code anti-patterns
       Then no violations are found
 
@@ -52,12 +53,12 @@ Feature: Anti-Pattern Detection
 
       Examples:
         | process_tag               |
-        | @libar-docs-quarter       |
-        | @libar-docs-team          |
-        | @libar-docs-effort        |
-        | @libar-docs-workflow      |
-        | @libar-docs-completed     |
-        | @libar-docs-effort-actual |
+        | @architect-quarter       |
+        | @architect-team          |
+        | @architect-effort        |
+        | @architect-workflow      |
+        | @architect-completed     |
+        | @architect-effort-actual |
 
   # ==========================================================================
   # Magic Comments Detection
@@ -164,11 +165,11 @@ Feature: Anti-Pattern Detection
     Scenario: Combined detection finds process-in-code issues
       Given a TypeScript file with directive tags:
         | tag                 |
-        | @libar-docs         |
-        | @libar-docs-quarter |
+        | @architect         |
+        | @architect-quarter |
       And a feature file with tags:
         | tag                       |
-        | libar-docs-pattern:MyTest |
+        | architect-pattern:MyTest |
       When detecting all anti-patterns
       Then 1 violation is found
       And violations include "process-in-code"

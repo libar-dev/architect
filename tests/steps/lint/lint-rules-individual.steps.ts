@@ -11,6 +11,7 @@ import {
   parseDirectiveTable,
   missingPatternName,
   missingStatus,
+  invalidStatus,
   missingWhenToUse,
   missingRelationships,
   type DataTableRow,
@@ -259,6 +260,104 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           state!.filePath,
           state!.lineNumber
         );
+      });
+
+      Then('no violation should be detected', () => {
+        expect(state!.violation).toBeNull();
+      });
+    });
+  });
+
+  // ===========================================================================
+  // invalid-status rule
+  // ===========================================================================
+
+  Rule('Files must use canonical FSM status values', ({ RuleScenario }) => {
+    RuleScenario('Reject planned status alias', ({ Given, When, Then, And }) => {
+      Given('a directive with status {string}', (_ctx: unknown, status: string) => {
+        state!.directive = createTestDirective({
+          status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
+        });
+      });
+
+      When('I apply the invalid-status rule', () => {
+        state!.violation = invalidStatus.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        ) as typeof state.violation;
+      });
+
+      Then('a violation should be detected', () => {
+        expect(state!.violation).not.toBeNull();
+      });
+
+      And('the violation severity should be {string}', (_ctx: unknown, severity: string) => {
+        expect(state!.violation?.severity).toBe(severity);
+      });
+
+      And('the violation message should contain {string}', (_ctx: unknown, text: string) => {
+        expect(state!.violation?.message).toContain(text);
+      });
+    });
+
+    RuleScenario('Reject in-progress status alias', ({ Given, When, Then, And }) => {
+      Given('a directive with status {string}', (_ctx: unknown, status: string) => {
+        state!.directive = createTestDirective({
+          status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
+        });
+      });
+
+      When('I apply the invalid-status rule', () => {
+        state!.violation = invalidStatus.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        ) as typeof state.violation;
+      });
+
+      Then('a violation should be detected', () => {
+        expect(state!.violation).not.toBeNull();
+      });
+
+      And('the violation message should contain {string}', (_ctx: unknown, text: string) => {
+        expect(state!.violation?.message).toContain(text);
+      });
+    });
+
+    RuleScenario('Reject implemented status alias', ({ Given, When, Then }) => {
+      Given('a directive with status {string}', (_ctx: unknown, status: string) => {
+        state!.directive = createTestDirective({
+          status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
+        });
+      });
+
+      When('I apply the invalid-status rule', () => {
+        state!.violation = invalidStatus.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        ) as typeof state.violation;
+      });
+
+      Then('a violation should be detected', () => {
+        expect(state!.violation).not.toBeNull();
+      });
+    });
+
+    RuleScenario('Accept canonical deferred status', ({ Given, When, Then }) => {
+      Given('a directive with status {string}', (_ctx: unknown, status: string) => {
+        state!.directive = createTestDirective({
+          status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
+        });
+      });
+
+      When('I apply the invalid-status rule', () => {
+        state!.violation = invalidStatus.check(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber
+        ) as typeof state.violation;
       });
 
       Then('no violation should be detected', () => {

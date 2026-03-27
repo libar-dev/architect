@@ -1,11 +1,11 @@
 /**
- * @libar-docs
- * @libar-docs-pattern GitNameStatusParser
- * @libar-docs-status active
- * @libar-docs-arch-role utility
- * @libar-docs-arch-context generator
- * @libar-docs-arch-layer infrastructure
- * @libar-docs-used-by GitBranchDiff, DetectChanges
+ * @architect
+ * @architect-pattern GitNameStatusParser
+ * @architect-status active
+ * @architect-arch-role utility
+ * @architect-arch-context generator
+ * @architect-arch-layer infrastructure
+ * @architect-used-by GitBranchDiff, DetectChanges
  *
  * ## GitNameStatusParser - Shared Parsing for `git diff --name-status -z`
  *

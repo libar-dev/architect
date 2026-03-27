@@ -1,16 +1,16 @@
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-infra
- * @libar-docs-pattern Documentation Generation Orchestrator
- * @libar-docs-status completed
- * @libar-docs-arch-role service
- * @libar-docs-arch-context generator
- * @libar-docs-arch-layer application
- * @libar-docs-uses Pattern Scanner, Doc Extractor, Gherkin Scanner, Gherkin Extractor, Generator Registry, JSON Output Codec
- * @libar-docs-used-by CLI, Programmatic API
- * @libar-docs-usecase "When running full documentation generation pipeline"
- * @libar-docs-usecase "When merging TypeScript and Gherkin patterns"
- * @libar-docs-convention pipeline-architecture
+ * @architect
+ * @architect-core @architect-infra
+ * @architect-pattern Documentation Generation Orchestrator
+ * @architect-status completed
+ * @architect-arch-role service
+ * @architect-arch-context generator
+ * @architect-arch-layer application
+ * @architect-uses Pattern Scanner, Doc Extractor, Gherkin Scanner, Gherkin Extractor, Generator Registry, JSON Output Codec
+ * @architect-used-by CLI, Programmatic API
+ * @architect-usecase "When running full documentation generation pipeline"
+ * @architect-usecase "When merging TypeScript and Gherkin patterns"
+ * @architect-convention pipeline-architecture
  *
  * ## Orchestrator Pipeline Responsibilities
  *
@@ -240,7 +240,7 @@ export interface GenerationWarning {
  *
  * Orchestrates the complete pipeline:
  * 1. Load tag registry
- * 2. Scan source files for @libar-docs directives
+ * 2. Scan source files for @architect directives
  * 3. Extract patterns from directives
  * 4. Run specified generators
  * 5. Write output files
@@ -250,8 +250,8 @@ export interface GenerationWarning {
  *
  * @example
  * ```typescript
- * import { generateDocumentation } from '@libar-dev/delivery-process/generators';
- * import '@libar-dev/delivery-process/generators/built-in';
+ * import { generateDocumentation } from '@libar-dev/architect/generators';
+ * import '@libar-dev/architect/generators/built-in';
  *
  * const result = await generateDocumentation({
  *   input: ['src/**\/*.ts'],
@@ -769,8 +769,8 @@ function mergeGenerateResults(results: GenerateResult[]): GenerateResult {
  *
  * @example
  * ```typescript
- * import { generateFromConfig } from '@libar-dev/delivery-process/generators';
- * import { loadProjectConfig } from '@libar-dev/delivery-process/config';
+ * import { generateFromConfig } from '@libar-dev/architect/generators';
+ * import { loadProjectConfig } from '@libar-dev/architect/config';
  *
  * const config = await loadProjectConfig(process.cwd());
  * const result = await generateFromConfig(config, {

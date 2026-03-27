@@ -1,18 +1,18 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern TagRegistryBuilder
- * @libar-docs-status completed
- * @libar-docs-arch-role service
- * @libar-docs-arch-context taxonomy
- * @libar-docs-arch-layer domain
- * @libar-docs-implements TypeScriptTaxonomyImplementation
- * @libar-docs-extract-shapes TagRegistry, MetadataTagDefinitionForRegistry, TagDefinition, buildRegistry, METADATA_TAGS_BY_GROUP
+ * @architect
+ * @architect-core
+ * @architect-pattern TagRegistryBuilder
+ * @architect-status completed
+ * @architect-arch-role service
+ * @architect-arch-context taxonomy
+ * @architect-arch-layer domain
+ * @architect-implements TypeScriptTaxonomyImplementation
+ * @architect-extract-shapes TagRegistry, MetadataTagDefinitionForRegistry, buildRegistry, METADATA_TAGS_BY_GROUP
  *
  * ## Tag Registry Builder
  *
  * Constructs a complete TagRegistry from TypeScript constants.
- * Provides the default tag definitions for the delivery-process annotation system.
+ * Provides the default tag definitions for the Architect annotation system.
  *
  * ### When to Use
  *
@@ -41,7 +41,7 @@ import { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG } from '../config/defaults.
  * TagRegistry interface (matches schema from validation-schemas/tag-registry.ts)
  */
 export interface TagRegistry {
-  /** Schema version for forward/backward compatibility checking */
+  /** Schema version for registry versioning */
   version: string;
   /** Category definitions for classifying patterns by domain (e.g., core, api, ddd) */
   categories: readonly CategoryDefinitionForRegistry[];
@@ -51,9 +51,9 @@ export interface TagRegistry {
   aggregationTags: readonly AggregationTagDefinitionForRegistry[];
   /** Available format options for documentation output */
   formatOptions: readonly string[];
-  /** Prefix for all tags (e.g., "@libar-docs-") */
+  /** Prefix for all tags (e.g., "@architect-") */
   tagPrefix: string;
-  /** File-level opt-in marker tag (e.g., "@libar-docs") */
+  /** File-level opt-in marker tag (e.g., "@architect") */
   fileOptInTag: string;
 }
 
@@ -85,16 +85,13 @@ export interface MetadataTagDefinitionForRegistry {
   values?: readonly string[];
   /** Default value applied when tag is not specified */
   default?: string;
-  /** Example usage showing tag syntax (e.g., "@libar-docs-pattern MyPattern") */
+  /** Example usage showing tag syntax (e.g., "@architect-pattern MyPattern") */
   example?: string;
   /** Maps tag name to metadata object property name (defaults to kebab-to-camelCase) */
   metadataKey?: string;
   /** Post-parse value transformer applied after format-based parsing */
   transform?: (value: string) => string;
 }
-
-// Type alias for consumers (backwards compatible)
-export type TagDefinition = MetadataTagDefinitionForRegistry;
 
 interface AggregationTagDefinitionForRegistry {
   /** Aggregation tag name (e.g., "overview", "decision", "intro") */
@@ -200,70 +197,70 @@ export function buildRegistry(): TagRegistry {
         format: 'value',
         purpose: 'Explicit pattern name',
         required: true,
-        example: '@libar-docs-pattern CommandOrchestrator',
+        example: '@architect-pattern CommandOrchestrator',
       },
       {
         tag: 'status',
         format: 'enum',
         purpose: 'Work item lifecycle status (per PDR-005 FSM)',
-        values: [...ACCEPTED_STATUS_VALUES], // Includes legacy values for extraction
+        values: [...ACCEPTED_STATUS_VALUES],
         default: DEFAULT_STATUS,
-        example: '@libar-docs-status roadmap',
+        example: '@architect-status roadmap',
       },
       {
         tag: 'core',
         format: 'flag',
         purpose: 'Marks as essential/must-know pattern',
-        example: '@libar-docs-core',
+        example: '@architect-core',
       },
       {
         tag: 'usecase',
         format: 'quoted-value',
         purpose: 'Use case association',
         repeatable: true,
-        example: '@libar-docs-usecase "When handling command failures"',
+        example: '@architect-usecase "When handling command failures"',
       },
       {
         tag: 'uses',
         format: 'csv',
         purpose: 'Patterns this depends on',
-        example: '@libar-docs-uses CommandBus, EventStore',
+        example: '@architect-uses CommandBus, EventStore',
       },
       {
         tag: 'used-by',
         format: 'csv',
         purpose: 'Patterns that depend on this',
-        example: '@libar-docs-used-by SagaOrchestrator',
+        example: '@architect-used-by SagaOrchestrator',
       },
       {
         tag: 'phase',
         format: 'number',
         purpose: 'Roadmap phase number (unified across monorepo)',
-        example: '@libar-docs-phase 14',
+        example: '@architect-phase 14',
       },
       {
         tag: 'release',
         format: 'value',
         purpose: 'Target release version (semver or vNEXT for unreleased work)',
-        example: '@libar-docs-release v0.1.0',
+        example: '@architect-release v0.1.0',
       },
       {
         tag: 'brief',
         format: 'value',
         purpose: 'Path to pattern brief markdown',
-        example: '@libar-docs-brief docs/briefs/decider-pattern.md',
+        example: '@architect-brief docs/briefs/decider-pattern.md',
       },
       {
         tag: 'depends-on',
         format: 'csv',
         purpose: 'Roadmap dependencies (pattern or phase names)',
-        example: '@libar-docs-depends-on EventStore, CommandBus',
+        example: '@architect-depends-on EventStore, CommandBus',
       },
       {
         tag: 'enables',
         format: 'csv',
         purpose: 'Patterns this enables',
-        example: '@libar-docs-enables SagaOrchestrator, ProjectionBuilder',
+        example: '@architect-enables SagaOrchestrator, ProjectionBuilder',
       },
       // Relationship tags for UML-inspired pattern modeling (PatternRelationshipModel)
       {
@@ -271,84 +268,84 @@ export function buildRegistry(): TagRegistry {
         format: 'csv',
         purpose: 'Patterns this code file realizes (realization relationship)',
         metadataKey: 'implementsPatterns',
-        example: '@libar-docs-implements EventStoreDurability, IdempotentAppend',
+        example: '@architect-implements EventStoreDurability, IdempotentAppend',
       },
       {
         tag: 'extends',
         format: 'value',
         purpose: 'Base pattern this pattern extends (generalization relationship)',
         metadataKey: 'extendsPattern',
-        example: '@libar-docs-extends ProjectionCategories',
+        example: '@architect-extends ProjectionCategories',
       },
       {
         tag: 'quarter',
         format: 'value',
         purpose: 'Delivery quarter for timeline tracking',
-        example: '@libar-docs-quarter Q1-2026',
+        example: '@architect-quarter Q1-2026',
       },
       {
         tag: 'completed',
         format: 'value',
         purpose: 'Completion date (YYYY-MM-DD format)',
-        example: '@libar-docs-completed 2026-01-08',
+        example: '@architect-completed 2026-01-08',
       },
       {
         tag: 'effort',
         format: 'value',
         purpose: 'Estimated effort (4h, 2d, 1w format)',
-        example: '@libar-docs-effort 2d',
+        example: '@architect-effort 2d',
       },
       {
         tag: 'effort-actual',
         format: 'value',
         purpose: 'Actual effort spent (4h, 2d, 1w format)',
-        example: '@libar-docs-effort-actual 3d',
+        example: '@architect-effort-actual 3d',
       },
       {
         tag: 'team',
         format: 'value',
         purpose: 'Responsible team assignment',
-        example: '@libar-docs-team platform',
+        example: '@architect-team platform',
       },
       {
         tag: 'workflow',
         format: 'enum',
         purpose: 'Workflow discipline for process tracking',
         values: [...WORKFLOW_VALUES],
-        example: '@libar-docs-workflow implementation',
+        example: '@architect-workflow implementation',
       },
       {
         tag: 'risk',
         format: 'enum',
         purpose: 'Risk level for planning',
         values: [...RISK_LEVELS],
-        example: '@libar-docs-risk medium',
+        example: '@architect-risk medium',
       },
       {
         tag: 'priority',
         format: 'enum',
         purpose: 'Priority level for roadmap ordering',
         values: [...PRIORITY_VALUES],
-        example: '@libar-docs-priority high',
+        example: '@architect-priority high',
       },
       {
         tag: 'product-area',
         format: 'value',
         purpose: 'Product area for PRD grouping',
-        example: '@libar-docs-product-area PlatformCore',
+        example: '@architect-product-area PlatformCore',
       },
       {
         tag: 'user-role',
         format: 'value',
         purpose: 'Target user persona for this feature',
-        example: '@libar-docs-user-role Developer',
+        example: '@architect-user-role Developer',
       },
       {
         tag: 'business-value',
         format: 'value',
         purpose: 'Business value statement (hyphenated for tag format)',
         transform: hyphenToSpace,
-        example: '@libar-docs-business-value eliminates-event-replay-complexity',
+        example: '@architect-business-value eliminates-event-replay-complexity',
       },
       {
         tag: 'constraint',
@@ -357,14 +354,14 @@ export function buildRegistry(): TagRegistry {
         repeatable: true,
         metadataKey: 'constraints',
         transform: hyphenToSpace,
-        example: '@libar-docs-constraint requires-convex-backend',
+        example: '@architect-constraint requires-convex-backend',
       },
       {
         tag: 'adr',
         format: 'value',
         purpose: 'ADR/PDR number for decision tracking',
         transform: padAdr,
-        example: '@libar-docs-adr 015',
+        example: '@architect-adr 015',
       },
       {
         tag: 'adr-status',
@@ -372,41 +369,41 @@ export function buildRegistry(): TagRegistry {
         purpose: 'ADR/PDR decision status',
         values: [...ADR_STATUS_VALUES],
         default: 'proposed',
-        example: '@libar-docs-adr-status accepted',
+        example: '@architect-adr-status accepted',
       },
       {
         tag: 'adr-category',
         format: 'value',
         purpose: 'ADR/PDR category (architecture, process, tooling)',
-        example: '@libar-docs-adr-category architecture',
+        example: '@architect-adr-category architecture',
       },
       {
         tag: 'adr-supersedes',
         format: 'value',
         purpose: 'ADR/PDR number this decision supersedes',
         transform: padAdr,
-        example: '@libar-docs-adr-supersedes 012',
+        example: '@architect-adr-supersedes 012',
       },
       {
         tag: 'adr-superseded-by',
         format: 'value',
         purpose: 'ADR/PDR number that supersedes this decision',
         transform: padAdr,
-        example: '@libar-docs-adr-superseded-by 020',
+        example: '@architect-adr-superseded-by 020',
       },
       {
         tag: 'adr-theme',
         format: 'enum',
         purpose: 'Theme grouping for related decisions (from synthesis)',
         values: [...ADR_THEME_VALUES],
-        example: '@libar-docs-adr-theme persistence',
+        example: '@architect-adr-theme persistence',
       },
       {
         tag: 'adr-layer',
         format: 'enum',
         purpose: 'Evolutionary layer of the decision',
         values: [...ADR_LAYER_VALUES],
-        example: '@libar-docs-adr-layer foundation',
+        example: '@architect-adr-layer foundation',
       },
       {
         tag: 'level',
@@ -414,39 +411,39 @@ export function buildRegistry(): TagRegistry {
         purpose: 'Hierarchy level for epic->phase->task breakdown',
         values: [...HIERARCHY_LEVELS],
         default: DEFAULT_HIERARCHY_LEVEL,
-        example: '@libar-docs-level epic',
+        example: '@architect-level epic',
       },
       {
         tag: 'parent',
         format: 'value',
         purpose: 'Parent pattern name in hierarchy (links tasks to phases, phases to epics)',
-        example: '@libar-docs-parent AggregateArchitecture',
+        example: '@architect-parent AggregateArchitecture',
       },
       {
         tag: 'title',
         format: 'quoted-value',
         purpose: 'Human-readable display title (supports quoted values with spaces)',
         transform: stripQuotes,
-        example: '@libar-docs-title:"Process Guard Linter"',
+        example: '@architect-title:"Process Guard Linter"',
       },
       // PDR-007: Two-Tier Spec Architecture traceability
       {
         tag: 'executable-specs',
         format: 'csv',
         purpose: 'Links roadmap spec to package executable spec locations (PDR-007)',
-        example: '@libar-docs-executable-specs platform-decider/tests/features/behavior',
+        example: '@architect-executable-specs platform-decider/tests/features/behavior',
       },
       {
         tag: 'roadmap-spec',
         format: 'value',
         purpose: 'Links package spec back to roadmap pattern for traceability (PDR-007)',
-        example: '@libar-docs-roadmap-spec DeciderPattern',
+        example: '@architect-roadmap-spec DeciderPattern',
       },
       {
         tag: 'behavior-file',
         format: 'value',
         purpose: 'Path to behavior test feature file for traceability',
-        example: '@libar-docs-behavior-file behavior/my-pattern.feature',
+        example: '@architect-behavior-file behavior/my-pattern.feature',
       },
       // Session discovery findings (retrospective tags)
       {
@@ -456,7 +453,7 @@ export function buildRegistry(): TagRegistry {
         repeatable: true,
         metadataKey: 'discoveredGaps',
         transform: hyphenToSpace,
-        example: '@libar-docs-discovered-gap missing-error-handling',
+        example: '@architect-discovered-gap missing-error-handling',
       },
       {
         tag: 'discovered-improvement',
@@ -465,7 +462,7 @@ export function buildRegistry(): TagRegistry {
         repeatable: true,
         metadataKey: 'discoveredImprovements',
         transform: hyphenToSpace,
-        example: '@libar-docs-discovered-improvement cache-invalidation',
+        example: '@architect-discovered-improvement cache-invalidation',
       },
       {
         tag: 'discovered-risk',
@@ -474,7 +471,7 @@ export function buildRegistry(): TagRegistry {
         repeatable: true,
         metadataKey: 'discoveredRisks',
         transform: hyphenToSpace,
-        example: '@libar-docs-discovered-risk data-loss-on-migration',
+        example: '@architect-discovered-risk data-loss-on-migration',
       },
       {
         tag: 'discovered-learning',
@@ -483,34 +480,34 @@ export function buildRegistry(): TagRegistry {
         repeatable: true,
         metadataKey: 'discoveredLearnings',
         transform: hyphenToSpace,
-        example: '@libar-docs-discovered-learning convex-mutation-limits',
+        example: '@architect-discovered-learning convex-mutation-limits',
       },
       // Cross-reference and API navigation tags (PatternRelationshipModel enhancement)
       {
         tag: 'see-also',
         format: 'csv',
         purpose: 'Related patterns for cross-reference without dependency implication',
-        example: '@libar-docs-see-also AgentAsBoundedContext, CrossContextIntegration',
+        example: '@architect-see-also AgentAsBoundedContext, CrossContextIntegration',
       },
       {
         tag: 'api-ref',
         format: 'csv',
         purpose: "File paths to implementation APIs (replaces 'See:' Markdown text in Rules)",
-        example: '@libar-docs-api-ref @libar-dev/platform-core/src/durability/outbox.ts',
+        example: '@architect-api-ref @libar-dev/platform-core/src/durability/outbox.ts',
       },
       // Shape extraction for documentation generation (ADR-021)
       {
         tag: 'extract-shapes',
         format: 'csv',
         purpose: 'TypeScript type names to extract from this file for documentation',
-        example: '@libar-docs-extract-shapes DeciderInput, ValidationResult, ProcessViolation',
+        example: '@architect-extract-shapes DeciderInput, ValidationResult, ProcessViolation',
       },
       // DD-1: Declaration-level shape tagging
       {
         tag: 'shape',
         format: 'value',
         purpose: 'Marks declaration as documentable shape, optionally with group name',
-        example: '@libar-docs-shape api-types',
+        example: '@architect-shape api-types',
       },
       // Architecture diagram generation tags
       {
@@ -529,39 +526,39 @@ export function buildRegistry(): TagRegistry {
           'read-model',
           'service',
         ] as const,
-        example: '@libar-docs-arch-role projection',
+        example: '@architect-arch-role projection',
       },
       {
         tag: 'arch-context',
         format: 'value',
         purpose: 'Bounded context this component belongs to (for subgraph grouping)',
-        example: '@libar-docs-arch-context orders',
+        example: '@architect-arch-context orders',
       },
       {
         tag: 'arch-layer',
         format: 'enum',
         purpose: 'Architectural layer for layered diagrams',
         values: ['domain', 'application', 'infrastructure'] as const,
-        example: '@libar-docs-arch-layer application',
+        example: '@architect-arch-layer application',
       },
       {
         tag: 'include',
         format: 'csv',
         purpose: 'Cross-cutting document inclusion for content routing and diagram scoping',
-        example: '@libar-docs-include reference-sample,codec-system',
+        example: '@architect-include reference-sample,codec-system',
       },
       // Design session stub metadata tags (DataAPIStubIntegration Phase B)
       {
         tag: 'target',
         format: 'value',
         purpose: 'Target implementation path for stub files',
-        example: '@libar-docs-target src/api/stub-resolver.ts',
+        example: '@architect-target src/api/stub-resolver.ts',
       },
       {
         tag: 'since',
         format: 'value',
         purpose: 'Design session that created this pattern',
-        example: '@libar-docs-since DS-A',
+        example: '@architect-since DS-A',
       },
       // Convention tags for reference document generation (CodecDrivenReferenceGeneration)
       {
@@ -569,27 +566,27 @@ export function buildRegistry(): TagRegistry {
         format: 'csv',
         purpose: 'Convention domains for reference document generation from decision records',
         values: [...CONVENTION_VALUES],
-        example: '@libar-docs-convention fsm-rules, testing-policy',
+        example: '@architect-convention fsm-rules, testing-policy',
       },
       // Claude module generation tags (ClaudeModuleGeneration Phase 25)
       {
         tag: 'claude-module',
         format: 'value',
         purpose: 'Module identifier for CLAUDE.md module generation (becomes filename)',
-        example: '@libar-docs-claude-module process-guard',
+        example: '@architect-claude-module process-guard',
       },
       {
         tag: 'claude-section',
         format: 'enum',
         purpose: 'Target section directory in _claude-md/ for module output',
         values: [...CLAUDE_SECTION_VALUES],
-        example: '@libar-docs-claude-section delivery-process',
+        example: '@architect-claude-section process',
       },
       {
         tag: 'claude-tags',
         format: 'csv',
         purpose: 'Variation filtering tags for modular-claude-md inclusion',
-        example: '@libar-docs-claude-tags core-mandatory, delivery-process',
+        example: '@architect-claude-tags core-mandatory, process',
       },
 
       // ── Sequence diagram annotation tags (DesignReviewCodec) ──────────
@@ -597,25 +594,25 @@ export function buildRegistry(): TagRegistry {
         tag: 'sequence-orchestrator',
         format: 'value',
         purpose: 'Identifies the coordinator module for sequence diagram generation',
-        example: '@libar-docs-sequence-orchestrator:init-cli',
+        example: '@architect-sequence-orchestrator:init-cli',
       },
       {
         tag: 'sequence-step',
         format: 'number',
         purpose: 'Explicit execution ordering number for sequence diagram steps',
-        example: '@libar-docs-sequence-step:1',
+        example: '@architect-sequence-step:1',
       },
       {
         tag: 'sequence-module',
         format: 'csv',
         purpose: 'Maps Rule to deliverable module(s) for sequence diagram participants',
-        example: '@libar-docs-sequence-module:detect-context',
+        example: '@architect-sequence-module:detect-context',
       },
       {
         tag: 'sequence-error',
         format: 'flag',
         purpose: 'Marks scenario as error/alternative path in sequence diagram',
-        example: '@libar-docs-sequence-error',
+        example: '@architect-sequence-error',
       },
     ],
 

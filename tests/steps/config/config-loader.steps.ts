@@ -5,7 +5,7 @@
  * Uses temp directories with actual config files to test the full
  * config loading pipeline.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -39,9 +39,8 @@ interface ConfigLoaderState {
 // Config File Templates
 // =============================================================================
 
-const VALID_GENERIC_CONFIG = `
-import { createDeliveryProcess } from "./src/index.js";
-export default createDeliveryProcess({ preset: "generic" });
+const VALID_MINIMAL_CONFIG = `
+export default { tagPrefix: "@custom-" };
 `.trim();
 
 const NO_DEFAULT_EXPORT_CONFIG = `
@@ -115,8 +114,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.configPath).not.toBeNull();
       });
 
-      And('config path should end with "delivery-process.config.js"', () => {
-        expect(state!.configPath!).toMatch(/delivery-process\.config\.js$/);
+      And('config path should end with "architect.config.js"', () => {
+        expect(state!.configPath!).toMatch(/architect\.config\.js$/);
       });
     });
 
@@ -134,8 +133,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.configPath).not.toBeNull();
       });
 
-      And('config path should end with "delivery-process.config.js"', () => {
-        expect(state!.configPath!).toMatch(/delivery-process\.config\.js$/);
+      And('config path should end with "architect.config.js"', () => {
+        expect(state!.configPath!).toMatch(/architect\.config\.js$/);
       });
     });
 
@@ -152,8 +151,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.configPath).not.toBeNull();
       });
 
-      And('config path should end with "delivery-process.config.ts"', () => {
-        expect(state!.configPath!).toMatch(/delivery-process\.config\.ts$/);
+      And('config path should end with "architect.config.ts"', () => {
+        expect(state!.configPath!).toMatch(/architect\.config\.ts$/);
       });
     });
 
@@ -222,9 +221,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.configResult!.value.isDefault).toBe(true);
       });
 
-      And('loaded registry tagPrefix should be "@libar-docs-"', () => {
+      And('loaded registry tagPrefix should be "@architect-"', () => {
         if (!state!.configResult!.ok) throw new Error('Expected success');
-        expect(state!.configResult!.value.instance.registry.tagPrefix).toBe('@libar-docs-');
+        expect(state!.configResult!.value.instance.registry.tagPrefix).toBe('@architect-');
       });
 
       And('loaded registry should have exactly 3 categories', () => {
@@ -234,32 +233,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
-    RuleScenario('Load valid config file', ({ Given, When, Then, And }) => {
-      Given('a valid config file with preset "generic"', async () => {
-        // Create a config file that uses generic preset
-        // We need to create a minimal working config that can be imported
-        const configContent = `
-// Simple config that creates a minimal valid instance
-export default {
-  registry: {
-    tagPrefix: "@docs-",
-    fileOptInTag: "@docs",
-    categories: [
-      { tag: "core", label: "Core" },
-      { tag: "api", label: "API" },
-      { tag: "infra", label: "Infrastructure" }
-    ],
-    statusValues: ["roadmap", "active", "completed", "deferred"],
-    tags: []
-  },
-  regexBuilders: {
-    category: () => /@docs-(core|api|infra)/,
-    status: () => /@docs-status:(roadmap|active|completed|deferred)/,
-    pattern: () => /@docs-pattern:([A-Za-z0-9]+)/
-  }
-};
-`.trim();
-        const configPath = path.join(state!.tempDir!, 'delivery-process.config.js');
+    RuleScenario('Load valid minimal config file', ({ Given, When, Then, And }) => {
+      Given('a valid config file with custom tagPrefix "@custom-"', async () => {
+        const configContent = VALID_MINIMAL_CONFIG;
+        const configPath = path.join(state!.tempDir!, 'architect.config.js');
         await fs.writeFile(configPath, configContent);
       });
 
@@ -276,15 +253,15 @@ export default {
         expect(state!.configResult!.value.isDefault).toBe(false);
       });
 
-      And('loaded registry tagPrefix should be "@docs-"', () => {
+      And('loaded registry tagPrefix should be "@custom-"', () => {
         if (!state!.configResult!.ok) throw new Error('Expected success');
-        expect(state!.configResult!.value.instance.registry.tagPrefix).toBe('@docs-');
+        expect(state!.configResult!.value.instance.registry.tagPrefix).toBe('@custom-');
       });
     });
 
     RuleScenario('Error on config without default export', ({ Given, When, Then, And }) => {
       Given('a config file without default export', async () => {
-        const configPath = path.join(state!.tempDir!, 'delivery-process.config.js');
+        const configPath = path.join(state!.tempDir!, 'architect.config.js');
         await fs.writeFile(configPath, NO_DEFAULT_EXPORT_CONFIG);
       });
 
@@ -304,7 +281,7 @@ export default {
 
     RuleScenario('Error on config with wrong type', ({ Given, When, Then, And }) => {
       Given('a config file exporting wrong type', async () => {
-        const configPath = path.join(state!.tempDir!, 'delivery-process.config.js');
+        const configPath = path.join(state!.tempDir!, 'architect.config.js');
         await fs.writeFile(configPath, WRONG_TYPE_CONFIG);
       });
 
@@ -316,9 +293,9 @@ export default {
         expect(state!.configResult!.ok).toBe(false);
       });
 
-      And('config error message should contain "DeliveryProcessInstance"', () => {
+      And('config error message should contain "defineConfig"', () => {
         if (state!.configResult!.ok) throw new Error('Expected failure');
-        expect(state!.configResult!.error.message).toContain('DeliveryProcessInstance');
+        expect(state!.configResult!.error.message).toContain('defineConfig');
       });
     });
   });
@@ -374,7 +351,7 @@ async function createDirectoryStructure(table: DataTableRow[]): Promise<void> {
     let content: string;
     switch (row.type) {
       case 'config':
-        content = VALID_GENERIC_CONFIG;
+        content = VALID_MINIMAL_CONFIG;
         break;
       case 'git':
         content = '[core]\n\trepositoryformatversion = 0';

@@ -1,9 +1,9 @@
-@libar-docs
-@lint @libar-docs-pattern:LintRuleIndividualTesting
-@libar-docs-implements:LintRules
-@libar-docs-status:completed
-@libar-docs-unlock-reason:'Split-from-original'
-@libar-docs-product-area:Validation
+@architect
+@lint @architect-pattern:LintRuleIndividualTesting
+@architect-implements:LintRules
+@architect-status:completed
+@architect-unlock-reason:'Split-from-original'
+@architect-product-area:Validation
 Feature: Pattern Annotation Lint Rules - Individual Rule Validation
   Individual lint rules that check parsed directives for completeness.
   Tests presence/absence checks: pattern name, status, whenToUse, and relationships.
@@ -66,7 +66,7 @@ Feature: Pattern Annotation Lint Rules - Individual Rule Validation
       When I apply the missing-status rule
       Then a violation should be detected
       And the violation severity should be "warning"
-      And the violation message should contain "@libar-docs-status"
+      And the violation message should contain "@architect-status"
 
     @rule:missing-status @happy-path
     Scenario: Accept completed status
@@ -90,6 +90,39 @@ Feature: Pattern Annotation Lint Rules - Individual Rule Validation
     Scenario: Accept deferred status
       Given a directive with status "deferred"
       When I apply the missing-status rule
+      Then no violation should be detected
+
+  Rule: Files must use canonical FSM status values
+
+    **Invariant:** Annotated files may use only the canonical PDR-005 FSM statuses: roadmap, active, completed, deferred.
+    **Rationale:** Legacy aliases hide process drift and break a single-source-of-truth workflow model.
+    **Verified by:** Reject planned status alias, Reject in-progress status alias, Reject implemented status alias, Accept canonical deferred status
+
+    @rule:invalid-status @severity:error
+    Scenario: Reject planned status alias
+      Given a directive with status "planned"
+      When I apply the invalid-status rule
+      Then a violation should be detected
+      And the violation severity should be "error"
+      And the violation message should contain "Invalid status"
+
+    @rule:invalid-status
+    Scenario: Reject in-progress status alias
+      Given a directive with status "in-progress"
+      When I apply the invalid-status rule
+      Then a violation should be detected
+      And the violation message should contain "roadmap, active, completed, deferred"
+
+    @rule:invalid-status
+    Scenario: Reject implemented status alias
+      Given a directive with status "implemented"
+      When I apply the invalid-status rule
+      Then a violation should be detected
+
+    @rule:invalid-status @happy-path
+    Scenario: Accept canonical deferred status
+      Given a directive with status "deferred"
+      When I apply the invalid-status rule
       Then no violation should be detected
 
   Rule: Files should document when to use the pattern

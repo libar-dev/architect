@@ -1,9 +1,9 @@
-@libar-docs
-@libar-docs-pattern:RendererBlockTypes
-@libar-docs-implements:UniversalMarkdownRenderer
-@libar-docs-status:completed
-@libar-docs-unlock-reason:'Split-from-original'
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:RendererBlockTypes
+@architect-implements:UniversalMarkdownRenderer
+@architect-status:completed
+@architect-unlock-reason:'Split-from-original'
+@architect-product-area:Generation
 @behavior @render
 Feature: Universal Markdown Renderer - Block Types
   The universal renderer converts RenderableDocument to markdown.

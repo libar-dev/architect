@@ -3,7 +3,7 @@
  *
  * Extracted from pr-changes-codec.steps.ts to support split test files.
  *
- * @libar-docs
+ * @architect
  */
 import type { RenderableDocument, TableBlock } from '../../../src/renderable/schema.js';
 import type { MasterDataset } from '../../../src/validation-schemas/master-dataset.js';

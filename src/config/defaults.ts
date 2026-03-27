@@ -1,20 +1,20 @@
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-config
- * @libar-docs-pattern ConfigurationDefaults
- * @libar-docs-status completed
- * @libar-docs-arch-layer domain
- * @libar-docs-arch-context config
- * @libar-docs-used-by DeliveryProcessFactory, PatternScanner, LintRules, DetectChanges, AntiPatternDetector
+ * @architect
+ * @architect-core @architect-config
+ * @architect-pattern ConfigurationDefaults
+ * @architect-status completed
+ * @architect-arch-layer domain
+ * @architect-arch-context config
+ * @architect-used-by ArchitectFactory, PatternScanner, LintRules, DetectChanges, AntiPatternDetector
  *
  * ## Configuration Defaults
  *
- * Centralized default constants for the delivery-process package.
+ * Centralized default constants for the Architect package.
  * These defaults are used when no custom configuration or registry is provided.
  *
  * ### Why Centralize?
  *
- * Previously, the default tag prefix string `"@libar-docs-"` appeared in 6+ files.
+ * Previously, the default tag prefix string `"@architect-"` appeared in 6+ files.
  * Centralizing eliminates duplication and provides a single source of truth.
  *
  * ### When to Use
@@ -29,41 +29,37 @@ import { createRegexBuilders, type RegexBuilders } from './regex-builders.js';
 import type { ContextInferenceRule } from '../generators/pipeline/context-inference.js';
 
 /**
- * Default tag prefix for @libar-docs-* annotations.
+ * Default tag prefix for @architect-* annotations.
  *
  * This is the prefix used when:
  * - No `TagRegistry` is provided to a function
  * - Error messages need to reference the tag format
- * - Backward compatibility with existing annotations is needed
  *
  * @example
  * ```typescript
  * const tagPrefix = registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
  * ```
  */
-export const DEFAULT_TAG_PREFIX = '@libar-docs-';
+export const DEFAULT_TAG_PREFIX = '@architect-';
 
 /**
  * Default file opt-in tag (without suffix).
  *
  * Files must contain this exact tag (in a JSDoc comment) to be included
  * in documentation generation. This is distinct from directive tags
- * which have suffixes like `@libar-docs-pattern`.
+ * which have suffixes like `@architect-pattern`.
  *
  * @example
  * ```typescript
  * // File with opt-in:
- * /** @libar-docs This file is documented *\/
+ * /** @architect This file is documented *\/
  * ```
  */
-export const DEFAULT_FILE_OPT_IN_TAG = '@libar-docs';
+export const DEFAULT_FILE_OPT_IN_TAG = '@architect';
 
 /**
  * Pre-built regex builders using default prefix and opt-in tag.
- *
- * Use this for backward compatibility in functions that previously
- * hardcoded the default prefix. The builders are created once at
- * module load time for efficiency.
+ * The builders are created once at module load time for efficiency.
  *
  * @example
  * ```typescript
@@ -82,7 +78,7 @@ export const DEFAULT_REGEX_BUILDERS: RegexBuilders = createRegexBuilders(
  * Default context inference rules for auto-inferring bounded context from file paths.
  *
  * These rules map directory paths to bounded context names. When a pattern has
- * an `@libar-docs-arch-layer` but no explicit `@libar-docs-arch-context`, the
+ * an `@architect-arch-layer` but no explicit `@architect-arch-context`, the
  * context is inferred from the file path using these rules.
  *
  * **Why This Exists:**
@@ -92,11 +88,11 @@ export const DEFAULT_REGEX_BUILDERS: RegexBuilders = createRegexBuilders(
  * - `src/generators/` → generator context
  *
  * Auto-inference eliminates redundant annotations while preserving the ability
- * to override with explicit `@libar-docs-arch-context` when needed.
+ * to override with explicit `@architect-arch-context` when needed.
  *
  * @example
  * ```typescript
- * // Pattern at src/validation/rules.ts with @libar-docs-arch-layer:application
+ * // Pattern at src/validation/rules.ts with @architect-arch-layer:application
  * // will automatically get archContext='validation' without explicit annotation
  * ```
  */

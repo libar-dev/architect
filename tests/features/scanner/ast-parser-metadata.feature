@@ -1,11 +1,11 @@
-@libar-docs
-@libar-docs-pattern:AstParserMetadata
-@libar-docs-implements:AstParser
-@libar-docs-status:completed
-@libar-docs-unlock-reason:'Split-from-original'
-@libar-docs-product-area:Annotation
+@architect
+@architect-pattern:AstParserMetadata
+@architect-implements:AstParser
+@architect-status:completed
+@architect-unlock-reason:'Split-from-original'
+@architect-product-area:Annotation
 Feature: TypeScript AST Parser - Metadata Extraction
-  The AST Parser extracts @libar-docs-* directives from TypeScript source files
+  The AST Parser extracts @architect-* directives from TypeScript source files
   using the TypeScript compiler API. It identifies exports, extracts metadata,
   and validates directive structure.
 
@@ -23,7 +23,7 @@ Feature: TypeScript AST Parser - Metadata Extraction
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * Test function with examples
          *
          * @example
@@ -54,7 +54,7 @@ Feature: TypeScript AST Parser - Metadata Extraction
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          *
          * This is a detailed description
          * that spans multiple lines
@@ -79,7 +79,7 @@ Feature: TypeScript AST Parser - Metadata Extraction
         // Line 1
         // Line 2
         /**
-         * @libar-docs-core
+         * @architect-core
          * Test
          */
         export function test() {
@@ -98,7 +98,7 @@ Feature: TypeScript AST Parser - Metadata Extraction
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * Function with signature
          */
         export function calculate(a: number, b: number, c: string): number {
@@ -114,7 +114,7 @@ Feature: TypeScript AST Parser - Metadata Extraction
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * Test function
          *
          * @param input - The input string
@@ -143,8 +143,8 @@ Feature: TypeScript AST Parser - Metadata Extraction
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core @libar-docs-api
-         * @libar-docs-overview
+         * @architect-core @architect-api
+         * @architect-overview
          *
          * This is the description.
          */
@@ -157,16 +157,16 @@ Feature: TypeScript AST Parser - Metadata Extraction
       And the directive should have 3 tags
       And the directive should have tags:
         | value               |
-        | @libar-docs-core    |
-        | @libar-docs-api     |
-        | @libar-docs-overview|
+        | @architect-core    |
+        | @architect-api     |
+        | @architect-overview|
 
     @function:parseFileDirectives @tags
     Scenario: Extract tag with description on same line
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core Brief description on same line
+         * @architect-core Brief description on same line
          */
         export function inlineDesc() {
           return true;
@@ -175,17 +175,17 @@ Feature: TypeScript AST Parser - Metadata Extraction
       When the file is parsed for directives
       Then 1 directive should be found
       And the directive should have 1 tag
-      And the directive should have tag "@libar-docs-core"
+      And the directive should have tag "@architect-core"
 
     @function:parseFileDirectives @tags @regression
     Scenario: NOT extract tags mentioned in description
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          *
-         * This function works with @libar-docs-api patterns.
-         * It supports @libar-docs-saga for orchestration.
+         * This function works with @architect-api patterns.
+         * It supports @architect-saga for orchestration.
          */
         export function processRequest() {
           return true;
@@ -194,38 +194,38 @@ Feature: TypeScript AST Parser - Metadata Extraction
       When the file is parsed for directives
       Then 1 directive should be found
       And the directive should have 1 tag
-      And the directive should have tag "@libar-docs-core"
+      And the directive should have tag "@architect-core"
       And the directive should not have any tags:
         | value             |
-        | @libar-docs-api   |
-        | @libar-docs-saga  |
+        | @architect-api   |
+        | @architect-saga  |
 
     @function:parseFileDirectives @tags @regression
     Scenario: NOT extract tags mentioned in @example sections
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * Test function
          *
          * @example
          * ```typescript
-         * hasTag('@libar-docs-example'); // checking for a tag
-         * hasTag('@libar-docs-saga'); // another example
+         * hasTag('@architect-example'); // checking for a tag
+         * hasTag('@architect-saga'); // another example
          * ```
          */
         export function hasTag(tag: string): boolean {
-          return tag.startsWith('@libar-docs');
+          return tag.startsWith('@architect');
         }
         """
       When the file is parsed for directives
       Then 1 directive should be found
       And the directive should have 1 tag
-      And the directive should have tag "@libar-docs-core"
+      And the directive should have tag "@architect-core"
       And the directive should not have any tags:
         | value                 |
-        | @libar-docs-example   |
-        | @libar-docs-saga      |
+        | @architect-example   |
+        | @architect-saga      |
 
   Rule: When to Use sections are extracted in all supported formats
 
@@ -238,7 +238,7 @@ Feature: TypeScript AST Parser - Metadata Extraction
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          *
          * ## Pattern Description
          *
@@ -266,7 +266,7 @@ Feature: TypeScript AST Parser - Metadata Extraction
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          *
          * **When to use:** Command validation requires complex business rules.
          *
@@ -288,7 +288,7 @@ Feature: TypeScript AST Parser - Metadata Extraction
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          *
          * ## Pattern
          *
@@ -315,7 +315,7 @@ Feature: TypeScript AST Parser - Metadata Extraction
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          *
          * Just a regular description without When to Use section.
          */

@@ -1,11 +1,11 @@
 /**
- * @libar-docs
- * @libar-docs-pattern ProcessApiReferenceGenerator
- * @libar-docs-status completed
- * @libar-docs-implements ProcessApiHybridGeneration
- * @libar-docs-arch-context generator
- * @libar-docs-arch-layer application
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-pattern ProcessApiReferenceGenerator
+ * @architect-status completed
+ * @architect-implements ProcessApiHybridGeneration
+ * @architect-arch-context generator
+ * @architect-arch-layer application
+ * @architect-product-area:Generation
  *
  * ## Standalone Generator for Process API CLI Reference
  *

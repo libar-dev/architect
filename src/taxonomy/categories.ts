@@ -1,12 +1,12 @@
 /**
- * @libar-docs
- * @libar-docs-pattern CategoryDefinitions
- * @libar-docs-status completed
- * @libar-docs-core
- * @libar-docs-arch-role read-model
- * @libar-docs-arch-context taxonomy
- * @libar-docs-arch-layer domain
- * @libar-docs-extract-shapes CategoryDefinition, CATEGORIES, CategoryTag, CATEGORY_TAGS
+ * @architect
+ * @architect-pattern CategoryDefinitions
+ * @architect-status completed
+ * @architect-core
+ * @architect-arch-role read-model
+ * @architect-arch-context taxonomy
+ * @architect-arch-layer domain
+ * @architect-extract-shapes CategoryDefinition, CATEGORIES, CategoryTag, CATEGORY_TAGS
  *
  * ## Category Definitions
  *
@@ -18,8 +18,8 @@
  */
 
 /**
- * @libar-docs-implements CategoryDefinitions
- * @libar-docs-shape reference-sample
+ * @architect-implements CategoryDefinitions
+ * @architect-shape reference-sample
  */
 export interface CategoryDefinition {
   /** Category tag name without prefix (e.g., "core", "api", "ddd", "saga") */

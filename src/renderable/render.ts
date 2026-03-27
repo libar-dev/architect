@@ -1,18 +1,17 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern UniversalRenderer
- * @libar-docs-status completed
- * @libar-docs-arch-role service
- * @libar-docs-arch-context renderer
- * @libar-docs-arch-layer application
+ * @architect
+ * @architect-core
+ * @architect-pattern UniversalRenderer
+ * @architect-status completed
+ * @architect-arch-role service
+ * @architect-arch-context renderer
+ * @architect-arch-layer application
  *
  * ## Universal Renderer
  *
  * Converts RenderableDocument to output strings. Three renderers:
  * - `renderToMarkdown` — Full markdown for human documentation
  * - `renderToClaudeMdModule` — Standard markdown with H3-rooted headings for modular-claude-md
- * - `renderToClaudeContext` — Token-efficient format with section markers (legacy)
  *
  * All are "dumb printers" — they know nothing about patterns, phases,
  * or domain concepts. All logic lives in the codecs; these just render blocks.
@@ -21,7 +20,6 @@
  *
  * - `renderToMarkdown` for human-readable docs (`docs/` output)
  * - `renderToClaudeMdModule` for AI context (`_claude-md/` output)
- * - `renderToClaudeContext` for token-efficient AI context (legacy, not used by generators)
  * - `renderDocumentWithFiles` for multi-file output with detail files
  */
 
@@ -137,117 +135,6 @@ function renderBlock(block: SectionBlock): string[] {
       const _exhaustive: never = block;
       return [`<!-- Unknown block type: ${JSON.stringify(_exhaustive)} -->`];
   }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// Claude Context Renderer
-// ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * Render a RenderableDocument to token-efficient text for LLM consumption.
- *
- * Uses `=== SECTION ===` markers instead of markdown headers, omits
- * mermaid diagrams (LLMs cannot render them), flattens collapsible blocks,
- * and strips link-out URLs. Produces ~20-40% fewer tokens than markdown
- * for the same document.
- *
- * @param doc - The document to render
- * @returns Token-efficient string for AI context
- */
-export function renderToClaudeContext(doc: RenderableDocument): string {
-  const lines: string[] = [];
-
-  // Title as top-level marker
-  lines.push(`=== ${doc.title.toUpperCase()} ===`, '');
-
-  // Frontmatter as plain lines (no bold markers, no separator)
-  if (doc.purpose) {
-    lines.push(`Purpose: ${doc.purpose}`);
-  }
-  if (doc.detailLevel) {
-    lines.push(`Detail Level: ${doc.detailLevel}`);
-  }
-  if (doc.purpose || doc.detailLevel) {
-    lines.push('');
-  }
-
-  // Sections
-  for (const block of doc.sections) {
-    lines.push(...renderBlockClaudeContext(block));
-  }
-
-  // Ensure single trailing newline
-  return lines.join('\n').trimEnd() + '\n';
-}
-
-/**
- * Render a single block to token-efficient lines for LLM consumption.
- */
-function renderBlockClaudeContext(block: SectionBlock): string[] {
-  switch (block.type) {
-    case 'heading': {
-      const text = block.text;
-      // Top-level headings (1-2) use === MARKERS ===, sub-headings use --- markers ---
-      if (block.level <= 2) {
-        return [`=== ${text.toUpperCase()} ===`, ''];
-      }
-      return [`--- ${text} ---`, ''];
-    }
-
-    case 'paragraph':
-      return [block.text, ''];
-
-    case 'separator':
-      // Omit horizontal rules — just a blank line saves tokens
-      return [''];
-
-    case 'table':
-      // Tables are already compact in pipe-delimited format
-      return renderTable(block);
-
-    case 'list':
-      // Lists are already compact
-      return renderList(block);
-
-    case 'code':
-      // Preserve code blocks — LLMs need syntax context
-      return [`\`\`\`${block.language ?? ''}`, block.content, '\`\`\`', ''];
-
-    case 'mermaid':
-      // Omit mermaid diagrams — LLMs cannot render visual diagrams
-      return [];
-
-    case 'collapsible':
-      // Flatten: render inner blocks directly without <details> wrapper
-      return renderCollapsibleClaudeContext(block);
-
-    case 'link-out':
-      // Plain text reference without URL (LLMs can't follow file links)
-      return [`-> ${block.text}`, ''];
-
-    default: {
-      // Type-safe exhaustive check
-      const _exhaustive: never = block;
-      return [`[Unknown block type: ${JSON.stringify(_exhaustive)}]`];
-    }
-  }
-}
-
-/**
- * Flatten a collapsible block — render inner blocks directly.
- */
-function renderCollapsibleClaudeContext(block: CollapsibleBlock): string[] {
-  const lines: string[] = [];
-
-  // Render summary as a sub-heading marker
-  lines.push(`--- ${block.summary} ---`, '');
-
-  // Render nested content directly
-  for (const contentBlock of block.content) {
-    lines.push(...renderBlockClaudeContext(contentBlock));
-  }
-
-  return lines;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

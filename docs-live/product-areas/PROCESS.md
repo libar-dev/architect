@@ -9,7 +9,7 @@
 
 ## Key Invariants
 
-- TypeScript source owns pattern identity: `@libar-docs-pattern` in TypeScript defines the pattern. Tier 1 specs are ephemeral working documents
+- TypeScript source owns pattern identity: `@architect-pattern` in TypeScript defines the pattern. Tier 1 specs are ephemeral working documents
 - 7 canonical product-area values: Annotation, Configuration, Generation, Validation, DataAPI, CoreTypes, Process — reader-facing sections, not source modules
 - Two distinct status domains: Pattern FSM status (4 values) vs. deliverable status (6 values). Never cross domains
 - Session types define capabilities: planning creates specs, design creates stubs, implementation writes code. Each session type has a fixed input/output contract enforced by convention
@@ -105,7 +105,7 @@
 **Verified by:** Canonical values are enforced
 
     Completed is a terminal state. Modifications require
-    `@libar-docs-unlock-reason` escape hatch.
+    `@architect-unlock-reason` escape hatch.
 
 ---
 
@@ -115,14 +115,14 @@
 
 **Rationale:** Without explicit format types, parsers must guess value structure, leading to silent data corruption when CSV values are treated as single strings or numbers are treated as text.
 
-| Format       | Parsing                        | Example                        |
-| ------------ | ------------------------------ | ------------------------------ |
-| flag         | Boolean presence, no value     | @libar-docs-core               |
-| value        | Simple string                  | @libar-docs-pattern MyPattern  |
-| enum         | Constrained to predefined list | @libar-docs-status completed   |
-| csv          | Comma-separated values         | @libar-docs-uses A, B, C       |
-| number       | Numeric value                  | @libar-docs-phase 15           |
-| quoted-value | Preserves spaces               | @libar-docs-brief:'Multi word' |
+| Format       | Parsing                        | Example                       |
+| ------------ | ------------------------------ | ----------------------------- |
+| flag         | Boolean presence, no value     | @architect-core               |
+| value        | Simple string                  | @architect-pattern MyPattern  |
+| enum         | Constrained to predefined list | @architect-status completed   |
+| csv          | Comma-separated values         | @architect-uses A, B, C       |
+| number       | Numeric value                  | @architect-phase 15           |
+| quoted-value | Preserves spaces               | @architect-brief:'Multi word' |
 
 **Verified by:** Canonical values are enforced
 
@@ -289,14 +289,14 @@ graph LR
 
 ### ADR 003 Source First Pattern Architecture
 
-| Rule                                         | Invariant                                                                                                                                                                                       | Rationale                                                                                                                                                                      |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| TypeScript source owns pattern identity      | A pattern is defined by `@libar-docs-pattern` in a TypeScript file — either a stub (pre-implementation) or source code (post-implementation).                                                   | If pattern identity lives in tier 1 specs, it becomes stale after implementation and diverges from the code that actually realizes the pattern.                                |
-| Tier 1 specs are ephemeral working documents | Tier 1 roadmap specs serve planning and delivery tracking. They are not the source of truth for pattern identity, invariants, or acceptance criteria. After completion, they may be archived.   | Treating tier 1 specs as durable creates a maintenance burden — at scale only 39% maintain traceability, and duplicated Rules/Scenarios average 200-400 stale lines.           |
-| Three durable artifact types                 | The delivery process produces three artifact types with long-term value. All other artifacts are projections or ephemeral.                                                                      | Without a clear boundary between durable and ephemeral artifacts, teams maintain redundant documents that inevitably drift from the source of truth.                           |
-| Implements is UML Realization (many-to-one)  | `@libar-docs-implements` declares a realization relationship. Multiple files can implement the same pattern. One file can implement multiple patterns (CSV format).                             | Without many-to-one realization, cross-cutting patterns that span multiple files cannot be traced back to a single canonical definition.                                       |
-| Single-definition constraint                 | `@libar-docs-pattern:X` may appear in exactly one file across the entire codebase. The `mergePatterns()` conflict check in `orchestrator.ts` correctly enforces this.                           | Duplicate pattern definitions cause merge conflicts in the MasterDataset and produce ambiguous ownership in generated documentation.                                           |
-| Reverse links preferred over forward links   | `@libar-docs-implements` (reverse: "I verify this pattern") is the primary traceability mechanism. `@libar-docs-executable-specs` (forward: "my tests live here") is retained but not required. | Forward links in tier 1 specs go stale when specs are archived, while reverse links in test files are self-maintaining because the test cannot run without the implementation. |
+| Rule                                         | Invariant                                                                                                                                                                                     | Rationale                                                                                                                                                                      |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| TypeScript source owns pattern identity      | A pattern is defined by `@architect-pattern` in a TypeScript file — either a stub (pre-implementation) or source code (post-implementation).                                                  | If pattern identity lives in tier 1 specs, it becomes stale after implementation and diverges from the code that actually realizes the pattern.                                |
+| Tier 1 specs are ephemeral working documents | Tier 1 roadmap specs serve planning and delivery tracking. They are not the source of truth for pattern identity, invariants, or acceptance criteria. After completion, they may be archived. | Treating tier 1 specs as durable creates a maintenance burden — at scale only 39% maintain traceability, and duplicated Rules/Scenarios average 200-400 stale lines.           |
+| Three durable artifact types                 | The delivery process produces three artifact types with long-term value. All other artifacts are projections or ephemeral.                                                                    | Without a clear boundary between durable and ephemeral artifacts, teams maintain redundant documents that inevitably drift from the source of truth.                           |
+| Implements is UML Realization (many-to-one)  | `@architect-implements` declares a realization relationship. Multiple files can implement the same pattern. One file can implement multiple patterns (CSV format).                            | Without many-to-one realization, cross-cutting patterns that span multiple files cannot be traced back to a single canonical definition.                                       |
+| Single-definition constraint                 | `@architect-pattern:X` may appear in exactly one file across the entire codebase. The `mergePatterns()` conflict check in `orchestrator.ts` correctly enforces this.                          | Duplicate pattern definitions cause merge conflicts in the MasterDataset and produce ambiguous ownership in generated documentation.                                           |
+| Reverse links preferred over forward links   | `@architect-implements` (reverse: "I verify this pattern") is the primary traceability mechanism. `@architect-executable-specs` (forward: "my tests live here") is retained but not required. | Forward links in tier 1 specs go stale when specs are archived, while reverse links in test files are self-maintaining because the test cannot run without the implementation. |
 
 ### Cli Behavior Testing
 

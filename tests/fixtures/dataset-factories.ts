@@ -6,7 +6,7 @@
  * wrap the pattern factories and transformToMasterDataset to produce
  * fully-formed datasets with all pre-computed views.
  *
- * @libar-docs
+ * @architect
  */
 
 import type { ExtractedPattern } from '../../src/validation-schemas/index.js';

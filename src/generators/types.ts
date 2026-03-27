@@ -1,5 +1,5 @@
 /**
- * @libar-docs
+ * @architect
  */
 
 import type { ExtractedPattern, TagRegistry } from '../validation-schemas';
@@ -8,11 +8,11 @@ import type { RuntimeMasterDataset } from './pipeline/index.js';
 import type { CodecOptions } from '../renderable/generate.js';
 
 /**
- * @libar-docs-generator
- * @libar-docs-pattern GeneratorTypes
- * @libar-docs-status completed
- * @libar-docs-used-by GeneratorRegistry, GeneratorFactory, Orchestrator, SectionRegistry
- * @libar-docs-extract-shapes DocumentGenerator, GeneratorContext, GeneratorOutput
+ * @architect-generator
+ * @architect-pattern GeneratorTypes
+ * @architect-status completed
+ * @architect-used-by GeneratorRegistry, GeneratorFactory, Orchestrator, SectionRegistry
+ * @architect-extract-shapes DocumentGenerator, GeneratorContext, GeneratorOutput
  *
  * ## GeneratorTypes - Pluggable Document Generation Interface
  *

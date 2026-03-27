@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern UtilsModule
- * @libar-docs-status completed
- * @libar-docs-uses StringUtilities, CollectionUtilities
+ * @architect
+ * @architect-core
+ * @architect-pattern UtilsModule
+ * @architect-status completed
+ * @architect-uses StringUtilities, CollectionUtilities
  *
  * ## UtilsModule - Shared Utilities Barrel Export
  *
- * Common helper functions used across the delivery-process package.
+ * Common helper functions used across the Architect package.
  * Provides text transformation and collection manipulation utilities.
  *
  * ### When to Use

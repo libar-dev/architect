@@ -1,8 +1,8 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern SharedCodecSchema
- * @libar-docs-status completed
+ * @architect
+ * @architect-core
+ * @architect-pattern SharedCodecSchema
+ * @architect-status completed
  *
  * ## Shared Codec Output Schema
  *

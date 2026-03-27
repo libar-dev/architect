@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-validation
- * @libar-docs-pattern FSMModule
- * @libar-docs-status active
- * @libar-docs-depends-on:PDR005MvpWorkflow
+ * @architect
+ * @architect-validation
+ * @architect-pattern FSMModule
+ * @architect-status active
+ * @architect-depends-on:PDR005MvpWorkflow
  *
  * ## FSM Module - Phase State Machine Implementation
  *
@@ -39,7 +39,7 @@
  *   validateTransition,
  *   getProtectionLevel,
  *   isValidTransition
- * } from "@libar-dev/delivery-process/validation/fsm";
+ * } from "@libar-dev/architect/validation/fsm";
  *
  * // Validate a status value
  * const result = validateStatus("roadmap");

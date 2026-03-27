@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:CodecUtilsValidation
-@libar-docs-status:active
-@libar-docs-product-area:Validation
+@architect
+@architect-pattern:CodecUtilsValidation
+@architect-status:active
+@architect-product-area:Validation
 @validation @codec
 Feature: Codec Utils Validation
   The codec utilities provide factory functions for creating type-safe JSON

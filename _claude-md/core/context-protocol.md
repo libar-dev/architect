@@ -6,12 +6,12 @@ The API returns structured, current data using 5-10x less context than file read
 
 #### PR / Session Start (run these FIRST)
 
-| Step | Command                                                    | What You Get                                |
-| ---- | ---------------------------------------------------------- | ------------------------------------------- |
-| 1    | `pnpm process:query -- overview`                           | Project health, active phases, blockers     |
-| 2    | `pnpm process:query -- scope-validate <pattern> <session>` | Pre-flight: FSM violations, missing deps    |
-| 3    | `pnpm process:query -- context <pattern> --session <type>` | Curated context bundle for the session      |
-| 4    | `pnpm process:query -- files <pattern> --related`          | File reading list with implementation paths |
+| Step | Command                                                      | What You Get                                |
+| ---- | ------------------------------------------------------------ | ------------------------------------------- |
+| 1    | `pnpm architect:query -- overview`                           | Project health, active phases, blockers     |
+| 2    | `pnpm architect:query -- scope-validate <pattern> <session>` | Pre-flight: FSM violations, missing deps    |
+| 3    | `pnpm architect:query -- context <pattern> --session <type>` | Curated context bundle for the session      |
+| 4    | `pnpm architect:query -- files <pattern> --related`          | File reading list with implementation paths |
 
 Session types: `planning` (minimal), `design` (full: stubs + deps + deliverables), `implement` (focused: deliverables + FSM + tests).
 
@@ -22,11 +22,11 @@ Session types: `planning` (minimal), `design` (full: stubs + deps + deliverables
 | Find code structure     | `arch context [name]` / `arch layer [name]` | Structured by annotations, not file paths   |
 | Find dependencies       | `dep-tree <pattern>`                        | Shows status of each dependency             |
 | Find business rules     | `rules --pattern <name>`                    | Extracted from Gherkin Rule: blocks         |
-| Find unannotated files  | `unannotated --path <dir>`                  | Catches missing @libar-docs markers         |
+| Find unannotated files  | `unannotated --path <dir>`                  | Catches missing @architect markers          |
 | Check FSM state         | `query getProtectionInfo <status>`          | Protection level + allowed actions          |
 | Check valid transitions | `query getValidTransitionsFrom <status>`    | Valid next states from current status       |
 | Tag inventory           | `tags`                                      | Counts per tag and value across all sources |
-| Annotation coverage     | `arch coverage`                             | Files with/without @libar-docs annotations  |
+| Annotation coverage     | `arch coverage`                             | Files with/without @architect annotations   |
 
 #### Why Annotations Beat Grep
 
@@ -35,6 +35,6 @@ Session types: `planning` (minimal), `design` (full: stubs + deps + deliverables
 - **Feed generation**: Annotations produce generated docs; grep results are ephemeral
 - **Discoverable**: `unannotated --path` finds gaps; grep doesn't know what's missing
 
-**When adding new code:** Add `@libar-docs` annotations and relationship tags (`@libar-docs-depends-on`, `@libar-docs-uses`) so future sessions can discover the code via API queries instead of grep.
+**When adding new code:** Add `@architect` annotations and relationship tags (`@architect-depends-on`, `@architect-uses`) so future sessions can discover the code via API queries instead of grep.
 
-Full CLI reference: `pnpm process:query -- --help`
+Full CLI reference: `pnpm architect:query -- --help`

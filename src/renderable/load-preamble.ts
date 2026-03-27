@@ -1,8 +1,8 @@
 /**
- * @libar-docs
- * @libar-docs-implements ProceduralGuideCodec
- * @libar-docs-arch-context renderer
- * @libar-docs-arch-layer domain
+ * @architect
+ * @architect-implements ProceduralGuideCodec
+ * @architect-arch-context renderer
+ * @architect-arch-layer domain
  *
  * ## loadPreambleFromMarkdown — Shared Markdown-to-SectionBlock Parser
  *
@@ -16,7 +16,7 @@
  *
  * ### When to Use
  *
- * - In `delivery-process.config.ts` to load preamble markdown files
+ * - In `architect.config.ts` to load preamble markdown files
  * - At config import time (before any codec `decode()` call)
  * - When any codec needs static SectionBlock[] from a `.md` file
  */

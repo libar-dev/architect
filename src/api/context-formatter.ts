@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-pattern ContextFormatterImpl
- * @libar-docs-status active
- * @libar-docs-implements DataAPIContextAssembly
- * @libar-docs-uses ContextAssemblerImpl
- * @libar-docs-used-by ProcessAPICLIImpl
- * @libar-docs-arch-role service
- * @libar-docs-arch-context api
- * @libar-docs-arch-layer application
+ * @architect
+ * @architect-pattern ContextFormatterImpl
+ * @architect-status active
+ * @architect-implements DataAPIContextAssembly
+ * @architect-uses ContextAssemblerImpl
+ * @architect-used-by ProcessAPICLIImpl
+ * @architect-arch-role service
+ * @architect-arch-context api
+ * @architect-arch-layer application
  *
  * ## ContextFormatter — Plain Text Renderer for Context Bundles
  *
@@ -209,7 +209,7 @@ export function formatOverview(overview: OverviewSummary): string {
 
   sections.push(
     '=== DATA API — Use Instead of Explore Agents ===\n' +
-      'pnpm process:query -- <subcommand>\n' +
+      'pnpm architect:query -- <subcommand>\n' +
       '\n' +
       '  overview                             Project health (this output)\n' +
       '  context <pattern> --session <type>   Curated context bundle (planning/design/implement)\n' +
@@ -221,7 +221,7 @@ export function formatOverview(overview: OverviewSummary): string {
       '  rules                                Business rules from Gherkin\n' +
       '  arch blocking                        Patterns stuck on incomplete deps\n' +
       '\n' +
-      'Full reference: pnpm process:query -- --help'
+      'Full reference: pnpm architect:query -- --help'
   );
 
   return sections.join('\n\n') + '\n';

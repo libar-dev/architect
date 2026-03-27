@@ -11,7 +11,7 @@
 
 The annotation system is the ingestion boundary — it transforms annotated TypeScript and Gherkin files into `ExtractedPattern[]` objects that feed the entire downstream pipeline. Two parallel scanning paths (TypeScript AST + Gherkin parser) converge through dual-source merging. The system is fully data-driven: the `TagRegistry` defines all tags, formats, and categories — adding a new annotation requires only a registry entry, zero parser changes.
 
-**26 patterns** — 23 completed, 2 active, 1 planned
+**27 patterns** — 24 completed, 2 active, 1 planned
 
 **Key patterns:** PatternRelationshipModel, ShapeExtraction, DualSourceExtraction, GherkinRulesSupport, DeclarationLevelShapeTagging, CrossSourceValidation, ExtractionPipelineEnhancementsTesting
 
@@ -19,11 +19,11 @@ The annotation system is the ingestion boundary — it transforms annotated Type
 
 > **How do I configure the tool?**
 
-Configuration is the entry boundary — it transforms a user-authored `delivery-process.config.ts` file into a fully resolved `DeliveryProcessInstance` that powers the entire pipeline. The flow is: `defineConfig()` provides type-safe authoring (Vite convention, zero validation), `ConfigLoader` discovers and loads the file, `ProjectConfigSchema` validates via Zod, `ConfigResolver` applies defaults and merges stubs into sources, and `DeliveryProcessFactory` builds the final instance with `TagRegistry` and `RegexBuilders`. Three presets define escalating taxonomy complexity — from 3 categories (`generic`, `libar-generic`) to 21 (`ddd-es-cqrs`). `SourceMerger` computes per-generator source overrides, enabling generators like changelog to pull from different feature sets than the base config.
+Configuration is the entry boundary — it transforms a user-authored `architect.config.ts` file into a fully resolved `ArchitectInstance` that powers the entire pipeline. The flow is: `defineConfig()` provides type-safe authoring (Vite convention, zero validation), `ConfigLoader` discovers and loads the file, `ProjectConfigSchema` validates via Zod, `ConfigResolver` applies defaults and merges stubs into sources, and `ArchitectFactory` builds the final instance with `TagRegistry` and `RegexBuilders`. Two presets define escalating taxonomy complexity — from 3 categories (`libar-generic`) to 21 (`ddd-es-cqrs`). `SourceMerger` computes per-generator source overrides, enabling generators like changelog to pull from different feature sets than the base config.
 
 **11 patterns** — 8 completed, 0 active, 3 planned
 
-**Key patterns:** DeliveryProcessFactory, ConfigLoader, ConfigResolver, DefineConfig, ConfigurationPresets, SourceMerger
+**Key patterns:** ArchitectFactory, ConfigLoader, ConfigResolver, DefineConfig, ConfigurationPresets, SourceMerger
 
 ## [Generation](product-areas/GENERATION.md)
 
@@ -39,7 +39,7 @@ The generation pipeline transforms annotated source code into markdown documents
 
 > **How is the workflow enforced?**
 
-Validation is the enforcement boundary — it ensures that every change to annotated source files respects the delivery lifecycle rules defined by the FSM, protection levels, and scope constraints. The system operates in three layers: the FSM validator checks status transitions against a 4-state directed graph, the Process Guard orchestrates commit-time validation using a Decider pattern (state derived from annotations, not stored separately), and the lint engine provides pluggable rule execution with pretty and JSON output. Anti-pattern detection enforces dual-source ownership boundaries — `@libar-docs-uses` belongs on TypeScript, `@libar-docs-depends-on` belongs on Gherkin — preventing cross-domain tag confusion that causes documentation drift. Definition of Done validation ensures completed patterns have all deliverables marked done and at least one acceptance-criteria scenario.
+Validation is the enforcement boundary — it ensures that every change to annotated source files respects the delivery lifecycle rules defined by the FSM, protection levels, and scope constraints. The system operates in three layers: the FSM validator checks status transitions against a 4-state directed graph, the Process Guard orchestrates commit-time validation using a Decider pattern (state derived from annotations, not stored separately), and the lint engine provides pluggable rule execution with pretty and JSON output. Anti-pattern detection enforces dual-source ownership boundaries — `@architect-uses` belongs on TypeScript, `@architect-depends-on` belongs on Gherkin — preventing cross-domain tag confusion that causes documentation drift. Definition of Done validation ensures completed patterns have all deliverables marked done and at least one acceptance-criteria scenario.
 
 **25 patterns** — 16 completed, 3 active, 6 planned
 
@@ -49,9 +49,9 @@ Validation is the enforcement boundary — it ensures that every change to annot
 
 > **How do I query process state?**
 
-The Data API provides direct terminal access to delivery process state. It replaces reading generated markdown or launching explore agents — targeted queries use 5-10x less context. The `context` command assembles curated bundles tailored to session type (planning, design, implement).
+The Data API provides direct terminal access to project state. It replaces reading generated markdown or launching explore agents — targeted queries use 5-10x less context. The `context` command assembles curated bundles tailored to session type (planning, design, implement).
 
-**41 patterns** — 24 completed, 14 active, 3 planned
+**40 patterns** — 23 completed, 15 active, 2 planned
 
 **Key patterns:** DataAPIContextAssembly, ProcessStateAPICLI, DataAPIDesignSessionSupport, DataAPIRelationshipGraph, DataAPIOutputShaping
 
@@ -81,14 +81,14 @@ Process defines the USDP-inspired session workflow that governs how work moves t
 
 | Area                                            | Patterns | Completed | Active | Planned |
 | ----------------------------------------------- | -------- | --------- | ------ | ------- |
-| [Annotation](product-areas/ANNOTATION.md)       | 26       | 23        | 2      | 1       |
+| [Annotation](product-areas/ANNOTATION.md)       | 27       | 24        | 2      | 1       |
 | [Configuration](product-areas/CONFIGURATION.md) | 11       | 8         | 0      | 3       |
 | [Generation](product-areas/GENERATION.md)       | 95       | 81        | 6      | 8       |
 | [Validation](product-areas/VALIDATION.md)       | 25       | 16        | 3      | 6       |
-| [DataAPI](product-areas/DATA-API.md)            | 41       | 24        | 14     | 3       |
+| [DataAPI](product-areas/DATA-API.md)            | 40       | 23        | 15     | 2       |
 | [CoreTypes](product-areas/CORE-TYPES.md)        | 11       | 7         | 4      | 0       |
 | [Process](product-areas/PROCESS.md)             | 11       | 4         | 0      | 7       |
-| **Total**                                       | **220**  | **163**   | **29** | **28**  |
+| **Total**                                       | **220**  | **163**   | **30** | **27**  |
 
 ---
 
@@ -103,7 +103,7 @@ C4Context
         System(ConfigResolver, "ConfigResolver")
         System(ConfigurationPresets, "ConfigurationPresets")
         System(SourceMerger, "SourceMerger")
-        System(DeliveryProcessFactory, "DeliveryProcessFactory")
+        System(ArchitectFactory, "ArchitectFactory")
         System(DefineConfig, "DefineConfig")
         System(ConfigLoader, "ConfigLoader")
     }
@@ -134,15 +134,15 @@ C4Context
     System_Ext(DocGenerationProofOfConcept, "DocGenerationProofOfConcept")
     System_Ext(DataAPIStubIntegration, "DataAPIStubIntegration")
     Rel(ConfigResolver, ProjectConfigTypes, "uses")
-    Rel(ConfigResolver, DeliveryProcessFactory, "uses")
+    Rel(ConfigResolver, ArchitectFactory, "uses")
     Rel(ConfigResolver, ConfigurationDefaults, "uses")
     Rel(ConfigurationPresets, ConfigurationTypes, "uses")
     Rel(SourceMerger, ProjectConfigTypes, "uses")
-    Rel(DeliveryProcessFactory, ConfigurationTypes, "uses")
-    Rel(DeliveryProcessFactory, ConfigurationPresets, "uses")
-    Rel(DeliveryProcessFactory, RegexBuilders, "uses")
+    Rel(ArchitectFactory, ConfigurationTypes, "uses")
+    Rel(ArchitectFactory, ConfigurationPresets, "uses")
+    Rel(ArchitectFactory, RegexBuilders, "uses")
     Rel(DefineConfig, ProjectConfigTypes, "uses")
-    Rel(ConfigLoader, DeliveryProcessFactory, "uses")
+    Rel(ConfigLoader, ArchitectFactory, "uses")
     Rel(ConfigLoader, ConfigurationTypes, "uses")
     Rel(CompositeCodec, ReferenceDocShowcase, "implements")
     Rel(ADR003SourceFirstPatternArchitecture, ADR001TaxonomyCanonicalValues, "depends on")
@@ -182,7 +182,7 @@ graph LR
         ConfigResolver("ConfigResolver")
         ConfigurationPresets["ConfigurationPresets"]
         SourceMerger("SourceMerger")
-        DeliveryProcessFactory("DeliveryProcessFactory")
+        ArchitectFactory("ArchitectFactory")
         DefineConfig[/"DefineConfig"/]
         ConfigLoader[/"ConfigLoader"/]
     end
@@ -215,15 +215,15 @@ graph LR
         DataAPIStubIntegration["DataAPIStubIntegration"]:::neighbor
     end
     ConfigResolver -->|uses| ProjectConfigTypes
-    ConfigResolver -->|uses| DeliveryProcessFactory
+    ConfigResolver -->|uses| ArchitectFactory
     ConfigResolver -->|uses| ConfigurationDefaults
     ConfigurationPresets -->|uses| ConfigurationTypes
     SourceMerger -->|uses| ProjectConfigTypes
-    DeliveryProcessFactory -->|uses| ConfigurationTypes
-    DeliveryProcessFactory -->|uses| ConfigurationPresets
-    DeliveryProcessFactory -->|uses| RegexBuilders
+    ArchitectFactory -->|uses| ConfigurationTypes
+    ArchitectFactory -->|uses| ConfigurationPresets
+    ArchitectFactory -->|uses| RegexBuilders
     DefineConfig -->|uses| ProjectConfigTypes
-    ConfigLoader -->|uses| DeliveryProcessFactory
+    ConfigLoader -->|uses| ArchitectFactory
     ConfigLoader -->|uses| ConfigurationTypes
     CompositeCodec ..->|implements| ReferenceDocShowcase
     ADR003SourceFirstPatternArchitecture -.->|depends on| ADR001TaxonomyCanonicalValues

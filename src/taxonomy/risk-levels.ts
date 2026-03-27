@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-pattern RiskLevels
- * @libar-docs-status completed
- * @libar-docs-core
- * @libar-docs-extract-shapes RISK_LEVELS, RiskLevel
+ * @architect
+ * @architect-pattern RiskLevels
+ * @architect-status completed
+ * @architect-core
+ * @architect-extract-shapes RISK_LEVELS, RiskLevel
  *
  * ## Risk Levels for Planning and Assessment
  *

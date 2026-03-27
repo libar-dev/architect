@@ -5,7 +5,7 @@
  * Ensures summary counts match phase table sums and backlog patterns are counted
  * correctly using pattern.id rather than patternName.
  *
- * @libar-docs
+ * @architect
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';

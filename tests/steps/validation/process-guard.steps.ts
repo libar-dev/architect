@@ -7,7 +7,7 @@
  * Key insight: The decider is a pure function - tests create in-memory
  * ProcessState and ChangeDetection objects without any git operations.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

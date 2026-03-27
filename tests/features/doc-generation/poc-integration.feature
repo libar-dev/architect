@@ -1,7 +1,8 @@
-@libar-docs
-@libar-docs-pattern:PocIntegration
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:PocIntegration
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Generation
 Feature: Documentation Generation POC Integration
 
   End-to-end integration tests that exercise the full documentation generation
@@ -25,7 +26,7 @@ Feature: Documentation Generation POC Integration
 
     @acceptance-criteria @integration
     Scenario: Load actual POC decision document
-      Given the POC decision document at "delivery-process/specs/doc-generation-proof-of-concept.feature"
+      Given the POC decision document at "architect/specs/doc-generation-proof-of-concept.feature"
       When parsing the decision document
       Then parsed content should have correct structure
 
@@ -110,7 +111,7 @@ Feature: Documentation Generation POC Integration
     @acceptance-criteria @integration
     Scenario: Extract Scenario Outline Examples from process-guard-linter.feature
       Given the source mapper with base directory at project root
-      When extracting from "delivery-process/specs/process-guard-linter.feature" with method "Scenario Outline Examples"
+      When extracting from "architect/specs/process-guard-linter.feature" with method "Scenario Outline Examples"
       Then extracted content should contain protection level table
 
   # ============================================================================

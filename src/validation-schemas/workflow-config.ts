@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-validation @libar-docs-config
- * @libar-docs-pattern WorkflowConfigSchema
- * @libar-docs-status completed
- * @libar-docs-used-by WorkflowLoader, ConfigurableWorkflows
+ * @architect
+ * @architect-validation @architect-config
+ * @architect-pattern WorkflowConfigSchema
+ * @architect-status completed
+ * @architect-used-by WorkflowLoader, ConfigurableWorkflows
  *
  * ## WorkflowConfigSchema - Workflow Configuration Validation
  *

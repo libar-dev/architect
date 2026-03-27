@@ -1,7 +1,7 @@
 /**
- * @libar-docs
- * @libar-docs-implements TagRegistryBuilderTesting
- * @libar-docs-uses RegistryBuilder, TagRegistry
+ * @architect
+ * @architect-implements TagRegistryBuilderTesting
+ * @architect-uses RegistryBuilder, TagRegistry
  *
  * Tag Registry Builder Step Definitions
  *

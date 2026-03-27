@@ -1,22 +1,22 @@
 /**
- * @libar-docs
- * @libar-docs-lint
- * @libar-docs-pattern DetectChanges
- * @libar-docs-status active
- * @libar-docs-implements ProcessGuardLinter
- * @libar-docs-uses DeriveProcessState
+ * @architect
+ * @architect-lint
+ * @architect-pattern DetectChanges
+ * @architect-status active
+ * @architect-implements ProcessGuardLinter
+ * @architect-uses DeriveProcessState
  *
  * ## DetectChanges - Git Diff Change Detection
  *
  * Detects changes from git diff including:
  * - Modified, added, deleted files
- * - Status transitions (@libar-docs-status changes)
+ * - Status transitions (@architect-status changes)
  * - Deliverable changes in Background tables
  *
  * ### Design Principles
  *
  * - **Parse Git Output**: Uses `git diff --name-status` and `git diff`
- * - **Status Detection**: Regex patterns for @libar-docs-status changes
+ * - **Status Detection**: Regex patterns for @architect-status changes
  * - **Deliverable Detection**: Parses DataTable changes
  *
  * Note: Taxonomy modification detection was removed when taxonomy
@@ -31,6 +31,7 @@
  */
 
 import * as path from 'path';
+import { globSync } from 'glob';
 import type { Result } from '../../types/index.js';
 import { Result as R } from '../../types/index.js';
 import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from '../../taxonomy/index.js';
@@ -44,14 +45,17 @@ import type {
 import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
 import { DEFAULT_STATUS } from '../../taxonomy/status-values.js';
 import type { WithTagRegistry } from '../../validation/types.js';
+import { DEFAULT_PROCESS_GUARD_SPEC_PATTERNS } from './derive-state.js';
 
 /**
  * Options for change detection functions.
  *
- * Currently only includes registry from WithTagRegistry, but kept as a
- * separate interface for future extensibility (e.g., adding filter options).
+ * Includes registry and optional feature globs so diff parsing can be
+ * scoped to the same workflow-authoritative files used for state derivation.
  */
-export type ChangeDetectionOptions = WithTagRegistry;
+export type ChangeDetectionOptions = WithTagRegistry & {
+  readonly featurePatterns?: readonly string[];
+};
 
 // =============================================================================
 // Core Functions
@@ -85,12 +89,13 @@ export function detectStagedChanges(
 
     // Get full diff for content analysis
     const diff = execGitSafe('diff', ['--cached'], baseDir);
+    const featureFiles = filterFeatureScopedFiles(baseDir, [...modified, ...added], options);
 
     // Detect status transitions
-    const statusTransitions = detectStatusTransitions(diff, [...modified, ...added], tagPrefix);
+    const statusTransitions = detectStatusTransitions(diff, featureFiles, tagPrefix);
 
     // Detect deliverable changes
-    const deliverableChanges = detectDeliverableChanges(diff, [...modified, ...added]);
+    const deliverableChanges = detectDeliverableChanges(diff, featureFiles);
 
     return R.ok({
       modifiedFiles: modified,
@@ -132,12 +137,13 @@ export function detectBranchChanges(
 
     // Get full diff
     const diff = execGitSafe('diff', [mergeBase], baseDir);
+    const featureFiles = filterFeatureScopedFiles(baseDir, [...modified, ...added], options);
 
     // Detect status transitions
-    const statusTransitions = detectStatusTransitions(diff, [...modified, ...added], tagPrefix);
+    const statusTransitions = detectStatusTransitions(diff, featureFiles, tagPrefix);
 
     // Detect deliverable changes
-    const deliverableChanges = detectDeliverableChanges(diff, [...modified, ...added]);
+    const deliverableChanges = detectDeliverableChanges(diff, featureFiles);
 
     return R.ok({
       modifiedFiles: modified,
@@ -187,12 +193,13 @@ export function detectFileChanges(
     // Get diff for modified files (use -- to separate paths from options)
     const diff =
       modified.length > 0 ? execGitSafe('diff', ['HEAD', '--', ...modified], baseDir) : '';
+    const featureFiles = filterFeatureScopedFiles(baseDir, [...modified, ...added], options);
 
     // Detect status transitions
-    const statusTransitions = detectStatusTransitions(diff, modified, tagPrefix);
+    const statusTransitions = detectStatusTransitions(diff, featureFiles, tagPrefix);
 
     // Detect deliverable changes
-    const deliverableChanges = detectDeliverableChanges(diff, modified);
+    const deliverableChanges = detectDeliverableChanges(diff, featureFiles);
 
     return R.ok({
       modifiedFiles: modified,
@@ -210,6 +217,29 @@ export function detectFileChanges(
 // =============================================================================
 // Status Transition Detection
 // =============================================================================
+
+function getProcessGuardFeaturePatterns(options?: ChangeDetectionOptions): readonly string[] {
+  const featurePatterns = options?.featurePatterns;
+  return featurePatterns !== undefined && featurePatterns.length > 0
+    ? featurePatterns
+    : DEFAULT_PROCESS_GUARD_SPEC_PATTERNS;
+}
+
+function filterFeatureScopedFiles(
+  baseDir: string,
+  files: readonly string[],
+  options?: ChangeDetectionOptions
+): string[] {
+  const featurePatterns = getProcessGuardFeaturePatterns(options);
+  const matchedFiles = new Set(
+    globSync([...featurePatterns], {
+      cwd: baseDir,
+      nodir: true,
+    }).map((file) => path.normalize(file))
+  );
+
+  return files.filter((file) => matchedFiles.has(path.normalize(file)));
+}
 
 /**
  * Escape special regex characters in a string
@@ -258,7 +288,7 @@ interface DiffFileParseState {
  *
  * @param diff - Git diff content
  * @param files - List of files to analyze
- * @param tagPrefix - Tag prefix to match (default: "@libar-docs-")
+ * @param tagPrefix - Tag prefix to match (default: "@architect-")
  */
 function detectStatusTransitions(
   diff: string,
@@ -303,7 +333,7 @@ function detectStatusTransitions(
 
     // Track line numbers from hunk headers (@@ -old,count +new,count @@)
     const hunkMatch = hunkHeaderPattern.exec(line);
-    if (hunkMatch?.[1]) {
+    if (hunkMatch?.[1] !== undefined) {
       // Hunk header gives starting line; we'll increment as we see lines
       state.newLineNumber = parseInt(hunkMatch[1], 10) - 1;
       // Reset docstring state at each hunk (conservative approach)

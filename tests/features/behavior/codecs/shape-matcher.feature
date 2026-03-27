@@ -1,9 +1,10 @@
-@libar-docs
+@architect
 @behavior @shape-matcher
-@libar-docs-pattern:ShapeMatcherTesting
-@libar-docs-status:completed
-@libar-docs-implements:ReferenceDocShowcase,DeclarationLevelShapeTagging
-@libar-docs-product-area:Generation
+@architect-pattern:ShapeMatcherTesting
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-implements:ReferenceDocShowcase,DeclarationLevelShapeTagging
+@architect-product-area:Generation
 Feature: Shape Source Pattern Matching
 
   Matches file paths against glob patterns for TypeScript shape extraction.
@@ -75,19 +76,19 @@ Feature: Shape Source Pattern Matching
       When matching path "other/generators/types.ts" against pattern "src/**/*.ts"
       Then the match result is false
 
-  Rule: Dataset shape extraction deduplicates by name
+  Rule: Source selectors deduplicate matching shapes by name
 
-    **Invariant:** When multiple patterns match a source glob, the returned shapes must be deduplicated by name so each shape appears at most once.
+    **Invariant:** When multiple patterns match a source selector, the returned shapes must be deduplicated by name so each shape appears at most once.
     **Rationale:** Duplicate shape names in generated documentation confuse readers and inflate type registries.
-    **Verified by:** Shapes are extracted from matching patterns, Duplicate shape names are deduplicated, No shapes returned when glob does not match
+    **Verified by:** Shapes are selected from matching source glob patterns, Duplicate shape names are deduplicated, No shapes returned when glob does not match
 
     @happy-path
-    Scenario: Shapes are extracted from matching patterns
+    Scenario: Shapes are selected from matching source glob patterns
       Given a MasterDataset with patterns:
         | filePath             | shapeName    | shapeKind  |
         | src/lint/rules.ts    | LintRule     | interface  |
         | src/lint/config.ts   | LintConfig   | type       |
-      When extracting shapes with source pattern "src/lint/*.ts"
+      When selecting shapes with source selector "src/lint/*.ts"
       Then 2 shapes are returned
       And the shape names are "LintRule" and "LintConfig"
 
@@ -97,7 +98,7 @@ Feature: Shape Source Pattern Matching
         | filePath             | shapeName    | shapeKind  |
         | src/lint/rules.ts    | LintRule     | interface  |
         | src/lint/config.ts   | LintRule     | type       |
-      When extracting shapes with source pattern "src/lint/*.ts"
+      When selecting shapes with source selector "src/lint/*.ts"
       Then 1 shapes are returned
 
     @edge-case
@@ -105,5 +106,5 @@ Feature: Shape Source Pattern Matching
       Given a MasterDataset with patterns:
         | filePath                | shapeName    | shapeKind  |
         | src/other/unrelated.ts  | Unrelated    | interface  |
-      When extracting shapes with source pattern "src/lint/*.ts"
+      When selecting shapes with source selector "src/lint/*.ts"
       Then 0 shapes are returned

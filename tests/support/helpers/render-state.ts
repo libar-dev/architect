@@ -6,7 +6,6 @@
  */
 import {
   renderToMarkdown,
-  renderToClaudeContext,
   renderToClaudeMdModule,
   renderDocumentWithFiles,
   type OutputFile,
@@ -31,7 +30,6 @@ import type { DataTableRow } from '../world.js';
 // Re-export for step files
 export {
   renderToMarkdown,
-  renderToClaudeContext,
   renderToClaudeMdModule,
   renderDocumentWithFiles,
   heading,
@@ -58,7 +56,6 @@ export interface RenderScenarioState {
 
   // Results
   markdown: string;
-  claudeContext: string;
   claudeMdModule: string;
   outputFiles: OutputFile[];
 
@@ -72,7 +69,6 @@ export function initState(): RenderScenarioState {
     doc: null,
     sections: [],
     markdown: '',
-    claudeContext: '',
     claudeMdModule: '',
     outputFiles: [],
     collapsibleSummary: '',

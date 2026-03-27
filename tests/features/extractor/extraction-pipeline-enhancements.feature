@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:ExtractionPipelineEnhancementsTesting
-@libar-docs-status:completed
-@libar-docs-implements:ReferenceDocShowcase
-@libar-docs-product-area:Annotation
+@architect
+@architect-pattern:ExtractionPipelineEnhancementsTesting
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-implements:ReferenceDocShowcase
+@architect-product-area:Annotation
 Feature: Extraction Pipeline Enhancements
 
   Validates extraction pipeline capabilities for ReferenceDocShowcase:
@@ -25,10 +26,10 @@ Feature: Extraction Pipeline Enhancements
     Scenario: Simple function signature is extracted with full types
       Given a TypeScript file with content:
         """
-        /** @libar-docs */
+        /** @architect */
 
         /**
-         * @libar-docs-core
+         * @architect-core
          * Simple utility
          */
         export function greet(name: string): string {
@@ -42,10 +43,10 @@ Feature: Extraction Pipeline Enhancements
     Scenario: Async function keeps async prefix in signature
       Given a TypeScript file with content:
         """
-        /** @libar-docs */
+        /** @architect */
 
         /**
-         * @libar-docs-core
+         * @architect-core
          * Async loader
          */
         export async function loadData(url: string): Promise<string> {
@@ -59,10 +60,10 @@ Feature: Extraction Pipeline Enhancements
     Scenario: Multi-parameter function has all types in signature
       Given a TypeScript file with content:
         """
-        /** @libar-docs */
+        /** @architect */
 
         /**
-         * @libar-docs-core
+         * @architect-core
          * Merge utility
          */
         export function merge(a: string[], b: string[], unique: boolean): string[] {
@@ -76,10 +77,10 @@ Feature: Extraction Pipeline Enhancements
     Scenario: Function with object parameter type preserves braces
       Given a TypeScript file with content:
         """
-        /** @libar-docs */
+        /** @architect */
 
         /**
-         * @libar-docs-core
+         * @architect-core
          * Config processor
          */
         export function configure(opts: { timeout: number; retries: number }): void {

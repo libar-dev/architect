@@ -1,7 +1,8 @@
-@libar-docs
-@libar-docs-pattern:ScannerCore
-@libar-docs-status:completed
-@libar-docs-product-area:Annotation
+@architect
+@architect-pattern:ScannerCore
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Annotation
 @behavior @scanner-core
 Feature: Scanner Core Integration
   The scanPatterns function orchestrates file discovery, directive detection,
@@ -9,7 +10,7 @@ Feature: Scanner Core Integration
 
   **Problem:**
   - Need to scan entire codebases for documentation directives efficiently
-  - Files without @libar-docs opt-in should be skipped to save processing time
+  - Files without @architect opt-in should be skipped to save processing time
   - Parse errors in one file shouldn't prevent scanning of other files
   - Must support exclusion patterns for node_modules, tests, and custom paths
 
@@ -36,11 +37,11 @@ Feature: Scanner Core Integration
       Given a file "src/auth.ts" with content:
         """
         /**
-         * @libar-docs
+         * @architect
          */
 
         /**
-         * @libar-docs-core @libar-docs-security
+         * @architect-core @architect-security
          * Authentication utilities
          */
         export function authenticate(username: string, password: string): boolean {
@@ -51,7 +52,7 @@ Feature: Scanner Core Integration
       Then the scan should succeed with 1 file
       And the scan should have 0 errors
       And file "auth.ts" should have 1 directive
-      And the directive should have tag "@libar-docs-core"
+      And the directive should have tag "@architect-core"
       And the directive should have 1 export
 
     @happy-path @basic-scanning
@@ -70,10 +71,10 @@ Feature: Scanner Core Integration
     Scenario: Extract complete directive information
       Given a file "src/complete.ts" with content:
         """
-        /** @libar-docs */
+        /** @architect */
 
         /**
-         * @libar-docs-core @libar-docs-validation
+         * @architect-core @architect-validation
          * Validates user input
          *
          * This function performs comprehensive validation
@@ -91,7 +92,7 @@ Feature: Scanner Core Integration
       When scanning with pattern "src/**/*.ts"
       Then the scan should succeed with 1 file
       And the scan should have 0 errors
-      And the directive should have tags "@libar-docs-core" and "@libar-docs-validation"
+      And the directive should have tags "@architect-core" and "@architect-validation"
       And the directive description should contain "Validates user input"
       And the directive description should also contain "comprehensive validation"
       And the directive should have 1 example
@@ -112,10 +113,10 @@ Feature: Scanner Core Integration
     Scenario: Collect errors for files that fail to parse
       Given a file "src/valid.ts" with content:
         """
-        /** @libar-docs */
+        /** @architect */
 
         /**
-         * @libar-docs-core
+         * @architect-core
          * Valid file
          */
         export function valid() {
@@ -124,10 +125,10 @@ Feature: Scanner Core Integration
         """
       And a file "src/invalid.ts" with content:
         """
-        /** @libar-docs */
+        /** @architect */
 
         /**
-         * @libar-docs-core
+         * @architect-core
          * This will fail
          */
         export function broken(
@@ -170,20 +171,20 @@ Feature: Scanner Core Integration
     Scenario: Respect exclusion patterns
       Given a file "src/public.ts" with content:
         """
-        /** @libar-docs */
+        /** @architect */
 
         /**
-         * @libar-docs-core
+         * @architect-core
          * Public API
          */
         export function publicApi() {}
         """
       And a file "src/internal/secret.ts" with content:
         """
-        /** @libar-docs */
+        /** @architect */
 
         /**
-         * @libar-docs-core
+         * @architect-core
          * Internal implementation
          */
         export function internalImpl() {}
@@ -197,26 +198,26 @@ Feature: Scanner Core Integration
     Scenario: Handle multiple files with multiple directives each
       Given a file "src/file1.ts" with content:
         """
-        /** @libar-docs */
+        /** @architect */
 
         /**
-         * @libar-docs-core
+         * @architect-core
          * First directive
          */
         export function first() {}
 
         /**
-         * @libar-docs-domain
+         * @architect-domain
          * Second directive
          */
         export function second() {}
         """
       And a file "src/file2.ts" with content:
         """
-        /** @libar-docs */
+        /** @architect */
 
         /**
-         * @libar-docs-validation
+         * @architect-validation
          * Third directive
          */
         export function third() {}
@@ -229,11 +230,11 @@ Feature: Scanner Core Integration
 
   Rule: File opt-in requirement gates scanning
 
-    **Invariant:** Only files containing a standalone @libar-docs marker (not @libar-docs-*) are eligible for directive extraction.
+    **Invariant:** Only files containing a standalone @architect marker (not @architect-*) are eligible for directive extraction.
 
     **Rationale:** Without opt-in gating, every TypeScript file in the monorepo would be parsed, wasting processing time on files that have no documentation directives.
 
-    **Verified by:** Handle files with quick directive check optimization, Skip files without @libar-docs file-level opt-in, Not confuse @libar-docs-* with @libar-docs opt-in, Detect @libar-docs opt-in combined with section tags
+    **Verified by:** Handle files with quick directive check optimization, Skip files without @architect file-level opt-in, Not confuse @architect-* with @architect opt-in, Detect @architect opt-in combined with section tags
 
     @happy-path @optimization
     Scenario: Handle files with quick directive check optimization
@@ -245,10 +246,10 @@ Feature: Scanner Core Integration
         """
       And a file "src/with-docs.ts" with content:
         """
-        /** @libar-docs */
+        /** @architect */
 
         /**
-         * @libar-docs-core
+         * @architect-core
          * Documented
          */
         export function documented() {
@@ -260,21 +261,21 @@ Feature: Scanner Core Integration
       And file "with-docs.ts" should be in the results
 
     @edge-case @opt-in-required
-    Scenario: Skip files without @libar-docs file-level opt-in
+    Scenario: Skip files without @architect file-level opt-in
       Given a file "src/no-optin.ts" with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * This file has section tags but no file-level opt-in
          */
         export function noOptIn() {}
         """
       And a file "src/with-optin.ts" with content:
         """
-        /** @libar-docs */
+        /** @architect */
 
         /**
-         * @libar-docs-core
+         * @architect-core
          * This file has proper opt-in
          */
         export function withOptIn() {}
@@ -285,11 +286,11 @@ Feature: Scanner Core Integration
       And the scan should have 0 errors
 
     @edge-case @opt-in-distinction
-    Scenario: Not confuse @libar-docs-* with @libar-docs opt-in
+    Scenario: Not confuse @architect-* with @architect opt-in
       Given a file "src/section-only.ts" with content:
         """
         /**
-         * @libar-docs-core @libar-docs-event-sourcing
+         * @architect-core @architect-event-sourcing
          * Multiple section tags but no opt-in
          */
         export function sectionOnly() {}
@@ -299,11 +300,11 @@ Feature: Scanner Core Integration
       And the scan should have 0 errors
 
     @happy-path @opt-in-combined
-    Scenario: Detect @libar-docs opt-in combined with section tags
+    Scenario: Detect @architect opt-in combined with section tags
       Given a file "src/combined.ts" with content:
         """
         /**
-         * @libar-docs @libar-docs-core
+         * @architect @architect-core
          * Combined opt-in and section tag
          */
         export function combined() {}
@@ -311,5 +312,5 @@ Feature: Scanner Core Integration
       When scanning with pattern "src/**/*.ts"
       Then the scan should succeed with 1 file
       And file "combined.ts" should have 1 directive
-      And the directive should have tag "@libar-docs-core"
+      And the directive should have tag "@architect-core"
       And the scan should have 0 errors

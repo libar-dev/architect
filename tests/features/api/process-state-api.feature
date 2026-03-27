@@ -1,9 +1,10 @@
-@libar-docs
-@libar-docs-implements:ProcessStateAPICLI
-@libar-docs-status:completed
+@architect
+@architect-implements:ProcessStateAPICLI
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
 @behavior @process-state-api
-@libar-docs-pattern:ProcessStateAPITesting
-@libar-docs-product-area:DataAPI
+@architect-pattern:ProcessStateAPITesting
+@architect-product-area:DataAPI
 Feature: Process State API
   Programmatic interface for querying delivery process state.
   Designed for Claude Code integration and tool automation.

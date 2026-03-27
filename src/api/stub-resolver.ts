@@ -1,10 +1,10 @@
 /**
- * @libar-docs
- * @libar-docs-pattern StubResolverImpl
- * @libar-docs-status active
- * @libar-docs-implements DataAPIStubIntegration
- * @libar-docs-uses ProcessStateAPI
- * @libar-docs-used-by ProcessAPICLIImpl
+ * @architect
+ * @architect-pattern StubResolverImpl
+ * @architect-status active
+ * @architect-implements DataAPIStubIntegration
+ * @architect-uses ProcessStateAPI
+ * @architect-used-by ProcessAPICLIImpl
  *
  * ## StubResolver — Design Stub Discovery and Resolution
  *
@@ -13,10 +13,10 @@
  *
  * Stub identification heuristic:
  * - Source file path contains `/stubs/` (lives in stubs directory), OR
- * - Pattern has a `targetPath` field (from @libar-docs-target tag)
+ * - Pattern has a `targetPath` field (from @architect-target tag)
  *
  * Resolution uses a `fileExists` callback (defaulting to `fs.existsSync()`) on
- * targetPath — not pipeline data — because target files may not have `@libar-docs`
+ * targetPath — not pipeline data — because target files may not have `@architect`
  * annotations. The callback enables testing without filesystem side effects.
  *
  * **When to Use:** When querying design stub status via the `stubs` CLI subcommand or when checking stub resolution in scope validation.
@@ -40,11 +40,11 @@ export interface StubResolution {
   readonly stubName: string;
   /** Source file path of the stub */
   readonly stubFile: string;
-  /** Target implementation path (from @libar-docs-target) */
+  /** Target implementation path (from @architect-target) */
   readonly targetPath: string;
-  /** Design session that created this stub (from @libar-docs-since) */
+  /** Design session that created this stub (from @architect-since) */
   readonly since: string | undefined;
-  /** Parent pattern this stub implements (from @libar-docs-implements) */
+  /** Parent pattern this stub implements (from @architect-implements) */
   readonly implementsPattern: string | undefined;
   /** Whether the target file exists on disk */
   readonly targetExists: boolean;
@@ -97,7 +97,7 @@ export interface PdrReference {
  *
  * A pattern is a stub if:
  * 1. Its source file path contains '/stubs/' (lives in stubs directory), OR
- * 2. It has a `targetPath` field (from @libar-docs-target tag)
+ * 2. It has a `targetPath` field (from @architect-target tag)
  */
 export function findStubPatterns(dataset: MasterDataset): readonly ExtractedPattern[] {
   return dataset.patterns.filter(

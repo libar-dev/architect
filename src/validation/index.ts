@@ -1,8 +1,8 @@
 /**
- * @libar-docs
- * @libar-docs-validation
- * @libar-docs-pattern ValidationModule
- * @libar-docs-status completed
+ * @architect
+ * @architect-validation
+ * @architect-pattern ValidationModule
+ * @architect-status completed
  *
  * ## ValidationModule - DoD Validation and Anti-Pattern Detection
  *

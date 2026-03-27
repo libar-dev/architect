@@ -4,7 +4,7 @@
  * Shared state management, step handler functions, and imports for the split
  * ast-parser test files (exports, metadata, relationships-edges).
  *
- * @libar-docs
+ * @architect
  */
 
 import { expect } from 'vitest';

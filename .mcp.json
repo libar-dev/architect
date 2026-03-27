@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "delivery-process": {
+    "architect": {
       "command": "npx",
       "args": ["tsx", "src/cli/mcp-server.ts", "--watch"]
     }

@@ -1,7 +1,7 @@
 /**
- * @libar-docs
- * @libar-docs-implements NormalizedStatusTesting
- * @libar-docs-uses NormalizedStatus
+ * @architect
+ * @architect-implements NormalizedStatusTesting
+ * @architect-uses NormalizedStatus
  *
  * Normalized Status Step Definitions
  *

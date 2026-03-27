@@ -1,14 +1,14 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern DesignReviewGenerator
- * @libar-docs-status active
- * @libar-docs-implements DesignReviewGeneration
- * @libar-docs-arch-role service
- * @libar-docs-arch-context generator
- * @libar-docs-arch-layer application
- * @libar-docs-uses DesignReviewCodec, MasterDataset, SequenceIndex
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-core
+ * @architect-pattern DesignReviewGenerator
+ * @architect-status active
+ * @architect-implements DesignReviewGeneration
+ * @architect-arch-role service
+ * @architect-arch-context generator
+ * @architect-arch-layer application
+ * @architect-uses DesignReviewCodec, MasterDataset, SequenceIndex
+ * @architect-product-area:Generation
  *
  * ## DesignReviewGenerator
  *
@@ -16,7 +16,7 @@
  * Auto-discovers annotated patterns from MasterDataset.sequenceIndex and
  * produces one design review per entry.
  *
- * Output: `delivery-process/design-reviews/{pattern-name}.md`
+ * Output: `architect/design-reviews/{pattern-name}.md`
  */
 
 import * as fs from 'node:fs/promises';

@@ -16,7 +16,7 @@
  * using DocStrings because DocStrings containing code fences (```)
  * are mishandled by vitest-cucumber.
  *
- * @libar-docs
+ * @architect
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';

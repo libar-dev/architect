@@ -42,7 +42,7 @@ graph TD
 Implementation sessions MUST follow this strict 5-step sequence. Skipping steps causes Process Guard rejection at commit time.
 
 1. **Transition to `active` FIRST** (before any code changes)
-2. **Create executable spec stubs** (if `@libar-docs-executable-specs` present)
+2. **Create executable spec stubs** (if `@architect-executable-specs` present)
 3. **For each deliverable:** implement, test, update status to `complete`
 4. **Transition to `completed`** (only when ALL deliverables done)
 5. **Regenerate docs:** `pnpm docs:all`
@@ -65,8 +65,8 @@ Implementation sessions MUST follow this strict 5-step sequence. Skipping steps 
 ### Context Gathering
 
 ```bash
-pnpm process:query -- overview                                # Project health
-pnpm process:query -- list --status roadmap --names-only      # Available patterns
+pnpm architect:query -- overview                                # Project health
+pnpm architect:query -- list --status roadmap --names-only      # Available patterns
 ```
 
 ### Planning Checklist
@@ -76,7 +76,7 @@ pnpm process:query -- list --status roadmap --names-only      # Available patter
 - [ ] **Structure the feature** with Problem/Solution, tags, deliverables table
 - [ ] **Convert constraints to Rule: blocks** with Invariant/Rationale
 - [ ] **Add scenarios** per Rule: 1 happy-path + 1 validation minimum
-- [ ] **Set executable specs location** via `@libar-docs-executable-specs` tag
+- [ ] **Set executable specs location** via `@architect-executable-specs` tag
 
 ### Planning Do NOT
 
@@ -93,9 +93,9 @@ pnpm process:query -- list --status roadmap --names-only      # Available patter
 ### Context Gathering
 
 ```bash
-pnpm process:query -- context <PatternName> --session design  # Full context bundle
-pnpm process:query -- dep-tree <PatternName>                  # Dependency chain
-pnpm process:query -- stubs <PatternName>                     # Existing design stubs
+pnpm architect:query -- context <PatternName> --session design  # Full context bundle
+pnpm architect:query -- dep-tree <PatternName>                  # Dependency chain
+pnpm architect:query -- stubs <PatternName>                     # Existing design stubs
 ```
 
 ### When to Use Design Sessions
@@ -108,12 +108,12 @@ pnpm process:query -- stubs <PatternName>                     # Existing design 
 
 ### Design Checklist
 
-- [ ] **Record decisions** as PDR `.feature` files in `delivery-process/decisions/`
+- [ ] **Record decisions** as PDR `.feature` files in `architect/decisions/`
 - [ ] **Document options** with at least 2-3 approaches and pros/cons
 - [ ] **Get approval** from user on recommended approach
-- [ ] **Create code stubs** in `delivery-process/stubs/{pattern-name}/`
+- [ ] **Create code stubs** in `architect/stubs/{pattern-name}/`
 - [ ] **Verify stub identifier spelling** before committing
-- [ ] **List canonical helpers** in `@libar-docs-uses` tags
+- [ ] **List canonical helpers** in `@architect-uses` tags
 
 ### Design Do NOT
 
@@ -143,8 +143,8 @@ pnpm process:query -- stubs <PatternName>                     # Existing design 
 For multi-session work, capture state at session boundaries using the Process Data API.
 
 ```bash
-pnpm process:query -- handoff --pattern <PatternName>
-pnpm process:query -- handoff --pattern <PatternName> --git   # include recent commits
+pnpm architect:query -- handoff --pattern <PatternName>
+pnpm architect:query -- handoff --pattern <PatternName> --git   # include recent commits
 ```
 
 ---
@@ -164,7 +164,7 @@ pnpm process:query -- handoff --pattern <PatternName> --git   # include recent c
 
 ### SessionGuidesModuleSource
 
-[View SessionGuidesModuleSource source](delivery-process/specs/session-guides-module-source.feature)
+[View SessionGuidesModuleSource source](architect/specs/session-guides-module-source.feature)
 
 **Problem:**
 CLAUDE.md contains a "Session Workflows" section (~160 lines) that is hand-maintained
@@ -172,7 +172,7 @@ with no link to any annotated source. Three hand-written files in `_claude-md/wo
 (session-workflows.md, session-details.md, fsm-handoff.md) are equally opaque: no
 machine-readable origin, no regeneration from source annotations.
 
-The prior plan proposed tagging ADR-001, ADR-003, and PDR-001 with `@libar-docs-claude-module`
+The prior plan proposed tagging ADR-001, ADR-003, and PDR-001 with `@architect-claude-module`
 to make them the source for generated workflow modules. Design analysis revealed this is
 fundamentally flawed: `claude-module` is a file-level tag that pulls ALL Rules from a file,
 but most Rules in those decision specs are irrelevant to session workflows (ADR-001 has 9
@@ -184,8 +184,8 @@ This spec file itself becomes the annotated source for session workflow content.
 Session workflow invariants are captured as Rule: blocks here, covering session type
 contracts, FSM protection, execution order, error recovery, and handoff patterns.
 
-Once ClaudeModuleGeneration (Phase 25) ships, adding `@libar-docs-claude-module` and
-`@libar-docs-claude-section:workflow` tags to this spec will cause the codec to produce
+Once ClaudeModuleGeneration (Phase 25) ships, adding `@architect-claude-module` and
+`@architect-claude-section:workflow` tags to this spec will cause the codec to produce
 `_claude-md/workflow/` modules automatically. The hand-written files are then deleted
 and the CLAUDE.md section becomes a generated include.
 
@@ -285,7 +285,7 @@ Three-layer architecture after Phase 39:
 
 **Invariant:** A design session makes architectural decisions and creates code stubs with interfaces. It must not produce implementation code. Context gathering via the Process Data API must precede any explore agent usage.
 
-**Rationale:** Design sessions resolve ambiguity before implementation begins. Code stubs in delivery-process/stubs/ live outside src/ to avoid TypeScript compilation and ESLint issues, making them zero-risk artifacts.
+**Rationale:** Design sessions resolve ambiguity before implementation begins. Code stubs in architect/stubs/ live outside src/ to avoid TypeScript compilation and ESLint issues, making them zero-risk artifacts.
 
 **Verified by:**
 
@@ -309,7 +309,7 @@ Three-layer architecture after Phase 39:
 
   Execution order:
   1. Transition to active FIRST (before any code changes)
-  2. Create executable spec stubs (if libar-docs-executable-specs present)
+  2. Create executable spec stubs (if @architect-executable-specs present)
   3. For each deliverable: implement
 
 - test
@@ -368,12 +368,12 @@ Three-layer architecture after Phase 39:
 
 #### ClaudeModuleGeneration is the generation mechanism
 
-**Invariant:** Phase 39 depends on ClaudeModuleGeneration (Phase 25). Adding `@libar-docs-claude-module` and `@libar-docs-claude-section:workflow` tags to this spec will cause ClaudeModuleGeneration to produce `_claude-md/workflow/` output files. The hand-written `_claude-md/workflow/` files are deleted after successful verified generation.
+**Invariant:** Phase 39 depends on ClaudeModuleGeneration (Phase 25). Adding `@architect-claude-module` and `@architect-claude-section:workflow` tags to this spec will cause ClaudeModuleGeneration to produce `_claude-md/workflow/` output files. The hand-written `_claude-md/workflow/` files are deleted after successful verified generation.
 
 **Rationale:** The annotation work (Rule blocks in this spec) is immediately useful — queryable via `pnpm process:query -- rules`. Generation deliverables cannot complete until Phase 25 ships the ClaudeModuleCodec. This sequencing is intentional: the annotation investment has standalone value regardless of whether the codec exists yet.
 
 **Prerequisite:** Phase 25 must add `workflow` to the `claude-section` enum
-values (currently: core, delivery-process, testing, infrastructure).
+values (currently: core, process, testing, infrastructure).
 
 **Verified by:**
 

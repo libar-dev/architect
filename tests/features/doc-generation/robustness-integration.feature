@@ -1,7 +1,8 @@
-@libar-docs
-@libar-docs-pattern:RobustnessIntegration
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:RobustnessIntegration
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Generation
 Feature: Robustness Integration
 
   **Context:** Document generation pipeline needs validation, deduplication, and

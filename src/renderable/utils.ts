@@ -1,8 +1,8 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern RenderableUtils
- * @libar-docs-status completed
+ * @architect
+ * @architect-core
+ * @architect-pattern RenderableUtils
+ * @architect-status completed
  *
  * ## Renderable Utilities
  *
@@ -267,8 +267,7 @@ export function extractSummary(description: string, patternName?: string): strin
 // Progress & Counts
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Note: StatusCounts type is now imported from validation-schemas (canonical source)
-// and re-exported above for backward compatibility
+// StatusCounts type imported from validation-schemas (canonical source)
 
 /**
  * Compute status counts from patterns

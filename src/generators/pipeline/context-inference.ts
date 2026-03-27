@@ -1,12 +1,12 @@
 /**
- * @libar-docs
- * @libar-docs-pattern ContextInferenceImpl
- * @libar-docs-status completed
- * @libar-docs-implements ContextInference
- * @libar-docs-arch-role utility
- * @libar-docs-arch-context generator
- * @libar-docs-arch-layer application
- * @libar-docs-used-by TransformDataset
+ * @architect
+ * @architect-pattern ContextInferenceImpl
+ * @architect-status completed
+ * @architect-implements ContextInference
+ * @architect-arch-role utility
+ * @architect-arch-context generator
+ * @architect-arch-layer application
+ * @architect-used-by TransformDataset
  *
  * ## ContextInference - File Path Based Context Resolution
  *
@@ -18,8 +18,8 @@
 /**
  * Rule for auto-inferring bounded context from file paths.
  *
- * When a pattern has an architecture layer (`@libar-docs-arch-layer`) but no explicit
- * context (`@libar-docs-arch-context`), these rules can infer the context from the
+ * When a pattern has an architecture layer (`@architect-arch-layer`) but no explicit
+ * context (`@architect-arch-context`), these rules can infer the context from the
  * file path. This reduces annotation redundancy when directory structure already
  * implies the bounded context.
  *

@@ -30,9 +30,9 @@ Process Guard validates delivery workflow changes at commit time. For FSM concep
 
 | Situation                     | Solution                           | Example                                       |
 | ----------------------------- | ---------------------------------- | --------------------------------------------- |
-| Fix bug in completed spec     | Add `@*-unlock-reason:'reason'`    | `@libar-docs-unlock-reason:'Fix typo'`        |
-| Modify outside session scope  | `--ignore-session` flag            | `lint-process --staged --ignore-session`      |
-| CI treats warnings as errors  | `--strict` flag                    | `lint-process --all --strict`                 |
+| Fix bug in completed spec     | Add `@*-unlock-reason:'reason'`    | `@architect-unlock-reason:'Fix typo'`         |
+| Modify outside session scope  | `--ignore-session` flag            | `architect-guard --staged --ignore-session`   |
+| CI treats warnings as errors  | `--strict` flag                    | `architect-guard --all --strict`              |
 | Skip workflow (legacy import) | Multiple transitions in one commit | Set `roadmap` then `completed` in same commit |
 
 ---
@@ -46,18 +46,18 @@ Process Guard validates delivery workflow changes at commit time. For FSM concep
 ```text
 [ERROR] specs/phase-state-machine.feature
   Cannot modify completed spec without unlock reason
-  Suggestion: Add @libar-docs-unlock-reason:'reason for modification'
+  Suggestion: Add @architect-unlock-reason:'reason for modification'
 ```
 
-**Cause:** File has `@libar-docs-status:completed` but no unlock annotation.
+**Cause:** File has `@architect-status:completed` but no unlock annotation.
 
 **Fix:** Add unlock reason explaining why modification is necessary:
 
 ```gherkin
-@libar-docs
-@libar-docs-pattern:PhaseStateMachine
-@libar-docs-status:completed
-@libar-docs-unlock-reason:'Fix incorrect FSM diagram in documentation'
+@architect
+@architect-pattern:PhaseStateMachine
+@architect-status:completed
+@architect-unlock-reason:'Fix incorrect FSM diagram in documentation'
 Feature: Phase State Machine
 ```
 
@@ -87,10 +87,10 @@ Feature: Phase State Machine
 
 ```gherkin
 # Step 1: Move to active
-@libar-docs-status:active
+@architect-status:active
 
 # Step 2: After implementation complete, move to completed
-@libar-docs-status:completed
+@architect-status:completed
 ```
 
 **Common invalid transitions:**
@@ -121,9 +121,9 @@ Feature: Phase State Machine
 1. **Remove the new deliverable** — Keep scope locked during implementation
 2. **Revert to roadmap** — If scope genuinely needs to expand:
    ```gherkin
-   @libar-docs-status:roadmap  # Temporarily revert
+   @architect-status:roadmap  # Temporarily revert
    # Add deliverable, then:
-   @libar-docs-status:active   # Resume implementation
+   @architect-status:active   # Resume implementation
    ```
 
 **Why this rule exists:** Prevents scope creep during implementation. Plan fully before starting; implement what was planned.
@@ -147,7 +147,7 @@ Feature: Phase State Machine
 1. **Add to session scope** — If this file should be in scope
 2. **Use `--ignore-session`** — For intentional out-of-scope changes:
    ```bash
-   lint-process --staged --ignore-session
+   architect-guard --staged --ignore-session
    ```
 
 ---
@@ -169,7 +169,7 @@ Feature: Phase State Machine
 1. **Remove from exclusion list** — If exclusion was a mistake
 2. **Use `--ignore-session`** — For emergency changes:
    ```bash
-   lint-process --staged --ignore-session
+   architect-guard --staged --ignore-session
    ```
 
 ---
@@ -226,19 +226,19 @@ lint-process [options]
 
 ```bash
 # Pre-commit hook (recommended)
-lint-process --staged
+architect-guard --staged
 
 # CI pipeline with strict mode
-lint-process --all --strict
+architect-guard --all --strict
 
 # Validate specific file
-lint-process --file specs/my-feature.feature
+architect-guard --file specs/my-feature.feature
 
 # Debug: see what state was derived
-lint-process --staged --show-state
+architect-guard --staged --show-state
 
 # Override session scope for emergency fix
-lint-process --staged --ignore-session
+architect-guard --staged --ignore-session
 ```
 
 ---
@@ -252,7 +252,7 @@ lint-process --staged --ignore-session
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-npx lint-process --staged
+npx architect-guard --staged
 ```
 
 ### package.json
@@ -260,8 +260,8 @@ npx lint-process --staged
 ```json
 {
   "scripts": {
-    "lint:process": "lint-process --staged",
-    "lint:process:ci": "lint-process --all --strict"
+    "lint:process": "architect-guard --staged",
+    "lint:process:ci": "architect-guard --all --strict"
   }
 }
 ```
@@ -277,7 +277,7 @@ import {
   validateChanges,
   hasErrors,
   summarizeResult,
-} from '@libar-dev/delivery-process/lint';
+} from '@libar-dev/architect/lint';
 
 // 1. Derive state from annotations
 const state = (await deriveProcessState({ baseDir: '.' })).value;

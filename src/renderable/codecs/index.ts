@@ -1,8 +1,8 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern DocumentCodecs
- * @libar-docs-status completed
+ * @architect
+ * @architect-core
+ * @architect-pattern DocumentCodecs
+ * @architect-status completed
  *
  * ## Document Codecs
  *

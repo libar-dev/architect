@@ -1,7 +1,8 @@
-@libar-docs
-@libar-docs-pattern:SourceMerging
-@libar-docs-status:completed
-@libar-docs-product-area:Configuration
+@architect
+@architect-pattern:SourceMerging
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Configuration
 @behavior @config
 Feature: Source Merging - Per-Generator Override Resolution
   mergeSourcesForGenerator computes effective sources for a specific

@@ -19,8 +19,8 @@ import { resolveFeatureStepPairs } from './pair-resolver.js';
  */
 const DEFAULT_FEATURE_GLOBS = [
   'tests/features/**/*.feature',
-  'delivery-process/specs/**/*.feature',
-  'delivery-process/decisions/**/*.feature',
+  'architect/specs/**/*.feature',
+  'architect/decisions/**/*.feature',
 ];
 
 const DEFAULT_STEP_GLOBS = ['tests/steps/**/*.steps.ts'];

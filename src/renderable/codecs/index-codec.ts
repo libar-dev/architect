@@ -1,11 +1,11 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern IndexCodec
- * @libar-docs-status completed
- * @libar-docs-convention codec-registry
- * @libar-docs-product-area:Generation
- * @libar-docs-implements EnhancedIndexGeneration
+ * @architect
+ * @architect-core
+ * @architect-pattern IndexCodec
+ * @architect-status completed
+ * @architect-convention codec-registry
+ * @architect-product-area:Generation
+ * @architect-implements EnhancedIndexGeneration
  *
  * ## IndexCodec
  *
@@ -172,7 +172,7 @@ function buildIndexDocument(
 
   return document('Documentation Index', sections, {
     purpose:
-      'Navigate the full documentation set for @libar-dev/delivery-process. ' +
+      'Navigate the full documentation set for @libar-dev/architect. ' +
       'Use section links for targeted reading.',
   });
 }
@@ -190,8 +190,8 @@ function buildPackageMetadata(dataset: MasterDataset): SectionBlock[] {
     table(
       ['Field', 'Value'],
       [
-        ['**Package**', '@libar-dev/delivery-process'],
-        ['**Purpose**', 'Code-first documentation and delivery process toolkit'],
+        ['**Package**', '@libar-dev/architect'],
+        ['**Purpose**', 'Context engineering platform for AI-assisted codebases'],
         [
           '**Patterns**',
           `${totalPatterns} tracked (${counts.completed} completed, ${counts.active} active, ${counts.planned} planned)`,

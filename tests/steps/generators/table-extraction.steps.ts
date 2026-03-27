@@ -5,7 +5,7 @@
  * Tests that tables in business rule descriptions appear exactly once in output
  * and that stripMarkdownTables correctly removes table syntax from text.
  *
- * @libar-docs
+ * @architect
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';

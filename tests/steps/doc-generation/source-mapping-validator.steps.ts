@@ -8,7 +8,7 @@
  * - Table format validation
  * - Validation result aggregation
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

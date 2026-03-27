@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:TaxonomyCodecTesting
-@libar-docs-implements:TaxonomyCodec
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:TaxonomyCodecTesting
+@architect-implements:TaxonomyCodec
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Generation
 Feature: Taxonomy Document Codec
 
   Validates the Taxonomy Codec that transforms MasterDataset into a
@@ -69,7 +70,7 @@ Feature: Taxonomy Document Codec
   Rule: Metadata tags can be grouped by domain
 
     **Invariant:** When groupByDomain is enabled, metadata tags must be organized into domain-specific subsections; when disabled, a single flat table must be rendered.
-    **Rationale:** Domain grouping improves scannability for large tag sets (21 categories in ddd-es-cqrs) while flat mode is simpler for small presets (3 categories in generic).
+    **Rationale:** Domain grouping improves scannability for large tag sets (21 categories in ddd-es-cqrs) while flat mode is simpler for small presets (3 categories in libar-generic).
     **Verified by:** With groupByDomain enabled tags are grouped into subsections, With groupByDomain disabled single table rendered
 
     @acceptance-criteria @unit

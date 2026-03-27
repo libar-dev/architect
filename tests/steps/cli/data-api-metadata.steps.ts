@@ -4,8 +4,8 @@
  * BDD step definitions for testing response metadata:
  * validation summary counts and pipeline timing.
  *
- * @libar-docs
- * @libar-docs-implements DataAPICLIErgonomics
+ * @architect
+ * @architect-implements DataAPICLIErgonomics
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

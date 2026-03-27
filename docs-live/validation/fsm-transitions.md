@@ -37,7 +37,7 @@ Complete transition matrix showing all valid state changes per PDR-005.
 
 ### From `completed`
 
-**Terminal state** - no valid transitions. Use `@libar-docs-unlock-reason` to modify.
+**Terminal state** - no valid transitions. Use `@architect-unlock-reason` to modify.
 
 ### From `deferred`
 

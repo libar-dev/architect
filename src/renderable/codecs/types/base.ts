@@ -1,8 +1,8 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern CodecBaseOptions
- * @libar-docs-status completed
+ * @architect
+ * @architect-core
+ * @architect-pattern CodecBaseOptions
+ * @architect-status completed
  *
  * ## Base Codec Options
  *

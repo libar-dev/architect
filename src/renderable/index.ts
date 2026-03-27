@@ -1,8 +1,8 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern RenderableDocumentModel(RDM)
- * @libar-docs-status completed
+ * @architect
+ * @architect-core
+ * @architect-pattern RenderableDocumentModel(RDM)
+ * @architect-status completed
  *
  * ## Renderable Document Model (RDM)
  *

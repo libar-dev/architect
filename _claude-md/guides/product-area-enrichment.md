@@ -9,27 +9,27 @@ Workflow for adding live Mermaid diagrams, enriched intros, and API Types sectio
 
 ```bash
 # 1. Find unannotated TS files in the product area's source directory
-pnpm process:query -- unannotated --path src/<area-dir>
+pnpm architect:query -- unannotated --path src/<area-dir>
 
 # 2. Check if product area has arch-context mappings
-#    Empty [] means use @libar-docs-include tags instead
+#    Empty [] means use @architect-include tags instead
 grep -A5 '<AreaName>:' src/renderable/codecs/reference.ts | head -10
 
 # 3. List patterns in the product area
-pnpm process:query -- list --product-area <AreaName> --names-only
+pnpm architect:query -- list --product-area <AreaName> --names-only
 ```
 
 #### Step-by-Step Workflow
 
-| Step | Action                                                                   | Why                                          |
-| ---- | ------------------------------------------------------------------------ | -------------------------------------------- |
-| 1    | Add `@libar-docs` to unannotated TS files                                | Scanner ignores files without opt-in marker  |
-| 2    | Add `@libar-docs-include:<scope>` to all feature files                   | Enables diagram scoping via `include` filter |
-| 3    | Add `@libar-docs-depends-on` to feature files                            | Creates relationship edges in diagrams       |
-| 4    | Add `@libar-docs-shape` + `@libar-docs-include` to key type declarations | Populates API Types section                  |
-| 5    | Add `@libar-docs-product-area:<Area>` to TS file annotations             | Routes TS patterns to product area           |
-| 6    | Update `PRODUCT_AREA_META` in `reference.ts` (~line 237)                 | Enriched intro, invariants, `diagramScopes`  |
-| 7    | `pnpm build && pnpm test && pnpm docs:product-areas`                     | Verify end-to-end                            |
+| Step | Action                                                                 | Why                                          |
+| ---- | ---------------------------------------------------------------------- | -------------------------------------------- |
+| 1    | Add `@architect` to unannotated TS files                               | Scanner ignores files without opt-in marker  |
+| 2    | Add `@architect-include:<scope>` to all feature files                  | Enables diagram scoping via `include` filter |
+| 3    | Add `@architect-depends-on` to feature files                           | Creates relationship edges in diagrams       |
+| 4    | Add `@architect-shape` + `@architect-include` to key type declarations | Populates API Types section                  |
+| 5    | Add `@architect-product-area:<Area>` to TS file annotations            | Routes TS patterns to product area           |
+| 6    | Update `PRODUCT_AREA_META` in `reference.ts` (~line 237)               | Enriched intro, invariants, `diagramScopes`  |
+| 7    | `pnpm build && pnpm test && pnpm docs:product-areas`                   | Verify end-to-end                            |
 
 #### PRODUCT_AREA_META Entry Structure
 
@@ -53,32 +53,32 @@ AreaName: {
 
 Filters are OR'd — a pattern matching ANY filter appears in the diagram:
 
-| Filter                 | Source Tag                      | Best For                                         |
-| ---------------------- | ------------------------------- | ------------------------------------------------ |
-| `include: ['scope']`   | `@libar-docs-include:scope`     | Areas with empty `PRODUCT_AREA_ARCH_CONTEXT_MAP` |
-| `archContext: ['ctx']` | `@libar-docs-arch-context:ctx`  | Areas with existing arch-context mappings        |
-| `patterns: ['Name']`   | Direct pattern name list        | Small, curated diagrams                          |
-| `archLayer: 'domain'`  | `@libar-docs-arch-layer:domain` | Layer-filtered views                             |
+| Filter                 | Source Tag                     | Best For                                         |
+| ---------------------- | ------------------------------ | ------------------------------------------------ |
+| `include: ['scope']`   | `@architect-include:scope`     | Areas with empty `PRODUCT_AREA_ARCH_CONTEXT_MAP` |
+| `archContext: ['ctx']` | `@architect-arch-context:ctx`  | Areas with existing arch-context mappings        |
+| `patterns: ['Name']`   | Direct pattern name list       | Small, curated diagrams                          |
+| `archLayer: 'domain'`  | `@architect-arch-layer:domain` | Layer-filtered views                             |
 
 #### Common Pitfalls
 
-| Pitfall                                    | Symptom                                            | Fix                                                   |
-| ------------------------------------------ | -------------------------------------------------- | ----------------------------------------------------- |
-| TS file missing `@libar-docs` marker       | Shapes not extracted, pattern absent from registry | Add file-level `@libar-docs` annotation block         |
-| Empty `PRODUCT_AREA_ARCH_CONTEXT_MAP`      | No diagrams render                                 | Use `include` filter in `diagramScopes`               |
-| No relationship tags on patterns           | Diagrams show isolated nodes (no edges)            | Add `@libar-docs-depends-on` to feature files         |
-| TS pattern name collides with Gherkin      | Duplicate pattern error                            | Use different name + `@libar-docs-implements` to link |
-| Declaration merging (`type X` + `const X`) | Shape for type alias not extracted                 | Fixed — `findDeclarations` returns arrays per name    |
-| Generic arrows in `.ts` with `jsx: true`   | Parse error on `<T>(val: T) =>`                    | Fixed — `jsx` flag now based on file extension        |
+| Pitfall                                    | Symptom                                            | Fix                                                  |
+| ------------------------------------------ | -------------------------------------------------- | ---------------------------------------------------- |
+| TS file missing `@architect` marker        | Shapes not extracted, pattern absent from registry | Add file-level `@architect` annotation block         |
+| Empty `PRODUCT_AREA_ARCH_CONTEXT_MAP`      | No diagrams render                                 | Use `include` filter in `diagramScopes`              |
+| No relationship tags on patterns           | Diagrams show isolated nodes (no edges)            | Add `@architect-depends-on` to feature files         |
+| TS pattern name collides with Gherkin      | Duplicate pattern error                            | Use different name + `@architect-implements` to link |
+| Declaration merging (`type X` + `const X`) | Shape for type alias not extracted                 | Fixed — `findDeclarations` returns arrays per name   |
+| Generic arrows in `.ts` with `jsx: true`   | Parse error on `<T>(val: T) =>`                    | Fixed — `jsx` flag now based on file extension       |
 
 #### Shape Extraction Prerequisites
 
 For a shape to appear in the API Types section:
 
-1. **File must have `@libar-docs`** opt-in marker (file-level JSDoc)
-2. **File must have `@libar-docs-product-area:<Area>`** to route to product area
-3. **Declaration must have `@libar-docs-shape`** in its JSDoc (declaration-level)
-4. **Declaration must have `@libar-docs-include:<scope>`** matching the `diagramScopes` filter
+1. **File must have `@architect`** opt-in marker (file-level JSDoc)
+2. **File must have `@architect-product-area:<Area>`** to route to product area
+3. **Declaration must have `@architect-shape`** in its JSDoc (declaration-level)
+4. **Declaration must have `@architect-include:<scope>`** matching the `diagramScopes` filter
 5. **File must be `.ts`** (shape extraction uses typescript-estree parser)
 
 Shape extraction works on both exported and non-exported declarations.

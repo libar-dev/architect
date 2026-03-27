@@ -1,9 +1,10 @@
-@libar-docs
+@architect
 @behavior @reference-generators
-@libar-docs-pattern:ReferenceGeneratorTesting
-@libar-docs-status:completed
-@libar-docs-implements:ReferenceDocShowcase
-@libar-docs-product-area:Generation
+@architect-pattern:ReferenceGeneratorTesting
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-implements:ReferenceDocShowcase
+@architect-product-area:Generation
 Feature: Reference Document Generator Registration
 
   Registers reference document generators from project config. Configs with

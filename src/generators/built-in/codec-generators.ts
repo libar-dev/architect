@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern CodecGeneratorRegistration
- * @libar-docs-status completed
- * @libar-docs-uses DesignReviewGenerator, DecisionDocGenerator, ProcessApiReferenceGenerator, CliRecipeGenerator
+ * @architect
+ * @architect-core
+ * @architect-pattern CodecGeneratorRegistration
+ * @architect-status completed
+ * @architect-uses DesignReviewGenerator, DecisionDocGenerator, ProcessApiReferenceGenerator, CliRecipeGenerator
  *
  * ## Codec-Based Generator Registration
  *
@@ -184,7 +184,7 @@ generatorRegistry.register(createDecisionDocGenerator());
 /**
  * Design Review Generator
  * Generates design review documents with sequence and component diagrams
- * from @libar-docs-sequence-* annotations on feature specs.
+ * from @architect-sequence-* annotations on feature specs.
  */
 generatorRegistry.register(createDesignReviewGenerator());
 

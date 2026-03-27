@@ -63,7 +63,7 @@ export function makeConfig(conventionTags: string, behaviorCategories: string): 
   return {
     title: 'Test Reference Document',
     conventionTags: conventionTags ? conventionTags.split(',').map((t) => t.trim()) : [],
-    shapeSources: [],
+    shapeSelectors: [],
     behaviorCategories: behaviorCategories
       ? behaviorCategories.split(',').map((t) => t.trim())
       : [],

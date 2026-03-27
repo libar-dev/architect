@@ -1,9 +1,9 @@
-@libar-docs
-@libar-docs-pattern:PrChangesCodecOptionsTesting
-@libar-docs-implements:PrChangesCodec
-@libar-docs-status:completed
-@libar-docs-unlock-reason:'Split-from-original'
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:PrChangesCodecOptionsTesting
+@architect-implements:PrChangesCodec
+@architect-status:completed
+@architect-unlock-reason:'Split-from-original'
+@architect-product-area:Generation
 @behavior @pr-changes-codec
 Feature: PR Changes Codec - Options and Filters
   The PrChangesCodec transforms MasterDataset into RenderableDocument for

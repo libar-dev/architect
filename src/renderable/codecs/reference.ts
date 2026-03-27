@@ -1,16 +1,16 @@
 /**
- * @libar-docs
- * @libar-docs-pattern ReferenceDocumentCodec
- * @libar-docs-status active
- * @libar-docs-implements CodecDrivenReferenceGeneration
- * @libar-docs-convention codec-registry
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-pattern ReferenceDocumentCodec
+ * @architect-status active
+ * @architect-implements CodecDrivenReferenceGeneration
+ * @architect-convention codec-registry
+ * @architect-product-area:Generation
  *
  * ## ReferenceDocumentCodec
  *
  * A single codec factory that creates reference document codecs from
  * configuration objects. Convention content is sourced from
- * decision records tagged with @libar-docs-convention.
+ * decision records tagged with @architect-convention.
  *
  * **Purpose:** Scoped reference documentation assembling four content layers (conventions, diagrams, shapes, behaviors) into a single document.
  *
@@ -18,9 +18,9 @@
  *
  * ### 4-Layer Composition (in order)
  *
- * 1. **Convention content** -- Extracted from `@libar-docs-convention`-tagged patterns (rules, invariants, tables)
+ * 1. **Convention content** -- Extracted from `@architect-convention`-tagged patterns (rules, invariants, tables)
  * 2. **Scoped diagrams** -- Mermaid diagrams filtered by `archContext`, `archLayer`, `patterns`, or `include` tags
- * 3. **TypeScript shapes** -- API surfaces from `shapeSources` globs or `shapeSelectors` (declaration-level filtering)
+ * 3. **TypeScript shapes** -- API surfaces from `shapeSelectors` (declaration-level filtering)
  * 4. **Behavior content** -- Gherkin-sourced patterns from `behaviorCategories`
  *
  * ### Key Options (ReferenceDocConfig)
@@ -28,9 +28,7 @@
  * | Option | Type | Description |
  * | --- | --- | --- |
  * | conventionTags | string[] | Convention tag values to extract from decision records |
- * | diagramScope | DiagramScope | Single diagram configuration |
- * | diagramScopes | DiagramScope[] | Multiple diagrams (takes precedence over diagramScope) |
- * | shapeSources | string[] | Glob patterns for TypeScript shape extraction |
+ * | diagramScopes | DiagramScope[] | Multiple diagrams |
  * | shapeSelectors | ShapeSelector[] | Fine-grained declaration-level shape filtering |
  * | behaviorCategories | string[] | Category tags for behavior pattern content |
  * | includeTags | string[] | Cross-cutting content routing via include tags |
@@ -105,7 +103,7 @@ import {
   type ConventionBundle,
 } from './convention-extractor.js';
 import { parseBusinessRuleAnnotations, truncateText } from './helpers.js';
-import { extractShapesFromDataset, filterShapesBySelectors } from './shape-matcher.js';
+import { filterShapesBySelectors } from './shape-matcher.js';
 import type { ShapeSelector } from './shape-matcher.js';
 import {
   sanitizeNodeId,
@@ -189,7 +187,7 @@ export interface DiagramScope {
  * Configuration for a reference document type.
  *
  * Each config object defines one reference document's composition.
- * Convention tags, shape sources, and behavior tags control content assembly.
+ * Convention tags, shape selectors, and behavior tags control content assembly.
  */
 export interface ReferenceDocConfig {
   /** Document title (e.g., "Process Guard Reference") */
@@ -198,19 +196,10 @@ export interface ReferenceDocConfig {
   /** Convention tag values to extract from decision records */
   readonly conventionTags: readonly string[];
 
-  /**
-   * Glob patterns for TypeScript shape extraction sources.
-   * Resolved via in-memory matching against pattern.source.file (AD-6).
-   */
-  readonly shapeSources: readonly string[];
-
   /** Categories to filter behavior patterns from MasterDataset */
   readonly behaviorCategories: readonly string[];
 
-  /** Optional scoped diagram generation from relationship metadata */
-  readonly diagramScope?: DiagramScope;
-
-  /** Multiple scoped diagrams. Takes precedence over diagramScope. */
+  /** Multiple scoped diagrams. */
   readonly diagramScopes?: readonly DiagramScope[];
 
   /** Target _claude-md/ directory for summary output */
@@ -239,7 +228,7 @@ export interface ReferenceDocConfig {
   /**
    * Exclude patterns whose source.file starts with any of these prefixes.
    * Used to filter ephemeral planning specs from behavior sections.
-   * @example ['delivery-process/specs/']
+   * @example ['architect/specs/']
    */
   readonly excludeSourcePaths?: readonly string[];
 
@@ -344,13 +333,13 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
     covers: 'Config loading, presets, resolution, source merging, schema validation',
     intro:
       'Configuration is the entry boundary — it transforms a user-authored ' +
-      '`delivery-process.config.ts` file into a fully resolved `DeliveryProcessInstance` ' +
+      '`architect.config.ts` file into a fully resolved `ArchitectInstance` ' +
       'that powers the entire pipeline. The flow is: `defineConfig()` provides type-safe ' +
       'authoring (Vite convention, zero validation), `ConfigLoader` discovers and loads ' +
       'the file, `ProjectConfigSchema` validates via Zod, `ConfigResolver` applies defaults ' +
-      'and merges stubs into sources, and `DeliveryProcessFactory` builds the final instance ' +
-      'with `TagRegistry` and `RegexBuilders`. Three presets define escalating taxonomy ' +
-      'complexity — from 3 categories (`generic`, `libar-generic`) to 21 (`ddd-es-cqrs`). ' +
+      'and merges stubs into sources, and `ArchitectFactory` builds the final instance ' +
+      'with `TagRegistry` and `RegexBuilders`. Two presets define escalating taxonomy ' +
+      'complexity — from 3 categories (`libar-generic`) to 21 (`ddd-es-cqrs`). ' +
       '`SourceMerger` computes per-generator source overrides, enabling generators like ' +
       'changelog to pull from different feature sets than the base config.',
     diagramScopes: [
@@ -366,13 +355,13 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
       },
     ],
     keyInvariants: [
-      'Preset-based taxonomy: `generic` (3 categories, `@docs-`), `libar-generic` (3 categories, `@libar-docs-`), `ddd-es-cqrs` (21 categories, full DDD). Presets replace base categories entirely — they define prefix, categories, and metadata tags as a unit',
-      'Resolution pipeline: defineConfig() → ConfigLoader → ProjectConfigSchema (Zod) → ConfigResolver → DeliveryProcessFactory → DeliveryProcessInstance. Each stage has a single responsibility',
+      'Preset-based taxonomy: `libar-generic` (3 categories, `@architect-`) and `ddd-es-cqrs` (21 categories, full DDD). Presets replace base categories entirely — they define prefix, categories, and metadata tags as a unit',
+      'Resolution pipeline: defineConfig() → ConfigLoader → ProjectConfigSchema (Zod) → ConfigResolver → ArchitectFactory → ArchitectInstance. Each stage has a single responsibility',
       'Stubs merged at resolution time: Stub directory globs are appended to typescript sources, making stubs transparent to the downstream pipeline',
       'Source override composition: SourceMerger applies per-generator overrides (`replaceFeatures`, `additionalFeatures`, `additionalInput`) to base sources. Exclude is always inherited from base',
     ],
     keyPatterns: [
-      'DeliveryProcessFactory',
+      'ArchitectFactory',
       'ConfigLoader',
       'ConfigResolver',
       'DefineConfig',
@@ -397,7 +386,7 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
       table(
         ['Stage', 'Module', 'Responsibility'],
         [
-          ['Scanner', '`src/scanner/`', 'File discovery, AST parsing, opt-in via `@libar-docs`'],
+          ['Scanner', '`src/scanner/`', 'File discovery, AST parsing, opt-in via `@architect`'],
           [
             'Extractor',
             '`src/extractor/`',
@@ -441,7 +430,7 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
       'Config-driven generation: A single `ReferenceDocConfig` produces a complete document. Content sources compose in fixed order: conventions, diagrams, shapes, behaviors',
       'RenderableDocument IR: Codecs express intent ("this is a table"), the renderer handles syntax ("pipe-delimited markdown"). Switching output format requires only a new renderer',
       'Composition order: Reference docs compose four content layers in fixed order. Product area docs compose five layers: intro, conventions, diagrams, shapes, business rules',
-      'Shape extraction: TypeScript shapes (`interface`, `type`, `enum`, `function`, `const`) are extracted by declaration-level `@libar-docs-shape` tags. Shapes include source text, JSDoc, type parameters, and property documentation',
+      'Shape extraction: TypeScript shapes (`interface`, `type`, `enum`, `function`, `const`) are extracted by declaration-level `@architect-shape` tags. Shapes include source text, JSDoc, type parameters, and property documentation',
       'Generator registration: Generators self-register via `registerGenerator()`. The orchestrator runs them in registration order. Each generator owns its output files and codec configuration',
     ],
     keyPatterns: [
@@ -465,7 +454,7 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
       'directed graph, the Process Guard orchestrates commit-time validation using a Decider pattern ' +
       '(state derived from annotations, not stored separately), and the lint engine provides pluggable ' +
       'rule execution with pretty and JSON output. Anti-pattern detection enforces dual-source ownership ' +
-      'boundaries — `@libar-docs-uses` belongs on TypeScript, `@libar-docs-depends-on` belongs on Gherkin — ' +
+      'boundaries — `@architect-uses` belongs on TypeScript, `@architect-depends-on` belongs on Gherkin — ' +
       'preventing cross-domain tag confusion that causes documentation drift. Definition of Done validation ' +
       'ensures completed patterns have all deliverables marked done and at least one acceptance-criteria scenario.',
     diagramScopes: [
@@ -481,7 +470,7 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
       },
     ],
     keyInvariants: [
-      'Protection levels: `roadmap`/`deferred` = none (fully editable), `active` = scope-locked (no new deliverables), `completed` = hard-locked (requires `@libar-docs-unlock-reason`)',
+      'Protection levels: `roadmap`/`deferred` = none (fully editable), `active` = scope-locked (no new deliverables), `completed` = hard-locked (requires `@architect-unlock-reason`)',
       'Valid FSM transitions: Only roadmap→active, roadmap→deferred, active→completed, active→roadmap, deferred→roadmap. Completed is terminal',
       'Decider pattern: All validation is (state, changes, options) → result. State is derived from annotations, not maintained separately',
       'Dual-source ownership: Anti-pattern detection enforces tag boundaries — `uses` on TypeScript (runtime deps), `depends-on`/`quarter`/`team` on Gherkin (planning metadata). Violations are flagged before they cause documentation drift',
@@ -498,7 +487,7 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
     question: 'How do I query process state?',
     covers: 'Process state API, stubs, context assembly, CLI',
     intro:
-      'The Data API provides direct terminal access to delivery process state. ' +
+      'The Data API provides direct terminal access to project state. ' +
       'It replaces reading generated markdown or launching explore agents — targeted queries ' +
       'use 5-10x less context. The `context` command assembles curated bundles tailored to ' +
       'session type (planning, design, implement).',
@@ -578,7 +567,7 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
       },
     ],
     keyInvariants: [
-      'TypeScript source owns pattern identity: `@libar-docs-pattern` in TypeScript defines the pattern. Tier 1 specs are ephemeral working documents',
+      'TypeScript source owns pattern identity: `@architect-pattern` in TypeScript defines the pattern. Tier 1 specs are ephemeral working documents',
       '7 canonical product-area values: Annotation, Configuration, Generation, Validation, DataAPI, CoreTypes, Process — reader-facing sections, not source modules',
       'Two distinct status domains: Pattern FSM status (4 values) vs. deliverable status (6 values). Never cross domains',
       'Session types define capabilities: planning creates specs, design creates stubs, implementation writes code. Each session type has a fixed input/output contract enforced by convention',
@@ -615,8 +604,8 @@ const DEFAULT_REFERENCE_OPTIONS: Required<ReferenceCodecOptions> = {
  *
  * The codec composes a RenderableDocument from up to four sources:
  * 1. Convention content from convention-tagged decision records
- * 2. Scoped relationship diagram (if diagramScope configured)
- * 3. TypeScript shapes from patterns matching shapeSources globs
+ * 2. Scoped relationship diagram (if diagramScopes configured)
+ * 3. TypeScript shapes from selector-matched patterns
  * 4. Behavior content from category-tagged patterns
  *
  * @param config - Reference document configuration
@@ -667,11 +656,10 @@ export function createReferenceCodec(
       const conventionBlocks =
         conventions.length > 0 ? buildConventionSections(conventions, opts.detailLevel) : [];
 
-      // 2. Scoped relationship diagrams (normalize singular to array)
+      // 2. Scoped relationship diagrams
       const diagramBlocks: SectionBlock[] = [];
       if (opts.detailLevel !== 'summary') {
-        const scopes: readonly DiagramScope[] =
-          config.diagramScopes ?? (config.diagramScope !== undefined ? [config.diagramScope] : []);
+        const scopes: readonly DiagramScope[] = config.diagramScopes ?? [];
 
         for (const scope of scopes) {
           const diagramSections = buildScopedDiagram(dataset, scope);
@@ -681,25 +669,14 @@ export function createReferenceCodec(
         }
       }
 
-      // 3. Shape extraction: combine shapeSources (coarse) + shapeSelectors (fine)
+      // 3. Shape extraction: selector-based filtering only
       const shapeBlocks: SectionBlock[] = [];
       {
         const allShapes =
-          config.shapeSources.length > 0
-            ? [...extractShapesFromDataset(dataset, config.shapeSources)]
+          config.shapeSelectors !== undefined && config.shapeSelectors.length > 0
+            ? [...filterShapesBySelectors(dataset, config.shapeSelectors)]
             : ([] as ExtractedShape[]);
         const seenNames = new Set(allShapes.map((s) => s.name));
-
-        // DD-3/DD-6: Fine-grained selector-based filtering
-        if (config.shapeSelectors !== undefined && config.shapeSelectors.length > 0) {
-          const selectorShapes = filterShapesBySelectors(dataset, config.shapeSelectors);
-          for (const shape of selectorShapes) {
-            if (!seenNames.has(shape.name)) {
-              seenNames.add(shape.name);
-              allShapes.push(shape);
-            }
-          }
-        }
 
         // DD-1: Merge include-tagged shapes (additive)
         if (includeSet !== undefined) {
@@ -763,9 +740,6 @@ export function createReferenceCodec(
         const diagnostics: string[] = [];
         if (config.conventionTags.length > 0) {
           diagnostics.push(`conventions [${config.conventionTags.join(', ')}]`);
-        }
-        if (config.shapeSources.length > 0) {
-          diagnostics.push(`shapes [${config.shapeSources.join(', ')}]`);
         }
         if (config.shapeSelectors !== undefined && config.shapeSelectors.length > 0) {
           diagnostics.push(`selectors [${config.shapeSelectors.length} selectors]`);
@@ -866,11 +840,7 @@ function decodeProductArea(
 
   // 3. Architecture diagrams — priority: config > meta > auto-generate
   if (opts.detailLevel !== 'summary') {
-    const scopes: readonly DiagramScope[] =
-      config.diagramScopes ??
-      (config.diagramScope !== undefined ? [config.diagramScope] : undefined) ??
-      meta?.diagramScopes ??
-      [];
+    const scopes: readonly DiagramScope[] = config.diagramScopes ?? meta?.diagramScopes ?? [];
 
     if (scopes.length > 0) {
       // Explicit scopes from config or meta — always render
@@ -920,15 +890,6 @@ function decodeProductArea(
       }
     }
 
-    // Also include shapes matched by explicit config (if any)
-    if (config.shapeSources.length > 0) {
-      for (const shape of extractShapesFromDataset(dataset, config.shapeSources)) {
-        if (!seenNames.has(shape.name)) {
-          seenNames.add(shape.name);
-          allShapes.push(shape);
-        }
-      }
-    }
     if (config.shapeSelectors !== undefined && config.shapeSelectors.length > 0) {
       for (const shape of filterShapesBySelectors(dataset, config.shapeSelectors)) {
         if (!seenNames.has(shape.name)) {

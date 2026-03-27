@@ -4,7 +4,7 @@
 
 ---
 
-**95 rules** from 26 features. 95 rules have explicit invariants.
+**90 rules** from 25 features. 90 rules have explicit invariants.
 
 ---
 
@@ -224,13 +224,14 @@ _Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),_
 
 #### formatOverview renders progress summary
 
-> **Invariant:** The overview formatter must render a progress summary line showing completion metrics for the project.
+> **Invariant:** The overview formatter must render a progress summary line showing completion metrics for the project and point users to the current query script name.
 >
-> **Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness without requiring detailed exploration.
+> **Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness, and the follow-up command guidance must be copy-pasteable.
 
 **Verified by:**
 
 - Overview renders progress line
+- Overview renders architect query guidance
 
 ---
 
@@ -263,10 +264,12 @@ _Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein._
 
 - Exact match scores 1.0
 - Exact match is case-insensitive
-- Prefix match scores 0.9
+- Prefix match scores above 0.9
 - Substring match scores 0.7
 - Levenshtein match for close typos
 - Results are sorted by score descending
+- Prefix matches rank shorter names higher
+- Prefix match scores reflect query coverage
 - Empty query matches all patterns as prefix
 - No candidate patterns returns no results
 
@@ -331,13 +334,14 @@ _Command-line interface for generating documentation from annotated TypeScript._
 
 #### CLI lists available generators
 
-> **Invariant:** The --list-generators flag must display all registered generator names without performing any generation.
+> **Invariant:** The --list-generators flag must display all registered generator names without performing any generation, including config-registered reference meta-generators.
 >
-> **Rationale:** Users need to discover available generators before specifying --generator — listing them avoids trial-and-error with invalid generator names.
+> **Rationale:** Users need to discover available generators before specifying --generator — listing them avoids trial-and-error with invalid generator names and must reflect the project config they are running against.
 
 **Verified by:**
 
 - List generators with --list-generators
+- List generators includes config-registered reference meta-generators
 
 ---
 
@@ -365,80 +369,6 @@ _Command-line interface for generating documentation from annotated TypeScript._
 - Unknown option causes error
 
 _generate-docs.feature_
-
-### Generate Tag Taxonomy Cli
-
-_Command-line interface for generating TAG_TAXONOMY.md from tag registry configuration._
-
----
-
-#### CLI displays help and version information
-
-> **Invariant:** The --help/-h and --version/-v flags must produce usage/version output and exit successfully without requiring other arguments.
->
-> **Rationale:** Help and version are universal CLI conventions — both short and long flag forms must work for discoverability and scripting compatibility.
-
-**Verified by:**
-
-- Display help with --help flag
-- Display help with -h flag
-- Display version with --version flag
-- Display version with -v flag
-
----
-
-#### CLI generates taxonomy at specified output path
-
-> **Invariant:** The taxonomy generator must write output to the specified path, creating parent directories if they do not exist, and defaulting to a standard path when no output is specified.
->
-> **Rationale:** Flexible output paths support both default conventions and custom layouts — auto-creating directories prevents "ENOENT" errors on first run.
-
-**Verified by:**
-
-- Generate taxonomy at default path
-- Generate taxonomy at custom output path
-- Create output directory if missing
-
----
-
-#### CLI respects overwrite flag for existing files
-
-> **Invariant:** The CLI must refuse to overwrite existing output files unless the --overwrite or -f flag is explicitly provided.
->
-> **Rationale:** Overwrite protection prevents accidental destruction of hand-edited taxonomy files — requiring an explicit flag makes destructive operations intentional.
-
-**Verified by:**
-
-- Fail when output file exists without --overwrite
-- Overwrite existing file with -f flag
-- Overwrite existing file with --overwrite flag
-
----
-
-#### Generated taxonomy contains expected sections
-
-> **Invariant:** The generated taxonomy file must include category documentation and statistics sections reflecting the configured tag registry.
->
-> **Rationale:** The taxonomy is a reference document — incomplete output missing categories or statistics would leave developers without the information they need to annotate correctly.
-
-**Verified by:**
-
-- Generated file contains category documentation
-- Generated file reports statistics
-
----
-
-#### CLI warns about unknown flags
-
-> **Invariant:** Unrecognized CLI flags must produce a warning message but allow execution to continue.
->
-> **Rationale:** Taxonomy generation is non-destructive — warning without failing is more user-friendly than hard errors for minor flag typos, while still surfacing the issue.
-
-**Verified by:**
-
-- Warn on unknown flag but continue
-
-_generate-tag-taxonomy.feature_
 
 ### Handoff Generator Tests
 
@@ -796,13 +726,14 @@ _Core CLI infrastructure: help, version, input validation, status, query, patter
 
 #### CLI requires input flag for subcommands
 
-> **Invariant:** Every data-querying subcommand must receive an explicit `--input` glob specifying the source files to scan.
+> **Invariant:** Every data-querying subcommand must receive either an explicit `--input` glob or a project config that provides source globs.
 >
-> **Rationale:** Without an input source, the pipeline has no files to scan and would produce empty or misleading results instead of a clear error.
+> **Rationale:** Without an input source, the pipeline has no files to scan and would produce empty or misleading results instead of a clear error, but project config auto-detection should remove that boilerplate when the repo is configured.
 
 **Verified by:**
 
 - Fail without --input flag when running status
+- Use architect.config.js sources when --input is omitted
 - Reject unknown options
 
 ---
@@ -902,6 +833,7 @@ _Dry-run mode shows pipeline scope without processing data._
 **Verified by:**
 
 - Dry-run shows file counts
+- Dry-run reports architect.config.js auto-detection
 
 _data-api-dryrun.feature_
 
@@ -1105,13 +1037,13 @@ _Discovery subcommands: list, search, context assembly, tags/sources, extended a
 
 #### CLI unannotated subcommand finds files without annotations
 
-> **Invariant:** The unannotated subcommand must return valid JSON listing every TypeScript file that lacks the `@libar-docs` opt-in marker.
+> **Invariant:** The unannotated subcommand must return valid JSON listing every TypeScript file that lacks the `@architect` opt-in marker.
 >
 > **Rationale:** Files missing the opt-in marker are invisible to the scanner; without this subcommand, unannotated files silently drop out of generated documentation and validation.
 
 **Verified by:**
 
-- Unannotated finds files missing libar-docs marker
+- Unannotated finds files missing architect marker
 
 _process-api-subcommands.feature_
 
@@ -1256,6 +1188,7 @@ _Starting an implementation or design session without checking prerequisites_
 - All implementation checks pass
 - Incomplete dependency blocks implementation
 - FSM transition from completed blocks implementation
+- Active pattern passes FSM check for implementation
 - Missing PDR references produce WARN
 - No deliverables blocks implementation
 - Strict mode promotes WARN to BLOCKED

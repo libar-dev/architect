@@ -4,7 +4,7 @@
 
 ---
 
-**88 rules** from 20 features. 88 rules have explicit invariants.
+**90 rules** from 21 features. 90 rules have explicit invariants.
 
 ---
 
@@ -12,7 +12,7 @@
 
 ### Ast Parser Exports
 
-_The AST Parser extracts @libar-docs-_ directives from TypeScript source files\*
+_The AST Parser extracts @architect-_ directives from TypeScript source files\*
 
 ---
 
@@ -44,7 +44,7 @@ _ast-parser-exports.feature_
 
 ### Ast Parser Metadata
 
-_The AST Parser extracts @libar-docs-_ directives from TypeScript source files\*
+_The AST Parser extracts @architect-_ directives from TypeScript source files\*
 
 ---
 
@@ -96,7 +96,7 @@ _ast-parser-metadata.feature_
 
 ### Ast Parser Relationships Edges
 
-_The AST Parser extracts @libar-docs-_ directives from TypeScript source files\*
+_The AST Parser extracts @architect-_ directives from TypeScript source files\*
 
 ---
 
@@ -108,10 +108,10 @@ _The AST Parser extracts @libar-docs-_ directives from TypeScript source files\*
 
 **Verified by:**
 
-- Extract @libar-docs-uses with single value
-- Extract @libar-docs-uses with comma-separated values
-- Extract @libar-docs-used-by with single value
-- Extract @libar-docs-used-by with comma-separated values
+- Extract @architect-uses with single value
+- Extract @architect-uses with comma-separated values
+- Extract @architect-used-by with single value
+- Extract @architect-used-by with comma-separated values
 - Extract both uses and usedBy from same directive
 - NOT capture uses/usedBy values in description
 - Not set uses/usedBy when no relationship tags exist
@@ -126,7 +126,7 @@ _The AST Parser extracts @libar-docs-_ directives from TypeScript source files\*
 
 **Verified by:**
 
-- Skip comments without @libar-docs-\* tags
+- Skip comments without @architect-\* tags
 - Skip invalid directive with incomplete tag
 - Handle malformed TypeScript gracefully
 - Handle empty file gracefully
@@ -136,6 +136,45 @@ _The AST Parser extracts @libar-docs-_ directives from TypeScript source files\*
 - Handle unicode characters in descriptions
 
 _ast-parser-relationships-edges.feature_
+
+### Claude Metadata Parity
+
+_The extractor must preserve Claude routing metadata from TypeScript directives_
+
+---
+
+#### TypeScript extraction preserves Claude metadata
+
+> **Invariant:** Claude routing metadata from TypeScript directives must be copied onto the extracted pattern.
+>
+> **Rationale:** Generated CLAUDE.md modules depend on the extracted pattern fields, so dropping directive metadata breaks downstream document routing.
+
+**Verified by:**
+
+- Extracted TypeScript pattern keeps Claude metadata
+- Extracted TypeScript pattern includes claudeModule
+- claudeSection
+- and claudeTags
+
+---
+
+#### Gherkin sync and async extraction keep Claude and ADR metadata aligned
+
+> **Invariant:** Sync and async Gherkin extraction must produce the same Claude and ADR metadata fields.
+>
+> **Rationale:** The async path is a performance optimization, not a different contract. Diverging metadata fields would make generated docs depend on call path.
+
+**Verified by:**
+
+- Sync and async Gherkin extraction return the same metadata
+- Sync and async extraction match for claudeModule
+- claudeSection
+- claudeTags
+- adrTheme
+- adrLayer
+- and effortActual
+
+_claude-metadata-parity.feature_
 
 ### Context Inference
 
@@ -247,9 +286,9 @@ _Tests the discoverTaggedShapes function that scans TypeScript source_
 
 ---
 
-#### Declarations opt in via libar-docs-shape tag
+#### Declarations opt in via architect-shape tag
 
-> **Invariant:** Only declarations with the libar-docs-shape tag in their immediately preceding JSDoc are collected as tagged shapes.
+> **Invariant:** Only declarations with the architect-shape tag in their immediately preceding JSDoc are collected as tagged shapes.
 >
 > **Rationale:** Extracting shapes without an explicit opt-in tag would surface internal implementation details in generated API documentation, violating information hiding.
 
@@ -279,7 +318,7 @@ _Tests the discoverTaggedShapes function that scans TypeScript source_
 - All five declaration kinds are discoverable
 - JSDoc with gap larger than MAX_JSDOC_LINE_DISTANCE is not matched
 - Tag as last line before closing JSDoc delimiter
-- Hypothetical libar-docs-shape-extended tag is not matched
+- Hypothetical architect-shape-extended tag is not matched
 - Tag coexists with other JSDoc content
 - Generic arrow function in non-JSX context parses correctly
 - All 5 declaration kinds supported
@@ -290,7 +329,7 @@ _declaration-level-shape-tagging.feature_
 
 ### Depends On Tag
 
-_Tests extraction of @libar-docs-depends-on and @libar-docs-enables_
+_Tests extraction of @architect-depends-on and @architect-enables_
 
 ---
 
@@ -375,16 +414,16 @@ _- Full AST parsing of every TypeScript file is expensive and slow_
 
 ---
 
-#### hasDocDirectives detects @libar-docs-\* section directives
+#### hasDocDirectives detects @architect-\* section directives
 
-> **Invariant:** hasDocDirectives must return true if and only if the source contains at least one @libar-docs-{suffix} directive (case-sensitive, @ required, suffix required).
+> **Invariant:** hasDocDirectives must return true if and only if the source contains at least one @architect-{suffix} directive (case-sensitive, @ required, suffix required).
 >
 > **Rationale:** This is the first-pass filter in the scanner pipeline; false negatives cause patterns to be silently missed, while false positives only waste AST parsing time.
 
 **Verified by:**
 
-- Detect @libar-docs-core directive in JSDoc block
-- Detect various @libar-docs-\* directives
+- Detect @architect-core directive in JSDoc block
+- Detect various @architect-\* directives
 - Detect directive anywhere in file content
 - Detect multiple directives on same line
 - Detect directive in inline comment
@@ -394,24 +433,24 @@ _- Full AST parsing of every TypeScript file is expensive and slow_
 
 ---
 
-#### hasFileOptIn detects file-level @libar-docs marker
+#### hasFileOptIn detects file-level @architect marker
 
-> **Invariant:** hasFileOptIn must return true if and only if the source contains a bare @libar-docs tag (not followed by a hyphen) inside a JSDoc block comment; line comments and @libar-docs-\* suffixed tags must not match.
+> **Invariant:** hasFileOptIn must return true if and only if the source contains a bare @architect tag (not followed by a hyphen) inside a JSDoc block comment; line comments and @architect-\* suffixed tags must not match.
 >
-> **Rationale:** File-level opt-in is the gate for including a file in the scanner pipeline; confusing @libar-docs-core (a section tag) with @libar-docs (file opt-in) would either miss files or over-include them.
+> **Rationale:** File-level opt-in is the gate for including a file in the scanner pipeline; confusing @architect-core (a section tag) with @architect (file opt-in) would either miss files or over-include them.
 
 **Verified by:**
 
-- Detect @libar-docs in JSDoc block comment
-- Detect @libar-docs with description on same line
-- Detect @libar-docs in multi-line JSDoc
-- Detect @libar-docs anywhere in file
-- Detect @libar-docs combined with section tags
+- Detect @architect in JSDoc block comment
+- Detect @architect with description on same line
+- Detect @architect in multi-line JSDoc
+- Detect @architect anywhere in file
+- Detect @architect combined with section tags
 - Return false when only section tags present
 - Return false for multiple section tags without opt-in
 - Return false for empty content in hasFileOptIn
-- Return false for @libar-docs in line comment
-- Not confuse @libar-docs-\* with @libar-docs opt-in
+- Return false for @architect in line comment
+- Not confuse @architect-\* with @architect opt-in
 
 _directive-detection.feature_
 
@@ -546,7 +585,7 @@ _dual-source-extraction.feature_
 
 ### Extends Tag
 
-_Tests for the @libar-docs-extends tag which establishes generalization_
+_Tests for the @architect-extends tag which establishes generalization_
 
 ---
 
@@ -764,7 +803,7 @@ _gherkin-parser.feature_
 
 ### Implements Tag Processing
 
-_Tests for the @libar-docs-implements tag which links implementation files_
+_Tests for the @architect-implements tag which links implementation files_
 
 ---
 
@@ -854,7 +893,7 @@ _- Manual layer annotation in every feature file is tedious and error-prone_
 
 - Detect timeline features from /timeline/ path
 - Detect timeline features regardless of parent directories
-- Detect timeline features in delivery-process package
+- Detect timeline features in Architect package
 
 ---
 
@@ -1000,14 +1039,14 @@ _- Gherkin tags are flat strings needing semantic interpretation_
 
 #### Category tags are colon-free tags filtered against known non-categories
 
-> **Invariant:** Tags without colons become categories, except known non-category tags (acceptance-criteria, happy-path) and the libar-docs opt-in marker.
+> **Invariant:** Tags without colons become categories, except known non-category tags (acceptance-criteria, happy-path) and the architect opt-in marker.
 >
 > **Rationale:** Including test-control tags (acceptance-criteria, happy-path) as categories pollutes the pattern taxonomy with non-semantic values.
 
 **Verified by:**
 
 - Extract category tags (no colon)
-- libar-docs opt-in marker is NOT a category
+- architect opt-in marker is NOT a category
 
 ---
 
@@ -1118,16 +1157,16 @@ _- Need to scan entire codebases for documentation directives efficiently_
 
 #### File opt-in requirement gates scanning
 
-> **Invariant:** Only files containing a standalone @libar-docs marker (not @libar-docs-\*) are eligible for directive extraction.
+> **Invariant:** Only files containing a standalone @architect marker (not @architect-\*) are eligible for directive extraction.
 >
 > **Rationale:** Without opt-in gating, every TypeScript file in the monorepo would be parsed, wasting processing time on files that have no documentation directives.
 
 **Verified by:**
 
 - Handle files with quick directive check optimization
-- Skip files without @libar-docs file-level opt-in
-- Not confuse @libar-docs-\* with @libar-docs opt-in
-- Detect @libar-docs opt-in combined with section tags
+- Skip files without @architect file-level opt-in
+- Not confuse @architect-\* with @architect opt-in
+- Detect @architect opt-in combined with section tags
 
 _scanner-core.feature_
 
@@ -1202,7 +1241,7 @@ _Validates the shape extraction system that extracts TypeScript type_
 
 #### Annotation tags are stripped from extracted JSDoc while preserving standard tags
 
-> **Invariant:** Extracted shapes never contain @libar-docs-\* annotation lines in their jsDoc field.
+> **Invariant:** Extracted shapes never contain @architect-\* annotation lines in their jsDoc field.
 >
 > **Rationale:** Shape JSDoc is rendered in documentation output. Annotation tags are metadata for the extraction pipeline, not user-visible documentation content.
 
@@ -1343,7 +1382,7 @@ _shape-extraction-types.feature_
 
 ### Uses Tag
 
-_Tests extraction and processing of @libar-docs-uses and @libar-docs-used-by_
+_Tests extraction and processing of @architect-uses and @architect-used-by_
 
 ---
 

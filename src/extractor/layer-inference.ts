@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-extractor
- * @libar-docs-pattern LayerInference
- * @libar-docs-status completed
- * @libar-docs-used-by GherkinExtractor
+ * @architect
+ * @architect-extractor
+ * @architect-pattern LayerInference
+ * @architect-status completed
+ * @architect-used-by GherkinExtractor
  *
  * ## LayerInference - Directory-Based Feature Classification
  *

@@ -1,12 +1,12 @@
-@libar-docs
-@libar-docs-pattern:UsesTagTesting
-@libar-docs-status:active
-@libar-docs-implements:PatternRelationshipModel
-@libar-docs-product-area:Annotation
+@architect
+@architect-pattern:UsesTagTesting
+@architect-status:active
+@architect-implements:PatternRelationshipModel
+@architect-product-area:Annotation
 @pattern-relationships
 Feature: Uses Tag Extraction
 
-  Tests extraction and processing of @libar-docs-uses and @libar-docs-used-by
+  Tests extraction and processing of @architect-uses and @architect-used-by
   relationship tags from TypeScript files.
 
   # ===========================================================================
@@ -50,10 +50,10 @@ Feature: Uses Tag Extraction
       Given a TypeScript file with content:
         """typescript
         /**
-         * @libar-docs
-         * @libar-docs-pattern ServiceA
-         * @libar-docs-status active
-         * @libar-docs-uses ServiceB
+         * @architect
+         * @architect-pattern ServiceA
+         * @architect-status active
+         * @architect-uses ServiceB
          */
         export class ServiceA {}
         """
@@ -65,10 +65,10 @@ Feature: Uses Tag Extraction
       Given a TypeScript file with content:
         """typescript
         /**
-         * @libar-docs
-         * @libar-docs-pattern Orchestrator
-         * @libar-docs-status active
-         * @libar-docs-uses ServiceA, ServiceB, ServiceC
+         * @architect
+         * @architect-pattern Orchestrator
+         * @architect-status active
+         * @architect-uses ServiceA, ServiceB, ServiceC
          */
         export class Orchestrator {}
         """
@@ -90,10 +90,10 @@ Feature: Uses Tag Extraction
       Given a TypeScript file with content:
         """typescript
         /**
-         * @libar-docs
-         * @libar-docs-pattern CoreService
-         * @libar-docs-status active
-         * @libar-docs-used-by HighLevelOrchestrator
+         * @architect
+         * @architect-pattern CoreService
+         * @architect-status active
+         * @architect-used-by HighLevelOrchestrator
          */
         export class CoreService {}
         """
@@ -105,10 +105,10 @@ Feature: Uses Tag Extraction
       Given a TypeScript file with content:
         """typescript
         /**
-         * @libar-docs
-         * @libar-docs-pattern Foundation
-         * @libar-docs-status active
-         * @libar-docs-used-by ServiceA, ServiceB
+         * @architect
+         * @architect-pattern Foundation
+         * @architect-status active
+         * @architect-used-by ServiceA, ServiceB
          */
         export class Foundation {}
         """

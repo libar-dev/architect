@@ -1,14 +1,14 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern SessionCodec
- * @libar-docs-status completed
- * @libar-docs-arch-role projection
- * @libar-docs-arch-context renderer
- * @libar-docs-arch-layer application
- * @libar-docs-include codec-transformation
- * @libar-docs-convention codec-registry
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-core
+ * @architect-pattern SessionCodec
+ * @architect-status completed
+ * @architect-arch-role projection
+ * @architect-arch-context renderer
+ * @architect-arch-layer application
+ * @architect-include codec-transformation
+ * @architect-convention codec-registry
+ * @architect-product-area:Generation
  *
  * ## SessionContextCodec
  *

@@ -1,12 +1,12 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern RenderableDocument
- * @libar-docs-status completed
- * @libar-docs-extract-shapes RenderableDocument, SectionBlock, HeadingBlock, TableBlock, ListBlock, CodeBlock, MermaidBlock, CollapsibleBlock
- * @libar-docs-arch-role read-model
- * @libar-docs-arch-context renderer
- * @libar-docs-arch-layer domain
+ * @architect
+ * @architect-core
+ * @architect-pattern RenderableDocument
+ * @architect-status completed
+ * @architect-extract-shapes RenderableDocument, SectionBlock, HeadingBlock, TableBlock, ListBlock, CodeBlock, MermaidBlock, CollapsibleBlock
+ * @architect-arch-role read-model
+ * @architect-arch-context renderer
+ * @architect-arch-layer domain
  *
  * ## RenderableDocument Schema
  *
@@ -182,8 +182,8 @@ export type CollapsibleBlock = {
 export type LinkOutBlock = z.infer<typeof LinkOutBlockSchema>;
 
 /**
- * @libar-docs-implements RenderableDocument
- * @libar-docs-shape reference-sample
+ * @architect-implements RenderableDocument
+ * @architect-shape reference-sample
  */
 export type SectionBlock =
   | HeadingBlock

@@ -1,10 +1,10 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern ErrorFactoryTypes
- * @libar-docs-status completed
- * @libar-docs-implements ErrorFactories
- * @libar-docs-product-area CoreTypes
+ * @architect
+ * @architect-core
+ * @architect-pattern ErrorFactoryTypes
+ * @architect-status completed
+ * @architect-implements ErrorFactories
+ * @architect-product-area CoreTypes
  *
  * ## Error Factories - Type Definitions
  *
@@ -19,8 +19,8 @@ import type { SourceFilePath } from './branded.js';
 /**
  * Base error interface for all documentation errors
  *
- * @libar-docs-shape
- * @libar-docs-include core-types
+ * @architect-shape
+ * @architect-include core-types
  */
 export interface BaseDocError {
   /** Error type discriminator for pattern matching */
@@ -52,7 +52,7 @@ export interface FileParseError extends BaseDocError {
 }
 
 /**
- * Directive validation error - invalid @libar-docs-* format
+ * Directive validation error - invalid @architect-* format
  */
 export interface DirectiveValidationError extends BaseDocError {
   readonly type: 'DIRECTIVE_VALIDATION_ERROR';
@@ -124,7 +124,7 @@ export interface ConfigError extends BaseDocError {
 }
 
 /**
- * Process metadata validation error - invalid @libar-docs-* tag values
+ * Process metadata validation error - invalid @architect-* tag values
  *
  * Raised when extracting process metadata from Gherkin feature tags
  * and the values don't conform to ProcessMetadataSchema.
@@ -172,8 +172,8 @@ export interface GherkinPatternValidationError extends BaseDocError {
  * - Type narrowing based on `type` field
  * - Compile-time verification of error handling
  *
- * @libar-docs-shape
- * @libar-docs-include core-types
+ * @architect-shape
+ * @architect-include core-types
  */
 export type DocError =
   | FileSystemError
@@ -312,7 +312,7 @@ export function createFileParseError(
  *   'src/utils.ts',
  *   42,
  *   'Missing required tags',
- *   '@libar-docs-'
+ *   '@architect-'
  * );
  * ```
  */

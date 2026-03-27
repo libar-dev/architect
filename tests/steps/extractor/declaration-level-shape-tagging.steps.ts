@@ -2,7 +2,7 @@
  * Step definitions for Declaration-Level Shape Tagging tests
  *
  * Tests the discoverTaggedShapes function that scans TypeScript source
- * code for declarations annotated with the @libar-docs-shape JSDoc tag.
+ * code for declarations annotated with the @architect-shape JSDoc tag.
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -45,10 +45,10 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
   });
 
   // ──────────────────────────────────────────────────────────────────────
-  // Rule 1: Declarations opt in via libar-docs-shape tag
+  // Rule 1: Declarations opt in via architect-shape tag
   // ──────────────────────────────────────────────────────────────────────
 
-  Rule('Declarations opt in via libar-docs-shape tag', ({ RuleScenario }) => {
+  Rule('Declarations opt in via architect-shape tag', ({ RuleScenario }) => {
     RuleScenario('Tagged declaration is extracted as shape', ({ Given, When, Then, And }) => {
       Given('a TypeScript source file containing:', (_ctx: unknown, docString: string) => {
         state!.sourceCode = docString;
@@ -348,7 +348,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     );
 
     RuleScenario(
-      'Hypothetical libar-docs-shape-extended tag is not matched',
+      'Hypothetical architect-shape-extended tag is not matched',
       ({ Given, When, Then }) => {
         Given('a TypeScript source file containing:', (_ctx: unknown, docString: string) => {
           state!.sourceCode = docString;

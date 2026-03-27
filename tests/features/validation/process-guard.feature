@@ -1,10 +1,11 @@
-@libar-docs
-@libar-docs-implements:ProcessGuardLinter
-@behavior @process-guard @libar-docs-pattern:ProcessGuardTesting
-@libar-docs-status:completed
-@libar-docs-product-area:Validation
-@libar-docs-depends-on:PhaseStateMachineValidation,AntiPatternDetector
-@libar-docs-include:reference-sample
+@architect
+@architect-implements:ProcessGuardLinter
+@behavior @process-guard @architect-pattern:ProcessGuardTesting
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Validation
+@architect-depends-on:PhaseStateMachineValidation,AntiPatternDetector
+@architect-include:reference-sample
 Feature: Process Guard Linter
   Pure validation functions for enforcing delivery process rules per PDR-005.
   All validation follows the Decider pattern: (state, changes, options) => result.
@@ -31,7 +32,7 @@ Feature: Process Guard Linter
 
   Rule: Completed files require unlock-reason to modify
 
-    **Invariant:** A completed spec file cannot be modified unless it carries an @libar-docs-unlock-reason tag.
+    **Invariant:** A completed spec file cannot be modified unless it carries an @architect-unlock-reason tag.
     **Rationale:** Completed work represents validated, shipped functionality — accidental modification risks regression.
     **Verified by:** Completed file with unlock-reason passes validation, Completed file without unlock-reason fails validation, Protection levels and unlock requirement, File transitioning to completed does not require unlock-reason
 

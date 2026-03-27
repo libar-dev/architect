@@ -1,10 +1,10 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern TaxonomyCodec
- * @libar-docs-status completed
- * @libar-docs-convention codec-registry
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-core
+ * @architect-pattern TaxonomyCodec
+ * @architect-status completed
+ * @architect-convention codec-registry
+ * @architect-product-area:Generation
  *
  * ## TaxonomyDocumentCodec
  *
@@ -422,18 +422,18 @@ function buildAggregationTagsSection(tagRegistry: TagRegistry): SectionBlock[] {
  */
 function buildFormatTypesSection(options: Required<TaxonomyCodecOptions>): SectionBlock[] {
   const formatDescriptions: Record<FormatType, { description: string; example: string }> = {
-    value: { description: 'Simple string value', example: '@libar-docs-pattern MyPattern' },
+    value: { description: 'Simple string value', example: '@architect-pattern MyPattern' },
     enum: {
       description: 'Constrained to predefined values',
-      example: '@libar-docs-status roadmap',
+      example: '@architect-status roadmap',
     },
     'quoted-value': {
       description: 'String in quotes (preserves spaces)',
-      example: '@libar-docs-usecase "When X happens"',
+      example: '@architect-usecase "When X happens"',
     },
-    csv: { description: 'Comma-separated values', example: '@libar-docs-uses A, B, C' },
-    number: { description: 'Numeric value', example: '@libar-docs-phase 14' },
-    flag: { description: 'Boolean presence (no value)', example: '@libar-docs-core' },
+    csv: { description: 'Comma-separated values', example: '@architect-uses A, B, C' },
+    number: { description: 'Numeric value', example: '@architect-phase 14' },
+    flag: { description: 'Boolean presence (no value)', example: '@architect-core' },
   };
 
   const rows = FORMAT_TYPES.map((format) => {
@@ -459,7 +459,7 @@ function buildFormatTypesSection(options: Required<TaxonomyCodecOptions>): Secti
  * Build presets comparison section
  */
 function buildPresetsSection(): SectionBlock[] {
-  const presetNames: PresetName[] = ['generic', 'libar-generic', 'ddd-es-cqrs'];
+  const presetNames: PresetName[] = ['libar-generic', 'ddd-es-cqrs'];
 
   const rows = presetNames.map((name) => {
     const preset = PRESETS[name];
@@ -467,11 +467,8 @@ function buildPresetsSection(): SectionBlock[] {
     let useCase = '';
 
     switch (name) {
-      case 'generic':
-        useCase = 'Simple projects with @docs- prefix';
-        break;
       case 'libar-generic':
-        useCase = 'Default preset with @libar-docs- prefix';
+        useCase = 'Default preset with @architect- prefix';
         break;
       case 'ddd-es-cqrs':
         useCase = 'Full DDD/ES/CQRS taxonomy';
@@ -674,37 +671,37 @@ function buildFormatTypesDetailDocument(): RenderableDocument {
     value: {
       description: 'Simple string value',
       parsingBehavior: 'Captures everything after the tag name as the value',
-      example: '@libar-docs-pattern CommandOrchestrator',
+      example: '@architect-pattern CommandOrchestrator',
       notes: 'Most common format for single-value tags',
     },
     enum: {
       description: 'Constrained to predefined values',
       parsingBehavior: 'Validates value against allowed list; rejects invalid values',
-      example: '@libar-docs-status roadmap',
+      example: '@architect-status roadmap',
       notes: 'Used for FSM states, priority levels, risk levels',
     },
     'quoted-value': {
       description: 'String in quotes (preserves spaces)',
       parsingBehavior: 'Extracts content between quotes; preserves internal whitespace',
-      example: '@libar-docs-usecase "When a user submits a form"',
+      example: '@architect-usecase "When a user submits a form"',
       notes: 'Use for human-readable text with spaces',
     },
     csv: {
       description: 'Comma-separated values',
       parsingBehavior: 'Splits on commas; trims whitespace from each value',
-      example: '@libar-docs-uses CommandBus, EventStore, Projection',
+      example: '@architect-uses CommandBus, EventStore, Projection',
       notes: 'Used for relationship tags and multi-value references',
     },
     number: {
       description: 'Numeric value',
       parsingBehavior: 'Parses as integer; NaN if invalid',
-      example: '@libar-docs-phase 14',
+      example: '@architect-phase 14',
       notes: 'Used for phase numbers and ordering',
     },
     flag: {
       description: 'Boolean presence (no value needed)',
       parsingBehavior: 'Presence of tag indicates true; absence indicates false',
-      example: '@libar-docs-core',
+      example: '@architect-core',
       notes: 'Used for boolean markers like core, overview, decision',
     },
   };

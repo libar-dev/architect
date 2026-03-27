@@ -1,7 +1,8 @@
-@libar-docs
-@libar-docs-pattern:RemainingWorkSummaryAccuracy
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:RemainingWorkSummaryAccuracy
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Generation
 Feature: Remaining Work Summary Accuracy
 
   Summary totals in REMAINING-WORK.md must match the sum of phase table rows.

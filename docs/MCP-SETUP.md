@@ -1,6 +1,6 @@
 # MCP Server Setup
 
-> delivery-process MCP server exposes ProcessStateAPI as native Claude Code tools with sub-millisecond dispatch.
+> Architect MCP server exposes ProcessStateAPI as native Claude Code tools with sub-millisecond dispatch.
 
 ## Quick Start
 
@@ -11,9 +11,9 @@ Add to your project's `.mcp.json`:
 ```json
 {
   "mcpServers": {
-    "delivery-process": {
+    "architect": {
       "command": "npx",
-      "args": ["dp-mcp-server"],
+      "args": ["architect-mcp"],
       "cwd": "${workspaceFolder}"
     }
   }
@@ -25,9 +25,9 @@ Add to your project's `.mcp.json`:
 ```json
 {
   "mcpServers": {
-    "delivery-process": {
+    "architect": {
       "command": "npx",
-      "args": ["dp-mcp-server"],
+      "args": ["architect-mcp"],
       "cwd": "/path/to/your/project"
     }
   }
@@ -41,9 +41,9 @@ Auto-rebuild the dataset when source files change:
 ```json
 {
   "mcpServers": {
-    "delivery-process": {
+    "architect": {
       "command": "npx",
-      "args": ["dp-mcp-server", "--watch"],
+      "args": ["architect-mcp", "--watch"],
       "cwd": "${workspaceFolder}"
     }
   }
@@ -57,10 +57,10 @@ Override config auto-detection for monorepo setups:
 ```json
 {
   "mcpServers": {
-    "delivery-process": {
+    "architect": {
       "command": "npx",
       "args": [
-        "dp-mcp-server",
+        "architect-mcp",
         "--input",
         "packages/core/src/**/*.ts",
         "--features",
@@ -84,38 +84,38 @@ The MCP server:
 
 ## Available Tools
 
-| Tool                   | Description                                          |
-| ---------------------- | ---------------------------------------------------- |
-| `dp_overview`          | Project health summary (start here)                  |
-| `dp_context`           | Session-aware context bundle for a pattern           |
-| `dp_pattern`           | Full pattern metadata                                |
-| `dp_list`              | List patterns with filters (status, phase, category) |
-| `dp_search`            | Fuzzy search patterns by name                        |
-| `dp_status`            | Status counts and completion percentage              |
-| `dp_files`             | File reading list for a pattern                      |
-| `dp_dep_tree`          | Dependency chain with status                         |
-| `dp_scope_validate`    | Pre-flight check for implementation                  |
-| `dp_handoff`           | Session-end state for continuity                     |
-| `dp_rules`             | Business rules and invariants                        |
-| `dp_tags`              | Tag usage report                                     |
-| `dp_sources`           | Source file inventory                                |
-| `dp_stubs`             | Design stubs with resolution status                  |
-| `dp_decisions`         | Design decisions from stubs                          |
-| `dp_arch_context`      | Bounded contexts with members                        |
-| `dp_arch_layer`        | Architecture layers with members                     |
-| `dp_arch_neighborhood` | Pattern uses/used-by/peers                           |
-| `dp_arch_blocking`     | Patterns blocked by dependencies                     |
-| `dp_arch_dangling`     | Broken pattern references                            |
-| `dp_arch_coverage`     | Annotation coverage analysis                         |
-| `dp_unannotated`       | Files missing @libar-docs                            |
-| `dp_rebuild`           | Force dataset rebuild                                |
-| `dp_config`            | Show current configuration                           |
-| `dp_help`              | List all tools                                       |
+| Tool                          | Description                                          |
+| ----------------------------- | ---------------------------------------------------- |
+| `architect_overview`          | Project health summary (start here)                  |
+| `architect_context`           | Session-aware context bundle for a pattern           |
+| `architect_pattern`           | Full pattern metadata                                |
+| `architect_list`              | List patterns with filters (status, phase, category) |
+| `architect_search`            | Fuzzy search patterns by name                        |
+| `architect_status`            | Status counts and completion percentage              |
+| `architect_files`             | File reading list for a pattern                      |
+| `architect_dep_tree`          | Dependency chain with status                         |
+| `architect_scope_validate`    | Pre-flight check for implementation                  |
+| `architect_handoff`           | Session-end state for continuity                     |
+| `architect_rules`             | Business rules and invariants                        |
+| `architect_tags`              | Tag usage report                                     |
+| `architect_sources`           | Source file inventory                                |
+| `architect_stubs`             | Design stubs with resolution status                  |
+| `architect_decisions`         | Design decisions from stubs                          |
+| `architect_arch_context`      | Bounded contexts with members                        |
+| `architect_arch_layer`        | Architecture layers with members                     |
+| `architect_arch_neighborhood` | Pattern uses/used-by/peers                           |
+| `architect_arch_blocking`     | Patterns blocked by dependencies                     |
+| `architect_arch_dangling`     | Broken pattern references                            |
+| `architect_arch_coverage`     | Annotation coverage analysis                         |
+| `architect_unannotated`       | Files missing @architect                             |
+| `architect_rebuild`           | Force dataset rebuild                                |
+| `architect_config`            | Show current configuration                           |
+| `architect_help`              | List all tools                                       |
 
 ## CLI Options
 
 ```text
-dp-mcp-server [options]
+architect-mcp [options]
 
   -i, --input <glob>       TypeScript source globs (repeatable)
   -f, --features <glob>    Gherkin feature globs (repeatable)
@@ -129,11 +129,11 @@ dp-mcp-server [options]
 
 ### Server fails to start
 
-Check that `delivery-process.config.ts` exists in your project root, or provide explicit `--input` and `--features` globs.
+Check that `architect.config.ts` exists in your project root, or provide explicit `--input` and `--features` globs.
 
 ### Tools return stale data
 
-Call `dp_rebuild` to force a dataset refresh, or start the server with `--watch` for automatic rebuilds.
+Call `architect_rebuild` to force a dataset refresh, or start the server with `--watch` for automatic rebuilds.
 
 ### Config not found in monorepo
 

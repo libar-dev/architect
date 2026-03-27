@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:LinterValidationTesting
-@libar-docs-status:completed
-@libar-docs-implements:PatternRelationshipModel
-@libar-docs-product-area:Validation
+@architect
+@architect-pattern:LinterValidationTesting
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-implements:PatternRelationshipModel
+@architect-product-area:Validation
 Feature: Linter Rules for Relationship Validation
 
   Tests for lint rules that validate relationship integrity, detect conflicts,
@@ -26,9 +27,9 @@ Feature: Linter Rules for Relationship Validation
       Given a TypeScript file with:
         """typescript
         /**
-         * @libar-docs
-         * @libar-docs-pattern:EventStoreDurability
-         * @libar-docs-implements:EventStoreDurability
+         * @architect
+         * @architect-pattern:EventStoreDurability
+         * @architect-implements:EventStoreDurability
          */
         """
       When the linter runs
@@ -41,9 +42,9 @@ Feature: Linter Rules for Relationship Validation
       Given a TypeScript file with:
         """typescript
         /**
-         * @libar-docs
-         * @libar-docs-implements:EventStoreDurability
-         * @libar-docs-status:roadmap
+         * @architect
+         * @architect-implements:EventStoreDurability
+         * @architect-status:roadmap
          */
         """
       When the linter runs

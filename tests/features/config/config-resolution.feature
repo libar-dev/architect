@@ -1,10 +1,11 @@
-@libar-docs
-@libar-docs-pattern:ConfigResolution
-@libar-docs-status:completed
-@libar-docs-product-area:Configuration
+@architect
+@architect-pattern:ConfigResolution
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Configuration
 @behavior @config
 Feature: Config Resolution - Defaults and Merging
-  resolveProjectConfig transforms a raw DeliveryProcessProjectConfig into
+  resolveProjectConfig transforms a raw ArchitectProjectConfig into
   a fully resolved ResolvedConfig with all defaults applied.
 
   **Problem:**
@@ -45,7 +46,7 @@ Feature: Config Resolution - Defaults and Merging
       Given a raw config with preset "libar-generic"
       When resolving the project config
       Then the instance should have 3 categories
-      And the instance tagPrefix should be "@libar-docs-"
+      And the instance tagPrefix should be "@architect-"
 
   Rule: Stubs are merged into typescript sources
 

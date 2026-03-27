@@ -1,14 +1,14 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern CompositeCodec
- * @libar-docs-status active
- * @libar-docs-implements ReferenceDocShowcase
- * @libar-docs-arch-role projection
- * @libar-docs-arch-context renderer
- * @libar-docs-arch-layer application
- * @libar-docs-convention codec-registry
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-core
+ * @architect-pattern CompositeCodec
+ * @architect-status active
+ * @architect-implements ReferenceDocShowcase
+ * @architect-arch-role projection
+ * @architect-arch-context renderer
+ * @architect-arch-layer application
+ * @architect-convention codec-registry
+ * @architect-product-area:Generation
  *
  * ## CompositeCodec
  *

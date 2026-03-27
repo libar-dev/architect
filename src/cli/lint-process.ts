@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 
 /**
- * @libar-docs
- * @libar-docs-cli
- * @libar-docs-lint
- * @libar-docs-pattern LintProcessCLI
- * @libar-docs-status active
- * @libar-docs-uses ProcessGuardModule
- * @libar-docs-extract-shapes ProcessGuardCLIConfig
+ * @architect
+ * @architect-cli
+ * @architect-lint
+ * @architect-pattern LintProcessCLI
+ * @architect-status active
+ * @architect-uses ProcessGuardModule
+ * @architect-extract-shapes ProcessGuardCLIConfig
  *
  * ## LintProcessCLI - Process Guard Linter CLI
  *
- * Validates git changes against delivery process rules.
+ * Validates git changes against workflow rules.
  * Enforces protection levels, status transitions, and session scope.
  *
  * ### When to Use
@@ -28,6 +28,7 @@
 
 import { printVersionAndExit } from './version.js';
 import { handleCliError } from './error-handler.js';
+import { formatConfigError, loadProjectConfig } from '../config/config-loader.js';
 import {
   deriveProcessState,
   detectStagedChanges,
@@ -139,10 +140,10 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ProcessGuardC
  */
 export function printHelp(): void {
   console.log(`
-lint-process - Validate changes against delivery process rules
+architect-guard - Validate changes against workflow rules
 
 Usage:
-  lint-process [options] [files...]
+  architect-guard [options] [files...]
 
 Modes:
   --staged            Validate staged changes (default, for pre-commit)
@@ -173,16 +174,16 @@ Rules Checked:
 
 Examples:
   # Pre-commit hook (default)
-  lint-process --staged
+  architect-guard --staged
 
   # CI/CD pipeline
-  lint-process --all --strict
+  architect-guard --all --strict
 
   # Check specific files
-  lint-process --file path/to/spec.feature
+  architect-guard --file path/to/spec.feature
 
   # Debugging - show derived state
-  lint-process --staged --show-state
+  architect-guard --staged --show-state
   `);
 }
 
@@ -247,7 +248,7 @@ async function main(): Promise<void> {
   const config = parseArgs();
 
   if (config.version) {
-    printVersionAndExit('lint-process');
+    printVersionAndExit('architect-guard');
   }
 
   if (config.help) {
@@ -259,8 +260,22 @@ async function main(): Promise<void> {
     console.log(`Process Guard: validating ${config.mode} changes...`);
     console.log(`  Base directory: ${config.baseDir}`);
 
+    const configResult = await loadProjectConfig(config.baseDir);
+    if (!configResult.ok) {
+      throw new Error(formatConfigError(configResult.error));
+    }
+
+    const projectConfig = configResult.value;
+    const featurePatterns =
+      projectConfig.project.sources.features.length > 0
+        ? projectConfig.project.sources.features
+        : undefined;
+
     // Derive process state
-    const stateResult = await deriveProcessState({ baseDir: config.baseDir });
+    const stateResult = await deriveProcessState({
+      baseDir: config.baseDir,
+      ...(featurePatterns ? { specPatterns: featurePatterns } : {}),
+    });
     if (!stateResult.ok) {
       throw stateResult.error;
     }
@@ -287,10 +302,16 @@ async function main(): Promise<void> {
     let changesResult;
     switch (config.mode) {
       case 'staged':
-        changesResult = detectStagedChanges(config.baseDir);
+        changesResult = detectStagedChanges(config.baseDir, {
+          registry: projectConfig.instance.registry,
+          ...(featurePatterns ? { featurePatterns } : {}),
+        });
         break;
       case 'all':
-        changesResult = detectBranchChanges(config.baseDir);
+        changesResult = detectBranchChanges(config.baseDir, 'main', {
+          registry: projectConfig.instance.registry,
+          ...(featurePatterns ? { featurePatterns } : {}),
+        });
         break;
       case 'files':
         if (config.files.length === 0) {
@@ -298,7 +319,10 @@ async function main(): Promise<void> {
           printHelp();
           process.exit(1);
         }
-        changesResult = detectFileChanges(config.baseDir, config.files);
+        changesResult = detectFileChanges(config.baseDir, config.files, {
+          registry: projectConfig.instance.registry,
+          ...(featurePatterns ? { featurePatterns } : {}),
+        });
         break;
     }
 

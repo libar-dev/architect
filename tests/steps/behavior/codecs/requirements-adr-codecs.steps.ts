@@ -7,7 +7,7 @@
  *
  * Tests document structure, groupBy options, status filtering, and detail file generation.
  *
- * @libar-docs
+ * @architect
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';

@@ -1,20 +1,20 @@
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-scanner
- * @libar-docs-pattern TypeScript AST Parser
- * @libar-docs-status completed
- * @libar-docs-arch-role infrastructure
- * @libar-docs-arch-context scanner
- * @libar-docs-arch-layer infrastructure
- * @libar-docs-uses TagRegistry, DocDirectiveSchema, typescript-estree
- * @libar-docs-used-by Pattern Scanner, Doc Extractor
- * @libar-docs-usecase "When parsing JSDoc comments for @libar-docs-* directives"
- * @libar-docs-usecase "When extracting code blocks following documentation comments"
+ * @architect
+ * @architect-core @architect-scanner
+ * @architect-pattern TypeScript AST Parser
+ * @architect-status completed
+ * @architect-arch-role infrastructure
+ * @architect-arch-context scanner
+ * @architect-arch-layer infrastructure
+ * @architect-uses TagRegistry, DocDirectiveSchema, typescript-estree
+ * @architect-used-by Pattern Scanner, Doc Extractor
+ * @architect-usecase "When parsing JSDoc comments for @architect-* directives"
+ * @architect-usecase "When extracting code blocks following documentation comments"
  *
  * ## TypeScript AST Parser - JSDoc Directive Extraction
  *
  * Parses TypeScript source files using @typescript-eslint/typescript-estree
- * to extract @libar-docs-* directives with their associated code blocks.
+ * to extract @architect-* directives with their associated code blocks.
  * First stage of the three-stage pipeline: Scanner → Extractor → Generator.
  *
  * ### When to Use
@@ -105,7 +105,7 @@ export interface ParseDirectivesResult {
  *
  * @example
  * ```
- * @libar-docs-pattern MyPattern
+ * @architect-pattern MyPattern
  * ```
  */
 function extractSingleValue(commentText: string, fullTag: string): string | undefined {
@@ -121,7 +121,7 @@ function extractSingleValue(commentText: string, fullTag: string): string | unde
  *
  * @example
  * ```
- * @libar-docs-status completed
+ * @architect-status completed
  * ```
  */
 function extractEnumValue(
@@ -140,7 +140,7 @@ function extractEnumValue(
  *
  * @example
  * ```
- * @libar-docs-usecase "When implementing a new command"
+ * @architect-usecase "When implementing a new command"
  * ```
  */
 function extractQuotedValue(commentText: string, fullTag: string): string[] {
@@ -164,7 +164,7 @@ function extractQuotedValue(commentText: string, fullTag: string): string[] {
  *
  * @example
  * ```
- * @libar-docs-uses PatternA, PatternB, PatternC
+ * @architect-uses PatternA, PatternB, PatternC
  * ```
  */
 function extractCsvValue(commentText: string, fullTag: string): string[] | undefined {
@@ -183,7 +183,7 @@ function extractCsvValue(commentText: string, fullTag: string): string[] | undef
  *
  * @example
  * ```
- * @libar-docs-phase 14
+ * @architect-phase 14
  * ```
  */
 function extractNumberValue(commentText: string, fullTag: string): number | undefined {
@@ -197,7 +197,7 @@ function extractNumberValue(commentText: string, fullTag: string): number | unde
  *
  * @example
  * ```
- * @libar-docs-core
+ * @architect-core
  * ```
  */
 function checkFlagPresent(commentText: string, fullTag: string): boolean {
@@ -221,11 +221,11 @@ function escapeRegex(str: string): string {
  * @internal
  */
 function buildDirectivePatterns(registry: TagRegistry): {
-  /** Matches directive tags (e.g., @libar-docs-pattern, @docs-core) */
+  /** Matches directive tags (e.g., @architect-pattern, @acme-core) */
   readonly tagRegex: RegExp;
   /** Matches start of line with opt-in or directive */
   readonly startsWithOptInOrDirective: RegExp;
-  /** Matches opt-in tag for removal (e.g., @libar-docs without suffix) */
+  /** Matches opt-in tag for removal (e.g., @architect without suffix) */
   readonly optInTagPattern: RegExp;
   /** Matches any non-opt-in @ tag (negative lookahead for registry prefix) */
   readonly nonOptInAtTagPattern: RegExp;
@@ -247,15 +247,15 @@ function buildDirectivePatterns(registry: TagRegistry): {
     tagRegex: new RegExp(`@${escapedPrefixWithoutAt}[\\w-]+`, 'g'),
 
     // Check if line starts with opt-in or directive
-    // e.g., ^@libar-docs or ^@libar-docs-pattern
+    // e.g., ^@architect or ^@architect-pattern
     startsWithOptInOrDirective: new RegExp(`^@${escapedOptInWithoutAt}(?:-[\\w-]+)?`),
 
     // Match opt-in tag for removal (not followed by -)
-    // e.g., @libar-docs followed by whitespace or end
+    // e.g., @architect followed by whitespace or end
     optInTagPattern: new RegExp(`@${escapedOptInWithoutAt}(?!-)(\\s|$)?`, 'g'),
 
     // Match any @ tag that is NOT our prefix
-    // e.g., @param, @returns, @example (not @libar-docs)
+    // e.g., @param, @returns, @example (not @architect)
     nonOptInAtTagPattern: new RegExp(`^@(?!${escapedOptInWithoutAt})`),
   };
 }
@@ -288,8 +288,8 @@ function buildValueTakingTagsPattern(registry: TagRegistry): string {
  * 1. Avoid regex compilation on every parse call
  * 2. Eliminate hardcoded tag lists that fall out of sync with registry
  *
- * Matches lines containing tags like @libar-docs-pattern, @libar-docs-status, etc.
- * Does NOT match flag-only tags like @libar-docs-core.
+ * Matches lines containing tags like @architect-pattern, @architect-status, etc.
+ * Does NOT match flag-only tags like @architect-core.
  *
  * @internal
  */
@@ -306,7 +306,7 @@ const _VALUE_TAKING_TAGS_REGEX: RegExp = (() => {
  *
  * @param commentText - Full JSDoc comment text
  * @param tagDef - Metadata tag definition from registry
- * @param prefix - Tag prefix (e.g., "@libar-docs-")
+ * @param prefix - Tag prefix (e.g., "@architect-")
  * @returns Extracted value in appropriate format, or undefined if not found
  */
 function extractMetadataTag(
@@ -348,7 +348,7 @@ function extractMetadataTag(
 }
 
 /**
- * Parses TypeScript content and extracts all @libar-docs-* directives
+ * Parses TypeScript content and extracts all @architect-* directives
  * with their associated code blocks and exports.
  *
  * **Error Handling**: Returns Result type to surface parse errors:
@@ -455,18 +455,18 @@ export function parseFileDirectives(
  * **Schema-First Enforcement**: Validates constructed directive against schema
  * to ensure data integrity at the boundary.
  *
- * **Directive-Level Tag Extraction**: Only extracts `@libar-docs-*` tags from
+ * **Directive-Level Tag Extraction**: Only extracts `@architect-*` tags from
  * the directive section (first lines before description content). Tags mentioned
  * in descriptions, examples, or other sections are NOT extracted.
  *
  * JSDoc structure:
  * ```
  * /**
- *  * @libar-docs-core @libar-docs-api   <- Directive tags (extracted)
+ *  * @architect-core @architect-api   <- Directive tags (extracted)
  *  *
- *  * Description mentioning @libar-docs-x <- NOT extracted
+ *  * Description mentioning @architect-x <- NOT extracted
  *  * @example
- *  * hasTag('@libar-docs-y');            <- NOT extracted
+ *  * hasTag('@architect-y');            <- NOT extracted
  *  *\/
  * ```
  */
@@ -484,8 +484,8 @@ function parseDirective(
 
   // Extract directive tags ONLY from directive section
   // Directive section = lines where tags appear at the START (not mentioned in text)
-  // A directive tag line: "@libar-docs-core @libar-docs-api Some brief description"
-  // A description line: "This works with @libar-docs-api patterns" (tag not at start)
+  // A directive tag line: "@architect-core @architect-api Some brief description"
+  // A description line: "This works with @architect-api patterns" (tag not at start)
   const tags: string[] = [];
   let inlineDescription = ''; // Capture description on same line as tags
 
@@ -505,14 +505,14 @@ function parseDirective(
     }
 
     // Check if line STARTS with opt-in or directive tag
-    // e.g., @libar-docs (no suffix) = file opt-in tag
-    // e.g., @libar-docs-* (with suffix) = section tag to extract
+    // e.g., @architect (no suffix) = file opt-in tag
+    // e.g., @architect-* (with suffix) = section tag to extract
     const startsWithDocTag = patterns.startsWithOptInOrDirective.exec(trimmedLine);
 
     if (startsWithDocTag) {
       // This is a directive line - extract only directive tags (with suffix)
       // Skip opt-in tag (no suffix) which is just the opt-in marker
-      // e.g., "@libar-docs @libar-docs-core Brief description" extracts only @libar-docs-core
+      // e.g., "@architect @architect-core Brief description" extracts only @architect-core
       let match;
       let lastTagEnd = 0;
       patterns.tagRegex.lastIndex = 0;
@@ -531,10 +531,10 @@ function parseDirective(
       }
 
       // Capture any description text after the tags on the same line
-      // e.g., "@libar-docs-core Brief description on same line" -> "Brief description on same line"
+      // e.g., "@architect-core Brief description on same line" -> "Brief description on same line"
       // But skip lines with metadata directives that take values (all non-flag tags)
       // to prevent their values from leaking into the description
-      // (e.g., "@libar-docs-phase 01" would incorrectly capture "01")
+      // (e.g., "@architect-phase 01" would incorrectly capture "01")
       const hasMetadataDirective = valueTakingTagsRegex.test(trimmedLine);
       if (!hasMetadataDirective) {
         const textAfterTags = trimmedLine
@@ -596,6 +596,10 @@ function parseDirective(
   const productArea = metadataResults.get('product-area') as string | undefined;
   // Convention tags for reference document generation
   const convention = metadataResults.get('convention') as string[] | undefined;
+  // Claude module generation tags
+  const claudeModule = metadataResults.get('claude-module') as string | undefined;
+  const claudeSection = metadataResults.get('claude-section') as string | undefined;
+  const claudeTags = metadataResults.get('claude-tags') as string[] | undefined;
 
   // Extract "### When to Use" section or "**When to use:**" inline format
   // Returns array of bullet points, stopping at section boundaries
@@ -681,6 +685,9 @@ function parseDirective(
     ...(archContext && { archContext }),
     ...(archLayer && { archLayer }),
     ...(include && include.length > 0 && { include }),
+    ...(claudeModule && { claudeModule }),
+    ...(claudeSection && { claudeSection }),
+    ...(claudeTags && claudeTags.length > 0 && { claudeTags }),
     // Shape extraction fields
     ...(extractShapes && extractShapes.length > 0 && { extractShapes }),
     // PRD metadata fields
@@ -934,7 +941,7 @@ function getExportType(declaration: TSESTree.Node): ExportInfo['type'] {
  * Recommendation: Keep all bullet points as single lines.
  *
  * @param commentText - Raw JSDoc comment content
- * @param fileOptInTag - The file opt-in tag (e.g., "@docs" or "@libar-docs")
+ * @param fileOptInTag - The file opt-in tag (e.g., "@docs" or "@architect")
  * @returns Array of bullet point strings, or undefined if no "When to Use" section
  */
 function extractWhenToUse(

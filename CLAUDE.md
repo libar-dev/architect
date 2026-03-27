@@ -1,6 +1,6 @@
-# @libar-dev/delivery-process
+# @libar-dev/architect
 
-> **Code-first documentation and delivery process toolkit**
+> **Context engineering platform with extraction pipeline and typed codecs**
 
 ---
 
@@ -8,7 +8,7 @@
 
 ### Project Overview
 
-Code-first documentation and delivery process toolkit. Extracts patterns from TypeScript and Gherkin sources using configurable annotations, generates LLM-optimized markdown and Mermaid architecture diagrams, and validates delivery workflow via pre-commit hooks.
+Context engineering platform with extraction pipeline and typed codecs. Extracts patterns from TypeScript and Gherkin sources using configurable annotations, generates LLM-optimized markdown and Mermaid architecture diagrams, and validates delivery workflow via pre-commit hooks.
 
 **Core Principle:** Code is the single source of truth. Generated documentation is a projection of annotated source code.
 
@@ -55,12 +55,12 @@ The API returns structured, current data using 5-10x less context than file read
 
 #### PR / Session Start (run these FIRST)
 
-| Step | Command                                                    | What You Get                                |
-| ---- | ---------------------------------------------------------- | ------------------------------------------- |
-| 1    | `pnpm process:query -- overview`                           | Project health, active phases, blockers     |
-| 2    | `pnpm process:query -- scope-validate <pattern> <session>` | Pre-flight: FSM violations, missing deps    |
-| 3    | `pnpm process:query -- context <pattern> --session <type>` | Curated context bundle for the session      |
-| 4    | `pnpm process:query -- files <pattern> --related`          | File reading list with implementation paths |
+| Step | Command                                                      | What You Get                                |
+| ---- | ------------------------------------------------------------ | ------------------------------------------- |
+| 1    | `pnpm architect:query -- overview`                           | Project health, active phases, blockers     |
+| 2    | `pnpm architect:query -- scope-validate <pattern> <session>` | Pre-flight: FSM violations, missing deps    |
+| 3    | `pnpm architect:query -- context <pattern> --session <type>` | Curated context bundle for the session      |
+| 4    | `pnpm architect:query -- files <pattern> --related`          | File reading list with implementation paths |
 
 Session types: `planning` (minimal), `design` (full: stubs + deps + deliverables), `implement` (focused: deliverables + FSM + tests).
 
@@ -71,11 +71,11 @@ Session types: `planning` (minimal), `design` (full: stubs + deps + deliverables
 | Find code structure     | `arch context [name]` / `arch layer [name]` | Structured by annotations, not file paths   |
 | Find dependencies       | `dep-tree <pattern>`                        | Shows status of each dependency             |
 | Find business rules     | `rules --pattern <name>`                    | Extracted from Gherkin Rule: blocks         |
-| Find unannotated files  | `unannotated --path <dir>`                  | Catches missing @libar-docs markers         |
+| Find unannotated files  | `unannotated --path <dir>`                  | Catches missing @architect markers          |
 | Check FSM state         | `query getProtectionInfo <status>`          | Protection level + allowed actions          |
 | Check valid transitions | `query getValidTransitionsFrom <status>`    | Valid next states from current status       |
 | Tag inventory           | `tags`                                      | Counts per tag and value across all sources |
-| Annotation coverage     | `arch coverage`                             | Files with/without @libar-docs annotations  |
+| Annotation coverage     | `arch coverage`                             | Files with/without @architect annotations   |
 
 #### Why Annotations Beat Grep
 
@@ -84,9 +84,9 @@ Session types: `planning` (minimal), `design` (full: stubs + deps + deliverables
 - **Feed generation**: Annotations produce generated docs; grep results are ephemeral
 - **Discoverable**: `unannotated --path` finds gaps; grep doesn't know what's missing
 
-**When adding new code:** Add `@libar-docs` annotations and relationship tags (`@libar-docs-depends-on`, `@libar-docs-uses`) so future sessions can discover the code via API queries instead of grep.
+**When adding new code:** Add `@architect` annotations and relationship tags (`@architect-depends-on`, `@architect-uses`) so future sessions can discover the code via API queries instead of grep.
 
-Full CLI reference: `pnpm process:query -- --help`
+Full CLI reference: `pnpm architect:query -- --help`
 
 ---
 
@@ -113,9 +113,9 @@ pnpm validate:all       # All validations including anti-patterns and DoD
 pnpm docs:all           # Generate all doc types
 
 # Data API (see Context Gathering Protocol above)
-pnpm process:query -- --help                              # All subcommands and options
-pnpm process:query -- context <pattern> --session design  # Session context bundle
-pnpm process:query -- overview                            # Project health summary
+pnpm architect:query -- --help                              # All subcommands and options
+pnpm architect:query -- context <pattern> --session design  # Session context bundle
+pnpm architect:query -- overview                            # Project health summary
 ```
 
 ---
@@ -124,9 +124,9 @@ pnpm process:query -- overview                            # Project health summa
 
 ### Data API CLI
 
-Query delivery process state directly from the terminal. **Use this instead of reading generated markdown or launching explore agents** — targeted queries use 5-10x less context.
+Query process state directly from the terminal. **Use this instead of reading generated markdown or launching explore agents** — targeted queries use 5-10x less context.
 
-**Run `pnpm process:query -- --help` for the full command reference**, including workflow recipes, session types, architecture queries, output modifiers, and available API methods.
+**Run `pnpm architect:query -- --help` for the full command reference**, including workflow recipes, session types, architecture queries, output modifiers, and available API methods.
 
 See the **Context Gathering Protocol** section above for mandatory session start commands and query recipes.
 
@@ -139,18 +139,18 @@ See the **Context Gathering Protocol** section above for mandatory session start
 
 ### MCP Server — Native AI Context Tools
 
-When the MCP server is running, **use `dp_*` tools instead of CLI commands** (`pnpm process:query --`). The MCP server keeps the MasterDataset in memory — tool calls dispatch in sub-milliseconds vs 2-5 seconds for CLI subprocess invocations. All 25 tools wrap the same ProcessStateAPI methods available via CLI.
+When the MCP server is running, **use `architect_*` tools instead of CLI commands** (`pnpm architect:query --`). The MCP server keeps the MasterDataset in memory — tool calls dispatch in sub-milliseconds vs 2-5 seconds for CLI subprocess invocations. All 25 tools wrap the same ProcessStateAPI methods available via CLI.
 
 #### Session Start (MCP Protocol)
 
 Use these tools at the start of every PR or implementation session, in order:
 
-| Step | MCP Tool            | What You Get                                | CLI Equivalent                                    |
-| ---- | ------------------- | ------------------------------------------- | ------------------------------------------------- |
-| 1    | `dp_overview`       | Project health, active phases, blockers     | `pnpm process:query -- overview`                  |
-| 2    | `dp_scope_validate` | Pre-flight: FSM violations, missing deps    | `pnpm process:query -- scope-validate <p> <type>` |
-| 3    | `dp_context`        | Curated context bundle for the session      | `pnpm process:query -- context <p> --session <t>` |
-| 4    | `dp_files`          | File reading list with implementation paths | `pnpm process:query -- files <p> --related`       |
+| Step | MCP Tool                   | What You Get                                | CLI Equivalent                                      |
+| ---- | -------------------------- | ------------------------------------------- | --------------------------------------------------- |
+| 1    | `architect_overview`       | Project health, active phases, blockers     | `pnpm architect:query -- overview`                  |
+| 2    | `architect_scope_validate` | Pre-flight: FSM violations, missing deps    | `pnpm architect:query -- scope-validate <p> <type>` |
+| 3    | `architect_context`        | Curated context bundle for the session      | `pnpm architect:query -- context <p> --session <t>` |
+| 4    | `architect_files`          | File reading list with implementation paths | `pnpm architect:query -- files <p> --related`       |
 
 Steps 1-2 can run in parallel (no dependencies between them).
 
@@ -158,61 +158,61 @@ Steps 1-2 can run in parallel (no dependencies between them).
 
 **Session-Aware Tools** — text output, use for workflow:
 
-| Tool                | Input               | Description                                    |
-| ------------------- | ------------------- | ---------------------------------------------- |
-| `dp_overview`       | _(none)_            | Progress %, active phases, blocking chains     |
-| `dp_context`        | `name`, `session?`  | Curated context (planning/design/implement)    |
-| `dp_files`          | `name`              | Ordered file list with roles                   |
-| `dp_dep_tree`       | `name`, `maxDepth?` | Dependency chain with status per dep           |
-| `dp_scope_validate` | `name`, `session`   | PASS/BLOCKED/WARN pre-flight verdict           |
-| `dp_handoff`        | `name`, `session?`  | Session-end state for multi-session continuity |
+| Tool                       | Input               | Description                                    |
+| -------------------------- | ------------------- | ---------------------------------------------- |
+| `architect_overview`       | _(none)_            | Progress %, active phases, blocking chains     |
+| `architect_context`        | `name`, `session?`  | Curated context (planning/design/implement)    |
+| `architect_files`          | `name`              | Ordered file list with roles                   |
+| `architect_dep_tree`       | `name`, `maxDepth?` | Dependency chain with status per dep           |
+| `architect_scope_validate` | `name`, `session`   | PASS/BLOCKED/WARN pre-flight verdict           |
+| `architect_handoff`        | `name`, `session?`  | Session-end state for multi-session continuity |
 
 **Data Query Tools** — JSON output, use for structured lookups:
 
-| Tool           | Input                                                    | Description                                        |
-| -------------- | -------------------------------------------------------- | -------------------------------------------------- |
-| `dp_status`    | _(none)_                                                 | Pattern counts by status, completion %             |
-| `dp_pattern`   | `name`                                                   | Full metadata: deliverables, relationships, shapes |
-| `dp_list`      | `status?`, `phase?`, `category?`, `namesOnly?`, `count?` | Filtered pattern listing                           |
-| `dp_search`    | `query`                                                  | Fuzzy name search with similarity scores           |
-| `dp_rules`     | `pattern?`, `onlyInvariants?`                            | Business rules from Gherkin Rule: blocks           |
-| `dp_tags`      | _(none)_                                                 | Tag usage counts across all sources                |
-| `dp_sources`   | _(none)_                                                 | File inventory by type (TS, Gherkin, stubs)        |
-| `dp_stubs`     | `unresolved?`                                            | Design stubs with resolution status                |
-| `dp_decisions` | `name?`                                                  | AD-N/DD-N design decisions from stubs              |
+| Tool                  | Input                                                    | Description                                        |
+| --------------------- | -------------------------------------------------------- | -------------------------------------------------- |
+| `architect_status`    | _(none)_                                                 | Pattern counts by status, completion %             |
+| `architect_pattern`   | `name`                                                   | Full metadata: deliverables, relationships, shapes |
+| `architect_list`      | `status?`, `phase?`, `category?`, `namesOnly?`, `count?` | Filtered pattern listing                           |
+| `architect_search`    | `query`                                                  | Fuzzy name search with similarity scores           |
+| `architect_rules`     | `pattern?`, `onlyInvariants?`                            | Business rules from Gherkin Rule: blocks           |
+| `architect_tags`      | _(none)_                                                 | Tag usage counts across all sources                |
+| `architect_sources`   | _(none)_                                                 | File inventory by type (TS, Gherkin, stubs)        |
+| `architect_stubs`     | `unresolved?`                                            | Design stubs with resolution status                |
+| `architect_decisions` | `name?`                                                  | AD-N/DD-N design decisions from stubs              |
 
 **Architecture Tools** — JSON output, use for dependency and structure analysis:
 
-| Tool                   | Input    | Description                                 |
-| ---------------------- | -------- | ------------------------------------------- |
-| `dp_arch_context`      | `name?`  | Bounded contexts with member patterns       |
-| `dp_arch_layer`        | `name?`  | Architecture layers with member patterns    |
-| `dp_arch_neighborhood` | `name`   | Uses, used-by, same-context peers           |
-| `dp_arch_blocking`     | _(none)_ | Patterns blocked by incomplete dependencies |
-| `dp_arch_dangling`     | _(none)_ | Broken references to nonexistent patterns   |
-| `dp_arch_coverage`     | `path?`  | Annotation coverage % and unused taxonomy   |
-| `dp_unannotated`       | `path?`  | Files missing @libar-docs annotations       |
+| Tool                          | Input    | Description                                 |
+| ----------------------------- | -------- | ------------------------------------------- |
+| `architect_arch_context`      | `name?`  | Bounded contexts with member patterns       |
+| `architect_arch_layer`        | `name?`  | Architecture layers with member patterns    |
+| `architect_arch_neighborhood` | `name`   | Uses, used-by, same-context peers           |
+| `architect_arch_blocking`     | _(none)_ | Patterns blocked by incomplete dependencies |
+| `architect_arch_dangling`     | _(none)_ | Broken references to nonexistent patterns   |
+| `architect_arch_coverage`     | `path?`  | Annotation coverage % and unused taxonomy   |
+| `architect_unannotated`       | `path?`  | Files missing @architect annotations        |
 
 **Server Management:**
 
-| Tool         | Description                                            |
-| ------------ | ------------------------------------------------------ |
-| `dp_rebuild` | Force dataset rebuild from current source files        |
-| `dp_config`  | Show source globs, base dir, build time, pattern count |
-| `dp_help`    | List all available tools with descriptions             |
+| Tool                | Description                                            |
+| ------------------- | ------------------------------------------------------ |
+| `architect_rebuild` | Force dataset rebuild from current source files        |
+| `architect_config`  | Show source globs, base dir, build time, pattern count |
+| `architect_help`    | List all available tools with descriptions             |
 
 #### Common Recipes
 
-| Goal                               | Tools                                                              |
-| ---------------------------------- | ------------------------------------------------------------------ |
-| What patterns are blocking?        | `dp_arch_blocking`                                                 |
-| Understand a pattern before coding | `dp_context` (name, session) + `dp_scope_validate` (name, session) |
-| Find business rules for a feature  | `dp_rules` with `pattern` filter                                   |
-| Check annotation gaps              | `dp_arch_coverage` or `dp_unannotated`                             |
-| Explore a bounded context          | `dp_arch_context` with name                                        |
-| Find what depends on a pattern     | `dp_arch_neighborhood` with name                                   |
-| List all roadmap patterns          | `dp_list` with `status: "roadmap"`                                 |
-| Search by partial name             | `dp_search` with query                                             |
+| Goal                               | Tools                                                                            |
+| ---------------------------------- | -------------------------------------------------------------------------------- |
+| What patterns are blocking?        | `architect_arch_blocking`                                                        |
+| Understand a pattern before coding | `architect_context` (name, session) + `architect_scope_validate` (name, session) |
+| Find business rules for a feature  | `architect_rules` with `pattern` filter                                          |
+| Check annotation gaps              | `architect_arch_coverage` or `architect_unannotated`                             |
+| Explore a bounded context          | `architect_arch_context` with name                                               |
+| Find what depends on a pattern     | `architect_arch_neighborhood` with name                                          |
+| List all roadmap patterns          | `architect_list` with `status: "roadmap"`                                        |
+| Search by partial name             | `architect_search` with query                                                    |
 
 #### Configuration
 
@@ -221,9 +221,9 @@ The MCP server is configured via `.mcp.json` in the project root:
 ```json
 {
   "mcpServers": {
-    "delivery-process": {
+    "architect": {
       "command": "npx",
-      "args": ["dp-mcp-server", "--watch"]
+      "args": ["architect-mcp", "--watch"]
     }
   }
 }
@@ -234,10 +234,10 @@ For monorepo setups with explicit source globs:
 ```json
 {
   "mcpServers": {
-    "delivery-process": {
+    "architect": {
       "command": "npx",
       "args": [
-        "dp-mcp-server",
+        "architect-mcp",
         "--watch",
         "--input",
         "packages/core/src/**/*.ts",
@@ -251,14 +251,14 @@ For monorepo setups with explicit source globs:
 }
 ```
 
-The `--watch` flag enables auto-rebuild when `.ts` or `.feature` files change (500ms debounce). Without it, use `dp_rebuild` after annotation changes.
+The `--watch` flag enables auto-rebuild when `.ts` or `.feature` files change (500ms debounce). Without it, use `architect_rebuild` after annotation changes.
 
 #### Tips
 
-- `dp_rules` without a `pattern` filter returns a compact summary (totals + rule names + per-area counts) — unfiltered output is capped to prevent context overflow.
-- `dp_pattern` returns full metadata (~66KB for completed patterns) — prefer `dp_context` with a session type for interactive sessions.
-- `dp_search` uses fuzzy matching — partial names work (e.g., "MCP" matches all MCP-related patterns).
-- `dp_list` filters compose: `status` + `phase` + `category` narrow results cumulatively.
+- `architect_rules` without a `pattern` filter returns a compact summary (totals + rule names + per-area counts) — unfiltered output is capped to prevent context overflow.
+- `architect_pattern` returns full metadata (~66KB for completed patterns) — prefer `architect_context` with a session type for interactive sessions.
+- `architect_search` uses fuzzy matching — partial names work (e.g., "MCP" matches all MCP-related patterns).
+- `architect_list` filters compose: `status` + `phase` + `category` narrow results cumulatively.
 - Session-aware tools return formatted text (like CLI output). Data and architecture tools return JSON.
 
 ---
@@ -272,7 +272,7 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
          (files)   (patterns)   (MasterDataset)  (Markdown)
 ```
 
-1. **Scanner** (`src/scanner/`): File discovery, AST parsing, opt-in detection via `@libar-docs` marker
+1. **Scanner** (`src/scanner/`): File discovery, AST parsing, opt-in detection via `@architect` marker
 2. **Extractor** (`src/extractor/`): Pattern extraction from TypeScript JSDoc and Gherkin tags
 3. **Transformer** (`src/generators/pipeline/`): Builds MasterDataset with pre-computed views
 4. **Codec** (`src/renderable/`): Zod 4 codecs transform MasterDataset → RenderableDocument → Markdown
@@ -286,11 +286,11 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 - **Pipeline Factory**: Shared `buildMasterDataset()` in `src/generators/pipeline/build-pipeline.ts` — all consumers (orchestrator, process-api, validate-patterns) call this instead of wiring inline pipelines. Per-consumer behavior via `PipelineOptions`.
 - **Single Read Model** (ADR-006): MasterDataset is the sole read model. No consumer re-derives data from raw scanner/extractor output. Anti-patterns: Parallel Pipeline, Lossy Local Type, Re-derived Relationship.
 
-**Live module inventory:** `pnpm process:query -- arch context` and `pnpm process:query -- arch layer`
+**Live module inventory:** `pnpm architect:query -- arch context` and `pnpm architect:query -- arch layer`
 
 ### Decision Specs
 
-Architecture and process decisions are recorded as annotated Gherkin specs in `delivery-process/decisions/`:
+Architecture and process decisions are recorded as annotated Gherkin specs in `architect/decisions/`:
 
 | Spec    | Key Decision                                                               |
 | ------- | -------------------------------------------------------------------------- |
@@ -301,7 +301,7 @@ Architecture and process decisions are recorded as annotated Gherkin specs in `d
 | ADR-006 | Single read model — MasterDataset is the sole read model for all consumers |
 | PDR-001 | Session workflow commands — Process Data API CLI design decisions          |
 
-Query decisions: `pnpm process:query -- decisions <pattern>`
+Query decisions: `pnpm architect:query -- decisions <pattern>`
 
 ---
 
@@ -580,7 +580,7 @@ console.log(JSON.stringify(doc.sections, null, 2));
 
 **Invariant:** A design session makes architectural decisions and creates code stubs with interfaces. It must not produce implementation code. Context gathering via the Process Data API must precede any explore agent usage.
 
-**Rationale:** Design sessions resolve ambiguity before implementation begins. Code stubs in delivery-process/stubs/ live outside src/ to avoid TypeScript compilation and ESLint issues, making them zero-risk artifacts.
+**Rationale:** Design sessions resolve ambiguity before implementation begins. Code stubs in architect/stubs/ live outside src/ to avoid TypeScript compilation and ESLint issues, making them zero-risk artifacts.
 
 | Use Design Session         | Skip Design Session |
 | -------------------------- | ------------------- |
@@ -609,7 +609,7 @@ console.log(JSON.stringify(doc.sections, null, 2));
 
 | Error                     | Cause                                          | Fix                                         |
 | ------------------------- | ---------------------------------------------- | ------------------------------------------- |
-| completed-protection      | File has completed status but no unlock tag    | Add libar-docs-unlock-reason tag            |
+| completed-protection      | File has completed status but no unlock tag    | Add @architect-unlock-reason tag            |
 | invalid-status-transition | Skipped FSM state (e.g., roadmap to completed) | Follow path: roadmap to active to completed |
 | scope-creep               | Added deliverable to active spec               | Remove deliverable OR revert to roadmap     |
 | session-scope (warning)   | Modified file outside session scope            | Add to scope OR use --ignore-session        |
@@ -617,7 +617,7 @@ console.log(JSON.stringify(doc.sections, null, 2));
 
 | Situation                    | Solution              | Example                                |
 | ---------------------------- | --------------------- | -------------------------------------- |
-| Fix bug in completed spec    | Add unlock reason tag | libar-docs-unlock-reason:Fix-typo      |
+| Fix bug in completed spec    | Add unlock reason tag | @architect-unlock-reason:Fix-typo      |
 | Modify outside session scope | Use ignore flag       | lint-process --staged --ignore-session |
 | CI treats warnings as errors | Use strict flag       | lint-process --all --strict            |
 
@@ -629,7 +629,7 @@ console.log(JSON.stringify(doc.sections, null, 2));
 
 #### ClaudeModuleGeneration is the generation mechanism
 
-**Invariant:** Phase 39 depends on ClaudeModuleGeneration (Phase 25). Adding `@libar-docs-claude-module` and `@libar-docs-claude-section:workflow` tags to this spec will cause ClaudeModuleGeneration to produce `_claude-md/workflow/` output files. The hand-written `_claude-md/workflow/` files are deleted after successful verified generation.
+**Invariant:** Phase 39 depends on ClaudeModuleGeneration (Phase 25). Adding `@architect-claude-module` and `@architect-claude-section:workflow` tags to this spec will cause ClaudeModuleGeneration to produce `_claude-md/workflow/` output files. The hand-written `_claude-md/workflow/` files are deleted after successful verified generation.
 
 **Rationale:** The annotation work (Rule blocks in this spec) is immediately useful — queryable via `pnpm process:query -- rules`. Generation deliverables cannot complete until Phase 25 ships the ClaudeModuleCodec. This sequencing is intentional: the annotation investment has standalone value regardless of whether the codec exists yet.
 
@@ -641,23 +641,23 @@ console.log(JSON.stringify(doc.sections, null, 2));
 
 Process Guard validates delivery workflow changes at commit time using a Decider pattern.
 
-Query validation rules: `pnpm process:query -- rules --pattern ProcessGuard`
-Query protection levels: `pnpm process:query -- query getProtectionInfo <status>`
+Query validation rules: `pnpm architect:query -- rules --pattern ProcessGuard`
+Query protection levels: `pnpm architect:query -- query getProtectionInfo <status>`
 
 #### CLI Usage
 
 ```bash
 # Pre-commit (default mode)
-lint-process --staged
+architect-guard --staged
 
 # CI pipeline with strict mode
-lint-process --all --strict
+architect-guard --all --strict
 
 # Debug: show derived process state
-lint-process --staged --show-state
+architect-guard --staged --show-state
 
 # Override session scope checking
-lint-process --staged --ignore-session
+architect-guard --staged --ignore-session
 ```
 
 #### Exit Codes
@@ -673,12 +673,12 @@ Enforces dual-source architecture ownership between TypeScript and Gherkin files
 
 #### Tag Location Constraints
 
-| Tag                      | Correct Location | Wrong Location | Why                                |
-| ------------------------ | ---------------- | -------------- | ---------------------------------- |
-| `@libar-docs-uses`       | TypeScript       | Feature files  | TS owns runtime dependencies       |
-| `@libar-docs-depends-on` | Feature files    | TypeScript     | Gherkin owns planning dependencies |
-| `@libar-docs-quarter`    | Feature files    | TypeScript     | Gherkin owns timeline metadata     |
-| `@libar-docs-team`       | Feature files    | TypeScript     | Gherkin owns ownership metadata    |
+| Tag                     | Correct Location | Wrong Location | Why                                |
+| ----------------------- | ---------------- | -------------- | ---------------------------------- |
+| `@architect-uses`       | TypeScript       | Feature files  | TS owns runtime dependencies       |
+| `@architect-depends-on` | Feature files    | TypeScript     | Gherkin owns planning dependencies |
+| `@architect-quarter`    | Feature files    | TypeScript     | Gherkin owns timeline metadata     |
+| `@architect-team`       | Feature files    | TypeScript     | Gherkin owns ownership metadata    |
 
 #### DoD Validation
 
@@ -698,10 +698,10 @@ Run: `pnpm validate:all` for full validation including anti-patterns and DoD.
 #### Roadmap Spec Structure
 
 ```gherkin
-@libar-docs
-@libar-docs-pattern:ProcessGuardLinter
-@libar-docs-status:roadmap
-@libar-docs-phase:99
+@architect
+@architect-pattern:ProcessGuardLinter
+@architect-status:roadmap
+@architect-phase:99
 Feature: Process Guard Linter
 
   **Problem:**
@@ -724,7 +724,7 @@ Feature: Process Guard Linter
 | Value-First      | `**Business Value:**`, `**How It Works:**` | TDD-style specs    |
 | Context/Approach | `**Context:**`, `**Approach:**`            | Technical patterns |
 
-Tag inventory: `pnpm process:query -- tags` (counts per tag and value across all sources).
+Tag inventory: `pnpm architect:query -- tags` (counts per tag and value across all sources).
 
 #### Rule Block Structure (Mandatory)
 
@@ -772,7 +772,7 @@ Rule: Reservations use atomic claim
   See `src/reservations/reserve.ts` for API.
 ```
 
-Code stubs live in `delivery-process/stubs/{pattern-name}/` — annotated TypeScript with `throw new Error("not yet implemented")`.
+Code stubs live in `architect/stubs/{pattern-name}/` — annotated TypeScript with `throw new Error("not yet implemented")`.
 
 #### Forbidden in Feature Descriptions
 
@@ -787,9 +787,9 @@ Code stubs live in `delivery-process/stubs/{pattern-name}/` — annotated TypeSc
 
 **Tag values cannot contain spaces.** Use hyphens instead:
 
-| Invalid                          | Valid                           |
-| -------------------------------- | ------------------------------- |
-| `@unlock-reason:Fix for issue`   | `@unlock-reason:Fix-for-issue`  |
-| `@libar-docs-pattern:My Pattern` | `@libar-docs-pattern:MyPattern` |
+| Invalid                         | Valid                          |
+| ------------------------------- | ------------------------------ |
+| `@unlock-reason:Fix for issue`  | `@unlock-reason:Fix-for-issue` |
+| `@architect-pattern:My Pattern` | `@architect-pattern:MyPattern` |
 
 ---

@@ -1,8 +1,8 @@
 {
   "document": {
-    "title": "@libar-dev/delivery-process",
+    "title": "@libar-dev/architect",
     "version": "1.0",
-    "description": "Code-first documentation and delivery process toolkit"
+    "description": "Context engineering platform with extraction pipeline and typed codecs"
   },
   "sections": [
     {
@@ -45,7 +45,7 @@
         {
           "path": "api/data-api-cli.md",
           "tags": ["core"],
-          "description": "Data API CLI for querying delivery process state"
+          "description": "Data API CLI for querying process state"
         },
         {
           "path": "api/mcp-server.md",

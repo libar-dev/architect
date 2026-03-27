@@ -58,14 +58,14 @@ function createDesignBundle(): ContextBundle {
         status: 'roadmap',
         phase: 22,
         category: 'agent',
-        file: 'delivery-process/specs/order-saga.feature',
+        file: 'architect/specs/order-saga.feature',
         summary: 'Orchestrates order lifecycle.',
       },
     ],
-    specFiles: ['delivery-process/specs/order-saga.feature'],
+    specFiles: ['architect/specs/order-saga.feature'],
     stubs: [
       {
-        stubFile: 'delivery-process/stubs/order-saga/saga.ts',
+        stubFile: 'architect/stubs/order-saga/saga.ts',
         targetPath: 'src/domain/order-saga.ts',
       },
     ],
@@ -97,11 +97,11 @@ function createImplementBundle(): ContextBundle {
         status: 'active',
         phase: 14,
         category: 'validation',
-        file: 'delivery-process/specs/process-guard.feature',
+        file: 'architect/specs/process-guard.feature',
         summary: 'Validates delivery workflow.',
       },
     ],
-    specFiles: ['delivery-process/specs/process-guard.feature'],
+    specFiles: ['architect/specs/process-guard.feature'],
     stubs: [],
     dependencies: [],
     sharedDependencies: [],
@@ -273,6 +273,28 @@ describeFeature(feature, ({ Rule }) => {
           }
         }
       );
+    });
+
+    RuleScenario('Overview renders architect query guidance', ({ Given, When, Then, And }) => {
+      Given(
+        'an overview with {int} total patterns at {int} percent',
+        (_ctx: unknown, total: number, percentage: number) => {
+          state = initState();
+          state.overview = createTestOverview(total, percentage);
+        }
+      );
+
+      When('I format the overview', () => {
+        state!.output = formatOverview(state!.overview!);
+      });
+
+      Then('the output contains {string}', (_ctx: unknown, text: string) => {
+        expect(state!.output).toContain(text);
+      });
+
+      And('the output contains {string}', (_ctx: unknown, text: string) => {
+        expect(state!.output).toContain(text);
+      });
     });
   });
 

@@ -1,11 +1,11 @@
 /**
- * @libar-docs
- * @libar-docs-pattern GitModule
- * @libar-docs-status active
- * @libar-docs-arch-role barrel
- * @libar-docs-arch-context generator
- * @libar-docs-arch-layer infrastructure
- * @libar-docs-uses GitBranchDiff, GitHelpers
+ * @architect
+ * @architect-pattern GitModule
+ * @architect-status active
+ * @architect-arch-role barrel
+ * @architect-arch-context generator
+ * @architect-arch-layer infrastructure
+ * @architect-uses GitBranchDiff, GitHelpers
  *
  * ## Git Module - Pure Git Operations
  *

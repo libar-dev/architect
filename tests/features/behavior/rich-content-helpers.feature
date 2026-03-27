@@ -1,10 +1,10 @@
-@libar-docs
-@libar-docs-pattern:RichContentHelpersTesting
-@libar-docs-implements:RichContentHelpers
-@libar-docs-status:completed
-@libar-docs-unlock-reason:Retroactive-completion
-@libar-docs-phase:44
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:RichContentHelpersTesting
+@architect-implements:RichContentHelpers
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion
+@architect-phase:44
+@architect-product-area:Generation
 @behavior
 
 Feature: Rich Content Rendering Helpers

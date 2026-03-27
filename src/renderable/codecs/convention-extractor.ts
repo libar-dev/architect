@@ -1,7 +1,7 @@
 /**
  * Convention Extractor
  *
- * Filters MasterDataset for patterns tagged with `@libar-docs-convention`
+ * Filters MasterDataset for patterns tagged with `@architect-convention`
  * and extracts convention content as structured data for reference codec
  * composition. Supports two sources:
  *
@@ -313,7 +313,7 @@ function extractConventionRulesFromDescription(
 /**
  * Extracts convention content from MasterDataset.
  *
- * Filters patterns tagged with `@libar-docs-convention` matching the
+ * Filters patterns tagged with `@architect-convention` matching the
  * requested tag values. For Gherkin-sourced patterns, extracts from
  * Rule: blocks. For TypeScript-sourced patterns (no rules array),
  * decomposes the JSDoc description by ## headings.

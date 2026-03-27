@@ -11,7 +11,7 @@
 If you discover a security vulnerability, please report it responsibly:
 
 1. **Do NOT open a public issue**
-2. Use [GitHub's private vulnerability reporting](https://github.com/libar-dev/delivery-process/security/advisories/new)
+2. Use [GitHub's private vulnerability reporting](https://github.com/libar-dev/architect/security/advisories/new)
 3. Or email: security@libar.dev
 
 We will acknowledge receipt within 48 hours and provide an initial assessment within 7 days.

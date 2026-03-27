@@ -23,14 +23,13 @@ import { buildRegistry } from '../../../../src/taxonomy/registry-builder.js';
 
 /**
  * Test configs: 7 product area configs + 2 manual reference configs.
- * Mirrors the shape of delivery-process.config.ts.
+ * Mirrors the shape of architect.config.ts.
  */
 const TEST_CONFIGS: readonly ReferenceDocConfig[] = [
   ...createProductAreaConfigs(),
   {
     title: 'Architecture Types Reference',
     conventionTags: ['pipeline-architecture'],
-    shapeSources: [],
     shapeSelectors: [{ group: 'master-dataset' }],
     behaviorCategories: [],
     claudeMdSection: 'architecture',
@@ -41,7 +40,6 @@ const TEST_CONFIGS: readonly ReferenceDocConfig[] = [
   {
     title: 'Reference Generation Sample',
     conventionTags: ['taxonomy-rules'],
-    shapeSources: [],
     shapeSelectors: [{ group: 'reference-sample' }],
     behaviorCategories: [],
     includeTags: ['reference-sample'],

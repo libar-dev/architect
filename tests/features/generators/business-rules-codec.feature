@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:BusinessRulesDocumentCodec
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
-@libar-docs-implements:BusinessRulesGenerator
+@architect
+@architect-pattern:BusinessRulesDocumentCodec
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Generation
+@architect-implements:BusinessRulesGenerator
 Feature: Business Rules Document Codec
 
   Tests the BusinessRulesCodec transformation from MasterDataset to RenderableDocument.

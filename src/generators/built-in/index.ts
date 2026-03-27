@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-generator
- * @libar-docs-pattern BuiltInGenerators
- * @libar-docs-status completed
- * @libar-docs-uses GeneratorRegistry, CodecBasedGenerator
+ * @architect
+ * @architect-generator
+ * @architect-pattern BuiltInGenerators
+ * @architect-status completed
+ * @architect-uses GeneratorRegistry, CodecBasedGenerator
  *
  * ## BuiltInGenerators - Default Generator Bootstrap
  *

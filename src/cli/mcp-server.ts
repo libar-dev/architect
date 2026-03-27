@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern MCPServerBin
- * @libar-docs-status active
- * @libar-docs-arch-role infrastructure
- * @libar-docs-arch-context cli
- * @libar-docs-arch-layer infrastructure
- * @libar-docs-uses MCPServerImpl
- * @libar-docs-implements MCPServerIntegration
+ * @architect
+ * @architect-core
+ * @architect-pattern MCPServerBin
+ * @architect-status active
+ * @architect-arch-role infrastructure
+ * @architect-arch-context cli
+ * @architect-arch-layer infrastructure
+ * @architect-uses MCPServerImpl
+ * @architect-implements MCPServerIntegration
  *
  * ## MCP Server CLI Entry Point
  *
@@ -41,7 +41,7 @@ switch (parsed.type) {
     process.exit(0);
     break;
   case 'error':
-    console.error(`[dp-mcp] Error: ${parsed.message}`);
+    console.error(`[architect-mcp] Error: ${parsed.message}`);
     process.exit(1);
     break;
   case 'options':

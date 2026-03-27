@@ -27,5 +27,5 @@ First npm-published pre-release for monorepo validation.
 - `@libar-dev/modular-claude-md` moved from dependencies to devDependencies
 - Package size trimmed (removed self-referential docs from tarball)
 
-[Unreleased]: https://github.com/libar-dev/delivery-process/compare/v1.0.0-pre.0...HEAD
-[1.0.0-pre.0]: https://github.com/libar-dev/delivery-process/releases/tag/v1.0.0-pre.0
+[Unreleased]: https://github.com/libar-dev/architect/compare/v1.0.0-pre.0...HEAD
+[1.0.0-pre.0]: https://github.com/libar-dev/architect/releases/tag/v1.0.0-pre.0

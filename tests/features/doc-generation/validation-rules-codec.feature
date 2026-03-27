@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:ValidationRulesCodecTesting
-@libar-docs-implements:ValidationRulesCodec
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:ValidationRulesCodecTesting
+@architect-implements:ValidationRulesCodec
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Generation
 Feature: Validation Rules Document Codec
 
   Validates the Validation Rules Codec that transforms MasterDataset into a

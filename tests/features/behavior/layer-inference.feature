@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:LayerInferenceTesting
-@libar-docs-implements:LayerInference
-@libar-docs-status:completed
-@libar-docs-product-area:Annotation
+@architect
+@architect-pattern:LayerInferenceTesting
+@architect-implements:LayerInference
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Annotation
 @behavior
 Feature: Layer Inference from Feature File Paths
   The layer inference module classifies feature files into testing layers
@@ -26,7 +27,7 @@ Feature: Layer Inference from Feature File Paths
 
     **Invariant:** Any feature file path containing a /timeline/ directory segment is classified as timeline layer.
     **Rationale:** Timeline features track phased delivery progress and must be grouped separately for roadmap generation and phase filtering.
-    **Verified by:** Detect timeline features from /timeline/ path, Detect timeline features regardless of parent directories, Detect timeline features in delivery-process package
+    **Verified by:** Detect timeline features from /timeline/ path, Detect timeline features regardless of parent directories, Detect timeline features in Architect package
 
     @happy-path @timeline
     Scenario: Detect timeline features from /timeline/ path
@@ -41,8 +42,8 @@ Feature: Layer Inference from Feature File Paths
       Then the inferred layer should be "timeline"
 
     @happy-path @timeline
-    Scenario: Detect timeline features in delivery-process package
-      Given the feature file path "packages/@libar-dev/delivery-process/tests/features/timeline/session-01.feature"
+    Scenario: Detect timeline features in Architect package
+      Given the feature file path "packages/@libar-dev/architect/tests/features/timeline/session-01.feature"
       When I infer the feature layer
       Then the inferred layer should be "timeline"
 

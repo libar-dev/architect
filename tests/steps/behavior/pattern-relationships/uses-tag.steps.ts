@@ -1,8 +1,8 @@
 /**
  * Uses Tag Step Definitions
  *
- * BDD step definitions for testing @libar-docs-uses and @libar-docs-used-by
- * tag extraction and processing through the delivery-process pipeline.
+ * BDD step definitions for testing @architect-uses and @architect-used-by
+ * tag extraction and processing through the Architect pipeline.
  *
  * These step definitions test:
  * 1. Tag registry definition (CSV format)
@@ -15,7 +15,10 @@ import { expect } from 'vitest';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
-import { buildRegistry, type TagDefinition } from '../../../../src/taxonomy/registry-builder.js';
+import {
+  buildRegistry,
+  type MetadataTagDefinitionForRegistry,
+} from '../../../../src/taxonomy/registry-builder.js';
 import { parseFileDirectives } from '../../../../src/scanner/ast-parser.js';
 import { Result } from '../../../../src/types/result.js';
 import {
@@ -44,7 +47,7 @@ const feature = await loadFeature(
 
 interface UsesTagState {
   tagRegistry: ReturnType<typeof buildRegistry>;
-  foundTag: TagDefinition | undefined;
+  foundTag: MetadataTagDefinitionForRegistry | undefined;
   sourceCode: string;
   extractedDirective: DocDirective | null;
   extractedPattern: ExtractedPattern | null;
@@ -115,7 +118,7 @@ describeFeature(feature, ({ Rule }) => {
 
       When('querying for tag "uses"', () => {
         state!.foundTag = state!.tagRegistry.metadataTags.find(
-          (t: TagDefinition) => t.tag === 'uses'
+          (t: MetadataTagDefinitionForRegistry) => t.tag === 'uses'
         );
       });
 
@@ -141,7 +144,7 @@ describeFeature(feature, ({ Rule }) => {
 
       When('querying for tag "used-by"', () => {
         state!.foundTag = state!.tagRegistry.metadataTags.find(
-          (t: TagDefinition) => t.tag === 'used-by'
+          (t: MetadataTagDefinitionForRegistry) => t.tag === 'used-by'
         );
       });
 

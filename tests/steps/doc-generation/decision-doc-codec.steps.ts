@@ -154,7 +154,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         state.textContent = `Some explanation...
 
 """bash
-npm install @libar-dev/delivery-process
+npm install @libar-dev/architect
 """
 
 More text here.`;

@@ -1,12 +1,13 @@
-@libar-docs
+@architect
 @behavior @extraction
-@libar-docs-pattern:DualSourceExtractorTesting
-@libar-docs-implements:DualSourceExtractor
-@libar-docs-status:completed
-@libar-docs-product-area:Annotation
+@architect-pattern:DualSourceExtractorTesting
+@architect-implements:DualSourceExtractor
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Annotation
 Feature: Dual-Source Extraction
   Extracts and combines pattern metadata from both TypeScript code stubs
-  (@libar-docs-*) and Gherkin feature files (@libar-process-*), validates
+  (@architect-*) and Gherkin feature files (@libar-process-*), validates
   consistency, and composes unified pattern data for documentation.
 
   **Problem:**
@@ -237,7 +238,7 @@ Feature: Dual-Source Extraction
     Scenario: Single include tag is extracted
       Given a feature with process tags:
         | tag                                           |
-        | libar-docs                     |
+        | architect                      |
         | pattern:IncludeTest            |
         | status:roadmap                 |
         | phase:01                       |
@@ -249,7 +250,7 @@ Feature: Dual-Source Extraction
     Scenario: CSV include tag produces multiple values
       Given a feature with process tags:
         | tag                                               |
-        | libar-docs                      |
+        | architect                       |
         | pattern:MultiInclude            |
         | status:roadmap                  |
         | phase:01                        |
@@ -262,7 +263,7 @@ Feature: Dual-Source Extraction
     Scenario: Feature without include tag has no include field
       Given a feature with process tags:
         | tag                                      |
-        | libar-docs                |
+        | architect                 |
         | pattern:NoInclude         |
         | status:roadmap            |
         | phase:01                  |

@@ -1,11 +1,12 @@
-@libar-docs
-@libar-docs-pattern:ExtendsTagTesting
-@libar-docs-status:completed
-@libar-docs-implements:PatternRelationshipModel
-@libar-docs-product-area:Annotation
+@architect
+@architect-pattern:ExtendsTagTesting
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-implements:PatternRelationshipModel
+@architect-product-area:Annotation
 Feature: Extends Tag Extraction and Processing
 
-  Tests for the @libar-docs-extends tag which establishes generalization
+  Tests for the @architect-extends tag which establishes generalization
   relationships between patterns (pattern inheritance).
 
   # ===========================================================================
@@ -43,9 +44,9 @@ Feature: Extends Tag Extraction and Processing
     Scenario: Parse extends from feature file
       Given a Gherkin file with tags:
         """gherkin
-        @libar-docs
-        @libar-docs-pattern:ReactiveProjections
-        @libar-docs-extends:ProjectionCategories
+        @architect
+        @architect-pattern:ReactiveProjections
+        @architect-extends:ProjectionCategories
         Feature: Reactive Projections
         """
       When the Gherkin parser extracts metadata

@@ -1,11 +1,11 @@
 /**
- * @libar-docs
- * @libar-docs-generator @libar-docs-infra
- * @libar-docs-pattern MergePatterns
- * @libar-docs-status completed
- * @libar-docs-implements OrchestratorPipelineFactoryMigration
- * @libar-docs-product-area Generation
- * @libar-docs-uses PatternHelpers
+ * @architect
+ * @architect-generator @architect-infra
+ * @architect-pattern MergePatterns
+ * @architect-status completed
+ * @architect-implements OrchestratorPipelineFactoryMigration
+ * @architect-product-area Generation
+ * @architect-uses PatternHelpers
  *
  * ## MergePatterns - Dual-Source Pattern Merging
  *

@@ -1,11 +1,11 @@
-@libar-docs
-@libar-docs-pattern:KebabCaseSlugs
-@libar-docs-status:completed
-@libar-docs-unlock-reason:Retroactive-completion
-@libar-docs-phase:44
-@libar-docs-product-area:CoreTypes
-@libar-docs-include:core-types
-@libar-docs-depends-on:StringUtils
+@architect
+@architect-pattern:KebabCaseSlugs
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion
+@architect-phase:44
+@architect-product-area:CoreTypes
+@architect-include:core-types
+@architect-depends-on:StringUtils
 
 Feature: Slug Generation for Progressive Disclosure
   As a documentation generator

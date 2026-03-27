@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:PrChangesCodecRenderingTesting
-@libar-docs-implements:PrChangesCodec
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:PrChangesCodecRenderingTesting
+@architect-implements:PrChangesCodec
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Generation
 @behavior @pr-changes-codec
 Feature: PR Changes Codec - Core Rendering
   The PrChangesCodec transforms MasterDataset into RenderableDocument for

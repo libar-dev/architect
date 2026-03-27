@@ -4,6 +4,7 @@
 import {
   missingPatternName,
   missingStatus,
+  invalidStatus,
   missingWhenToUse,
   tautologicalDescription,
   missingRelationships,
@@ -20,6 +21,7 @@ import type { DataTableRow } from '../world.js';
 export {
   missingPatternName,
   missingStatus,
+  invalidStatus,
   missingWhenToUse,
   tautologicalDescription,
   missingRelationships,
@@ -58,7 +60,7 @@ export function initState(): LintRulesScenarioState {
 
 export function createTestDirective(overrides: Partial<DocDirective> = {}): DocDirective {
   return {
-    tags: [asDirectiveTag('@libar-docs-test')],
+    tags: [asDirectiveTag('@architect-test')],
     description: '',
     examples: [],
     position: { startLine: 1, endLine: 10 },

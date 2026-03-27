@@ -1,10 +1,10 @@
-# Delivery Process Methodology
+# Architect Methodology
 
 > **Editorial Document:** This document contains design philosophy and rationale that cannot be auto-generated from code annotations. It is maintained manually.
 
 > **Git is the event store. Documentation artifacts are projections. Annotated code is the single source of truth.**
 
-This document explains the _why_ behind `@libar-dev/delivery-process`. For _how_, see [README.md](../README.md) and [TAXONOMY.md](./TAXONOMY.md).
+This document explains the _why_ behind `@libar-dev/architect`. For _how_, see [README.md](../README.md) and [TAXONOMY.md](./TAXONOMY.md).
 
 ---
 
@@ -29,7 +29,7 @@ Event sourcing teaches us: **derive state, don't store it**. Apply this to docum
 - **Projections** = Generated docs (PATTERNS.md, ROADMAP.md)
 - **Read Model** = MasterDataset (consumed by codecs, validators, and Data API CLI)
 
-When you run `generate-docs`, you're rebuilding read models from the event stream. The source annotations are always authoritative.
+When you run `architect-generate`, you're rebuilding read models from the event stream. The source annotations are always authoritative.
 
 ---
 
@@ -41,11 +41,11 @@ Every pattern in this package uses its own annotation system. Real examples:
 
 ```typescript
 /**
- * @libar-docs
- * @libar-docs-pattern Document Extractor
- * @libar-docs-status completed
- * @libar-docs-uses Pattern Scanner, Tag Registry, Zod
- * @libar-docs-used-by Orchestrator, Generators
+ * @architect
+ * @architect-pattern Document Extractor
+ * @architect-status completed
+ * @architect-uses Pattern Scanner, Tag Registry, Zod
+ * @architect-used-by Orchestrator, Generators
  */
 export function extractPatterns(
   scannedFiles: readonly ScannedFile[], baseDir: string, registry?: TagRegistry
@@ -56,11 +56,11 @@ export function extractPatterns(
 
 ```typescript
 /**
- * @libar-docs
- * @libar-docs-pattern Pattern Scanner
- * @libar-docs-status completed
- * @libar-docs-uses glob, AST Parser
- * @libar-docs-used-by Doc Extractor, Orchestrator
+ * @architect
+ * @architect-pattern Pattern Scanner
+ * @architect-status completed
+ * @architect-uses glob, AST Parser
+ * @architect-used-by Doc Extractor, Orchestrator
  */
 export async function scanPatterns(
   config: ScannerConfig, registry?: TagRegistry
@@ -118,12 +118,12 @@ Run `pnpm docs:patterns` and these annotations become a searchable pattern regis
 **Feature file** (specs/my-pattern.feature):
 
 ```gherkin
-@libar-docs
-@libar-docs-pattern:EventStoreDurability
-@libar-docs-status:roadmap
-@libar-docs-phase:18
-@libar-docs-depends-on:EventStoreFoundation
-@libar-docs-enables:SagaEngine
+@architect
+@architect-pattern:EventStoreDurability
+@architect-status:roadmap
+@architect-phase:18
+@architect-depends-on:EventStoreFoundation
+@architect-enables:SagaEngine
 Feature: Event Store Durability
 ```
 
@@ -131,11 +131,11 @@ Feature: Event Store Durability
 
 ```typescript
 /**
- * @libar-docs
- * @libar-docs-status roadmap
- * @libar-docs-event-sourcing
- * @libar-docs-uses EventStoreFoundation, Workpool
- * @libar-docs-used-by SagaEngine, CommandOrchestrator
+ * @architect
+ * @architect-status roadmap
+ * @architect-event-sourcing
+ * @architect-uses EventStoreFoundation, Workpool
+ * @architect-used-by SagaEngine, CommandOrchestrator
  */
 ```
 
@@ -145,10 +145,10 @@ Note: Code stubs must NOT use `@<prefix>-pattern`. The feature file is the canon
 
 ## Two-Tier Spec Architecture
 
-| Tier        | Location                  | Purpose                                     | Executable |
-| ----------- | ------------------------- | ------------------------------------------- | ---------- |
-| **Roadmap** | `delivery-process/specs/` | Planning, deliverables, acceptance criteria | No         |
-| **Package** | `{pkg}/tests/features/`   | Implementation proof, regression testing    | Yes        |
+| Tier        | Location                | Purpose                                     | Executable |
+| ----------- | ----------------------- | ------------------------------------------- | ---------- |
+| **Roadmap** | `architect/specs/`      | Planning, deliverables, acceptance criteria | No         |
+| **Package** | `{pkg}/tests/features/` | Implementation proof, regression testing    | Yes        |
 
 **Traceability:**
 
@@ -165,8 +165,8 @@ Code is the source of truth. Feature files reference code, not duplicate it.
 
 ```typescript
 /**
- * @libar-docs
- * @libar-docs-status roadmap
+ * @architect
+ * @architect-status roadmap
  *
  * ## Reservation Pattern - TTL-Based Pre-Creation Uniqueness
  */
@@ -192,7 +192,7 @@ Two types of stubs serve different purposes and live in different locations:
 Design session code stubs define API shapes with `throw new Error("Not implemented")`. They live **outside `src/`** to avoid TypeScript compilation and ESLint issues:
 
 ```
-delivery-process/
+architect/
 ├── stubs/                    # Design session code stubs (not compiled)
 │   └── {pattern-name}/      # One directory per pattern
 │       └── *.ts             # API shapes, interfaces, throw-not-implemented
@@ -200,13 +200,13 @@ delivery-process/
 └── ...
 ```
 
-| Phase          | Location                            | Status                               |
-| -------------- | ----------------------------------- | ------------------------------------ |
-| Design         | `delivery-process/stubs/{pattern}/` | `throw new Error("Not implemented")` |
-| Implementation | Move/copy to `src/`                 | Replace with real logic              |
-| Completed      | `src/`                              | Production code                      |
+| Phase          | Location                     | Status                               |
+| -------------- | ---------------------------- | ------------------------------------ |
+| Design         | `architect/stubs/{pattern}/` | `throw new Error("Not implemented")` |
+| Implementation | Move/copy to `src/`          | Replace with real logic              |
+| Completed      | `src/`                       | Production code                      |
 
-Stubs are scanned by the documentation pipeline (via `-i 'delivery-process/stubs/**/*.ts'`) but excluded from TypeScript compilation (`tsconfig.json` includes only `src/**/*`) and ESLint (`eslint` targets `src tests`).
+Stubs are scanned by the documentation pipeline (via `-i 'architect/stubs/**/*.ts'`) but excluded from TypeScript compilation (`tsconfig.json` includes only `src/**/*`) and ESLint (`eslint` targets `src tests`).
 
 ### Planning Stubs (Test Step Definition Stubs)
 

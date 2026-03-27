@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:GenerateDocsCli
-@libar-docs-status:completed
-@libar-docs-product-area:DataAPI
-@libar-docs-implements:CliBehaviorTesting
+@architect
+@architect-pattern:GenerateDocsCli
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:DataAPI
+@architect-implements:CliBehaviorTesting
 @cli @generate-docs
 Feature: generate-docs CLI
   Command-line interface for generating documentation from annotated TypeScript.
@@ -53,15 +54,25 @@ Feature: generate-docs CLI
 
   Rule: CLI lists available generators
 
-    **Invariant:** The --list-generators flag must display all registered generator names without performing any generation.
-    **Rationale:** Users need to discover available generators before specifying --generator — listing them avoids trial-and-error with invalid generator names.
-    **Verified by:** List generators with --list-generators
+    **Invariant:** The --list-generators flag must display all registered generator names without performing any generation, including config-registered reference meta-generators.
+    **Rationale:** Users need to discover available generators before specifying --generator — listing them avoids trial-and-error with invalid generator names and must reflect the project config they are running against.
+    **Verified by:** List generators with --list-generators, List generators includes config-registered reference meta-generators
 
     @happy-path
     Scenario: List generators with --list-generators
       When running "generate-docs --list-generators"
       Then exit code is 0
       And stdout contains "patterns"
+
+    @happy-path
+    Scenario: List generators includes config-registered reference meta-generators
+      Given an architect.config.js with reference doc configs
+      When running "generate-docs --list-generators"
+      Then exit code is 0
+      And stdout contains all of:
+        | text               |
+        | reference-docs     |
+        | product-area-docs  |
 
   # ============================================================================
   # RULE 4: Generate Documents

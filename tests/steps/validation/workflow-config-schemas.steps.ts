@@ -1,7 +1,7 @@
 /**
- * @libar-docs
- * @libar-docs-implements WorkflowConfigSchemasTesting
- * @libar-docs-uses WorkflowConfigSchema
+ * @architect
+ * @architect-implements WorkflowConfigSchemasTesting
+ * @architect-uses WorkflowConfigSchema
  *
  * Workflow Config Schema Step Definitions
  *

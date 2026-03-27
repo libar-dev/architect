@@ -5,7 +5,7 @@
 
 ---
 
-**How do I query process state?** The Data API provides direct terminal access to delivery process state. It replaces reading generated markdown or launching explore agents — targeted queries use 5-10x less context. The `context` command assembles curated bundles tailored to session type (planning, design, implement).
+**How do I query process state?** The Data API provides direct terminal access to project state. It replaces reading generated markdown or launching explore agents — targeted queries use 5-10x less context. The `context` command assembles curated bundles tailored to session type (planning, design, implement).
 
 ## Key Invariants
 
@@ -66,6 +66,11 @@ Scoped architecture diagram showing component relationships:
 graph TB
     subgraph api["Api"]
         MasterDataset[/"MasterDataset"/]
+        MCPToolRegistry("MCPToolRegistry")
+        MCPServerImpl("MCPServerImpl")
+        MCPPipelineSession("MCPPipelineSession")
+        MCPModule[/"MCPModule"/]
+        MCPFileWatcher[/"MCPFileWatcher"/]
         PatternSummarizerImpl("PatternSummarizerImpl")
         ScopeValidatorImpl("ScopeValidatorImpl")
         ProcessStateAPI("ProcessStateAPI")
@@ -81,12 +86,14 @@ graph TB
         ReplMode("ReplMode")
         ProcessAPICLIImpl("ProcessAPICLIImpl")
         OutputPipelineImpl("OutputPipelineImpl")
+        MCPServerBin[/"MCPServerBin"/]
         DatasetCache[/"DatasetCache"/]
         CLISchema["CLISchema"]
     end
     subgraph related["Related"]
         WorkflowConfigSchema["WorkflowConfigSchema"]:::neighbor
         Pattern_Scanner["Pattern Scanner"]:::neighbor
+        ConfigLoader["ConfigLoader"]:::neighbor
         StubResolverImpl["StubResolverImpl"]:::neighbor
         RulesQueryModule["RulesQueryModule"]:::neighbor
         FSMValidator["FSMValidator"]:::neighbor
@@ -94,12 +101,48 @@ graph TB
         ProcessStateAPICLI["ProcessStateAPICLI"]:::neighbor
         ProcessApiHybridGeneration["ProcessApiHybridGeneration"]:::neighbor
         PhaseStateMachineValidation["PhaseStateMachineValidation"]:::neighbor
+        MCPServerIntegration["MCPServerIntegration"]:::neighbor
         DataAPIDesignSessionSupport["DataAPIDesignSessionSupport"]:::neighbor
         DataAPIOutputShaping["DataAPIOutputShaping"]:::neighbor
         DataAPIContextAssembly["DataAPIContextAssembly"]:::neighbor
         DataAPICLIErgonomics["DataAPICLIErgonomics"]:::neighbor
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
     end
+    MCPToolRegistry -->|uses| ProcessStateAPI
+    MCPToolRegistry -->|uses| MCPPipelineSession
+    MCPToolRegistry ..->|implements| MCPServerIntegration
+    MCPServerImpl -->|uses| MCPPipelineSession
+    MCPServerImpl -->|uses| MCPToolRegistry
+    MCPServerImpl -->|uses| MCPFileWatcher
+    MCPServerImpl ..->|implements| MCPServerIntegration
+    MCPPipelineSession -->|uses| PipelineFactory
+    MCPPipelineSession -->|uses| ProcessStateAPI
+    MCPPipelineSession -->|uses| ConfigLoader
+    MCPPipelineSession ..->|implements| MCPServerIntegration
+    MCPModule -->|uses| MCPServerImpl
+    MCPModule -->|uses| MCPPipelineSession
+    MCPModule -->|uses| MCPFileWatcher
+    MCPModule -->|uses| MCPToolRegistry
+    MCPFileWatcher ..->|implements| MCPServerIntegration
+    ReplMode -->|uses| PipelineFactory
+    ReplMode -->|uses| ProcessStateAPI
+    ReplMode ..->|implements| DataAPICLIErgonomics
+    ProcessAPICLIImpl -->|uses| ProcessStateAPI
+    ProcessAPICLIImpl -->|uses| MasterDataset
+    ProcessAPICLIImpl -->|uses| PipelineFactory
+    ProcessAPICLIImpl -->|uses| RulesQueryModule
+    ProcessAPICLIImpl -->|uses| PatternSummarizerImpl
+    ProcessAPICLIImpl -->|uses| FuzzyMatcherImpl
+    ProcessAPICLIImpl -->|uses| OutputPipelineImpl
+    ProcessAPICLIImpl ..->|implements| ProcessStateAPICLI
+    OutputPipelineImpl -->|uses| PatternSummarizerImpl
+    OutputPipelineImpl ..->|implements| DataAPIOutputShaping
+    MCPServerBin -->|uses| MCPServerImpl
+    MCPServerBin ..->|implements| MCPServerIntegration
+    DatasetCache -->|uses| PipelineFactory
+    DatasetCache -->|uses| WorkflowConfigSchema
+    DatasetCache ..->|implements| DataAPICLIErgonomics
+    CLISchema ..->|implements| ProcessApiHybridGeneration
     PatternSummarizerImpl -->|uses| ProcessStateAPI
     PatternSummarizerImpl ..->|implements| DataAPIOutputShaping
     ScopeValidatorImpl -->|uses| ProcessStateAPI
@@ -129,26 +172,10 @@ graph TB
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
-    ReplMode -->|uses| PipelineFactory
-    ReplMode -->|uses| ProcessStateAPI
-    ReplMode ..->|implements| DataAPICLIErgonomics
-    ProcessAPICLIImpl -->|uses| ProcessStateAPI
-    ProcessAPICLIImpl -->|uses| MasterDataset
-    ProcessAPICLIImpl -->|uses| PipelineFactory
-    ProcessAPICLIImpl -->|uses| RulesQueryModule
-    ProcessAPICLIImpl -->|uses| PatternSummarizerImpl
-    ProcessAPICLIImpl -->|uses| FuzzyMatcherImpl
-    ProcessAPICLIImpl -->|uses| OutputPipelineImpl
-    ProcessAPICLIImpl ..->|implements| ProcessStateAPICLI
-    OutputPipelineImpl -->|uses| PatternSummarizerImpl
-    OutputPipelineImpl ..->|implements| DataAPIOutputShaping
-    DatasetCache -->|uses| PipelineFactory
-    DatasetCache -->|uses| WorkflowConfigSchema
-    DatasetCache ..->|implements| DataAPICLIErgonomics
-    CLISchema ..->|implements| ProcessApiHybridGeneration
     StubResolverImpl -->|uses| ProcessStateAPI
     FSMValidator ..->|implements| PhaseStateMachineValidation
     PipelineFactory -->|uses| MasterDataset
+    MCPServerIntegration -.->|depends on| DataAPICLIErgonomics
     DataAPIDesignSessionSupport -.->|depends on| DataAPIContextAssembly
     DataAPIContextAssembly -.->|depends on| DataAPIOutputShaping
     DataAPIArchitectureQueries -.->|depends on| DataAPIOutputShaping
@@ -305,22 +332,22 @@ MasterDatasetSchema = z.object({
  * Status-based grouping of patterns
  *
  * Patterns are normalized to three canonical states:
- * - completed: implemented, completed
- * - active: active, partial, in-progress
- * - planned: roadmap, planned, undefined
+ * - completed: completed
+ * - active: active
+ * - planned: roadmap, deferred, or undefined/unknown
  *
  */
 ```
 
 ```typescript
 StatusGroupsSchema = z.object({
-  /** Patterns with status 'completed' or 'implemented' */
+  /** Patterns with status 'completed' */
   completed: z.array(ExtractedPatternSchema),
 
-  /** Patterns with status 'active', 'partial', or 'in-progress' */
+  /** Patterns with status 'active' */
   active: z.array(ExtractedPatternSchema),
 
-  /** Patterns with status 'roadmap', 'planned', or undefined */
+  /** Patterns with status 'roadmap', 'deferred', or undefined/unknown */
   planned: z.array(ExtractedPatternSchema),
 });
 ```
@@ -416,16 +443,16 @@ SourceViewsSchema = z.object({
 
 ```typescript
 RelationshipEntrySchema = z.object({
-  /** Patterns this pattern uses (from @libar-docs-uses) */
+  /** Patterns this pattern uses (from @architect-uses) */
   uses: z.array(z.string()),
 
-  /** Patterns that use this pattern (from @libar-docs-used-by) */
+  /** Patterns that use this pattern (from @architect-used-by) */
   usedBy: z.array(z.string()),
 
-  /** Patterns this pattern depends on (from @libar-docs-depends-on) */
+  /** Patterns this pattern depends on (from @architect-depends-on) */
   dependsOn: z.array(z.string()),
 
-  /** Patterns this pattern enables (from @libar-docs-enables) */
+  /** Patterns this pattern enables (from @architect-enables) */
   enables: z.array(z.string()),
 
   // UML-inspired relationship fields (PatternRelationshipModel)
@@ -441,10 +468,10 @@ RelationshipEntrySchema = z.object({
   /** Patterns that extend this pattern (computed inverse) */
   extendedBy: z.array(z.string()),
 
-  /** Related patterns for cross-reference without dependency (from @libar-docs-see-also tag) */
+  /** Related patterns for cross-reference without dependency (from @architect-see-also tag) */
   seeAlso: z.array(z.string()),
 
-  /** File paths to implementation APIs (from @libar-docs-api-ref tag) */
+  /** File paths to implementation APIs (from @architect-api-ref tag) */
   apiRef: z.array(z.string()),
 });
 ```
@@ -482,7 +509,7 @@ ArchIndexSchema = z.object({
 
 ## Business Rules
 
-39 patterns, 151 rules with invariants (151 total)
+38 patterns, 146 rules with invariants (146 total)
 
 ### Arch Queries Test
 
@@ -503,19 +530,19 @@ ArchIndexSchema = z.object({
 
 ### Context Formatter Tests
 
-| Rule                                                 | Invariant                                                                                                                                                                                            | Rationale                                                                                                                                                               |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| formatContextBundle renders section markers          | The context formatter must render section markers for all populated sections in a context bundle, with design bundles rendering all sections and implement bundles focusing on deliverables and FSM. | Section markers enable structured parsing of context output — without them, AI consumers cannot reliably extract specific sections from the formatted bundle.           |
-| formatDepTree renders indented tree                  | The dependency tree formatter must render with indentation arrows and a focal pattern marker to visually distinguish the target pattern from its dependencies.                                       | Visual hierarchy in the dependency tree makes dependency chains scannable at a glance — flat output would require mental parsing to understand depth and relationships. |
-| formatOverview renders progress summary              | The overview formatter must render a progress summary line showing completion metrics for the project.                                                                                               | The progress line is the first thing developers see when starting a session — it provides immediate project health awareness without requiring detailed exploration.    |
-| formatFileReadingList renders categorized file paths | The file reading list formatter must categorize paths into primary and dependency sections, producing minimal output when the list is empty.                                                         | Categorized file lists tell developers which files to read first (primary) versus reference (dependency) — uncategorized lists waste time on low-priority files.        |
+| Rule                                                 | Invariant                                                                                                                                                                                            | Rationale                                                                                                                                                                                |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| formatContextBundle renders section markers          | The context formatter must render section markers for all populated sections in a context bundle, with design bundles rendering all sections and implement bundles focusing on deliverables and FSM. | Section markers enable structured parsing of context output — without them, AI consumers cannot reliably extract specific sections from the formatted bundle.                            |
+| formatDepTree renders indented tree                  | The dependency tree formatter must render with indentation arrows and a focal pattern marker to visually distinguish the target pattern from its dependencies.                                       | Visual hierarchy in the dependency tree makes dependency chains scannable at a glance — flat output would require mental parsing to understand depth and relationships.                  |
+| formatOverview renders progress summary              | The overview formatter must render a progress summary line showing completion metrics for the project and point users to the current query script name.                                              | The progress line is the first thing developers see when starting a session — it provides immediate project health awareness, and the follow-up command guidance must be copy-pasteable. |
+| formatFileReadingList renders categorized file paths | The file reading list formatter must categorize paths into primary and dependency sections, producing minimal output when the list is empty.                                                         | Categorized file lists tell developers which files to read first (primary) versus reference (dependency) — uncategorized lists waste time on low-priority files.                         |
 
 ### Data API Architecture Queries
 
 | Rule                                                           | Invariant                                                                                                                                                | Rationale                                                                                                                                                                                                                                                                                     |
 | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Arch subcommand provides neighborhood and comparison views     | Architecture queries resolve pattern names to concrete relationships and file paths, not just abstract names.                                            | The current `arch graph <pattern>` returns dependency and relationship names but not the full picture of what surrounds a pattern. Design sessions need to understand: "If I'm working on X, what else is directly connected?" and "How do contexts A and B relate?"                          |
-| Coverage analysis reports annotation completeness with gaps    | Coverage reports identify unannotated files that should have the libar-docs opt-in marker based on their location and content.                           | Annotation completeness directly impacts the quality of all generated documentation and API queries. Files without the opt-in marker are invisible to the pipeline. Coverage gaps mean missing patterns in the registry, incomplete dependency graphs, and blind spots in architecture views. |
+| Coverage analysis reports annotation completeness with gaps    | Coverage reports identify unannotated files that should have the @architect opt-in marker based on their location and content.                           | Annotation completeness directly impacts the quality of all generated documentation and API queries. Files without the opt-in marker are invisible to the pipeline. Coverage gaps mean missing patterns in the registry, incomplete dependency graphs, and blind spots in architecture views. |
 | Tags and sources commands provide taxonomy and inventory views | All tag values in use are discoverable without reading configuration files. Source file inventory shows the full scope of annotated and scanned content. | Agents frequently need to know "what categories exist?" or "how many feature files are there?" without reading taxonomy configuration. These are meta-queries about the annotation system itself, essential for writing new annotations correctly and understanding scope.                    |
 
 ### Data API CLI Ergonomics
@@ -573,11 +600,11 @@ ArchIndexSchema = z.object({
 
 ### Data API Stub Integration
 
-| Rule                                                           | Invariant                                                                                                                            | Rationale                                                                                                                                                                                                                                                                                                                                                                  |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| All stubs are visible to the scanner pipeline                  | Every stub file in `delivery-process/stubs/` has `@libar-docs` opt-in and `@libar-docs-implements` linking it to its parent pattern. | The scanner requires `@libar-docs` opt-in marker to include a file. Without it, stubs are invisible regardless of other annotations. The `@libar-docs-implements` tag creates the bidirectional link: spec defines the pattern (via `@libar-docs-pattern`), stub implements it. Per PDR-009, stubs must NOT use `@libar-docs-pattern` -- that belongs to the feature file. |
-| Stubs subcommand lists design stubs with implementation status | `stubs` returns stub files with their target paths, design session origins, and whether the target file already exists.              | Before implementation, agents need to know: which stubs exist for a pattern, where they should be moved to, and which have already been implemented. The stub-to-implementation resolver compares `@libar-docs-target` paths against actual files to determine status.                                                                                                     |
-| Decisions and PDR commands surface design rationale            | Design decisions (AD-N items) and PDR references from stub annotations are queryable by pattern name or PDR number.                  | Design sessions produce numbered decisions (AD-1, AD-2, etc.) and reference PDR decision records (see PDR-012). When reviewing designs or starting implementation, agents need to find these decisions without reading every stub file manually.                                                                                                                           |
+| Rule                                                           | Invariant                                                                                                                   | Rationale                                                                                                                                                                                                                                                                                                                                                              |
+| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| All stubs are visible to the scanner pipeline                  | Every stub file in `architect/stubs/` has `@architect` opt-in and `@architect-implements` linking it to its parent pattern. | The scanner requires `@architect` opt-in marker to include a file. Without it, stubs are invisible regardless of other annotations. The `@architect-implements` tag creates the bidirectional link: spec defines the pattern (via `@architect-pattern`), stub implements it. Per PDR-009, stubs must NOT use `@architect-pattern` -- that belongs to the feature file. |
+| Stubs subcommand lists design stubs with implementation status | `stubs` returns stub files with their target paths, design session origins, and whether the target file already exists.     | Before implementation, agents need to know: which stubs exist for a pattern, where they should be moved to, and which have already been implemented. The stub-to-implementation resolver compares `@architect-target` paths against actual files to determine status.                                                                                                  |
+| Decisions and PDR commands surface design rationale            | Design decisions (AD-N items) and PDR references from stub annotations are queryable by pattern name or PDR number.         | Design sessions produce numbered decisions (AD-1, AD-2, etc.) and reference PDR decision records (see PDR-012). When reviewing designs or starting implementation, agents need to find these decisions without reading every stub file manually.                                                                                                                       |
 
 ### Fuzzy Match Tests
 
@@ -589,23 +616,13 @@ ArchIndexSchema = z.object({
 
 ### Generate Docs Cli
 
-| Rule                                          | Invariant                                                                                                                        | Rationale                                                                                                                                                                         |
-| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CLI displays help and version information     | The --help and -v flags must produce usage/version output and exit successfully without requiring other arguments.               | Help and version are universal CLI conventions — they must work standalone so users can discover usage without reading external documentation.                                    |
-| CLI requires input patterns                   | The generate-docs CLI must fail with a clear error when the --input flag is not provided.                                        | Without input source paths, the generator has nothing to scan — failing early with a clear message prevents confusing "no patterns found" errors downstream.                      |
-| CLI lists available generators                | The --list-generators flag must display all registered generator names without performing any generation.                        | Users need to discover available generators before specifying --generator — listing them avoids trial-and-error with invalid generator names.                                     |
-| CLI generates documentation from source files | Given valid input patterns and a generator name, the CLI must scan sources, extract patterns, and produce markdown output files. | This is the core pipeline — the CLI is the primary entry point for transforming annotated source code into generated documentation.                                               |
-| CLI rejects unknown options                   | Unrecognized CLI flags must cause an error with a descriptive message rather than being silently ignored.                        | Silent flag ignoring hides typos and misconfigurations — users typing --ouput instead of --output would get unexpected default behavior without realizing their flag was ignored. |
-
-### Generate Tag Taxonomy Cli
-
-| Rule                                            | Invariant                                                                                                                                                                        | Rationale                                                                                                                                                                 |
-| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CLI displays help and version information       | The --help/-h and --version/-v flags must produce usage/version output and exit successfully without requiring other arguments.                                                  | Help and version are universal CLI conventions — both short and long flag forms must work for discoverability and scripting compatibility.                                |
-| CLI generates taxonomy at specified output path | The taxonomy generator must write output to the specified path, creating parent directories if they do not exist, and defaulting to a standard path when no output is specified. | Flexible output paths support both default conventions and custom layouts — auto-creating directories prevents "ENOENT" errors on first run.                              |
-| CLI respects overwrite flag for existing files  | The CLI must refuse to overwrite existing output files unless the --overwrite or -f flag is explicitly provided.                                                                 | Overwrite protection prevents accidental destruction of hand-edited taxonomy files — requiring an explicit flag makes destructive operations intentional.                 |
-| Generated taxonomy contains expected sections   | The generated taxonomy file must include category documentation and statistics sections reflecting the configured tag registry.                                                  | The taxonomy is a reference document — incomplete output missing categories or statistics would leave developers without the information they need to annotate correctly. |
-| CLI warns about unknown flags                   | Unrecognized CLI flags must produce a warning message but allow execution to continue.                                                                                           | Taxonomy generation is non-destructive — warning without failing is more user-friendly than hard errors for minor flag typos, while still surfacing the issue.            |
+| Rule                                          | Invariant                                                                                                                                                        | Rationale                                                                                                                                                                                                  |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CLI displays help and version information     | The --help and -v flags must produce usage/version output and exit successfully without requiring other arguments.                                               | Help and version are universal CLI conventions — they must work standalone so users can discover usage without reading external documentation.                                                             |
+| CLI requires input patterns                   | The generate-docs CLI must fail with a clear error when the --input flag is not provided.                                                                        | Without input source paths, the generator has nothing to scan — failing early with a clear message prevents confusing "no patterns found" errors downstream.                                               |
+| CLI lists available generators                | The --list-generators flag must display all registered generator names without performing any generation, including config-registered reference meta-generators. | Users need to discover available generators before specifying --generator — listing them avoids trial-and-error with invalid generator names and must reflect the project config they are running against. |
+| CLI generates documentation from source files | Given valid input patterns and a generator name, the CLI must scan sources, extract patterns, and produce markdown output files.                                 | This is the core pipeline — the CLI is the primary entry point for transforming annotated source code into generated documentation.                                                                        |
+| CLI rejects unknown options                   | Unrecognized CLI flags must cause an error with a descriptive message rather than being silently ignored.                                                        | Silent flag ignoring hides typos and misconfigurations — users typing --ouput instead of --output would get unexpected default behavior without realizing their flag was ignored.                          |
 
 ### Handoff Generator Tests
 
@@ -639,13 +656,13 @@ ArchIndexSchema = z.object({
 
 ### MCP Server Integration
 
-| Rule                                                                    | Invariant                                                                                                                                                                                                                | Rationale                                                                                                                                                                                                                                                                               |
-| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MCP server starts via stdio transport and manages its own lifecycle     | The MCP server communicates over stdio using JSON-RPC. It builds the pipeline once during initialization, then enters a request-response loop. No non-MCP output is written to stdout (no console.log, no pnpm banners). | MCP defines stdio as the standard transport for local tool servers. Claude Code spawns the process and communicates over stdin/stdout pipes. Any extraneous stdout output corrupts the JSON-RPC stream. Loading the pipeline during initialization ensures the first tool call is fast. |
-| ProcessStateAPI methods and CLI subcommands are registered as MCP tools | Every CLI subcommand is registered as an MCP tool with a JSON Schema describing its input parameters. Tool names use snake*case with a "dp*" prefix to avoid collisions with other MCP servers.                          | MCP tools are the unit of interaction. Each tool needs a name, description (for LLM tool selection), and JSON Schema for input validation. The "dp\_" prefix prevents collisions in multi-server setups.                                                                                |
-| MasterDataset is loaded once and reused across all tool invocations     | The pipeline runs exactly once during server initialization. All subsequent tool calls read from in-memory MasterDataset. A manual rebuild can be triggered via a "dp_rebuild" tool.                                     | The pipeline costs 2-5 seconds. Running it per tool call negates MCP benefits. Pre-computed views provide O(1) access ideal for a query server.                                                                                                                                         |
-| Source file changes trigger automatic dataset rebuild with debouncing   | When --watch is enabled, changes to source files trigger an automatic pipeline rebuild. Multiple rapid changes are debounced into a single rebuild (default 500ms window).                                               | During implementation sessions, source files change frequently. Without auto-rebuild, agents must manually call dp_rebuild. Debouncing prevents redundant rebuilds during rapid-fire saves.                                                                                             |
-| MCP server is configurable via standard client configuration            | The server works with .mcp.json (Claude Code), claude_desktop_config.json (Claude Desktop), and any MCP client. It accepts --input, --features, --base-dir args and auto-detects delivery-process.config.ts.             | MCP clients discover servers through configuration files. The server must work with sensible defaults (config auto-detection) while supporting explicit overrides for monorepo setups.                                                                                                  |
+| Rule                                                                    | Invariant                                                                                                                                                                                                                                                                                                 | Rationale                                                                                                                                                                                                                                                                               |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MCP server starts via stdio transport and manages its own lifecycle     | The MCP server communicates over stdio using JSON-RPC. It builds the pipeline once during initialization, then enters a request-response loop. No non-MCP output is written to stdout (no console.log, no pnpm banners).                                                                                  | MCP defines stdio as the standard transport for local tool servers. Claude Code spawns the process and communicates over stdin/stdout pipes. Any extraneous stdout output corrupts the JSON-RPC stream. Loading the pipeline during initialization ensures the first tool call is fast. |
+| ProcessStateAPI methods and CLI subcommands are registered as MCP tools | Every CLI subcommand is registered as an MCP tool with a JSON Schema describing its input parameters. Tool names use snake*case with a "architect*" prefix to avoid collisions with other MCP servers.                                                                                                    | MCP tools are the unit of interaction. Each tool needs a name, description (for LLM tool selection), and JSON Schema for input validation. The "architect\_" prefix prevents collisions in multi-server setups.                                                                         |
+| MasterDataset is loaded once and reused across all tool invocations     | The pipeline runs exactly once during server initialization. All subsequent tool calls read from in-memory MasterDataset. A manual rebuild can be triggered via a "architect_rebuild" tool, and overlapping rebuild requests coalesce so the final in-memory session reflects the newest completed build. | The pipeline costs 2-5 seconds. Running it per tool call negates MCP benefits. Pre-computed views provide O(1) access ideal for a query server.                                                                                                                                         |
+| Source file changes trigger automatic dataset rebuild with debouncing   | When --watch is enabled, changes to source files trigger an automatic pipeline rebuild. Multiple rapid changes are debounced into a single rebuild (default 500ms window).                                                                                                                                | During implementation sessions, source files change frequently. Without auto-rebuild, agents must manually call architect_rebuild. Debouncing prevents redundant rebuilds during rapid-fire saves.                                                                                      |
+| MCP server is configurable via standard client configuration            | The server works with .mcp.json (Claude Code), claude_desktop_config.json (Claude Desktop), and any MCP client. It accepts --input, --features, --base-dir args, auto-detects architect.config.ts, and reports the package version accurately through the CLI.                                            | MCP clients discover servers through configuration files. The server must work with sensible defaults (config auto-detection) while supporting explicit overrides for monorepo setups.                                                                                                  |
 
 ### Output Pipeline Tests
 
@@ -692,16 +709,16 @@ ArchIndexSchema = z.object({
 
 ### Process Api Cli Core
 
-| Rule                                              | Invariant                                                                                                                | Rationale                                                                                                                                                       |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CLI displays help and version information         | The CLI must always provide discoverable usage and version information via standard flags.                               | Without accessible help and version output, users cannot self-serve CLI usage or report issues with a specific version.                                         |
-| CLI requires input flag for subcommands           | Every data-querying subcommand must receive an explicit `--input` glob specifying the source files to scan.              | Without an input source, the pipeline has no files to scan and would produce empty or misleading results instead of a clear error.                              |
-| CLI status subcommand shows delivery state        | The status subcommand must return structured JSON containing delivery progress derived from the MasterDataset.           | Consumers depend on machine-readable status output for scripting and CI integration; unstructured output breaks downstream automation.                          |
-| CLI query subcommand executes API methods         | The query subcommand must dispatch to any public Data API method by name and pass positional arguments through.          | The CLI is the primary interface for ad-hoc queries; failing to resolve a valid method name or its arguments silently drops the user's request.                 |
-| CLI pattern subcommand shows pattern detail       | The pattern subcommand must return the full JSON detail for an exact pattern name match, or a clear error if not found.  | Pattern lookup is the primary debugging tool for annotation issues; ambiguous or silent failures waste investigation time.                                      |
-| CLI arch subcommand queries architecture          | The arch subcommand must expose role, bounded context, and layer queries over the MasterDataset's architecture metadata. | Architecture queries replace manual exploration of annotated sources; missing or incorrect results lead to wrong structural assumptions during design sessions. |
-| CLI shows errors for missing subcommand arguments | Subcommands that require arguments must reject invocations with missing arguments and display usage guidance.            | Silent acceptance of incomplete input would produce confusing pipeline errors instead of actionable feedback at the CLI boundary.                               |
-| CLI handles argument edge cases                   | The CLI must gracefully handle non-standard argument forms including numeric coercion and the `--` pnpm separator.       | Real-world invocations via pnpm pass `--` separators and numeric strings; mishandling these causes silent data loss or crashes in automated workflows.          |
+| Rule                                              | Invariant                                                                                                                     | Rationale                                                                                                                                                                                                                        |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CLI displays help and version information         | The CLI must always provide discoverable usage and version information via standard flags.                                    | Without accessible help and version output, users cannot self-serve CLI usage or report issues with a specific version.                                                                                                          |
+| CLI requires input flag for subcommands           | Every data-querying subcommand must receive either an explicit `--input` glob or a project config that provides source globs. | Without an input source, the pipeline has no files to scan and would produce empty or misleading results instead of a clear error, but project config auto-detection should remove that boilerplate when the repo is configured. |
+| CLI status subcommand shows delivery state        | The status subcommand must return structured JSON containing delivery progress derived from the MasterDataset.                | Consumers depend on machine-readable status output for scripting and CI integration; unstructured output breaks downstream automation.                                                                                           |
+| CLI query subcommand executes API methods         | The query subcommand must dispatch to any public Data API method by name and pass positional arguments through.               | The CLI is the primary interface for ad-hoc queries; failing to resolve a valid method name or its arguments silently drops the user's request.                                                                                  |
+| CLI pattern subcommand shows pattern detail       | The pattern subcommand must return the full JSON detail for an exact pattern name match, or a clear error if not found.       | Pattern lookup is the primary debugging tool for annotation issues; ambiguous or silent failures waste investigation time.                                                                                                       |
+| CLI arch subcommand queries architecture          | The arch subcommand must expose role, bounded context, and layer queries over the MasterDataset's architecture metadata.      | Architecture queries replace manual exploration of annotated sources; missing or incorrect results lead to wrong structural assumptions during design sessions.                                                                  |
+| CLI shows errors for missing subcommand arguments | Subcommands that require arguments must reject invocations with missing arguments and display usage guidance.                 | Silent acceptance of incomplete input would produce confusing pipeline errors instead of actionable feedback at the CLI boundary.                                                                                                |
+| CLI handles argument edge cases                   | The CLI must gracefully handle non-standard argument forms including numeric coercion and the `--` pnpm separator.            | Real-world invocations via pnpm pass `--` separators and numeric strings; mishandling these causes silent data loss or crashes in automated workflows.                                                                           |
 
 ### Process Api Cli Dry Run
 
@@ -745,7 +762,7 @@ ArchIndexSchema = z.object({
 | CLI context assembly subcommands return text output            | Context assembly subcommands (context, overview, dep-tree) must produce non-empty human-readable text containing the requested pattern or summary, and require a pattern argument where applicable. | These subcommands replace manual file reads in AI sessions; empty or off-target output forces expensive explore-agent fallbacks that consume 5-10x more context.               |
 | CLI tags and sources subcommands return JSON                   | The tags and sources subcommands must return valid JSON with the expected top-level structure (data key for tags, array for sources).                                                               | Annotation exploration depends on machine-parseable output; invalid JSON prevents automated enrichment workflows from detecting unannotated files and tag gaps.                |
 | CLI extended arch subcommands query architecture relationships | Extended arch subcommands (neighborhood, compare, coverage) must return valid JSON reflecting the actual architecture relationships present in the scanned sources.                                 | Architecture queries drive design-session decisions; stale or structurally invalid output leads to incorrect dependency analysis and missed coupling between bounded contexts. |
-| CLI unannotated subcommand finds files without annotations     | The unannotated subcommand must return valid JSON listing every TypeScript file that lacks the `@libar-docs` opt-in marker.                                                                         | Files missing the opt-in marker are invisible to the scanner; without this subcommand, unannotated files silently drop out of generated documentation and validation.          |
+| CLI unannotated subcommand finds files without annotations     | The unannotated subcommand must return valid JSON listing every TypeScript file that lacks the `@architect` opt-in marker.                                                                          | Files missing the opt-in marker are invisible to the scanner; without this subcommand, unannotated files silently drop out of generated documentation and validation.          |
 
 ### Process API Layered Extraction
 

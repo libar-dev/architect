@@ -43,22 +43,22 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
   });
 
   // ──────────────────────────────────────────────────────────────────────
-  // Rule: Scoped diagrams are generated from diagramScope config
+  // Rule: Scoped diagrams are generated from diagramScopes config
   // ──────────────────────────────────────────────────────────────────────
 
-  Rule('Scoped diagrams are generated from diagramScope config', ({ RuleScenario }) => {
+  Rule('Scoped diagrams are generated from diagramScopes config', ({ RuleScenario }) => {
     RuleScenario(
-      'Config with diagramScope produces mermaid block at detailed level',
+      'Config with diagramScopes produces mermaid block at detailed level',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with diagramScope archContext {string}',
+          'a reference config with diagramScopes archContext {string}',
           (_ctx: unknown, context: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: [],
+              shapeSelectors: [],
               behaviorCategories: [],
-              diagramScope: { archContext: [context] },
+              diagramScopes: [{ archContext: [context] }],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',
@@ -110,14 +110,14 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Neighbor patterns appear in diagram with distinct style',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with diagramScope archContext {string}',
+          'a reference config with diagramScopes archContext {string}',
           (_ctx: unknown, context: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: [],
+              shapeSelectors: [],
               behaviorCategories: [],
-              diagramScope: { archContext: [context] },
+              diagramScopes: [{ archContext: [context] }],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',
@@ -182,14 +182,14 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'include filter selects patterns by include tag membership',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with diagramScope include {string}',
+          'a reference config with diagramScopes include {string}',
           (_ctx: unknown, viewName: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: [],
+              shapeSelectors: [],
               behaviorCategories: [],
-              diagramScope: { include: [viewName] },
+              diagramScopes: [{ include: [viewName] }],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',
@@ -244,14 +244,14 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Self-contained scope produces no Related subgraph',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with diagramScope archContext {string}',
+          'a reference config with diagramScopes archContext {string}',
           (_ctx: unknown, context: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: [],
+              shapeSelectors: [],
               behaviorCategories: [],
-              diagramScope: { archContext: [context] },
+              diagramScopes: [{ archContext: [context] }],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',
@@ -300,13 +300,13 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     );
 
     RuleScenario('Multiple filter dimensions OR together', ({ Given, And, When, Then }) => {
-      Given('a reference config with diagramScope combining archContext and include', () => {
+      Given('a reference config with diagramScopes combining archContext and include', () => {
         state!.config = {
           title: 'Test Reference Document',
           conventionTags: [],
-          shapeSources: [],
+          shapeSelectors: [],
           behaviorCategories: [],
-          diagramScope: { archContext: ['lint'], include: ['pipeline-stages'] },
+          diagramScopes: [{ archContext: ['lint'], include: ['pipeline-stages'] }],
           claudeMdSection: 'test',
           docsFilename: 'TEST-REFERENCE.md',
           claudeMdFilename: 'test.md',
@@ -362,14 +362,14 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Explicit pattern names filter selects named patterns',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with diagramScope patterns {string}',
+          'a reference config with diagramScopes patterns {string}',
           (_ctx: unknown, patternName: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: [],
+              shapeSelectors: [],
               behaviorCategories: [],
-              diagramScope: { patterns: [patternName] },
+              diagramScopes: [{ patterns: [patternName] }],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',
@@ -423,7 +423,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     );
 
     RuleScenario(
-      'Config without diagramScope produces no diagram section',
+      'Config without diagramScopes produces no diagram section',
       ({ Given, And, When, Then }) => {
         Given(
           'a reference config with convention tags {string} and behavior tags {string}',
@@ -477,14 +477,14 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'archLayer filter selects patterns by architectural layer',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with diagramScope archLayer {string}',
+          'a reference config with diagramScopes archLayer {string}',
           (_ctx: unknown, layer: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: [],
+              shapeSelectors: [],
               behaviorCategories: [],
-              diagramScope: { archLayer: [layer] },
+              diagramScopes: [{ archLayer: [layer] }],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',
@@ -541,14 +541,14 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('archLayer and archContext compose via OR', ({ Given, And, When, Then }) => {
       Given(
-        'a reference config with diagramScope archLayer {string} and archContext {string}',
+        'a reference config with diagramScopes archLayer {string} and archContext {string}',
         (_ctx: unknown, layer: string, context: string) => {
           state!.config = {
             title: 'Test Reference Document',
             conventionTags: [],
-            shapeSources: [],
+            shapeSelectors: [],
             behaviorCategories: [],
-            diagramScope: { archLayer: [layer], archContext: [context] },
+            diagramScopes: [{ archLayer: [layer], archContext: [context] }],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
             claudeMdFilename: 'test.md',
@@ -601,14 +601,14 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Summary level omits scoped diagram', ({ Given, And, When, Then }) => {
       Given(
-        'a reference config with diagramScope archContext {string}',
+        'a reference config with diagramScopes archContext {string}',
         (_ctx: unknown, context: string) => {
           state!.config = {
             title: 'Test Reference Document',
             conventionTags: [],
-            shapeSources: [],
+            shapeSelectors: [],
             behaviorCategories: [],
-            diagramScope: { archContext: [context] },
+            diagramScopes: [{ archContext: [context] }],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
             claudeMdFilename: 'test.md',
@@ -654,14 +654,14 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'master-dataset-views source produces MasterDataset fan-out diagram',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with diagramScope source {string}',
+          'a reference config with diagramScopes source {string}',
           (_ctx: unknown, source: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: [],
+              shapeSelectors: [],
               behaviorCategories: [],
-              diagramScope: { source: source as 'master-dataset-views' },
+              diagramScopes: [{ source: source as 'master-dataset-views' }],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',
@@ -731,7 +731,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           state!.config = {
             title: 'Test Reference Document',
             conventionTags: [],
-            shapeSources: [],
+            shapeSelectors: [],
             behaviorCategories: [],
             diagramScopes: [
               {
@@ -794,11 +794,11 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario(
       'Diagram direction is reflected in mermaid output',
       ({ Given, And, When, Then }) => {
-        Given('a reference config with LR direction diagramScope', () => {
+        Given('a reference config with LR direction diagramScopes', () => {
           state!.config = {
             title: 'Test Reference Document',
             conventionTags: [],
-            shapeSources: [],
+            shapeSelectors: [],
             behaviorCategories: [],
             diagramScopes: [
               { include: ['pipeline-stages'], title: 'Pipeline Data Flow', direction: 'LR' },
@@ -842,65 +842,6 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
           const content = mermaidBlocks[0]!.content;
           expect(content).toContain(text);
-        });
-      }
-    );
-
-    RuleScenario(
-      'Legacy diagramScope still works when diagramScopes is absent',
-      ({ Given, And, When, Then }) => {
-        Given(
-          'a reference config with diagramScope archContext {string}',
-          (_ctx: unknown, context: string) => {
-            state!.config = {
-              title: 'Test Reference Document',
-              conventionTags: [],
-              shapeSources: [],
-              behaviorCategories: [],
-              diagramScope: { archContext: [context] },
-              claudeMdSection: 'test',
-              docsFilename: 'TEST-REFERENCE.md',
-              claudeMdFilename: 'test.md',
-            };
-          }
-        );
-
-        And(
-          'a MasterDataset with arch-annotated patterns in context {string}',
-          (_ctx: unknown, context: string) => {
-            state!.dataset = createTestMasterDataset({
-              patterns: [
-                createTestPattern({
-                  name: 'LintRules',
-                  archContext: context,
-                  archRole: 'service',
-                }),
-                createTestPattern({
-                  name: 'ProcessGuard',
-                  archContext: context,
-                  archRole: 'decider',
-                }),
-              ],
-            });
-          }
-        );
-
-        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
-          const codec = createReferenceCodec(state!.config!, {
-            detailLevel: level as DetailLevel,
-          });
-          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
-        });
-
-        Then('the document contains a mermaid block', () => {
-          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
-          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
-        });
-
-        And('the document has a heading {string}', (_ctx: unknown, headingText: string) => {
-          const headings = findHeadings(state!.document!);
-          const match = headings.some((h) => h.text.includes(headingText));
-          expect(match).toBe(true);
         });
       }
     );

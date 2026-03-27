@@ -252,11 +252,11 @@ describeFeature(feature, ({ Rule, Background, BeforeEachScenario }) => {
         });
       });
 
-      RuleScenario('libar-docs opt-in marker is NOT a category', ({ Given, When, Then, And }) => {
-        Given('feature tags "libar-docs", "ddd", and "core"', () => {
-          // @libar-docs is the opt-in marker, NOT a domain category
-          // After normalization, it becomes "libar-docs" and should be excluded
-          state!.tags = ['libar-docs', 'ddd', 'core'];
+      RuleScenario('architect opt-in marker is NOT a category', ({ Given, When, Then, And }) => {
+        Given('feature tags "architect", "ddd", and "core"', () => {
+          // @architect is the opt-in marker, NOT a domain category
+          // "architect" should be excluded from categories
+          state!.tags = ['architect', 'ddd', 'core'];
         });
 
         When('extracting pattern tags', () => {
@@ -271,9 +271,9 @@ describeFeature(feature, ({ Rule, Background, BeforeEachScenario }) => {
           expect(state!.metadata.core).toBe(true);
         });
 
-        And('the metadata categories should not contain "libar-docs"', () => {
-          // libar-docs is the opt-in marker, NOT a domain category
-          expect(state!.metadata.categories).not.toContain('libar-docs');
+        And('the metadata categories should not contain "architect"', () => {
+          // architect is the opt-in marker, NOT a domain category
+          expect(state!.metadata.categories).not.toContain('architect');
         });
       });
     }

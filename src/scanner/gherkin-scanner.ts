@@ -1,14 +1,14 @@
 /**
- * @libar-docs
- * @libar-docs-scanner
- * @libar-docs-pattern GherkinScanner
- * @libar-docs-status completed
- * @libar-docs-implements GherkinRulesSupport
- * @libar-docs-uses GherkinASTParser, GherkinTypes
- * @libar-docs-used-by DualSourceExtractor, Orchestrator
- * @libar-docs-arch-role infrastructure
- * @libar-docs-arch-context scanner
- * @libar-docs-arch-layer infrastructure
+ * @architect
+ * @architect-scanner
+ * @architect-pattern GherkinScanner
+ * @architect-status completed
+ * @architect-implements GherkinRulesSupport
+ * @architect-uses GherkinASTParser, GherkinTypes
+ * @architect-used-by DualSourceExtractor, Orchestrator
+ * @architect-arch-role infrastructure
+ * @architect-arch-context scanner
+ * @architect-arch-layer infrastructure
  *
  * ## GherkinScanner - Multi-Source Pattern Extraction from Feature Files
  *

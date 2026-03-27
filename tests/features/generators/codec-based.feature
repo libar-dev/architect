@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:CodecBasedGeneratorTesting
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
-@libar-docs-implements:CodecBasedGenerator,GeneratorInfrastructureTesting
+@architect
+@architect-pattern:CodecBasedGeneratorTesting
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Generation
+@architect-implements:CodecBasedGenerator,GeneratorInfrastructureTesting
 Feature: Codec-Based Generator
 
   Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)

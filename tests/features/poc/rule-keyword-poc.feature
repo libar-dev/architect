@@ -1,7 +1,8 @@
-@libar-docs
-@libar-docs-pattern:RuleKeywordPoC
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:RuleKeywordPoC
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Generation
 @poc @rule-keyword
 Feature: PoC - Rule Keyword Support
   This feature tests whether vitest-cucumber supports the Rule keyword

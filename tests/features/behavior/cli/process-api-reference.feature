@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:ProcessApiReferenceTests
-@libar-docs-implements:ProcessApiHybridGeneration
-@libar-docs-status:completed
-@libar-docs-product-area:DataAPI
+@architect
+@architect-pattern:ProcessApiReferenceTests
+@architect-implements:ProcessApiHybridGeneration
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:DataAPI
 @behavior @cli @process-api-reference
 Feature: Process API CLI Reference Generation
 

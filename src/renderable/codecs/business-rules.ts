@@ -1,11 +1,11 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern BusinessRulesCodec
- * @libar-docs-status completed
- * @libar-docs-unlock-reason:Progressive-disclosure-by-product-area
- * @libar-docs-convention codec-registry
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-core
+ * @architect-pattern BusinessRulesCodec
+ * @architect-status completed
+ * @architect-unlock-reason:Progressive-disclosure-by-product-area
+ * @architect-convention codec-registry
+ * @architect-product-area:Generation
  *
  * ## BusinessRulesCodec
  *

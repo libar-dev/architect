@@ -1,8 +1,8 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern SourceMappingValidator
- * @libar-docs-status completed
+ * @architect
+ * @architect-core
+ * @architect-pattern SourceMappingValidator
+ * @architect-status completed
  *
  * ## Source Mapping Validator - Pre-flight Validation
  *

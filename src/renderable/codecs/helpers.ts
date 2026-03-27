@@ -1,8 +1,8 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern RichContentHelpers
- * @libar-docs-status completed
+ * @architect
+ * @architect-core
+ * @architect-pattern RichContentHelpers
+ * @architect-status completed
  *
  * ## Rich Content Rendering Helpers
  *
@@ -188,7 +188,7 @@ export interface RichContentOptions {
    *
    * - H2: Use when rendering as top-level section in detail documents
    * - H3: Use when rendering under a parent H2 section
-   * - H4: Use when deeply nested (default for backward compatibility)
+   * - H4: Use when deeply nested (default)
    */
   baseHeadingLevel?: 2 | 3 | 4;
   /**
@@ -346,7 +346,7 @@ export function renderDataTable(dt: ScenarioDataTable): SectionBlock {
 /**
  * Render a DocString as a code block
  *
- * Accepts either a plain string (legacy format) or an object with content and optional mediaType.
+ * Accepts either a plain string or an object with content and optional mediaType.
  * When mediaType is provided in the object, it takes precedence over the language parameter.
  *
  * @param docString - The DocString content (string or object with content/mediaType)
@@ -355,7 +355,7 @@ export function renderDataTable(dt: ScenarioDataTable): SectionBlock {
  *
  * @example
  * ```typescript
- * // With plain string (legacy)
+ * // With plain string
  * const codeBlock = renderDocString(step.docString, "json");
  *
  * // With object containing mediaType
@@ -367,7 +367,7 @@ export function renderDocString(
   language = 'markdown'
 ): SectionBlock {
   if (typeof docString === 'string') {
-    // Legacy string format
+    // Plain string format
     return code(docString, language);
   }
   // Object format with optional mediaType
@@ -1058,7 +1058,7 @@ export function renderScenarioContent(
  * @example
  * ```typescript
  * if (pattern.scenarios && pattern.scenarios.length > 0) {
- *   // Default H4 heading (backward compatible)
+ *   // Default H4 heading
  *   sections.push(...renderAcceptanceCriteria(pattern.scenarios));
  *
  *   // H2 heading for top-level section in detail documents
@@ -1098,7 +1098,7 @@ export function renderAcceptanceCriteria(
  * @example
  * ```typescript
  * if (pattern.rules && pattern.rules.length > 0) {
- *   // Default H4 heading (backward compatible)
+ *   // Default H4 heading
  *   sections.push(...renderBusinessRulesSection(pattern.rules));
  *
  *   // H2 heading for top-level section in detail documents

@@ -4,7 +4,7 @@
  * BDD step definitions for testing the architecture generator
  * registration in the generator registry and CLI invocation.
  *
- * @libar-docs
+ * @architect
  */
 
 import { expect } from 'vitest';

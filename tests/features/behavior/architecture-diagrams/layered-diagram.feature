@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:LayeredDiagramGeneration
-@libar-docs-status:completed
-@libar-docs-implements:ArchitectureDiagramGeneration
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:LayeredDiagramGeneration
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-implements:ArchitectureDiagramGeneration
+@architect-product-area:Generation
 @architecture
 Feature: Layered Architecture Diagram Generation
 

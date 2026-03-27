@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-pattern ClaudeModuleCodec
- * @libar-docs-status active
- * @libar-docs-convention codec-registry
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-pattern ClaudeModuleCodec
+ * @architect-status active
+ * @architect-convention codec-registry
+ * @architect-product-area:Generation
  *
  * ## ClaudeModuleCodec
  *
@@ -145,7 +145,7 @@ function buildClaudeModuleDocument(
       'Claude Modules',
       [
         heading(2, 'No Claude Modules Found'),
-        paragraph('No patterns have `@libar-docs-claude-module` tags.'),
+        paragraph('No patterns have `@architect-claude-module` tags.'),
       ],
       {
         purpose: 'Claude module generation index',

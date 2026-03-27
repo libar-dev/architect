@@ -5,7 +5,7 @@
  * component diagram generation. Tests bounded context subgraphs,
  * relationship arrow rendering, and document structure.
  *
- * @libar-docs
+ * @architect
  */
 
 import { expect } from 'vitest';
@@ -106,7 +106,7 @@ function generateDiagram(): void {
   });
 
   // Inject relationships into relationshipIndex
-  // (This simulates what the real pipeline would do from @libar-docs-uses tags)
+  // (This simulates what the real pipeline would do from @architect-uses tags)
   if (Object.keys(state.relationships).length > 0) {
     dataset.relationshipIndex = {};
     for (const [name, rel] of Object.entries(state.relationships)) {

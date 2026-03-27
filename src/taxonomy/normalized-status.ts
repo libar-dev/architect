@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-pattern NormalizedStatus
- * @libar-docs-status completed
- * @libar-docs-core
- * @libar-docs-extract-shapes NORMALIZED_STATUS_VALUES, NormalizedStatus, STATUS_NORMALIZATION_MAP, normalizeStatus
+ * @architect
+ * @architect-pattern NormalizedStatus
+ * @architect-status completed
+ * @architect-core
+ * @architect-extract-shapes NORMALIZED_STATUS_VALUES, NormalizedStatus, STATUS_NORMALIZATION_MAP, normalizeStatus
  *
  * ## Normalized Status Values for Display
  *
- * The delivery-process system uses a two-level status taxonomy:
+ * The Architect system uses a two-level status taxonomy:
  *
  * 1. Raw status (PROCESS_STATUS_VALUES in status-values.ts):
  *    The 4 FSM states stored in data: roadmap, active, completed, deferred
@@ -36,15 +36,13 @@ export type NormalizedStatus = (typeof NORMALIZED_STATUS_VALUES)[number];
 /**
  * Maps raw status values → normalized display status
  *
- * Includes both:
- * Canonical taxonomy values (per PDR-005 FSM)
+ * Canonical taxonomy values (per PDR-005 FSM).
  */
 export const STATUS_NORMALIZATION_MAP: Readonly<Record<string, NormalizedStatus>> = {
   completed: 'completed',
   active: 'active',
   roadmap: 'planned',
   deferred: 'planned',
-  planned: 'planned',
 };
 
 /**
@@ -53,11 +51,11 @@ export const STATUS_NORMALIZATION_MAP: Readonly<Record<string, NormalizedStatus>
  * Maps status values to three canonical display states:
  * - "completed": completed
  * - "active": active
- * - "planned": roadmap, deferred, planned, or any unknown value
+ * - "planned": roadmap, deferred, or any unknown value
  *
  * Per PDR-005: deferred items are treated as planned (not actively worked on)
  *
- * @libar-docs-shape reference-sample
+ * @architect-shape reference-sample
  * @param status - Raw status from pattern (case-insensitive)
  * @returns "completed" | "active" | "planned"
  *
@@ -67,6 +65,7 @@ export const STATUS_NORMALIZATION_MAP: Readonly<Record<string, NormalizedStatus>
  * normalizeStatus("active")      // → "active"
  * normalizeStatus("roadmap")     // → "planned"
  * normalizeStatus("deferred")    // → "planned"
+ * normalizeStatus("planned")     // → "planned" (unknown input defaults to planned)
  * normalizeStatus(undefined)     // → "planned"
  * ```
  */
@@ -107,8 +106,8 @@ export function isPatternActive(status: string | undefined): boolean {
 /**
  * Check if a pattern's FSM status normalizes to "planned"
  *
- * Includes both "roadmap" and "deferred" FSM states, as well as
- * undefined/unknown statuses. Use this for **pattern-level** status checks.
+ * Includes both "roadmap" and "deferred" FSM states, as well as undefined/unknown
+ * statuses. Use this for **pattern-level** status checks.
  * For **deliverable-level** status checks, use `isDeliverableStatusPending()` from
  * `taxonomy/deliverable-status.ts` instead.
  *

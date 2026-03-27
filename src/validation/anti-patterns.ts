@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-validation
- * @libar-docs-pattern AntiPatternDetector
- * @libar-docs-status completed
- * @libar-docs-arch-role service
- * @libar-docs-arch-context validation
- * @libar-docs-arch-layer application
- * @libar-docs-uses DoDValidationTypes, GherkinTypes
- * @libar-docs-extract-shapes AntiPatternDetectionOptions, detectAntiPatterns, detectProcessInCode, detectMagicComments, detectScenarioBloat, detectMegaFeature, formatAntiPatternReport, toValidationIssues
+ * @architect
+ * @architect-validation
+ * @architect-pattern AntiPatternDetector
+ * @architect-status completed
+ * @architect-arch-role service
+ * @architect-arch-context validation
+ * @architect-arch-layer application
+ * @architect-uses DoDValidationTypes, GherkinTypes
+ * @architect-extract-shapes AntiPatternDetectionOptions, detectAntiPatterns, detectProcessInCode, detectMagicComments, detectScenarioBloat, detectMegaFeature, formatAntiPatternReport, toValidationIssues
  *
  * ## AntiPatternDetector - Documentation Anti-Pattern Detection
  *
@@ -59,8 +59,8 @@ const FEATURE_ONLY_TAG_SUFFIXES = [
  * Builds feature-only annotation list from the tag prefix.
  * These tags should appear in feature files, not TypeScript code.
  *
- * @param tagPrefix - The tag prefix (e.g., "@docs-" or "@libar-docs-")
- * @returns Array of full annotation strings (e.g., ["@docs-quarter", "@docs-team", ...])
+ * @param tagPrefix - The tag prefix (e.g., "@architect-" or "@acme-")
+ * @returns Array of full annotation strings (e.g., ["@architect-quarter", "@architect-team", ...])
  */
 function buildFeatureOnlyAnnotations(tagPrefix: string): readonly string[] {
   return FEATURE_ONLY_TAG_SUFFIXES.map((suffix) => `${tagPrefix}${suffix}`);
@@ -87,11 +87,11 @@ export interface AntiPatternDetectionOptions extends WithTagRegistry {
 /**
  * Detect process metadata in code anti-pattern
  *
- * Finds process tracking annotations (e.g., @docs-quarter, @docs-team, etc.)
+ * Finds process tracking annotations (e.g., @architect-quarter, @architect-team, etc.)
  * in TypeScript files. Process metadata belongs in feature files.
  *
  * @param scannedFiles - Array of scanned TypeScript files
- * @param registry - Optional tag registry for prefix-aware detection (defaults to @libar-docs-)
+ * @param registry - Optional tag registry for prefix-aware detection (defaults to @architect-)
  * @returns Array of anti-pattern violations
  */
 export function detectProcessInCode(
@@ -117,7 +117,7 @@ export function detectProcessInCode(
               file: file.filePath,
               line: directive.position.startLine,
               severity: 'error',
-              fix: `Move to corresponding .feature file using @libar-docs-${suffix} tag.`,
+              fix: `Move to corresponding .feature file using @architect-${suffix} tag.`,
             });
           }
         }
@@ -261,12 +261,12 @@ export function detectMegaFeature(
  *
  * @example
  * ```typescript
- * // With default prefix (@libar-docs-)
+ * // With default prefix (@architect-)
  * const violations = detectAntiPatterns(tsFiles, featureFiles);
  *
  * // With custom prefix
  * const registry = createDefaultTagRegistry();
- * registry.tagPrefix = "@docs-";
+ * registry.tagPrefix = "@architect-";
  * const customViolations = detectAntiPatterns(tsFiles, featureFiles, { registry });
  *
  * for (const v of violations) {

@@ -9,7 +9,7 @@
  * - OR logic for combined filters
  * - Status filtering (active/completed only)
  *
- * @libar-docs
+ * @architect
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';

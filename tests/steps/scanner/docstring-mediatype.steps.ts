@@ -4,7 +4,7 @@
  * BDD step definitions for testing DocString mediaType (language hint) preservation
  * through the parsing pipeline from feature files to rendered output.
  *
- * @libar-docs
+ * @architect
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';

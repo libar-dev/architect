@@ -2,39 +2,39 @@
 
 ```text
 Need to check annotation quality?
-  Yes -> lint-patterns
+  Yes -> architect-lint-patterns
 
 Need to check vitest-cucumber compatibility?
-  Yes -> lint-steps
+  Yes -> architect-lint-steps
 
 Need FSM workflow validation?
-  Yes -> lint-process
+  Yes -> architect-guard
 
 Need cross-source or DoD validation?
-  Yes -> validate-patterns
+  Yes -> architect-validate
 
 Running pre-commit hook?
-  lint-process --staged (default)
+  architect-guard --staged (default)
 ```
 
 ## Command Summary
 
-| Command             | Purpose                           | When to Use                                   |
-| ------------------- | --------------------------------- | --------------------------------------------- |
-| `lint-patterns`     | Annotation quality                | Ensure patterns have required tags            |
-| `lint-steps`        | vitest-cucumber compatibility     | After writing/modifying feature or step files |
-| `lint-process`      | FSM workflow enforcement          | Pre-commit hooks, CI pipelines                |
-| `validate-patterns` | Cross-source + DoD + anti-pattern | Release validation, comprehensive             |
+| Command                   | Purpose                           | When to Use                                   |
+| ------------------------- | --------------------------------- | --------------------------------------------- |
+| `architect-lint-patterns` | Annotation quality                | Ensure patterns have required tags            |
+| `architect-lint-steps`    | vitest-cucumber compatibility     | After writing/modifying feature or step files |
+| `architect-guard`         | FSM workflow enforcement          | Pre-commit hooks, CI pipelines                |
+| `architect-validate`      | Cross-source + DoD + anti-pattern | Release validation, comprehensive             |
 
 ---
 
-## lint-patterns
+## architect-lint-patterns
 
 Validates `@<prefix>-*` annotation quality in TypeScript files.
 
 ```bash
-npx lint-patterns -i "src/**/*.ts"
-npx lint-patterns -i "src/**/*.ts" --strict   # CI
+npx architect-lint-patterns -i "src/**/*.ts"
+npx architect-lint-patterns -i "src/**/*.ts" --strict   # CI
 ```
 
 ### CLI Flags
@@ -64,7 +64,7 @@ npx lint-patterns -i "src/**/*.ts" --strict   # CI
 
 ---
 
-## lint-steps
+## architect-lint-steps
 
 Static analyzer for vitest-cucumber feature/step compatibility. Catches mismatches that cause cryptic runtime failures.
 
@@ -112,13 +112,13 @@ pnpm lint:steps --strict     # CI
 
 ---
 
-## lint-process
+## architect-guard
 
 FSM validation for delivery workflow. Enforces status transitions and protection levels.
 
 ```bash
-npx lint-process --staged          # Pre-commit (default)
-npx lint-process --all --strict    # CI pipeline
+npx architect-guard --staged          # Pre-commit (default)
+npx architect-guard --all --strict    # CI pipeline
 ```
 
 **What it validates:**
@@ -132,12 +132,12 @@ For detailed rules, escape hatches, and error fixes, see the [Process Guard Refe
 
 ---
 
-## validate-patterns
+## architect-validate
 
 Cross-source validator combining multiple checks.
 
 ```bash
-npx validate-patterns \
+npx architect-validate \
   -i "src/**/*.ts" \
   -F "specs/**/*.feature" \
   --dod \
@@ -194,12 +194,12 @@ For patterns with `completed` status, checks:
 ```json
 {
   "scripts": {
-    "lint:patterns": "lint-patterns -i 'src/**/*.ts'",
-    "lint:steps": "lint-steps",
-    "lint:steps:ci": "lint-steps --strict",
-    "lint:process": "lint-process --staged",
-    "lint:process:ci": "lint-process --all --strict",
-    "validate:all": "validate-patterns -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns"
+    "lint:patterns": "architect-lint-patterns -i 'src/**/*.ts'",
+    "lint:steps": "architect-lint-steps",
+    "lint:steps:ci": "architect-lint-steps --strict",
+    "lint:process": "architect-guard --staged",
+    "lint:process:ci": "architect-guard --all --strict",
+    "validate:all": "architect-validate -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns"
   }
 }
 ```
@@ -207,27 +207,27 @@ For patterns with `completed` status, checks:
 ### Pre-commit Hook
 
 ```bash
-npx lint-process --staged
+npx architect-guard --staged
 ```
 
 ### GitHub Actions
 
 ```yaml
 - name: Lint annotations
-  run: npx lint-patterns -i "src/**/*.ts" --strict
+  run: npx architect-lint-patterns -i "src/**/*.ts" --strict
 
 - name: Lint steps
-  run: npx lint-steps --strict
+  run: npx architect-lint-steps --strict
 
 - name: Validate patterns
-  run: npx validate-patterns -i "src/**/*.ts" -F "specs/**/*.feature" --dod --anti-patterns
+  run: npx architect-validate -i "src/**/*.ts" -F "specs/**/*.feature" --dod --anti-patterns
 ```
 
 ---
 
 ## Exit Codes
 
-| Code | lint-patterns / lint-steps / lint-process    | validate-patterns                   |
+| Code | architect-lint-patterns / architect-lint-steps / architect-guard    | architect-validate                   |
 | ---- | -------------------------------------------- | ----------------------------------- |
 | `0`  | No errors (warnings allowed unless --strict) | No issues found                     |
 | `1`  | Errors found (or warnings with --strict)     | Errors found                        |
@@ -241,14 +241,14 @@ All validation tools expose programmatic APIs:
 
 ```typescript
 // Pattern linting
-import { lintFiles, hasFailures } from '@libar-dev/delivery-process/lint';
+import { lintFiles, hasFailures } from '@libar-dev/architect/lint';
 
 // Step linting
-import { runStepLint, STEP_LINT_RULES } from '@libar-dev/delivery-process/lint';
+import { runStepLint, STEP_LINT_RULES } from '@libar-dev/architect/lint';
 
 // Process guard
-import { deriveProcessState, validateChanges } from '@libar-dev/delivery-process/lint';
+import { deriveProcessState, validateChanges } from '@libar-dev/architect/lint';
 
 // Anti-patterns and DoD
-import { detectAntiPatterns, validateDoD } from '@libar-dev/delivery-process/validation';
+import { detectAntiPatterns, validateDoD } from '@libar-dev/architect/validation';
 ```

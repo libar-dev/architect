@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 /**
- * @libar-docs
- * @libar-docs-cli
- * @libar-docs-pattern ValidatePatternsCLI
- * @libar-docs-status completed
- * @libar-docs-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, MasterDataset, CodecUtils
- * @libar-docs-extract-shapes ValidateCLIConfig, ValidationIssue, ValidationSummary
+ * @architect
+ * @architect-cli
+ * @architect-pattern ValidatePatternsCLI
+ * @architect-status completed
+ * @architect-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, MasterDataset, CodecUtils
+ * @architect-extract-shapes ValidateCLIConfig, ValidationIssue, ValidationSummary
  *
  * ## ValidatePatternsCLI - Cross-Source Pattern Validator
  *
@@ -253,10 +253,10 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ValidateCLICo
  */
 export function printHelp(): void {
   console.log(`
-validate-patterns - Cross-validate TypeScript patterns vs Gherkin features
+architect-validate - Cross-validate TypeScript patterns vs Gherkin features
 
 Usage:
-  validate-patterns [options]
+  architect-validate [options]
 
 Options:
   -i, --input <pattern>       Glob pattern for TypeScript files (repeatable; falls back to config)
@@ -306,22 +306,22 @@ Anti-Pattern Detection (--anti-patterns):
 
 Examples:
   # Cross-source validation
-  validate-patterns -i "src/**/*.ts" -F "tests/features/**/*.feature"
+  architect-validate -i "src/**/*.ts" -F "tests/features/**/*.feature"
 
   # DoD validation for all completed phases
-  validate-patterns -i "src/**/*.ts" -F "features/**/*.feature" --dod
+  architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --dod
 
   # DoD validation for specific phase
-  validate-patterns -i "src/**/*.ts" -F "features/**/*.feature" --dod --phase 14
+  architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --dod --phase 14
 
   # Anti-pattern detection
-  validate-patterns -i "src/**/*.ts" -F "features/**/*.feature" --anti-patterns
+  architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --anti-patterns
 
   # Full validation (cross-source + DoD + anti-patterns)
-  validate-patterns -i "src/**/*.ts" -F "features/**/*.feature" --dod --anti-patterns --strict
+  architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --dod --anti-patterns --strict
 
   # JSON output for tooling
-  validate-patterns -i "src/**/*.ts" -F "features/**/*.feature" --format json
+  architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --format json
   `);
 }
 
@@ -431,7 +431,7 @@ export function validatePatterns(dataset: RuntimeMasterDataset): ValidationSumma
 
     // If the Gherkin pattern explicitly implements a DIFFERENT pattern, it's not
     // a true name match — it's a naming collision. The Gherkin pattern belongs to
-    // whichever pattern it declares in @libar-docs-implements.
+    // whichever pattern it declares in @architect-implements.
     if (gherkinMatch !== undefined) {
       const gherkinImpl = gherkinMatch.implementsPatterns ?? [];
       if (gherkinImpl.length > 0 && !gherkinImpl.some((n) => n.toLowerCase() === tsName)) {
@@ -672,7 +672,7 @@ async function main(): Promise<void> {
   const config = parseArgs();
 
   if (config.version) {
-    printVersionAndExit('validate-patterns');
+    printVersionAndExit('architect-validate');
   }
 
   if (config.help) {
@@ -684,23 +684,29 @@ async function main(): Promise<void> {
   const configApplied = await applyProjectSourceDefaults(config);
 
   if (!configApplied && config.input.length === 0) {
-    console.error('  (No delivery-process.config.ts found; provide -i/--input flags)');
+    console.error(
+      '  (No architect.config.ts or architect.config.js found; provide -i/--input flags)'
+    );
   }
 
   // Validate that we have sources (from CLI or config)
   if (config.input.length === 0) {
     console.error('Error: No TypeScript sources specified.');
-    console.error('Provide -i/--input flags or configure sources in delivery-process.config.ts');
+    console.error(
+      'Provide -i/--input flags or configure sources in architect.config.ts or architect.config.js'
+    );
     process.exit(1);
   }
   if (config.features.length === 0) {
     console.error('Error: No feature files specified.');
-    console.error('Provide -F/--features flags or configure sources in delivery-process.config.ts');
+    console.error(
+      'Provide -F/--features flags or configure sources in architect.config.ts or architect.config.js'
+    );
     process.exit(1);
   }
 
   try {
-    // Load configuration (discovers delivery-process.config.ts)
+    // Load configuration (discovers architect.config.ts or architect.config.js)
     const configResult = await loadConfig(config.baseDir);
     if (!configResult.ok) {
       console.error(formatConfigError(configResult.error));

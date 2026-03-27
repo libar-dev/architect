@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:WorkflowConfigSchemasValidation
-@libar-docs-status:active
-@libar-docs-product-area:Validation
+@architect
+@architect-pattern:WorkflowConfigSchemasValidation
+@architect-status:active
+@architect-product-area:Validation
 @validation @workflow
 Feature: Workflow Config Schema Validation
   The workflow configuration module defines Zod schemas for validating

@@ -1,10 +1,10 @@
 /**
- * @libar-docs
- * @libar-docs-pattern ShapeExtractor
- * @libar-docs-status completed
- * @libar-docs-phase 26
- * @libar-docs-implements ShapeExtraction
- * @libar-docs-uses typescript-estree
+ * @architect
+ * @architect-pattern ShapeExtractor
+ * @architect-status completed
+ * @architect-phase 26
+ * @architect-implements ShapeExtraction
+ * @architect-uses typescript-estree
  *
  * ## Shape Extractor - TypeScript Type Extraction
  *
@@ -13,7 +13,7 @@
  *
  * ### When to Use
  *
- * - When processing @libar-docs-extract-shapes tags during extraction
+ * - When processing @architect-extract-shapes tags during extraction
  * - When generating documentation that needs actual type definitions
  * - When eliminating duplication between JSDoc examples and code
  *
@@ -434,11 +434,11 @@ function extractShape(
     }
   }
 
-  // Get JSDoc if requested, stripping @libar-docs-* annotation lines
+  // Get JSDoc if requested, stripping @architect-* annotation lines
   let jsDoc: string | undefined;
   if (options.includeJsDoc) {
     const rawJsDoc = extractPrecedingJsDoc(sourceCode, node, comments);
-    jsDoc = rawJsDoc !== undefined ? stripLibarDocsTags(rawJsDoc) : undefined;
+    jsDoc = rawJsDoc !== undefined ? stripArchitectTags(rawJsDoc) : undefined;
   }
 
   // DD-3: Parse @param/@returns/@throws from JSDoc for function shapes
@@ -523,7 +523,7 @@ function extractShape(
 }
 
 /**
- * Strip @libar-docs-* annotation lines from a JSDoc comment.
+ * Strip @architect-* annotation lines from a JSDoc comment.
  *
  * Preserves standard JSDoc tags (@param, @returns, @example, etc.) and
  * all non-annotation content. Returns undefined if all content lines were
@@ -538,9 +538,9 @@ function extractJsDocLineContent(line: string): string {
     .trim();
 }
 
-function stripLibarDocsTags(jsDoc: string): string | undefined {
+function stripArchitectTags(jsDoc: string): string | undefined {
   const lines = jsDoc.split('\n');
-  const filtered = lines.filter((line) => !extractJsDocLineContent(line).startsWith('@libar-docs'));
+  const filtered = lines.filter((line) => !extractJsDocLineContent(line).startsWith('@architect'));
 
   // Check if anything meaningful remains (not just /** and */)
   const hasContent = filtered.some((line) => extractJsDocLineContent(line).length > 0);
@@ -940,7 +940,7 @@ export interface ProcessExtractShapesResult {
 /**
  * DD-4: Extract all exported declarations from a file as shapes.
  *
- * Auto-discovery mode: when `@libar-docs-extract-shapes *` is used,
+ * Auto-discovery mode: when `@architect-extract-shapes *` is used,
  * all exported types/interfaces/enums/functions/consts are extracted
  * without requiring explicit names.
  *
@@ -996,7 +996,7 @@ function extractAllExportedShapes(sourceCode: string, jsx = false): Result<Shape
  * Process extract-shapes tag and return shapes for ExtractedPattern.
  *
  * Called by the document extractor when processing TypeScript files
- * with @libar-docs-extract-shapes tags.
+ * with @architect-extract-shapes tags.
  *
  * DD-4: Supports wildcard `*` for auto-discovery mode.
  *
@@ -1063,7 +1063,7 @@ export function processExtractShapesTag(
   for (const name of result.imported) {
     warnings.push(
       `[extract-shapes] Shape '${name}' is imported, not defined in this file. ` +
-        `Add @libar-docs-extract-shapes to the source file instead.`
+        `Add @architect-extract-shapes to the source file instead.`
     );
   }
 
@@ -1072,7 +1072,7 @@ export function processExtractShapesTag(
     const typeOnlyNote = reExport.typeOnly ? ' (type-only)' : '';
     warnings.push(
       `[extract-shapes] Shape '${reExport.name}' is re-exported${typeOnlyNote} from '${reExport.sourceModule}'. ` +
-        `Add @libar-docs-extract-shapes to ${reExport.sourceModule} instead.`
+        `Add @architect-extract-shapes to ${reExport.sourceModule} instead.`
     );
   }
 
@@ -1084,7 +1084,7 @@ export function processExtractShapesTag(
 // =============================================================================
 
 /**
- * Extract the @libar-docs-shape tag from JSDoc text.
+ * Extract the @architect-shape tag from JSDoc text.
  *
  * Returns `{ tagged: true, group }` if the tag is present,
  * where `group` is `undefined` for bare tags and a string for valued tags.
@@ -1093,8 +1093,8 @@ export function processExtractShapesTag(
  */
 function extractShapeTag(jsDocText: string): { tagged: boolean; group?: string } {
   // Match tag with optional group name, excluding JSDoc delimiters (* and /).
-  // Negative lookahead (?!-) prevents matching hypothetical libar-docs-shape-* tags.
-  const match = /libar-docs-shape(?!-)(?:\s+([^\s*/]+))?/.exec(jsDocText);
+  // Negative lookahead (?!-) prevents matching hypothetical architect-shape-* tags.
+  const match = /architect-shape(?!-)(?:\s+([^\s*/]+))?/.exec(jsDocText);
   if (!match) return { tagged: false };
   const group = match[1];
   if (group !== undefined) {
@@ -1104,7 +1104,7 @@ function extractShapeTag(jsDocText: string): { tagged: boolean; group?: string }
 }
 
 /**
- * Extract the @libar-docs-include tag from JSDoc text.
+ * Extract the @architect-include tag from JSDoc text.
  *
  * Returns an array of include values if the tag is present (CSV format),
  * or `undefined` if the tag is absent. Values are trimmed and filtered for empties.
@@ -1112,7 +1112,7 @@ function extractShapeTag(jsDocText: string): { tagged: boolean; group?: string }
  * @param jsDocText - Raw JSDoc text including delimiters
  */
 function extractIncludeTag(jsDocText: string): readonly string[] | undefined {
-  const match = /libar-docs-include(?!-)(?:\s+([^\n@*]+))?/.exec(jsDocText);
+  const match = /architect-include(?!-)(?:\s+([^\n@*]+))?/.exec(jsDocText);
   if (!match) return undefined;
   const raw = match[1];
   if (raw === undefined) return undefined;
@@ -1124,10 +1124,10 @@ function extractIncludeTag(jsDocText: string): readonly string[] | undefined {
 }
 
 /**
- * Discover declarations tagged with @libar-docs-shape in source code.
+ * Discover declarations tagged with @architect-shape in source code.
  *
  * Scans all top-level declarations (exported and non-exported per DD-7)
- * for @libar-docs-shape tags in their preceding JSDoc. Tagged declarations
+ * for @architect-shape tags in their preceding JSDoc. Tagged declarations
  * are extracted as shapes with an optional group from the tag value (DD-5).
  *
  * Reuses existing infrastructure: findDeclarations(), extractPrecedingJsDoc(),
@@ -1172,7 +1172,7 @@ export function discoverTaggedShapes(
       const jsDoc = extractPrecedingJsDoc(sourceCode, declaration.node, comments);
       if (jsDoc === undefined) continue;
 
-      // Check for @libar-docs-shape tag
+      // Check for @architect-shape tag
       const tagResult = extractShapeTag(jsDoc);
       if (!tagResult.tagged) continue;
 
@@ -1183,7 +1183,7 @@ export function discoverTaggedShapes(
       });
 
       // DD-5: Add group field from tag value
-      // DD-3 (CrossCuttingDocumentInclusion): Add includes from @libar-docs-include
+      // DD-3 (CrossCuttingDocumentInclusion): Add includes from @architect-include
       const includeValues = extractIncludeTag(jsDoc);
       shapes.push({
         ...shape,
@@ -1195,11 +1195,3 @@ export function discoverTaggedShapes(
 
   return Result.ok({ shapes, warnings });
 }
-
-// =============================================================================
-// Re-export Rendering Helper (moved to codec layer)
-// =============================================================================
-
-// Re-export renderShapesAsMarkdown from the codec helpers where it belongs
-// This maintains backwards compatibility for existing imports
-export { renderShapesAsMarkdown } from '../renderable/codecs/helpers.js';

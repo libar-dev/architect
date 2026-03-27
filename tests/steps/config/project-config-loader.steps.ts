@@ -2,10 +2,9 @@
  * Project Config Loader Step Definitions
  *
  * BDD step definitions for testing loadProjectConfig, the unified
- * config loader that supports both new-style defineConfig and legacy
- * createDeliveryProcess config formats.
+ * config loader that supports the current defineConfig project format.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -35,27 +34,6 @@ const NEW_STYLE_CONFIG = `
 export default {
   preset: 'libar-generic',
   sources: { typescript: ['src/**/*.ts'] },
-};
-`.trim();
-
-const LEGACY_CONFIG = `
-export default {
-  registry: {
-    tagPrefix: "@libar-docs-",
-    fileOptInTag: "@libar-docs",
-    categories: [
-      { tag: "core", label: "Core" },
-      { tag: "api", label: "API" },
-      { tag: "infra", label: "Infrastructure" }
-    ],
-    statusValues: ["roadmap", "active", "completed", "deferred"],
-    tags: []
-  },
-  regexBuilders: {
-    category: () => /@libar-docs-(core|api|infra)/,
-    status: () => /@libar-docs-status:(roadmap|active|completed|deferred)/,
-    pattern: () => /@libar-docs-pattern:([A-Za-z0-9]+)/
-  }
 };
 `.trim();
 
@@ -148,7 +126,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         Given(
           'a new-style config file with preset "libar-generic" and typescript sources',
           async () => {
-            const configPath = path.join(state!.tempDir!, 'delivery-process.config.js');
+            const configPath = path.join(state!.tempDir!, 'architect.config.js');
             await fs.writeFile(configPath, NEW_STYLE_CONFIG);
           }
         );
@@ -175,42 +153,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   });
 
   // ===========================================================================
-  // Legacy config backward compatibility
-  // ===========================================================================
-
-  Rule('Legacy config is loaded with backward compatibility', ({ RuleScenario }) => {
-    RuleScenario(
-      'Legacy createDeliveryProcess export loads correctly',
-      ({ Given, When, Then, And }) => {
-        Given('a legacy config file with registry and regexBuilders', async () => {
-          const configPath = path.join(state!.tempDir!, 'delivery-process.config.js');
-          await fs.writeFile(configPath, LEGACY_CONFIG);
-        });
-
-        When('loading project config from temp directory', async () => {
-          state!.loadResult = await loadProjectConfig(state!.tempDir!);
-        });
-
-        Then('project config loading should succeed', () => {
-          expect(state!.loadResult!.ok).toBe(true);
-        });
-
-        And('project config isDefault should be false', () => {
-          if (!state!.loadResult!.ok) throw new Error('Expected success');
-          expect(state!.loadResult!.value.isDefault).toBe(false);
-        });
-      }
-    );
-  });
-
-  // ===========================================================================
   // Invalid configs produce errors
   // ===========================================================================
 
   Rule('Invalid configs produce clear errors', ({ RuleScenario }) => {
     RuleScenario('Config without default export returns error', ({ Given, When, Then, And }) => {
       Given('a config file without a default export', async () => {
-        const configPath = path.join(state!.tempDir!, 'delivery-process.config.js');
+        const configPath = path.join(state!.tempDir!, 'architect.config.js');
         await fs.writeFile(configPath, NO_DEFAULT_EXPORT_CONFIG);
       });
 
@@ -232,7 +181,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       'Config with invalid project config returns Zod error',
       ({ Given, When, Then, And }) => {
         Given('a config file with invalid project config data', async () => {
-          const configPath = path.join(state!.tempDir!, 'delivery-process.config.js');
+          const configPath = path.join(state!.tempDir!, 'architect.config.js');
           await fs.writeFile(configPath, INVALID_PROJECT_CONFIG);
         });
 

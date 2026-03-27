@@ -5,7 +5,7 @@
  * registry and AST parser. These tests verify that arch-role, arch-context,
  * and arch-layer tags are correctly defined and extracted.
  *
- * @libar-docs
+ * @architect
  */
 
 import { expect } from 'vitest';

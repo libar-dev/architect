@@ -1,15 +1,15 @@
 /**
- * @libar-docs
+ * @architect
  */
 
 import type { DocumentGenerator } from './types';
 
 /**
- * @libar-docs-generator
- * @libar-docs-pattern GeneratorRegistry
- * @libar-docs-status completed
- * @libar-docs-uses GeneratorTypes
- * @libar-docs-used-by GeneratorFactory, Orchestrator, GenerateDocsCLI
+ * @architect-generator
+ * @architect-pattern GeneratorRegistry
+ * @architect-status completed
+ * @architect-uses GeneratorTypes
+ * @architect-used-by GeneratorFactory, Orchestrator, GenerateDocsCLI
  *
  * ## GeneratorRegistry - Central Registry for Document Generators
  *

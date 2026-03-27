@@ -1,19 +1,19 @@
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-config
- * @libar-docs-pattern DeliveryProcessFactory
- * @libar-docs-status completed
- * @libar-docs-arch-role service
- * @libar-docs-arch-context config
- * @libar-docs-arch-layer application
- * @libar-docs-include reference-sample
- * @libar-docs-uses ConfigurationTypes, ConfigurationPresets, RegexBuilders, TagRegistry
- * @libar-docs-used-by PublicAPI
- * @libar-docs-extract-shapes CreateDeliveryProcessOptions, createDeliveryProcess
+ * @architect
+ * @architect-core @architect-config
+ * @architect-pattern ArchitectFactory
+ * @architect-status completed
+ * @architect-arch-role service
+ * @architect-arch-context config
+ * @architect-arch-layer application
+ * @architect-include reference-sample
+ * @architect-uses ConfigurationTypes, ConfigurationPresets, RegexBuilders, TagRegistry
+ * @architect-used-by PublicAPI
+ * @architect-extract-shapes CreateArchitectOptions, createArchitect
  *
- * ## Delivery Process Factory
+ * ## Architect Factory
  *
- * Main factory function for creating configured delivery process instances.
+ * Main factory function for creating configured Architect instances.
  * Supports presets, custom configuration, and configuration overrides.
  *
  * ### When to Use
@@ -23,16 +23,16 @@
  * - When customizing the taxonomy for a specific project
  */
 
-import type { DeliveryProcessConfig, DeliveryProcessInstance } from './types.js';
+import type { ArchitectConfig, ArchitectInstance } from './types.js';
 import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 import { buildRegistry } from '../taxonomy/registry-builder.js';
 import { createRegexBuilders } from './regex-builders.js';
 import { LIBAR_GENERIC_PRESET, PRESETS, type PresetName } from './presets.js';
 
 /**
- * Options for creating a delivery process instance
+ * Options for creating an Architect instance
  */
-export interface CreateDeliveryProcessOptions {
+export interface CreateArchitectOptions {
   /** Use a preset configuration */
   preset?: PresetName;
   /** Custom tag prefix (overrides preset) */
@@ -40,11 +40,11 @@ export interface CreateDeliveryProcessOptions {
   /** Custom file opt-in tag (overrides preset) */
   fileOptInTag?: string;
   /** Custom categories (replaces preset categories entirely) */
-  categories?: DeliveryProcessConfig['categories'];
+  categories?: ArchitectConfig['categories'];
 }
 
 /**
- * Creates a configured delivery process instance.
+ * Creates a configured Architect instance.
  *
  * Configuration resolution order:
  * 1. Start with preset (or libar-generic default)
@@ -57,18 +57,18 @@ export interface CreateDeliveryProcessOptions {
  * Categories from the preset replace base categories entirely.
  *
  * @param options - Configuration options
- * @returns Configured delivery process instance
+ * @returns Configured Architect instance
  *
  * @example
  * ```typescript
- * // Use generic preset
- * const dp = createDeliveryProcess({ preset: "generic" });
+ * // Use the default preset
+ * const dp = createArchitect();
  * ```
  *
  * @example
  * ```typescript
  * // Custom prefix with DDD taxonomy
- * const dp = createDeliveryProcess({
+ * const dp = createArchitect({
  *   preset: "ddd-es-cqrs",
  *   tagPrefix: "@my-project-",
  *   fileOptInTag: "@my-project"
@@ -78,12 +78,10 @@ export interface CreateDeliveryProcessOptions {
  * @example
  * ```typescript
  * // Default (libar-generic preset with 3 categories)
- * const dp = createDeliveryProcess();
+ * const dp = createArchitect();
  * ```
  */
-export function createDeliveryProcess(
-  options: CreateDeliveryProcessOptions = {}
-): DeliveryProcessInstance {
+export function createArchitect(options: CreateArchitectOptions = {}): ArchitectInstance {
   // Start with preset or default to libar-generic
   const baseConfig = options.preset ? PRESETS[options.preset] : LIBAR_GENERIC_PRESET;
 

@@ -4,8 +4,8 @@
  * BDD step definitions for testing the generate-docs CLI
  * which generates documentation from annotated TypeScript.
  *
- * @libar-docs
- * @libar-docs-implements CliBehaviorTesting
+ * @architect
+ * @architect-implements CliBehaviorTesting
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -45,13 +45,13 @@ function initState(): CLITestState {
 // =============================================================================
 
 function createPatternFile(): string {
-  return `/** @libar-docs */
+  return `/** @architect */
 
 /**
- * @libar-docs-core
- * @libar-docs-pattern TestGeneratorPattern
- * @libar-docs-status completed
- * @libar-docs-uses AnotherPattern
+ * @architect-core
+ * @architect-pattern TestGeneratorPattern
+ * @architect-status completed
+ * @architect-uses AnotherPattern
  *
  * ## TestGeneratorPattern
  *
@@ -62,6 +62,34 @@ function createPatternFile(): string {
 export interface TestGeneratorPattern {
   id: string;
 }
+`;
+}
+
+function createReferenceDocsConfigFile(): string {
+  return `export default {
+  sources: {
+    typescript: ['src/**/*.ts']
+  },
+  referenceDocConfigs: [
+    {
+      title: 'Reference Sample',
+      conventionTags: [],
+      behaviorCategories: [],
+      claudeMdSection: 'reference',
+      docsFilename: 'REFERENCE-SAMPLE.md',
+      claudeMdFilename: 'reference-sample.md'
+    },
+    {
+      title: 'Configuration Overview',
+      productArea: 'Configuration',
+      conventionTags: [],
+      behaviorCategories: [],
+      claudeMdSection: 'configuration',
+      docsFilename: 'CONFIGURATION.md',
+      claudeMdFilename: 'configuration.md'
+    }
+  ]
+};
 `;
 }
 
@@ -189,6 +217,29 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(getResult().stdout).toContain(text);
       });
     });
+
+    RuleScenario(
+      'List generators includes config-registered reference meta-generators',
+      ({ Given, When, Then, And }) => {
+        Given('an architect.config.js with reference doc configs', async () => {
+          await writeTempFile(getTempDir(), 'architect.config.js', createReferenceDocsConfigFile());
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult().exitCode).toBe(code);
+        });
+
+        And('stdout contains all of:', (_ctx: unknown, table: Array<{ text: string }>) => {
+          for (const row of table) {
+            expect(getResult().stdout).toContain(row.text);
+          }
+        });
+      }
+    );
   });
 
   // ---------------------------------------------------------------------------

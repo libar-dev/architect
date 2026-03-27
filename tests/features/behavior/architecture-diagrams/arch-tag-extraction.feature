@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:ArchTagExtraction
-@libar-docs-status:completed
-@libar-docs-implements:ArchitectureDiagramGeneration
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:ArchTagExtraction
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-implements:ArchitectureDiagramGeneration
+@architect-product-area:Generation
 @architecture
 Feature: Architecture Tag Extraction
 
@@ -98,10 +99,10 @@ Feature: Architecture Tag Extraction
       Given TypeScript source:
         """typescript
         /**
-         * @libar-docs
-         * @libar-docs-pattern MyProjection
-         * @libar-docs-status completed
-         * @libar-docs-arch-role projection
+         * @architect
+         * @architect-pattern MyProjection
+         * @architect-status completed
+         * @architect-arch-role projection
          */
         export const myProjection = {};
         """
@@ -113,10 +114,10 @@ Feature: Architecture Tag Extraction
       Given TypeScript source:
         """typescript
         /**
-         * @libar-docs
-         * @libar-docs-pattern MyHandler
-         * @libar-docs-status completed
-         * @libar-docs-arch-role command-handler
+         * @architect
+         * @architect-pattern MyHandler
+         * @architect-status completed
+         * @architect-arch-role command-handler
          */
         export const myHandler = {};
         """
@@ -136,10 +137,10 @@ Feature: Architecture Tag Extraction
       Given TypeScript source:
         """typescript
         /**
-         * @libar-docs
-         * @libar-docs-pattern OrderHandler
-         * @libar-docs-status completed
-         * @libar-docs-arch-context orders
+         * @architect
+         * @architect-pattern OrderHandler
+         * @architect-status completed
+         * @architect-arch-context orders
          */
         export const orderHandler = {};
         """
@@ -151,10 +152,10 @@ Feature: Architecture Tag Extraction
       Given TypeScript source:
         """typescript
         /**
-         * @libar-docs
-         * @libar-docs-pattern InventoryHandler
-         * @libar-docs-status completed
-         * @libar-docs-arch-context inventory
+         * @architect
+         * @architect-pattern InventoryHandler
+         * @architect-status completed
+         * @architect-arch-context inventory
          */
         export const inventoryHandler = {};
         """
@@ -174,10 +175,10 @@ Feature: Architecture Tag Extraction
       Given TypeScript source:
         """typescript
         /**
-         * @libar-docs
-         * @libar-docs-pattern MyService
-         * @libar-docs-status completed
-         * @libar-docs-arch-layer application
+         * @architect
+         * @architect-pattern MyService
+         * @architect-status completed
+         * @architect-arch-layer application
          */
         export const myService = {};
         """
@@ -189,10 +190,10 @@ Feature: Architecture Tag Extraction
       Given TypeScript source:
         """typescript
         /**
-         * @libar-docs
-         * @libar-docs-pattern MyInfra
-         * @libar-docs-status completed
-         * @libar-docs-arch-layer infrastructure
+         * @architect
+         * @architect-pattern MyInfra
+         * @architect-status completed
+         * @architect-arch-layer infrastructure
          */
         export const myInfra = {};
         """
@@ -212,12 +213,12 @@ Feature: Architecture Tag Extraction
       Given TypeScript source:
         """typescript
         /**
-         * @libar-docs
-         * @libar-docs-pattern OrderCommandHandlers
-         * @libar-docs-status completed
-         * @libar-docs-arch-role command-handler
-         * @libar-docs-arch-context orders
-         * @libar-docs-arch-layer application
+         * @architect
+         * @architect-pattern OrderCommandHandlers
+         * @architect-status completed
+         * @architect-arch-role command-handler
+         * @architect-arch-context orders
+         * @architect-arch-layer application
          */
         export const orderCommandHandlers = {};
         """
@@ -239,9 +240,9 @@ Feature: Architecture Tag Extraction
       Given TypeScript source:
         """typescript
         /**
-         * @libar-docs
-         * @libar-docs-pattern NoArchTags
-         * @libar-docs-status completed
+         * @architect
+         * @architect-pattern NoArchTags
+         * @architect-status completed
          */
         export const noArchTags = {};
         """

@@ -4,8 +4,8 @@
  * BDD step definitions for testing the lint-process CLI
  * which validates changes against delivery process rules.
  *
- * @libar-docs
- * @libar-docs-implements CliBehaviorTesting
+ * @architect
+ * @architect-implements CliBehaviorTesting
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -56,17 +56,39 @@ function initGitRepo(dir: string): void {
 // Fixture Content Builders
 // =============================================================================
 
-function createFeatureFile(status: string): string {
-  return `@libar-docs-pattern:TestPattern
-@libar-docs-phase:1
-@libar-docs-status:${status}
-Feature: Test Pattern
-  A test feature for lint-process CLI testing.
+function createFeatureFile(status: string, unlockReason?: string): string {
+  const lines = [
+    '@architect-pattern:TestPattern',
+    '@architect-phase:1',
+    `@architect-status:${status}`,
+  ];
 
-  Scenario: Basic scenario
-    Given a test condition
-    When an action occurs
-    Then a result is expected
+  if (unlockReason) {
+    lines.push(`@architect-unlock-reason:${unlockReason}`);
+  }
+
+  lines.push(
+    'Feature: Test Pattern',
+    '  A test feature for lint-process CLI testing.',
+    '',
+    '  Scenario: Basic scenario',
+    '    Given a test condition',
+    '    When an action occurs',
+    '    Then a result is expected',
+    ''
+  );
+
+  return lines.join('\n');
+}
+
+function createArchitectConfig(featurePattern: string): string {
+  return `export default {
+  preset: 'libar-generic',
+  sources: {
+    typescript: ['src/**/*.ts'],
+    features: ['${featurePattern}'],
+  },
+};
 `;
 }
 
@@ -395,5 +417,103 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(combined).toContain(text);
       });
     });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Rule: CLI honors config-defined feature scope
+  // ---------------------------------------------------------------------------
+
+  Rule('CLI honors config-defined feature scope', ({ RuleScenario }) => {
+    RuleScenario(
+      'Config includes completed test features in process state',
+      ({ Given, And, When, Then }) => {
+        Given('a git repository', () => {
+          initGitRepo(getTempDir());
+        });
+
+        And(
+          'an architect config that scopes features to {string}',
+          async (_ctx: unknown, featurePattern: string) => {
+            await writeTempFile(
+              getTempDir(),
+              'architect.config.ts',
+              createArchitectConfig(featurePattern)
+            );
+          }
+        );
+
+        And(
+          'a completed feature file {string} with unlock-reason {string}',
+          async (_ctx: unknown, filePath: string, unlockReason: string) => {
+            await writeTempFile(
+              getTempDir(),
+              filePath,
+              createFeatureFile('completed', unlockReason)
+            );
+          }
+        );
+
+        And('all files are staged', () => {
+          execSync('git add .', { cwd: getTempDir(), stdio: 'pipe' });
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult().exitCode).toBe(code);
+        });
+
+        And('output does not contain {string}', (_ctx: unknown, text: string) => {
+          const combined = getResult().stdout + getResult().stderr;
+          expect(combined).not.toContain(text);
+        });
+      }
+    );
+
+    RuleScenario(
+      'Non-feature files with status-like text are ignored',
+      ({ Given, And, When, Then }) => {
+        Given('a git repository', () => {
+          initGitRepo(getTempDir());
+        });
+
+        And(
+          'an architect config that scopes features to {string}',
+          async (_ctx: unknown, featurePattern: string) => {
+            await writeTempFile(
+              getTempDir(),
+              'architect.config.ts',
+              createArchitectConfig(featurePattern)
+            );
+          }
+        );
+
+        And(
+          'a markdown file {string} containing {string}',
+          async (_ctx: unknown, filePath: string, content: string) => {
+            await writeTempFile(getTempDir(), filePath, `# Example\n\n${content}\n`);
+          }
+        );
+
+        And('all files are staged', () => {
+          execSync('git add .', { cwd: getTempDir(), stdio: 'pipe' });
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult().exitCode).toBe(code);
+        });
+
+        And('output does not contain {string}', (_ctx: unknown, text: string) => {
+          const combined = getResult().stdout + getResult().stderr;
+          expect(combined).not.toContain(text);
+        });
+      }
+    );
   });
 });

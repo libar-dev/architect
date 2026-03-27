@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:PrChangesOptions
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
-@libar-docs-implements:GeneratorInfrastructureTesting
+@architect
+@architect-pattern:PrChangesOptions
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Generation
+@architect-implements:GeneratorInfrastructureTesting
 Feature: PR Changes Options
 
   Tests the PrChangesCodec filtering capabilities for generating PR-scoped

@@ -1,7 +1,8 @@
 /**
  * Shared state and helpers for shape-extraction test splits.
  */
-import { extractShapes, renderShapesAsMarkdown } from '../../../src/extractor/shape-extractor.js';
+import { extractShapes } from '../../../src/extractor/shape-extractor.js';
+import { renderShapesAsMarkdown } from '../../../src/renderable/codecs/helpers.js';
 import type { ShapeExtractionResult } from '../../../src/validation-schemas/extracted-shape.js';
 import { buildRegistry } from '../../../src/taxonomy/index.js';
 import type { Result } from '../../../src/types/result.js';

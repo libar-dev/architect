@@ -1,10 +1,10 @@
 /**
- * @libar-docs
- * @libar-docs-validation
- * @libar-docs-pattern DualSourceSchemas
- * @libar-docs-status completed
- * @libar-docs-implements MvpWorkflowImplementation
- * @libar-docs-used-by DocExtractor, FeatureParser, CrossValidator
+ * @architect
+ * @architect-validation
+ * @architect-pattern DualSourceSchemas
+ * @architect-status completed
+ * @architect-implements MvpWorkflowImplementation
+ * @architect-used-by DocExtractor, FeatureParser, CrossValidator
  *
  * ## DualSourceSchemas - Dual-Source Extraction Type Validation
  *
@@ -32,7 +32,7 @@ import {
 } from '../taxonomy/index.js';
 
 /**
- * Process status values from Gherkin @libar-docs-status tag
+ * Process status values from Gherkin @architect-status tag
  *
  * Per PDR-005 MVP Workflow State Machine:
  * - roadmap: Planned work, fully editable
@@ -40,36 +40,36 @@ import {
  * - completed: Done, hard-locked
  * - deferred: On hold, fully editable
  *
- * @see delivery-process/src/taxonomy/status-values.ts
+ * @see architect/src/taxonomy/status-values.ts
  */
 export const ProcessStatusSchema = z.enum(PROCESS_STATUS_VALUES);
 export type ProcessStatus = ProcessStatusValue;
 
 /**
- * Hierarchy level values from Gherkin @libar-docs-level tag
+ * Hierarchy level values from Gherkin @architect-level tag
  *
  * Three-level hierarchy for organizing work:
  * - **epic**: Multi-quarter strategic initiatives
  * - **phase**: Standard work units (2-5 days)
  * - **task**: Fine-grained session-level work (1-4 hours)
  *
- * Default is "phase" for backward compatibility with existing feature files.
+ * Default is "phase".
  *
- * @see delivery-process/src/taxonomy/hierarchy-levels.ts
+ * @see architect/src/taxonomy/hierarchy-levels.ts
  */
 export const HierarchyLevelSchema = z.enum(HIERARCHY_LEVELS);
 export type HierarchyLevel = TaxonomyHierarchyLevel;
 
 /**
- * Risk level values from Gherkin @libar-docs-risk tag
+ * Risk level values from Gherkin @architect-risk tag
  *
- * @see delivery-process/src/taxonomy/risk-levels.ts
+ * @see architect/src/taxonomy/risk-levels.ts
  */
 export const RiskLevelSchema = z.enum(RISK_LEVELS);
 export type RiskLevel = TaxonomyRiskLevel;
 
 /**
- * Process metadata from Gherkin feature tags (@libar-docs-*)
+ * Process metadata from Gherkin feature tags (@architect-*)
  *
  * Extracted from timeline feature files to provide temporal process data
  * (quarter, effort, team, workflow) that complements the timeless pattern
@@ -83,9 +83,9 @@ export const ProcessMetadataSchema = z
     phase: z.number().int().positive(),
     /** Process status */
     status: ProcessStatusSchema,
-    /** Hierarchy level (default: "phase" for backward compatibility) */
+    /** Hierarchy level (default: "phase") */
     level: HierarchyLevelSchema.default('phase'),
-    /** Parent pattern name for hierarchy (from @libar-docs-parent tag) */
+    /** Parent pattern name for hierarchy (from @architect-parent tag) */
     parent: z.string().optional(),
     /** Quarter assignment (e.g., "Q1-2025") */
     quarter: z.string().optional(),

@@ -1,18 +1,18 @@
 /**
- * @libar-docs
- * @libar-docs-lint
- * @libar-docs-pattern LintRules
- * @libar-docs-status completed
- * @libar-docs-arch-role service
- * @libar-docs-arch-context lint
- * @libar-docs-arch-layer application
- * @libar-docs-implements PatternRelationshipModel
- * @libar-docs-used-by LintEngine
- * @libar-docs-extract-shapes LintRule, LintContext, defaultRules, severityOrder, filterRulesBySeverity, missingPatternName, missingStatus, invalidStatus, missingWhenToUse, tautologicalDescription, missingRelationships, patternConflictInImplements, missingRelationshipTarget
+ * @architect
+ * @architect-lint
+ * @architect-pattern LintRules
+ * @architect-status completed
+ * @architect-arch-role service
+ * @architect-arch-context lint
+ * @architect-arch-layer application
+ * @architect-implements PatternRelationshipModel
+ * @architect-used-by LintEngine
+ * @architect-extract-shapes LintRule, LintContext, defaultRules, severityOrder, filterRulesBySeverity, missingPatternName, missingStatus, invalidStatus, missingWhenToUse, tautologicalDescription, missingRelationships, patternConflictInImplements, missingRelationshipTarget
  *
  * ## LintRules - Annotation Quality Rules
  *
- * Defines lint rules that check @libar-docs-* directives for completeness
+ * Defines lint rules that check @architect-* directives for completeness
  * and quality. Rules include: missing-pattern-name, missing-status,
  * missing-when-to-use, tautological-description, and missing-relationships.
  *
@@ -26,7 +26,7 @@
 import type { DocDirective } from '../validation-schemas/doc-directive.js';
 import type { LintSeverity, LintViolation } from '../validation-schemas/lint.js';
 import type { TagRegistry } from '../validation-schemas/tag-registry.js';
-import { STATUS_NORMALIZATION_MAP, PROCESS_STATUS_VALUES } from '../taxonomy/index.js';
+import { PROCESS_STATUS_VALUES, VALID_PROCESS_STATUS_SET } from '../taxonomy/index.js';
 import { DEFAULT_TAG_PREFIX } from '../config/defaults.js';
 
 /**
@@ -130,20 +130,20 @@ export const missingPatternName: LintRule = {
 /**
  * Rule: missing-status
  *
- * Patterns should have an explicit status (completed, active, roadmap).
+ * Patterns should have an explicit status (completed, active, roadmap, deferred).
  * This helps readers understand if the pattern is ready for use.
  */
 export const missingStatus: LintRule = {
   id: 'missing-status',
   severity: 'warning',
-  description: 'Pattern should have status tag (completed|active|roadmap)',
+  description: 'Pattern should have status tag (roadmap|active|completed|deferred)',
   check: (directive, file, line, context) => {
     if (!directive.status) {
       const tagPrefix = getTagPrefix(context);
       return violation(
         'missing-status',
         'warning',
-        `No ${tagPrefix}status found. Add: ${tagPrefix}status completed|active|roadmap`,
+        `No ${tagPrefix}status found. Add: ${tagPrefix}status roadmap|active|completed|deferred`,
         file,
         line
       );
@@ -155,32 +155,23 @@ export const missingStatus: LintRule = {
 /**
  * Rule: invalid-status
  *
- * Status values must be valid PDR-005 FSM states or recognized legacy aliases.
- *
- * Valid FSM values: roadmap, active, completed, deferred
- * Accepted legacy aliases: implemented → completed, partial → active, in-progress → active, planned → planned
+ * Status values must be valid PDR-005 FSM states.
  */
 export const invalidStatus: LintRule = {
   id: 'invalid-status',
   severity: 'error',
-  description:
-    'Status must be a valid FSM state (roadmap, active, completed, deferred) or legacy alias',
+  description: 'Status must be a valid FSM state (roadmap, active, completed, deferred)',
   check: (directive, file, line) => {
     // Skip if no status (handled by missing-status rule)
     if (!directive.status) {
       return null;
     }
 
-    // Check if status is in the normalization map (includes both FSM and legacy values)
-    const normalizedStatus = STATUS_NORMALIZATION_MAP[directive.status.toLowerCase()];
-    if (!normalizedStatus) {
-      const validValues = [
-        ...new Set([...PROCESS_STATUS_VALUES, ...Object.keys(STATUS_NORMALIZATION_MAP)]),
-      ];
+    if (!VALID_PROCESS_STATUS_SET.has(directive.status.toLowerCase())) {
       return violation(
         'invalid-status',
         'error',
-        `Invalid status '${directive.status}'. Valid values: ${validValues.join(', ')}.`,
+        `Invalid status '${directive.status}'. Valid values: ${PROCESS_STATUS_VALUES.join(', ')}.`,
         file,
         line
       );
@@ -297,12 +288,12 @@ export const missingRelationships: LintRule = {
  * Rule: pattern-conflict-in-implements
  *
  * Validates that a file doesn't create a circular reference by defining
- * a pattern that it also implements. Having both @libar-docs-pattern X
- * AND @libar-docs-implements X on the same file is a conflict.
+ * a pattern that it also implements. Having both @architect-pattern X
+ * AND @architect-implements X on the same file is a conflict.
  *
  * However, a file CAN have both tags when they reference DIFFERENT patterns:
- * - @libar-docs-pattern SubPattern (defines its own identity)
- * - @libar-docs-implements ParentSpec (links to parent spec)
+ * - @architect-pattern SubPattern (defines its own identity)
+ * - @architect-implements ParentSpec (links to parent spec)
  *
  * This supports the sub-pattern hierarchy where implementation files can be
  * named patterns that also implement a larger spec (e.g., MockPaymentActions

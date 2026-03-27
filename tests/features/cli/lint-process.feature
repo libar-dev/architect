@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:LintProcessCli
-@libar-docs-status:completed
-@libar-docs-product-area:DataAPI
-@libar-docs-implements:CliBehaviorTesting
+@architect
+@architect-pattern:LintProcessCli
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:DataAPI
+@architect-implements:CliBehaviorTesting
 @cli @lint-process
 Feature: lint-process CLI
   Command-line interface for validating changes against delivery process rules.
@@ -36,7 +37,7 @@ Feature: lint-process CLI
     Scenario: Display version with --version flag
       When running "lint-process --version"
       Then exit code is 0
-      And stdout contains "lint-process"
+      And stdout contains "architect-guard"
 
     @happy-path
     Scenario: Display version with -v flag
@@ -169,3 +170,33 @@ Feature: lint-process CLI
       When running "lint-process --unknown-flag --staged"
       Then exit code is 0
       And output contains "Warning"
+
+  # ============================================================================
+  # RULE 8: Config-Driven Feature Scope
+  # ============================================================================
+
+  Rule: CLI honors config-defined feature scope
+
+    **Invariant:** Process guard must derive state and diff transitions from the configured feature globs, including `tests/features/**/*.feature`, while ignoring non-feature files that only contain annotation-like text.
+    **Rationale:** Rebrand cleanup imports completed artifacts under multiple feature roots — using hardcoded feature locations misses valid unlock reasons and creates false positives from docs or helper files.
+    **Verified by:** Config includes completed test features in process state, Non-feature files with status-like text are ignored
+
+    @happy-path
+    Scenario: Config includes completed test features in process state
+      Given a git repository
+      And an architect config that scopes features to "tests/features/**/*.feature"
+      And a completed feature file "tests/features/api/scoped.feature" with unlock-reason "Retroactive-completion-during-rebrand"
+      And all files are staged
+      When running "lint-process --staged"
+      Then exit code is 0
+      And output does not contain "invalid-status-transition"
+
+    @happy-path
+    Scenario: Non-feature files with status-like text are ignored
+      Given a git repository
+      And an architect config that scopes features to "tests/features/**/*.feature"
+      And a markdown file "docs/example.md" containing "@architect-status:completed"
+      And all files are staged
+      When running "lint-process --staged"
+      Then exit code is 0
+      And output does not contain "invalid-status-transition"

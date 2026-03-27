@@ -4,7 +4,7 @@
  * Provides utilities for executing CLI commands via subprocess
  * and capturing their output for assertion in tests.
  *
- * @libar-docs
+ * @architect
  */
 
 import { spawn } from 'node:child_process';

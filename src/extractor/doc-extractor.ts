@@ -1,16 +1,16 @@
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-extractor
- * @libar-docs-pattern Document Extractor
- * @libar-docs-status completed
- * @libar-docs-arch-role service
- * @libar-docs-arch-context extractor
- * @libar-docs-arch-layer application
- * @libar-docs-include pipeline-stages
- * @libar-docs-uses Pattern Scanner, Tag Registry, Zod
- * @libar-docs-used-by Orchestrator, Generators
- * @libar-docs-usecase "When converting scanned files to ExtractedPattern objects"
- * @libar-docs-usecase "When inferring pattern names and categories from exports"
+ * @architect
+ * @architect-core @architect-extractor
+ * @architect-pattern Document Extractor
+ * @architect-status completed
+ * @architect-arch-role service
+ * @architect-arch-context extractor
+ * @architect-arch-layer application
+ * @architect-include pipeline-stages
+ * @architect-uses Pattern Scanner, Tag Registry, Zod
+ * @architect-used-by Orchestrator, Generators
+ * @architect-usecase "When converting scanned files to ExtractedPattern objects"
+ * @architect-usecase "When inferring pattern names and categories from exports"
  *
  * ## Document Extractor - Pattern Extraction and Metadata Generation
  *
@@ -164,8 +164,8 @@ export function buildPattern(
   const name = inferPatternName(directive, exports, registry);
   const category = asCategoryName(inferCategory(directive.tags as readonly string[], registry));
 
-  // Shape extraction: both @libar-docs-extract-shapes (pattern-level) and
-  // @libar-docs-shape (declaration-level) contribute to extractedShapes.
+  // Shape extraction: both @architect-extract-shapes (pattern-level) and
+  // @architect-shape (declaration-level) contribute to extractedShapes.
   // Read file once for both paths.
   let extractedShapes;
   const extractionWarnings: string[] = [];
@@ -182,7 +182,7 @@ export function buildPattern(
       );
     }
 
-    // Path 1: Existing @libar-docs-extract-shapes tag processing
+    // Path 1: Existing @architect-extract-shapes tag processing
     if (
       sourceContent !== undefined &&
       directive.extractShapes !== undefined &&
@@ -197,11 +197,11 @@ export function buildPattern(
       extractionWarnings.push(...shapeResult.warnings);
     }
 
-    // Path 2: Declaration-level @libar-docs-shape discovery
+    // Path 2: Declaration-level @architect-shape discovery
     // Performance note: when both paths fire, sourceCode is parsed by typescript-estree
     // twice (once in processExtractShapesTag, once in discoverTaggedShapes). Acceptable
     // for v1 — future optimization could accept a pre-parsed AST.
-    if (sourceContent?.includes('libar-docs-shape') === true) {
+    if (sourceContent?.includes('architect-shape') === true) {
       const taggedResult = discoverTaggedShapes(sourceContent, { jsx });
       if (taggedResult.ok && taggedResult.value.shapes.length > 0) {
         const existingByName = new Map((extractedShapes ?? []).map((s) => [s.name, s]));
@@ -225,7 +225,7 @@ export function buildPattern(
       }
     }
   } else if (directive.extractShapes !== undefined && directive.extractShapes.length > 0) {
-    // Non-TS file with extract-shapes tag — legacy path
+    // Non-TS file with extract-shapes tag — non-TS extraction path
     try {
       const sourceContent = fs.readFileSync(filePath, 'utf-8');
       const shapeResult = processExtractShapesTag(
@@ -291,9 +291,13 @@ export function buildPattern(
     ...(directive.archLayer !== undefined && { archLayer: directive.archLayer }),
     ...(directive.include !== undefined &&
       directive.include.length > 0 && { include: directive.include }),
+    ...(directive.claudeModule !== undefined && { claudeModule: directive.claudeModule }),
+    ...(directive.claudeSection !== undefined && { claudeSection: directive.claudeSection }),
+    ...(directive.claudeTags !== undefined &&
+      directive.claudeTags.length > 0 && { claudeTags: directive.claudeTags }),
     // PRD metadata fields
     ...(directive.productArea !== undefined && { productArea: directive.productArea }),
-    // Shape extraction fields (extracted from source file when @libar-docs-extract-shapes present)
+    // Shape extraction fields (extracted from source file when @architect-extract-shapes present)
     ...(extractedShapes && extractedShapes.length > 0 && { extractedShapes }),
     // Convention tags for reference document generation
     ...(directive.convention !== undefined &&
@@ -353,7 +357,7 @@ export function buildPattern(
  *
  * // From export
  * const name2 = inferPatternName(
- *   { description: '@docs-core', tags: [...] },
+ *   { description: '@architect-core', tags: [...] },
  *   [{ name: 'createUser', type: 'function' }],
  *   registry
  * );
@@ -361,7 +365,7 @@ export function buildPattern(
  *
  * // From tag
  * const name3 = inferPatternName(
- *   { description: '', tags: ['@docs-domain-auth'] },
+ *   { description: '', tags: ['@architect-domain-auth'] },
  *   [],
  *   registry
  * );
@@ -403,25 +407,25 @@ export function inferPatternName(
 }
 
 /**
- * Infer category from @libar-docs-* tags using priority system
+ * Infer category from @architect-* tags using priority system
  *
  * Categories are selected based on priority order:
  * domain > arch > infra > validation > testing > performance > security > core
  *
- * @param tags - Array of @libar-docs-* tags
+ * @param tags - Array of @architect-* tags
  * @returns Inferred category string
  *
  * @example
  * ```typescript
  * // Priority-based selection
  * const cat1 = inferCategory([
- *   '@libar-docs-core',
- *   '@libar-docs-domain-auth'
+ *   '@architect-core',
+ *   '@architect-domain-auth'
  * ]);
  * console.log(cat1); // 'domain' (higher priority than 'core')
  *
  * // From first tag
- * const cat2 = inferCategory(['@libar-docs-validation-zod']);
+ * const cat2 = inferCategory(['@architect-validation-zod']);
  * console.log(cat2); // 'validation'
  *
  * // No tags
@@ -457,7 +461,7 @@ export function inferCategory(tags: readonly string[], registry: TagRegistry): s
     const withoutPrefix = tag.substring(prefix.length);
 
     // Find ALL matching categories in this tag
-    // This handles cases like "@libar-docs-utils-validation" which contains both "utils" and "validation"
+    // This handles cases like "@architect-utils-validation" which contains both "utils" and "validation"
     const matches: string[] = [];
 
     // Check for exact match first
@@ -529,9 +533,9 @@ export function inferCategory(tags: readonly string[], registry: TagRegistry): s
  *
  * @example
  * ```typescript
- * hasAggregationTag(['@libar-docs-core', '@libar-docs-overview'], "overview", registry); // true
- * hasAggregationTag(['@libar-docs-core'], "overview", registry); // false
- * hasAggregationTag(['@libar-docs-arch', '@libar-docs-decision'], "decision", registry); // true
+ * hasAggregationTag(['@architect-core', '@architect-overview'], "overview", registry); // true
+ * hasAggregationTag(['@architect-core'], "overview", registry); // false
+ * hasAggregationTag(['@architect-arch', '@architect-decision'], "decision", registry); // true
  * ```
  */
 export function hasAggregationTag(
@@ -563,18 +567,18 @@ export interface AggregationTags {
  * Identifies which aggregated documents a pattern should appear in.
  * Patterns can appear in multiple documents if they have multiple aggregation tags.
  *
- * @param tags - Array of @libar-docs-* tags
+ * @param tags - Array of @architect-* tags
  * @param registry - Tag registry for aggregation tag lookup
  * @returns Object indicating which aggregated docs to include pattern in
  *
  * @example
  * ```typescript
  * // Pattern with both overview and decision tags
- * getAggregationTags(['@libar-docs-overview', '@libar-docs-decision'], registry);
+ * getAggregationTags(['@architect-overview', '@architect-decision'], registry);
  * // { overview: true, decision: true, intro: false }
  *
  * // Pattern with only core tag (no aggregation)
- * getAggregationTags(['@libar-docs-core'], registry);
+ * getAggregationTags(['@architect-core'], registry);
  * // { overview: false, decision: false, intro: false }
  * ```
  */

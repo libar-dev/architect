@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:ProcessApiCliHelp
-@libar-docs-implements:DataAPICLIErgonomics
-@libar-docs-status:active
-@libar-docs-product-area:DataAPI
+@architect
+@architect-pattern:ProcessApiCliHelp
+@architect-implements:DataAPICLIErgonomics
+@architect-status:active
+@architect-product-area:DataAPI
 @cli @process-api @help
 Feature: Process API CLI - Per-Subcommand Help
   Per-subcommand help displays usage, flags, and examples for individual subcommands.

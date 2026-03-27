@@ -8,7 +8,7 @@ The taxonomy defines the vocabulary for pattern annotations: what tags exist, th
 
 ## Concept
 
-A **taxonomy** is a classification system. In `@libar-dev/delivery-process`, the taxonomy defines:
+A **taxonomy** is a classification system. In `@libar-dev/architect`, the taxonomy defines:
 
 | Component        | Purpose                                                   |
 | ---------------- | --------------------------------------------------------- |
@@ -17,7 +17,7 @@ A **taxonomy** is a classification system. In `@libar-dev/delivery-process`, the
 | **Format Types** | How tag values are parsed (`flag`, `csv`, `enum`)         |
 | **Hierarchy**    | Work item levels (`epic`, `phase`, `task`)                |
 
-The taxonomy is NOT a fixed schema. Presets (`libar-generic`, `generic`, `ddd-es-cqrs`) select different subsets, and you can define custom categories.
+The taxonomy is NOT a fixed schema. Presets (`libar-generic`, `ddd-es-cqrs`) select different subsets, and you can define custom categories.
 
 ---
 
@@ -45,11 +45,11 @@ src/taxonomy/
 The `buildRegistry()` function creates a `TagRegistry` containing all taxonomy definitions:
 
 ```typescript
-import { buildRegistry } from '@libar-dev/delivery-process/taxonomy';
+import { buildRegistry } from '@libar-dev/architect/taxonomy';
 
 const registry = buildRegistry();
-// registry.tagPrefix       → "@libar-docs-"
-// registry.fileOptInTag    → "@libar-docs"
+// registry.tagPrefix       → "@architect-"
+// registry.fileOptInTag    → "@architect"
 // registry.categories      → CategoryDefinition[]
 // registry.metadataTags    → MetadataTagDefinition[]
 // registry.aggregationTags → AggregationTagDefinition[]
@@ -58,11 +58,10 @@ const registry = buildRegistry();
 
 ### Presets Select Taxonomy Subsets
 
-| Preset                    | Categories | Tag Prefix     | Use Case                           |
-| ------------------------- | ---------- | -------------- | ---------------------------------- |
-| `libar-generic` (default) | 3          | `@libar-docs-` | Simple projects (this package)     |
-| `ddd-es-cqrs`             | 21         | `@libar-docs-` | DDD/Event Sourcing architectures   |
-| `generic`                 | 3          | `@docs-`       | Simple projects with @docs- prefix |
+| Preset                    | Categories | Tag Prefix    | Use Case                         |
+| ------------------------- | ---------- | ------------- | -------------------------------- |
+| `libar-generic` (default) | 3          | `@architect-` | Simple projects (this package)   |
+| `ddd-es-cqrs`             | 21         | `@architect-` | DDD/Event Sourcing architectures |
 
 The preset determines which categories are available. All presets share the same status values and format types.
 
@@ -72,14 +71,14 @@ The preset determines which categories are available. All presets share the same
 
 Tags have different value formats:
 
-| Format         | Example                    | Parsing                        |
-| -------------- | -------------------------- | ------------------------------ |
-| `flag`         | `@docs-core`               | Boolean presence (no value)    |
-| `value`        | `@docs-pattern MyPattern`  | Simple string                  |
-| `enum`         | `@docs-status completed`   | Constrained to predefined list |
-| `csv`          | `@docs-uses A, B, C`       | Comma-separated values         |
-| `number`       | `@docs-phase 15`           | Numeric value                  |
-| `quoted-value` | `@docs-brief:'Multi word'` | Preserves spaces               |
+| Format         | Example                         | Parsing                        |
+| -------------- | ------------------------------- | ------------------------------ |
+| `flag`         | `@architect-core`               | Boolean presence (no value)    |
+| `value`        | `@architect-pattern MyPattern`  | Simple string                  |
+| `enum`         | `@architect-status completed`   | Constrained to predefined list |
+| `csv`          | `@architect-uses A, B, C`       | Comma-separated values         |
+| `number`       | `@architect-phase 15`           | Numeric value                  |
+| `quoted-value` | `@architect-brief:'Multi word'` | Preserves spaces               |
 
 ---
 
@@ -88,11 +87,11 @@ Tags have different value formats:
 Generate a human-readable taxonomy reference from the TypeScript taxonomy source:
 
 ```bash
-# Via the docs generator (recommended)
-npx generate-docs -g taxonomy -i "src/**/*.ts" -o docs -f
+# Via the docs script (recommended)
+pnpm docs:taxonomy
 
-# Flat single-file reference (deprecated — use generate-docs instead)
-npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f
+# Direct CLI equivalent
+pnpm exec architect-generate -g taxonomy -i "src/**/*.ts" -o docs -f
 ```
 
 The generated output reflects every tag the system supports — including all 21 categories available with the `ddd-es-cqrs` preset.

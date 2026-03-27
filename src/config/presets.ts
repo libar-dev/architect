@@ -1,13 +1,13 @@
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-config
- * @libar-docs-pattern ConfigurationPresets
- * @libar-docs-status completed
- * @libar-docs-arch-layer domain
- * @libar-docs-arch-context config
- * @libar-docs-uses ConfigurationTypes, Categories, RegistryBuilder
- * @libar-docs-used-by DeliveryProcessFactory
- * @libar-docs-extract-shapes GENERIC_PRESET, LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PresetName, PRESETS
+ * @architect
+ * @architect-core @architect-config
+ * @architect-pattern ConfigurationPresets
+ * @architect-status completed
+ * @architect-arch-layer domain
+ * @architect-arch-context config
+ * @architect-uses ConfigurationTypes, Categories, RegistryBuilder
+ * @architect-used-by ArchitectFactory
+ * @architect-extract-shapes LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PresetName, PRESETS
  *
  * ## Configuration Presets
  *
@@ -17,88 +17,41 @@
  *
  * ### Available Presets
  *
- * - **GENERIC_PRESET**: Minimal categories with @docs- prefix for non-DDD projects
- * - **LIBAR_GENERIC_PRESET**: Minimal categories with @libar-docs- prefix (for package-level config)
- * - **DDD_ES_CQRS_PRESET**: Full 21-category taxonomy with @libar-docs- prefix
+ * - **LIBAR_GENERIC_PRESET**: Minimal categories with @architect- prefix (for package-level config)
+ * - **DDD_ES_CQRS_PRESET**: Full 21-category taxonomy with @architect- prefix
  *
  * ### When to Use
  *
- * - Use GENERIC_PRESET for simple documentation needs with @docs- prefix
- * - Use LIBAR_GENERIC_PRESET for simple documentation needs with @libar-docs- prefix (default)
+ * - Use LIBAR_GENERIC_PRESET for simple documentation needs with @architect- prefix (default)
  * - Use DDD_ES_CQRS_PRESET for full DDD/ES/CQRS taxonomy
  * - Use as base for custom configurations
  */
 
-import type { DeliveryProcessConfig } from './types.js';
+import type { ArchitectConfig } from './types.js';
 import { CATEGORIES, type CategoryDefinition } from '../taxonomy/categories.js';
 import { buildRegistry } from '../taxonomy/registry-builder.js';
 import { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG } from './defaults.js';
 
 /**
- * Generic preset for non-DDD projects.
+ * Default libar-generic preset with @architect- prefix.
  *
- * Minimal categories with @docs- prefix. Suitable for:
- * - Simple documentation needs
- * - Non-DDD architectures
- * - Projects that want basic pattern tracking
- *
- * @example
- * ```typescript
- * import { createDeliveryProcess, GENERIC_PRESET } from '@libar-dev/delivery-process';
- *
- * const dp = createDeliveryProcess({ preset: "generic" });
- * // Uses @docs-, @docs-pattern, @docs-status, etc.
- * ```
- */
-export const GENERIC_PRESET = {
-  tagPrefix: '@docs-',
-  fileOptInTag: '@docs',
-  categories: [
-    {
-      tag: 'core',
-      domain: 'Core',
-      priority: 1,
-      description: 'Core patterns',
-      aliases: [],
-    },
-    {
-      tag: 'api',
-      domain: 'API',
-      priority: 2,
-      description: 'Public APIs',
-      aliases: [],
-    },
-    {
-      tag: 'infra',
-      domain: 'Infrastructure',
-      priority: 3,
-      description: 'Infrastructure',
-      aliases: ['infrastructure'],
-    },
-  ] as const satisfies readonly CategoryDefinition[],
-} as const satisfies DeliveryProcessConfig;
-
-/**
- * Generic preset with @libar-docs- prefix.
- *
- * Same minimal categories as GENERIC_PRESET but with @libar-docs- prefix.
- * This is the universal default preset for both `createDeliveryProcess()` and
+ * This is the universal default preset for both `createArchitect()` and
  * `loadConfig()` fallback.
  *
  * Suitable for:
  * - Most projects (default choice)
- * - Projects already using @libar-docs- tags
- * - Package-level configuration (simplified categories, same prefix)
+ * - Projects already using @architect- tags
+ * - Package-level configuration with a compact three-category taxonomy
  * - Gradual adoption without tag migration
  *
  * @example
  * ```typescript
- * import { createDeliveryProcess } from '@libar-dev/delivery-process';
+ * import { createArchitect } from '@libar-dev/architect';
  *
  * // Default preset (libar-generic):
- * const dp = createDeliveryProcess();
- * // Uses @libar-docs-, @libar-docs-pattern, @libar-docs-status, etc.
- * // With 3 category tags: @libar-docs-core, @libar-docs-api, @libar-docs-infra
+ * const dp = createArchitect();
+ * // Uses @architect-, @architect-pattern, @architect-status, etc.
+ * // With 3 category tags: @architect-core, @architect-api, @architect-infra
  * ```
  */
 export const LIBAR_GENERIC_PRESET = {
@@ -127,12 +80,12 @@ export const LIBAR_GENERIC_PRESET = {
       aliases: ['infrastructure'],
     },
   ] as const satisfies readonly CategoryDefinition[],
-} as const satisfies DeliveryProcessConfig;
+} as const satisfies ArchitectConfig;
 
 /**
  * Full DDD/ES/CQRS preset (current @libar-dev taxonomy).
  *
- * Complete 21-category taxonomy with @libar-docs- prefix. Suitable for:
+ * Complete 21-category taxonomy with @architect- prefix. Suitable for:
  * - DDD architectures
  * - Event sourcing projects
  * - CQRS implementations
@@ -140,9 +93,9 @@ export const LIBAR_GENERIC_PRESET = {
  *
  * @example
  * ```typescript
- * import { createDeliveryProcess, DDD_ES_CQRS_PRESET } from '@libar-dev/delivery-process';
+ * import { createArchitect, DDD_ES_CQRS_PRESET } from '@libar-dev/architect';
  *
- * const dp = createDeliveryProcess({ preset: "ddd-es-cqrs" });
+ * const dp = createArchitect({ preset: "ddd-es-cqrs" });
  * ```
  */
 export const DDD_ES_CQRS_PRESET = {
@@ -150,27 +103,26 @@ export const DDD_ES_CQRS_PRESET = {
   fileOptInTag: DEFAULT_FILE_OPT_IN_TAG,
   categories: CATEGORIES,
   metadataTags: buildRegistry().metadataTags,
-} as const satisfies DeliveryProcessConfig;
+} as const satisfies ArchitectConfig;
 
 /**
  * Available preset names
  */
-export type PresetName = 'generic' | 'libar-generic' | 'ddd-es-cqrs';
+export type PresetName = 'libar-generic' | 'ddd-es-cqrs';
 
 /**
  * Preset lookup map
  *
  * @example
  * ```typescript
- * import { PRESETS, type PresetName } from '@libar-dev/delivery-process';
+ * import { PRESETS, type PresetName } from '@libar-dev/architect';
  *
  * function getPreset(name: PresetName) {
  *   return PRESETS[name];
  * }
  * ```
  */
-export const PRESETS: Record<PresetName, DeliveryProcessConfig> = {
-  generic: GENERIC_PRESET,
+export const PRESETS: Record<PresetName, ArchitectConfig> = {
   'libar-generic': LIBAR_GENERIC_PRESET,
   'ddd-es-cqrs': DDD_ES_CQRS_PRESET,
 };

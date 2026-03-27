@@ -1,7 +1,8 @@
-@libar-docs
-@libar-docs-pattern:PresetSystem
-@libar-docs-status:completed
-@libar-docs-product-area:Configuration
+@architect
+@architect-pattern:PresetSystem
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Configuration
 @behavior @presets
 Feature: Preset System for Configuration
   Presets provide pre-configured taxonomies for different project types.
@@ -12,37 +13,8 @@ Feature: Preset System for Configuration
   - Simple projects need minimal configuration
 
   **Solution:**
-  - GENERIC_PRESET for non-DDD projects
   - DDD_ES_CQRS_PRESET for full DDD/ES/CQRS taxonomy
   - PRESETS lookup map for programmatic access
-
-  # ==========================================================================
-  # Generic Preset
-  # ==========================================================================
-
-  Rule: Generic preset provides minimal taxonomy
-
-    **Invariant:** The generic preset must provide exactly 3 categories (core, api, infra) with @docs- prefix.
-    **Rationale:** Simple projects need minimal configuration without DDD-specific categories cluttering the taxonomy.
-    **Verified by:** Generic preset has correct prefix configuration, Generic preset has core categories only
-
-    @happy-path
-    Scenario: Generic preset has correct prefix configuration
-      Given the generic preset
-      Then it should have tagPrefix "@docs-"
-      And it should have fileOptInTag "@docs"
-
-    @happy-path
-    Scenario: Generic preset has core categories only
-      Given the generic preset
-      Then it should include category "core"
-      And it should include category "api"
-      And it should include category "infra"
-      And it should NOT include category "ddd"
-      And it should NOT include category "event-sourcing"
-      And it should NOT include category "cqrs"
-      And it should NOT include category "saga"
-      And it should have exactly 3 categories
 
   # ==========================================================================
   # Libar Generic Preset (for package extraction)
@@ -50,15 +22,15 @@ Feature: Preset System for Configuration
 
   Rule: Libar generic preset provides minimal taxonomy with libar prefix
 
-    **Invariant:** The libar-generic preset must provide exactly 3 categories with @libar-docs- prefix.
-    **Rationale:** This package uses @libar-docs- prefix to avoid collisions with consumer projects' annotations.
+    **Invariant:** The libar-generic preset must provide exactly 3 categories with @architect- prefix.
+    **Rationale:** This package uses @architect- prefix to avoid collisions with consumer projects' annotations.
     **Verified by:** Libar generic preset has correct prefix configuration, Libar generic preset has core categories only
 
     @happy-path
     Scenario: Libar generic preset has correct prefix configuration
       Given the libar-generic preset
-      Then it should have tagPrefix "@libar-docs-"
-      And it should have fileOptInTag "@libar-docs"
+      Then it should have tagPrefix "@architect-"
+      And it should have fileOptInTag "@architect"
 
     @happy-path
     Scenario: Libar generic preset has core categories only
@@ -85,8 +57,8 @@ Feature: Preset System for Configuration
     @happy-path
     Scenario: Full preset has correct prefix configuration
       Given the ddd-es-cqrs preset
-      Then it should have tagPrefix "@libar-docs-"
-      And it should have fileOptInTag "@libar-docs"
+      Then it should have tagPrefix "@architect-"
+      And it should have fileOptInTag "@architect"
 
     @happy-path
     Scenario: Full preset has all DDD categories
@@ -123,19 +95,34 @@ Feature: Preset System for Configuration
 
     **Invariant:** All preset instances must be accessible via the PRESETS map using their canonical string key.
     **Rationale:** Programmatic access enables config files to reference presets by name instead of importing instances.
-    **Verified by:** Generic preset accessible via PRESETS map, DDD preset accessible via PRESETS map, Libar generic preset accessible via PRESETS map
-
-    @happy-path
-    Scenario: Generic preset accessible via PRESETS map
-      When I access PRESETS with key "generic"
-      Then the preset tagPrefix should be "@docs-"
+    **Verified by:** DDD preset accessible via PRESETS map, Libar generic preset accessible via PRESETS map
 
     @happy-path
     Scenario: DDD preset accessible via PRESETS map
       When I access PRESETS with key "ddd-es-cqrs"
-      Then the preset tagPrefix should be "@libar-docs-"
+      Then the preset tagPrefix should be "@architect-"
 
     @happy-path
     Scenario: Libar generic preset accessible via PRESETS map
       When I access PRESETS with key "libar-generic"
-      Then the preset tagPrefix should be "@libar-docs-"
+      Then the preset tagPrefix should be "@architect-"
+
+  # ==========================================================================
+  # Public Type Exports
+  # ==========================================================================
+
+  Rule: PresetName type is exported from public entrypoints
+
+    **Invariant:** The `PresetName` type must remain available from both package entrypoints so downstream configs and helper functions can reference preset keys without reaching into internal files.
+    **Rationale:** Removing a documented type export is a breaking API change even when runtime behavior is unchanged.
+    **Verified by:** Package entrypoint exports PresetName type, Config entrypoint exports PresetName type
+
+    @happy-path
+    Scenario: Package entrypoint exports PresetName type
+      When I use the package entrypoint PresetName type with key "libar-generic"
+      Then the preset tagPrefix should be "@architect-"
+
+    @happy-path
+    Scenario: Config entrypoint exports PresetName type
+      When I use the config entrypoint PresetName type with key "ddd-es-cqrs"
+      Then the preset tagPrefix should be "@architect-"

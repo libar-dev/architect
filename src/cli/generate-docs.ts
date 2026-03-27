@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-cli
- * @libar-docs-pattern Documentation Generator CLI
- * @libar-docs-status completed
- * @libar-docs-uses Orchestrator, Generator Registry
- * @libar-docs-used-by npm scripts, CI pipelines
- * @libar-docs-usecase "When generating documentation from command line"
- * @libar-docs-usecase "When integrating doc generation into npm scripts"
- * @libar-docs-extract-shapes CLIConfig
+ * @architect
+ * @architect-core @architect-cli
+ * @architect-pattern Documentation Generator CLI
+ * @architect-status completed
+ * @architect-uses Orchestrator, Generator Registry
+ * @architect-used-by npm scripts, CI pipelines
+ * @architect-usecase "When generating documentation from command line"
+ * @architect-usecase "When integrating doc generation into npm scripts"
+ * @architect-extract-shapes CLIConfig
  *
- * ## generate-docs - Single Entry Point for All Documentation Generation
+ * ## architect-generate - Single Entry Point for All Documentation Generation
  *
  * Replaces multiple specialized CLIs with one unified interface that supports
  * multiple generators in a single run.
@@ -19,7 +19,7 @@
  *
  * - Generating any documentation from annotated TypeScript source
  * - Running multiple generators in one command
- * - Using delivery-process.config.ts for reproducible builds
+ * - Using a project config file for reproducible builds
  *
  * ### Key Concepts
  *
@@ -36,6 +36,7 @@ import * as path from 'path';
 import { generatorRegistry } from '../generators/registry.js';
 import { generateDocumentation, generateFromConfig } from '../generators/orchestrator.js';
 import { loadProjectConfig } from '../config/config-loader.js';
+import { registerReferenceGenerators } from '../generators/built-in/reference-generators.js';
 import { printVersionAndExit } from './version.js';
 
 // Import built-in generators (registers patterns, adrs, overview)
@@ -220,7 +221,7 @@ function parseArgs(argv: string[] = process.argv.slice(2)): CLIConfig {
 
 function showHelp(): void {
   console.log(`
-Usage: generate-docs [options]
+Usage: architect-generate [options]
 
 Generate documentation from annotated TypeScript source code.
 
@@ -242,18 +243,18 @@ PR Changes Options (for -g pr-changes):
   --changed-files <file>       Explicit file list (repeatable, overrides git)
   --release-filter <version>   Filter by release version (e.g., v0.2.0)
 
-  When delivery-process.config.ts provides sources, --input is optional.
+  When architect.config.ts or architect.config.js provides sources, --input is optional.
   CLI flags override config when both are provided.
 
 Examples:
-  generate-docs -i "src/**/*.ts" -o docs
-  generate-docs -i "src/**/*.ts" -g patterns -g adrs -f
-  generate-docs --list-generators
+  architect-generate -i "src/**/*.ts" -o docs
+  architect-generate -i "src/**/*.ts" -g patterns -g adrs -f
+  architect-generate --list-generators
 
 PR Changes Examples:
-  generate-docs -g pr-changes --git-diff-base main -o docs-living -f
-  generate-docs -g pr-changes --release-filter v0.2.0 -o docs-living -f
-  generate-docs -g pr-changes --changed-files src/foo.ts --changed-files src/bar.ts -o docs
+  architect-generate -g pr-changes --git-diff-base main -o docs-living -f
+  architect-generate -g pr-changes --release-filter v0.2.0 -o docs-living -f
+  architect-generate -g pr-changes --changed-files src/foo.ts --changed-files src/bar.ts -o docs
 `);
 }
 
@@ -262,7 +263,7 @@ async function main(): Promise<void> {
 
   // Show version
   if (opts.version) {
-    printVersionAndExit('generate-docs');
+    printVersionAndExit('architect-generate');
   }
 
   // Show help
@@ -271,8 +272,22 @@ async function main(): Promise<void> {
     return;
   }
 
+  const baseDir = path.resolve(opts.baseDir);
+
   // List generators
   if (opts.listGenerators) {
+    const configResult = await loadProjectConfig(baseDir);
+    if (!configResult.ok) {
+      console.error(`Error loading config: ${configResult.error.message}`);
+      process.exit(1);
+    }
+    if (configResult.value.project.referenceDocConfigs.length > 0) {
+      registerReferenceGenerators(
+        generatorRegistry,
+        configResult.value.project.referenceDocConfigs
+      );
+    }
+
     console.log('Available generators:');
     const available = generatorRegistry.available();
     if (available.length === 0) {
@@ -288,8 +303,6 @@ async function main(): Promise<void> {
     return;
   }
 
-  const baseDir = path.resolve(opts.baseDir);
-
   // Load project config
   const configResult = await loadProjectConfig(baseDir);
   if (!configResult.ok) {
@@ -299,7 +312,7 @@ async function main(): Promise<void> {
   const resolvedConfig = configResult.value;
 
   if (resolvedConfig.isDefault) {
-    console.log('  (No delivery-process.config.ts found; using defaults)');
+    console.log('  (No architect.config.ts or architect.config.js found; using defaults)');
   }
 
   // Determine generators to run (CLI -g overrides config)
@@ -314,7 +327,7 @@ async function main(): Promise<void> {
   let result;
 
   if (input.length > 0) {
-    // CLI flags provided — use legacy path (explicit overrides)
+    // CLI flags provided — explicit overrides take precedence over config
     console.log('Scanning source files...');
 
     result = await generateDocumentation({
@@ -332,7 +345,7 @@ async function main(): Promise<void> {
     });
   } else if (resolvedConfig.project.sources.typescript.length > 0) {
     // No CLI input — use config-based sources
-    console.log('Using sources from delivery-process.config.ts...');
+    console.log('Using sources from project config...');
     console.log('Scanning source files...');
 
     result = await generateFromConfig(resolvedConfig, {
@@ -345,11 +358,11 @@ async function main(): Promise<void> {
     console.error('Error: No source files specified.');
     console.error('');
     console.error(
-      'Either provide --input flags or configure sources in delivery-process.config.ts:'
+      'Either provide --input flags or configure sources in architect.config.ts or architect.config.js:'
     );
     console.error('');
-    console.error('  // delivery-process.config.ts');
-    console.error('  import { defineConfig } from "@libar-dev/delivery-process/config";');
+    console.error('  // architect.config.ts (or .js)');
+    console.error('  import { defineConfig } from "@libar-dev/architect/config";');
     console.error('  export default defineConfig({');
     console.error('    sources: { typescript: ["src/**/*.ts"] }');
     console.error('  });');

@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:TimelineCodecTesting
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
-@libar-docs-implements:CodecBehaviorTesting
+@architect
+@architect-pattern:TimelineCodecTesting
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Generation
+@architect-implements:CodecBehaviorTesting
 @behavior @timeline-codecs
 Feature: Timeline Document Codecs
   The timeline codecs (RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWorkCodec)

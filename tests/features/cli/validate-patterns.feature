@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:ValidatePatternsCli
-@libar-docs-status:completed
-@libar-docs-product-area:DataAPI
-@libar-docs-implements:CliBehaviorTesting
+@architect
+@architect-pattern:ValidatePatternsCli
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:DataAPI
+@architect-implements:CliBehaviorTesting
 @cli @validate-patterns
 Feature: validate-patterns CLI
   Command-line interface for cross-validating TypeScript patterns vs Gherkin feature files.
@@ -36,7 +37,7 @@ Feature: validate-patterns CLI
     Scenario: Display version with --version flag
       When running "validate-patterns --version"
       Then exit code is 0
-      And stdout contains "validate-patterns"
+      And stdout contains "architect-validate"
 
     @happy-path
     Scenario: Display version with -v flag

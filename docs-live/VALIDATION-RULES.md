@@ -112,7 +112,7 @@ Override mechanisms for exceptional situations.
 
 | Situation                    | Solution              | Example                                  |
 | ---------------------------- | --------------------- | ---------------------------------------- |
-| Fix bug in completed spec    | Add unlock reason tag | `@libar-docs-unlock-reason:'Fix-typo'`   |
+| Fix bug in completed spec    | Add unlock reason tag | `@architect-unlock-reason:'Fix-typo'`    |
 | Modify outside session scope | Use ignore flag       | `lint-process --staged --ignore-session` |
 | CI treats warnings as errors | Use strict flag       | `lint-process --all --strict`            |
 

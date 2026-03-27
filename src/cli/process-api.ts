@@ -1,19 +1,19 @@
 #!/usr/bin/env node
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-cli
- * @libar-docs-pattern ProcessAPICLIImpl
- * @libar-docs-status active
- * @libar-docs-implements ProcessStateAPICLI
- * @libar-docs-arch-role service
- * @libar-docs-arch-context cli
- * @libar-docs-arch-layer application
- * @libar-docs-uses ProcessStateAPI, MasterDataset, PipelineFactory, RulesQueryModule, PatternSummarizerImpl, FuzzyMatcherImpl, OutputPipelineImpl
- * @libar-docs-used-by npm scripts, Claude Code sessions
- * @libar-docs-usecase "When querying delivery process state from CLI"
- * @libar-docs-usecase "When Claude Code needs real-time delivery state queries"
+ * @architect
+ * @architect-core @architect-cli
+ * @architect-pattern ProcessAPICLIImpl
+ * @architect-status active
+ * @architect-implements ProcessStateAPICLI
+ * @architect-arch-role service
+ * @architect-arch-context cli
+ * @architect-arch-layer application
+ * @architect-uses ProcessStateAPI, MasterDataset, PipelineFactory, RulesQueryModule, PatternSummarizerImpl, FuzzyMatcherImpl, OutputPipelineImpl
+ * @architect-used-by npm scripts, Claude Code sessions
+ * @architect-usecase "When querying project state from CLI"
+ * @architect-usecase "When Claude Code needs real-time delivery state queries"
  *
- * ## process-api - CLI Query Interface to ProcessStateAPI
+ * ## architect - CLI Query Interface to ProcessStateAPI
  *
  * Exposes ProcessStateAPI methods as CLI subcommands with JSON output.
  * Runs pipeline steps 1-8 (config -> scan -> extract -> transform),
@@ -23,13 +23,13 @@
  *
  * - When Claude Code needs real-time delivery state queries
  * - When AI agents need structured JSON instead of regenerating markdown
- * - When scripting delivery process queries in CI/CD
+ * - When scripting architect queries in CI/CD
  *
  * ### Key Concepts
  *
  * - **Subcommand Routing**: CLI subcommands map to ProcessStateAPI methods
  * - **JSON Output**: All output is JSON to stdout, errors to stderr
- * - **Pipeline Reuse**: Steps 1-8 match generate-docs exactly
+ * - **Pipeline Reuse**: Steps 1-8 match architect-generate exactly
  * - **QueryResult Envelope**: All output wrapped in success/error discriminated union
  * - **Output Shaping**: 594KB -> 4KB via summarization and modifiers
  */
@@ -41,7 +41,7 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { applyProjectSourceDefaults } from '../config/config-loader.js';
+import { applyProjectSourceDefaults, findConfigFile } from '../config/config-loader.js';
 import {
   buildMasterDataset,
   type PipelineResult,
@@ -389,12 +389,12 @@ function showHelp(): void {
   const sessions = formatHelpOptions(CLI_SCHEMA.sessionOptions);
 
   console.log(`
-process-api - Query delivery process state from annotated sources
+architect - Query project state from annotated sources
 
   Use this instead of reading generated markdown or launching explore agents.
   Targeted queries use 5-10x less context than file reads.
 
-Usage: process-api [options] <subcommand> [args...]
+Usage: architect [options] <subcommand> [args...]
 
 Quick Start — Session Recipe:
 
@@ -455,7 +455,7 @@ Metadata & Inventory:
 
   tags                      Tag usage report (counts per tag and value)
   sources                   File inventory by type (TS, Gherkin, Stubs)
-  unannotated [--path dir]  TypeScript files missing @libar-docs annotations
+  unannotated [--path dir]  TypeScript files missing @architect annotations
   query <method> [args...]  Execute any query API method directly
 
 Options:
@@ -477,28 +477,28 @@ ${sessions}
 Common Recipes:
 
   Starting a session:
-    process-api overview
-    process-api scope-validate MyPattern implement
-    process-api context MyPattern --session implement
+    architect overview
+    architect scope-validate MyPattern implement
+    architect context MyPattern --session implement
 
   Finding what to work on:
-    process-api list --status roadmap --names-only
-    process-api arch blocking
-    process-api query getRoadmapItems --names-only
+    architect list --status roadmap --names-only
+    architect arch blocking
+    architect query getRoadmapItems --names-only
 
   Investigating a pattern:
-    process-api search EventStore
-    process-api dep-tree EventStoreDurability --depth 2
-    process-api arch neighborhood EventStoreDurability
-    process-api stubs EventStoreDurability
+    architect search EventStore
+    architect dep-tree EventStoreDurability --depth 2
+    architect arch neighborhood EventStoreDurability
+    architect stubs EventStoreDurability
 
   Design session prep:
-    process-api context MyPattern --session design
-    process-api decisions MyPattern
-    process-api stubs --unresolved
+    architect context MyPattern --session design
+    architect decisions MyPattern
+    architect stubs --unresolved
 
   Ending a session:
-    process-api handoff --pattern MyPattern
+    architect handoff --pattern MyPattern
 
 Session Types (for --session flag):
 
@@ -536,7 +536,7 @@ function showSubcommandHelp(subcommand: string): void {
     for (const group of narratives) {
       for (const cmd of group.commands) {
         if (cmd.command === subcommand) {
-          console.log(`\nprocess-api ${subcommand} — ${cmd.description}\n`);
+          console.log(`\narchitect ${subcommand} — ${cmd.description}\n`);
           console.log(`Usage: ${cmd.usageExample}\n`);
           if (cmd.details !== undefined) {
             console.log(cmd.details);
@@ -566,7 +566,7 @@ function showSubcommandHelp(subcommand: string): void {
 
   // Fallback: subcommand not found in narratives
   console.log(`\nNo detailed help available for '${subcommand}'.`);
-  console.log('Run process-api --help for the full command reference.\n');
+  console.log('Run architect --help for the full command reference.\n');
 }
 
 /**
@@ -604,17 +604,14 @@ async function executeDryRun(opts: ProcessAPICLIConfig): Promise<void> {
   const featureFiles = await glob(opts.features, { cwd: baseDir });
 
   // Check config file
-  const configPath = path.join(baseDir, 'delivery-process.config.ts');
-  const hasConfig = fs.existsSync(configPath);
+  const configPath = await findConfigFile(baseDir);
 
   // Check cache status
   const cacheDir = getCacheDir(opts.baseDir);
   const cacheInfo = cacheFileExists(cacheDir);
 
   console.log('=== DRY RUN ===');
-  console.log(
-    `Config: ${hasConfig ? 'delivery-process.config.ts (auto-detected)' : 'none (filesystem fallback)'}`
-  );
+  console.log(`Config: ${formatConfigStatus(configPath)}`);
   console.log(`Base dir: ${baseDir}`);
   console.log(`Input patterns: ${opts.input.join(', ')}`);
   console.log(`Feature patterns: ${opts.features.join(', ')}`);
@@ -640,7 +637,7 @@ async function executeDryRun(opts: ProcessAPICLIConfig): Promise<void> {
 
 /**
  * If --input and --features are not provided, try to load defaults from config.
- * Prefers loadProjectConfig() for repos with delivery-process.config.ts,
+ * Prefers loadProjectConfig() for repos with a project config file,
  * falls back to filesystem auto-detection for repos without one.
  */
 async function applyConfigDefaults(config: ProcessAPICLIConfig): Promise<void> {
@@ -650,39 +647,45 @@ async function applyConfigDefaults(config: ProcessAPICLIConfig): Promise<void> {
   }
 
   // Fall back to existing filesystem auto-detection for repos without config
-  applyConfigDefaultsFallback(config);
+  await applyConfigDefaultsFallback(config);
 }
 
 /**
  * Filesystem-based auto-detection fallback for repos without a config file.
  * Checks for conventional directory structures and applies defaults.
  */
-function applyConfigDefaultsFallback(config: ProcessAPICLIConfig): void {
+async function applyConfigDefaultsFallback(config: ProcessAPICLIConfig): Promise<void> {
   const baseDir = path.resolve(config.baseDir);
 
   if (config.input.length === 0) {
     // Check for config file existence as signal to use defaults
-    const configPath = path.join(baseDir, 'delivery-process.config.ts');
-    if (fs.existsSync(configPath)) {
+    const configPath = await findConfigFile(baseDir);
+    if (configPath !== null) {
       config.input.push('src/**/*.ts');
       // Also check for stubs directory
-      const stubsDir = path.join(baseDir, 'delivery-process', 'stubs');
+      const stubsDir = path.join(baseDir, 'architect', 'stubs');
       if (fs.existsSync(stubsDir)) {
-        config.input.push('delivery-process/stubs/**/*.ts');
+        config.input.push('architect/stubs/**/*.ts');
       }
     }
   }
 
   if (config.features.length === 0) {
-    const specsDir = path.join(baseDir, 'delivery-process', 'specs');
+    const specsDir = path.join(baseDir, 'architect', 'specs');
     if (fs.existsSync(specsDir)) {
-      config.features.push('delivery-process/specs/*.feature');
+      config.features.push('architect/specs/*.feature');
     }
-    const releasesDir = path.join(baseDir, 'delivery-process', 'releases');
+    const releasesDir = path.join(baseDir, 'architect', 'releases');
     if (fs.existsSync(releasesDir)) {
-      config.features.push('delivery-process/releases/*.feature');
+      config.features.push('architect/releases/*.feature');
     }
   }
+}
+
+function formatConfigStatus(configPath: string | null): string {
+  return configPath !== null
+    ? `${path.basename(configPath)} (auto-detected)`
+    : 'none (filesystem fallback)';
 }
 
 // =============================================================================
@@ -763,7 +766,7 @@ function tryFsmShortCircuit(subcommand: string, subArgs: readonly string[]): unk
 
   switch (methodName) {
     case 'isValidTransition': {
-      const usage = 'Usage: process-api query isValidTransition <fromStatus> <toStatus>';
+      const usage = 'Usage: architect query isValidTransition <fromStatus> <toStatus>';
       const from = parseProcessStatus(fsmArgs[0], usage, 'fromStatus');
       const to = parseProcessStatus(fsmArgs[1], usage, 'toStatus');
       return fsmIsValidTransition(from, to);
@@ -775,7 +778,7 @@ function tryFsmShortCircuit(subcommand: string, subArgs: readonly string[]): unk
       if (from === undefined || to === undefined) {
         throw new QueryApiError(
           'INVALID_ARGUMENT',
-          'Usage: process-api query checkTransition <fromStatus> <toStatus>'
+          'Usage: architect query checkTransition <fromStatus> <toStatus>'
         );
       }
       const result = fsmValidateTransition(from, to);
@@ -791,7 +794,7 @@ function tryFsmShortCircuit(subcommand: string, subArgs: readonly string[]): unk
     case 'getValidTransitionsFrom': {
       const status = parseProcessStatus(
         fsmArgs[0],
-        'Usage: process-api query getValidTransitionsFrom <status>',
+        'Usage: architect query getValidTransitionsFrom <status>',
         'status'
       );
       return fsmGetValidTransitionsFrom(status);
@@ -800,7 +803,7 @@ function tryFsmShortCircuit(subcommand: string, subArgs: readonly string[]): unk
     case 'getProtectionInfo': {
       const status = parseProcessStatus(
         fsmArgs[0],
-        'Usage: process-api query getProtectionInfo <status>',
+        'Usage: architect query getProtectionInfo <status>',
         'status'
       );
       const summary = fsmGetProtectionSummary(status);
@@ -999,7 +1002,7 @@ function handleQuery(
   if (!methodName) {
     throw new QueryApiError(
       'INVALID_ARGUMENT',
-      'Usage: process-api query <method> [args...]\nMethods: ' + API_METHODS.join(', ')
+      'Usage: architect query <method> [args...]\nMethods: ' + API_METHODS.join(', ')
     );
   }
 
@@ -1018,7 +1021,7 @@ function handleQuery(
 function handlePattern(api: ProcessStateAPI, args: string[]): unknown {
   const name = args[0];
   if (!name) {
-    throw new QueryApiError('INVALID_ARGUMENT', 'Usage: process-api pattern <name>');
+    throw new QueryApiError('INVALID_ARGUMENT', 'Usage: architect pattern <name>');
   }
 
   const pattern = api.getPattern(name);
@@ -1178,7 +1181,7 @@ function handleList(
 function handleSearch(api: ProcessStateAPI, subArgs: string[]): unknown {
   const query = subArgs[0];
   if (!query) {
-    throw new QueryApiError('INVALID_ARGUMENT', 'Usage: process-api search <query>');
+    throw new QueryApiError('INVALID_ARGUMENT', 'Usage: architect search <query>');
   }
 
   const names = allPatternNames(api.getMasterDataset());
@@ -1206,7 +1209,7 @@ async function handleArch(ctx: RouteContext): Promise<unknown> {
   if (!archIndex || archIndex.all.length === 0) {
     throw new QueryApiError(
       'PATTERN_NOT_FOUND',
-      'No architecture data available. Ensure patterns have @libar-docs-arch-role annotations.'
+      'No architecture data available. Ensure patterns have @architect-arch-role annotations.'
     );
   }
 
@@ -1261,10 +1264,7 @@ async function handleArch(ctx: RouteContext): Promise<unknown> {
     case 'neighborhood': {
       const patternName = args[1];
       if (!patternName) {
-        throw new QueryApiError(
-          'INVALID_ARGUMENT',
-          'Usage: process-api arch neighborhood <pattern>'
-        );
+        throw new QueryApiError('INVALID_ARGUMENT', 'Usage: architect arch neighborhood <pattern>');
       }
       const neighborhood = computeNeighborhood(patternName, ctx.dataset);
       if (neighborhood === undefined) {
@@ -1278,10 +1278,7 @@ async function handleArch(ctx: RouteContext): Promise<unknown> {
       const ctx1Name = args[1];
       const ctx2Name = args[2];
       if (!ctx1Name || !ctx2Name) {
-        throw new QueryApiError(
-          'INVALID_ARGUMENT',
-          'Usage: process-api arch compare <ctx1> <ctx2>'
-        );
+        throw new QueryApiError('INVALID_ARGUMENT', 'Usage: architect arch compare <ctx1> <ctx2>');
       }
       const comparison = compareContexts(ctx1Name, ctx2Name, ctx.dataset);
       if (comparison === undefined) {
@@ -1568,7 +1565,7 @@ function handleContext(ctx: RouteContext): string {
   if (patternNames.length === 0) {
     throw new QueryApiError(
       'CONTEXT_ASSEMBLY_ERROR',
-      'Usage: process-api context <pattern> [pattern2...] [--session planning|design|implement]'
+      'Usage: architect context <pattern> [pattern2...] [--session planning|design|implement]'
     );
   }
 
@@ -1586,7 +1583,7 @@ function handleFiles(ctx: RouteContext): string {
   if (patternName === undefined) {
     throw new QueryApiError(
       'CONTEXT_ASSEMBLY_ERROR',
-      'Usage: process-api files <pattern> [--related]'
+      'Usage: architect files <pattern> [--related]'
     );
   }
 
@@ -1600,7 +1597,7 @@ function handleDepTreeCmd(ctx: RouteContext): string {
   if (patternName === undefined) {
     throw new QueryApiError(
       'CONTEXT_ASSEMBLY_ERROR',
-      'Usage: process-api dep-tree <pattern> [--depth N]'
+      'Usage: architect dep-tree <pattern> [--depth N]'
     );
   }
 
@@ -1656,7 +1653,7 @@ function handleScopeValidate(ctx: RouteContext): string {
       }
       i++;
     } else if (arg === '--strict') {
-      // DD-4: promotes WARN → BLOCKED (consistent with lint-process --strict)
+      // DD-4: promotes WARN → BLOCKED (consistent with architect-guard --strict)
       strict = true;
     } else if (arg !== undefined && !arg.startsWith('-')) {
       if (patternName === undefined) {
@@ -1671,7 +1668,7 @@ function handleScopeValidate(ctx: RouteContext): string {
   if (patternName === undefined) {
     throw new QueryApiError(
       'INVALID_ARGUMENT',
-      'Usage: process-api scope-validate <pattern> [implement|design] [--type implement|design] [--strict]'
+      'Usage: architect scope-validate <pattern> [implement|design] [--type implement|design] [--strict]'
     );
   }
 
@@ -1730,7 +1727,7 @@ function handleHandoff(ctx: RouteContext): string {
   if (patternName === undefined) {
     throw new QueryApiError(
       'INVALID_ARGUMENT',
-      'Usage: process-api handoff --pattern <name> [--git] [--session planning|design|implement|review]'
+      'Usage: architect handoff --pattern <name> [--git] [--session planning|design|implement|review]'
     );
   }
 
@@ -1900,7 +1897,7 @@ async function main(): Promise<void> {
   const opts = parseArgs();
 
   if (opts.version) {
-    printVersionAndExit('process-api');
+    printVersionAndExit('architect');
   }
 
   if (opts.help || !opts.subcommand) {
@@ -1908,7 +1905,7 @@ async function main(): Promise<void> {
     process.exit(opts.help ? 0 : 1);
   }
 
-  // Per-subcommand help (e.g., `process-api context --help`)
+  // Per-subcommand help (e.g., `architect context --help`)
   if (opts.subcommandHelp !== null) {
     showSubcommandHelp(opts.subcommandHelp);
     process.exit(0);
@@ -1945,11 +1942,11 @@ async function main(): Promise<void> {
 
   if (opts.input.length === 0) {
     console.error(
-      'Error: --input is required (or place delivery-process.config.ts in cwd for auto-detection)'
+      'Error: --input is required (or place architect.config.ts or architect.config.js in your project for auto-detection)'
     );
     console.error('');
     console.error('Example:');
-    console.error('  process-api -i "src/**/*.ts" status');
+    console.error('  architect -i "src/**/*.ts" status');
     process.exit(1);
   }
 

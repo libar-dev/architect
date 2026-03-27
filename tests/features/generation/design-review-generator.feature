@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:DesignReviewGeneratorLifecycleTests
-@libar-docs-status:active
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:DesignReviewGeneratorLifecycleTests
+@architect-status:active
+@architect-product-area:Generation
 @behavior @design-review
 Feature: Design Review Generator Lifecycle
 

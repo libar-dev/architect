@@ -5,7 +5,7 @@
  * layered diagram generation. Tests layer subgraphs,
  * layer ordering, and context labels in nodes.
  *
- * @libar-docs
+ * @architect
  */
 
 import { expect } from 'vitest';

@@ -1,12 +1,12 @@
 /**
- * @libar-docs
- * @libar-docs-generator @libar-docs-infra
- * @libar-docs-pattern PipelineFactory
- * @libar-docs-status completed
- * @libar-docs-implements ProcessAPILayeredExtraction
- * @libar-docs-product-area DataAPI
- * @libar-docs-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, MasterDataset
- * @libar-docs-convention pipeline-architecture
+ * @architect
+ * @architect-generator @architect-infra
+ * @architect-pattern PipelineFactory
+ * @architect-status completed
+ * @architect-implements ProcessAPILayeredExtraction
+ * @architect-product-area DataAPI
+ * @architect-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, MasterDataset
+ * @architect-convention pipeline-architecture
  *
  * ## Shared Pipeline Factory Responsibilities
  *
@@ -72,7 +72,7 @@ import type { ContextInferenceRule } from './context-inference.js';
  * DD-3: exclude, contextInferenceRules support future orchestrator
  *        migration without breaking changes.
  *
- * @libar-docs-shape master-dataset
+ * @architect-shape master-dataset
  */
 export interface PipelineOptions {
   readonly input: readonly string[];
@@ -132,7 +132,7 @@ export interface ScanMetadata {
 /**
  * Successful pipeline result containing the dataset and validation summary.
  *
- * @libar-docs-shape master-dataset
+ * @architect-shape master-dataset
  */
 export interface PipelineResult {
   readonly dataset: RuntimeMasterDataset;
@@ -153,7 +153,7 @@ export interface PipelineResult {
  * or log to console.
  *
  * Steps:
- * 1. Load configuration (discovers delivery-process.config.ts)
+ * 1. Load configuration (discovers architect.config.ts)
  * 2. Scan TypeScript source files
  * 3. Extract patterns from TypeScript
  * 4. Scan and extract Gherkin patterns

@@ -10,7 +10,7 @@
  * - Deliverables rendering
  * - Acceptance criteria and business rules
  *
- * @libar-docs
+ * @architect
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';

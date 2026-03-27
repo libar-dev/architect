@@ -1,7 +1,8 @@
-@libar-docs
-@libar-docs-pattern:RemainingWorkEnhancement
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
+@architect
+@architect-pattern:RemainingWorkEnhancement
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Generation
 @behavior @remaining-work
 Feature: Remaining Work Enhancement
   Enhanced REMAINING-WORK.md generation with priority-based sorting,

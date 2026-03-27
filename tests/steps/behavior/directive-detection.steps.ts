@@ -2,9 +2,9 @@
  * Directive Detection Step Definitions
  *
  * BDD step definitions for testing hasDocDirectives and hasFileOptIn
- * functions which detect @libar-docs directives in source code content.
+ * functions which detect @architect directives in source code content.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -47,18 +47,18 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
   });
 
   // ===========================================================================
-  // Rule: hasDocDirectives detects @libar-docs-* section directives
+  // Rule: hasDocDirectives detects @architect-* section directives
   // ===========================================================================
 
   Rule(
-    'hasDocDirectives detects @libar-docs-* section directives',
+    'hasDocDirectives detects @architect-* section directives',
     ({ RuleScenario, RuleScenarioOutline }) => {
-      RuleScenario('Detect @libar-docs-core directive in JSDoc block', ({ Given, When, Then }) => {
-        Given('source code with JSDoc containing "@libar-docs-core"', () => {
+      RuleScenario('Detect @architect-core directive in JSDoc block', ({ Given, When, Then }) => {
+        Given('source code with JSDoc containing "@architect-core"', () => {
           state = initState();
           state.sourceCode = `
           /**
-           * @libar-docs-core
+           * @architect-core
            * Test function
            */
           export function test() {}
@@ -75,7 +75,7 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
       });
 
       RuleScenarioOutline(
-        'Detect various @libar-docs-* directives',
+        'Detect various @architect-* directives',
         ({ Given, When, Then }, variables: { directive: string }) => {
           Given('source code containing directive {string}', () => {
             state = initState();
@@ -100,7 +100,7 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
           export function foo() {}
 
           /**
-           * @libar-docs-core
+           * @architect-core
            */
           export function bar() {}
 
@@ -212,21 +212,21 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
   );
 
   // ===========================================================================
-  // Rule: hasFileOptIn detects file-level @libar-docs marker
+  // Rule: hasFileOptIn detects file-level @architect marker
   // ===========================================================================
 
-  Rule('hasFileOptIn detects file-level @libar-docs marker', ({ RuleScenario }) => {
-    RuleScenario('Detect @libar-docs in JSDoc block comment', ({ Given, When, Then }) => {
-      Given('source code with file-level "@libar-docs" opt-in', () => {
+  Rule('hasFileOptIn detects file-level @architect marker', ({ RuleScenario }) => {
+    RuleScenario('Detect @architect in JSDoc block comment', ({ Given, When, Then }) => {
+      Given('source code with file-level "@architect" opt-in', () => {
         state = initState();
         state.sourceCode = `
 /**
- * @libar-docs
+ * @architect
  * This file contains documented patterns
  */
 
 /**
- * @libar-docs-core
+ * @architect-core
  * Some function
  */
 export function test() {}
@@ -242,7 +242,7 @@ export function test() {}
       });
     });
 
-    RuleScenario('Detect @libar-docs with description on same line', ({ Given, When, Then }) => {
+    RuleScenario('Detect @architect with description on same line', ({ Given, When, Then }) => {
       Given('source code {string}', (_ctx: unknown, code: string) => {
         state = initState();
         state.sourceCode = code;
@@ -257,14 +257,14 @@ export function test() {}
       });
     });
 
-    RuleScenario('Detect @libar-docs in multi-line JSDoc', ({ Given, When, Then }) => {
-      Given('source code with @libar-docs in middle of multi-line JSDoc', () => {
+    RuleScenario('Detect @architect in multi-line JSDoc', ({ Given, When, Then }) => {
+      Given('source code with @architect in middle of multi-line JSDoc', () => {
         state = initState();
         state.sourceCode = `
 /**
  * File-level documentation
  *
- * @libar-docs
+ * @architect
  *
  * This file contains important patterns.
  */
@@ -281,18 +281,18 @@ export const VERSION = '1.0.0';
       });
     });
 
-    RuleScenario('Detect @libar-docs anywhere in file', ({ Given, When, Then }) => {
-      Given('source code with @libar-docs after other content', () => {
+    RuleScenario('Detect @architect anywhere in file', ({ Given, When, Then }) => {
+      Given('source code with @architect after other content', () => {
         state = initState();
         state.sourceCode = `
 export function foo() {}
 
 /**
- * @libar-docs
+ * @architect
  */
 
 /**
- * @libar-docs-core
+ * @architect-core
  */
 export function bar() {}
         `;
@@ -307,7 +307,7 @@ export function bar() {}
       });
     });
 
-    RuleScenario('Detect @libar-docs combined with section tags', ({ Given, When, Then }) => {
+    RuleScenario('Detect @architect combined with section tags', ({ Given, When, Then }) => {
       Given('source code {string}', (_ctx: unknown, code: string) => {
         state = initState();
         state.sourceCode = code;
@@ -323,11 +323,11 @@ export function bar() {}
     });
 
     RuleScenario('Return false when only section tags present', ({ Given, When, Then }) => {
-      Given('source code with only "@libar-docs-core" section tag', () => {
+      Given('source code with only "@architect-core" section tag', () => {
         state = initState();
         state.sourceCode = `
 /**
- * @libar-docs-core
+ * @architect-core
  * Some function without file opt-in
  */
 export function test() {}
@@ -376,7 +376,7 @@ export function test() {}
       });
     });
 
-    RuleScenario('Return false for @libar-docs in line comment', ({ Given, When, Then }) => {
+    RuleScenario('Return false for @architect in line comment', ({ Given, When, Then }) => {
       Given('source code {string}', (_ctx: unknown, code: string) => {
         state = initState();
         state.sourceCode = code;
@@ -391,7 +391,7 @@ export function test() {}
       });
     });
 
-    RuleScenario('Not confuse @libar-docs-* with @libar-docs opt-in', ({ Given, When, Then }) => {
+    RuleScenario('Not confuse @architect-* with @architect opt-in', ({ Given, When, Then }) => {
       Given('source code {string}', (_ctx: unknown, code: string) => {
         state = initState();
         state.sourceCode = code;

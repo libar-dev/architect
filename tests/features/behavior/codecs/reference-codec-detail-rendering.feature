@@ -1,10 +1,10 @@
-@libar-docs
+@architect
 @behavior @reference-codec
-@libar-docs-pattern:ReferenceCodecDetailRendering
-@libar-docs-status:completed
-@libar-docs-unlock-reason:'Split-from-original'
-@libar-docs-implements:ReferenceDocShowcase
-@libar-docs-product-area:Generation
+@architect-pattern:ReferenceCodecDetailRendering
+@architect-status:completed
+@architect-unlock-reason:'Split-from-original'
+@architect-implements:ReferenceDocShowcase
+@architect-product-area:Generation
 Feature: Reference Codec - Detail Level Rendering
 
   Standard detail level behavior, deep behavior rendering with structured
@@ -73,14 +73,14 @@ Feature: Reference Codec - Detail Level Rendering
 
     @happy-path
     Scenario: Standard level includes JSDoc in code blocks
-      Given a reference config with shapeSources "src/lint/*.ts"
+      Given a reference config with source selector "src/lint/*.ts"
       And a MasterDataset with a shape pattern with JSDoc
       When decoding at detail level "standard"
       Then the document contains text "Input to the process guard decider function"
 
     @happy-path
     Scenario: Detailed level includes JSDoc in code block and property table
-      Given a reference config with shapeSources "src/lint/*.ts"
+      Given a reference config with source selector "src/lint/*.ts"
       And a MasterDataset with a shape pattern with JSDoc and property docs
       When decoding at detail level "detailed"
       Then the document contains text "Input to the process guard decider function"
@@ -88,7 +88,7 @@ Feature: Reference Codec - Detail Level Rendering
 
     @edge-case
     Scenario: Shapes without JSDoc render code blocks only
-      Given a reference config with shapeSources "src/lint/*.ts"
+      Given a reference config with source selector "src/lint/*.ts"
       And a MasterDataset with a shape pattern without JSDoc
       When decoding at detail level "standard"
       Then the document does not contain text "Input to the process guard"
@@ -101,7 +101,7 @@ Feature: Reference Codec - Detail Level Rendering
 
     @happy-path
     Scenario: Detailed level renders param table for function shapes
-      Given a reference config with shapeSources "src/lint/*.ts"
+      Given a reference config with source selector "src/lint/*.ts"
       And a MasterDataset with a function shape with param docs
       When decoding at detail level "detailed"
       Then the document has a table with columns "Parameter" and "Type" and "Description"
@@ -109,7 +109,7 @@ Feature: Reference Codec - Detail Level Rendering
 
     @happy-path
     Scenario: Detailed level renders returns and throws documentation
-      Given a reference config with shapeSources "src/lint/*.ts"
+      Given a reference config with source selector "src/lint/*.ts"
       And a MasterDataset with a function shape with returns and throws docs
       When decoding at detail level "detailed"
       Then the rendered output contains returns paragraph with type and description
@@ -117,7 +117,7 @@ Feature: Reference Codec - Detail Level Rendering
 
     @happy-path
     Scenario: Standard level renders param table without throws
-      Given a reference config with shapeSources "src/lint/*.ts"
+      Given a reference config with source selector "src/lint/*.ts"
       And a MasterDataset with a function shape with param and throws docs
       When decoding at detail level "standard"
       Then the document has a table with columns "Parameter" and "Type" and "Description"
@@ -125,7 +125,7 @@ Feature: Reference Codec - Detail Level Rendering
 
     @edge-case
     Scenario: Shapes without param docs skip param table
-      Given a reference config with shapeSources "src/lint/*.ts"
+      Given a reference config with source selector "src/lint/*.ts"
       And a MasterDataset with a shape pattern with JSDoc
       When decoding at detail level "detailed"
       Then the document does not have a table with column "Parameter"

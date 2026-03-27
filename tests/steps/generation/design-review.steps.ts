@@ -14,8 +14,8 @@
  * - Case-insensitive process-api sequence lookup
  * - Mermaid-safe escaping across rendered label positions
  *
- * @libar-docs
- * @libar-docs-uses DesignReviewCodec, SequenceIndex, renderToMarkdown
+ * @architect
+ * @architect-uses DesignReviewCodec, SequenceIndex, renderToMarkdown
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';

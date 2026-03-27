@@ -1,8 +1,9 @@
-@libar-docs
-@libar-docs-pattern:PlanningCodecTesting
-@libar-docs-status:completed
-@libar-docs-product-area:Generation
-@libar-docs-implements:CodecBehaviorTesting
+@architect
+@architect-pattern:PlanningCodecTesting
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-product-area:Generation
+@architect-implements:CodecBehaviorTesting
 @behavior @planning-codecs
 Feature: Planning Document Codecs
   The planning codecs (PlanningChecklistCodec, SessionPlanCodec, SessionFindingsCodec)

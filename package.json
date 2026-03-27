@@ -1,7 +1,7 @@
 {
-  "name": "@libar-dev/delivery-process",
+  "name": "@libar-dev/architect",
   "version": "1.0.0-pre.2",
-  "description": "Context engineering toolkit: extract patterns from TypeScript and Gherkin into a queryable delivery state with living docs, architecture graphs, and FSM-enforced workflows.",
+  "description": "Context engineering platform: extract patterns from TypeScript and Gherkin into a queryable state with living docs, architecture graphs, and FSM-enforced workflows.",
   "type": "module",
   "sideEffects": false,
   "main": "dist/index.js",
@@ -63,14 +63,13 @@
     }
   },
   "bin": {
-    "generate-docs": "./dist/cli/generate-docs.js",
-    "lint-patterns": "./dist/cli/lint-patterns.js",
-    "lint-process": "./dist/cli/lint-process.js",
-    "generate-tag-taxonomy": "./dist/cli/generate-tag-taxonomy.js",
-    "validate-patterns": "./dist/cli/validate-patterns.js",
-    "process-api": "./dist/cli/process-api.js",
-    "lint-steps": "./dist/cli/lint-steps.js",
-    "dp-mcp-server": "./dist/cli/mcp-server.js"
+    "architect": "./dist/cli/process-api.js",
+    "architect-generate": "./dist/cli/generate-docs.js",
+    "architect-lint-patterns": "./dist/cli/lint-patterns.js",
+    "architect-guard": "./dist/cli/lint-process.js",
+    "architect-validate": "./dist/cli/validate-patterns.js",
+    "architect-lint-steps": "./dist/cli/lint-steps.js",
+    "architect-mcp": "./dist/cli/mcp-server.js"
   },
   "scripts": {
     "build": "tsc",
@@ -82,10 +81,10 @@
     "test:coverage": "vitest run --coverage",
     "lint": "eslint src tests",
     "lint:fix": "eslint src tests --fix",
-    "lint:process": "tsx src/cli/lint-process.ts --staged",
-    "lint:process:all": "tsx src/cli/lint-process.ts --all",
-    "lint:steps": "tsx src/cli/lint-steps.ts",
-    "lint-patterns": "tsx src/cli/lint-patterns.ts --input 'src/**/*.ts' --input 'delivery-process/stubs/**/*.ts'",
+    "architect:guard": "tsx src/cli/lint-process.ts --staged",
+    "architect:guard:all": "tsx src/cli/lint-process.ts --all",
+    "architect:lint-steps": "tsx src/cli/lint-steps.ts",
+    "architect:lint-patterns": "tsx src/cli/lint-patterns.ts --input 'src/**/*.ts' --input 'architect/stubs/**/*.ts'",
     "validate:patterns": "tsx src/cli/validate-patterns.ts",
     "validate:dod": "tsx src/cli/validate-patterns.ts --dod",
     "validate:anti-patterns": "tsx src/cli/validate-patterns.ts --anti-patterns",
@@ -111,9 +110,8 @@
     "docs:design-review": "tsx src/cli/generate-docs.ts -g design-review",
     "docs:all": "pnpm docs:decisions && pnpm docs:product-areas && pnpm docs:taxonomy && pnpm docs:business-rules && pnpm docs:validation && pnpm docs:reference && pnpm docs:claude-modules && pnpm docs:process-api-reference && pnpm docs:cli-recipe && pnpm docs:architecture && pnpm docs:changelog && pnpm docs:design-review && pnpm docs:index",
     "docs:all-preview": "pnpm docs:patterns && pnpm docs:roadmap && pnpm docs:remaining && pnpm docs:changelog && pnpm docs:architecture && pnpm docs:decisions && pnpm docs:reference && pnpm docs:product-areas && pnpm docs:taxonomy && pnpm docs:validation && pnpm docs:requirements && pnpm docs:current && pnpm docs:milestones && pnpm docs:business-rules",
-    "process:query": "tsx src/cli/process-api.ts",
-    "process:q": "tsx src/cli/process-api.ts",
-    "docs:tag-taxonomy": "tsx src/cli/generate-tag-taxonomy.ts --output delivery-process/tag-taxonomy.md --overwrite",
+    "architect:query": "tsx src/cli/process-api.ts",
+    "architect:q": "tsx src/cli/process-api.ts",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{json,md,yml}\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{json,md,yml}\"",
     "preversion": "pnpm test && pnpm typecheck && pnpm lint && pnpm format:check",
@@ -153,7 +151,8 @@
     "living-documentation",
     "documentation-generator",
     "technical-documentation",
-    "delivery-process",
+    "architect",
+    "libar-architect",
     "workflow-enforcement",
     "fsm-enforcement",
     "pre-commit-hooks",
@@ -171,7 +170,7 @@
     "cli"
   ],
   "author": "Libar AI",
-  "license": "MIT",
+  "license": "(MIT AND BUSL-1.1)",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/libar-dev/delivery-process.git"
@@ -213,6 +212,7 @@
     "docs-live",
     "README.md",
     "LICENSE",
+    "LICENSE-MCP",
     "CHANGELOG.md"
   ],
   "private": false,

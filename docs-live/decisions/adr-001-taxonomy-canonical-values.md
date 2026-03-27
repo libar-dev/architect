@@ -106,7 +106,7 @@ These are the durable constants of the delivery process.
 - Canonical values are enforced
 
   Completed is a terminal state. Modifications require
-  `@libar-docs-unlock-reason` escape hatch.
+  `@architect-unlock-reason` escape hatch.
 
 ### Tag format types
 
@@ -114,14 +114,14 @@ These are the durable constants of the delivery process.
 
 **Rationale:** Without explicit format types, parsers must guess value structure, leading to silent data corruption when CSV values are treated as single strings or numbers are treated as text.
 
-| Format       | Parsing                        | Example                        |
-| ------------ | ------------------------------ | ------------------------------ |
-| flag         | Boolean presence, no value     | @libar-docs-core               |
-| value        | Simple string                  | @libar-docs-pattern MyPattern  |
-| enum         | Constrained to predefined list | @libar-docs-status completed   |
-| csv          | Comma-separated values         | @libar-docs-uses A, B, C       |
-| number       | Numeric value                  | @libar-docs-phase 15           |
-| quoted-value | Preserves spaces               | @libar-docs-brief:'Multi word' |
+| Format       | Parsing                        | Example                       |
+| ------------ | ------------------------------ | ----------------------------- |
+| flag         | Boolean presence, no value     | @architect-core               |
+| value        | Simple string                  | @architect-pattern MyPattern  |
+| enum         | Constrained to predefined list | @architect-status completed   |
+| csv          | Comma-separated values         | @architect-uses A, B, C       |
+| number       | Numeric value                  | @architect-phase 15           |
+| quoted-value | Preserves spaces               | @architect-brief:'Multi word' |
 
 **Verified by:**
 

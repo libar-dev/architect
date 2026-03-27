@@ -5,7 +5,7 @@
  * generation pipeline. Tests verify that validation, deduplication, and warning
  * collection work together correctly.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -205,8 +205,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         createTypeScriptFile(
           'src/types.ts',
           `/**
- * @libar-docs
- * @libar-docs-extract-shapes TestType
+ * @architect
+ * @architect-extract-shapes TestType
  */
 export interface TestType {
   id: string;
@@ -373,7 +373,7 @@ export interface TestType {
         createTypeScriptFile(
           'src/types.ts',
           `/**
- * @libar-docs
+ * @architect
  *
  * ## Protection Levels
  *
@@ -533,7 +533,7 @@ export const LEVELS = {};
         createTypeScriptFile(
           'src/types.ts',
           `/**
- * @libar-docs
+ * @architect
  */
 export const EMPTY = {};
 `
@@ -589,8 +589,8 @@ export const EMPTY = {};
         createTypeScriptFile(
           'src/types.ts',
           `/**
- * @libar-docs
- * @libar-docs-extract-shapes TestType
+ * @architect
+ * @architect-extract-shapes TestType
  */
 export interface TestType {
   id: string;
@@ -646,8 +646,8 @@ export interface TestType {
         createTypeScriptFile(
           newFileName,
           `/**
- * @libar-docs
- * @libar-docs-extract-shapes TestType
+ * @architect
+ * @architect-extract-shapes TestType
  */
 export interface TestType { id: string; }
 `
@@ -725,7 +725,7 @@ export interface TestType { id: string; }
         // Create a file without the @extract-shapes tag (will cause extraction error)
         createTypeScriptFile(
           'src/types.ts',
-          `// No @libar-docs-extract-shapes tag
+          `// No @architect-extract-shapes tag
 export const x = 1;
 `
         );

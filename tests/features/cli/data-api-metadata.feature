@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:ProcessApiCliMetadata
-@libar-docs-implements:DataAPICLIErgonomics
-@libar-docs-status:active
-@libar-docs-product-area:DataAPI
+@architect
+@architect-pattern:ProcessApiCliMetadata
+@architect-implements:DataAPICLIErgonomics
+@architect-status:active
+@architect-product-area:DataAPI
 @cli @process-api @metadata
 Feature: Process API CLI - Response Metadata
   Response metadata includes validation summary and pipeline timing for diagnostics.

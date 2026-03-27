@@ -3,10 +3,10 @@
 #### Roadmap Spec Structure
 
 ```gherkin
-@libar-docs
-@libar-docs-pattern:ProcessGuardLinter
-@libar-docs-status:roadmap
-@libar-docs-phase:99
+@architect
+@architect-pattern:ProcessGuardLinter
+@architect-status:roadmap
+@architect-phase:99
 Feature: Process Guard Linter
 
   **Problem:**
@@ -29,7 +29,7 @@ Feature: Process Guard Linter
 | Value-First      | `**Business Value:**`, `**How It Works:**` | TDD-style specs    |
 | Context/Approach | `**Context:**`, `**Approach:**`            | Technical patterns |
 
-Tag inventory: `pnpm process:query -- tags` (counts per tag and value across all sources).
+Tag inventory: `pnpm architect:query -- tags` (counts per tag and value across all sources).
 
 #### Rule Block Structure (Mandatory)
 

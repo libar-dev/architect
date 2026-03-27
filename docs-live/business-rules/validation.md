@@ -4,7 +4,7 @@
 
 ---
 
-**61 rules** from 14 features. 61 rules have explicit invariants.
+**62 rules** from 14 features. 62 rules have explicit invariants.
 
 ---
 
@@ -18,7 +18,7 @@ _- Dependencies in features (should be code-only) cause drift_
 
 #### Process metadata should not appear in TypeScript code
 
-> **Invariant:** Process metadata tags (@libar-docs-status, @libar-docs-phase, etc.) must only appear in Gherkin feature files, never in TypeScript source code.
+> **Invariant:** Process metadata tags (@architect-status, @architect-phase, etc.) must only appear in Gherkin feature files, never in TypeScript source code.
 >
 > **Rationale:** TypeScript owns runtime behavior while Gherkin owns delivery process metadata — mixing them creates dual-source conflicts and validation ambiguity.
 
@@ -694,6 +694,21 @@ _Individual lint rules that check parsed directives for completeness._
 
 ---
 
+#### Files must use canonical FSM status values
+
+> **Invariant:** Annotated files may use only the canonical PDR-005 FSM statuses: roadmap, active, completed, deferred.
+>
+> **Rationale:** Legacy aliases hide process drift and break a single-source-of-truth workflow model.
+
+**Verified by:**
+
+- Reject planned status alias
+- Reject in-progress status alias
+- Reject implemented status alias
+- Accept canonical deferred status
+
+---
+
 #### Files should document when to use the pattern
 
 > **Invariant:** Annotated files should include whenToUse guidance so consumers know when to apply the pattern.
@@ -732,7 +747,7 @@ _- Completed specs modified without explicit unlock reason_
 
 #### Completed files require unlock-reason to modify
 
-> **Invariant:** A completed spec file cannot be modified unless it carries an @libar-docs-unlock-reason tag.
+> **Invariant:** A completed spec file cannot be modified unless it carries an @architect-unlock-reason tag.
 >
 > **Rationale:** Completed work represents validated, shipped functionality — accidental modification risks regression.
 
@@ -827,7 +842,7 @@ _Tests for the detectStatusTransitions function that parses git diff output._
 
 #### Status transitions are detected from file-level tags
 
-> **Invariant:** Status transitions must be detected by comparing @libar-docs-status tags at the file level between the old and new versions of a file.
+> **Invariant:** Status transitions must be detected by comparing @architect-status tags at the file level between the old and new versions of a file.
 >
 > **Rationale:** File-level tags are the canonical source of pattern status — detecting transitions from tags ensures consistency with the FSM validator.
 

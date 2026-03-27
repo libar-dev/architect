@@ -5,7 +5,7 @@
  * createDefaultResolvedConfig, verifying defaults, source merging,
  * and context inference rule ordering.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -15,17 +15,14 @@ import {
   createDefaultResolvedConfig,
 } from '../../../src/config/resolve-config.js';
 import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../../../src/config/defaults.js';
-import type {
-  DeliveryProcessProjectConfig,
-  ResolvedConfig,
-} from '../../../src/config/project-config.js';
+import type { ArchitectProjectConfig, ResolvedConfig } from '../../../src/config/project-config.js';
 
 // =============================================================================
 // Types
 // =============================================================================
 
 interface ConfigResolutionState {
-  rawConfig: DeliveryProcessProjectConfig | null;
+  rawConfig: ArchitectProjectConfig | null;
   resolvedConfig: ResolvedConfig | null;
   resolveOptions: { readonly configPath: string } | undefined;
 }
@@ -117,8 +114,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.resolvedConfig!.instance.registry.categories).toHaveLength(3);
       });
 
-      And('the instance tagPrefix should be "@libar-docs-"', () => {
-        expect(state!.resolvedConfig!.instance.registry.tagPrefix).toBe('@libar-docs-');
+      And('the instance tagPrefix should be "@architect-"', () => {
+        expect(state!.resolvedConfig!.instance.registry.tagPrefix).toBe('@architect-');
       });
     });
   });

@@ -1,18 +1,18 @@
 /**
- * @libar-docs
- * @libar-docs-core @libar-docs-config
- * @libar-docs-pattern ConfigLoader
- * @libar-docs-status completed
- * @libar-docs-arch-role infrastructure
- * @libar-docs-arch-context config
- * @libar-docs-arch-layer infrastructure
- * @libar-docs-uses DeliveryProcessFactory, ConfigurationTypes
- * @libar-docs-used-by CLI
- * @libar-docs-extract-shapes ConfigDiscoveryResult, ConfigLoadError, ConfigLoadResult, findConfigFile, loadConfig, formatConfigError
+ * @architect
+ * @architect-core @architect-config
+ * @architect-pattern ConfigLoader
+ * @architect-status completed
+ * @architect-arch-role infrastructure
+ * @architect-arch-context config
+ * @architect-arch-layer infrastructure
+ * @architect-uses ArchitectFactory, ConfigurationTypes
+ * @architect-used-by CLI
+ * @architect-extract-shapes ConfigDiscoveryResult, ConfigLoadError, ConfigLoadResult, findConfigFile, loadConfig, formatConfigError
  *
  * ## Config Loader - TypeScript Configuration File Discovery
  *
- * Discovers and loads `delivery-process.config.ts` files for hierarchical configuration.
+ * Discovers and loads `architect.config.ts` or `architect.config.js` files for hierarchical configuration.
  * Supports package-level and repo-level configuration inheritance.
  *
  * ### When to Use
@@ -23,42 +23,38 @@
  *
  * ### Discovery Strategy
  *
- * 1. Look for `delivery-process.config.ts` in current directory
+ * 1. Look for `architect.config.ts` or `architect.config.js` in current directory
  * 2. Walk up parent directories until repo root (contains .git)
  * 3. Stop at first config found or fall back to default
  *
  * ### Config File Format
  *
- * Config files should export a `DeliveryProcessInstance`:
+ * Config files should export an `ArchitectProjectConfig`:
  *
  * ```typescript
- * import { createDeliveryProcess } from '@libar-dev/delivery-process';
+ * import { defineConfig } from '@libar-dev/architect/config';
  *
- * export default createDeliveryProcess({ preset: "libar-generic" });
+ * export default defineConfig({ preset: "libar-generic" });
  * ```
  */
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { pathToFileURL } from 'url';
-import type { DeliveryProcessProjectConfig, ResolvedConfig } from './project-config.js';
-import {
-  isProjectConfig,
-  isLegacyInstance,
-  DeliveryProcessProjectConfigSchema,
-} from './project-config-schema.js';
+import type { ArchitectProjectConfig, ResolvedConfig } from './project-config.js';
+import { isProjectConfig, ArchitectProjectConfigSchema } from './project-config-schema.js';
 import { resolveProjectConfig, createDefaultResolvedConfig } from './resolve-config.js';
-import type { DeliveryProcessInstance } from './types.js';
+import type { ArchitectInstance } from './types.js';
 
 /**
  * Config file name to search for
  */
-const CONFIG_FILE_NAME = 'delivery-process.config.ts';
+const CONFIG_FILE_NAME = 'architect.config.ts';
 
 /**
  * Compiled JavaScript variant (for projects that pre-compile configs)
  */
-const CONFIG_FILE_NAME_JS = 'delivery-process.config.js';
+const CONFIG_FILE_NAME_JS = 'architect.config.js';
 
 /**
  * Result of config file discovery
@@ -69,7 +65,7 @@ export interface ConfigDiscoveryResult {
   /** Absolute path to the config file (if found) */
   path?: string;
   /** The loaded configuration instance */
-  instance: DeliveryProcessInstance;
+  instance: ArchitectInstance;
   /** Whether the default configuration was used */
   isDefault: boolean;
 }
@@ -173,7 +169,7 @@ export async function findConfigFile(startDir: string): Promise<string | null> {
  * Load configuration from file or use defaults.
  *
  * Delegates to {@link loadProjectConfig} for file discovery and parsing,
- * then maps the result to the legacy {@link ConfigDiscoveryResult} shape.
+ * then maps the result to the {@link ConfigDiscoveryResult} shape.
  *
  * @param baseDir - Directory to start searching from (usually cwd or project root)
  * @returns Result with loaded configuration or error
@@ -252,11 +248,10 @@ export type ProjectConfigLoadResult =
 /**
  * Load unified project configuration from file or use defaults.
  *
- * Supports both new-style `DeliveryProcessProjectConfig` (via `defineConfig()`)
- * and legacy `DeliveryProcessInstance` (via `createDeliveryProcess()`) config files.
+ * Loads `ArchitectProjectConfig` (via `defineConfig()`) config files.
  *
  * Discovery strategy:
- * 1. Search for `delivery-process.config.ts` starting from baseDir
+ * 1. Search for `architect.config.ts` or `architect.config.js` starting from baseDir
  * 2. Walk up parent directories until repo root
  * 3. If found, import and resolve the configuration
  * 4. If not found, return default resolved config
@@ -342,24 +337,9 @@ export async function loadProjectConfig(baseDir: string): Promise<ProjectConfigL
     };
   }
 
-  // Legacy DeliveryProcessInstance (createDeliveryProcess) — check first because
-  // isProjectConfig is a loose check that could match legacy instances with extra fields
-  if (isLegacyInstance(exported)) {
-    const defaultResolved = createDefaultResolvedConfig();
-    return {
-      ok: true,
-      value: {
-        instance: exported,
-        project: defaultResolved.project,
-        isDefault: false,
-        configPath,
-      },
-    };
-  }
-
-  // New-style project config (defineConfig)
+  // Project config (defineConfig)
   if (isProjectConfig(exported)) {
-    const parseResult = DeliveryProcessProjectConfigSchema.safeParse(exported);
+    const parseResult = ArchitectProjectConfigSchema.safeParse(exported);
     if (!parseResult.success) {
       const zodMessage = parseResult.error.issues
         .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
@@ -375,7 +355,7 @@ export async function loadProjectConfig(baseDir: string): Promise<ProjectConfigL
     }
     let resolved: ResolvedConfig;
     try {
-      resolved = resolveProjectConfig(parseResult.data as DeliveryProcessProjectConfig, {
+      resolved = resolveProjectConfig(parseResult.data as ArchitectProjectConfig, {
         configPath,
       });
     } catch (error) {
@@ -402,7 +382,7 @@ export async function loadProjectConfig(baseDir: string): Promise<ProjectConfigL
     error: {
       type: 'config-load-error',
       path: configPath,
-      message: `Config file must export a DeliveryProcessProjectConfig (use defineConfig()) or DeliveryProcessInstance (use createDeliveryProcess()): ${configPath}`,
+      message: `Config file must export an ArchitectProjectConfig (use defineConfig()): ${configPath}`,
     },
   };
 }

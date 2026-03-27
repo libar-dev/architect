@@ -15,7 +15,7 @@
  * Tests markdown string output, complementing pr-changes-codec.steps.ts
  * which tests at the RenderableDocument level.
  *
- * @libar-docs
+ * @architect
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';

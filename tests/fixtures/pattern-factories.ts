@@ -238,7 +238,7 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
   } = options;
 
   const directive: DocDirective = {
-    tags: [asDirectiveTag(`@libar-docs-${category}`)],
+    tags: [asDirectiveTag(`@architect-${category}`)],
     description,
     examples: [],
     position: { startLine: lines[0], endLine: lines[1] },

@@ -35,7 +35,7 @@
 
     **What We Have:**
 
-    The delivery-process package already has the required ingredients:
+    The Architect package already has the required ingredients:
     - Pattern extraction from TypeScript JSDoc and Gherkin tags
     - Rich content support (DocStrings, tables, code blocks in features)
     - Multi-source aggregation via tag taxonomy
@@ -118,77 +118,77 @@
 
 ### Protection Levels
 
-| spec | intent |
-| --- | --- |
+| spec                        | intent |
+| --------------------------- | ------ |
 | mvp-workflow-implementation | modify |
-| short-form-tag-migration | review |
+| short-form-tag-migration    | review |
 
-| spec |
-| --- |
+| spec                        |
+| --------------------------- |
 | mvp-workflow-implementation |
 
-| Deliverable | Status |
-| --- | --- |
-| Task A | Done |
-| Task B | Pending |
+| Deliverable | Status  |
+| ----------- | ------- |
+| Task A      | Done    |
+| Task B      | Pending |
 
-| Deliverable | Status |
-| --- | --- |
-| Task A | Pending |
+| Deliverable | Status  |
+| ----------- | ------- |
+| Task A      | Pending |
 
-| Section | Content |
-| --- | --- |
-| Active Session | Session ID and status, or "none" |
-| Scoped Specs | List of specs in scope |
+| Section         | Content                            |
+| --------------- | ---------------------------------- |
+| Active Session  | Session ID and status, or "none"   |
+| Scoped Specs    | List of specs in scope             |
 | Protected Specs | Specs with active/completed status |
 
-| Tag | Format | Purpose |
-| --- | --- | --- |
-| session-id | value | Unique session identifier |
-| session-status | enum | Session lifecycle: draft, active, closed |
-| session-scope | flag | Marks file as session definition |
+| Tag            | Format | Purpose                                  |
+| -------------- | ------ | ---------------------------------------- |
+| session-id     | value  | Unique session identifier                |
+| session-status | enum   | Session lifecycle: draft, active, closed |
+| session-scope  | flag   | Marks file as session definition         |
 
-| Tag | Format | Purpose |
-| --- | --- | --- |
+| Tag           | Format       | Purpose                            |
+| ------------- | ------------ | ---------------------------------- |
 | unlock-reason | quoted-value | Required to modify protected files |
-| locked-by | value | Session ID that locked the file |
+| locked-by     | value        | Session ID that locked the file    |
 
 ### Valid Transitions
 
-| spec | intent |
-| --- | --- |
+| spec                        | intent |
+| --------------------------- | ------ |
 | mvp-workflow-implementation | modify |
-| short-form-tag-migration | review |
+| short-form-tag-migration    | review |
 
-| spec |
-| --- |
+| spec                        |
+| --------------------------- |
 | mvp-workflow-implementation |
 
-| Deliverable | Status |
-| --- | --- |
-| Task A | Done |
-| Task B | Pending |
+| Deliverable | Status  |
+| ----------- | ------- |
+| Task A      | Done    |
+| Task B      | Pending |
 
-| Deliverable | Status |
-| --- | --- |
-| Task A | Pending |
+| Deliverable | Status  |
+| ----------- | ------- |
+| Task A      | Pending |
 
-| Section | Content |
-| --- | --- |
-| Active Session | Session ID and status, or "none" |
-| Scoped Specs | List of specs in scope |
+| Section         | Content                            |
+| --------------- | ---------------------------------- |
+| Active Session  | Session ID and status, or "none"   |
+| Scoped Specs    | List of specs in scope             |
 | Protected Specs | Specs with active/completed status |
 
-| Tag | Format | Purpose |
-| --- | --- | --- |
-| session-id | value | Unique session identifier |
-| session-status | enum | Session lifecycle: draft, active, closed |
-| session-scope | flag | Marks file as session definition |
+| Tag            | Format | Purpose                                  |
+| -------------- | ------ | ---------------------------------------- |
+| session-id     | value  | Unique session identifier                |
+| session-status | enum   | Session lifecycle: draft, active, closed |
+| session-scope  | flag   | Marks file as session definition         |
 
-| Tag | Format | Purpose |
-| --- | --- | --- |
+| Tag           | Format       | Purpose                            |
+| ------------- | ------------ | ---------------------------------- |
 | unlock-reason | quoted-value | Required to modify protected files |
-| locked-by | value | Session ID that locked the file |
+| locked-by     | value        | Session ID that locked the file    |
 
 ### API Types
 
@@ -204,14 +204,14 @@
 
 ### Error Messages
 
-| Error Code |
-|---|
-| completed-protection |
+| Error Code                |
+| ------------------------- |
+| completed-protection      |
 | invalid-status-transition |
-| scope-creep |
-| deliverable-removed |
-| session-scope |
-| session-excluded |
+| scope-creep               |
+| deliverable-removed       |
+| session-scope             |
+| session-excluded          |
 
 ### Pre-commit Setup
 
@@ -221,48 +221,48 @@ generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' -
 
 ```json
 {
-      "scripts": {
-        "lint:process": "lint-process --staged",
-        "lint:process:ci": "lint-process --all --strict"
-      }
-    }
+  "scripts": {
+    "lint:process": "architect-guard --staged",
+    "lint:process:ci": "architect-guard --all --strict"
+  }
+}
 ```
 
 ```typescript
 import {
-      deriveProcessState,
-      detectStagedChanges,
-      validateChanges,
-      hasErrors,
-      summarizeResult,
-    } from '@libar-dev/delivery-process/lint';
+  deriveProcessState,
+  detectStagedChanges,
+  validateChanges,
+  hasErrors,
+  summarizeResult,
+} from '@libar-dev/architect/lint';
 
-    // 1. Derive state from annotations
-    const state = (await deriveProcessState({ baseDir: '.' })).value;
+// 1. Derive state from annotations
+const state = (await deriveProcessState({ baseDir: '.' })).value;
 
-    // 2. Detect changes
-    const changes = detectStagedChanges('.').value;
+// 2. Detect changes
+const changes = detectStagedChanges('.').value;
 
-    // 3. Validate
-    const { result } = validateChanges({
-      state,
-      changes,
-      options: { strict: false, ignoreSession: false },
-    });
+// 3. Validate
+const { result } = validateChanges({
+  state,
+  changes,
+  options: { strict: false, ignoreSession: false },
+});
 
-    // 4. Handle results
-    if (hasErrors(result)) {
-      console.log(summarizeResult(result));
-      process.exit(1);
-    }
+// 4. Handle results
+if (hasErrors(result)) {
+  console.log(summarizeResult(result));
+  process.exit(1);
+}
 ```
 
 ```bash
-npx lint-process --staged
+npx architect-guard --staged
 ```
 
 ```javascript
-// TODO: Delivery process design artifacts: Relax unused-vars
+// TODO: Architect design artifacts: Relax unused-vars
     {
       files: [
         "**/packages/platform-core/src/durability/durableAppend.ts",
@@ -277,28 +277,28 @@ npx lint-process --staged
 
 ```typescript
 // specs/stubs/shape-extractor.ts
-    /**
-     * @libar-docs
-     * @libar-docs-pattern ShapeExtractorStub
-     * @libar-docs-status roadmap
-     *
-     * ## Shape Extractor - Design Stub
-     *
-     * API design for extracting TypeScript types from source files.
-     */
+/**
+ * @architect
+ * @architect-pattern ShapeExtractorStub
+ * @architect-status roadmap
+ *
+ * ## Shape Extractor - Design Stub
+ *
+ * API design for extracting TypeScript types from source files.
+ */
 
-    export interface ExtractedShape {
-      name: string;
-      kind: 'interface' | 'type' | 'enum' | 'function';
-      sourceText: string;
-    }
+export interface ExtractedShape {
+  name: string;
+  kind: 'interface' | 'type' | 'enum' | 'function';
+  sourceText: string;
+}
 
-    export function extractShapes(
-      sourceCode: string,
-      shapeNames: string[]
-    ): Map<string, ExtractedShape> {
-      throw new Error('ShapeExtractor not yet implemented - roadmap pattern');
-    }
+export function extractShapes(
+  sourceCode: string,
+  shapeNames: string[]
+): Map<string, ExtractedShape> {
+  throw new Error('ShapeExtractor not yet implemented - roadmap pattern');
+}
 ```
 
 ### Programmatic API
@@ -309,48 +309,48 @@ generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' -
 
 ```json
 {
-      "scripts": {
-        "lint:process": "lint-process --staged",
-        "lint:process:ci": "lint-process --all --strict"
-      }
-    }
+  "scripts": {
+    "lint:process": "architect-guard --staged",
+    "lint:process:ci": "architect-guard --all --strict"
+  }
+}
 ```
 
 ```typescript
 import {
-      deriveProcessState,
-      detectStagedChanges,
-      validateChanges,
-      hasErrors,
-      summarizeResult,
-    } from '@libar-dev/delivery-process/lint';
+  deriveProcessState,
+  detectStagedChanges,
+  validateChanges,
+  hasErrors,
+  summarizeResult,
+} from '@libar-dev/architect/lint';
 
-    // 1. Derive state from annotations
-    const state = (await deriveProcessState({ baseDir: '.' })).value;
+// 1. Derive state from annotations
+const state = (await deriveProcessState({ baseDir: '.' })).value;
 
-    // 2. Detect changes
-    const changes = detectStagedChanges('.').value;
+// 2. Detect changes
+const changes = detectStagedChanges('.').value;
 
-    // 3. Validate
-    const { result } = validateChanges({
-      state,
-      changes,
-      options: { strict: false, ignoreSession: false },
-    });
+// 3. Validate
+const { result } = validateChanges({
+  state,
+  changes,
+  options: { strict: false, ignoreSession: false },
+});
 
-    // 4. Handle results
-    if (hasErrors(result)) {
-      console.log(summarizeResult(result));
-      process.exit(1);
-    }
+// 4. Handle results
+if (hasErrors(result)) {
+  console.log(summarizeResult(result));
+  process.exit(1);
+}
 ```
 
 ```bash
-npx lint-process --staged
+npx architect-guard --staged
 ```
 
 ```javascript
-// TODO: Delivery process design artifacts: Relax unused-vars
+// TODO: Architect design artifacts: Relax unused-vars
     {
       files: [
         "**/packages/platform-core/src/durability/durableAppend.ts",
@@ -365,26 +365,26 @@ npx lint-process --staged
 
 ```typescript
 // specs/stubs/shape-extractor.ts
-    /**
-     * @libar-docs
-     * @libar-docs-pattern ShapeExtractorStub
-     * @libar-docs-status roadmap
-     *
-     * ## Shape Extractor - Design Stub
-     *
-     * API design for extracting TypeScript types from source files.
-     */
+/**
+ * @architect
+ * @architect-pattern ShapeExtractorStub
+ * @architect-status roadmap
+ *
+ * ## Shape Extractor - Design Stub
+ *
+ * API design for extracting TypeScript types from source files.
+ */
 
-    export interface ExtractedShape {
-      name: string;
-      kind: 'interface' | 'type' | 'enum' | 'function';
-      sourceText: string;
-    }
+export interface ExtractedShape {
+  name: string;
+  kind: 'interface' | 'type' | 'enum' | 'function';
+  sourceText: string;
+}
 
-    export function extractShapes(
-      sourceCode: string,
-      shapeNames: string[]
-    ): Map<string, ExtractedShape> {
-      throw new Error('ShapeExtractor not yet implemented - roadmap pattern');
-    }
+export function extractShapes(
+  sourceCode: string,
+  shapeNames: string[]
+): Map<string, ExtractedShape> {
+  throw new Error('ShapeExtractor not yet implemented - roadmap pattern');
+}
 ```

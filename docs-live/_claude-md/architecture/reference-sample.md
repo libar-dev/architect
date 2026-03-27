@@ -52,14 +52,14 @@
 
 **Invariant:** Every tag has one of 6 format types that determines how its value is parsed.
 
-| Format       | Parsing                        | Example                        |
-| ------------ | ------------------------------ | ------------------------------ |
-| flag         | Boolean presence, no value     | @libar-docs-core               |
-| value        | Simple string                  | @libar-docs-pattern MyPattern  |
-| enum         | Constrained to predefined list | @libar-docs-status completed   |
-| csv          | Comma-separated values         | @libar-docs-uses A, B, C       |
-| number       | Numeric value                  | @libar-docs-phase 15           |
-| quoted-value | Preserves spaces               | @libar-docs-brief:'Multi word' |
+| Format       | Parsing                        | Example                       |
+| ------------ | ------------------------------ | ----------------------------- |
+| flag         | Boolean presence, no value     | @architect-core               |
+| value        | Simple string                  | @architect-pattern MyPattern  |
+| enum         | Constrained to predefined list | @architect-status completed   |
+| csv          | Comma-separated values         | @architect-uses A, B, C       |
+| number       | Numeric value                  | @architect-phase 15           |
+| quoted-value | Preserves spaces               | @architect-brief:'Multi word' |
 
 #### Source ownership
 
@@ -106,16 +106,25 @@
 
 | Type                      | Kind      |
 | ------------------------- | --------- |
-| SectionBlock              | type      |
 | normalizeStatus           | function  |
 | DELIVERABLE_STATUS_VALUES | const     |
 | CategoryDefinition        | interface |
+| SectionBlock              | type      |
 
 #### Behavior Specifications
 
-##### DeliveryProcessFactory
+##### ArchitectFactory
 
 ##### DefineConfig
+
+##### ConfigBasedWorkflowDefinition
+
+| Rule                                                 | Description                                                                                                              |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Default workflow is built from an inline constant    | **Invariant:** `loadDefaultWorkflow()` returns a `LoadedWorkflow` without<br> file system access. It cannot fail. The... |
+| Custom workflow files still work via --workflow flag | **Invariant:** `loadWorkflowFromPath()` remains available for projects<br> that need custom workflow definitions. The... |
+| FSM validation and Process Guard are not affected    | **Invariant:** The FSM transition matrix, protection levels, and Process<br> Guard rules remain hardcoded in...          |
+| Workflow as a configurable preset field is deferred  | **Invariant:** The inline default workflow constant is the only workflow source until preset integration is...           |
 
 ##### ADR005CodecBasedMarkdownRendering
 
@@ -141,20 +150,11 @@
 | Canonical phase definitions (6-phase USDP standard) | **Invariant:** The default workflow defines exactly 6 phases in fixed<br> order. These are the canonical phase names...  |
 | Deliverable status canonical values                 | **Invariant:** Deliverable status (distinct from pattern FSM status)<br> uses exactly 6 values, enforced by Zod...       |
 
-##### ConfigBasedWorkflowDefinition
-
-| Rule                                                 | Description                                                                                                              |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Default workflow is built from an inline constant    | **Invariant:** `loadDefaultWorkflow()` returns a `LoadedWorkflow` without<br> file system access. It cannot fail. The... |
-| Custom workflow files still work via --workflow flag | **Invariant:** `loadWorkflowFromPath()` remains available for projects<br> that need custom workflow definitions. The... |
-| FSM validation and Process Guard are not affected    | **Invariant:** The FSM transition matrix, protection levels, and Process<br> Guard rules remain hardcoded in...          |
-| Workflow as a configurable preset field is deferred  | **Invariant:** The inline default workflow constant is the only workflow source until preset integration is...           |
-
 ##### ProcessGuardTesting
 
 | Rule                                                | Description                                                                                                            |
 | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Completed files require unlock-reason to modify     | **Invariant:** A completed spec file cannot be modified unless it carries an @libar-docs-unlock-reason tag....         |
+| Completed files require unlock-reason to modify     | **Invariant:** A completed spec file cannot be modified unless it carries an @architect-unlock-reason tag....          |
 | Status transitions must follow PDR-005 FSM          | **Invariant:** Status changes must follow the directed graph: roadmap->active->completed, roadmap<->deferred,...       |
 | Active specs cannot add new deliverables            | **Invariant:** A spec in active status cannot have deliverables added that were not present when it entered active.... |
 | Files outside active session scope trigger warnings | **Invariant:** Files modified outside the active session's declared scope produce a session-scope warning....          |

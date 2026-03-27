@@ -4,7 +4,7 @@
  * BDD step definitions for testing mergeSourcesForGenerator,
  * verifying override semantics for features, typescript sources, and exclude.
  *
- * @libar-docs
+ * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

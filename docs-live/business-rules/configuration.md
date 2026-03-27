@@ -4,7 +4,7 @@
 
 ---
 
-**32 rules** from 7 features. 32 rules have explicit invariants.
+**31 rules** from 7 features. 31 rules have explicit invariants.
 
 ---
 
@@ -52,7 +52,7 @@ _- Different directories need different taxonomies_
 **Verified by:**
 
 - Load valid config with default fallback
-- Load valid config file
+- Load valid minimal config file
 - Error on config without default export
 - Error on config with wrong type
 
@@ -176,7 +176,6 @@ _- Different projects need different tag prefixes_
 **Verified by:**
 
 - Create with no arguments uses libar-generic preset
-- Create with generic preset
 - Create with libar-generic preset
 - Create with ddd-es-cqrs preset explicitly
 
@@ -204,7 +203,6 @@ _- Different projects need different tag prefixes_
 
 **Verified by:**
 
-- Generic preset excludes DDD categories
 - Libar-generic preset excludes DDD categories
 
 ---
@@ -253,13 +251,15 @@ _- Users need type-safe config authoring without runtime overhead_
 **Verified by:**
 
 - Valid minimal config passes validation
+- Valid minimal file-opt-in config passes validation
+- Valid reference-doc config passes validation
 - Valid full config passes validation
 
 ---
 
 #### Schema rejects invalid configurations
 
-> **Invariant:** The configuration schema must reject invalid values including empty globs, directory traversal patterns, mutually exclusive options, invalid preset names, and unknown fields.
+> **Invariant:** The configuration schema must reject invalid values including empty globs, directory traversal patterns, mutually exclusive options, invalid preset names, removed compatibility aliases, and unknown fields.
 >
 > **Rationale:** Schema validation is the first line of defense against misconfiguration — permissive validation lets invalid configs produce confusing downstream errors.
 
@@ -269,22 +269,23 @@ _- Users need type-safe config authoring without runtime overhead_
 - Parent directory traversal rejected in globs
 - replaceFeatures and additionalFeatures mutually exclusive
 - Invalid preset name rejected
+- Legacy preset alias rejected
 - Unknown fields rejected in strict mode
 
 ---
 
-#### Type guards distinguish config formats
+#### Type guard validates config format
 
-> **Invariant:** The isProjectConfig and isLegacyInstance type guards must correctly distinguish between new-style project configs and legacy configuration instances.
+> **Invariant:** The isProjectConfig type guard must correctly identify valid project configs.
 >
-> **Rationale:** The codebase supports both config formats during migration — incorrect type detection would apply the wrong loading path and produce runtime errors.
+> **Rationale:** Config loading relies on type detection to apply the correct parsing path.
 
 **Verified by:**
 
-- isProjectConfig returns true for new-style config
-- isProjectConfig returns false for legacy instance
-- isLegacyInstance returns true for legacy objects
-- isLegacyInstance returns false for new-style config
+- isProjectConfig returns true for minimal config
+- isProjectConfig returns true for file-opt-in-only config
+- isProjectConfig returns true for reference-doc config
+- isProjectConfig returns false for non-config object
 
 _define-config.feature_
 
@@ -294,24 +295,11 @@ _- New users need sensible defaults for their project type_
 
 ---
 
-#### Generic preset provides minimal taxonomy
-
-> **Invariant:** The generic preset must provide exactly 3 categories (core, api, infra) with @docs- prefix.
->
-> **Rationale:** Simple projects need minimal configuration without DDD-specific categories cluttering the taxonomy.
-
-**Verified by:**
-
-- Generic preset has correct prefix configuration
-- Generic preset has core categories only
-
----
-
 #### Libar generic preset provides minimal taxonomy with libar prefix
 
-> **Invariant:** The libar-generic preset must provide exactly 3 categories with @libar-docs- prefix.
+> **Invariant:** The libar-generic preset must provide exactly 3 categories with @architect- prefix.
 >
-> **Rationale:** This package uses @libar-docs- prefix to avoid collisions with consumer projects' annotations.
+> **Rationale:** This package uses @architect- prefix to avoid collisions with consumer projects' annotations.
 
 **Verified by:**
 
@@ -343,15 +331,27 @@ _- New users need sensible defaults for their project type_
 
 **Verified by:**
 
-- Generic preset accessible via PRESETS map
 - DDD preset accessible via PRESETS map
 - Libar generic preset accessible via PRESETS map
+
+---
+
+#### PresetName type is exported from public entrypoints
+
+> **Invariant:** The `PresetName` type must remain available from both package entrypoints so downstream configs and helper functions can reference preset keys without reaching into internal files.
+>
+> **Rationale:** Removing a documented type export is a breaking API change even when runtime behavior is unchanged.
+
+**Verified by:**
+
+- Package entrypoint exports PresetName type
+- Config entrypoint exports PresetName type
 
 _preset-system.feature_
 
 ### Project Config Loader
 
-_- Two config formats exist (new-style and legacy) that need unified loading_
+_- Invalid configs must produce actionable error messages_
 
 ---
 
@@ -376,18 +376,6 @@ _- Two config formats exist (new-style and legacy) that need unified loading_
 **Verified by:**
 
 - defineConfig export loads and resolves correctly
-
----
-
-#### Legacy config is loaded with backward compatibility
-
-> **Invariant:** A file exporting createDeliveryProcess must be loaded and produce a valid resolved config.
->
-> **Rationale:** Backward compatibility prevents breaking existing consumers during migration to the new config format.
-
-**Verified by:**
-
-- Legacy createDeliveryProcess export loads correctly
 
 ---
 

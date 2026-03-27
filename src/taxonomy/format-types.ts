@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-pattern FormatTypes
- * @libar-docs-status completed
- * @libar-docs-core
- * @libar-docs-extract-shapes FORMAT_TYPES, FormatType
+ * @architect
+ * @architect-pattern FormatTypes
+ * @architect-status completed
+ * @architect-core
+ * @architect-extract-shapes FORMAT_TYPES, FormatType
  *
  * ## Tag Value Format Types
  *

@@ -14,7 +14,7 @@
 
 **Status: SUPERSEDED** - This POC has been implemented. See:
 
-- Convention-tagged decision records (ADR/PDR) with @libar-docs-convention tags
+- Convention-tagged decision records (ADR/PDR) with @architect-convention tags
 - `docs-generated/ANNOTATION-GUIDE.md` - Comprehensive guide for fixing generated docs
 
 This decision establishes the pattern for generating technical documentation
@@ -61,7 +61,7 @@ the PROOF OF CONCEPT (demonstrating the pattern works).
 
     **What We Have:**
 
-    The delivery-process package already has the required ingredients:
+    The Architect package already has the required ingredients:
     - Pattern extraction from TypeScript JSDoc and Gherkin tags
     - Rich content support (DocStrings, tables, code blocks in features)
     - Multi-source aggregation via tag taxonomy
@@ -175,15 +175,15 @@ generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' -
 | THIS DECISION (Rule: X)   | Extract specific Rule: block from current document |
 | THIS DECISION (DocString) | Extract fenced code blocks from current document   |
 
-| Extraction Method          | Source Type              | Action                                                |
-| -------------------------- | ------------------------ | ----------------------------------------------------- |
-| Decision rule description  | Decision (.feature)      | Extract Rule: block content (Invariant, Rationale)    |
-| @extract-shapes tag        | TypeScript (.ts)         | Invoke shape extractor for @libar-docs-extract-shapes |
-| Rule blocks                | Behavior spec (.feature) | Extract Rule: names and descriptions                  |
-| Scenario Outline Examples  | Behavior spec (.feature) | Extract Examples tables as markdown                   |
-| JSDoc section              | TypeScript (.ts)         | Extract markdown from JSDoc comments                  |
-| createViolation() patterns | TypeScript (.ts)         | Extract error message literals                        |
-| Fenced code block          | Decision (.feature)      | Extract DocString code blocks with language           |
+| Extraction Method          | Source Type              | Action                                               |
+| -------------------------- | ------------------------ | ---------------------------------------------------- |
+| Decision rule description  | Decision (.feature)      | Extract Rule: block content (Invariant, Rationale)   |
+| @extract-shapes tag        | TypeScript (.ts)         | Invoke shape extractor for @architect-extract-shapes |
+| Rule blocks                | Behavior spec (.feature) | Extract Rule: names and descriptions                 |
+| Scenario Outline Examples  | Behavior spec (.feature) | Extract Examples tables as markdown                  |
+| JSDoc section              | TypeScript (.ts)         | Extract markdown from JSDoc comments                 |
+| createViolation() patterns | TypeScript (.ts)         | Extract error message literals                       |
+| Fenced code block          | Decision (.feature)      | Extract DocString code blocks with language          |
 
 **Table Format:**
 
@@ -243,7 +243,7 @@ generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' -
 
 - Decision Rule descriptions become documentation sections
 
-**Invariant:** Pre-implementation design stubs must reside in `delivery-process/stubs/`, never in `src/`.
+**Invariant:** Pre-implementation design stubs must reside in `architect/stubs/`, never in `src/`.
 
 **Rationale:** Stubs in `src/` require ESLint exceptions, create confusion between production and design code, and risk accidental imports of unimplemented functions.
 
@@ -255,18 +255,18 @@ generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' -
 | Import accidents         | Other code might import unimplemented stubs |
 | Maintenance burden       | Must track which files are stubs            |
 
-| Location                               | Content                                       | When Moved to src/     |
-| -------------------------------------- | --------------------------------------------- | ---------------------- |
-| delivery-process/stubs/{pattern}/\*.ts | API shapes, interfaces, throw-not-implemented | Implementation session |
-| src/\*_/_.ts                           | Production code only                          | Already there          |
+| Location                        | Content                                       | When Moved to src/     |
+| ------------------------------- | --------------------------------------------- | ---------------------- |
+| architect/stubs/{pattern}/\*.ts | API shapes, interfaces, throw-not-implemented | Implementation session |
+| src/\*_/_.ts                    | Production code only                          | Already there          |
 
-| Benefit               | How                                                                  |
-| --------------------- | -------------------------------------------------------------------- |
-| No ESLint exceptions  | Stubs aren't in src/, no relaxation needed                           |
-| Clear separation      | delivery-process/stubs/ = design, src/ = production                  |
-| Documentation source  | Stubs with @extract-shapes generate API docs                         |
-| Safe iteration        | Can refine stub APIs without breaking anything                       |
-| Implementation signal | Moving from delivery-process/stubs/ to src/ = implementation started |
+| Benefit               | How                                                           |
+| --------------------- | ------------------------------------------------------------- |
+| No ESLint exceptions  | Stubs aren't in src/, no relaxation needed                    |
+| Clear separation      | architect/stubs/ = design, src/ = production                  |
+| Documentation source  | Stubs with @extract-shapes generate API docs                  |
+| Safe iteration        | Can refine stub APIs without breaking anything                |
+| Implementation signal | Moving from architect/stubs/ to src/ = implementation started |
 
 | Document               | Decision Source                                 |
 | ---------------------- | ----------------------------------------------- |
@@ -299,17 +299,17 @@ generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' -
 
 **The Solution:**
 
-    Design stubs live in `delivery-process/stubs/`:
+    Design stubs live in `architect/stubs/`:
 
 
     **Design Stub Pattern:**
 
 ```typescript
-// delivery-process/stubs/shape-extractor/shape-extractor.ts
+// architect/stubs/shape-extractor/shape-extractor.ts
 /**
- * @libar-docs
- * @libar-docs-pattern ShapeExtractorStub
- * @libar-docs-status roadmap
+ * @architect
+ * @architect-pattern ShapeExtractorStub
+ * @architect-status roadmap
  *
  * ## Shape Extractor - Design Stub
  *
@@ -334,7 +334,7 @@ export function extractShapes(
 
     **Workflow:**
 
-    1. **Design session:** Create stub in `delivery-process/stubs/{pattern-name}/`
+    1. **Design session:** Create stub in `architect/stubs/{pattern-name}/`
     2. **Iterate:** Refine API shapes, add JSDoc, test with docs generation
     3. **Implementation session:** Move/copy to `src/`, implement real logic
     4. **Stub becomes example:** Original stub stays as reference (optional)
@@ -361,23 +361,23 @@ export function extractShapes(
 | docs/DOC-GENERATION-PROOF-OF-CONCEPT.md                  | Detailed reference | detailed     |
 | \_claude-md/generated/doc-generation-proof-of-concept.md | AI context         | summary      |
 
-| Section           | Source File                                         | Extraction Method          |
-| ----------------- | --------------------------------------------------- | -------------------------- |
-| Intro & Context   | THIS DECISION (Rule: Context above)                 | Decision rule description  |
-| How It Works      | THIS DECISION (Rule: Decision above)                | Decision rule description  |
-| Validation Rules  | tests/features/validation/process-guard.feature     | Rule blocks                |
-| Protection Levels | delivery-process/specs/process-guard-linter.feature | Scenario Outline Examples  |
-| Valid Transitions | delivery-process/specs/process-guard-linter.feature | Scenario Outline Examples  |
-| API Types         | src/lint/process-guard/types.ts                     | @extract-shapes tag        |
-| Decider API       | src/lint/process-guard/decider.ts                   | @extract-shapes tag        |
-| CLI Options       | src/cli/lint-process.ts                             | JSDoc section              |
-| Error Messages    | src/lint/process-guard/decider.ts                   | createViolation() patterns |
-| Pre-commit Setup  | THIS DECISION (DocString)                           | Fenced code block          |
-| Programmatic API  | THIS DECISION (DocString)                           | Fenced code block          |
+| Section           | Source File                                     | Extraction Method          |
+| ----------------- | ----------------------------------------------- | -------------------------- |
+| Intro & Context   | THIS DECISION (Rule: Context above)             | Decision rule description  |
+| How It Works      | THIS DECISION (Rule: Decision above)            | Decision rule description  |
+| Validation Rules  | tests/features/validation/process-guard.feature | Rule blocks                |
+| Protection Levels | architect/specs/process-guard-linter.feature    | Scenario Outline Examples  |
+| Valid Transitions | architect/specs/process-guard-linter.feature    | Scenario Outline Examples  |
+| API Types         | src/lint/process-guard/types.ts                 | @extract-shapes tag        |
+| Decider API       | src/lint/process-guard/decider.ts               | @extract-shapes tag        |
+| CLI Options       | src/cli/lint-process.ts                         | JSDoc section              |
+| Error Messages    | src/lint/process-guard/decider.ts               | createViolation() patterns |
+| Pre-commit Setup  | THIS DECISION (DocString)                       | Fenced code block          |
+| Programmatic API  | THIS DECISION (DocString)                       | Fenced code block          |
 
 | Situation                     | Solution              | Example                                   |
 | ----------------------------- | --------------------- | ----------------------------------------- |
-| Fix bug in completed spec     | Add unlock reason tag | `@libar-docs-unlock-reason:'Fix-typo'`    |
+| Fix bug in completed spec     | Add unlock reason tag | `@architect-unlock-reason:'Fix-typo'`     |
 | Modify outside session scope  | Use ignore flag       | `lint-process --staged --ignore-session`  |
 | CI treats warnings as errors  | Use strict flag       | `lint-process --all --strict`             |
 | Skip workflow (legacy import) | Multiple transitions  | Set roadmap then completed in same commit |
@@ -418,7 +418,7 @@ import {
   validateChanges,
   hasErrors,
   summarizeResult,
-} from '@libar-dev/delivery-process/lint';
+} from '@libar-dev/architect/lint';
 
 // 1. Derive state from annotations
 const state = (await deriveProcessState({ baseDir: '.' })).value;

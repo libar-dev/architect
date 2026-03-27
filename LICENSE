@@ -1,3 +1,7 @@
+This MIT license applies to all files in this repository EXCEPT those in the
+src/mcp/ directory, which are licensed under the Business Source License 1.1
+(see LICENSE-MCP).
+
 MIT License
 
 Copyright (c) 2024-2026 libar-dev

@@ -1,7 +1,7 @@
 /**
- * @libar-docs
- * @libar-docs-implements TagRegistrySchemasTesting
- * @libar-docs-uses TagRegistrySchema
+ * @architect
+ * @architect-implements TagRegistrySchemasTesting
+ * @architect-uses TagRegistrySchema
  *
  * Tag Registry Schema Step Definitions
  *
@@ -65,8 +65,8 @@ function createMinimalRegistry(overrides: Partial<TagRegistry> = {}): TagRegistr
     metadataTags: overrides.metadataTags ?? [],
     aggregationTags: overrides.aggregationTags ?? [],
     formatOptions: overrides.formatOptions ?? ['full', 'list', 'summary'],
-    tagPrefix: overrides.tagPrefix ?? '@libar-docs-',
-    fileOptInTag: overrides.fileOptInTag ?? '@libar-docs',
+    tagPrefix: overrides.tagPrefix ?? '@architect-',
+    fileOptInTag: overrides.fileOptInTag ?? '@architect',
   };
 }
 
@@ -130,8 +130,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           state!.registry = createDefaultTagRegistry();
         });
 
-        Then('the registry tag prefix should be "@libar-docs-"', () => {
-          expect(state!.registry!.tagPrefix).toBe('@libar-docs-');
+        Then('the registry tag prefix should be "@architect-"', () => {
+          expect(state!.registry!.tagPrefix).toBe('@architect-');
         });
       });
     }
@@ -218,9 +218,9 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     });
 
     RuleScenario('Merge replaces scalar fields when provided', ({ Given, When, Then }) => {
-      Given('a base registry with tag prefix "@libar-docs-"', () => {
+      Given('a base registry with tag prefix "@architect-"', () => {
         state!.baseRegistry = createMinimalRegistry({
-          tagPrefix: '@libar-docs-',
+          tagPrefix: '@architect-',
         });
       });
 

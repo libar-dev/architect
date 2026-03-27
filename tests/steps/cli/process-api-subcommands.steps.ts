@@ -5,8 +5,8 @@
  * discovery subcommands: list, search, context assembly,
  * tags/sources, extended arch, unannotated.
  *
- * @libar-docs
- * @libar-docs-implements ProcessStateAPICLI
+ * @architect
+ * @architect-implements ProcessStateAPICLI
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -360,7 +360,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
   Rule('CLI unannotated subcommand finds files without annotations', ({ RuleScenario }) => {
     RuleScenario(
-      'Unannotated finds files missing libar-docs marker',
+      'Unannotated finds files missing architect marker',
       ({ Given, When, Then, And }) => {
         Given('TypeScript files with mixed annotations', async () => {
           await writeMixedAnnotationFiles(state);

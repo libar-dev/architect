@@ -1,14 +1,14 @@
-@libar-docs
-@libar-docs-pattern:NormalizedStatusTesting
-@libar-docs-status:active
-@libar-docs-product-area:CoreTypes
-@libar-docs-include:core-types
+@architect
+@architect-pattern:NormalizedStatusTesting
+@architect-status:active
+@architect-product-area:CoreTypes
+@architect-include:core-types
 @taxonomy @status
 Feature: Normalized Status Taxonomy
   The normalized status module maps any status input — raw FSM states (roadmap,
-  active, completed, deferred), already-normalized values (planned), undefined,
-  or unknown strings — to exactly one of three display buckets (completed,
-  active, planned) for UI presentation and generated documentation output.
+  active, completed, deferred), undefined, or unknown strings — to exactly
+  one of three display buckets (completed, active, planned) for UI
+  presentation and generated documentation output.
 
   Background:
     Given a normalized status test context
@@ -30,7 +30,6 @@ Feature: Normalized Status Taxonomy
         | active    | active           |
         | roadmap   | planned          |
         | deferred  | planned          |
-        | planned   | planned          |
 
     @function:normalizeStatus
     Scenario: normalizeStatus defaults undefined to planned

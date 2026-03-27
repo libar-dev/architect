@@ -1,16 +1,16 @@
 /**
- * @libar-docs
- * @libar-docs-core
- * @libar-docs-pattern DesignReviewCodec
- * @libar-docs-status active
- * @libar-docs-implements DesignReviewGeneration
- * @libar-docs-arch-role projection
- * @libar-docs-arch-context renderer
- * @libar-docs-arch-layer application
- * @libar-docs-include codec-transformation
- * @libar-docs-uses MasterDataset, SequenceIndex, MermaidDiagramUtils
- * @libar-docs-convention codec-registry
- * @libar-docs-product-area:Generation
+ * @architect
+ * @architect-core
+ * @architect-pattern DesignReviewCodec
+ * @architect-status active
+ * @architect-implements DesignReviewGeneration
+ * @architect-arch-role projection
+ * @architect-arch-context renderer
+ * @architect-arch-layer application
+ * @architect-include codec-transformation
+ * @architect-uses MasterDataset, SequenceIndex, MermaidDiagramUtils
+ * @architect-convention codec-registry
+ * @architect-product-area:Generation
  *
  * ## DesignReviewCodec
  *
@@ -21,7 +21,7 @@
  * **Purpose:** Auto-generate design review documents from sequence annotations
  * on Gherkin specs. Diagrams stay synchronized with spec changes.
  *
- * **Output Files:** `delivery-process/design-reviews/{pattern-name}.md`
+ * **Output Files:** `architect/design-reviews/{pattern-name}.md`
  *
  * ### Factory Pattern
  *
@@ -136,7 +136,7 @@ function buildDesignReviewDocument(
       heading(2, 'No Sequence Data'),
       paragraph(
         `Pattern "${patternName}" has no sequence annotations. ` +
-          'Add `@libar-docs-sequence-orchestrator` and `@libar-docs-sequence-step` ' +
+          'Add `@architect-sequence-orchestrator` and `@architect-sequence-step` ' +
           'tags to generate design review diagrams.'
       ),
     ]);
@@ -237,9 +237,9 @@ function buildSequenceDiagramSection(
   return [
     heading(2, 'Sequence Diagram — Runtime Interaction Flow'),
     paragraph(
-      'Generated from: `@libar-docs-sequence-step`, `@libar-docs-sequence-module`, ' +
-        '`@libar-docs-sequence-error`, `**Input:**`/`**Output:**` markers, and ' +
-        '`@libar-docs-sequence-orchestrator` on the Feature.'
+      'Generated from: `@architect-sequence-step`, `@architect-sequence-module`, ' +
+        '`@architect-sequence-error`, `**Input:**`/`**Output:**` markers, and ' +
+        '`@architect-sequence-orchestrator` on the Feature.'
     ),
     mermaid(lines.join('\n')),
   ];
@@ -314,7 +314,7 @@ function buildComponentDiagramSection(
   return [
     heading(2, 'Component Diagram — Types and Data Flow'),
     paragraph(
-      'Generated from: `@libar-docs-sequence-module` (nodes), `**Input:**`/`**Output:**` ' +
+      'Generated from: `@architect-sequence-module` (nodes), `**Input:**`/`**Output:**` ' +
         '(edges and type shapes), deliverables table (locations), and `sequence-step` (grouping).'
     ),
     mermaid(lines.join('\n')),

@@ -1,8 +1,8 @@
-@libar-docs
-@libar-docs-pattern:FileCacheTesting
-@libar-docs-status:active
-@libar-docs-product-area:CoreTypes
-@libar-docs-include:core-types
+@architect
+@architect-pattern:FileCacheTesting
+@architect-status:active
+@architect-product-area:CoreTypes
+@architect-include:core-types
 @cache @utils
 Feature: File Cache
   The file cache provides request-scoped content caching for generation runs.

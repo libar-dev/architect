@@ -1,7 +1,7 @@
-@libar-docs
-@libar-docs-pattern:TagRegistrySchemasValidation
-@libar-docs-status:active
-@libar-docs-product-area:Validation
+@architect
+@architect-pattern:TagRegistrySchemasValidation
+@architect-status:active
+@architect-product-area:Validation
 @validation @tag-registry
 Feature: Tag Registry Schema Validation
   The tag registry configuration module provides schema-validated taxonomy
@@ -36,7 +36,7 @@ Feature: Tag Registry Schema Validation
     @function:createDefaultTagRegistry
     Scenario: Default registry has expected tag prefix
       When I create a default tag registry
-      Then the registry tag prefix should be "@libar-docs-"
+      Then the registry tag prefix should be "@architect-"
 
   Rule: mergeTagRegistries deep-merges registries by tag
 
@@ -59,7 +59,7 @@ Feature: Tag Registry Schema Validation
 
     @function:mergeTagRegistries
     Scenario: Merge replaces scalar fields when provided
-      Given a base registry with tag prefix "@libar-docs-"
+      Given a base registry with tag prefix "@architect-"
       When I merge with an override that sets tag prefix "@custom-"
       Then the merged registry tag prefix should be "@custom-"
 

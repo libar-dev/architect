@@ -1,9 +1,9 @@
 /**
- * @libar-docs
- * @libar-docs-pattern StatusValues
- * @libar-docs-status completed
- * @libar-docs-core
- * @libar-docs-extract-shapes PROCESS_STATUS_VALUES, ProcessStatusValue, ACCEPTED_STATUS_VALUES, AcceptedStatusValue, DEFAULT_STATUS, VALID_PROCESS_STATUS_SET
+ * @architect
+ * @architect-pattern StatusValues
+ * @architect-status completed
+ * @architect-core
+ * @architect-extract-shapes PROCESS_STATUS_VALUES, ProcessStatusValue, ACCEPTED_STATUS_VALUES, AcceptedStatusValue, DEFAULT_STATUS, VALID_PROCESS_STATUS_SET
  *
  * ## Process Workflow Status Values
  *
@@ -26,7 +26,7 @@ export const PROCESS_STATUS_VALUES = [
 ] as const;
 
 /**
- * Extended status values accepted for extraction and validation
+ * Status values accepted for extraction and validation
  *
  * FSM states that can be used in annotations.
  * Use only these canonical values: roadmap, active, completed, deferred.

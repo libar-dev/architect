@@ -1,11 +1,11 @@
-@libar-docs
-@libar-docs-pattern:AstParserRelationshipsEdges
-@libar-docs-implements:AstParser
-@libar-docs-status:completed
-@libar-docs-unlock-reason:'Split-from-original'
-@libar-docs-product-area:Annotation
+@architect
+@architect-pattern:AstParserRelationshipsEdges
+@architect-implements:AstParser
+@architect-status:completed
+@architect-unlock-reason:'Split-from-original'
+@architect-product-area:Annotation
 Feature: TypeScript AST Parser - Relationships and Edge Cases
-  The AST Parser extracts @libar-docs-* directives from TypeScript source files
+  The AST Parser extracts @architect-* directives from TypeScript source files
   using the TypeScript compiler API. It identifies exports, extracts metadata,
   and validates directive structure.
 
@@ -16,15 +16,15 @@ Feature: TypeScript AST Parser - Relationships and Edge Cases
 
       **Invariant:** The uses and usedBy relationship arrays are populated from directive tags, not from description content. When no relationship tags exist, the fields are undefined.
       **Rationale:** Relationship data drives dependency diagrams and impact analysis — extracting from prose would produce false edges from incidental mentions.
-      **Verified by:** Extract @libar-docs-uses with single value, Extract @libar-docs-uses with comma-separated values, Extract @libar-docs-used-by with single value, Extract @libar-docs-used-by with comma-separated values, Extract both uses and usedBy from same directive, NOT capture uses/usedBy values in description, Not set uses/usedBy when no relationship tags exist
+      **Verified by:** Extract @architect-uses with single value, Extract @architect-uses with comma-separated values, Extract @architect-used-by with single value, Extract @architect-used-by with comma-separated values, Extract both uses and usedBy from same directive, NOT capture uses/usedBy values in description, Not set uses/usedBy when no relationship tags exist
 
     @function:parseFileDirectives @relationships
-    Scenario: Extract @libar-docs-uses with single value
+    Scenario: Extract @architect-uses with single value
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
-         * @libar-docs-uses FSM Types
+         * @architect-core
+         * @architect-uses FSM Types
          *
          * Pattern that uses another pattern.
          */
@@ -39,12 +39,12 @@ Feature: TypeScript AST Parser - Relationships and Edge Cases
         | FSM Types |
 
     @function:parseFileDirectives @relationships
-    Scenario: Extract @libar-docs-uses with comma-separated values
+    Scenario: Extract @architect-uses with comma-separated values
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
-         * @libar-docs-uses FSM Types, Invariant Error, CMS Types
+         * @architect-core
+         * @architect-uses FSM Types, Invariant Error, CMS Types
          *
          * Pattern that uses multiple patterns.
          */
@@ -62,12 +62,12 @@ Feature: TypeScript AST Parser - Relationships and Edge Cases
         | CMS Types       |
 
     @function:parseFileDirectives @relationships
-    Scenario: Extract @libar-docs-used-by with single value
+    Scenario: Extract @architect-used-by with single value
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
-         * @libar-docs-used-by createDeciderHandler Factory
+         * @architect-core
+         * @architect-used-by createDeciderHandler Factory
          *
          * Pattern used by another pattern.
          */
@@ -82,12 +82,12 @@ Feature: TypeScript AST Parser - Relationships and Edge Cases
         | createDeciderHandler Factory |
 
     @function:parseFileDirectives @relationships
-    Scenario: Extract @libar-docs-used-by with comma-separated values
+    Scenario: Extract @architect-used-by with comma-separated values
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
-         * @libar-docs-used-by defineFSM Factory, Decider Types
+         * @architect-core
+         * @architect-used-by defineFSM Factory, Decider Types
          *
          * Pattern used by multiple patterns.
          */
@@ -108,9 +108,9 @@ Feature: TypeScript AST Parser - Relationships and Edge Cases
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
-         * @libar-docs-uses FSM Types
-         * @libar-docs-used-by createDeciderHandler Factory
+         * @architect-core
+         * @architect-uses FSM Types
+         * @architect-used-by createDeciderHandler Factory
          *
          * Pattern with both uses and used-by relationships.
          */
@@ -132,9 +132,9 @@ Feature: TypeScript AST Parser - Relationships and Edge Cases
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
-         * @libar-docs-uses FSM Types
-         * @libar-docs-used-by createDeciderHandler Factory
+         * @architect-core
+         * @architect-uses FSM Types
+         * @architect-used-by createDeciderHandler Factory
          *
          * ## Decider Pattern - Pure Domain Decision Logic
          *
@@ -163,7 +163,7 @@ Feature: TypeScript AST Parser - Relationships and Edge Cases
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          *
          * Pattern without relationship tags.
          */
@@ -180,10 +180,10 @@ Feature: TypeScript AST Parser - Relationships and Edge Cases
 
       **Invariant:** The parser never crashes on invalid input. Files without directives return empty results. Malformed TypeScript returns a structured error with the file path.
       **Rationale:** The scanner processes hundreds of files in bulk — a single malformed file must not abort the entire pipeline or produce an undiagnosable crash.
-      **Verified by:** Skip comments without @libar-docs-* tags, Skip invalid directive with incomplete tag, Handle malformed TypeScript gracefully, Handle empty file gracefully, Handle whitespace-only file, Handle file with only comments and no exports, Skip inline comments (non-block), Handle unicode characters in descriptions
+      **Verified by:** Skip comments without @architect-* tags, Skip invalid directive with incomplete tag, Handle malformed TypeScript gracefully, Handle empty file gracefully, Handle whitespace-only file, Handle file with only comments and no exports, Skip inline comments (non-block), Handle unicode characters in descriptions
 
     @function:parseFileDirectives @edge-case
-    Scenario: Skip comments without @libar-docs-* tags
+    Scenario: Skip comments without @architect-* tags
       Given a TypeScript file with content:
         """
         /**
@@ -203,7 +203,7 @@ Feature: TypeScript AST Parser - Relationships and Edge Cases
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-
+         * @architect-
          */
         export function invalid() {
           return 'invalid';
@@ -217,7 +217,7 @@ Feature: TypeScript AST Parser - Relationships and Edge Cases
       Given a TypeScript file with malformed content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * This will fail to parse
          */
         export function broken(
@@ -249,7 +249,7 @@ Feature: TypeScript AST Parser - Relationships and Edge Cases
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * This is a comment with no following export
          */
 
@@ -262,7 +262,7 @@ Feature: TypeScript AST Parser - Relationships and Edge Cases
     Scenario: Skip inline comments (non-block)
       Given a TypeScript file with content:
         """
-        // @libar-docs-core - This is an inline comment
+        // @architect-core - This is an inline comment
         export function test() {
           return 'test';
         }
@@ -275,7 +275,7 @@ Feature: TypeScript AST Parser - Relationships and Edge Cases
       Given a TypeScript file with content:
         """
         /**
-         * @libar-docs-core
+         * @architect-core
          * Funcion de autenticacion con emojis
          */
         export function autenticar() {

@@ -6,7 +6,7 @@ import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import {
   matchesShapePattern,
-  extractShapesFromDataset,
+  filterShapesBySelectors,
 } from '../../../../src/renderable/codecs/shape-matcher.js';
 import type { MasterDataset } from '../../../../src/validation-schemas/master-dataset.js';
 import type { ExtractedShape } from '../../../../src/validation-schemas/extracted-shape.js';
@@ -183,49 +183,52 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
   });
 
   // ──────────────────────────────────────────────────────────────────────
-  // Rule: Dataset shape extraction deduplicates by name
+  // Rule: Source selectors deduplicate matching shapes by name
   // ──────────────────────────────────────────────────────────────────────
 
-  Rule('Dataset shape extraction deduplicates by name', ({ RuleScenario }) => {
-    RuleScenario('Shapes are extracted from matching patterns', ({ Given, When, Then, And }) => {
-      Given(
-        'a MasterDataset with patterns:',
-        (_ctx: unknown, dataTable: Array<Record<string, string>>) => {
-          const patterns = dataTable.map((row) =>
-            createTestPattern({
-              filePath: row['filePath']!,
-              extractedShapes: [
-                {
-                  name: row['shapeName']!,
-                  kind: row['shapeKind']! as ExtractedShape['kind'],
-                  sourceText: `export ${row['shapeKind']!} ${row['shapeName']!} {}`,
-                  lineNumber: 1,
-                  exported: true,
-                },
-              ],
-            })
-          );
-          state!.dataset = createTestMasterDataset({ patterns });
-        }
-      );
+  Rule('Source selectors deduplicate matching shapes by name', ({ RuleScenario }) => {
+    RuleScenario(
+      'Shapes are selected from matching source glob patterns',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a MasterDataset with patterns:',
+          (_ctx: unknown, dataTable: Array<Record<string, string>>) => {
+            const patterns = dataTable.map((row) =>
+              createTestPattern({
+                filePath: row['filePath']!,
+                extractedShapes: [
+                  {
+                    name: row['shapeName']!,
+                    kind: row['shapeKind']! as ExtractedShape['kind'],
+                    sourceText: `export ${row['shapeKind']!} ${row['shapeName']!} {}`,
+                    lineNumber: 1,
+                    exported: true,
+                  },
+                ],
+              })
+            );
+            state!.dataset = createTestMasterDataset({ patterns });
+          }
+        );
 
-      When('extracting shapes with source pattern {string}', (_ctx: unknown, pattern: string) => {
-        state!.extractedShapes = extractShapesFromDataset(state!.dataset!, [pattern]);
-      });
+        When('selecting shapes with source selector {string}', (_ctx: unknown, pattern: string) => {
+          state!.extractedShapes = filterShapesBySelectors(state!.dataset!, [{ source: pattern }]);
+        });
 
-      Then('{int} shapes are returned', (_ctx: unknown, count: number) => {
-        expect(state!.extractedShapes).toHaveLength(count);
-      });
+        Then('{int} shapes are returned', (_ctx: unknown, count: number) => {
+          expect(state!.extractedShapes).toHaveLength(count);
+        });
 
-      And(
-        'the shape names are {string} and {string}',
-        (_ctx: unknown, name1: string, name2: string) => {
-          const names = state!.extractedShapes.map((s) => s.name);
-          expect(names).toContain(name1);
-          expect(names).toContain(name2);
-        }
-      );
-    });
+        And(
+          'the shape names are {string} and {string}',
+          (_ctx: unknown, name1: string, name2: string) => {
+            const names = state!.extractedShapes.map((s) => s.name);
+            expect(names).toContain(name1);
+            expect(names).toContain(name2);
+          }
+        );
+      }
+    );
 
     RuleScenario('Duplicate shape names are deduplicated', ({ Given, When, Then }) => {
       Given(
@@ -249,8 +252,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         }
       );
 
-      When('extracting shapes with source pattern {string}', (_ctx: unknown, pattern: string) => {
-        state!.extractedShapes = extractShapesFromDataset(state!.dataset!, [pattern]);
+      When('selecting shapes with source selector {string}', (_ctx: unknown, pattern: string) => {
+        state!.extractedShapes = filterShapesBySelectors(state!.dataset!, [{ source: pattern }]);
       });
 
       Then('{int} shapes are returned', (_ctx: unknown, count: number) => {
@@ -280,8 +283,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         }
       );
 
-      When('extracting shapes with source pattern {string}', (_ctx: unknown, pattern: string) => {
-        state!.extractedShapes = extractShapesFromDataset(state!.dataset!, [pattern]);
+      When('selecting shapes with source selector {string}', (_ctx: unknown, pattern: string) => {
+        state!.extractedShapes = filterShapesBySelectors(state!.dataset!, [{ source: pattern }]);
       });
 
       Then('{int} shapes are returned', (_ctx: unknown, count: number) => {

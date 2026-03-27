@@ -29,9 +29,9 @@
 
 | Situation                     | Solution                           | Example                                       |
 | ----------------------------- | ---------------------------------- | --------------------------------------------- |
-| Fix bug in completed spec     | Add `@*-unlock-reason:'reason'`    | `@libar-docs-unlock-reason:'Fix typo'`        |
-| Modify outside session scope  | `--ignore-session` flag            | `lint-process --staged --ignore-session`      |
-| CI treats warnings as errors  | `--strict` flag                    | `lint-process --all --strict`                 |
+| Fix bug in completed spec     | Add `@*-unlock-reason:'reason'`    | `@architect-unlock-reason:'Fix typo'`         |
+| Modify outside session scope  | `--ignore-session` flag            | `architect-guard --staged --ignore-session`   |
+| CI treats warnings as errors  | `--strict` flag                    | `architect-guard --all --strict`              |
 | Skip workflow (legacy import) | Multiple transitions in one commit | Set `roadmap` then `completed` in same commit |
 
 ---
@@ -39,7 +39,7 @@
 ## CLI Usage
 
 ```bash
-lint-process [options]
+architect-guard [options]
 ```
 
 ### Modes
@@ -71,11 +71,11 @@ lint-process [options]
 ### Examples
 
 ```bash
-lint-process --staged                        # Pre-commit hook (recommended)
-lint-process --all --strict                  # CI pipeline with strict mode
-lint-process --file specs/my-feature.feature # Validate specific file
-lint-process --staged --show-state           # Debug: see derived state
-lint-process --staged --ignore-session       # Override session scope
+architect-guard --staged                        # Pre-commit hook (recommended)
+architect-guard --all --strict                  # CI pipeline with strict mode
+architect-guard --file specs/my-feature.feature # Validate specific file
+architect-guard --staged --show-state           # Debug: see derived state
+architect-guard --staged --ignore-session       # Override session scope
 ```
 
 ---
@@ -88,7 +88,7 @@ Configure Process Guard as a pre-commit hook using Husky.
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-npx lint-process --staged
+npx architect-guard --staged
 ```
 
 ### package.json Scripts
@@ -96,8 +96,8 @@ npx lint-process --staged
 ```json
 {
   "scripts": {
-    "lint:process": "lint-process --staged",
-    "lint:process:ci": "lint-process --all --strict"
+    "lint:process": "architect-guard --staged",
+    "lint:process:ci": "architect-guard --all --strict"
   }
 }
 ```
@@ -115,7 +115,7 @@ import {
   validateChanges,
   hasErrors,
   summarizeResult,
-} from '@libar-dev/delivery-process/lint';
+} from '@libar-dev/architect/lint';
 
 // 1. Derive state from annotations
 const state = (await deriveProcessState({ baseDir: '.' })).value;
@@ -170,7 +170,7 @@ Follows the Decider pattern from platform-core: no I/O, no side effects.
 
 ### When to Use
 
-- When validating proposed changes against delivery process rules
+- When validating proposed changes against workflow rules
 - When implementing custom validation rules for the process guard
 - When building pre-commit hooks that enforce FSM transitions
 
@@ -198,11 +198,11 @@ Follows the Decider pattern from platform-core: no I/O, no side effects.
 
 **Rationale:** The `completed` status represents verified, accepted work. Allowing silent modification undermines the terminal-state guarantee. Requiring an unlock reason creates an audit trail and forces the developer to justify why completed work needs revisiting.
 
-| Situation                  | Solution                           | Example                                             |
-| -------------------------- | ---------------------------------- | --------------------------------------------------- |
-| Fix typo in completed spec | Add unlock reason tag              | `@libar-docs-unlock-reason:Fix-typo-in-FSM-diagram` |
-| Spec needs rework          | Create new spec instead            | New feature file with `roadmap` status              |
-| Legacy import              | Multiple transitions in one commit | Set `roadmap` then `completed`                      |
+| Situation                  | Solution                           | Example                                            |
+| -------------------------- | ---------------------------------- | -------------------------------------------------- |
+| Fix typo in completed spec | Add unlock reason tag              | `@architect-unlock-reason:Fix-typo-in-FSM-diagram` |
+| Spec needs rework          | Create new spec instead            | New feature file with `roadmap` status             |
+| Legacy import              | Multiple transitions in one commit | Set `roadmap` then `completed`                     |
 
 ---
 
