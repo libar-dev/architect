@@ -722,7 +722,7 @@ export async function generateFromDecision(
     pipelineResult;
 
   // Generate output at requested detail level
-  const sectionOption = options.claudeMdSection;
+  const sectionOption = options.claudeMdSection ?? pattern.claudeSection;
   const outputPaths = determineOutputPaths(
     patternName,
     sectionOption ? { section: sectionOption } : undefined
@@ -798,7 +798,7 @@ export async function generateFromDecisionMultiLevel(
     pipelineResult;
 
   // Determine output paths
-  const sectionOption = options.claudeMdSection;
+  const sectionOption = options.claudeMdSection ?? pattern.claudeSection;
   const outputPaths = determineOutputPaths(
     patternName,
     sectionOption ? { section: sectionOption } : undefined

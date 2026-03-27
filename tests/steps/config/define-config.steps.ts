@@ -280,6 +280,20 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
+    RuleScenario('Legacy preset alias rejected', ({ Given, When, Then }) => {
+      Given('a config object with preset "generic"', () => {
+        state!.testObject = { preset: 'generic' };
+      });
+
+      When('validating against ArchitectProjectConfigSchema', () => {
+        state!.validationResult = ArchitectProjectConfigSchema.safeParse(state!.testObject);
+      });
+
+      Then('validation should fail', () => {
+        expect(state!.validationResult!.success).toBe(false);
+      });
+    });
+
     RuleScenario('Unknown fields rejected in strict mode', ({ Given, When, Then }) => {
       Given('a config object with an unknown field "foobar"', () => {
         state!.testObject = { preset: 'libar-generic', foobar: 'baz' };
@@ -314,8 +328,42 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
+    RuleScenario(
+      'isProjectConfig returns true for file-opt-in-only config',
+      ({ Given, When, Then }) => {
+        Given('a config object with only fileOptInTag "@custom"', () => {
+          state!.testObject = { fileOptInTag: '@custom' };
+        });
+
+        When('checking isProjectConfig', () => {
+          state!.typeGuardResult = isProjectConfig(state!.testObject);
+        });
+
+        Then('the result should be true', () => {
+          expect(state!.typeGuardResult).toBe(true);
+        });
+      }
+    );
+
+    RuleScenario(
+      'isProjectConfig returns true for reference-doc config',
+      ({ Given, When, Then }) => {
+        Given('a config object with referenceDocConfigs only', () => {
+          state!.testObject = { referenceDocConfigs: [] };
+        });
+
+        When('checking isProjectConfig', () => {
+          state!.typeGuardResult = isProjectConfig(state!.testObject);
+        });
+
+        Then('the result should be true', () => {
+          expect(state!.typeGuardResult).toBe(true);
+        });
+      }
+    );
+
     RuleScenario('isProjectConfig returns false for non-config object', ({ Given, When, Then }) => {
-      Given('a legacy instance object with registry and regexBuilders', () => {
+      Given('an object with registry and regexBuilders only', () => {
         state!.testObject = {
           registry: { tagPrefix: '@test-' },
           regexBuilders: { category: (): RegExp => /@test-core/ },

@@ -33,16 +33,15 @@ import { buildRegistry } from '../taxonomy/registry-builder.js';
 import { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG } from './defaults.js';
 
 /**
- * Default preset with @architect- prefix.
+ * Default libar-generic preset with @architect- prefix.
  *
- * Same minimal categories as the default preset.
  * This is the universal default preset for both `createArchitect()` and
  * `loadConfig()` fallback.
  *
  * Suitable for:
  * - Most projects (default choice)
  * - Projects already using @architect- tags
- * - Package-level configuration (simplified categories, same prefix)
+ * - Package-level configuration with a compact three-category taxonomy
  * - Gradual adoption without tag migration
  *
  * @example
@@ -109,7 +108,7 @@ export const DDD_ES_CQRS_PRESET = {
 /**
  * Available preset names
  */
-export type PresetName = 'generic' | 'libar-generic' | 'ddd-es-cqrs';
+export type PresetName = 'libar-generic' | 'ddd-es-cqrs';
 
 /**
  * Preset lookup map
@@ -124,7 +123,6 @@ export type PresetName = 'generic' | 'libar-generic' | 'ddd-es-cqrs';
  * ```
  */
 export const PRESETS: Record<PresetName, ArchitectConfig> = {
-  generic: LIBAR_GENERIC_PRESET,
   'libar-generic': LIBAR_GENERIC_PRESET,
   'ddd-es-cqrs': DDD_ES_CQRS_PRESET,
 };

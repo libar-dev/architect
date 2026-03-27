@@ -9,12 +9,7 @@
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
-import {
-  LIBAR_GENERIC_PRESET,
-  DDD_ES_CQRS_PRESET,
-  PRESETS,
-  type PresetName,
-} from '../../../src/config/presets.js';
+import { LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PRESETS } from '../../../src/config/presets.js';
 import type { ArchitectConfig } from '../../../src/config/types.js';
 
 // =============================================================================
@@ -244,7 +239,7 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
     RuleScenario('DDD preset accessible via PRESETS map', ({ When, Then }) => {
       When('I access PRESETS with key "ddd-es-cqrs"', () => {
         state = initState();
-        state.presetFromMap = PRESETS['ddd-es-cqrs' as PresetName];
+        state.presetFromMap = PRESETS['ddd-es-cqrs'];
       });
 
       Then('the preset tagPrefix should be "@architect-"', () => {
@@ -255,7 +250,7 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
     RuleScenario('Libar generic preset accessible via PRESETS map', ({ When, Then }) => {
       When('I access PRESETS with key "libar-generic"', () => {
         state = initState();
-        state.presetFromMap = PRESETS['libar-generic' as PresetName];
+        state.presetFromMap = PRESETS['libar-generic'];
       });
 
       Then('the preset tagPrefix should be "@architect-"', () => {

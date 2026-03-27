@@ -63,9 +63,9 @@ Feature: Define Config - Schema Validation and Type Guards
 
   Rule: Schema rejects invalid configurations
 
-    **Invariant:** The configuration schema must reject invalid values including empty globs, directory traversal patterns, mutually exclusive options, invalid preset names, and unknown fields.
+    **Invariant:** The configuration schema must reject invalid values including empty globs, directory traversal patterns, mutually exclusive options, invalid preset names, removed compatibility aliases, and unknown fields.
     **Rationale:** Schema validation is the first line of defense against misconfiguration — permissive validation lets invalid configs produce confusing downstream errors.
-    **Verified by:** Empty glob pattern rejected, Parent directory traversal rejected in globs, replaceFeatures and additionalFeatures mutually exclusive, Invalid preset name rejected, Unknown fields rejected in strict mode
+    **Verified by:** Empty glob pattern rejected, Parent directory traversal rejected in globs, replaceFeatures and additionalFeatures mutually exclusive, Invalid preset name rejected, Legacy preset alias rejected, Unknown fields rejected in strict mode
 
     @validation
     Scenario: Empty glob pattern rejected
@@ -95,6 +95,12 @@ Feature: Define Config - Schema Validation and Type Guards
       Then validation should fail
 
     @validation
+    Scenario: Legacy preset alias rejected
+      Given a config object with preset "generic"
+      When validating against ArchitectProjectConfigSchema
+      Then validation should fail
+
+    @validation
     Scenario: Unknown fields rejected in strict mode
       Given a config object with an unknown field "foobar"
       When validating against ArchitectProjectConfigSchema
@@ -104,7 +110,7 @@ Feature: Define Config - Schema Validation and Type Guards
 
     **Invariant:** The isProjectConfig type guard must correctly identify valid project configs.
     **Rationale:** Config loading relies on type detection to apply the correct parsing path.
-    **Verified by:** isProjectConfig returns true for minimal config, isProjectConfig returns false for non-config object
+    **Verified by:** isProjectConfig returns true for minimal config, isProjectConfig returns true for file-opt-in-only config, isProjectConfig returns true for reference-doc config, isProjectConfig returns false for non-config object
 
     @happy-path
     Scenario: isProjectConfig returns true for minimal config
@@ -113,7 +119,19 @@ Feature: Define Config - Schema Validation and Type Guards
       Then the result should be true
 
     @happy-path
+    Scenario: isProjectConfig returns true for file-opt-in-only config
+      Given a config object with only fileOptInTag "@custom"
+      When checking isProjectConfig
+      Then the result should be true
+
+    @happy-path
+    Scenario: isProjectConfig returns true for reference-doc config
+      Given a config object with referenceDocConfigs only
+      When checking isProjectConfig
+      Then the result should be true
+
+    @happy-path
     Scenario: isProjectConfig returns false for non-config object
-      Given a legacy instance object with registry and regexBuilders
+      Given an object with registry and regexBuilders only
       When checking isProjectConfig
       Then the result should be false
