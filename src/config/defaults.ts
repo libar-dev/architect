@@ -34,7 +34,6 @@ import type { ContextInferenceRule } from '../generators/pipeline/context-infere
  * This is the prefix used when:
  * - No `TagRegistry` is provided to a function
  * - Error messages need to reference the tag format
- * - Backward compatibility with existing annotations is needed
  *
  * @example
  * ```typescript
@@ -60,10 +59,7 @@ export const DEFAULT_FILE_OPT_IN_TAG = '@architect';
 
 /**
  * Pre-built regex builders using default prefix and opt-in tag.
- *
- * Use this for backward compatibility in functions that previously
- * hardcoded the default prefix. The builders are created once at
- * module load time for efficiency.
+ * The builders are created once at module load time for efficiency.
  *
  * @example
  * ```typescript

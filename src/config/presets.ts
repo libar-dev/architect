@@ -7,7 +7,7 @@
  * @architect-arch-context config
  * @architect-uses ConfigurationTypes, Categories, RegistryBuilder
  * @architect-used-by ArchitectFactory
- * @architect-extract-shapes GENERIC_PRESET, LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PresetName, PRESETS
+ * @architect-extract-shapes LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PresetName, PRESETS
  *
  * ## Configuration Presets
  *
@@ -17,13 +17,11 @@
  *
  * ### Available Presets
  *
- * - **GENERIC_PRESET**: Minimal categories with @architect- prefix for non-DDD projects
  * - **LIBAR_GENERIC_PRESET**: Minimal categories with @architect- prefix (for package-level config)
  * - **DDD_ES_CQRS_PRESET**: Full 21-category taxonomy with @architect- prefix
  *
  * ### When to Use
  *
- * - Use GENERIC_PRESET for simple documentation needs with @architect- prefix
  * - Use LIBAR_GENERIC_PRESET for simple documentation needs with @architect- prefix (default)
  * - Use DDD_ES_CQRS_PRESET for full DDD/ES/CQRS taxonomy
  * - Use as base for custom configurations
@@ -35,53 +33,9 @@ import { buildRegistry } from '../taxonomy/registry-builder.js';
 import { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG } from './defaults.js';
 
 /**
- * Generic preset for non-DDD projects.
+ * Default preset with @architect- prefix.
  *
- * Minimal categories with @architect- prefix. Suitable for:
- * - Simple documentation needs
- * - Non-DDD architectures
- * - Projects that want basic pattern tracking
- *
- * @example
- * ```typescript
- * import { createArchitect, GENERIC_PRESET } from '@libar-dev/architect';
- *
- * const dp = createArchitect({ preset: "generic" });
- * // Uses @architect-, @architect-pattern, @architect-status, etc.
- * ```
- */
-export const GENERIC_PRESET = {
-  tagPrefix: '@architect-',
-  fileOptInTag: '@architect',
-  categories: [
-    {
-      tag: 'core',
-      domain: 'Core',
-      priority: 1,
-      description: 'Core patterns',
-      aliases: [],
-    },
-    {
-      tag: 'api',
-      domain: 'API',
-      priority: 2,
-      description: 'Public APIs',
-      aliases: [],
-    },
-    {
-      tag: 'infra',
-      domain: 'Infrastructure',
-      priority: 3,
-      description: 'Infrastructure',
-      aliases: ['infrastructure'],
-    },
-  ] as const satisfies readonly CategoryDefinition[],
-} as const satisfies ArchitectConfig;
-
-/**
- * Generic preset with @architect- prefix.
- *
- * Same minimal categories as GENERIC_PRESET but with @architect- prefix.
+ * Same minimal categories as the default preset.
  * This is the universal default preset for both `createArchitect()` and
  * `loadConfig()` fallback.
  *
@@ -170,7 +124,7 @@ export type PresetName = 'generic' | 'libar-generic' | 'ddd-es-cqrs';
  * ```
  */
 export const PRESETS: Record<PresetName, ArchitectConfig> = {
-  generic: GENERIC_PRESET,
+  generic: LIBAR_GENERIC_PRESET,
   'libar-generic': LIBAR_GENERIC_PRESET,
   'ddd-es-cqrs': DDD_ES_CQRS_PRESET,
 };

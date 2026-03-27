@@ -372,12 +372,12 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
   Rule('Shape JSDoc prose renders at standard and detailed levels', ({ RuleScenario }) => {
     RuleScenario('Standard level includes JSDoc in code blocks', ({ Given, And, When, Then }) => {
       Given(
-        'a reference config with shapeSources {string}',
-        (_ctx: unknown, shapeSources: string) => {
+        'a reference config with source selector {string}',
+        (_ctx: unknown, shapeSource: string) => {
           state!.config = {
             title: 'Test Reference Document',
             conventionTags: [],
-            shapeSources: shapeSources.split(',').map((s) => s.trim()),
+            shapeSelectors: [{ source: shapeSource }],
             behaviorCategories: [],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
@@ -424,12 +424,12 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Detailed level includes JSDoc in code block and property table',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with shapeSources {string}',
-          (_ctx: unknown, shapeSources: string) => {
+          'a reference config with source selector {string}',
+          (_ctx: unknown, shapeSource: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: shapeSources.split(',').map((s) => s.trim()),
+              shapeSelectors: [{ source: shapeSource }],
               behaviorCategories: [],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
@@ -485,12 +485,12 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Shapes without JSDoc render code blocks only', ({ Given, And, When, Then }) => {
       Given(
-        'a reference config with shapeSources {string}',
-        (_ctx: unknown, shapeSources: string) => {
+        'a reference config with source selector {string}',
+        (_ctx: unknown, shapeSource: string) => {
           state!.config = {
             title: 'Test Reference Document',
             conventionTags: [],
-            shapeSources: shapeSources.split(',').map((s) => s.trim()),
+            shapeSelectors: [{ source: shapeSource }],
             behaviorCategories: [],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
@@ -548,12 +548,12 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Detailed level renders param table for function shapes',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with shapeSources {string}',
-          (_ctx: unknown, shapeSources: string) => {
+          'a reference config with source selector {string}',
+          (_ctx: unknown, shapeSource: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: shapeSources.split(',').map((s) => s.trim()),
+              shapeSelectors: [{ source: shapeSource }],
               behaviorCategories: [],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
@@ -633,12 +633,12 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Detailed level renders returns and throws documentation',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with shapeSources {string}',
-          (_ctx: unknown, shapeSources: string) => {
+          'a reference config with source selector {string}',
+          (_ctx: unknown, shapeSource: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: shapeSources.split(',').map((s) => s.trim()),
+              shapeSelectors: [{ source: shapeSource }],
               behaviorCategories: [],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
@@ -701,12 +701,12 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Standard level renders param table without throws',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with shapeSources {string}',
-          (_ctx: unknown, shapeSources: string) => {
+          'a reference config with source selector {string}',
+          (_ctx: unknown, shapeSource: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: shapeSources.split(',').map((s) => s.trim()),
+              shapeSelectors: [{ source: shapeSource }],
               behaviorCategories: [],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
@@ -770,12 +770,12 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Shapes without param docs skip param table', ({ Given, And, When, Then }) => {
       Given(
-        'a reference config with shapeSources {string}',
-        (_ctx: unknown, shapeSources: string) => {
+        'a reference config with source selector {string}',
+        (_ctx: unknown, shapeSource: string) => {
           state!.config = {
             title: 'Test Reference Document',
             conventionTags: [],
-            shapeSources: shapeSources.split(',').map((s) => s.trim()),
+            shapeSelectors: [{ source: shapeSource }],
             behaviorCategories: [],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
@@ -1131,7 +1131,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           state.config = {
             title: 'Test Reference',
             conventionTags: [],
-            shapeSources: [],
+            shapeSelectors: [],
             behaviorCategories: [],
             includeTags: tags.split(',').map((t) => t.trim()),
             claudeMdSection: 'test',
@@ -1189,7 +1189,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
             state.config = {
               title: 'Test Reference',
               conventionTags: [],
-              shapeSources: [],
+              shapeSelectors: [],
               behaviorCategories: behTags.split(',').map((t) => t.trim()),
               includeTags: includeTags.split(',').map((t) => t.trim()),
               claudeMdSection: 'test',
@@ -1250,7 +1250,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           state.config = {
             title: 'Test Reference',
             conventionTags: [],
-            shapeSources: [],
+            shapeSelectors: [],
             behaviorCategories: [],
             includeTags: tags.split(',').map((t) => t.trim()),
             claudeMdSection: 'test',

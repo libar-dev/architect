@@ -58,7 +58,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
               state!.config = {
                 title: 'Test Dedup Document',
                 conventionTags: [convTag],
-                shapeSources: [],
+                shapeSelectors: [],
                 behaviorCategories: [],
                 includeTags: [includeTag],
                 claudeMdSection: 'test',
@@ -137,7 +137,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
               state!.config = {
                 title: 'Test Dedup Standard',
                 conventionTags: [convTag],
-                shapeSources: [],
+                shapeSelectors: [],
                 behaviorCategories: [],
                 includeTags: [includeTag],
                 claudeMdSection: 'test',
@@ -210,7 +210,6 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           state!.config = {
             title: 'Types First Test',
             conventionTags: ['test-conv'],
-            shapeSources: [],
             shapeSelectors: [{ group: 'test-shapes' }],
             behaviorCategories: [],
             shapesFirst: true,
@@ -290,7 +289,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           state!.config = {
             title: `${area} Product Area`,
             conventionTags: [],
-            shapeSources: [],
+            shapeSelectors: [],
             behaviorCategories: [],
             productArea: area,
             claudeMdSection: 'test',
@@ -392,7 +391,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         state!.config = {
           title: `${area} Product Area`,
           conventionTags: [],
-          shapeSources: [],
+          shapeSelectors: [],
           behaviorCategories: [],
           productArea: area,
           claudeMdSection: 'test',

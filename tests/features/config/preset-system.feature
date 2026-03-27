@@ -12,37 +12,8 @@ Feature: Preset System for Configuration
   - Simple projects need minimal configuration
 
   **Solution:**
-  - GENERIC_PRESET for non-DDD projects
   - DDD_ES_CQRS_PRESET for full DDD/ES/CQRS taxonomy
   - PRESETS lookup map for programmatic access
-
-  # ==========================================================================
-  # Generic Preset
-  # ==========================================================================
-
-  Rule: Generic preset provides minimal taxonomy
-
-    **Invariant:** The generic preset must provide exactly 3 categories (core, api, infra) with @architect- prefix.
-    **Rationale:** Simple projects need minimal configuration without DDD-specific categories cluttering the taxonomy.
-    **Verified by:** Generic preset has correct prefix configuration, Generic preset has core categories only
-
-    @happy-path
-    Scenario: Generic preset has correct prefix configuration
-      Given the generic preset
-      Then it should have tagPrefix "@architect-"
-      And it should have fileOptInTag "@architect"
-
-    @happy-path
-    Scenario: Generic preset has core categories only
-      Given the generic preset
-      Then it should include category "core"
-      And it should include category "api"
-      And it should include category "infra"
-      And it should NOT include category "ddd"
-      And it should NOT include category "event-sourcing"
-      And it should NOT include category "cqrs"
-      And it should NOT include category "saga"
-      And it should have exactly 3 categories
 
   # ==========================================================================
   # Libar Generic Preset (for package extraction)
@@ -123,12 +94,7 @@ Feature: Preset System for Configuration
 
     **Invariant:** All preset instances must be accessible via the PRESETS map using their canonical string key.
     **Rationale:** Programmatic access enables config files to reference presets by name instead of importing instances.
-    **Verified by:** Generic preset accessible via PRESETS map, DDD preset accessible via PRESETS map, Libar generic preset accessible via PRESETS map
-
-    @happy-path
-    Scenario: Generic preset accessible via PRESETS map
-      When I access PRESETS with key "generic"
-      Then the preset tagPrefix should be "@architect-"
+    **Verified by:** DDD preset accessible via PRESETS map, Libar generic preset accessible via PRESETS map
 
     @happy-path
     Scenario: DDD preset accessible via PRESETS map

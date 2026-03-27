@@ -7,10 +7,7 @@
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
-import {
-  filterShapesBySelectors,
-  extractShapesFromDataset,
-} from '../../../../src/renderable/codecs/shape-matcher.js';
+import { filterShapesBySelectors } from '../../../../src/renderable/codecs/shape-matcher.js';
 import type { ShapeSelector } from '../../../../src/renderable/codecs/shape-matcher.js';
 import type { MasterDataset } from '../../../../src/validation-schemas/master-dataset.js';
 import type {
@@ -195,37 +192,28 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       });
     });
 
-    // ────────────────────────────────────────────────────────────────
-    // Scenario: shapeSources backward compatibility
-    // ────────────────────────────────────────────────────────────────
+    RuleScenario('Source-only selector returns all matching shapes', ({ Given, When, Then }) => {
+      Given(
+        'a MasterDataset with patterns containing these extracted shapes:',
+        (_ctx: unknown, table: readonly ShapeRow[]) => {
+          state!.dataset = buildDatasetFromRows(table);
+        }
+      );
 
-    RuleScenario(
-      'shapeSources without shapeSelectors returns all shapes',
-      ({ Given, When, Then }) => {
-        Given(
-          'a MasterDataset with patterns containing these extracted shapes:',
-          (_ctx: unknown, table: readonly ShapeRow[]) => {
-            state!.dataset = buildDatasetFromRows(table);
-          }
-        );
+      When('filtering with selector source {string}', (_ctx: unknown, source: string) => {
+        const selectors: readonly ShapeSelector[] = [{ source }];
+        state!.resultShapes = filterShapesBySelectors(state!.dataset!, selectors);
+      });
 
-        When(
-          'extracting shapes with shapeSources {string}',
-          (_ctx: unknown, shapeSource: string) => {
-            state!.resultShapes = extractShapesFromDataset(state!.dataset!, [shapeSource]);
-          }
-        );
-
-        Then(
-          '2 shapes are returned including {string} and {string}',
-          (_ctx: unknown, name1: string, name2: string) => {
-            expect(state!.resultShapes).toHaveLength(2);
-            const names = state!.resultShapes.map((s) => s.name);
-            expect(names).toContain(name1);
-            expect(names).toContain(name2);
-          }
-        );
-      }
-    );
+      Then(
+        '2 shapes are returned including {string} and {string}',
+        (_ctx: unknown, name1: string, name2: string) => {
+          expect(state!.resultShapes).toHaveLength(2);
+          const names = state!.resultShapes.map((s) => s.name);
+          expect(names).toContain(name1);
+          expect(names).toContain(name2);
+        }
+      );
+    });
   });
 });

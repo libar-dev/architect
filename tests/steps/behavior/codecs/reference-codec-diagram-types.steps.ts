@@ -47,14 +47,14 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
   Rule('Diagram type controls Mermaid output format', ({ RuleScenario }) => {
     RuleScenario('Default diagramType produces flowchart', ({ Given, And, When, Then }) => {
       Given(
-        'a reference config with diagramScope archContext {string}',
+        'a reference config with diagramScopes archContext {string}',
         (_ctx: unknown, context: string) => {
           state!.config = {
             title: 'Test Reference Document',
             conventionTags: [],
-            shapeSources: [],
+            shapeSelectors: [],
             behaviorCategories: [],
-            diagramScope: { archContext: [context] },
+            diagramScopes: [{ archContext: [context] }],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
             claudeMdFilename: 'test.md',
@@ -105,17 +105,19 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Sequence diagram renders participant-message format',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with diagramScope archContext {string} and diagramType {string}',
+          'a reference config with diagramScopes archContext {string} and diagramType {string}',
           (_ctx: unknown, context: string, diagramType: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: [],
+              shapeSelectors: [],
               behaviorCategories: [],
-              diagramScope: {
-                archContext: [context],
-                diagramType: diagramType as 'sequenceDiagram',
-              },
+              diagramScopes: [
+                {
+                  archContext: [context],
+                  diagramType: diagramType as 'sequenceDiagram',
+                },
+              ],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',
@@ -180,17 +182,19 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('State diagram renders state transitions', ({ Given, And, When, Then }) => {
       Given(
-        'a reference config with diagramScope archContext {string} and diagramType {string}',
+        'a reference config with diagramScopes archContext {string} and diagramType {string}',
         (_ctx: unknown, context: string, diagramType: string) => {
           state!.config = {
             title: 'Test Reference Document',
             conventionTags: [],
-            shapeSources: [],
+            shapeSelectors: [],
             behaviorCategories: [],
-            diagramScope: {
-              archContext: [context],
-              diagramType: diagramType as 'stateDiagram-v2',
-            },
+            diagramScopes: [
+              {
+                archContext: [context],
+                diagramType: diagramType as 'stateDiagram-v2',
+              },
+            ],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
             claudeMdFilename: 'test.md',
@@ -248,17 +252,19 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Sequence diagram includes neighbor patterns as participants',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with diagramScope archContext {string} and diagramType {string}',
+          'a reference config with diagramScopes archContext {string} and diagramType {string}',
           (_ctx: unknown, context: string, diagramType: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: [],
+              shapeSelectors: [],
               behaviorCategories: [],
-              diagramScope: {
-                archContext: [context],
-                diagramType: diagramType as 'sequenceDiagram',
-              },
+              diagramScopes: [
+                {
+                  archContext: [context],
+                  diagramType: diagramType as 'sequenceDiagram',
+                },
+              ],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',
@@ -306,17 +312,19 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('State diagram adds start and end pseudo-states', ({ Given, And, When, Then }) => {
       Given(
-        'a reference config with diagramScope archContext {string} and diagramType {string}',
+        'a reference config with diagramScopes archContext {string} and diagramType {string}',
         (_ctx: unknown, context: string, diagramType: string) => {
           state!.config = {
             title: 'Test Reference Document',
             conventionTags: [],
-            shapeSources: [],
+            shapeSelectors: [],
             behaviorCategories: [],
-            diagramScope: {
-              archContext: [context],
-              diagramType: diagramType as 'stateDiagram-v2',
-            },
+            diagramScopes: [
+              {
+                archContext: [context],
+                diagramType: diagramType as 'stateDiagram-v2',
+              },
+            ],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
             claudeMdFilename: 'test.md',
@@ -369,17 +377,19 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('C4 diagram renders system boundary format', ({ Given, And, When, Then }) => {
       Given(
-        'a reference config with diagramScope archContext {string} and diagramType {string}',
+        'a reference config with diagramScopes archContext {string} and diagramType {string}',
         (_ctx: unknown, context: string, diagramType: string) => {
           state!.config = {
             title: 'Test Reference Document',
             conventionTags: [],
-            shapeSources: [],
+            shapeSelectors: [],
             behaviorCategories: [],
-            diagramScope: {
-              archContext: [context],
-              diagramType: diagramType as 'C4Context',
-            },
+            diagramScopes: [
+              {
+                archContext: [context],
+                diagramType: diagramType as 'C4Context',
+              },
+            ],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
             claudeMdFilename: 'test.md',
@@ -446,17 +456,19 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'C4 diagram renders neighbor patterns as external systems',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with diagramScope archContext {string} and diagramType {string}',
+          'a reference config with diagramScopes archContext {string} and diagramType {string}',
           (_ctx: unknown, context: string, diagramType: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: [],
+              shapeSelectors: [],
               behaviorCategories: [],
-              diagramScope: {
-                archContext: [context],
-                diagramType: diagramType as 'C4Context',
-              },
+              diagramScopes: [
+                {
+                  archContext: [context],
+                  diagramType: diagramType as 'C4Context',
+                },
+              ],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',
@@ -501,17 +513,19 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Class diagram renders class members and relationships',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with diagramScope archContext {string} and diagramType {string}',
+          'a reference config with diagramScopes archContext {string} and diagramType {string}',
           (_ctx: unknown, context: string, diagramType: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: [],
+              shapeSelectors: [],
               behaviorCategories: [],
-              diagramScope: {
-                archContext: [context],
-                diagramType: diagramType as 'classDiagram',
-              },
+              diagramScopes: [
+                {
+                  archContext: [context],
+                  diagramType: diagramType as 'classDiagram',
+                },
+              ],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',
@@ -570,17 +584,19 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Class diagram renders archRole as stereotype', ({ Given, And, When, Then }) => {
       Given(
-        'a reference config with diagramScope archContext {string} and diagramType {string}',
+        'a reference config with diagramScopes archContext {string} and diagramType {string}',
         (_ctx: unknown, context: string, diagramType: string) => {
           state!.config = {
             title: 'Test Reference Document',
             conventionTags: [],
-            shapeSources: [],
+            shapeSelectors: [],
             behaviorCategories: [],
-            diagramScope: {
-              archContext: [context],
-              diagramType: diagramType as 'classDiagram',
-            },
+            diagramScopes: [
+              {
+                archContext: [context],
+                diagramType: diagramType as 'classDiagram',
+              },
+            ],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
             claudeMdFilename: 'test.md',
@@ -636,14 +652,14 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Relationship edges display type labels by default',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with diagramScope archContext {string}',
+          'a reference config with diagramScopes archContext {string}',
           (_ctx: unknown, context: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: [],
+              shapeSelectors: [],
               behaviorCategories: [],
-              diagramScope: { archContext: [context] },
+              diagramScopes: [{ archContext: [context] }],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',
@@ -694,14 +710,14 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Edge labels can be disabled for compact diagrams',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with diagramScope archContext {string} and showEdgeLabels false',
+          'a reference config with diagramScopes archContext {string} and showEdgeLabels false',
           (_ctx: unknown, context: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: [],
+              shapeSelectors: [],
               behaviorCategories: [],
-              diagramScope: { archContext: [context], showEdgeLabels: false },
+              diagramScopes: [{ archContext: [context], showEdgeLabels: false }],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',
@@ -750,14 +766,14 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('archRole controls Mermaid node shape', ({ Given, And, When, Then }) => {
       Given(
-        'a reference config with diagramScope archContext {string}',
+        'a reference config with diagramScopes archContext {string}',
         (_ctx: unknown, context: string) => {
           state!.config = {
             title: 'Test Reference Document',
             conventionTags: [],
-            shapeSources: [],
+            shapeSelectors: [],
             behaviorCategories: [],
-            diagramScope: { archContext: [context] },
+            diagramScopes: [{ archContext: [context] }],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
             claudeMdFilename: 'test.md',
@@ -812,14 +828,14 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Pattern without archRole uses default rectangle shape',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with diagramScope archContext {string}',
+          'a reference config with diagramScopes archContext {string}',
           (_ctx: unknown, context: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
-              shapeSources: [],
+              shapeSelectors: [],
               behaviorCategories: [],
-              diagramScope: { archContext: [context] },
+              diagramScopes: [{ archContext: [context] }],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',

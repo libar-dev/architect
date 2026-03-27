@@ -19,8 +19,7 @@ Feature: Shape Selector Filtering
 
     **Verified by:** Select by source and names,
     Select by group,
-    Select by source alone,
-    shapeSources backward compatibility preserved
+    Select by source alone
 
     @acceptance-criteria @happy-path
     Scenario: Select specific shapes by source and names
@@ -57,10 +56,10 @@ Feature: Shape Selector Filtering
       And shape "ProcessStatus" is not included
 
     @acceptance-criteria @happy-path
-    Scenario: shapeSources without shapeSelectors returns all shapes
+    Scenario: Source-only selector returns all matching shapes
       Given a MasterDataset with patterns containing these extracted shapes:
         | Pattern Source | Shape Name | Group | Kind |
         | src/taxonomy/risk-levels.ts | RiskLevel | api-types | type |
         | src/taxonomy/risk-levels.ts | RISK_LEVELS | | const |
-      When extracting shapes with shapeSources "src/taxonomy/*.ts"
+      When filtering with selector source "src/taxonomy/*.ts"
       Then 2 shapes are returned including "RiskLevel" and "RISK_LEVELS"

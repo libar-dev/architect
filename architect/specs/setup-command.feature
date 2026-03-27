@@ -85,8 +85,8 @@ Feature: Interactive Setup Command
   @architect-sequence-module:prompts
   Rule: Interactive prompts configure preset and source paths with smart defaults
 
-    **Invariant:** The init command prompts for preset selection from the three
-    available presets (generic, libar-generic, ddd-es-cqrs) with descriptions, and
+    **Invariant:** The init command prompts for preset selection from the two
+    available presets (libar-generic, ddd-es-cqrs) with descriptions, and
     for source glob paths with defaults inferred from project structure. The --yes
     flag skips non-destructive selection prompts and uses defaults. Destructive
     overwrites require an explicit --force flag; otherwise init exits without
@@ -100,17 +100,16 @@ Feature: Interactive Setup Command
 
     **Output:** InitConfig -- targetDir, preset, sources, force, context
 
-    **Verified by:** Preset selection shows all three presets,
+    **Verified by:** Preset selection shows both supported presets,
     Non-interactive mode uses defaults without prompting
 
     @acceptance-criteria @happy-path
-    Scenario: Preset selection prompt shows all three presets
+    Scenario: Preset selection prompt shows both supported presets
       Given a project directory with package.json
       When running the init command
-      Then the prompt displays three preset choices:
+      Then the prompt displays two preset choices:
         | Preset | Description |
-        | generic | Minimal categories with docs- prefix |
-        | libar-generic | Minimal categories with libar-docs- prefix |
+        | libar-generic | Minimal categories with @architect- prefix |
         | ddd-es-cqrs | Full 21-category DDD taxonomy |
       And the default selection is "libar-generic"
 

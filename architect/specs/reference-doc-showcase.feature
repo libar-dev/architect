@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:ReferenceDocShowcase
 @architect-status:completed
+@architect-unlock-reason:'reference-render-contract-cleanup'
 @architect-phase:30
 @architect-effort:13d
 @architect-product-area:Generation
@@ -68,7 +69,6 @@ Feature: Reference Document Showcase
       | Auto-shape discovery mode | Complete | src/extractor/shape-extractor.ts |
       | Convention content from TypeScript JSDoc | Complete | src/scanner/ast-parser.ts |
       | CompositeCodec for multi-codec assembly | Complete | src/renderable/codecs/ |
-      | renderToClaudeContext renderer | Complete | src/renderable/ |
       | Data-driven Gherkin tag extraction | Complete | src/scanner/gherkin-ast-parser.ts |
       | Expanded sample config with all content sources | Complete | architect.config.ts |
       | Sample convention decision with rich content | Complete | architect/decisions/ |
@@ -296,7 +296,7 @@ Feature: Reference Document Showcase
     return type instead of the placeholder value. JSDoc param, returns, and
     throws tags are extracted and stored on ExtractedShape. Property-level JSDoc
     preserves full multi-line content without first-line truncation. Auto-shape
-    discovery mode extracts all exported types from files matching shapeSources
+    discovery mode extracts all exported types from files matching source-selector globs
     globs without requiring explicit extract-shapes annotations.
 
     **Rationale:** Function signatures are the most valuable API surface -- they
@@ -304,7 +304,7 @@ Feature: Reference Document Showcase
     field already exists in the schema but holds a lossy placeholder. The fix is
     approximately 15 lines in ast-parser.ts: threading sourceCode into
     extractFromDeclaration and slicing parameter ranges. Auto-shape discovery
-    eliminates manual annotation burden for files that match shapeSources globs.
+    eliminates manual annotation burden for files that match source-selector globs.
 
     **Verified by:** Function signatures populate ExportInfo,
     Param and returns tags appear in shape sections,
@@ -332,8 +332,8 @@ Feature: Reference Document Showcase
       And no first-line truncation occurs
 
     @acceptance-criteria @happy-path
-    Scenario: Auto-shape discovery extracts exports from shapeSources files
-      Given a TypeScript file matching a shapeSources glob pattern
+    Scenario: Auto-shape discovery extracts exports from source-selector files
+      Given a TypeScript file matching a source-selector glob pattern
       And the file has exported types but no extract-shapes annotation
       When shape extraction runs in auto-discovery mode
       Then all exported types from the file are included as shapes
@@ -342,7 +342,7 @@ Feature: Reference Document Showcase
 
     **Invariant:** CompositeCodec assembles reference documents from multiple
     codec outputs by concatenating RenderableDocument sections. The
-    renderToClaudeContext renderer produces token-efficient output using section
+    modular claude-md renderer produces token-efficient output using section
     markers optimized for LLM consumption. The Gherkin tag extractor uses
     TagRegistry metadata instead of hardcoded if/else branches, making new tag
     addition a zero-code-change operation. Convention content can be extracted
@@ -350,7 +350,7 @@ Feature: Reference Document Showcase
     annotations, not only from Gherkin Rule blocks.
 
     **Rationale:** CompositeCodec enables referenceDocConfigs to include content
-    from any codec, not just the current 4 sources. The renderToClaudeContext
+    from any codec, not just the current 4 sources. The modular claude-md
     renderer unifies two formatting paths (codec-based markdown vs hand-written
     markers in context-formatter.ts). Data-driven tag extraction cuts the
     maintenance burden of the 40-branch if/else in gherkin-ast-parser.ts roughly
@@ -369,9 +369,9 @@ Feature: Reference Document Showcase
       Then the output contains sections from both codecs in order
 
     @acceptance-criteria @happy-path
-    Scenario: renderToClaudeContext produces token-efficient output
+    Scenario: modular claude-md renderer produces token-efficient output
       Given a RenderableDocument with multiple section types
-      When rendered via renderToClaudeContext
+      When rendered via the modular claude-md renderer
       Then the output uses section markers instead of markdown headers
       And token count is lower than equivalent markdown output
 

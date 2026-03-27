@@ -30,7 +30,6 @@ const TEST_CONFIGS: readonly ReferenceDocConfig[] = [
   {
     title: 'Architecture Types Reference',
     conventionTags: ['pipeline-architecture'],
-    shapeSources: [],
     shapeSelectors: [{ group: 'master-dataset' }],
     behaviorCategories: [],
     claudeMdSection: 'architecture',
@@ -41,7 +40,6 @@ const TEST_CONFIGS: readonly ReferenceDocConfig[] = [
   {
     title: 'Reference Generation Sample',
     conventionTags: ['taxonomy-rules'],
-    shapeSources: [],
     shapeSelectors: [{ group: 'reference-sample' }],
     behaviorCategories: [],
     includeTags: ['reference-sample'],

@@ -81,14 +81,14 @@ Feature: Reference Codec - Core Behavior
       When decoding at detail level "standard"
       Then the document has a heading "Behavior Specifications"
 
-  Rule: Shape sources are extracted from matching patterns
+  Rule: Source selectors are extracted from matching patterns
 
-    **Invariant:** Only shapes from patterns whose file path matches the configured shapeSources glob may appear in the API Types section.
+    **Invariant:** Only shapes from patterns whose file path matches the configured source selector glob may appear in the API Types section.
     **Rationale:** Including shapes from unrelated source paths would pollute the API Types section with irrelevant type definitions, breaking the scoped documentation contract.
 
     @happy-path
-    Scenario: Shapes appear when source file matches shapeSources glob
-      Given a reference config with shapeSources "src/lint/*.ts"
+    Scenario: Shapes appear when source file matches source selector glob
+      Given a reference config with source selector "src/lint/*.ts"
       And a MasterDataset with a pattern at "src/lint/rules.ts" with extracted shapes
       When decoding at detail level "detailed"
       Then the document has a heading "API Types"
@@ -96,7 +96,7 @@ Feature: Reference Codec - Core Behavior
 
     @happy-path
     Scenario: Summary level shows shapes as a compact table
-      Given a reference config with shapeSources "src/lint/*.ts"
+      Given a reference config with source selector "src/lint/*.ts"
       And a MasterDataset with a pattern at "src/lint/rules.ts" with extracted shapes
       When decoding at detail level "summary"
       Then the document has a heading "API Types"
@@ -104,7 +104,7 @@ Feature: Reference Codec - Core Behavior
 
     @edge-case
     Scenario: No shapes when source file does not match glob
-      Given a reference config with shapeSources "src/config/*.ts"
+      Given a reference config with source selector "src/config/*.ts"
       And a MasterDataset with a pattern at "src/lint/rules.ts" with extracted shapes
       When decoding at detail level "detailed"
       Then the document does not have a heading "API Types"

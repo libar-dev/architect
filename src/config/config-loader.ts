@@ -169,7 +169,7 @@ export async function findConfigFile(startDir: string): Promise<string | null> {
  * Load configuration from file or use defaults.
  *
  * Delegates to {@link loadProjectConfig} for file discovery and parsing,
- * then maps the result to the legacy {@link ConfigDiscoveryResult} shape.
+ * then maps the result to the {@link ConfigDiscoveryResult} shape.
  *
  * @param baseDir - Directory to start searching from (usually cwd or project root)
  * @returns Result with loaded configuration or error

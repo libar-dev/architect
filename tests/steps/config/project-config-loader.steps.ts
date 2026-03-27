@@ -2,8 +2,7 @@
  * Project Config Loader Step Definitions
  *
  * BDD step definitions for testing loadProjectConfig, the unified
- * config loader that supports both new-style defineConfig and legacy
- * createArchitect config formats.
+ * config loader that supports the current defineConfig project format.
  *
  * @architect
  */

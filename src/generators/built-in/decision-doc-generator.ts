@@ -137,38 +137,6 @@ export interface DecisionDocGeneratorResult {
 }
 
 // =============================================================================
-// Tag Helpers
-// =============================================================================
-
-/**
- * Extract claude-md-section from pattern tags
- *
- * Looks for `@architect-claude-md-section:VALUE` tag and extracts the value.
- * Returns undefined if tag not found.
- *
- * @param pattern - Extracted pattern with directive tags
- * @returns Section value (e.g., "validation") or undefined
- *
- * @example
- * ```typescript
- * // Pattern with @architect-claude-md-section:validation tag
- * const section = extractClaudeMdSection(pattern);
- * // Returns: "validation"
- * ```
- */
-export function extractClaudeMdSection(pattern: ExtractedPattern): string | undefined {
-  const tags = pattern.directive.tags;
-  for (const tag of tags) {
-    // Match @architect-claude-md-section:VALUE or @docs-claude-md-section:VALUE
-    const match = /^@(?:libar-)?docs-claude-md-section[:\s]+(.+)$/i.exec(tag);
-    if (match?.[1]) {
-      return match[1].trim();
-    }
-  }
-  return undefined;
-}
-
-// =============================================================================
 // Output Path Resolution
 // =============================================================================
 
@@ -919,8 +887,8 @@ export class DecisionDocGeneratorImpl implements DocumentGenerator {
 
     // Generate documentation for each decision pattern
     for (const pattern of decisionPatterns) {
-      // Extract section from pattern tags or default to 'generated'
-      const section = extractClaudeMdSection(pattern) ?? 'generated';
+      // Use the canonical extracted claude section when present.
+      const section = pattern.claudeSection ?? 'generated';
 
       const result = await generateFromDecisionMultiLevel(pattern, {
         baseDir: context.baseDir,

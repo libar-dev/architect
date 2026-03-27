@@ -233,23 +233,30 @@ export const ArchitectProjectConfigSchema = z
 /**
  * Type guard for raw project config objects.
  *
- * Used by `loadProjectConfig()` to distinguish between:
- * - New-style `ArchitectProjectConfig` (has `sources`, `preset`, `output`, etc.)
- * - Legacy `ArchitectInstance` (has `registry` + `regexBuilders`)
+ * Used by `loadProjectConfig()` to distinguish project config exports from
+ * runtime instance objects.
  */
 export function isProjectConfig(value: unknown): value is ArchitectProjectConfig {
   if (value === null || typeof value !== 'object') {
     return false;
   }
   const obj = value as Record<string, unknown>;
-  // New-style config has at least one of these top-level fields
-  return (
-    'sources' in obj ||
-    'preset' in obj ||
-    'output' in obj ||
-    'generators' in obj ||
-    'generatorOverrides' in obj
-  );
+  const projectConfigKeys = [
+    'preset',
+    'tagPrefix',
+    'fileOptInTag',
+    'categories',
+    'sources',
+    'output',
+    'generators',
+    'generatorOverrides',
+    'codecOptions',
+    'contextInferenceRules',
+    'workflowPath',
+    'referenceDocConfigs',
+  ] as const;
+
+  return projectConfigKeys.some((key) => key in obj);
 }
 
 // ---------------------------------------------------------------------------

@@ -5,7 +5,7 @@
 @behavior @configuration
 Feature: Configuration API for Open-Sourcing
   The createArchitect factory provides a type-safe way to configure
-  the delivery process with custom tag prefixes and presets.
+  the package with custom tag prefixes and presets.
 
   **Problem:**
   - Different projects need different tag prefixes
@@ -28,18 +28,11 @@ Feature: Configuration API for Open-Sourcing
 
     **Invariant:** The configuration factory must produce a fully initialized instance for any supported preset, with the libar-generic preset as the default when no arguments are provided.
     **Rationale:** A sensible default preset eliminates boilerplate for the common case while still supporting specialized presets (ddd-es-cqrs) for advanced monorepo configurations.
-    **Verified by:** Create with no arguments uses libar-generic preset, Create with generic preset, Create with libar-generic preset, Create with ddd-es-cqrs preset explicitly
+    **Verified by:** Create with no arguments uses libar-generic preset, Create with libar-generic preset, Create with ddd-es-cqrs preset explicitly
 
     @happy-path
     Scenario: Create with no arguments uses libar-generic preset
       When I call createArchitect without arguments
-      Then the registry tagPrefix should be "@architect-"
-      And the registry fileOptInTag should be "@architect"
-      And the registry should have exactly 3 categories
-
-    @happy-path
-    Scenario: Create with generic preset
-      When I call createArchitect with preset "generic"
       Then the registry tagPrefix should be "@architect-"
       And the registry fileOptInTag should be "@architect"
       And the registry should have exactly 3 categories
@@ -92,15 +85,7 @@ Feature: Configuration API for Open-Sourcing
 
     **Invariant:** When a preset defines its own category set, it must fully replace (not merge with) the base categories.
     **Rationale:** Category sets are curated per-preset — merging would include irrelevant categories (e.g., DDD categories in a generic project) that pollute taxonomy reports.
-    **Verified by:** Generic preset excludes DDD categories, Libar-generic preset excludes DDD categories
-
-    @happy-path
-    Scenario: Generic preset excludes DDD categories
-      When I call createArchitect with preset "generic"
-      Then the registry should NOT include category "ddd"
-      And the registry should NOT include category "event-sourcing"
-      And the registry should NOT include category "cqrs"
-      And the registry should NOT include category "saga"
+    **Verified by:** Libar-generic preset excludes DDD categories
 
     @happy-path
     Scenario: Libar-generic preset excludes DDD categories

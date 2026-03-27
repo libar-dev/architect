@@ -98,7 +98,7 @@ Feature: Config Loader - TypeScript Configuration Discovery
 
     **Invariant:** Loaded config files must have a valid default export matching the expected configuration schema, with appropriate error messages for invalid formats.
     **Rationale:** Invalid configurations produce cryptic downstream errors — early validation with clear messages prevents debugging wasted on malformed config.
-    **Verified by:** Load valid config with default fallback, Load valid config file, Error on config without default export, Error on config with wrong type
+    **Verified by:** Load valid config with default fallback, Load valid minimal config file, Error on config without default export, Error on config with wrong type
 
     @happy-path
     Scenario: Load valid config with default fallback
@@ -110,12 +110,12 @@ Feature: Config Loader - TypeScript Configuration Discovery
       And loaded registry should have exactly 3 categories
 
     @happy-path
-    Scenario: Load valid config file
-      Given a valid config file with preset "generic"
+    Scenario: Load valid minimal config file
+      Given a valid config file with custom tagPrefix "@custom-"
       When loading config from base directory
       Then config loading should succeed
       And loaded config should NOT be the default
-      And loaded registry tagPrefix should be "@architect-"
+      And loaded registry tagPrefix should be "@custom-"
 
     @error-handling
     Scenario: Error on config without default export

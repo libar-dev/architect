@@ -27,7 +27,7 @@ Feature: Define Config - Schema Validation and Type Guards
 
     @happy-path
     Scenario: defineConfig returns input unchanged
-      Given a project config with preset "libar-generic"
+      Given a project config with only tagPrefix "@custom-"
       When calling defineConfig with the config
       Then the result should be the exact same object
 
@@ -35,11 +35,23 @@ Feature: Define Config - Schema Validation and Type Guards
 
     **Invariant:** Valid configuration objects (both minimal and fully-specified) must pass schema validation without errors.
     **Rationale:** The schema must accept all legitimate configuration shapes — rejecting valid configs would block users from using supported features.
-    **Verified by:** Valid minimal config passes validation, Valid full config passes validation
+    **Verified by:** Valid minimal config passes validation, Valid minimal file-opt-in config passes validation, Valid reference-doc config passes validation, Valid full config passes validation
 
     @happy-path
     Scenario: Valid minimal config passes validation
-      Given a config object with only preset "libar-generic"
+      Given a config object with only tagPrefix "@custom-"
+      When validating against ArchitectProjectConfigSchema
+      Then validation should succeed
+
+    @happy-path
+    Scenario: Valid minimal file-opt-in config passes validation
+      Given a config object with only fileOptInTag "@custom"
+      When validating against ArchitectProjectConfigSchema
+      Then validation should succeed
+
+    @happy-path
+    Scenario: Valid reference-doc config passes validation
+      Given a config object with referenceDocConfigs only
       When validating against ArchitectProjectConfigSchema
       Then validation should succeed
 
@@ -92,11 +104,11 @@ Feature: Define Config - Schema Validation and Type Guards
 
     **Invariant:** The isProjectConfig type guard must correctly identify valid project configs.
     **Rationale:** Config loading relies on type detection to apply the correct parsing path.
-    **Verified by:** isProjectConfig returns true for new-style config, isProjectConfig returns false for non-config object
+    **Verified by:** isProjectConfig returns true for minimal config, isProjectConfig returns false for non-config object
 
     @happy-path
-    Scenario: isProjectConfig returns true for new-style config
-      Given a new-style config object with sources field
+    Scenario: isProjectConfig returns true for minimal config
+      Given a config object with only tagPrefix "@custom-"
       When checking isProjectConfig
       Then the result should be true
 

@@ -5,10 +5,9 @@
 @behavior @config
 Feature: Project Config Loader - Unified Configuration Loading
   loadProjectConfig loads and resolves configuration from file,
-  supporting both new-style defineConfig and legacy createArchitect formats.
+  using the unified defineConfig project configuration format.
 
   **Problem:**
-  - Two config formats exist (new-style and legacy) that need unified loading
   - Invalid configs must produce actionable error messages
   - Missing config files should gracefully fall back to defaults
 

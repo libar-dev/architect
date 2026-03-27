@@ -38,17 +38,11 @@ export type { ArchitectConfig, ArchitectInstance, RegexBuilders } from './types.
 // Regex builders (for advanced use cases)
 export { createRegexBuilders } from './regex-builders.js';
 
-// Default constants (for internal use and backward compatibility)
+// Default constants (for internal use)
 export { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG, DEFAULT_REGEX_BUILDERS } from './defaults.js';
 
 // Presets
-export {
-  GENERIC_PRESET,
-  LIBAR_GENERIC_PRESET,
-  DDD_ES_CQRS_PRESET,
-  PRESETS,
-  type PresetName,
-} from './presets.js';
+export { LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PRESETS } from './presets.js';
 
 // Config file discovery and loading
 export {

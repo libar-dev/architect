@@ -34,10 +34,10 @@
  *
  * @example
  * ```typescript
- * import { createArchitect, GENERIC_PRESET } from '@libar-dev/architect';
+ * import { createArchitect } from '@libar-dev/architect';
  *
- * // Use generic preset for non-DDD projects
- * const dp = createArchitect({ preset: "generic" });
+ * // Use the default libar-generic preset for non-DDD projects
+ * const dp = createArchitect();
  *
  * // Or customize the tag prefix
  * const dp = createArchitect({
@@ -52,13 +52,7 @@ export type { ArchitectConfig, ArchitectInstance, RegexBuilders } from './config
 
 export { createRegexBuilders } from './config/regex-builders.js';
 
-export {
-  GENERIC_PRESET,
-  LIBAR_GENERIC_PRESET,
-  DDD_ES_CQRS_PRESET,
-  PRESETS,
-  type PresetName,
-} from './config/presets.js';
+export { LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PRESETS } from './config/presets.js';
 
 // Core types (schema-inferred)
 export * from './types/index.js';

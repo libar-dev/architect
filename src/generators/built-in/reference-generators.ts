@@ -66,7 +66,7 @@ export interface ProductAreaConfigOptions {
  *
  * Each config uses `productArea` as the primary filter — the codec
  * auto-derives all content sources from the filtered pattern set.
- * Explicit `conventionTags`, `shapeSources`, and `behaviorCategories`
+ * Explicit `conventionTags`, `shapeSelectors`, and `behaviorCategories`
  * are left empty because the product-area decode path ignores them.
  *
  * @param options - Optional customization for output filenames

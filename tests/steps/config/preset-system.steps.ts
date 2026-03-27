@@ -2,7 +2,7 @@
  * Preset System Step Definitions
  *
  * BDD step definitions for testing the preset system including
- * GENERIC_PRESET, DDD_ES_CQRS_PRESET, and PRESETS lookup.
+ * LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, and PRESETS lookup.
  *
  * @architect
  */
@@ -10,7 +10,6 @@
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import {
-  GENERIC_PRESET,
   LIBAR_GENERIC_PRESET,
   DDD_ES_CQRS_PRESET,
   PRESETS,
@@ -49,73 +48,6 @@ const feature = await loadFeature('tests/features/config/preset-system.feature')
 describeFeature(feature, ({ Rule, AfterEachScenario }) => {
   AfterEachScenario(() => {
     state = null;
-  });
-
-  // ===========================================================================
-  // Generic Preset
-  // ===========================================================================
-
-  Rule('Generic preset provides minimal taxonomy', ({ RuleScenario }) => {
-    RuleScenario('Generic preset has correct prefix configuration', ({ Given, Then, And }) => {
-      Given('the generic preset', () => {
-        state = initState();
-        state.preset = GENERIC_PRESET;
-      });
-
-      Then('it should have tagPrefix "@architect-"', () => {
-        expect(state!.preset!.tagPrefix).toBe('@architect-');
-      });
-
-      And('it should have fileOptInTag "@architect"', () => {
-        expect(state!.preset!.fileOptInTag).toBe('@architect');
-      });
-    });
-
-    RuleScenario('Generic preset has core categories only', ({ Given, Then, And }) => {
-      Given('the generic preset', () => {
-        state = initState();
-        state.preset = GENERIC_PRESET;
-      });
-
-      Then('it should include category "core"', () => {
-        const categoryTags = state!.preset!.categories.map((c) => c.tag);
-        expect(categoryTags).toContain('core');
-      });
-
-      And('it should include category "api"', () => {
-        const categoryTags = state!.preset!.categories.map((c) => c.tag);
-        expect(categoryTags).toContain('api');
-      });
-
-      And('it should include category "infra"', () => {
-        const categoryTags = state!.preset!.categories.map((c) => c.tag);
-        expect(categoryTags).toContain('infra');
-      });
-
-      And('it should NOT include category "ddd"', () => {
-        const categoryTags = state!.preset!.categories.map((c) => c.tag);
-        expect(categoryTags).not.toContain('ddd');
-      });
-
-      And('it should NOT include category "event-sourcing"', () => {
-        const categoryTags = state!.preset!.categories.map((c) => c.tag);
-        expect(categoryTags).not.toContain('event-sourcing');
-      });
-
-      And('it should NOT include category "cqrs"', () => {
-        const categoryTags = state!.preset!.categories.map((c) => c.tag);
-        expect(categoryTags).not.toContain('cqrs');
-      });
-
-      And('it should NOT include category "saga"', () => {
-        const categoryTags = state!.preset!.categories.map((c) => c.tag);
-        expect(categoryTags).not.toContain('saga');
-      });
-
-      And('it should have exactly 3 categories', () => {
-        expect(state!.preset!.categories).toHaveLength(3);
-      });
-    });
   });
 
   // ===========================================================================
@@ -309,17 +241,6 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
   // ===========================================================================
 
   Rule('Presets can be accessed by name', ({ RuleScenario }) => {
-    RuleScenario('Generic preset accessible via PRESETS map', ({ When, Then }) => {
-      When('I access PRESETS with key "generic"', () => {
-        state = initState();
-        state.presetFromMap = PRESETS['generic' as PresetName];
-      });
-
-      Then('the preset tagPrefix should be "@architect-"', () => {
-        expect(state!.presetFromMap!.tagPrefix).toBe('@architect-');
-      });
-    });
-
     RuleScenario('DDD preset accessible via PRESETS map', ({ When, Then }) => {
       When('I access PRESETS with key "ddd-es-cqrs"', () => {
         state = initState();

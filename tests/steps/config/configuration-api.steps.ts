@@ -93,31 +93,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
-    RuleScenario('Create with generic preset', ({ When, Then, And }) => {
-      When('I call createArchitect with preset "generic"', () => {
-        const dp = createArchitect({ preset: 'generic' });
-        state!.registry = dp.registry;
-      });
-
-      Then('the registry tagPrefix should be "@architect-"', () => {
-        expect(state!.registry!.tagPrefix).toBe('@architect-');
-      });
-
-      And('the registry fileOptInTag should be "@architect"', () => {
-        expect(state!.registry!.fileOptInTag).toBe('@architect');
-      });
-
-      And('the registry should have exactly 3 categories', () => {
-        // Generic preset categories REPLACE base taxonomy (not merged)
-        expect(state!.registry!.categories).toHaveLength(3);
-        // The preset's 3 categories (core, api, infra) should be included
-        const categoryTags = state!.registry!.categories.map((c) => c.tag);
-        expect(categoryTags).toContain('core');
-        expect(categoryTags).toContain('api');
-        expect(categoryTags).toContain('infra');
-      });
-    });
-
     RuleScenario('Create with libar-generic preset', ({ When, Then, And }) => {
       When('I call createArchitect with preset "libar-generic"', () => {
         const dp = createArchitect({ preset: 'libar-generic' });
@@ -210,33 +185,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // ===========================================================================
 
   Rule('Preset categories replace base categories entirely', ({ RuleScenario }) => {
-    RuleScenario('Generic preset excludes DDD categories', ({ When, Then, And }) => {
-      When('I call createArchitect with preset "generic"', () => {
-        const dp = createArchitect({ preset: 'generic' });
-        state!.registry = dp.registry;
-      });
-
-      Then('the registry should NOT include category "ddd"', () => {
-        const categoryTags = state!.registry!.categories.map((c) => c.tag);
-        expect(categoryTags).not.toContain('ddd');
-      });
-
-      And('the registry should NOT include category "event-sourcing"', () => {
-        const categoryTags = state!.registry!.categories.map((c) => c.tag);
-        expect(categoryTags).not.toContain('event-sourcing');
-      });
-
-      And('the registry should NOT include category "cqrs"', () => {
-        const categoryTags = state!.registry!.categories.map((c) => c.tag);
-        expect(categoryTags).not.toContain('cqrs');
-      });
-
-      And('the registry should NOT include category "saga"', () => {
-        const categoryTags = state!.registry!.categories.map((c) => c.tag);
-        expect(categoryTags).not.toContain('saga');
-      });
-    });
-
     RuleScenario('Libar-generic preset excludes DDD categories', ({ When, Then, And }) => {
       When('I call createArchitect with preset "libar-generic"', () => {
         const dp = createArchitect({ preset: 'libar-generic' });

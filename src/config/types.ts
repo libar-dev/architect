@@ -29,9 +29,9 @@ import type { ContextInferenceRule } from '../generators/pipeline/context-infere
  * Uses generics to preserve literal types from presets.
  */
 export interface ArchitectConfig {
-  /** Tag prefix for directives (e.g., "@docs-" or "@architect-") */
+  /** Tag prefix for directives (e.g., "@architect-") */
   readonly tagPrefix: string;
-  /** File-level opt-in tag (e.g., "@docs" or "@architect") */
+  /** File-level opt-in tag (e.g., "@architect") */
   readonly fileOptInTag: string;
   /** Category definitions for pattern classification */
   readonly categories: readonly CategoryDefinition[];
@@ -71,14 +71,14 @@ export interface ArchitectInstance {
  * based on the configured tag prefix.
  */
 export interface RegexBuilders {
-  /** Pattern to match file-level opt-in (e.g., /** @docs *\/) */
+  /** Pattern to match file-level opt-in (e.g., /** @architect *\/) */
   readonly fileOptInPattern: RegExp;
-  /** Pattern to match directives (e.g., @docs-pattern, @docs-status) */
+  /** Pattern to match directives (e.g., @architect-pattern, @architect-status) */
   readonly directivePattern: RegExp;
   /** Check if content has the file-level opt-in marker */
   hasFileOptIn(content: string): boolean;
   /** Check if content has any doc directives */
   hasDocDirectives(content: string): boolean;
-  /** Normalize a tag by removing @ and prefix (e.g., "@docs-pattern" -> "pattern") */
+  /** Normalize a tag by removing @ and prefix (e.g., "@architect-pattern" -> "pattern") */
   normalizeTag(tag: string): string;
 }

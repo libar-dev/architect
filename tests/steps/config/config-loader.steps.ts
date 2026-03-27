@@ -39,8 +39,8 @@ interface ConfigLoaderState {
 // Config File Templates
 // =============================================================================
 
-const VALID_GENERIC_CONFIG = `
-export default { preset: "generic", sources: { typescript: ["src/**/*.ts"] } };
+const VALID_MINIMAL_CONFIG = `
+export default { tagPrefix: "@custom-" };
 `.trim();
 
 const NO_DEFAULT_EXPORT_CONFIG = `
@@ -233,18 +233,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
-    RuleScenario('Load valid config file', ({ Given, When, Then, And }) => {
-      Given('a valid config file with preset "generic"', async () => {
-        // Create a config file that uses defineConfig() format
-        const configContent = `
-export default {
-  preset: "generic",
-  sources: {
-    typescript: ["src/**/*.ts"],
-    features: ["specs/**/*.feature"]
-  }
-};
-`.trim();
+    RuleScenario('Load valid minimal config file', ({ Given, When, Then, And }) => {
+      Given('a valid config file with custom tagPrefix "@custom-"', async () => {
+        const configContent = VALID_MINIMAL_CONFIG;
         const configPath = path.join(state!.tempDir!, 'architect.config.js');
         await fs.writeFile(configPath, configContent);
       });
@@ -262,9 +253,9 @@ export default {
         expect(state!.configResult!.value.isDefault).toBe(false);
       });
 
-      And('loaded registry tagPrefix should be "@architect-"', () => {
+      And('loaded registry tagPrefix should be "@custom-"', () => {
         if (!state!.configResult!.ok) throw new Error('Expected success');
-        expect(state!.configResult!.value.instance.registry.tagPrefix).toBe('@architect-');
+        expect(state!.configResult!.value.instance.registry.tagPrefix).toBe('@custom-');
       });
     });
 
@@ -360,7 +351,7 @@ async function createDirectoryStructure(table: DataTableRow[]): Promise<void> {
     let content: string;
     switch (row.type) {
       case 'config':
-        content = VALID_GENERIC_CONFIG;
+        content = VALID_MINIMAL_CONFIG;
         break;
       case 'git':
         content = '[core]\n\trepositoryformatversion = 0';

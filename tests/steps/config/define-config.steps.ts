@@ -81,8 +81,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
   Rule('defineConfig is an identity function', ({ RuleScenario }) => {
     RuleScenario('defineConfig returns input unchanged', ({ Given, When, Then }) => {
-      Given('a project config with preset "libar-generic"', () => {
-        state!.inputConfig = { preset: 'libar-generic' };
+      Given('a project config with only tagPrefix "@custom-"', () => {
+        state!.inputConfig = { tagPrefix: '@custom-' };
       });
 
       When('calling defineConfig with the config', () => {
@@ -101,8 +101,36 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
   Rule('Schema validates correct configurations', ({ RuleScenario }) => {
     RuleScenario('Valid minimal config passes validation', ({ Given, When, Then }) => {
-      Given('a config object with only preset "libar-generic"', () => {
-        state!.testObject = { preset: 'libar-generic' };
+      Given('a config object with only tagPrefix "@custom-"', () => {
+        state!.testObject = { tagPrefix: '@custom-' };
+      });
+
+      When('validating against ArchitectProjectConfigSchema', () => {
+        state!.validationResult = ArchitectProjectConfigSchema.safeParse(state!.testObject);
+      });
+
+      Then('validation should succeed', () => {
+        expect(state!.validationResult!.success).toBe(true);
+      });
+    });
+
+    RuleScenario('Valid minimal file-opt-in config passes validation', ({ Given, When, Then }) => {
+      Given('a config object with only fileOptInTag "@custom"', () => {
+        state!.testObject = { fileOptInTag: '@custom' };
+      });
+
+      When('validating against ArchitectProjectConfigSchema', () => {
+        state!.validationResult = ArchitectProjectConfigSchema.safeParse(state!.testObject);
+      });
+
+      Then('validation should succeed', () => {
+        expect(state!.validationResult!.success).toBe(true);
+      });
+    });
+
+    RuleScenario('Valid reference-doc config passes validation', ({ Given, When, Then }) => {
+      Given('a config object with referenceDocConfigs only', () => {
+        state!.testObject = { referenceDocConfigs: [] };
       });
 
       When('validating against ArchitectProjectConfigSchema', () => {
@@ -272,9 +300,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // ===========================================================================
 
   Rule('Type guard validates config format', ({ RuleScenario }) => {
-    RuleScenario('isProjectConfig returns true for new-style config', ({ Given, When, Then }) => {
-      Given('a new-style config object with sources field', () => {
-        state!.testObject = { sources: { typescript: ['src/**/*.ts'] } };
+    RuleScenario('isProjectConfig returns true for minimal config', ({ Given, When, Then }) => {
+      Given('a config object with only tagPrefix "@custom-"', () => {
+        state!.testObject = { tagPrefix: '@custom-' };
       });
 
       When('checking isProjectConfig', () => {

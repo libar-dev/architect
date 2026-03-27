@@ -161,10 +161,10 @@ export interface ArchitectProjectConfig {
   /** Use a preset taxonomy configuration */
   readonly preset?: PresetName;
 
-  /** Custom tag prefix (overrides preset, e.g., '@docs-') */
+  /** Custom tag prefix (overrides preset, e.g., '@architect-') */
   readonly tagPrefix?: string;
 
-  /** Custom file opt-in tag (overrides preset, e.g., '@docs') */
+  /** Custom file opt-in tag (overrides preset, e.g., '@architect') */
   readonly fileOptInTag?: string;
 
   /** Custom categories (replaces preset categories entirely) */

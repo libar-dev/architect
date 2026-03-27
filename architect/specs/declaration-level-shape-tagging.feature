@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:DeclarationLevelShapeTagging
 @architect-status:completed
+@architect-unlock-reason:'reference-render-contract-cleanup'
 @architect-phase:31
 @architect-effort:3d
 @architect-product-area:Annotation
@@ -12,8 +13,8 @@ Feature: Declaration-Level Shape Tagging
   **Problem:**
   The current shape extraction system operates at file granularity. The
   libar-docs-extract-shapes tag on a pattern block extracts named declarations
-  from the entire file, and the reference doc config shapeSources field selects
-  shapes by file glob only. There is no way for a reference document to request
+  from the entire file, and the reference doc config shapeSelectors field selects
+  shapes by source selector only. There is no way for a reference document to request
   "only RiskLevel and RISK_LEVELS from risk-levels.ts" -- it gets every shape
   the file exports. This produces noisy reference documents that include
   irrelevant types alongside the focused content the document is trying to
@@ -21,8 +22,8 @@ Feature: Declaration-Level Shape Tagging
 
   The reference doc system is designed for composing focused documents from
   cherry-picked content: conventionTags filters by tag, behaviorCategories
-  filters by category, diagramScope filters by arch metadata. But shapeSources
-  is the one axis with no content-level filter -- only file-level.
+  filters by category, diagramScopes filters by arch metadata. But source
+  selectors provide the coarse file-level axis with content-level filtering.
 
   **Solution:**
   Introduce a lightweight libar-docs-shape annotation tag on individual
@@ -59,12 +60,10 @@ Feature: Declaration-Level Shape Tagging
     is deferred to a future pattern when barrel file re-exports become a
     problem.
 
-  DD-3: shapeSelectors subsumes shapeSources for new configs
-    shapeSources remains for backward compatibility (glob-in, everything-out).
+  DD-3: shapeSelectors is the canonical selector surface
     shapeSelectors provides three selection modes: by source + names, by
-    group tag, or by source alone (all tagged shapes from a file). Both
-    fields compose -- shapeSources is the coarse filter, shapeSelectors
-    adds precision. New configs should prefer shapeSelectors.
+    group tag, or by source alone (all tagged shapes from a file). New
+    configs should use shapeSelectors for all shape selection.
 
   DD-4: Top-level declarations only in v1
     Only interface, type, enum, function, and const declarations at the
@@ -86,7 +85,7 @@ Feature: Declaration-Level Shape Tagging
     - source key present, no names key: source-only selector (all tagged
       shapes from that source file)
     Zod schema uses z.union() with three z.object() variants. The source
-    field uses the same glob syntax as shapeSources (exact path, single
+    field uses the same glob syntax as source selectors (exact path, single
     wildcard, or recursive glob). The names field is a readonly string
     array of declaration names to include. The group field is a string
     matching the libar-docs-shape tag value.
@@ -251,20 +250,18 @@ Feature: Declaration-Level Shape Tagging
     **Invariant:** shapeSelectors provides three selection modes: by
     source path + specific names (DD-6 source+names variant), by group
     tag (DD-6 group variant), or by source path alone (DD-6 source-only
-    variant). shapeSources remains for backward compatibility. When both
-    are present, shapeSources provides the coarse file-level filter and
-    shapeSelectors adds fine-grained name/group filtering on top.
+    variant). shapeSelectors provides the coarse file-level filter and
+    optional fine-grained name/group filtering on top.
 
     **Rationale:** The reference doc system composes focused documents
     from cherry-picked content. Every other content axis (conventions,
-    behaviors, diagrams) has content-level filtering. shapeSources was
-    the only axis limited to file-level granularity. shapeSelectors
-    closes this gap with the same explicitness as conventionTags.
+    behaviors, diagrams) has content-level filtering. shapeSelectors
+    closes the file-level granularity gap with the same explicitness as
+    conventionTags.
 
     **Verified by:** Select by source and names,
     Select by group,
-    Select by source alone,
-    shapeSources backward compatibility preserved
+    Select by source alone
 
     @acceptance-criteria @happy-path
     Scenario: Select specific shapes by source and names
@@ -313,13 +310,11 @@ Feature: Declaration-Level Shape Tagging
       And "ProcessStatus" from status-values.ts is not included
 
     @acceptance-criteria @happy-path
-    Scenario: shapeSources without shapeSelectors returns all shapes
+    Scenario: Source-only selector returns all matching shapes
       Given a MasterDataset with patterns containing extracted shapes
-      And a reference doc config with shapeSources "src/taxonomy/*.ts" only
-      And no shapeSelectors configured
+      And a reference doc config with shapeSelectors [{"source":"src/taxonomy/*.ts"}]
       When the reference codec renders
       Then all extracted shapes from matching files appear
-      And behavior is identical to pre-existing extractShapesFromDataset
 
   Rule: Discovery uses existing estree parser with JSDoc comment scanning
 

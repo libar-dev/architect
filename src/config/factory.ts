@@ -61,8 +61,8 @@ export interface CreateArchitectOptions {
  *
  * @example
  * ```typescript
- * // Use generic preset
- * const dp = createArchitect({ preset: "generic" });
+ * // Use the default preset
+ * const dp = createArchitect();
  * ```
  *
  * @example

@@ -20,7 +20,7 @@
  *
  * 1. **Convention content** -- Extracted from `@architect-convention`-tagged patterns (rules, invariants, tables)
  * 2. **Scoped diagrams** -- Mermaid diagrams filtered by `archContext`, `archLayer`, `patterns`, or `include` tags
- * 3. **TypeScript shapes** -- API surfaces from `shapeSources` globs or `shapeSelectors` (declaration-level filtering)
+ * 3. **TypeScript shapes** -- API surfaces from `shapeSelectors` (declaration-level filtering)
  * 4. **Behavior content** -- Gherkin-sourced patterns from `behaviorCategories`
  *
  * ### Key Options (ReferenceDocConfig)
@@ -28,9 +28,7 @@
  * | Option | Type | Description |
  * | --- | --- | --- |
  * | conventionTags | string[] | Convention tag values to extract from decision records |
- * | diagramScope | DiagramScope | Single diagram configuration |
- * | diagramScopes | DiagramScope[] | Multiple diagrams (takes precedence over diagramScope) |
- * | shapeSources | string[] | Glob patterns for TypeScript shape extraction |
+ * | diagramScopes | DiagramScope[] | Multiple diagrams |
  * | shapeSelectors | ShapeSelector[] | Fine-grained declaration-level shape filtering |
  * | behaviorCategories | string[] | Category tags for behavior pattern content |
  * | includeTags | string[] | Cross-cutting content routing via include tags |
@@ -105,7 +103,7 @@ import {
   type ConventionBundle,
 } from './convention-extractor.js';
 import { parseBusinessRuleAnnotations, truncateText } from './helpers.js';
-import { extractShapesFromDataset, filterShapesBySelectors } from './shape-matcher.js';
+import { filterShapesBySelectors } from './shape-matcher.js';
 import type { ShapeSelector } from './shape-matcher.js';
 import {
   sanitizeNodeId,
@@ -198,19 +196,10 @@ export interface ReferenceDocConfig {
   /** Convention tag values to extract from decision records */
   readonly conventionTags: readonly string[];
 
-  /**
-   * Glob patterns for TypeScript shape extraction sources.
-   * Resolved via in-memory matching against pattern.source.file (AD-6).
-   */
-  readonly shapeSources: readonly string[];
-
   /** Categories to filter behavior patterns from MasterDataset */
   readonly behaviorCategories: readonly string[];
 
-  /** Optional scoped diagram generation from relationship metadata */
-  readonly diagramScope?: DiagramScope;
-
-  /** Multiple scoped diagrams. Takes precedence over diagramScope. */
+  /** Multiple scoped diagrams. */
   readonly diagramScopes?: readonly DiagramScope[];
 
   /** Target _claude-md/ directory for summary output */
@@ -615,8 +604,8 @@ const DEFAULT_REFERENCE_OPTIONS: Required<ReferenceCodecOptions> = {
  *
  * The codec composes a RenderableDocument from up to four sources:
  * 1. Convention content from convention-tagged decision records
- * 2. Scoped relationship diagram (if diagramScope configured)
- * 3. TypeScript shapes from patterns matching shapeSources globs
+ * 2. Scoped relationship diagram (if diagramScopes configured)
+ * 3. TypeScript shapes from selector-matched patterns
  * 4. Behavior content from category-tagged patterns
  *
  * @param config - Reference document configuration
@@ -667,11 +656,10 @@ export function createReferenceCodec(
       const conventionBlocks =
         conventions.length > 0 ? buildConventionSections(conventions, opts.detailLevel) : [];
 
-      // 2. Scoped relationship diagrams (normalize singular to array)
+      // 2. Scoped relationship diagrams
       const diagramBlocks: SectionBlock[] = [];
       if (opts.detailLevel !== 'summary') {
-        const scopes: readonly DiagramScope[] =
-          config.diagramScopes ?? (config.diagramScope !== undefined ? [config.diagramScope] : []);
+        const scopes: readonly DiagramScope[] = config.diagramScopes ?? [];
 
         for (const scope of scopes) {
           const diagramSections = buildScopedDiagram(dataset, scope);
@@ -681,25 +669,14 @@ export function createReferenceCodec(
         }
       }
 
-      // 3. Shape extraction: combine shapeSources (coarse) + shapeSelectors (fine)
+      // 3. Shape extraction: selector-based filtering only
       const shapeBlocks: SectionBlock[] = [];
       {
         const allShapes =
-          config.shapeSources.length > 0
-            ? [...extractShapesFromDataset(dataset, config.shapeSources)]
+          config.shapeSelectors !== undefined && config.shapeSelectors.length > 0
+            ? [...filterShapesBySelectors(dataset, config.shapeSelectors)]
             : ([] as ExtractedShape[]);
         const seenNames = new Set(allShapes.map((s) => s.name));
-
-        // DD-3/DD-6: Fine-grained selector-based filtering
-        if (config.shapeSelectors !== undefined && config.shapeSelectors.length > 0) {
-          const selectorShapes = filterShapesBySelectors(dataset, config.shapeSelectors);
-          for (const shape of selectorShapes) {
-            if (!seenNames.has(shape.name)) {
-              seenNames.add(shape.name);
-              allShapes.push(shape);
-            }
-          }
-        }
 
         // DD-1: Merge include-tagged shapes (additive)
         if (includeSet !== undefined) {
@@ -763,9 +740,6 @@ export function createReferenceCodec(
         const diagnostics: string[] = [];
         if (config.conventionTags.length > 0) {
           diagnostics.push(`conventions [${config.conventionTags.join(', ')}]`);
-        }
-        if (config.shapeSources.length > 0) {
-          diagnostics.push(`shapes [${config.shapeSources.join(', ')}]`);
         }
         if (config.shapeSelectors !== undefined && config.shapeSelectors.length > 0) {
           diagnostics.push(`selectors [${config.shapeSelectors.length} selectors]`);
@@ -866,11 +840,7 @@ function decodeProductArea(
 
   // 3. Architecture diagrams — priority: config > meta > auto-generate
   if (opts.detailLevel !== 'summary') {
-    const scopes: readonly DiagramScope[] =
-      config.diagramScopes ??
-      (config.diagramScope !== undefined ? [config.diagramScope] : undefined) ??
-      meta?.diagramScopes ??
-      [];
+    const scopes: readonly DiagramScope[] = config.diagramScopes ?? meta?.diagramScopes ?? [];
 
     if (scopes.length > 0) {
       // Explicit scopes from config or meta — always render
@@ -920,15 +890,6 @@ function decodeProductArea(
       }
     }
 
-    // Also include shapes matched by explicit config (if any)
-    if (config.shapeSources.length > 0) {
-      for (const shape of extractShapesFromDataset(dataset, config.shapeSources)) {
-        if (!seenNames.has(shape.name)) {
-          seenNames.add(shape.name);
-          allShapes.push(shape);
-        }
-      }
-    }
     if (config.shapeSelectors !== undefined && config.shapeSelectors.length > 0) {
       for (const shape of filterShapesBySelectors(dataset, config.shapeSelectors)) {
         if (!seenNames.has(shape.name)) {
