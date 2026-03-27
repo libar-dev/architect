@@ -38,27 +38,6 @@ export default {
 };
 `.trim();
 
-const LEGACY_CONFIG = `
-export default {
-  registry: {
-    tagPrefix: "@architect-",
-    fileOptInTag: "@architect",
-    categories: [
-      { tag: "core", label: "Core" },
-      { tag: "api", label: "API" },
-      { tag: "infra", label: "Infrastructure" }
-    ],
-    statusValues: ["roadmap", "active", "completed", "deferred"],
-    tags: []
-  },
-  regexBuilders: {
-    category: () => /@architect-(core|api|infra)/,
-    status: () => /@architect-status:(roadmap|active|completed|deferred)/,
-    pattern: () => /@architect-pattern:([A-Za-z0-9]+)/
-  }
-};
-`.trim();
-
 const NO_DEFAULT_EXPORT_CONFIG = `
 export const config = { foo: "bar" };
 `.trim();
@@ -172,32 +151,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         });
       }
     );
-  });
-
-  // ===========================================================================
-  // Legacy config backward compatibility
-  // ===========================================================================
-
-  Rule('Legacy config is loaded with backward compatibility', ({ RuleScenario }) => {
-    RuleScenario('Legacy createArchitect export loads correctly', ({ Given, When, Then, And }) => {
-      Given('a legacy config file with registry and regexBuilders', async () => {
-        const configPath = path.join(state!.tempDir!, 'architect.config.js');
-        await fs.writeFile(configPath, LEGACY_CONFIG);
-      });
-
-      When('loading project config from temp directory', async () => {
-        state!.loadResult = await loadProjectConfig(state!.tempDir!);
-      });
-
-      Then('project config loading should succeed', () => {
-        expect(state!.loadResult!.ok).toBe(true);
-      });
-
-      And('project config isDefault should be false', () => {
-        if (!state!.loadResult!.ok) throw new Error('Expected success');
-        expect(state!.loadResult!.value.isDefault).toBe(false);
-      });
-    });
   });
 
   // ===========================================================================

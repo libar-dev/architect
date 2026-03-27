@@ -72,7 +72,7 @@
 
 | Error                     | Cause                                          | Fix                                         |
 | ------------------------- | ---------------------------------------------- | ------------------------------------------- |
-| completed-protection      | File has completed status but no unlock tag    | Add libar-docs-unlock-reason tag            |
+| completed-protection      | File has completed status but no unlock tag    | Add architect-unlock-reason tag             |
 | invalid-status-transition | Skipped FSM state (e.g., roadmap to completed) | Follow path: roadmap to active to completed |
 | scope-creep               | Added deliverable to active spec               | Remove deliverable OR revert to roadmap     |
 | session-scope (warning)   | Modified file outside session scope            | Add to scope OR use --ignore-session        |
@@ -80,7 +80,7 @@
 
 | Situation                    | Solution              | Example                                   |
 | ---------------------------- | --------------------- | ----------------------------------------- |
-| Fix bug in completed spec    | Add unlock reason tag | libar-docs-unlock-reason:Fix-typo         |
+| Fix bug in completed spec    | Add unlock reason tag | architect-unlock-reason:Fix-typo          |
 | Modify outside session scope | Use ignore flag       | architect-guard --staged --ignore-session |
 | CI treats warnings as errors | Use strict flag       | architect-guard --all --strict            |
 

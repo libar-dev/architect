@@ -45,6 +45,6 @@ export class MyClass { ... }
 | ------------------------- | ---------------------------------------------------------- |
 | `architect-generate`      | Generate documentation from annotated sources              |
 | `architect-lint-patterns` | Validate annotation quality (missing tags, invalid status) |
-| `architect-guard`         | FSM validation for delivery process                        |
+| `architect-guard`         | FSM validation for architect process                       |
 | `architect-validate`      | Cross-source validation with DoD checks                    |
 | `architect-taxonomy`      | Generate tag reference from TypeScript                     |

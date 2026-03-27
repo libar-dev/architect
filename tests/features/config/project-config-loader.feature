@@ -47,19 +47,6 @@ Feature: Project Config Loader - Unified Configuration Loading
       And project config isDefault should be false
       And project config instance should have 3 categories
 
-  Rule: Legacy config is loaded with backward compatibility
-
-    **Invariant:** A file exporting createArchitect must be loaded and produce a valid resolved config.
-    **Rationale:** Backward compatibility prevents breaking existing consumers during migration to the new config format.
-    **Verified by:** Legacy createArchitect export loads correctly
-
-    @happy-path
-    Scenario: Legacy createArchitect export loads correctly
-      Given a legacy config file with registry and regexBuilders
-      When loading project config from temp directory
-      Then project config loading should succeed
-      And project config isDefault should be false
-
   Rule: Invalid configs produce clear errors
 
     **Invariant:** Config files without a default export or with invalid data must produce descriptive error messages.

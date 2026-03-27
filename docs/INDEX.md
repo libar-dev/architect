@@ -19,22 +19,22 @@
 
 ## Quick Navigation
 
-| If you want to...              | Read this                                    | Lines  |
-| ------------------------------ | -------------------------------------------- | ------ |
-| Get started quickly            | [README.md](../README.md)                    | 1-504  |
-| Configure presets and tags     | [CONFIGURATION.md](./CONFIGURATION.md)       | 1-357  |
-| Understand the "why"           | [METHODOLOGY.md](./METHODOLOGY.md)           | 1-238  |
-| Learn the architecture         | [ARCHITECTURE.md](./ARCHITECTURE.md)         | 1-1638 |
-| Run AI coding sessions         | [SESSION-GUIDES.md](./SESSION-GUIDES.md)     | 1-389  |
-| Write Gherkin specs            | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | 1-515  |
-| Enforce delivery process rules | [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | 1-341  |
-| Validate annotation quality    | [VALIDATION.md](./VALIDATION.md)             | 1-281  |
-| Query process state via CLI    | [PROCESS-API.md](./PROCESS-API.md)           | 1-507  |
-| Understand the taxonomy        | [TAXONOMY.md](./TAXONOMY.md)                 | 1-105  |
-| Publish to npm                 | [MAINTAINERS.md](../MAINTAINERS.md)          | —      |
-| Learn annotation patterns      | [ANNOTATION-GUIDE.md](./ANNOTATION-GUIDE.md) | 1-268  |
-| Review the changelog           | [CHANGELOG.md](../CHANGELOG.md)              | 1-26   |
-| Security policy                | [SECURITY.md](../SECURITY.md)                | 1-21   |
+| If you want to...           | Read this                                    | Lines  |
+| --------------------------- | -------------------------------------------- | ------ |
+| Get started quickly         | [README.md](../README.md)                    | 1-504  |
+| Configure presets and tags  | [CONFIGURATION.md](./CONFIGURATION.md)       | 1-357  |
+| Understand the "why"        | [METHODOLOGY.md](./METHODOLOGY.md)           | 1-238  |
+| Learn the architecture      | [ARCHITECTURE.md](./ARCHITECTURE.md)         | 1-1638 |
+| Run AI coding sessions      | [SESSION-GUIDES.md](./SESSION-GUIDES.md)     | 1-389  |
+| Write Gherkin specs         | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | 1-515  |
+| Enforce process rules       | [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | 1-341  |
+| Validate annotation quality | [VALIDATION.md](./VALIDATION.md)             | 1-281  |
+| Query process state via CLI | [PROCESS-API.md](./PROCESS-API.md)           | 1-507  |
+| Understand the taxonomy     | [TAXONOMY.md](./TAXONOMY.md)                 | 1-105  |
+| Publish to npm              | [MAINTAINERS.md](../MAINTAINERS.md)          | —      |
+| Learn annotation patterns   | [ANNOTATION-GUIDE.md](./ANNOTATION-GUIDE.md) | 1-268  |
+| Review the changelog        | [CHANGELOG.md](../CHANGELOG.md)              | 1-26   |
+| Security policy             | [SECURITY.md](../SECURITY.md)                | 1-21   |
 
 ---
 
@@ -89,15 +89,14 @@
 
 ### CONFIGURATION.md (Lines 1-357)
 
-| Section                | Lines   | Key Topics                                      |
-| ---------------------- | ------- | ----------------------------------------------- |
-| Quick Reference        | 10-56   | Preset comparison, defineConfig() examples      |
-| Presets                | 84-151  | Generic vs DDD-ES-CQRS preset details           |
-| Unified Config File    | 154-244 | defineConfig(), sources, output, gen overrides  |
-| Custom Configuration   | 248-295 | Custom tag prefix, custom categories            |
-| Programmatic Config    | 299-331 | loadProjectConfig(), mergeSourcesForGenerator() |
-| Backward Compatibility | 336-346 | Legacy createArchitect() support                |
-| Related Documentation  | 350-357 | Links to README, TAXONOMY, ARCHITECTURE         |
+| Section               | Lines   | Key Topics                                      |
+| --------------------- | ------- | ----------------------------------------------- |
+| Quick Reference       | 10-56   | Preset comparison, defineConfig() examples      |
+| Presets               | 84-151  | Generic vs DDD-ES-CQRS preset details           |
+| Unified Config File   | 154-244 | defineConfig(), sources, output, gen overrides  |
+| Custom Configuration  | 248-295 | Custom tag prefix, custom categories            |
+| Programmatic Config   | 299-331 | loadProjectConfig(), mergeSourcesForGenerator() |
+| Related Documentation | 350-357 | Links to README, TAXONOMY, ARCHITECTURE         |
 
 ---
 

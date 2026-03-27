@@ -176,7 +176,7 @@ export function extractPatternsFromGherkin(
 
     // Skip if no @architect opt-in marker (consistent with TypeScript requirement)
     // The marker normalizes to 'architect' after stripping the @ prefix
-    const hasOptIn = feature.tags.some((tag) => tag === 'libar-docs' || tag === 'architect');
+    const hasOptIn = feature.tags.some((tag) => tag === 'architect');
     if (!hasOptIn) {
       continue;
     }
@@ -528,7 +528,7 @@ export async function extractPatternsFromGherkinAsync(
 
     // Skip if no @architect opt-in marker (consistent with TypeScript requirement)
     // The marker normalizes to 'architect' after stripping the @ prefix
-    const hasOptIn = feature.tags.some((tag) => tag === 'libar-docs' || tag === 'architect');
+    const hasOptIn = feature.tags.some((tag) => tag === 'architect');
     if (!hasOptIn) continue;
 
     // Skip if no pattern or status tag

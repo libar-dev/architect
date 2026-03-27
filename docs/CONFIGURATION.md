@@ -335,20 +335,6 @@ const effectiveSources = mergeSourcesForGenerator(
 
 ---
 
-## Backward Compatibility
-
-The legacy `createArchitect()` API is still exported and supported. Config files using the old format are detected automatically by `loadProjectConfig()` and wrapped in a `ResolvedConfig` with default project settings.
-
-```typescript
-// Legacy format (still works)
-import { createArchitect } from '@libar-dev/architect';
-export default createArchitect({ preset: 'ddd-es-cqrs' });
-```
-
-New projects should use `defineConfig()` for the unified configuration experience.
-
----
-
 ## Related Documentation
 
 | Document                             | Purpose                         |

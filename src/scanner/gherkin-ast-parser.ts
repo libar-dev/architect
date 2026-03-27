@@ -596,7 +596,6 @@ export function extractPatternTags(tags: readonly string[]): {
       if (
         normalized !== 'acceptance-criteria' &&
         !normalized.startsWith('happy-path') &&
-        normalized !== 'libar-docs' &&
         normalized !== 'architect'
       ) {
         const existing = metadata['categories'] as string[] | undefined;

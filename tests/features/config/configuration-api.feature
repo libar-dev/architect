@@ -40,8 +40,8 @@ Feature: Configuration API for Open-Sourcing
     @happy-path
     Scenario: Create with generic preset
       When I call createArchitect with preset "generic"
-      Then the registry tagPrefix should be "@docs-"
-      And the registry fileOptInTag should be "@docs"
+      Then the registry tagPrefix should be "@architect-"
+      And the registry fileOptInTag should be "@architect"
       And the registry should have exactly 3 categories
 
     @happy-path
@@ -150,12 +150,12 @@ Feature: Configuration API for Open-Sourcing
 
     @happy-path
     Scenario: normalizeTag removes configured prefix
-      Given a registry with tagPrefix "@docs-"
-      When I normalize tag "@docs-pattern"
+      Given a registry with tagPrefix "@architect-"
+      When I normalize tag "@architect-pattern"
       Then the normalized tag should be "pattern"
 
     @edge-case
     Scenario: normalizeTag handles tag without prefix
-      Given a registry with tagPrefix "@docs-"
+      Given a registry with tagPrefix "@architect-"
       When I normalize tag "pattern"
       Then the normalized tag should be "pattern"

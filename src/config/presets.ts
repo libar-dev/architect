@@ -17,13 +17,13 @@
  *
  * ### Available Presets
  *
- * - **GENERIC_PRESET**: Minimal categories with @docs- prefix for non-DDD projects
+ * - **GENERIC_PRESET**: Minimal categories with @architect- prefix for non-DDD projects
  * - **LIBAR_GENERIC_PRESET**: Minimal categories with @architect- prefix (for package-level config)
  * - **DDD_ES_CQRS_PRESET**: Full 21-category taxonomy with @architect- prefix
  *
  * ### When to Use
  *
- * - Use GENERIC_PRESET for simple documentation needs with @docs- prefix
+ * - Use GENERIC_PRESET for simple documentation needs with @architect- prefix
  * - Use LIBAR_GENERIC_PRESET for simple documentation needs with @architect- prefix (default)
  * - Use DDD_ES_CQRS_PRESET for full DDD/ES/CQRS taxonomy
  * - Use as base for custom configurations
@@ -37,7 +37,7 @@ import { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG } from './defaults.js';
 /**
  * Generic preset for non-DDD projects.
  *
- * Minimal categories with @docs- prefix. Suitable for:
+ * Minimal categories with @architect- prefix. Suitable for:
  * - Simple documentation needs
  * - Non-DDD architectures
  * - Projects that want basic pattern tracking
@@ -47,12 +47,12 @@ import { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG } from './defaults.js';
  * import { createArchitect, GENERIC_PRESET } from '@libar-dev/architect';
  *
  * const dp = createArchitect({ preset: "generic" });
- * // Uses @docs-, @docs-pattern, @docs-status, etc.
+ * // Uses @architect-, @architect-pattern, @architect-status, etc.
  * ```
  */
 export const GENERIC_PRESET = {
-  tagPrefix: '@docs-',
-  fileOptInTag: '@docs',
+  tagPrefix: '@architect-',
+  fileOptInTag: '@architect',
   categories: [
     {
       tag: 'core',

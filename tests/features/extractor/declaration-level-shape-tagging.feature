@@ -6,14 +6,14 @@
 Feature: Declaration-Level Shape Tagging - Extraction
 
   Tests the discoverTaggedShapes function that scans TypeScript source
-  code for declarations annotated with the libar-docs-shape JSDoc tag.
+  code for declarations annotated with the architect-shape JSDoc tag.
 
   Background: Shape discovery context
     Given the shape discovery system is initialized
 
-  Rule: Declarations opt in via libar-docs-shape tag
+  Rule: Declarations opt in via architect-shape tag
 
-    **Invariant:** Only declarations with the libar-docs-shape tag in their
+    **Invariant:** Only declarations with the architect-shape tag in their
     immediately preceding JSDoc are collected as tagged shapes.
     **Rationale:** Extracting shapes without an explicit opt-in tag would surface internal implementation details in generated API documentation, violating information hiding.
 
@@ -207,7 +207,7 @@ Feature: Declaration-Level Shape Tagging - Extraction
       And the shape has name "AppConfig" and group "config-types"
 
     @acceptance-criteria @edge-case
-    Scenario: Hypothetical libar-docs-shape-extended tag is not matched
+    Scenario: Hypothetical architect-shape-extended tag is not matched
       Given a TypeScript source file containing:
         """typescript
         /** @architect-shape-extended */

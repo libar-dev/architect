@@ -62,12 +62,12 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
         state.preset = GENERIC_PRESET;
       });
 
-      Then('it should have tagPrefix "@docs-"', () => {
-        expect(state!.preset!.tagPrefix).toBe('@docs-');
+      Then('it should have tagPrefix "@architect-"', () => {
+        expect(state!.preset!.tagPrefix).toBe('@architect-');
       });
 
-      And('it should have fileOptInTag "@docs"', () => {
-        expect(state!.preset!.fileOptInTag).toBe('@docs');
+      And('it should have fileOptInTag "@architect"', () => {
+        expect(state!.preset!.fileOptInTag).toBe('@architect');
       });
     });
 
@@ -315,8 +315,8 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
         state.presetFromMap = PRESETS['generic' as PresetName];
       });
 
-      Then('the preset tagPrefix should be "@docs-"', () => {
-        expect(state!.presetFromMap!.tagPrefix).toBe('@docs-');
+      Then('the preset tagPrefix should be "@architect-"', () => {
+        expect(state!.presetFromMap!.tagPrefix).toBe('@architect-');
       });
     });
 

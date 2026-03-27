@@ -27,7 +27,6 @@
 
 import { z } from 'zod';
 import type { ArchitectProjectConfig } from './project-config.js';
-import type { ArchitectInstance } from './types.js';
 // Cross-layer: config → renderable (see comment in project-config.ts)
 import { DIAGRAM_SOURCE_VALUES } from '../renderable/codecs/reference.js';
 import { SectionBlockSchema } from '../renderable/schema.js';
@@ -251,17 +250,6 @@ export function isProjectConfig(value: unknown): value is ArchitectProjectConfig
     'generators' in obj ||
     'generatorOverrides' in obj
   );
-}
-
-/**
- * Type guard for legacy ArchitectInstance objects.
- */
-export function isLegacyInstance(value: unknown): value is ArchitectInstance {
-  if (value === null || typeof value !== 'object') {
-    return false;
-  }
-  const obj = value as Record<string, unknown>;
-  return 'registry' in obj && 'regexBuilders' in obj;
 }
 
 // ---------------------------------------------------------------------------

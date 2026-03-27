@@ -86,7 +86,7 @@ Feature: Directive Detection
         | pattern          | reason                  |
         | @architect      | Missing category suffix |
         | @libar-doc-core  | Wrong prefix (doc)      |
-        | libar-docs-core  | Missing @ symbol        |
+        | architect-core   | Missing @ symbol        |
         | @LIBAR-DOCS-CORE | Wrong case              |
 
   Rule: hasFileOptIn detects file-level @architect marker

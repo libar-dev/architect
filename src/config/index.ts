@@ -89,7 +89,6 @@ export {
   OutputConfigSchema,
   GeneratorSourceOverrideSchema,
   isProjectConfig,
-  isLegacyInstance,
 } from './project-config-schema.js';
 
 // Config resolution and source merging

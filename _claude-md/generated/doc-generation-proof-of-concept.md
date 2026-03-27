@@ -262,7 +262,7 @@ npx architect-guard --staged
 ```
 
 ```javascript
-// TODO: Delivery process design artifacts: Relax unused-vars
+// TODO: Architect design artifacts: Relax unused-vars
     {
       files: [
         "**/packages/platform-core/src/durability/durableAppend.ts",
@@ -350,7 +350,7 @@ npx architect-guard --staged
 ```
 
 ```javascript
-// TODO: Delivery process design artifacts: Relax unused-vars
+// TODO: Architect design artifacts: Relax unused-vars
     {
       files: [
         "**/packages/platform-core/src/durability/durableAppend.ts",

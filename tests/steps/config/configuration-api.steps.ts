@@ -99,12 +99,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         state!.registry = dp.registry;
       });
 
-      Then('the registry tagPrefix should be "@docs-"', () => {
-        expect(state!.registry!.tagPrefix).toBe('@docs-');
+      Then('the registry tagPrefix should be "@architect-"', () => {
+        expect(state!.registry!.tagPrefix).toBe('@architect-');
       });
 
-      And('the registry fileOptInTag should be "@docs"', () => {
-        expect(state!.registry!.fileOptInTag).toBe('@docs');
+      And('the registry fileOptInTag should be "@architect"', () => {
+        expect(state!.registry!.fileOptInTag).toBe('@architect');
       });
 
       And('the registry should have exactly 3 categories', () => {
@@ -343,12 +343,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
 
     RuleScenario('normalizeTag removes configured prefix', ({ Given, When, Then }) => {
-      Given('a registry with tagPrefix "@docs-"', () => {
-        state!.regexBuilders = createRegexBuilders('@docs-', '@docs');
+      Given('a registry with tagPrefix "@architect-"', () => {
+        state!.regexBuilders = createRegexBuilders('@architect-', '@architect');
       });
 
-      When('I normalize tag "@docs-pattern"', () => {
-        state!.normalizedTag = state!.regexBuilders!.normalizeTag('@docs-pattern');
+      When('I normalize tag "@architect-pattern"', () => {
+        state!.normalizedTag = state!.regexBuilders!.normalizeTag('@architect-pattern');
       });
 
       Then('the normalized tag should be "pattern"', () => {
@@ -357,8 +357,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
 
     RuleScenario('normalizeTag handles tag without prefix', ({ Given, When, Then }) => {
-      Given('a registry with tagPrefix "@docs-"', () => {
-        state!.regexBuilders = createRegexBuilders('@docs-', '@docs');
+      Given('a registry with tagPrefix "@architect-"', () => {
+        state!.regexBuilders = createRegexBuilders('@architect-', '@architect');
       });
 
       When('I normalize tag "pattern"', () => {

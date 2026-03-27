@@ -468,7 +468,7 @@ function buildPresetsSection(): SectionBlock[] {
 
     switch (name) {
       case 'generic':
-        useCase = 'Simple projects with @docs- prefix';
+        useCase = 'Simple projects with @architect- prefix';
         break;
       case 'libar-generic':
         useCase = 'Default preset with @architect- prefix';

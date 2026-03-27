@@ -161,7 +161,7 @@ Feature: Process API CLI - Discovery Subcommands
     **Rationale:** Files missing the opt-in marker are invisible to the scanner; without this subcommand, unannotated files silently drop out of generated documentation and validation.
 
     @happy-path
-    Scenario: Unannotated finds files missing libar-docs marker
+    Scenario: Unannotated finds files missing architect marker
       Given TypeScript files with mixed annotations
       When running "process-api -i 'src/**/*.ts' unannotated"
       Then exit code is 0

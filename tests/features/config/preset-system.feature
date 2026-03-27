@@ -22,15 +22,15 @@ Feature: Preset System for Configuration
 
   Rule: Generic preset provides minimal taxonomy
 
-    **Invariant:** The generic preset must provide exactly 3 categories (core, api, infra) with @docs- prefix.
+    **Invariant:** The generic preset must provide exactly 3 categories (core, api, infra) with @architect- prefix.
     **Rationale:** Simple projects need minimal configuration without DDD-specific categories cluttering the taxonomy.
     **Verified by:** Generic preset has correct prefix configuration, Generic preset has core categories only
 
     @happy-path
     Scenario: Generic preset has correct prefix configuration
       Given the generic preset
-      Then it should have tagPrefix "@docs-"
-      And it should have fileOptInTag "@docs"
+      Then it should have tagPrefix "@architect-"
+      And it should have fileOptInTag "@architect"
 
     @happy-path
     Scenario: Generic preset has core categories only
@@ -128,7 +128,7 @@ Feature: Preset System for Configuration
     @happy-path
     Scenario: Generic preset accessible via PRESETS map
       When I access PRESETS with key "generic"
-      Then the preset tagPrefix should be "@docs-"
+      Then the preset tagPrefix should be "@architect-"
 
     @happy-path
     Scenario: DDD preset accessible via PRESETS map

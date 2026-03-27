@@ -83,7 +83,7 @@ Feature: CLAUDE.md Module Generation from Source Annotations
       When querying for tag "claude-section"
       Then the tag should exist
       And the tag format should be "enum"
-      And the tag should have values including "core", "delivery-process", "testing", "infrastructure", "workflow"
+      And the tag should have values including "core", "process", "testing", "infrastructure", "workflow"
 
     @acceptance-criteria @happy-path
     Scenario: Tag registry contains claude-tags
@@ -113,7 +113,7 @@ Feature: CLAUDE.md Module Generation from Source Annotations
       Given a feature file with tags:
         """gherkin
         @architect-claude-module:process-guard
-        @architect-claude-section:delivery-process
+        @architect-claude-section:process
         Feature: Process Guard
         """
       When the Gherkin extractor processes the file
@@ -134,11 +134,11 @@ Feature: CLAUDE.md Module Generation from Source Annotations
     Scenario: Extract claude-tags as array
       Given a feature file with tags:
         """gherkin
-        @architect-claude-tags:core-mandatory,delivery-process,platform-packages
+        @architect-claude-tags:core-mandatory,process,platform-packages
         Feature: Multi-tag Example
         """
       When the Gherkin extractor processes the file
-      Then the pattern should have claudeTags ["core-mandatory", "delivery-process", "platform-packages"]
+      Then the pattern should have claudeTags ["core-mandatory", "process", "platform-packages"]
 
     @acceptance-criteria @validation
     Scenario: Patterns without claude tags are not module candidates
@@ -297,7 +297,7 @@ Feature: CLAUDE.md Module Generation from Source Annotations
       Given a pattern with:
         | Tag | Value |
         | claude-module | process-guard |
-        | claude-section | delivery-process |
+        | claude-section | process |
       And output directory is "_claude-md"
       When the generator runs
       Then file should be written to "_claude-md/architect/process-guard.md"
@@ -306,7 +306,7 @@ Feature: CLAUDE.md Module Generation from Source Annotations
     Scenario: Multiple modules generated from single run
       Given patterns with different claude-section values:
         | Pattern | claude-module | claude-section |
-        | ProcessGuard | process-guard | delivery-process |
+        | ProcessGuard | process-guard | process |
         | FsmValidator | fsm-validator | testing |
         | LayerInference | layer-inference | testing |
       When the generator runs

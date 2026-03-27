@@ -9,7 +9,7 @@ Feature: Stub Integration Taxonomy Tags
   in JSDoc descriptions, invisible to structured queries.
 
   **Solution:**
-  Register libar-docs-target and libar-docs-since as taxonomy tags
+  Register architect-target and architect-since as taxonomy tags
   so they flow through the extraction pipeline as structured fields.
 
   Rule: Taxonomy tags are registered in the registry

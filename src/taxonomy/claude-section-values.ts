@@ -10,7 +10,7 @@
 
 export const CLAUDE_SECTION_VALUES = [
   'core',
-  'delivery-process',
+  'process',
   'testing',
   'infrastructure',
   'workflow',

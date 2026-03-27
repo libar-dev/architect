@@ -1,4 +1,4 @@
-# Delivery Process Methodology
+# Architect Methodology
 
 > **Editorial Document:** This document contains design philosophy and rationale that cannot be auto-generated from code annotations. It is maintained manually.
 

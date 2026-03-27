@@ -366,7 +366,7 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
       },
     ],
     keyInvariants: [
-      'Preset-based taxonomy: `generic` (3 categories, `@docs-`), `libar-generic` (3 categories, `@architect-`), `ddd-es-cqrs` (21 categories, full DDD). Presets replace base categories entirely — they define prefix, categories, and metadata tags as a unit',
+      'Preset-based taxonomy: `generic` (3 categories, `@architect-`), `libar-generic` (3 categories, `@architect-`), `ddd-es-cqrs` (21 categories, full DDD). Presets replace base categories entirely — they define prefix, categories, and metadata tags as a unit',
       'Resolution pipeline: defineConfig() → ConfigLoader → ProjectConfigSchema (Zod) → ConfigResolver → ArchitectFactory → ArchitectInstance. Each stage has a single responsibility',
       'Stubs merged at resolution time: Stub directory globs are appended to typescript sources, making stubs transparent to the downstream pipeline',
       'Source override composition: SourceMerger applies per-generator overrides (`replaceFeatures`, `additionalFeatures`, `additionalInput`) to base sources. Exclude is always inherited from base',

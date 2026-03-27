@@ -14,7 +14,6 @@ import {
   ArchitectProjectConfigSchema,
   GeneratorSourceOverrideSchema,
   isProjectConfig,
-  isLegacyInstance,
 } from '../../../src/config/project-config-schema.js';
 import type { ArchitectProjectConfig } from '../../../src/config/project-config.js';
 
@@ -272,7 +271,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // Type guards
   // ===========================================================================
 
-  Rule('Type guards distinguish config formats', ({ RuleScenario }) => {
+  Rule('Type guard validates config format', ({ RuleScenario }) => {
     RuleScenario('isProjectConfig returns true for new-style config', ({ Given, When, Then }) => {
       Given('a new-style config object with sources field', () => {
         state!.testObject = { sources: { typescript: ['src/**/*.ts'] } };
@@ -287,47 +286,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
-    RuleScenario('isProjectConfig returns false for legacy instance', ({ Given, When, Then }) => {
+    RuleScenario('isProjectConfig returns false for non-config object', ({ Given, When, Then }) => {
       Given('a legacy instance object with registry and regexBuilders', () => {
         state!.testObject = {
-          registry: { tagPrefix: '@docs-' },
-          regexBuilders: { category: (): RegExp => /@docs-core/ },
+          registry: { tagPrefix: '@test-' },
+          regexBuilders: { category: (): RegExp => /@test-core/ },
         };
       });
 
       When('checking isProjectConfig', () => {
         state!.typeGuardResult = isProjectConfig(state!.testObject);
-      });
-
-      Then('the result should be false', () => {
-        expect(state!.typeGuardResult).toBe(false);
-      });
-    });
-
-    RuleScenario('isLegacyInstance returns true for legacy objects', ({ Given, When, Then }) => {
-      Given('a legacy instance object with registry and regexBuilders', () => {
-        state!.testObject = {
-          registry: { tagPrefix: '@docs-' },
-          regexBuilders: { category: (): RegExp => /@docs-core/ },
-        };
-      });
-
-      When('checking isLegacyInstance', () => {
-        state!.typeGuardResult = isLegacyInstance(state!.testObject);
-      });
-
-      Then('the result should be true', () => {
-        expect(state!.typeGuardResult).toBe(true);
-      });
-    });
-
-    RuleScenario('isLegacyInstance returns false for new-style config', ({ Given, When, Then }) => {
-      Given('a new-style config object with sources field', () => {
-        state!.testObject = { sources: { typescript: ['src/**/*.ts'] } };
-      });
-
-      When('checking isLegacyInstance', () => {
-        state!.typeGuardResult = isLegacyInstance(state!.testObject);
       });
 
       Then('the result should be false', () => {

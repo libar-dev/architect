@@ -99,9 +99,9 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
 
   Rule: Category tags are colon-free tags filtered against known non-categories
 
-      **Invariant:** Tags without colons become categories, except known non-category tags (acceptance-criteria, happy-path) and the libar-docs opt-in marker.
+      **Invariant:** Tags without colons become categories, except known non-category tags (acceptance-criteria, happy-path) and the architect opt-in marker.
       **Rationale:** Including test-control tags (acceptance-criteria, happy-path) as categories pollutes the pattern taxonomy with non-semantic values.
-      **Verified by:** Extract category tags (no colon), libar-docs opt-in marker is NOT a category
+      **Verified by:** Extract category tags (no colon), architect opt-in marker is NOT a category
 
     @happy-path @categories
     Scenario: Extract category tags (no colon)
@@ -113,12 +113,12 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
       And the metadata categories should not contain "acceptance-criteria"
 
     @edge-case @categories
-    Scenario: libar-docs opt-in marker is NOT a category
-      Given feature tags "libar-docs", "ddd", and "core"
+    Scenario: architect opt-in marker is NOT a category
+      Given feature tags "architect", "ddd", and "core"
       When extracting pattern tags
       Then the metadata categories should contain "ddd"
       And the metadata core flag should be true
-      And the metadata categories should not contain "libar-docs"
+      And the metadata categories should not contain "architect"
 
   Rule: Complex tag lists produce fully populated metadata
 

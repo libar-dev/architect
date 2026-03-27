@@ -168,7 +168,7 @@ Feature: Anti-Pattern Detection
         | @architect-quarter |
       And a feature file with tags:
         | tag                       |
-        | libar-docs-pattern:MyTest |
+        | architect-pattern:MyTest |
       When detecting all anti-patterns
       Then 1 violation is found
       And violations include "process-in-code"

@@ -4,7 +4,7 @@
 
 > **Code-Driven Documentation Generator with Codec-Based Transformation Pipeline**
 
-This document describes the architecture of the `@libar-dev/architect` package, a documentation generator that extracts patterns from TypeScript and Gherkin sources, transforms them through a unified pipeline, and renders them as markdown via typed codecs.
+This document describes the architecture of the `@libar-dev/architect` package, a documentation generator that extracts patterns from TypeScript and Gherkin sources, transforms them through a unified pipeline, and renders them as Markdown via typed codecs.
 
 ---
 
@@ -154,14 +154,14 @@ The pipeline has two entry points. The orchestrator (`src/generators/orchestrato
 
 **TypeScript Scanning Flow:**
 
-```
+```text
 findFilesToScan()     →  hasFileOptIn()      →  parseFileDirectives()
 (glob patterns)          (@architect check)    (AST extraction)
 ```
 
 **Gherkin Scanning Flow:**
 
-```
+```text
 findFeatureFiles()    →  parseFeatureFile()  →  extractPatternTags()
 (glob patterns)          (Cucumber parser)      (tag extraction)
 ```
@@ -957,7 +957,7 @@ Individual declarations can be tagged with `@architect-shape` in their JSDoc, wi
 ```typescript
 /**
  * @architect-shape api-types
- * Configuration for the delivery process pipeline.
+ * Configuration for the architect pipeline.
  */
 export interface PipelineConfig { ... }
 ```

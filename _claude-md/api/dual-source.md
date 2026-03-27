@@ -6,7 +6,7 @@ Patterns can be defined in TypeScript, Feature files, or both. Each source owns 
 
 | Use Case                  | Source       | Why                                       |
 | ------------------------- | ------------ | ----------------------------------------- |
-| Retroactive documentation | TypeScript   | Code existed before delivery process      |
+| Retroactive documentation | TypeScript   | Code existed before architect             |
 | Rich relationships        | TypeScript   | `@architect-uses`, `@architect-used-by`   |
 | Phase/release tracking    | Feature file | Milestone planning                        |
 | Acceptance criteria       | Feature file | BDD scenarios                             |

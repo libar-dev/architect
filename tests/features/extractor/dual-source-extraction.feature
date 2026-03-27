@@ -237,7 +237,7 @@ Feature: Dual-Source Extraction
     Scenario: Single include tag is extracted
       Given a feature with process tags:
         | tag                                           |
-        | libar-docs                     |
+        | architect                      |
         | pattern:IncludeTest            |
         | status:roadmap                 |
         | phase:01                       |
@@ -249,7 +249,7 @@ Feature: Dual-Source Extraction
     Scenario: CSV include tag produces multiple values
       Given a feature with process tags:
         | tag                                               |
-        | libar-docs                      |
+        | architect                       |
         | pattern:MultiInclude            |
         | status:roadmap                  |
         | phase:01                        |
@@ -262,7 +262,7 @@ Feature: Dual-Source Extraction
     Scenario: Feature without include tag has no include field
       Given a feature with process tags:
         | tag                                      |
-        | libar-docs                |
+        | architect                 |
         | pattern:NoInclude         |
         | status:roadmap            |
         | phase:01                  |

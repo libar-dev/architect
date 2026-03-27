@@ -1,6 +1,6 @@
 ### Project Overview
 
-Code-first documentation and delivery process toolkit. Extracts patterns from TypeScript and Gherkin sources using configurable annotations, generates LLM-optimized markdown and Mermaid architecture diagrams, and validates delivery workflow via pre-commit hooks.
+Context engineering platform with extraction pipeline and typed codecs. Extracts patterns from TypeScript and Gherkin sources using configurable annotations, generates LLM-optimized markdown and Mermaid architecture diagrams, and validates delivery workflow via pre-commit hooks.
 
 **Core Principle:** Code is the single source of truth. Generated documentation is a projection of annotated source code.
 

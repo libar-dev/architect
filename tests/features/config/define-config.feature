@@ -11,12 +11,10 @@ Feature: Define Config - Schema Validation and Type Guards
   **Problem:**
   - Users need type-safe config authoring without runtime overhead
   - Invalid configs must be caught at load time, not at usage time
-  - New-style vs legacy config must be distinguishable programmatically
-
   **Solution:**
   - defineConfig() is a zero-cost identity function for TypeScript autocompletion
   - Zod schema validates at load time with precise error messages
-  - isProjectConfig() and isLegacyInstance() type guards disambiguate config formats
+  - isProjectConfig() type guard validates config format
 
   Background:
     Given a define-config test context
@@ -90,11 +88,11 @@ Feature: Define Config - Schema Validation and Type Guards
       When validating against ArchitectProjectConfigSchema
       Then validation should fail
 
-  Rule: Type guards distinguish config formats
+  Rule: Type guard validates config format
 
-    **Invariant:** The isProjectConfig and isLegacyInstance type guards must correctly distinguish between new-style project configs and legacy configuration instances.
-    **Rationale:** The codebase supports both config formats during migration — incorrect type detection would apply the wrong loading path and produce runtime errors.
-    **Verified by:** isProjectConfig returns true for new-style config, isProjectConfig returns false for legacy instance, isLegacyInstance returns true for legacy objects, isLegacyInstance returns false for new-style config
+    **Invariant:** The isProjectConfig type guard must correctly identify valid project configs.
+    **Rationale:** Config loading relies on type detection to apply the correct parsing path.
+    **Verified by:** isProjectConfig returns true for new-style config, isProjectConfig returns false for non-config object
 
     @happy-path
     Scenario: isProjectConfig returns true for new-style config
@@ -103,19 +101,7 @@ Feature: Define Config - Schema Validation and Type Guards
       Then the result should be true
 
     @happy-path
-    Scenario: isProjectConfig returns false for legacy instance
+    Scenario: isProjectConfig returns false for non-config object
       Given a legacy instance object with registry and regexBuilders
       When checking isProjectConfig
-      Then the result should be false
-
-    @happy-path
-    Scenario: isLegacyInstance returns true for legacy objects
-      Given a legacy instance object with registry and regexBuilders
-      When checking isLegacyInstance
-      Then the result should be true
-
-    @happy-path
-    Scenario: isLegacyInstance returns false for new-style config
-      Given a new-style config object with sources field
-      When checking isLegacyInstance
       Then the result should be false

@@ -40,8 +40,7 @@ interface ConfigLoaderState {
 // =============================================================================
 
 const VALID_GENERIC_CONFIG = `
-import { createArchitect } from "./src/index.js";
-export default createArchitect({ preset: "generic" });
+export default { preset: "generic", sources: { typescript: ["src/**/*.ts"] } };
 `.trim();
 
 const NO_DEFAULT_EXPORT_CONFIG = `
@@ -236,26 +235,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
     RuleScenario('Load valid config file', ({ Given, When, Then, And }) => {
       Given('a valid config file with preset "generic"', async () => {
-        // Create a config file that uses generic preset
-        // We need to create a minimal working config that can be imported
+        // Create a config file that uses defineConfig() format
         const configContent = `
-// Simple config that creates a minimal valid instance
 export default {
-  registry: {
-    tagPrefix: "@docs-",
-    fileOptInTag: "@docs",
-    categories: [
-      { tag: "core", label: "Core" },
-      { tag: "api", label: "API" },
-      { tag: "infra", label: "Infrastructure" }
-    ],
-    statusValues: ["roadmap", "active", "completed", "deferred"],
-    tags: []
-  },
-  regexBuilders: {
-    category: () => /@docs-(core|api|infra)/,
-    status: () => /@docs-status:(roadmap|active|completed|deferred)/,
-    pattern: () => /@docs-pattern:([A-Za-z0-9]+)/
+  preset: "generic",
+  sources: {
+    typescript: ["src/**/*.ts"],
+    features: ["specs/**/*.feature"]
   }
 };
 `.trim();
@@ -276,9 +262,9 @@ export default {
         expect(state!.configResult!.value.isDefault).toBe(false);
       });
 
-      And('loaded registry tagPrefix should be "@docs-"', () => {
+      And('loaded registry tagPrefix should be "@architect-"', () => {
         if (!state!.configResult!.ok) throw new Error('Expected success');
-        expect(state!.configResult!.value.instance.registry.tagPrefix).toBe('@docs-');
+        expect(state!.configResult!.value.instance.registry.tagPrefix).toBe('@architect-');
       });
     });
 
@@ -316,9 +302,9 @@ export default {
         expect(state!.configResult!.ok).toBe(false);
       });
 
-      And('config error message should contain "ArchitectInstance"', () => {
+      And('config error message should contain "defineConfig"', () => {
         if (state!.configResult!.ok) throw new Error('Expected failure');
-        expect(state!.configResult!.error.message).toContain('ArchitectInstance');
+        expect(state!.configResult!.error.message).toContain('defineConfig');
       });
     });
   });

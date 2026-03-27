@@ -108,13 +108,7 @@ export async function computeCacheKey(opts: PipelineOptions): Promise<string> {
   }
 
   // Also include config file mtime if it exists (.ts or .js)
-  // Include legacy names too — config-loader supports them with deprecation warnings
-  for (const configName of [
-    'architect.config.ts',
-    'architect.config.js',
-    'delivery-process.config.ts',
-    'delivery-process.config.js',
-  ]) {
+  for (const configName of ['architect.config.ts', 'architect.config.js']) {
     const configPath = path.join(baseDir, configName);
     try {
       const configStat = await fsp.stat(configPath);

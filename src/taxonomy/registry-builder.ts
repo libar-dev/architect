@@ -583,13 +583,13 @@ export function buildRegistry(): TagRegistry {
         format: 'enum',
         purpose: 'Target section directory in _claude-md/ for module output',
         values: [...CLAUDE_SECTION_VALUES],
-        example: '@architect-claude-section delivery-process',
+        example: '@architect-claude-section process',
       },
       {
         tag: 'claude-tags',
         format: 'csv',
         purpose: 'Variation filtering tags for modular-claude-md inclusion',
-        example: '@architect-claude-tags core-mandatory, delivery-process',
+        example: '@architect-claude-tags core-mandatory, process',
       },
 
       // ── Sequence diagram annotation tags (DesignReviewCodec) ──────────

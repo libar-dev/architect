@@ -29,12 +29,12 @@
  *
  * ### Config File Format
  *
- * Config files should export a `ArchitectInstance`:
+ * Config files should export an `ArchitectProjectConfig`:
  *
  * ```typescript
- * import { createArchitect } from '@libar-dev/architect';
+ * import { defineConfig } from '@libar-dev/architect/config';
  *
- * export default createArchitect({ preset: "libar-generic" });
+ * export default defineConfig({ preset: "libar-generic" });
  * ```
  */
 
@@ -42,11 +42,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { pathToFileURL } from 'url';
 import type { ArchitectProjectConfig, ResolvedConfig } from './project-config.js';
-import {
-  isProjectConfig,
-  isLegacyInstance,
-  ArchitectProjectConfigSchema,
-} from './project-config-schema.js';
+import { isProjectConfig, ArchitectProjectConfigSchema } from './project-config-schema.js';
 import { resolveProjectConfig, createDefaultResolvedConfig } from './resolve-config.js';
 import type { ArchitectInstance } from './types.js';
 
@@ -59,12 +55,6 @@ const CONFIG_FILE_NAME = 'architect.config.ts';
  * Compiled JavaScript variant (for projects that pre-compile configs)
  */
 const CONFIG_FILE_NAME_JS = 'architect.config.js';
-
-/**
- * Legacy config file names (deprecated, emit warning if found)
- */
-const LEGACY_CONFIG_FILE_NAME = 'delivery-process.config.ts';
-const LEGACY_CONFIG_FILE_NAME_JS = 'delivery-process.config.js';
 
 /**
  * Result of config file discovery
@@ -150,45 +140,13 @@ export async function findConfigFile(startDir: string): Promise<string | null> {
     // Check for TypeScript config first
     const tsConfigPath = path.join(currentDir, CONFIG_FILE_NAME);
     if (await fileExists(tsConfigPath)) {
-      // Warn if legacy config also exists — user should clean up
-      const legacyTsPath = path.join(currentDir, LEGACY_CONFIG_FILE_NAME);
-      if (await fileExists(legacyTsPath)) {
-        console.error(
-          `Warning: Both '${CONFIG_FILE_NAME}' and '${LEGACY_CONFIG_FILE_NAME}' exist in ${currentDir}. ` +
-            `Using '${CONFIG_FILE_NAME}'. Delete '${LEGACY_CONFIG_FILE_NAME}' to silence this warning.`
-        );
-      }
       return tsConfigPath;
     }
 
     // Check for JavaScript config (pre-compiled)
     const jsConfigPath = path.join(currentDir, CONFIG_FILE_NAME_JS);
     if (await fileExists(jsConfigPath)) {
-      // Warn if legacy config also exists — user should clean up
-      const legacyJsPath = path.join(currentDir, LEGACY_CONFIG_FILE_NAME_JS);
-      if (await fileExists(legacyJsPath)) {
-        console.error(
-          `Warning: Both '${CONFIG_FILE_NAME_JS}' and '${LEGACY_CONFIG_FILE_NAME_JS}' exist in ${currentDir}. ` +
-            `Using '${CONFIG_FILE_NAME_JS}'. Delete '${LEGACY_CONFIG_FILE_NAME_JS}' to silence this warning.`
-        );
-      }
       return jsConfigPath;
-    }
-
-    // Check for legacy config file names (backward compat)
-    const legacyTsPath = path.join(currentDir, LEGACY_CONFIG_FILE_NAME);
-    if (await fileExists(legacyTsPath)) {
-      console.error(
-        `Warning: '${LEGACY_CONFIG_FILE_NAME}' is deprecated. Rename to '${CONFIG_FILE_NAME}'.`
-      );
-      return legacyTsPath;
-    }
-    const legacyJsPath = path.join(currentDir, LEGACY_CONFIG_FILE_NAME_JS);
-    if (await fileExists(legacyJsPath)) {
-      console.error(
-        `Warning: '${LEGACY_CONFIG_FILE_NAME_JS}' is deprecated. Rename to '${CONFIG_FILE_NAME_JS}'.`
-      );
-      return legacyJsPath;
     }
 
     // Stop at repo root to avoid walking too far
@@ -290,8 +248,7 @@ export type ProjectConfigLoadResult =
 /**
  * Load unified project configuration from file or use defaults.
  *
- * Supports both new-style `ArchitectProjectConfig` (via `defineConfig()`)
- * and legacy `ArchitectInstance` (via `createArchitect()`) config files.
+ * Loads `ArchitectProjectConfig` (via `defineConfig()`) config files.
  *
  * Discovery strategy:
  * 1. Search for `architect.config.ts` starting from baseDir
@@ -380,22 +337,7 @@ export async function loadProjectConfig(baseDir: string): Promise<ProjectConfigL
     };
   }
 
-  // Legacy ArchitectInstance (createArchitect) — check first because
-  // isProjectConfig is a loose check that could match legacy instances with extra fields
-  if (isLegacyInstance(exported)) {
-    const defaultResolved = createDefaultResolvedConfig();
-    return {
-      ok: true,
-      value: {
-        instance: exported,
-        project: defaultResolved.project,
-        isDefault: false,
-        configPath,
-      },
-    };
-  }
-
-  // New-style project config (defineConfig)
+  // Project config (defineConfig)
   if (isProjectConfig(exported)) {
     const parseResult = ArchitectProjectConfigSchema.safeParse(exported);
     if (!parseResult.success) {
@@ -440,7 +382,7 @@ export async function loadProjectConfig(baseDir: string): Promise<ProjectConfigL
     error: {
       type: 'config-load-error',
       path: configPath,
-      message: `Config file must export an ArchitectProjectConfig (use defineConfig()) or an ArchitectInstance (use createArchitect()): ${configPath}`,
+      message: `Config file must export an ArchitectProjectConfig (use defineConfig()): ${configPath}`,
     },
   };
 }

@@ -115,7 +115,7 @@ Feature: Config Loader - TypeScript Configuration Discovery
       When loading config from base directory
       Then config loading should succeed
       And loaded config should NOT be the default
-      And loaded registry tagPrefix should be "@docs-"
+      And loaded registry tagPrefix should be "@architect-"
 
     @error-handling
     Scenario: Error on config without default export
@@ -129,7 +129,7 @@ Feature: Config Loader - TypeScript Configuration Discovery
       Given a config file exporting wrong type
       When loading config from base directory
       Then config loading should fail
-      And config error message should contain "ArchitectInstance"
+      And config error message should contain "defineConfig"
 
   # ==========================================================================
   # Error Formatting

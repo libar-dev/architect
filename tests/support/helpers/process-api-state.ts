@@ -313,7 +313,7 @@ export async function writeMixedAnnotationFiles(state: CLITestState | null): Pro
     ...createPatternFiles(),
     {
       path: 'src/unannotated.ts',
-      content: '/** No libar-docs marker */\nexport const x = 1;\n',
+      content: '/** No @architect marker */\nexport const x = 1;\n',
     },
   ];
   for (const file of files) {

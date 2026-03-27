@@ -244,7 +244,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           feature: {
             name: 'InvalidPattern',
             description: 'Invalid pattern',
-            tags: ['libar-docs', 'pattern:InvalidPattern', 'status:roadmap', 'phase:0'], // phase:0 fails validation
+            tags: ['architect', 'pattern:InvalidPattern', 'status:roadmap', 'phase:0'], // phase:0 fails validation
             language: 'en',
             line: 1,
           },
@@ -297,7 +297,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           feature: {
             name: 'WarningPattern',
             description: 'Pattern that triggers validation',
-            tags: ['libar-docs', 'pattern:WarningPattern', 'status:roadmap', 'phase:-1'], // negative phase fails
+            tags: ['architect', 'pattern:WarningPattern', 'status:roadmap', 'phase:-1'], // negative phase fails
             language: 'en',
             line: 1,
           },
@@ -328,7 +328,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           feature: {
             name: 'NoOptInPattern',
             description: 'Pattern without opt-in marker',
-            // Note: NO 'libar-docs' in tags - only pattern/status tags
+            // Note: NO 'architect' in tags - only pattern/status tags
             tags: ['pattern:NoOptInPattern', 'status:roadmap', 'phase:1'],
             language: 'en',
             line: 1,
