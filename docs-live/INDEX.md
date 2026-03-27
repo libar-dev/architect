@@ -10,7 +10,7 @@
 | ----------------- | ------------------------------------------------------ |
 | **Package**       | @libar-dev/architect                                   |
 | **Purpose**       | Context engineering platform for AI-assisted codebases |
-| **Patterns**      | 394 tracked (261 completed, 81 active, 52 planned)     |
+| **Patterns**      | 395 tracked (262 completed, 81 active, 52 planned)     |
 | **Product Areas** | 7                                                      |
 | **License**       | MIT                                                    |
 
@@ -149,24 +149,24 @@
 
 | Area          | Patterns | Completed | Active | Planned | Progress                   |
 | ------------- | -------- | --------- | ------ | ------- | -------------------------- |
-| Annotation    | 26       | 23        | 2      | 1       | [███████░] 23/26 88%       |
+| Annotation    | 27       | 24        | 2      | 1       | [███████░] 24/27 89%       |
 | Configuration | 11       | 8         | 0      | 3       | [██████░░] 8/11 73%        |
 | CoreTypes     | 11       | 7         | 4      | 0       | [█████░░░] 7/11 64%        |
 | DataAPI       | 40       | 23        | 15     | 2       | [█████░░░] 23/40 57%       |
 | Generation    | 95       | 81        | 6      | 8       | [███████░] 81/95 85%       |
 | Process       | 11       | 4         | 0      | 7       | [███░░░░░] 4/11 36%        |
 | Validation    | 25       | 16        | 3      | 6       | [█████░░░] 16/25 64%       |
-| **Total**     | **219**  | **162**   | **30** | **27**  | **[██████░░] 162/219 74%** |
+| **Total**     | **220**  | **163**   | **30** | **27**  | **[██████░░] 163/220 74%** |
 
 ---
 
 ## Phase Progress
 
-**394** patterns total: **261** completed (66%), **81** active, **52** planned. [█████████████░░░░░░░] 261/394
+**395** patterns total: **262** completed (66%), **81** active, **52** planned. [█████████████░░░░░░░] 262/395
 
 | Status    | Count | Percentage |
 | --------- | ----- | ---------- |
-| Completed | 261   | 66%        |
+| Completed | 262   | 66%        |
 | Active    | 81    | 21%        |
 | Planned   | 52    | 13%        |
 

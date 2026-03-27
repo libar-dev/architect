@@ -2,7 +2,7 @@
  * Configuration Module
  *
  * Unified project configuration for Architect. Use `defineConfig()` in
- * `architect.config.ts` to centralize taxonomy, sources, output, and
+ * `architect.config.ts` or `architect.config.js` to centralize taxonomy, sources, output, and
  * generator overrides.
  *
  * @example
@@ -42,7 +42,7 @@ export { createRegexBuilders } from './regex-builders.js';
 export { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG, DEFAULT_REGEX_BUILDERS } from './defaults.js';
 
 // Presets
-export { LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PRESETS } from './presets.js';
+export { LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PRESETS, type PresetName } from './presets.js';
 
 // Config file discovery and loading
 export {

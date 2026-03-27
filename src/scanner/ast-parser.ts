@@ -596,6 +596,10 @@ function parseDirective(
   const productArea = metadataResults.get('product-area') as string | undefined;
   // Convention tags for reference document generation
   const convention = metadataResults.get('convention') as string[] | undefined;
+  // Claude module generation tags
+  const claudeModule = metadataResults.get('claude-module') as string | undefined;
+  const claudeSection = metadataResults.get('claude-section') as string | undefined;
+  const claudeTags = metadataResults.get('claude-tags') as string[] | undefined;
 
   // Extract "### When to Use" section or "**When to use:**" inline format
   // Returns array of bullet points, stopping at section boundaries
@@ -681,6 +685,9 @@ function parseDirective(
     ...(archContext && { archContext }),
     ...(archLayer && { archLayer }),
     ...(include && include.length > 0 && { include }),
+    ...(claudeModule && { claudeModule }),
+    ...(claudeSection && { claudeSection }),
+    ...(claudeTags && claudeTags.length > 0 && { claudeTags }),
     // Shape extraction fields
     ...(extractShapes && extractShapes.length > 0 && { extractShapes }),
     // PRD metadata fields

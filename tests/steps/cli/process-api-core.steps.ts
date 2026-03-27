@@ -11,6 +11,7 @@
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
+import { writeTempFile } from '../../support/helpers/file-system.js';
 import {
   type CLITestState,
   initState,
@@ -32,6 +33,15 @@ let state: CLITestState | null = null;
 // =============================================================================
 
 const feature = await loadFeature('tests/features/cli/process-api-core.feature');
+
+function createJsProjectConfig(): string {
+  return `export default {
+  sources: {
+    typescript: ['src/**/*.ts']
+  }
+};
+`;
+}
 
 describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
@@ -120,6 +130,37 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(combined).toContain(text);
       });
     });
+
+    RuleScenario(
+      'Use architect.config.js sources when --input is omitted',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript files with pattern annotations', async () => {
+          await writePatternFiles(state);
+        });
+
+        And('an architect.config.js with TypeScript sources', async () => {
+          await writeTempFile(
+            state!.tempContext!.tempDir,
+            'architect.config.js',
+            createJsProjectConfig()
+          );
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(state, cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult(state).exitCode).toBe(code);
+        });
+
+        And('stdout is valid JSON with key {string}', (_ctx: unknown, key: string) => {
+          const result = getResult(state);
+          const parsed = JSON.parse(result.stdout) as Record<string, unknown>;
+          expect(parsed).toHaveProperty(key);
+        });
+      }
+    );
 
     RuleScenario('Reject unknown options', ({ When, Then, And }) => {
       When('running {string}', async (_ctx: unknown, cmd: string) => {

@@ -274,6 +274,28 @@ describeFeature(feature, ({ Rule }) => {
         }
       );
     });
+
+    RuleScenario('Overview renders architect query guidance', ({ Given, When, Then, And }) => {
+      Given(
+        'an overview with {int} total patterns at {int} percent',
+        (_ctx: unknown, total: number, percentage: number) => {
+          state = initState();
+          state.overview = createTestOverview(total, percentage);
+        }
+      );
+
+      When('I format the overview', () => {
+        state!.output = formatOverview(state!.overview!);
+      });
+
+      Then('the output contains {string}', (_ctx: unknown, text: string) => {
+        expect(state!.output).toContain(text);
+      });
+
+      And('the output contains {string}', (_ctx: unknown, text: string) => {
+        expect(state!.output).toContain(text);
+      });
+    });
   });
 
   // ===========================================================================

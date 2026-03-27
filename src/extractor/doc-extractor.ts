@@ -291,6 +291,10 @@ export function buildPattern(
     ...(directive.archLayer !== undefined && { archLayer: directive.archLayer }),
     ...(directive.include !== undefined &&
       directive.include.length > 0 && { include: directive.include }),
+    ...(directive.claudeModule !== undefined && { claudeModule: directive.claudeModule }),
+    ...(directive.claudeSection !== undefined && { claudeSection: directive.claudeSection }),
+    ...(directive.claudeTags !== undefined &&
+      directive.claudeTags.length > 0 && { claudeTags: directive.claudeTags }),
     // PRD metadata fields
     ...(directive.productArea !== undefined && { productArea: directive.productArea }),
     // Shape extraction fields (extracted from source file when @architect-extract-shapes present)

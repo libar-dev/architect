@@ -222,6 +222,9 @@ export const DocDirectiveSchema = z
     /** Effort estimate for timeline workflow (from @architect-effort tag) */
     effort: z.string().optional(),
 
+    /** Actual effort logged after implementation (from @architect-effort-actual tag) */
+    effortActual: z.string().optional(),
+
     /** Responsible team for process workflow (from @architect-team tag) */
     team: z.string().optional(),
 

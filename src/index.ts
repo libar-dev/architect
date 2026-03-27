@@ -52,7 +52,12 @@ export type { ArchitectConfig, ArchitectInstance, RegexBuilders } from './config
 
 export { createRegexBuilders } from './config/regex-builders.js';
 
-export { LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PRESETS } from './config/presets.js';
+export {
+  LIBAR_GENERIC_PRESET,
+  DDD_ES_CQRS_PRESET,
+  PRESETS,
+  type PresetName,
+} from './config/presets.js';
 
 // Core types (schema-inferred)
 export * from './types/index.js';

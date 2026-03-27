@@ -59,11 +59,11 @@ Scoped architecture diagram showing component relationships:
 ```mermaid
 graph TB
     subgraph generator["Generator"]
+        SourceMapper[/"SourceMapper"/]
+        Documentation_Generation_Orchestrator("Documentation Generation Orchestrator")
         GitModule["GitModule"]
         GitHelpers["GitHelpers"]
         GitBranchDiff["GitBranchDiff"]
-        SourceMapper[/"SourceMapper"/]
-        Documentation_Generation_Orchestrator("Documentation Generation Orchestrator")
         TransformTypes["TransformTypes"]
         TransformDataset("TransformDataset")
         SequenceTransformUtils("SequenceTransformUtils")
@@ -98,12 +98,12 @@ graph TB
         ContextInference["ContextInference"]:::neighbor
     end
     loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
-    GitModule -->|uses| GitBranchDiff
-    GitModule -->|uses| GitHelpers
     SourceMapper -.->|depends on| DecisionDocCodec
     SourceMapper -.->|depends on| ShapeExtractor
     SourceMapper -.->|depends on| GherkinASTParser
     Documentation_Generation_Orchestrator -->|uses| Pattern_Scanner
+    GitModule -->|uses| GitBranchDiff
+    GitModule -->|uses| GitHelpers
     PatternsCodec ..->|implements| PatternRelationshipModel
     DesignReviewCodec -->|uses| MasterDataset
     DesignReviewCodec -->|uses| MermaidDiagramUtils

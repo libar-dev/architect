@@ -19,7 +19,7 @@
  *
  * - Generating any documentation from annotated TypeScript source
  * - Running multiple generators in one command
- * - Using architect.config.ts for reproducible builds
+ * - Using a project config file for reproducible builds
  *
  * ### Key Concepts
  *
@@ -36,6 +36,7 @@ import * as path from 'path';
 import { generatorRegistry } from '../generators/registry.js';
 import { generateDocumentation, generateFromConfig } from '../generators/orchestrator.js';
 import { loadProjectConfig } from '../config/config-loader.js';
+import { registerReferenceGenerators } from '../generators/built-in/reference-generators.js';
 import { printVersionAndExit } from './version.js';
 
 // Import built-in generators (registers patterns, adrs, overview)
@@ -242,7 +243,7 @@ PR Changes Options (for -g pr-changes):
   --changed-files <file>       Explicit file list (repeatable, overrides git)
   --release-filter <version>   Filter by release version (e.g., v0.2.0)
 
-  When architect.config.ts provides sources, --input is optional.
+  When architect.config.ts or architect.config.js provides sources, --input is optional.
   CLI flags override config when both are provided.
 
 Examples:
@@ -271,8 +272,22 @@ async function main(): Promise<void> {
     return;
   }
 
+  const baseDir = path.resolve(opts.baseDir);
+
   // List generators
   if (opts.listGenerators) {
+    const configResult = await loadProjectConfig(baseDir);
+    if (!configResult.ok) {
+      console.error(`Error loading config: ${configResult.error.message}`);
+      process.exit(1);
+    }
+    if (configResult.value.project.referenceDocConfigs.length > 0) {
+      registerReferenceGenerators(
+        generatorRegistry,
+        configResult.value.project.referenceDocConfigs
+      );
+    }
+
     console.log('Available generators:');
     const available = generatorRegistry.available();
     if (available.length === 0) {
@@ -288,8 +303,6 @@ async function main(): Promise<void> {
     return;
   }
 
-  const baseDir = path.resolve(opts.baseDir);
-
   // Load project config
   const configResult = await loadProjectConfig(baseDir);
   if (!configResult.ok) {
@@ -299,7 +312,7 @@ async function main(): Promise<void> {
   const resolvedConfig = configResult.value;
 
   if (resolvedConfig.isDefault) {
-    console.log('  (No architect.config.ts found; using defaults)');
+    console.log('  (No architect.config.ts or architect.config.js found; using defaults)');
   }
 
   // Determine generators to run (CLI -g overrides config)
@@ -332,7 +345,7 @@ async function main(): Promise<void> {
     });
   } else if (resolvedConfig.project.sources.typescript.length > 0) {
     // No CLI input — use config-based sources
-    console.log('Using sources from architect.config.ts...');
+    console.log('Using sources from project config...');
     console.log('Scanning source files...');
 
     result = await generateFromConfig(resolvedConfig, {
@@ -344,9 +357,11 @@ async function main(): Promise<void> {
   } else {
     console.error('Error: No source files specified.');
     console.error('');
-    console.error('Either provide --input flags or configure sources in architect.config.ts:');
+    console.error(
+      'Either provide --input flags or configure sources in architect.config.ts or architect.config.js:'
+    );
     console.error('');
-    console.error('  // architect.config.ts');
+    console.error('  // architect.config.ts (or .js)');
     console.error('  import { defineConfig } from "@libar-dev/architect/config";');
     console.error('  export default defineConfig({');
     console.error('    sources: { typescript: ["src/**/*.ts"] }');

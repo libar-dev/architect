@@ -10,6 +10,8 @@
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import { LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PRESETS } from '../../../src/config/presets.js';
+import type { PresetName as PackagePresetName } from '../../../src/index.js';
+import type { PresetName as ConfigPresetName } from '../../../src/config/index.js';
 import type { ArchitectConfig } from '../../../src/config/types.js';
 
 // =============================================================================
@@ -251,6 +253,32 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
       When('I access PRESETS with key "libar-generic"', () => {
         state = initState();
         state.presetFromMap = PRESETS['libar-generic'];
+      });
+
+      Then('the preset tagPrefix should be "@architect-"', () => {
+        expect(state!.presetFromMap!.tagPrefix).toBe('@architect-');
+      });
+    });
+  });
+
+  Rule('PresetName type is exported from public entrypoints', ({ RuleScenario }) => {
+    RuleScenario('Package entrypoint exports PresetName type', ({ When, Then }) => {
+      When('I use the package entrypoint PresetName type with key "libar-generic"', () => {
+        state = initState();
+        const presetName: PackagePresetName = 'libar-generic';
+        state.presetFromMap = PRESETS[presetName];
+      });
+
+      Then('the preset tagPrefix should be "@architect-"', () => {
+        expect(state!.presetFromMap!.tagPrefix).toBe('@architect-');
+      });
+    });
+
+    RuleScenario('Config entrypoint exports PresetName type', ({ When, Then }) => {
+      When('I use the config entrypoint PresetName type with key "ddd-es-cqrs"', () => {
+        state = initState();
+        const presetName: ConfigPresetName = 'ddd-es-cqrs';
+        state.presetFromMap = PRESETS[presetName];
       });
 
       Then('the preset tagPrefix should be "@architect-"', () => {

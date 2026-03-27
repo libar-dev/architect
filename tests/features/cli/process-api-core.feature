@@ -43,14 +43,22 @@ Feature: Process API CLI - Core Infrastructure
 
   Rule: CLI requires input flag for subcommands
 
-    **Invariant:** Every data-querying subcommand must receive an explicit `--input` glob specifying the source files to scan.
-    **Rationale:** Without an input source, the pipeline has no files to scan and would produce empty or misleading results instead of a clear error.
+    **Invariant:** Every data-querying subcommand must receive either an explicit `--input` glob or a project config that provides source globs.
+    **Rationale:** Without an input source, the pipeline has no files to scan and would produce empty or misleading results instead of a clear error, but project config auto-detection should remove that boilerplate when the repo is configured.
 
     @validation
     Scenario: Fail without --input flag when running status
       When running "process-api status"
       Then exit code is 1
       And output contains "--input"
+
+    @happy-path
+    Scenario: Use architect.config.js sources when --input is omitted
+      Given TypeScript files with pattern annotations
+      And an architect.config.js with TypeScript sources
+      When running "process-api status"
+      Then exit code is 0
+      And stdout is valid JSON with key "success"
 
     @validation
     Scenario: Reject unknown options

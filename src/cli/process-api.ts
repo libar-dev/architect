@@ -41,7 +41,7 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { applyProjectSourceDefaults } from '../config/config-loader.js';
+import { applyProjectSourceDefaults, findConfigFile } from '../config/config-loader.js';
 import {
   buildMasterDataset,
   type PipelineResult,
@@ -604,17 +604,14 @@ async function executeDryRun(opts: ProcessAPICLIConfig): Promise<void> {
   const featureFiles = await glob(opts.features, { cwd: baseDir });
 
   // Check config file
-  const configPath = path.join(baseDir, 'architect.config.ts');
-  const hasConfig = fs.existsSync(configPath);
+  const configPath = await findConfigFile(baseDir);
 
   // Check cache status
   const cacheDir = getCacheDir(opts.baseDir);
   const cacheInfo = cacheFileExists(cacheDir);
 
   console.log('=== DRY RUN ===');
-  console.log(
-    `Config: ${hasConfig ? 'architect.config.ts (auto-detected)' : 'none (filesystem fallback)'}`
-  );
+  console.log(`Config: ${formatConfigStatus(configPath)}`);
   console.log(`Base dir: ${baseDir}`);
   console.log(`Input patterns: ${opts.input.join(', ')}`);
   console.log(`Feature patterns: ${opts.features.join(', ')}`);
@@ -640,7 +637,7 @@ async function executeDryRun(opts: ProcessAPICLIConfig): Promise<void> {
 
 /**
  * If --input and --features are not provided, try to load defaults from config.
- * Prefers loadProjectConfig() for repos with architect.config.ts,
+ * Prefers loadProjectConfig() for repos with a project config file,
  * falls back to filesystem auto-detection for repos without one.
  */
 async function applyConfigDefaults(config: ProcessAPICLIConfig): Promise<void> {
@@ -650,20 +647,20 @@ async function applyConfigDefaults(config: ProcessAPICLIConfig): Promise<void> {
   }
 
   // Fall back to existing filesystem auto-detection for repos without config
-  applyConfigDefaultsFallback(config);
+  await applyConfigDefaultsFallback(config);
 }
 
 /**
  * Filesystem-based auto-detection fallback for repos without a config file.
  * Checks for conventional directory structures and applies defaults.
  */
-function applyConfigDefaultsFallback(config: ProcessAPICLIConfig): void {
+async function applyConfigDefaultsFallback(config: ProcessAPICLIConfig): Promise<void> {
   const baseDir = path.resolve(config.baseDir);
 
   if (config.input.length === 0) {
     // Check for config file existence as signal to use defaults
-    const configPath = path.join(baseDir, 'architect.config.ts');
-    if (fs.existsSync(configPath)) {
+    const configPath = await findConfigFile(baseDir);
+    if (configPath !== null) {
       config.input.push('src/**/*.ts');
       // Also check for stubs directory
       const stubsDir = path.join(baseDir, 'architect', 'stubs');
@@ -683,6 +680,12 @@ function applyConfigDefaultsFallback(config: ProcessAPICLIConfig): void {
       config.features.push('architect/releases/*.feature');
     }
   }
+}
+
+function formatConfigStatus(configPath: string | null): string {
+  return configPath !== null
+    ? `${path.basename(configPath)} (auto-detected)`
+    : 'none (filesystem fallback)';
 }
 
 // =============================================================================
@@ -1939,7 +1942,7 @@ async function main(): Promise<void> {
 
   if (opts.input.length === 0) {
     console.error(
-      'Error: --input is required (or place architect.config.ts in cwd for auto-detection)'
+      'Error: --input is required (or place architect.config.ts or architect.config.js in your project for auto-detection)'
     );
     console.error('');
     console.error('Example:');

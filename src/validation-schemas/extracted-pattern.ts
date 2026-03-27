@@ -238,6 +238,9 @@ export const ExtractedPatternSchema = z
     /** Effort estimate (from @architect-effort tag, e.g., "2w", "4d") */
     effort: z.string().optional(),
 
+    /** Actual effort recorded after delivery (from @architect-effort-actual tag) */
+    effortActual: z.string().optional(),
+
     /** Team assignment (from @architect-team tag) */
     team: z.string().optional(),
 
@@ -355,6 +358,12 @@ export const ExtractedPatternSchema = z
      * Groups decisions by domain (architecture, process, testing, tooling).
      */
     adrCategory: z.string().optional(),
+
+    /** ADR theme grouping (from @architect-adr-theme tag) */
+    adrTheme: z.string().optional(),
+
+    /** ADR layer grouping (from @architect-adr-layer tag) */
+    adrLayer: z.string().optional(),
 
     /**
      * ADR number this decision supersedes (from @architect-adr-supersedes tag)

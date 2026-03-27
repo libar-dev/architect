@@ -224,13 +224,14 @@ _Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),_
 
 #### formatOverview renders progress summary
 
-> **Invariant:** The overview formatter must render a progress summary line showing completion metrics for the project.
+> **Invariant:** The overview formatter must render a progress summary line showing completion metrics for the project and point users to the current query script name.
 >
-> **Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness without requiring detailed exploration.
+> **Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness, and the follow-up command guidance must be copy-pasteable.
 
 **Verified by:**
 
 - Overview renders progress line
+- Overview renders architect query guidance
 
 ---
 
@@ -333,13 +334,14 @@ _Command-line interface for generating documentation from annotated TypeScript._
 
 #### CLI lists available generators
 
-> **Invariant:** The --list-generators flag must display all registered generator names without performing any generation.
+> **Invariant:** The --list-generators flag must display all registered generator names without performing any generation, including config-registered reference meta-generators.
 >
-> **Rationale:** Users need to discover available generators before specifying --generator — listing them avoids trial-and-error with invalid generator names.
+> **Rationale:** Users need to discover available generators before specifying --generator — listing them avoids trial-and-error with invalid generator names and must reflect the project config they are running against.
 
 **Verified by:**
 
 - List generators with --list-generators
+- List generators includes config-registered reference meta-generators
 
 ---
 
@@ -724,13 +726,14 @@ _Core CLI infrastructure: help, version, input validation, status, query, patter
 
 #### CLI requires input flag for subcommands
 
-> **Invariant:** Every data-querying subcommand must receive an explicit `--input` glob specifying the source files to scan.
+> **Invariant:** Every data-querying subcommand must receive either an explicit `--input` glob or a project config that provides source globs.
 >
-> **Rationale:** Without an input source, the pipeline has no files to scan and would produce empty or misleading results instead of a clear error.
+> **Rationale:** Without an input source, the pipeline has no files to scan and would produce empty or misleading results instead of a clear error, but project config auto-detection should remove that boilerplate when the repo is configured.
 
 **Verified by:**
 
 - Fail without --input flag when running status
+- Use architect.config.js sources when --input is omitted
 - Reject unknown options
 
 ---
@@ -830,6 +833,7 @@ _Dry-run mode shows pipeline scope without processing data._
 **Verified by:**
 
 - Dry-run shows file counts
+- Dry-run reports architect.config.js auto-detection
 
 _data-api-dryrun.feature_
 

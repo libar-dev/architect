@@ -684,23 +684,29 @@ async function main(): Promise<void> {
   const configApplied = await applyProjectSourceDefaults(config);
 
   if (!configApplied && config.input.length === 0) {
-    console.error('  (No architect.config.ts found; provide -i/--input flags)');
+    console.error(
+      '  (No architect.config.ts or architect.config.js found; provide -i/--input flags)'
+    );
   }
 
   // Validate that we have sources (from CLI or config)
   if (config.input.length === 0) {
     console.error('Error: No TypeScript sources specified.');
-    console.error('Provide -i/--input flags or configure sources in architect.config.ts');
+    console.error(
+      'Provide -i/--input flags or configure sources in architect.config.ts or architect.config.js'
+    );
     process.exit(1);
   }
   if (config.features.length === 0) {
     console.error('Error: No feature files specified.');
-    console.error('Provide -F/--features flags or configure sources in architect.config.ts');
+    console.error(
+      'Provide -F/--features flags or configure sources in architect.config.ts or architect.config.js'
+    );
     process.exit(1);
   }
 
   try {
-    // Load configuration (discovers architect.config.ts)
+    // Load configuration (discovers architect.config.ts or architect.config.js)
     const configResult = await loadConfig(config.baseDir);
     if (!configResult.ok) {
       console.error(formatConfigError(configResult.error));

@@ -4,7 +4,7 @@
 
 ---
 
-**88 rules** from 20 features. 88 rules have explicit invariants.
+**90 rules** from 21 features. 90 rules have explicit invariants.
 
 ---
 
@@ -136,6 +136,45 @@ _The AST Parser extracts @architect-_ directives from TypeScript source files\*
 - Handle unicode characters in descriptions
 
 _ast-parser-relationships-edges.feature_
+
+### Claude Metadata Parity
+
+_The extractor must preserve Claude routing metadata from TypeScript directives_
+
+---
+
+#### TypeScript extraction preserves Claude metadata
+
+> **Invariant:** Claude routing metadata from TypeScript directives must be copied onto the extracted pattern.
+>
+> **Rationale:** Generated CLAUDE.md modules depend on the extracted pattern fields, so dropping directive metadata breaks downstream document routing.
+
+**Verified by:**
+
+- Extracted TypeScript pattern keeps Claude metadata
+- Extracted TypeScript pattern includes claudeModule
+- claudeSection
+- and claudeTags
+
+---
+
+#### Gherkin sync and async extraction keep Claude and ADR metadata aligned
+
+> **Invariant:** Sync and async Gherkin extraction must produce the same Claude and ADR metadata fields.
+>
+> **Rationale:** The async path is a performance optimization, not a different contract. Diverging metadata fields would make generated docs depend on call path.
+
+**Verified by:**
+
+- Sync and async Gherkin extraction return the same metadata
+- Sync and async extraction match for claudeModule
+- claudeSection
+- claudeTags
+- adrTheme
+- adrLayer
+- and effortActual
+
+_claude-metadata-parity.feature_
 
 ### Context Inference
 

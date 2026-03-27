@@ -51,9 +51,9 @@ Feature: Context Formatter - Plain Text Rendering
 
   Rule: formatOverview renders progress summary
 
-    **Invariant:** The overview formatter must render a progress summary line showing completion metrics for the project.
-    **Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness without requiring detailed exploration.
-    **Verified by:** Overview renders progress line
+    **Invariant:** The overview formatter must render a progress summary line showing completion metrics for the project and point users to the current query script name.
+    **Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness, and the follow-up command guidance must be copy-pasteable.
+    **Verified by:** Overview renders progress line, Overview renders architect query guidance
 
     @acceptance-criteria @happy-path
     Scenario: Overview renders progress line
@@ -64,6 +64,13 @@ Feature: Context Formatter - Plain Text Rendering
         | 69 patterns    |
         | 52%            |
         | === PROGRESS ===|
+
+    @acceptance-criteria @happy-path
+    Scenario: Overview renders architect query guidance
+      Given an overview with 69 total patterns at 52 percent
+      When I format the overview
+      Then the output contains "pnpm architect:query -- <subcommand>"
+      And the output contains "Full reference: pnpm architect:query -- --help"
 
   Rule: formatFileReadingList renders categorized file paths
 

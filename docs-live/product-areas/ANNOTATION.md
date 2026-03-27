@@ -338,7 +338,7 @@ CATEGORY_TAGS = CATEGORIES.map((c) => c.tag) as readonly CategoryTag[];
 
 ## Business Rules
 
-25 patterns, 116 rules with invariants (116 total)
+26 patterns, 118 rules with invariants (118 total)
 
 ### Ast Parser Exports
 
@@ -360,6 +360,13 @@ CATEGORY_TAGS = CATEGORIES.map((c) => c.tag) as readonly CategoryTag[];
 | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | Relationship tags extract uses and usedBy dependencies | The uses and usedBy relationship arrays are populated from directive tags, not from description content. When no relationship tags exist, the fields are undefined. | Relationship data drives dependency diagrams and impact analysis — extracting from prose would produce false edges from incidental mentions.    |
 | Edge cases and malformed input are handled gracefully  | The parser never crashes on invalid input. Files without directives return empty results. Malformed TypeScript returns a structured error with the file path.       | The scanner processes hundreds of files in bulk — a single malformed file must not abort the entire pipeline or produce an undiagnosable crash. |
+
+### Claude Metadata Parity Testing
+
+| Rule                                                                   | Invariant                                                                                     | Rationale                                                                                                                                        |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| TypeScript extraction preserves Claude metadata                        | Claude routing metadata from TypeScript directives must be copied onto the extracted pattern. | Generated CLAUDE.md modules depend on the extracted pattern fields, so dropping directive metadata breaks downstream document routing.           |
+| Gherkin sync and async extraction keep Claude and ADR metadata aligned | Sync and async Gherkin extraction must produce the same Claude and ADR metadata fields.       | The async path is a performance optimization, not a different contract. Diverging metadata fields would make generated docs depend on call path. |
 
 ### Context Inference
 

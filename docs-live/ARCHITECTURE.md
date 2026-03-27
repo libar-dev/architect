@@ -69,11 +69,11 @@ graph TB
         ContentDeduplicator["ContentDeduplicator[infrastructure]"]
         CodecBasedGenerator["CodecBasedGenerator[service]"]
         FileCache["FileCache[infrastructure]"]
+        DesignReviewGenerator["DesignReviewGenerator[service]"]
+        DecisionDocGenerator["DecisionDocGenerator[service]"]
         TransformDataset["TransformDataset[service]"]
         SequenceTransformUtils["SequenceTransformUtils[service]"]
         RelationshipResolver["RelationshipResolver[service]"]
-        DesignReviewGenerator["DesignReviewGenerator[service]"]
-        DecisionDocGenerator["DecisionDocGenerator[service]"]
     end
     subgraph lint["Lint BC"]
         LintRules["LintRules[service]"]
@@ -112,7 +112,6 @@ graph TB
         Convention_Annotation_Example___DD_3_Decision["Convention Annotation Example — DD-3 Decision[decider]"]
     end
     DoDValidator --> DualSourceExtractor
-    GherkinScanner --> GherkinASTParser
     MCPToolRegistry --> ProcessStateAPI
     MCPToolRegistry --> MCPPipelineSession
     MCPServerImpl --> MCPPipelineSession
@@ -132,6 +131,9 @@ graph TB
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
     Document_Extractor --> Pattern_Scanner
+    ConfigResolver --> ArchitectFactory
+    ArchitectFactory --> RegexBuilders
+    ConfigLoader --> ArchitectFactory
     ReplMode --> ProcessStateAPI
     ProcessAPICLIImpl --> ProcessStateAPI
     ProcessAPICLIImpl --> MasterDataset
@@ -140,9 +142,6 @@ graph TB
     ProcessAPICLIImpl --> OutputPipelineImpl
     OutputPipelineImpl --> PatternSummarizerImpl
     MCPServerBin --> MCPServerImpl
-    ConfigResolver --> ArchitectFactory
-    ArchitectFactory --> RegexBuilders
-    ConfigLoader --> ArchitectFactory
     PatternSummarizerImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
     ScopeValidatorImpl --> MasterDataset
@@ -160,17 +159,18 @@ graph TB
     ContextAssemblerImpl --> FuzzyMatcherImpl
     ArchQueriesImpl --> ProcessStateAPI
     ArchQueriesImpl --> MasterDataset
+    GherkinScanner --> GherkinASTParser
     FSMValidator --> FSMTransitions
     FSMValidator --> FSMStates
     DesignReviewCodec --> MasterDataset
     ArchitectureCodec --> MasterDataset
     ProcessGuardDecider --> FSMValidator
-    TransformDataset --> MasterDataset
-    SequenceTransformUtils --> MasterDataset
     DesignReviewGenerator --> DesignReviewCodec
     DesignReviewGenerator --> MasterDataset
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
+    TransformDataset --> MasterDataset
+    SequenceTransformUtils --> MasterDataset
 ```
 
 ---

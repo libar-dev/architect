@@ -22,7 +22,7 @@
  * - Preset name must be one of the known presets
  * - `replaceFeatures` and `additionalFeatures` are mutually exclusive
  *
- * **When to Use:** When loading and validating project configuration from `architect.config.ts` at startup.
+ * **When to Use:** When loading and validating project configuration from `architect.config.ts` or `architect.config.js` at startup.
  */
 
 import { z } from 'zod';

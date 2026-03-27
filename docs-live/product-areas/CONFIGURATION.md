@@ -222,7 +222,7 @@ interface RegexBuilders {
 /**
  * Unified project configuration for Architect.
  *
- * This is the shape users provide in `architect.config.ts`.
+ * This is the shape users provide in `architect.config.ts` or `architect.config.js`.
  * `defineConfig()` is an identity function providing type safety.
  *
  * @example
@@ -298,7 +298,7 @@ interface ArchitectProjectConfig {
   /**
    * Reference document configurations for convention-based doc generation.
    * Each config defines one reference document's content composition via
-   * convention tags, shape sources, behavior categories, and diagram scopes.
+   * convention tags, shape selectors, behavior categories, and diagram scopes.
    *
    * When not specified, no reference generators are registered.
    * Import `LIBAR_REFERENCE_CONFIGS` from the generators module
@@ -308,20 +308,20 @@ interface ArchitectProjectConfig {
 }
 ```
 
-| Property              | Description                                                                                                                                                                                                                                                                                                                                                           |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| preset                | Use a preset taxonomy configuration                                                                                                                                                                                                                                                                                                                                   |
-| tagPrefix             | Custom tag prefix (overrides preset, e.g., '@architect-')                                                                                                                                                                                                                                                                                                             |
-| fileOptInTag          | Custom file opt-in tag (overrides preset, e.g., '@architect')                                                                                                                                                                                                                                                                                                         |
-| categories            | Custom categories (replaces preset categories entirely)                                                                                                                                                                                                                                                                                                               |
-| sources               | Source file glob configuration                                                                                                                                                                                                                                                                                                                                        |
-| output                | Output configuration for generated docs                                                                                                                                                                                                                                                                                                                               |
-| generators            | Default generator names to run when CLI doesn't specify --generators                                                                                                                                                                                                                                                                                                  |
-| generatorOverrides    | Per-generator source and output overrides                                                                                                                                                                                                                                                                                                                             |
-| contextInferenceRules | Rules for auto-inferring bounded context from file paths                                                                                                                                                                                                                                                                                                              |
-| workflowPath          | Path to custom workflow config JSON (relative to config file)                                                                                                                                                                                                                                                                                                         |
-| codecOptions          | Per-codec options for fine-tuning document generation. Keys match codec names (e.g., 'business-rules', 'patterns'). Passed through to codec factories at generation time.                                                                                                                                                                                             |
-| referenceDocConfigs   | Reference document configurations for convention-based doc generation. Each config defines one reference document's content composition via convention tags, shape sources, behavior categories, and diagram scopes. When not specified, no reference generators are registered. Import `LIBAR_REFERENCE_CONFIGS` from the generators module to use the built-in set. |
+| Property              | Description                                                                                                                                                                                                                                                                                                                                                             |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| preset                | Use a preset taxonomy configuration                                                                                                                                                                                                                                                                                                                                     |
+| tagPrefix             | Custom tag prefix (overrides preset, e.g., '@architect-')                                                                                                                                                                                                                                                                                                               |
+| fileOptInTag          | Custom file opt-in tag (overrides preset, e.g., '@architect')                                                                                                                                                                                                                                                                                                           |
+| categories            | Custom categories (replaces preset categories entirely)                                                                                                                                                                                                                                                                                                                 |
+| sources               | Source file glob configuration                                                                                                                                                                                                                                                                                                                                          |
+| output                | Output configuration for generated docs                                                                                                                                                                                                                                                                                                                                 |
+| generators            | Default generator names to run when CLI doesn't specify --generators                                                                                                                                                                                                                                                                                                    |
+| generatorOverrides    | Per-generator source and output overrides                                                                                                                                                                                                                                                                                                                               |
+| contextInferenceRules | Rules for auto-inferring bounded context from file paths                                                                                                                                                                                                                                                                                                                |
+| workflowPath          | Path to custom workflow config JSON (relative to config file)                                                                                                                                                                                                                                                                                                           |
+| codecOptions          | Per-codec options for fine-tuning document generation. Keys match codec names (e.g., 'business-rules', 'patterns'). Passed through to codec factories at generation time.                                                                                                                                                                                               |
+| referenceDocConfigs   | Reference document configurations for convention-based doc generation. Each config defines one reference document's content composition via convention tags, shape selectors, behavior categories, and diagram scopes. When not specified, no reference generators are registered. Import `LIBAR_REFERENCE_CONFIGS` from the generators module to use the built-in set. |
 
 ### SourcesConfig (interface)
 
@@ -947,7 +947,7 @@ const PRESETS: Record<PresetName, ArchitectConfig>;
 
 ## Business Rules
 
-10 patterns, 45 rules with invariants (45 total)
+10 patterns, 46 rules with invariants (46 total)
 
 ### Config Based Workflow Definition
 
@@ -1009,11 +1009,12 @@ const PRESETS: Record<PresetName, ArchitectConfig>;
 
 ### Preset System
 
-| Rule                                                             | Invariant                                                                                         | Rationale                                                                                                           |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Libar generic preset provides minimal taxonomy with libar prefix | The libar-generic preset must provide exactly 3 categories with @architect- prefix.               | This package uses @architect- prefix to avoid collisions with consumer projects' annotations.                       |
-| DDD-ES-CQRS preset provides full taxonomy                        | The DDD preset must provide all 21 categories spanning DDD, ES, CQRS, and infrastructure domains. | DDD architectures require fine-grained categorization to distinguish bounded contexts, aggregates, and projections. |
-| Presets can be accessed by name                                  | All preset instances must be accessible via the PRESETS map using their canonical string key.     | Programmatic access enables config files to reference presets by name instead of importing instances.               |
+| Rule                                                             | Invariant                                                                                                                                                                            | Rationale                                                                                                           |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| Libar generic preset provides minimal taxonomy with libar prefix | The libar-generic preset must provide exactly 3 categories with @architect- prefix.                                                                                                  | This package uses @architect- prefix to avoid collisions with consumer projects' annotations.                       |
+| DDD-ES-CQRS preset provides full taxonomy                        | The DDD preset must provide all 21 categories spanning DDD, ES, CQRS, and infrastructure domains.                                                                                    | DDD architectures require fine-grained categorization to distinguish bounded contexts, aggregates, and projections. |
+| Presets can be accessed by name                                  | All preset instances must be accessible via the PRESETS map using their canonical string key.                                                                                        | Programmatic access enables config files to reference presets by name instead of importing instances.               |
+| PresetName type is exported from public entrypoints              | The `PresetName` type must remain available from both package entrypoints so downstream configs and helper functions can reference preset keys without reaching into internal files. | Removing a documented type export is a breaking API change even when runtime behavior is unchanged.                 |
 
 ### Project Config Loader
 

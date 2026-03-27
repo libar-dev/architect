@@ -4,7 +4,7 @@
 
 ---
 
-**30 rules** from 7 features. 30 rules have explicit invariants.
+**31 rules** from 7 features. 31 rules have explicit invariants.
 
 ---
 
@@ -333,6 +333,19 @@ _- New users need sensible defaults for their project type_
 
 - DDD preset accessible via PRESETS map
 - Libar generic preset accessible via PRESETS map
+
+---
+
+#### PresetName type is exported from public entrypoints
+
+> **Invariant:** The `PresetName` type must remain available from both package entrypoints so downstream configs and helper functions can reference preset keys without reaching into internal files.
+>
+> **Rationale:** Removing a documented type export is a breaking API change even when runtime behavior is unchanged.
+
+**Verified by:**
+
+- Package entrypoint exports PresetName type
+- Config entrypoint exports PresetName type
 
 _preset-system.feature_
 

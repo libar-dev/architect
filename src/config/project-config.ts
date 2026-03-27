@@ -29,7 +29,7 @@
  *
  * ### When to Use
  *
- * - Define project config in `architect.config.ts`
+ * - Define project config in `architect.config.ts` or `architect.config.js`
  * - Internal resolution via `resolveProjectConfig()`
  * - CLI override merging
  */
@@ -137,7 +137,7 @@ export interface GeneratorSourceOverride {
 /**
  * Unified project configuration for Architect.
  *
- * This is the shape users provide in `architect.config.ts`.
+ * This is the shape users provide in `architect.config.ts` or `architect.config.js`.
  * `defineConfig()` is an identity function providing type safety.
  *
  * @example
@@ -210,7 +210,7 @@ export interface ArchitectProjectConfig {
   /**
    * Reference document configurations for convention-based doc generation.
    * Each config defines one reference document's content composition via
-   * convention tags, shape sources, behavior categories, and diagram scopes.
+   * convention tags, shape selectors, behavior categories, and diagram scopes.
    *
    * When not specified, no reference generators are registered.
    * Import `LIBAR_REFERENCE_CONFIGS` from the generators module

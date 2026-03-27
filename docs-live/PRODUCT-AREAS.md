@@ -11,7 +11,7 @@
 
 The annotation system is the ingestion boundary — it transforms annotated TypeScript and Gherkin files into `ExtractedPattern[]` objects that feed the entire downstream pipeline. Two parallel scanning paths (TypeScript AST + Gherkin parser) converge through dual-source merging. The system is fully data-driven: the `TagRegistry` defines all tags, formats, and categories — adding a new annotation requires only a registry entry, zero parser changes.
 
-**26 patterns** — 23 completed, 2 active, 1 planned
+**27 patterns** — 24 completed, 2 active, 1 planned
 
 **Key patterns:** PatternRelationshipModel, ShapeExtraction, DualSourceExtraction, GherkinRulesSupport, DeclarationLevelShapeTagging, CrossSourceValidation, ExtractionPipelineEnhancementsTesting
 
@@ -81,14 +81,14 @@ Process defines the USDP-inspired session workflow that governs how work moves t
 
 | Area                                            | Patterns | Completed | Active | Planned |
 | ----------------------------------------------- | -------- | --------- | ------ | ------- |
-| [Annotation](product-areas/ANNOTATION.md)       | 26       | 23        | 2      | 1       |
+| [Annotation](product-areas/ANNOTATION.md)       | 27       | 24        | 2      | 1       |
 | [Configuration](product-areas/CONFIGURATION.md) | 11       | 8         | 0      | 3       |
 | [Generation](product-areas/GENERATION.md)       | 95       | 81        | 6      | 8       |
 | [Validation](product-areas/VALIDATION.md)       | 25       | 16        | 3      | 6       |
 | [DataAPI](product-areas/DATA-API.md)            | 40       | 23        | 15     | 2       |
 | [CoreTypes](product-areas/CORE-TYPES.md)        | 11       | 7         | 4      | 0       |
 | [Process](product-areas/PROCESS.md)             | 11       | 4         | 0      | 7       |
-| **Total**                                       | **219**  | **162**   | **30** | **27**  |
+| **Total**                                       | **220**  | **163**   | **30** | **27**  |
 
 ---
 

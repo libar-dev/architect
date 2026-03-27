@@ -10,6 +10,7 @@
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
+import { writeTempFile } from '../../support/helpers/file-system.js';
 import {
   type CLITestState,
   initState,
@@ -30,6 +31,15 @@ let state: CLITestState | null = null;
 // =============================================================================
 
 const feature = await loadFeature('tests/features/cli/data-api-dryrun.feature');
+
+function createJsProjectConfig(): string {
+  return `export default {
+  sources: {
+    typescript: ['src/**/*.ts']
+  }
+};
+`;
+}
 
 describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
@@ -84,5 +94,38 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(getResult(state).stdout).not.toContain(text);
       });
     });
+
+    RuleScenario(
+      'Dry-run reports architect.config.js auto-detection',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript files with pattern annotations', async () => {
+          await writePatternFiles(state);
+        });
+
+        And('an architect.config.js with TypeScript sources', async () => {
+          await writeTempFile(
+            state!.tempContext!.tempDir,
+            'architect.config.js',
+            createJsProjectConfig()
+          );
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(state, cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult(state).exitCode).toBe(code);
+        });
+
+        And('stdout contains {string}', (_ctx: unknown, text: string) => {
+          expect(getResult(state).stdout).toContain(text);
+        });
+
+        And('stdout does not contain {string}', (_ctx: unknown, text: string) => {
+          expect(getResult(state).stdout).not.toContain(text);
+        });
+      }
+    );
   });
 });

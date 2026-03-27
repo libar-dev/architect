@@ -12,7 +12,7 @@
  *
  * ## Config Loader - TypeScript Configuration File Discovery
  *
- * Discovers and loads `architect.config.ts` files for hierarchical configuration.
+ * Discovers and loads `architect.config.ts` or `architect.config.js` files for hierarchical configuration.
  * Supports package-level and repo-level configuration inheritance.
  *
  * ### When to Use
@@ -23,7 +23,7 @@
  *
  * ### Discovery Strategy
  *
- * 1. Look for `architect.config.ts` in current directory
+ * 1. Look for `architect.config.ts` or `architect.config.js` in current directory
  * 2. Walk up parent directories until repo root (contains .git)
  * 3. Stop at first config found or fall back to default
  *
@@ -251,7 +251,7 @@ export type ProjectConfigLoadResult =
  * Loads `ArchitectProjectConfig` (via `defineConfig()`) config files.
  *
  * Discovery strategy:
- * 1. Search for `architect.config.ts` starting from baseDir
+ * 1. Search for `architect.config.ts` or `architect.config.js` starting from baseDir
  * 2. Walk up parent directories until repo root
  * 3. If found, import and resolve the configuration
  * 4. If not found, return default resolved config

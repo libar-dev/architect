@@ -100,7 +100,7 @@ export const CLI_SCHEMA: CLISchema = {
   globalOptions: {
     title: 'Global Options',
     postNote:
-      '**Config auto-detection:** If `--input` and `--features` are not provided, the CLI loads defaults from `architect.config.ts` in the current directory. If no config file exists, it falls back to filesystem-based detection. If neither works, `--input` is required.',
+      '**Config auto-detection:** If `--input` and `--features` are not provided, the CLI loads defaults from `architect.config.ts` or `architect.config.js`. If no config file exists, it falls back to filesystem-based detection. If neither works, `--input` is required.',
     options: [
       {
         flag: '--input <pattern>',
