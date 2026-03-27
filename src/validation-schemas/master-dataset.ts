@@ -47,20 +47,20 @@ import { TagRegistrySchema } from './tag-registry.js';
  * Status-based grouping of patterns
  *
  * Patterns are normalized to three canonical states:
- * - completed: implemented, completed
- * - active: active, partial, in-progress
- * - planned: roadmap, planned, undefined
+ * - completed: completed
+ * - active: active
+ * - planned: roadmap, deferred, or undefined/unknown
  *
  * @architect-shape master-dataset
  */
 export const StatusGroupsSchema = z.object({
-  /** Patterns with status 'completed' or 'implemented' */
+  /** Patterns with status 'completed' */
   completed: z.array(ExtractedPatternSchema),
 
-  /** Patterns with status 'active', 'partial', or 'in-progress' */
+  /** Patterns with status 'active' */
   active: z.array(ExtractedPatternSchema),
 
-  /** Patterns with status 'roadmap', 'planned', or undefined */
+  /** Patterns with status 'roadmap', 'deferred', or undefined/unknown */
   planned: z.array(ExtractedPatternSchema),
 });
 

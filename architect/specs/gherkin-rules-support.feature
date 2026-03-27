@@ -1,7 +1,7 @@
 @architect
 @architect-pattern:GherkinRulesSupport
 @architect-status:completed
-@architect-unlock-reason:Add-libar-docs-opt-in-marker
+@architect-unlock-reason:Add-architect-opt-in-marker
 @architect-phase:100
 @architect-release:v1.0.0
 @architect-effort:4h

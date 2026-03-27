@@ -5,7 +5,7 @@
 
 ---
 
-**How do I query process state?** The Data API provides direct terminal access to delivery process state. It replaces reading generated markdown or launching explore agents — targeted queries use 5-10x less context. The `context` command assembles curated bundles tailored to session type (planning, design, implement).
+**How do I query process state?** The Data API provides direct terminal access to project state. It replaces reading generated markdown or launching explore agents — targeted queries use 5-10x less context. The `context` command assembles curated bundles tailored to session type (planning, design, implement).
 
 ## Key Invariants
 
@@ -45,7 +45,7 @@ and `transformToMasterDataset` with validation summary.
 
 ## Consumer Architecture and PipelineOptions Differentiation
 
-Three consumers share this factory: `architect`, `architect-validate`, and the
+Three consumers share this factory: `process-api`, `validate-patterns`, and the
 generation orchestrator. `PipelineOptions` differentiates behavior by
 `mergeConflictStrategy` (`fatal` vs `concatenate`), `includeValidation` toggles,
 and `failOnScanErrors` policy without forking pipeline logic.
@@ -66,6 +66,11 @@ Scoped architecture diagram showing component relationships:
 graph TB
     subgraph api["Api"]
         MasterDataset[/"MasterDataset"/]
+        MCPToolRegistry("MCPToolRegistry")
+        MCPServerImpl("MCPServerImpl")
+        MCPPipelineSession("MCPPipelineSession")
+        MCPModule[/"MCPModule"/]
+        MCPFileWatcher[/"MCPFileWatcher"/]
         PatternSummarizerImpl("PatternSummarizerImpl")
         ScopeValidatorImpl("ScopeValidatorImpl")
         ProcessStateAPI("ProcessStateAPI")
@@ -81,12 +86,14 @@ graph TB
         ReplMode("ReplMode")
         ProcessAPICLIImpl("ProcessAPICLIImpl")
         OutputPipelineImpl("OutputPipelineImpl")
+        MCPServerBin[/"MCPServerBin"/]
         DatasetCache[/"DatasetCache"/]
         CLISchema["CLISchema"]
     end
     subgraph related["Related"]
         WorkflowConfigSchema["WorkflowConfigSchema"]:::neighbor
         Pattern_Scanner["Pattern Scanner"]:::neighbor
+        ConfigLoader["ConfigLoader"]:::neighbor
         StubResolverImpl["StubResolverImpl"]:::neighbor
         RulesQueryModule["RulesQueryModule"]:::neighbor
         FSMValidator["FSMValidator"]:::neighbor
@@ -94,12 +101,48 @@ graph TB
         ProcessStateAPICLI["ProcessStateAPICLI"]:::neighbor
         ProcessApiHybridGeneration["ProcessApiHybridGeneration"]:::neighbor
         PhaseStateMachineValidation["PhaseStateMachineValidation"]:::neighbor
+        MCPServerIntegration["MCPServerIntegration"]:::neighbor
         DataAPIDesignSessionSupport["DataAPIDesignSessionSupport"]:::neighbor
         DataAPIOutputShaping["DataAPIOutputShaping"]:::neighbor
         DataAPIContextAssembly["DataAPIContextAssembly"]:::neighbor
         DataAPICLIErgonomics["DataAPICLIErgonomics"]:::neighbor
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
     end
+    MCPToolRegistry -->|uses| ProcessStateAPI
+    MCPToolRegistry -->|uses| MCPPipelineSession
+    MCPToolRegistry ..->|implements| MCPServerIntegration
+    MCPServerImpl -->|uses| MCPPipelineSession
+    MCPServerImpl -->|uses| MCPToolRegistry
+    MCPServerImpl -->|uses| MCPFileWatcher
+    MCPServerImpl ..->|implements| MCPServerIntegration
+    MCPPipelineSession -->|uses| PipelineFactory
+    MCPPipelineSession -->|uses| ProcessStateAPI
+    MCPPipelineSession -->|uses| ConfigLoader
+    MCPPipelineSession ..->|implements| MCPServerIntegration
+    MCPModule -->|uses| MCPServerImpl
+    MCPModule -->|uses| MCPPipelineSession
+    MCPModule -->|uses| MCPFileWatcher
+    MCPModule -->|uses| MCPToolRegistry
+    MCPFileWatcher ..->|implements| MCPServerIntegration
+    ReplMode -->|uses| PipelineFactory
+    ReplMode -->|uses| ProcessStateAPI
+    ReplMode ..->|implements| DataAPICLIErgonomics
+    ProcessAPICLIImpl -->|uses| ProcessStateAPI
+    ProcessAPICLIImpl -->|uses| MasterDataset
+    ProcessAPICLIImpl -->|uses| PipelineFactory
+    ProcessAPICLIImpl -->|uses| RulesQueryModule
+    ProcessAPICLIImpl -->|uses| PatternSummarizerImpl
+    ProcessAPICLIImpl -->|uses| FuzzyMatcherImpl
+    ProcessAPICLIImpl -->|uses| OutputPipelineImpl
+    ProcessAPICLIImpl ..->|implements| ProcessStateAPICLI
+    OutputPipelineImpl -->|uses| PatternSummarizerImpl
+    OutputPipelineImpl ..->|implements| DataAPIOutputShaping
+    MCPServerBin -->|uses| MCPServerImpl
+    MCPServerBin ..->|implements| MCPServerIntegration
+    DatasetCache -->|uses| PipelineFactory
+    DatasetCache -->|uses| WorkflowConfigSchema
+    DatasetCache ..->|implements| DataAPICLIErgonomics
+    CLISchema ..->|implements| ProcessApiHybridGeneration
     PatternSummarizerImpl -->|uses| ProcessStateAPI
     PatternSummarizerImpl ..->|implements| DataAPIOutputShaping
     ScopeValidatorImpl -->|uses| ProcessStateAPI
@@ -129,26 +172,10 @@ graph TB
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
-    ReplMode -->|uses| PipelineFactory
-    ReplMode -->|uses| ProcessStateAPI
-    ReplMode ..->|implements| DataAPICLIErgonomics
-    ProcessAPICLIImpl -->|uses| ProcessStateAPI
-    ProcessAPICLIImpl -->|uses| MasterDataset
-    ProcessAPICLIImpl -->|uses| PipelineFactory
-    ProcessAPICLIImpl -->|uses| RulesQueryModule
-    ProcessAPICLIImpl -->|uses| PatternSummarizerImpl
-    ProcessAPICLIImpl -->|uses| FuzzyMatcherImpl
-    ProcessAPICLIImpl -->|uses| OutputPipelineImpl
-    ProcessAPICLIImpl ..->|implements| ProcessStateAPICLI
-    OutputPipelineImpl -->|uses| PatternSummarizerImpl
-    OutputPipelineImpl ..->|implements| DataAPIOutputShaping
-    DatasetCache -->|uses| PipelineFactory
-    DatasetCache -->|uses| WorkflowConfigSchema
-    DatasetCache ..->|implements| DataAPICLIErgonomics
-    CLISchema ..->|implements| ProcessApiHybridGeneration
     StubResolverImpl -->|uses| ProcessStateAPI
     FSMValidator ..->|implements| PhaseStateMachineValidation
     PipelineFactory -->|uses| MasterDataset
+    MCPServerIntegration -.->|depends on| DataAPICLIErgonomics
     DataAPIDesignSessionSupport -.->|depends on| DataAPIContextAssembly
     DataAPIContextAssembly -.->|depends on| DataAPIOutputShaping
     DataAPIArchitectureQueries -.->|depends on| DataAPIOutputShaping
@@ -305,22 +332,22 @@ MasterDatasetSchema = z.object({
  * Status-based grouping of patterns
  *
  * Patterns are normalized to three canonical states:
- * - completed: implemented, completed
- * - active: active, partial, in-progress
- * - planned: roadmap, planned, undefined
+ * - completed: completed
+ * - active: active
+ * - planned: roadmap, deferred, or undefined/unknown
  *
  */
 ```
 
 ```typescript
 StatusGroupsSchema = z.object({
-  /** Patterns with status 'completed' or 'implemented' */
+  /** Patterns with status 'completed' */
   completed: z.array(ExtractedPatternSchema),
 
-  /** Patterns with status 'active', 'partial', or 'in-progress' */
+  /** Patterns with status 'active' */
   active: z.array(ExtractedPatternSchema),
 
-  /** Patterns with status 'roadmap', 'planned', or undefined */
+  /** Patterns with status 'roadmap', 'deferred', or undefined/unknown */
   planned: z.array(ExtractedPatternSchema),
 });
 ```
@@ -515,7 +542,7 @@ ArchIndexSchema = z.object({
 | Rule                                                           | Invariant                                                                                                                                                | Rationale                                                                                                                                                                                                                                                                                     |
 | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Arch subcommand provides neighborhood and comparison views     | Architecture queries resolve pattern names to concrete relationships and file paths, not just abstract names.                                            | The current `arch graph <pattern>` returns dependency and relationship names but not the full picture of what surrounds a pattern. Design sessions need to understand: "If I'm working on X, what else is directly connected?" and "How do contexts A and B relate?"                          |
-| Coverage analysis reports annotation completeness with gaps    | Coverage reports identify unannotated files that should have the libar-docs opt-in marker based on their location and content.                           | Annotation completeness directly impacts the quality of all generated documentation and API queries. Files without the opt-in marker are invisible to the pipeline. Coverage gaps mean missing patterns in the registry, incomplete dependency graphs, and blind spots in architecture views. |
+| Coverage analysis reports annotation completeness with gaps    | Coverage reports identify unannotated files that should have the @architect opt-in marker based on their location and content.                           | Annotation completeness directly impacts the quality of all generated documentation and API queries. Files without the opt-in marker are invisible to the pipeline. Coverage gaps mean missing patterns in the registry, incomplete dependency graphs, and blind spots in architecture views. |
 | Tags and sources commands provide taxonomy and inventory views | All tag values in use are discoverable without reading configuration files. Source file inventory shows the full scope of annotated and scanned content. | Agents frequently need to know "what categories exist?" or "how many feature files are there?" without reading taxonomy configuration. These are meta-queries about the annotation system itself, essential for writing new annotations correctly and understanding scope.                    |
 
 ### Data API CLI Ergonomics
@@ -639,13 +666,13 @@ ArchIndexSchema = z.object({
 
 ### MCP Server Integration
 
-| Rule                                                                    | Invariant                                                                                                                                                                                                                | Rationale                                                                                                                                                                                                                                                                               |
-| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MCP server starts via stdio transport and manages its own lifecycle     | The MCP server communicates over stdio using JSON-RPC. It builds the pipeline once during initialization, then enters a request-response loop. No non-MCP output is written to stdout (no console.log, no pnpm banners). | MCP defines stdio as the standard transport for local tool servers. Claude Code spawns the process and communicates over stdin/stdout pipes. Any extraneous stdout output corrupts the JSON-RPC stream. Loading the pipeline during initialization ensures the first tool call is fast. |
-| ProcessStateAPI methods and CLI subcommands are registered as MCP tools | Every CLI subcommand is registered as an MCP tool with a JSON Schema describing its input parameters. Tool names use snake*case with a "dp*" prefix to avoid collisions with other MCP servers.                          | MCP tools are the unit of interaction. Each tool needs a name, description (for LLM tool selection), and JSON Schema for input validation. The "dp\_" prefix prevents collisions in multi-server setups.                                                                                |
-| MasterDataset is loaded once and reused across all tool invocations     | The pipeline runs exactly once during server initialization. All subsequent tool calls read from in-memory MasterDataset. A manual rebuild can be triggered via a "architect_rebuild" tool.                              | The pipeline costs 2-5 seconds. Running it per tool call negates MCP benefits. Pre-computed views provide O(1) access ideal for a query server.                                                                                                                                         |
-| Source file changes trigger automatic dataset rebuild with debouncing   | When --watch is enabled, changes to source files trigger an automatic pipeline rebuild. Multiple rapid changes are debounced into a single rebuild (default 500ms window).                                               | During implementation sessions, source files change frequently. Without auto-rebuild, agents must manually call architect_rebuild. Debouncing prevents redundant rebuilds during rapid-fire saves.                                                                                      |
-| MCP server is configurable via standard client configuration            | The server works with .mcp.json (Claude Code), claude_desktop_config.json (Claude Desktop), and any MCP client. It accepts --input, --features, --base-dir args and auto-detects architect.config.ts.                    | MCP clients discover servers through configuration files. The server must work with sensible defaults (config auto-detection) while supporting explicit overrides for monorepo setups.                                                                                                  |
+| Rule                                                                    | Invariant                                                                                                                                                                                                                                                                                                 | Rationale                                                                                                                                                                                                                                                                               |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MCP server starts via stdio transport and manages its own lifecycle     | The MCP server communicates over stdio using JSON-RPC. It builds the pipeline once during initialization, then enters a request-response loop. No non-MCP output is written to stdout (no console.log, no pnpm banners).                                                                                  | MCP defines stdio as the standard transport for local tool servers. Claude Code spawns the process and communicates over stdin/stdout pipes. Any extraneous stdout output corrupts the JSON-RPC stream. Loading the pipeline during initialization ensures the first tool call is fast. |
+| ProcessStateAPI methods and CLI subcommands are registered as MCP tools | Every CLI subcommand is registered as an MCP tool with a JSON Schema describing its input parameters. Tool names use snake*case with a "architect*" prefix to avoid collisions with other MCP servers.                                                                                                    | MCP tools are the unit of interaction. Each tool needs a name, description (for LLM tool selection), and JSON Schema for input validation. The "architect\_" prefix prevents collisions in multi-server setups.                                                                         |
+| MasterDataset is loaded once and reused across all tool invocations     | The pipeline runs exactly once during server initialization. All subsequent tool calls read from in-memory MasterDataset. A manual rebuild can be triggered via a "architect_rebuild" tool, and overlapping rebuild requests coalesce so the final in-memory session reflects the newest completed build. | The pipeline costs 2-5 seconds. Running it per tool call negates MCP benefits. Pre-computed views provide O(1) access ideal for a query server.                                                                                                                                         |
+| Source file changes trigger automatic dataset rebuild with debouncing   | When --watch is enabled, changes to source files trigger an automatic pipeline rebuild. Multiple rapid changes are debounced into a single rebuild (default 500ms window).                                                                                                                                | During implementation sessions, source files change frequently. Without auto-rebuild, agents must manually call architect_rebuild. Debouncing prevents redundant rebuilds during rapid-fire saves.                                                                                      |
+| MCP server is configurable via standard client configuration            | The server works with .mcp.json (Claude Code), claude_desktop_config.json (Claude Desktop), and any MCP client. It accepts --input, --features, --base-dir args, auto-detects architect.config.ts, and reports the package version accurately through the CLI.                                            | MCP clients discover servers through configuration files. The server must work with sensible defaults (config auto-detection) while supporting explicit overrides for monorepo setups.                                                                                                  |
 
 ### Output Pipeline Tests
 

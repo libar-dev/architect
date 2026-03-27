@@ -67,7 +67,7 @@
  * | behaviorCategories | [] (empty -- uses includeTags instead) | [] |
  * | includeTags | ['session-workflows'] | [] |
  * | conventionTags | [] | ['annotation-system'] |
- * | shapeSources | [] | [] |
+ * | shapeSelectors | [] | [] |
  * | claudeMdSection | 'workflow' | 'annotation' |
  * | docsFilename | 'SESSION-WORKFLOW-GUIDE.md' | 'ANNOTATION-REFERENCE.md' |
  * | claudeMdFilename | 'session-workflow-guide.md' | 'annotation-reference.md' |

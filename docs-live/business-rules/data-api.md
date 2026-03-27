@@ -263,10 +263,12 @@ _Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein._
 
 - Exact match scores 1.0
 - Exact match is case-insensitive
-- Prefix match scores 0.9
+- Prefix match scores above 0.9
 - Substring match scores 0.7
 - Levenshtein match for close typos
 - Results are sorted by score descending
+- Prefix matches rank shorter names higher
+- Prefix match scores reflect query coverage
 - Empty query matches all patterns as prefix
 - No candidate patterns returns no results
 
@@ -1111,7 +1113,7 @@ _Discovery subcommands: list, search, context assembly, tags/sources, extended a
 
 **Verified by:**
 
-- Unannotated finds files missing libar-docs marker
+- Unannotated finds files missing architect marker
 
 _process-api-subcommands.feature_
 
@@ -1256,6 +1258,7 @@ _Starting an implementation or design session without checking prerequisites_
 - All implementation checks pass
 - Incomplete dependency blocks implementation
 - FSM transition from completed blocks implementation
+- Active pattern passes FSM check for implementation
 - Missing PDR references produce WARN
 - No deliverables blocks implementation
 - Strict mode promotes WARN to BLOCKED

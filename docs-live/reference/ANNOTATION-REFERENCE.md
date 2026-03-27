@@ -39,11 +39,10 @@ Feature: My Pattern
 
 ### Tag Prefix by Preset
 
-| Preset                    | Prefix        | Categories | Use Case                      |
-| ------------------------- | ------------- | ---------- | ----------------------------- |
-| `libar-generic` (default) | `@architect-` | 3          | Simple projects               |
-| `ddd-es-cqrs`             | `@architect-` | 21         | DDD/Event Sourcing monorepos  |
-| `generic`                 | `@docs-`      | 3          | Simple projects, short prefix |
+| Preset                    | Prefix        | Categories | Use Case                     |
+| ------------------------- | ------------- | ---------- | ---------------------------- |
+| `libar-generic` (default) | `@architect-` | 3          | Simple projects              |
+| `ddd-es-cqrs`             | `@architect-` | 21         | DDD/Event Sourcing monorepos |
 
 ### Dual-Source Ownership
 

@@ -16,7 +16,7 @@ Feature: Design Review Diagram Generation
   minutes per pattern and produces artifacts that are stale by the next spec edit.
 
   **Solution:**
-  A generation pipeline that reads sequence annotations (libar-docs-sequence-*) from
+  A generation pipeline that reads sequence annotations (`architect-sequence-*`) from
   feature files and produces design review documents with Mermaid sequence and component
   diagrams. The pipeline fits into the existing codec/generator architecture: sequence
   data is pre-computed in a SequenceIndex view on MasterDataset, then a standalone
@@ -37,10 +37,7 @@ Feature: Design Review Diagram Generation
 
   Rule: SequenceIndex pre-computes ordered steps from rule-level tags
 
-    **Invariant:** The MasterDataset sequenceIndex contains one entry per pattern
-    that has libar-docs-sequence-orchestrator and at least one rule with
-    libar-docs-sequence-step. Steps are sorted by stepNumber. Participants are
-    deduplicated and ordered with orchestrator first.
+    **Invariant:** The MasterDataset sequenceIndex contains one entry per pattern that has the `architect-sequence-orchestrator` tag and at least one rule with the `architect-sequence-step` tag. Steps are sorted by stepNumber. Participants are deduplicated and ordered with orchestrator first.
 
     **Rationale:** Pre-computing in the transform pass avoids repeated parsing
     in the codec. ADR-006 mandates the MasterDataset as the sole read model.
@@ -51,23 +48,20 @@ Feature: Design Review Diagram Generation
 
     @acceptance-criteria @happy-path
     Scenario: SequenceIndex populated for annotated pattern
-      Given a pattern with sequence-orchestrator and 6 sequence-step rules
+      Given a pattern with @architect-sequence-orchestrator and 6 @architect-sequence-step rules
       When the pattern is transformed to MasterDataset
       Then sequenceIndex contains an entry for the pattern
       And the entry has 6 ordered steps with modules and data flow types
 
     @acceptance-criteria @validation
     Scenario: Patterns without sequence annotations excluded
-      Given a pattern with no sequence-orchestrator tag
+      Given a pattern with no @architect-sequence-orchestrator tag
       When the pattern is transformed to MasterDataset
       Then sequenceIndex does not contain an entry for the pattern
 
   Rule: DesignReviewCodec generates sequence diagrams from ordered steps
 
-    **Invariant:** The sequence diagram contains participants derived from
-    sequence-module tags, Note blocks from Rule names, call arrows from
-    Input/Output markers, and alt blocks from sequence-error scenarios.
-    Participant order follows step order with User and orchestrator first.
+    **Invariant:** The sequence diagram contains participants derived from `@architect-sequence-module` tags, Note blocks from Rule names, call arrows from Input/Output markers, and alt blocks from `@architect-sequence-error` scenarios. Participant order follows step order with User and orchestrator first.
 
     **Rationale:** Sequence diagrams verify interaction ordering and error
     handling completeness. Auto-generation ensures diagrams stay synchronized
@@ -85,7 +79,7 @@ Feature: Design Review Diagram Generation
 
     @acceptance-criteria @validation
     Scenario: Error scenarios produce alt blocks
-      Given a step with 2 scenarios tagged sequence-error
+      Given a step with 2 scenarios tagged @architect-sequence-error
       When the design review is generated
       Then the sequence diagram contains 2 alt blocks for that step
 

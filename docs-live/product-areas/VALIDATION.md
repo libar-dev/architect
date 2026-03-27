@@ -45,8 +45,8 @@ C4Context
         System(FSMTransitions, "FSMTransitions")
         System(FSMStates, "FSMStates")
     }
-    System_Ext(DoDValidationTypes, "DoDValidationTypes")
     System_Ext(CodecUtils, "CodecUtils")
+    System_Ext(DoDValidationTypes, "DoDValidationTypes")
     System_Ext(DualSourceExtractor, "DualSourceExtractor")
     System_Ext(DetectChanges, "DetectChanges")
     System_Ext(DeriveProcessState, "DeriveProcessState")
@@ -95,8 +95,8 @@ graph LR
         FSMStates[/"FSMStates"/]
     end
     subgraph related["Related"]
-        DoDValidationTypes["DoDValidationTypes"]:::neighbor
         CodecUtils["CodecUtils"]:::neighbor
+        DoDValidationTypes["DoDValidationTypes"]:::neighbor
         DualSourceExtractor["DualSourceExtractor"]:::neighbor
         DetectChanges["DetectChanges"]:::neighbor
         DeriveProcessState["DeriveProcessState"]:::neighbor
@@ -412,7 +412,7 @@ function formatDoDSummary(summary: DoDValidationSummary): string;
  *
  * // With custom prefix
  * const registry = createDefaultTagRegistry();
- * registry.tagPrefix = "@docs-";
+ * registry.tagPrefix = "@architect-";
  * const customViolations = detectAntiPatterns(tsFiles, featureFiles, { registry });
  *
  * for (const v of violations) {
@@ -444,7 +444,7 @@ function detectAntiPatterns(
 /**
  * Detect process metadata in code anti-pattern
  *
- * Finds process tracking annotations (e.g., @docs-quarter, @docs-team, etc.)
+ * Finds process tracking annotations (e.g., @architect-quarter, @architect-team, etc.)
  * in TypeScript files. Process metadata belongs in feature files.
  *
  * @param scannedFiles - Array of scanned TypeScript files
@@ -899,7 +899,7 @@ const missingPatternName: LintRule;
 /**
  * Rule: missing-status
  *
- * Patterns should have an explicit status (completed, active, roadmap).
+ * Patterns should have an explicit status (completed, active, roadmap, deferred).
  * This helps readers understand if the pattern is ready for use.
  */
 ```
@@ -912,7 +912,7 @@ const missingStatus: LintRule;
 
 ## Business Rules
 
-23 patterns, 102 rules with invariants (102 total)
+23 patterns, 103 rules with invariants (103 total)
 
 ### Anti Pattern Detector Testing
 
@@ -1006,6 +1006,7 @@ const missingStatus: LintRule;
 | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | Files must declare an explicit pattern name   | Every annotated file must have a non-empty patternName to be identifiable in the registry.                           | Without a pattern name, the file cannot be tracked, linked, or referenced in generated documentation.   |
 | Files should declare a lifecycle status       | Every annotated file should have a status tag to track its position in the delivery lifecycle.                       | Missing status prevents FSM validation and roadmap tracking.                                            |
+| Files must use canonical FSM status values    | Annotated files may use only the canonical PDR-005 FSM statuses: roadmap, active, completed, deferred.               | Legacy aliases hide process drift and break a single-source-of-truth workflow model.                    |
 | Files should document when to use the pattern | Annotated files should include whenToUse guidance so consumers know when to apply the pattern.                       | Without usage guidance, patterns become undiscoverable despite being documented.                        |
 | Files should declare relationship tags        | Annotated files should declare uses or usedBy relationships to enable dependency tracking and architecture diagrams. | Isolated patterns without relationships produce diagrams with no edges and prevent dependency analysis. |
 
@@ -1034,7 +1035,7 @@ const missingStatus: LintRule;
 | Status transitions follow PDR-005 FSM                 | Every status change must follow a valid edge in the PDR-005 finite state machine; no transition may skip intermediate states.                                        | Skipping states (e.g., `roadmap` directly to `completed`) bypasses scope-locking and review gates, allowing incomplete work to be marked as done.     |
 | Active specs cannot add new deliverables              | The deliverables table of an `active` spec is immutable with respect to new rows; only existing deliverable statuses may change.                                     | Adding deliverables after work has begun constitutes scope creep, undermining effort estimates and blocking completion.                               |
 | CLI provides flexible validation modes                | The CLI must support both pre-commit (staged-only) and CI (all-files) validation modes with deterministic exit codes reflecting violation severity.                  | Without flexible modes, teams cannot integrate process guard into both local developer workflows and CI pipelines with appropriate strictness levels. |
-| Integrates with existing lint infrastructure          | Process guard output format and exit code semantics must be consistent with the existing `architect-lint-patterns` tool.                                             | Inconsistent output formats force consumers to maintain separate parsers, and inconsistent exit codes break combined lint pipelines.                  |
+| Integrates with existing lint infrastructure          | Process guard output format and exit code semantics must be consistent with the existing `lint-patterns` tool.                                                       | Inconsistent output formats force consumers to maintain separate parsers, and inconsistent exit codes break combined lint pipelines.                  |
 | New tags support process guard functionality          | Session and protection tags must be registered in the TypeScript taxonomy with defined formats before use in feature files.                                          | Unregistered tags bypass schema validation and are silently ignored by the scanner, causing process guard rules to fail without diagnostics.          |
 
 ### Process Guard Testing
@@ -1063,7 +1064,7 @@ const missingStatus: LintRule;
 | File status determines unused-vars enforcement    | Files with `@architect-status roadmap` or `deferred` have relaxed unused-vars rules. Files with `active`, `completed`, or no status have strict enforcement.    | Design artifacts (roadmap stubs) define API shapes that are intentionally unused until implementation. Relaxing rules for these files prevents false positives while ensuring implemented code (active/completed) remains strictly checked. |
 | Reuses deriveProcessState for status extraction   | Status extraction logic must be shared with Process Guard Linter. No duplicate parsing or status-to-protection mapping.                                         | DRY principle - the Process Guard already has battle-tested status extraction from JSDoc comments. Duplicating this logic creates maintenance burden and potential inconsistencies between tools.                                           |
 | ESLint Processor filters messages based on status | The processor uses ESLint's postprocess hook to filter or downgrade messages. Source code is never modified. No eslint-disable comments are injected.           | ESLint processors can inspect and filter linting messages after rules run. This approach: - Requires no source code modification - Works with any ESLint rule (not just no-unused-vars) - Can be extended to other status-based behaviors   |
-| CLI can generate static ESLint ignore list        | Running `pnpm architect:guard --eslint-ignores` outputs a list of files that should have relaxed linting, suitable for inclusion in eslint.config.js.           | For CI environments or users preferring static configuration, a generated list provides an alternative to runtime processing. The list can be regenerated whenever status annotations change.                                               |
+| CLI can generate static ESLint ignore list        | Running `pnpm lint:process --eslint-ignores` outputs a list of files that should have relaxed linting, suitable for inclusion in eslint.config.js.              | For CI environments or users preferring static configuration, a generated list provides an alternative to runtime processing. The list can be regenerated whenever status annotations change.                                               |
 | Replaces directory-based ESLint exclusions        | After implementation, the directory-based exclusions in eslint.config.js (lines 30-57) are removed. All suppression is driven by @architect-status annotations. | Directory-based exclusions are tech debt: - They don't account for file lifecycle (roadmap -> completed) - They require manual updates when new roadmap directories are added - They persist even after files are implemented               |
 | Rule relaxation is configurable                   | The set of rules relaxed for roadmap/deferred files is configurable, defaulting to `@typescript-eslint/no-unused-vars`.                                         | Different projects may want to relax different rules for design artifacts. The default covers the common case (unused exports in API stubs).                                                                                                |
 

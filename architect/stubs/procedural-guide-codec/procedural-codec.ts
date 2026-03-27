@@ -136,7 +136,7 @@ import type { SectionBlock } from '../../../src/renderable/schema.js';
 interface ReferenceDocConfigEntry {
   readonly title: string;
   readonly conventionTags: readonly string[];
-  readonly shapeSources: readonly string[];
+  readonly shapeSelectors: readonly string[];
   readonly behaviorCategories: readonly string[];
   readonly includeTags?: readonly string[];
   readonly preamble?: readonly SectionBlock[];
@@ -163,7 +163,7 @@ interface ReferenceDocConfigEntry {
  * {
  *   title: 'Session Workflow Guide',
  *   conventionTags: [],
- *   shapeSources: [],
+ *   shapeSelectors: [],
  *   behaviorCategories: [],
  *   includeTags: ['session-workflows'],
  *   claudeMdSection: 'workflow',

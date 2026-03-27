@@ -206,7 +206,7 @@ export function buildRegistry(): TagRegistry {
         tag: 'status',
         format: 'enum',
         purpose: 'Work item lifecycle status (per PDR-005 FSM)',
-        values: [...ACCEPTED_STATUS_VALUES], // Includes legacy values for extraction
+        values: [...ACCEPTED_STATUS_VALUES],
         default: DEFAULT_STATUS,
         example: '@architect-status roadmap',
       },

@@ -419,6 +419,7 @@ graph LR
         DataAPIOutputShaping["DataAPIOutputShaping"]:::neighbor
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
     end
+    TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
     loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
     ProjectConfigTypes -->|uses| ConfigurationTypes
     ProjectConfigTypes -->|uses| ConfigurationPresets
@@ -428,7 +429,6 @@ graph LR
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
-    TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
     FSMTransitions ..->|implements| PhaseStateMachineValidation
     FSMStates ..->|implements| PhaseStateMachineValidation
     ProcessStateAPI -->|uses| MasterDataset
@@ -441,21 +441,6 @@ graph LR
 
 ## API Types
 
-### SectionBlock (type)
-
-```typescript
-type SectionBlock =
-  | HeadingBlock
-  | ParagraphBlock
-  | SeparatorBlock
-  | TableBlock
-  | ListBlock
-  | CodeBlock
-  | MermaidBlock
-  | CollapsibleBlock
-  | LinkOutBlock;
-```
-
 ### normalizeStatus (function)
 
 ````typescript
@@ -465,7 +450,7 @@ type SectionBlock =
  * Maps status values to three canonical display states:
  * - "completed": completed
  * - "active": active
- * - "planned": roadmap, deferred, planned, or any unknown value
+ * - "planned": roadmap, deferred, or any unknown value
  *
  * Per PDR-005: deferred items are treated as planned (not actively worked on)
  *
@@ -478,6 +463,7 @@ type SectionBlock =
  * normalizeStatus("active")      // → "active"
  * normalizeStatus("roadmap")     // → "planned"
  * normalizeStatus("deferred")    // → "planned"
+ * normalizeStatus("planned")     // → "planned" (unknown input defaults to planned)
  * normalizeStatus(undefined)     // → "planned"
  * ```
  */
@@ -549,6 +535,21 @@ interface CategoryDefinition {
 | description | Brief description of the category's purpose and typical patterns                  |
 | aliases     | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
 
+### SectionBlock (type)
+
+```typescript
+type SectionBlock =
+  | HeadingBlock
+  | ParagraphBlock
+  | SeparatorBlock
+  | TableBlock
+  | ListBlock
+  | CodeBlock
+  | MermaidBlock
+  | CollapsibleBlock
+  | LinkOutBlock;
+```
+
 ---
 
 ## Behavior Specifications
@@ -557,9 +558,9 @@ interface CategoryDefinition {
 
 [View ArchitectFactory source](src/config/factory.ts)
 
-## Delivery Process Factory
+## Architect Factory
 
-Main factory function for creating configured delivery process instances.
+Main factory function for creating configured Architect instances.
 Supports presets, custom configuration, and configuration overrides.
 
 ### When to Use
@@ -891,7 +892,7 @@ These are the durable constants of the delivery process.
 [View ConfigBasedWorkflowDefinition source](architect/specs/config-based-workflow-definition.feature)
 
 **Problem:**
-Every `pnpm architect:query` and `pnpm docs:*` invocation prints:
+Every `pnpm process:query` and `pnpm docs:*` invocation prints:
 `Failed to load default workflow (6-phase-standard): Workflow file not found`
 
 The `loadDefaultWorkflow()` function resolves to `catalogue/workflows/`
@@ -993,7 +994,7 @@ Design Decisions (DS-1, 2026-02-15):
   workflow into the preset/config system enables:
   - Different presets with different default phases (e.g.
 
-- 3-phase generic)
+- 3-phase libar-generic)
   - Per-project phase customization in architect.config.ts
   - Phase definitions appearing in generated documentation
 

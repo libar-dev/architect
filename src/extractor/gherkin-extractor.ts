@@ -238,7 +238,7 @@ export function extractPatternsFromGherkin(
     // Build raw pattern object using explicit property assignment for performance
     // This avoids ~50 intermediate objects created by conditional spreads
     const directive: Record<string, unknown> = {
-      // Preserve ALL tags (including value tags like claude-md-section:validation)
+      // Preserve ALL tags (including value tags like claude-section:validation)
       // Tags are stored as @architect-{tag} to match TypeScript directive format
       tags: feature.tags.map((tag) =>
         asDirectiveTag(`@architect-${tag}`)
@@ -566,7 +566,7 @@ export async function extractPatternsFromGherkinAsync(
 
     // Build pattern object (same as sync version but without behaviorFileVerified)
     const directive: Record<string, unknown> = {
-      // Preserve ALL tags (including value tags like claude-md-section:validation)
+      // Preserve ALL tags (including value tags like claude-section:validation)
       tags: feature.tags.map((tag) =>
         asDirectiveTag(`@architect-${tag}`)
       ) as readonly DirectiveTag[],

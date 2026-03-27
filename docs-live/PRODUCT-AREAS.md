@@ -19,7 +19,7 @@ The annotation system is the ingestion boundary — it transforms annotated Type
 
 > **How do I configure the tool?**
 
-Configuration is the entry boundary — it transforms a user-authored `architect.config.ts` file into a fully resolved `ArchitectInstance` that powers the entire pipeline. The flow is: `defineConfig()` provides type-safe authoring (Vite convention, zero validation), `ConfigLoader` discovers and loads the file, `ProjectConfigSchema` validates via Zod, `ConfigResolver` applies defaults and merges stubs into sources, and `ArchitectFactory` builds the final instance with `TagRegistry` and `RegexBuilders`. Three presets define escalating taxonomy complexity — from 3 categories (`generic`, `libar-generic`) to 21 (`ddd-es-cqrs`). `SourceMerger` computes per-generator source overrides, enabling generators like changelog to pull from different feature sets than the base config.
+Configuration is the entry boundary — it transforms a user-authored `architect.config.ts` file into a fully resolved `ArchitectInstance` that powers the entire pipeline. The flow is: `defineConfig()` provides type-safe authoring (Vite convention, zero validation), `ConfigLoader` discovers and loads the file, `ProjectConfigSchema` validates via Zod, `ConfigResolver` applies defaults and merges stubs into sources, and `ArchitectFactory` builds the final instance with `TagRegistry` and `RegexBuilders`. Two presets define escalating taxonomy complexity — from 3 categories (`libar-generic`) to 21 (`ddd-es-cqrs`). `SourceMerger` computes per-generator source overrides, enabling generators like changelog to pull from different feature sets than the base config.
 
 **11 patterns** — 8 completed, 0 active, 3 planned
 
@@ -49,9 +49,9 @@ Validation is the enforcement boundary — it ensures that every change to annot
 
 > **How do I query process state?**
 
-The Data API provides direct terminal access to delivery process state. It replaces reading generated markdown or launching explore agents — targeted queries use 5-10x less context. The `context` command assembles curated bundles tailored to session type (planning, design, implement).
+The Data API provides direct terminal access to project state. It replaces reading generated markdown or launching explore agents — targeted queries use 5-10x less context. The `context` command assembles curated bundles tailored to session type (planning, design, implement).
 
-**41 patterns** — 24 completed, 14 active, 3 planned
+**41 patterns** — 24 completed, 15 active, 2 planned
 
 **Key patterns:** DataAPIContextAssembly, ProcessStateAPICLI, DataAPIDesignSessionSupport, DataAPIRelationshipGraph, DataAPIOutputShaping
 
@@ -85,10 +85,10 @@ Process defines the USDP-inspired session workflow that governs how work moves t
 | [Configuration](product-areas/CONFIGURATION.md) | 11       | 8         | 0      | 3       |
 | [Generation](product-areas/GENERATION.md)       | 95       | 81        | 6      | 8       |
 | [Validation](product-areas/VALIDATION.md)       | 25       | 16        | 3      | 6       |
-| [DataAPI](product-areas/DATA-API.md)            | 41       | 24        | 14     | 3       |
+| [DataAPI](product-areas/DATA-API.md)            | 41       | 24        | 15     | 2       |
 | [CoreTypes](product-areas/CORE-TYPES.md)        | 11       | 7         | 4      | 0       |
 | [Process](product-areas/PROCESS.md)             | 11       | 4         | 0      | 7       |
-| **Total**                                       | **220**  | **163**   | **29** | **28**  |
+| **Total**                                       | **220**  | **163**   | **30** | **27**  |
 
 ---
 

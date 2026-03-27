@@ -292,7 +292,7 @@ Feature: Architecture Document Refactoring
     **Invariant:** DD-6: A new ReferenceDocConfig produces ARCHITECTURE-TYPES.md using
     shapeSelectors with group master-dataset to extract MasterDataset schema types,
     RuntimeMasterDataset, RawDataset, PipelineOptions, and PipelineResult. Source files
-    tagged with libar-docs-shape master-dataset and libar-docs-include master-dataset
+    tagged with @architect-shape master-dataset and @architect-include master-dataset
     contribute shapes to the reference doc. The Unified Transformation section (L345-478)
     is replaced with a condensed narrative (~15 lines) and pointer to ARCHITECTURE-TYPES.md.
 
@@ -307,7 +307,7 @@ Feature: Architecture Document Refactoring
 
     @acceptance-criteria @happy-path
     Scenario: MasterDataset shapes extracted via shape selectors
-      Given source files tagged with libar-docs-shape master-dataset
+      Given source files tagged with @architect-shape master-dataset
       And a ReferenceDocConfig with shapeSelectors targeting master-dataset group
       When the reference codec generates ARCHITECTURE-TYPES.md
       Then MasterDatasetSchema, RuntimeMasterDataset, and RawDataset types appear
@@ -315,8 +315,8 @@ Feature: Architecture Document Refactoring
 
     @acceptance-criteria @happy-path
     Scenario: Pipeline types included in ARCHITECTURE-TYPES reference doc
-      Given PipelineOptions and PipelineResult tagged with libar-docs-shape master-dataset
-      And libar-docs-include master-dataset on their source files
+      Given PipelineOptions and PipelineResult tagged with @architect-shape master-dataset
+      And @architect-include master-dataset on their source files
       When the reference codec generates ARCHITECTURE-TYPES.md
       Then PipelineOptions and PipelineResult shapes appear in the API Types section
       And both detailed and compact outputs are produced
@@ -353,8 +353,8 @@ Feature: Architecture Document Refactoring
 
     @acceptance-criteria @happy-path
     Scenario: Convention tag pipeline-architecture produces pipeline flow content
-      Given orchestrator.ts annotated with libar-docs-convention pipeline-architecture
-      And build-pipeline.ts annotated with libar-docs-convention pipeline-architecture
+      Given orchestrator.ts annotated with @architect-convention pipeline-architecture
+      And build-pipeline.ts annotated with @architect-convention pipeline-architecture
       When the reference codec generates ARCHITECTURE-TYPES.md
       Then convention content describing pipeline steps appears in the document
       And consumer architecture patterns from build-pipeline.ts appear

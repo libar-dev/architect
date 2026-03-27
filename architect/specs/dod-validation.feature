@@ -23,7 +23,7 @@ Feature: DoD Validation CLI - Machine-Checkable Definition of Done
 
   Implements Convergence Opportunity 2: DoD as Machine-Checkable.
 
-  See: docs/ideation-convergence/01-delivery-process-opportunities.md
+  See the convergence-opportunity notes in the ideation docs for the full discussion.
 
   Background: Deliverables
     Given the following deliverables:

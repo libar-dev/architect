@@ -12,7 +12,7 @@ Feature: Declaration-Level Shape Tagging
 
   **Problem:**
   The current shape extraction system operates at file granularity. The
-  libar-docs-extract-shapes tag on a pattern block extracts named declarations
+  the `architect-extract-shapes` tag on a pattern block extracts named declarations
   from the entire file, and the reference doc config shapeSelectors field selects
   shapes by source selector only. There is no way for a reference document to request
   "only RiskLevel and RISK_LEVELS from risk-levels.ts" -- it gets every shape
@@ -26,7 +26,7 @@ Feature: Declaration-Level Shape Tagging
   selectors provide the coarse file-level axis with content-level filtering.
 
   **Solution:**
-  Introduce a lightweight libar-docs-shape annotation tag on individual
+  Introduce a lightweight @architect-shape annotation tag on individual
   TypeScript declarations. Each tagged declaration self-identifies as a
   documentable shape, optionally belonging to a named group. On the consumer
   side, add shapeSelectors to ReferenceDocConfig for fine-grained selection
@@ -41,18 +41,18 @@ Feature: Declaration-Level Shape Tagging
   **Design Decisions:**
 
   DD-1: Tag format is value (not flag)
-    The libar-docs-shape tag works bare (no value) for simple opt-in, but
-    also accepts an optional group name like libar-docs-shape api-types.
+    The @architect-shape tag works bare (no value) for simple opt-in, but
+    also accepts an optional group name like @architect-shape api-types.
     This enables group-based selection in shapeSelectors without a second
     tag. Using format: value means undefined when bare, string when
     provided. Registry entry: tag: 'shape', format: 'value', with example
-    'libar-docs-shape api-types'. Placed in metadataTags array in
+    '@architect-shape api-types'. Placed in metadataTags array in
     buildRegistry() at src/taxonomy/registry-builder.ts.
 
   DD-2: Stay on typescript-estree parser (no TS compiler API switch)
     The existing extractPrecedingJsDoc() in shape-extractor.ts already finds
     JSDoc above declarations by scanning the AST comments array. Checking
-    that JSDoc text for the libar-docs-shape tag is a string search on
+    that JSDoc text for the @architect-shape tag is a string search on
     already-extracted content -- zero parser changes needed. The TS compiler
     APIs node.jsDoc property is not available on estree nodes, but the
     comment-based approach is equivalent for declaration-level tag detection.
@@ -74,7 +74,7 @@ Feature: Declaration-Level Shape Tagging
 
   DD-5: Group stored on ExtractedShape schema
     The ExtractedShapeSchema gains an optional group: string field from
-    the libar-docs-shape tag value. This enables downstream filtering
+    the @architect-shape tag value. This enables downstream filtering
     by shapeSelectors without re-parsing source files.
 
   DD-6: ShapeSelector is a structural discriminated union
@@ -88,14 +88,14 @@ Feature: Declaration-Level Shape Tagging
     field uses the same glob syntax as source selectors (exact path, single
     wildcard, or recursive glob). The names field is a readonly string
     array of declaration names to include. The group field is a string
-    matching the libar-docs-shape tag value.
+    matching the @architect-shape tag value.
     This lives on ReferenceDocConfig as:
     readonly shapeSelectors?: readonly ShapeSelector[]
 
   DD-7: Tagged non-exported declarations are included
     The existing findDeclarations() in shape-extractor.ts discovers all
     top-level declarations regardless of export status. When a declaration
-    has the libar-docs-shape tag in its JSDoc, it is extracted even if not
+    has the @architect-shape tag in its JSDoc, it is extracted even if not
     exported. This is intentional: the tag is an explicit documentation
     opt-in that overrides the export-based filtering used by the
     extractAllExportedShapes() auto-discovery mode. A module-internal
@@ -122,11 +122,7 @@ Feature: Declaration-Level Shape Tagging
   | architect.config.ts | Update showcase config to use shapeSelectors | ~5 lines |
 
   **Integration Wiring (doc-extractor.ts):**
-  The existing shape extraction at doc-extractor.ts lines 167-178 handles
-  libar-docs-extract-shapes (pattern-level tag, names shapes by name).
-  The new discoverTaggedShapes() is called in addition to that path:
-  after parsing the source file, scan all declarations for libar-docs-shape
-  JSDoc tags and merge any found shapes into the patterns extractedShapes
+  The existing shape extraction at doc-extractor.ts lines 167-178 handles the `architect-extract-shapes` tag (pattern-level tag, names shapes by name). The new discoverTaggedShapes() is called in addition to that path: after parsing the source file, scan all declarations for the `architect-shape` JSDoc tag and merge any found shapes into the patterns extractedShapes
   array. Both paths contribute to the same ExtractedPattern.extractedShapes
   field. Deduplication by shape name (existing behavior in shape-matcher.ts
   line 86) prevents duplicates when both paths find the same declaration.
@@ -147,7 +143,7 @@ Feature: Declaration-Level Shape Tagging
   same typescript-eslint/typescript-estree dependency, different function
   call. This gives full TypeScript type checker access: resolve re-exports
   via checker.getAliasedSymbol(), expand type aliases, follow import chains.
-  The libar-docs-shape tag and shapeSelectors config remain unchanged.
+  The @architect-shape tag and shapeSelectors config remain unchanged.
 
   Background: Deliverables
     Given the following deliverables:
@@ -160,14 +156,9 @@ Feature: Declaration-Level Shape Tagging
       | Selector-based filtering in shape matcher | Complete | src/renderable/codecs/shape-matcher.ts |
       | Showcase config using declaration-level shapes | Complete | architect.config.ts |
 
-  Rule: Declarations opt in via libar-docs-shape tag
+  Rule: Declarations opt in via @architect-shape tag
 
-    **Invariant:** Only declarations with the libar-docs-shape tag in their
-    immediately preceding JSDoc are collected as tagged shapes. Declarations
-    without the tag are ignored even if they are exported. The tag value
-    is optional -- bare libar-docs-shape opts in without a group, while
-    libar-docs-shape group-name assigns the declaration to a named group.
-    Tagged non-exported declarations are included (DD-7).
+    **Invariant:** Only declarations with the `architect-shape` tag in their immediately preceding JSDoc are collected as tagged shapes. Declarations without the tag are ignored even if they are exported. The tag value is optional -- bare `architect-shape` opts in without a group, while `architect-shape group-name` assigns the declaration to a named group. Tagged non-exported declarations are included (DD-7).
 
     **Rationale:** Explicit opt-in prevents over-extraction of internal
     helpers. Unlike auto-discovery mode (extract-shapes *) which grabs all
@@ -323,11 +314,11 @@ Feature: Declaration-Level Shape Tagging
     does not require the TypeScript compiler API, ts-morph, or
     parseAndGenerateServices. Tag detection is a regex match on the
     JSDoc comment text already extracted by the existing infrastructure.
-    The tag regex pattern is: /libar-docs-shape(?:\s+(\S+))?/
+    The tag regex pattern is: /@architect-shape(?:\s+(\S+))?/
     where capture group 1 is the optional group name.
 
     **Rationale:** The shape extractor already traverses declarations
-    and extracts their JSDoc. Adding libar-docs-shape detection is a
+    and extracts their JSDoc. Adding @architect-shape detection is a
     string search on content that is already available -- approximately
     15 lines of new logic. Switching parsers would introduce churn with
     no benefit for the v1 use case of tag detection on top-level

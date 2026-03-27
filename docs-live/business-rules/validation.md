@@ -4,7 +4,7 @@
 
 ---
 
-**61 rules** from 14 features. 61 rules have explicit invariants.
+**62 rules** from 14 features. 62 rules have explicit invariants.
 
 ---
 
@@ -691,6 +691,21 @@ _Individual lint rules that check parsed directives for completeness._
 - Accept active status
 - Accept roadmap status
 - Accept deferred status
+
+---
+
+#### Files must use canonical FSM status values
+
+> **Invariant:** Annotated files may use only the canonical PDR-005 FSM statuses: roadmap, active, completed, deferred.
+>
+> **Rationale:** Legacy aliases hide process drift and break a single-source-of-truth workflow model.
+
+**Verified by:**
+
+- Reject planned status alias
+- Reject in-progress status alias
+- Reject implemented status alias
+- Accept canonical deferred status
 
 ---
 

@@ -59,8 +59,8 @@ const FEATURE_ONLY_TAG_SUFFIXES = [
  * Builds feature-only annotation list from the tag prefix.
  * These tags should appear in feature files, not TypeScript code.
  *
- * @param tagPrefix - The tag prefix (e.g., "@docs-" or "@architect-")
- * @returns Array of full annotation strings (e.g., ["@docs-quarter", "@docs-team", ...])
+ * @param tagPrefix - The tag prefix (e.g., "@architect-" or "@acme-")
+ * @returns Array of full annotation strings (e.g., ["@architect-quarter", "@architect-team", ...])
  */
 function buildFeatureOnlyAnnotations(tagPrefix: string): readonly string[] {
   return FEATURE_ONLY_TAG_SUFFIXES.map((suffix) => `${tagPrefix}${suffix}`);
@@ -87,7 +87,7 @@ export interface AntiPatternDetectionOptions extends WithTagRegistry {
 /**
  * Detect process metadata in code anti-pattern
  *
- * Finds process tracking annotations (e.g., @docs-quarter, @docs-team, etc.)
+ * Finds process tracking annotations (e.g., @architect-quarter, @architect-team, etc.)
  * in TypeScript files. Process metadata belongs in feature files.
  *
  * @param scannedFiles - Array of scanned TypeScript files
@@ -266,7 +266,7 @@ export function detectMegaFeature(
  *
  * // With custom prefix
  * const registry = createDefaultTagRegistry();
- * registry.tagPrefix = "@docs-";
+ * registry.tagPrefix = "@architect-";
  * const customViolations = detectAntiPatterns(tsFiles, featureFiles, { registry });
  *
  * for (const v of violations) {

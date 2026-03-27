@@ -7,14 +7,14 @@
 
 ## Overview
 
-This diagram shows 59 key components with explicit architectural roles across 10 bounded contexts.
+This diagram shows 65 key components with explicit architectural roles across 10 bounded contexts.
 
 | Metric             | Count |
 | ------------------ | ----- |
-| Diagram Components | 59    |
+| Diagram Components | 65    |
 | Bounded Contexts   | 10    |
 | Component Roles    | 5     |
-| Total Annotated    | 163   |
+| Total Annotated    | 169   |
 
 ---
 
@@ -26,6 +26,11 @@ Component architecture with bounded context isolation:
 graph TB
     subgraph api["Api BC"]
         MasterDataset["MasterDataset[read-model]"]
+        MCPToolRegistry["MCPToolRegistry[service]"]
+        MCPServerImpl["MCPServerImpl[service]"]
+        MCPPipelineSession["MCPPipelineSession[service]"]
+        MCPModule["MCPModule[infrastructure]"]
+        MCPFileWatcher["MCPFileWatcher[infrastructure]"]
         PatternSummarizerImpl["PatternSummarizerImpl[service]"]
         ScopeValidatorImpl["ScopeValidatorImpl[service]"]
         ProcessStateAPI["ProcessStateAPI[service]"]
@@ -40,6 +45,7 @@ graph TB
         ReplMode["ReplMode[service]"]
         ProcessAPICLIImpl["ProcessAPICLIImpl[service]"]
         OutputPipelineImpl["OutputPipelineImpl[service]"]
+        MCPServerBin["MCPServerBin[infrastructure]"]
         DatasetCache["DatasetCache[infrastructure]"]
     end
     subgraph config["Config BC"]
@@ -105,16 +111,30 @@ graph TB
     subgraph shared["Shared Infrastructure"]
         Convention_Annotation_Example___DD_3_Decision["Convention Annotation Example — DD-3 Decision[decider]"]
     end
-    DoDValidator --> DualSourceExtractor
     GherkinScanner --> GherkinASTParser
-    LintEngine --> LintRules
+    DoDValidator --> DualSourceExtractor
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> GherkinASTParser
     Documentation_Generation_Orchestrator --> Pattern_Scanner
+    LintEngine --> LintRules
     GherkinExtractor --> GherkinASTParser
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
     Document_Extractor --> Pattern_Scanner
+    MCPToolRegistry --> ProcessStateAPI
+    MCPToolRegistry --> MCPPipelineSession
+    MCPServerImpl --> MCPPipelineSession
+    MCPServerImpl --> MCPToolRegistry
+    MCPServerImpl --> MCPFileWatcher
+    MCPPipelineSession --> ProcessStateAPI
+    MCPPipelineSession --> ConfigLoader
+    MCPModule --> MCPServerImpl
+    MCPModule --> MCPPipelineSession
+    MCPModule --> MCPFileWatcher
+    MCPModule --> MCPToolRegistry
+    ConfigResolver --> ArchitectFactory
+    ArchitectFactory --> RegexBuilders
+    ConfigLoader --> ArchitectFactory
     ReplMode --> ProcessStateAPI
     ProcessAPICLIImpl --> ProcessStateAPI
     ProcessAPICLIImpl --> MasterDataset
@@ -122,9 +142,7 @@ graph TB
     ProcessAPICLIImpl --> FuzzyMatcherImpl
     ProcessAPICLIImpl --> OutputPipelineImpl
     OutputPipelineImpl --> PatternSummarizerImpl
-    ConfigResolver --> ArchitectFactory
-    ArchitectFactory --> RegexBuilders
-    ConfigLoader --> ArchitectFactory
+    MCPServerBin --> MCPServerImpl
     PatternSummarizerImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
     ScopeValidatorImpl --> MasterDataset
@@ -146,13 +164,13 @@ graph TB
     FSMValidator --> FSMStates
     DesignReviewCodec --> MasterDataset
     ArchitectureCodec --> MasterDataset
-    ProcessGuardDecider --> FSMValidator
     TransformDataset --> MasterDataset
     SequenceTransformUtils --> MasterDataset
     DesignReviewGenerator --> DesignReviewCodec
     DesignReviewGenerator --> MasterDataset
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
+    ProcessGuardDecider --> FSMValidator
 ```
 
 ---
@@ -175,6 +193,8 @@ All components with architecture annotations:
 | Component                                                         | Context    | Role           | Layer          | Source File                                                           |
 | ----------------------------------------------------------------- | ---------- | -------------- | -------------- | --------------------------------------------------------------------- |
 | 🚧 Pattern Helpers                                                | api        | -              | domain         | src/api/pattern-helpers.ts                                            |
+| 🚧 MCP File Watcher                                               | api        | infrastructure | infrastructure | src/mcp/file-watcher.ts                                               |
+| 🚧 MCP Module                                                     | api        | infrastructure | application    | src/mcp/index.ts                                                      |
 | ✅ Master Dataset                                                 | api        | read-model     | domain         | src/validation-schemas/master-dataset.ts                              |
 | 🚧 Arch Queries Impl                                              | api        | service        | domain         | src/api/arch-queries.ts                                               |
 | 🚧 Context Assembler Impl                                         | api        | service        | application    | src/api/context-assembler.ts                                          |
@@ -182,11 +202,15 @@ All components with architecture annotations:
 | 🚧 Coverage Analyzer Impl                                         | api        | service        | application    | src/api/coverage-analyzer.ts                                          |
 | 🚧 Fuzzy Matcher Impl                                             | api        | service        | application    | src/api/fuzzy-match.ts                                                |
 | ✅ Handoff Generator Impl                                         | api        | service        | application    | src/api/handoff-generator.ts                                          |
+| 🚧 MCP Pipeline Session                                           | api        | service        | application    | src/mcp/pipeline-session.ts                                           |
+| 🚧 MCP Server Impl                                                | api        | service        | application    | src/mcp/server.ts                                                     |
+| 🚧 MCP Tool Registry                                              | api        | service        | application    | src/mcp/tool-registry.ts                                              |
 | 🚧 Pattern Summarizer Impl                                        | api        | service        | application    | src/api/summarize.ts                                                  |
 | 🚧 Process State API                                              | api        | service        | application    | src/api/process-state.ts                                              |
 | ✅ Scope Validator Impl                                           | api        | service        | application    | src/api/scope-validator.ts                                            |
 | ✅ CLI Schema                                                     | cli        | -              | domain         | src/cli/cli-schema.ts                                                 |
 | 🚧 Dataset Cache                                                  | cli        | infrastructure | infrastructure | src/cli/dataset-cache.ts                                              |
+| 🚧 MCP Server Bin                                                 | cli        | infrastructure | infrastructure | src/cli/mcp-server.ts                                                 |
 | 🚧 Output Pipeline Impl                                           | cli        | service        | application    | src/cli/output-pipeline.ts                                            |
 | 🚧 Process API CLI Impl                                           | cli        | service        | application    | src/cli/process-api.ts                                                |
 | 🚧 Repl Mode                                                      | cli        | service        | application    | src/cli/repl.ts                                                       |
@@ -199,8 +223,8 @@ All components with architecture annotations:
 | 🚧 Project Config Schema                                          | config     | infrastructure | infrastructure | src/config/project-config-schema.ts                                   |
 | ✅ Regex Builders                                                 | config     | infrastructure | infrastructure | src/config/regex-builders.ts                                          |
 | ✅ Workflow Loader                                                | config     | infrastructure | infrastructure | src/config/workflow-loader.ts                                         |
+| ✅ Architect Factory                                              | config     | service        | application    | src/config/factory.ts                                                 |
 | 🚧 Config Resolver                                                | config     | service        | application    | src/config/resolve-config.ts                                          |
-| ✅ Delivery Process Factory                                       | config     | service        | application    | src/config/factory.ts                                                 |
 | 🚧 Source Merger                                                  | config     | service        | application    | src/config/merge-sources.ts                                           |
 | ✅ Document Extractor                                             | extractor  | service        | application    | src/extractor/doc-extractor.ts                                        |
 | ✅ Dual Source Extractor                                          | extractor  | service        | application    | src/extractor/dual-source-extractor.ts                                |

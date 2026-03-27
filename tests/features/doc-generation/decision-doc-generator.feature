@@ -112,7 +112,7 @@ Feature: Decision Document Generator
 
     **Invariant:** The generator must produce both compact and detailed output files from a single generation run, using the pattern name or patternName tag as the identifier.
     **Rationale:** Both output levels serve different audiences (AI vs human) — generating them together ensures consistency and eliminates the risk of one becoming stale.
-    **Verified by:** Generate both compact and detailed outputs, Pattern name falls back to pattern.name
+    **Verified by:** Generate both compact and detailed outputs, Pattern name falls back to pattern.name, Pattern claude section routes compact output
 
     @acceptance-criteria @integration
     Scenario: Generate both compact and detailed outputs
@@ -126,6 +126,12 @@ Feature: Decision Document Generator
       Given a pattern with only the name field
       When generating multi-level output
       Then generation should succeed using the name field
+
+    @acceptance-criteria @integration
+    Scenario: Pattern claude section routes compact output
+      Given a pattern named "ProcessGuard" with claude section "process"
+      When generating multi-level output
+      Then compact path should be "_claude-md/process/process-guard.md"
 
   # ============================================================================
   # RULE 5: Generator Registration

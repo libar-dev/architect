@@ -4,6 +4,7 @@
 import {
   missingPatternName,
   missingStatus,
+  invalidStatus,
   missingWhenToUse,
   tautologicalDescription,
   missingRelationships,
@@ -20,6 +21,7 @@ import type { DataTableRow } from '../world.js';
 export {
   missingPatternName,
   missingStatus,
+  invalidStatus,
   missingWhenToUse,
   tautologicalDescription,
   missingRelationships,

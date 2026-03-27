@@ -30,7 +30,7 @@ import type { TagRegistry } from '../validation-schemas/tag-registry.js';
  * Base interface for options that accept a TagRegistry for prefix-aware behavior.
  *
  * Many validation functions need to be aware of the configured tag prefix
- * (e.g., "@architect-" vs "@docs-"). This interface provides a consistent
+ * (e.g., "@architect-" vs "@acme-"). This interface provides a consistent
  * way to pass that configuration.
  *
  * ### When to Use

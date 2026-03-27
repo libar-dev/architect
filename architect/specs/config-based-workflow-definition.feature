@@ -163,7 +163,7 @@ Feature: Config-Based Workflow Definition
 
     The inline constant in `workflow-loader.ts` resolves the warning. Moving
     workflow into the preset/config system enables:
-    - Different presets with different default phases (e.g., 3-phase generic)
+    - Different presets with different default phases (e.g., 3-phase libar-generic)
     - Per-project phase customization in architect.config.ts
     - Phase definitions appearing in generated documentation
 

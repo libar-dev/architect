@@ -34,12 +34,12 @@ pnpm add @libar-dev/architect@pre
 ### 2. Annotate Your Code
 
 ```typescript
-/** @docs */
+/** @architect */
 
 /**
- * @docs-pattern UserAuthentication
- * @docs-status roadmap
- * @docs-uses SessionManager, TokenValidator
+ * @architect-pattern UserAuthentication
+ * @architect-status roadmap
+ * @architect-uses SessionManager, TokenValidator
  *
  * ## User Authentication
  *
@@ -50,7 +50,7 @@ export class UserAuthentication {
 }
 ```
 
-> Tag prefix is configurable. The `generic` preset uses `@docs-*` (shown above). The default `libar-generic` preset uses `@architect-*`. See [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
+> Tag prefix is configurable. The default `libar-generic` preset uses `@architect-*` (shown above). See [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
 
 ### 3. Generate Documentation
 
@@ -94,18 +94,18 @@ export function transformToMasterDataset(input: TransformInput): MasterDataset {
 
 All output goes to [`docs-live/`](docs-live/INDEX.md) — 57+ auto-generated files from annotated source code:
 
-| Output                            | Files | Source                                          |
-| --------------------------------- | ----: | ----------------------------------------------- |
-| **Product area docs**             |     7 | `@docs-uses`, `@docs-status`, relationship tags |
-| **Business rules**                |     7 | Gherkin `Rule:` Invariant/Rationale blocks      |
-| **Architecture decisions (ADRs)** |     7 | Decision feature files                          |
-| **Reference guides**              |     8 | CLI schema, codec patterns, annotations         |
-| **Live Mermaid diagrams**         |     — | `@docs-uses`, `@docs-depends-on` relationships  |
-| **API type shapes**               |     — | `@docs-shape` on TypeScript declarations        |
-| **Validation rules**              |     3 | Process Guard FSM specs                         |
-| **Taxonomy reference**            |     3 | Tag registry                                    |
-| **AI context modules**            |    13 | `@docs-claude-module` tagged specs              |
-| **Changelog**                     |     1 | Release specs                                   |
+| Output                            | Files | Source                                                    |
+| --------------------------------- | ----: | --------------------------------------------------------- |
+| **Product area docs**             |     7 | `@architect-uses`, `@architect-status`, relationship tags |
+| **Business rules**                |     7 | Gherkin `Rule:` Invariant/Rationale blocks                |
+| **Architecture decisions (ADRs)** |     7 | Decision feature files                                    |
+| **Reference guides**              |     8 | CLI schema, codec patterns, annotations                   |
+| **Live Mermaid diagrams**         |     — | `@architect-uses`, `@architect-depends-on` relationships  |
+| **API type shapes**               |     — | `@architect-shape` on TypeScript declarations             |
+| **Validation rules**              |     3 | Process Guard FSM specs                                   |
+| **Taxonomy reference**            |     3 | Tag registry                                              |
+| **AI context modules**            |    13 | `@architect-claude-module` tagged specs                   |
+| **Changelog**                     |     1 | Release specs                                             |
 
 **Browse it:** [`docs-live/INDEX.md`](docs-live/INDEX.md) is the navigation hub with reading order, document roles, and product area statistics.
 

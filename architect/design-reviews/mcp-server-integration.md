@@ -45,11 +45,6 @@ sequenceDiagram
     mcp_server->>+pipeline_session: SessionOptions
     pipeline_session-->>-mcp_server: PipelineSession
 
-    alt Server starts with explicit input globs
-        mcp_server-->>User: error
-        mcp_server->>mcp_server: exit(1)
-    end
-
     Note over mcp_server: Rule 2 — Every CLI subcommand is registered as an MCP tool with a JSON Schema describing its input parameters. Tool names use snake_case with a &quot;architect_&quot; prefix to avoid collisions with other MCP servers.
 
     mcp_server->>+tool_registry: PipelineSession
@@ -64,11 +59,6 @@ sequenceDiagram
 
     mcp_server->>+pipeline_session: ToolCallRequest
     pipeline_session-->>-mcp_server: ToolCallResult
-
-    alt Concurrent reads during rebuild use previous dataset
-        mcp_server-->>User: error
-        mcp_server->>mcp_server: exit(1)
-    end
 
     Note over mcp_server: Rule 4 — When —watch is enabled, changes to source files trigger an automatic pipeline rebuild. Multiple rapid changes are debounced into a single rebuild (default 500ms window).
 
@@ -147,12 +137,12 @@ graph LR
 
 ## Key Type Definitions
 
-| Type               | Fields                                                          | Produced By                    | Consumed By   |
-| ------------------ | --------------------------------------------------------------- | ------------------------------ | ------------- |
-| `PipelineSession`  | dataset, api, registry, baseDir, sourceGlobs, buildTimeMs       | pipeline-session, file-watcher | tool-registry |
-| `RegisteredTools`  | 25 tools with dp\_ prefix, Zod input schemas, handler functions | tool-registry                  |               |
-| `ToolCallResult`   | content, isError                                                | pipeline-session               |               |
-| `McpServerOptions` | parsed options merged with config defaults                      | mcp-server                     |               |
+| Type               | Fields                                                                 | Produced By                    | Consumed By   |
+| ------------------ | ---------------------------------------------------------------------- | ------------------------------ | ------------- |
+| `PipelineSession`  | dataset, api, registry, baseDir, sourceGlobs, buildTimeMs              | pipeline-session, file-watcher | tool-registry |
+| `RegisteredTools`  | 25 tools with architect\_ prefix, Zod input schemas, handler functions | tool-registry                  |               |
+| `ToolCallResult`   | content, isError                                                       | pipeline-session               |               |
+| `McpServerOptions` | parsed options merged with config defaults                             | mcp-server                     |               |
 
 ---
 
@@ -164,7 +154,7 @@ Verify these design properties against the diagrams above:
 | ---- | ------------------------------------ | ------------------------------- | --------- |
 | DQ-1 | Is the execution ordering correct?   | 5 steps in monotonic order      | Sequence  |
 | DQ-2 | Are all interfaces well-defined?     | 4 distinct types across 5 steps | Component |
-| DQ-3 | Is error handling complete?          | 5 error paths identified        | Sequence  |
+| DQ-3 | Is error handling complete?          | 3 error paths identified        | Sequence  |
 | DQ-4 | Is data flow unidirectional?         | Review component diagram edges  | Component |
 | DQ-5 | Does validation prove the full path? | Review final step               | Both      |
 
@@ -182,4 +172,4 @@ Record design observations from reviewing the diagrams above. Each finding shoul
 
 ## Summary
 
-The MCPServerIntegration design review covers 5 sequential steps across 4 participants with 4 key data types and 5 error paths.
+The MCPServerIntegration design review covers 5 sequential steps across 4 participants with 4 key data types and 3 error paths.

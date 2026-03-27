@@ -54,7 +54,7 @@ sequenceDiagram
         init_cli->>init_cli: exit(1)
     end
 
-    Note over init_cli: Rule 2 — The init command prompts for preset selection from the three available presets (generic, libar-generic, ddd-es-cqrs) with descriptions, and for source glob paths with defaults inferred from project structure. The —yes flag skips non-destructive selection prompts and uses defaults. Destructive overwrites require an explicit —force flag; otherwise init exits without modifying existing files.
+    Note over init_cli: Rule 2 — The init command prompts for preset selection from the two available presets (libar-generic, ddd-es-cqrs) with descriptions, and for source glob paths with defaults inferred from project structure. The —yes flag skips non-destructive selection prompts and uses defaults. Destructive overwrites require an explicit —force flag; otherwise init exits without modifying existing files.
 
     init_cli->>+prompts: ProjectContext
     prompts-->>-init_cli: InitConfig

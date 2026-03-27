@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:CrossCuttingDocumentInclusion
 @architect-status:completed
+@architect-unlock-reason:compatibility-contract-cleanup
 @architect-phase:32
 @architect-effort:2d
 @architect-product-area:Generation
@@ -22,27 +23,27 @@ Feature: Cross-Cutting Document Inclusion
   More fundamentally, content-to-document is a many-to-many relationship.
   A CategoryDefinition interface should be includable in a Taxonomy Reference,
   a Configuration Guide, AND a claude.md architecture section simultaneously.
-  However, libar-docs-shape only supports one group, and behaviorCategories only
+  However, the `architect-shape` tag only supports one group, and behaviorCategories only
   supports one category per pattern. There is no cross-cutting tag that says
   "include this specific item in these specific documents."
 
-  The experimental libar-docs-arch-view tag partially solved this for diagram
+  The experimental `architect-include` tag partially solved this for diagram
   scoping but its name is misleading -- it routes content, not architectural
   views. It should be replaced by a general-purpose include tag.
 
   **Solution:**
-  Replace libar-docs-arch-view with libar-docs-include as a general-purpose
+  Replace arch-view with `architect-include` as a general-purpose
   CSV tag on both patterns and shape declarations. This tag acts as a
   document-routing mechanism alongside existing selectors. The tag controls
   two things: (1) diagram scoping -- DiagramScope gains an include field
   replacing archView, and (2) content routing -- ReferenceDocConfig gains an
   includeTags field. Content matching logic becomes: include if item matches
-  existing selectors OR has a matching libar-docs-include tag value. The
+  existing selectors OR has a matching `architect-include` tag value. The
   include tag is purely additive -- it never removes content that would be
   selected by existing filters.
 
   The tag is CSV format, so one item can appear in multiple documents:
-  libar-docs-include:reference-sample,codec-system,config-guide
+  `@architect-include:reference-sample,codec-system,config-guide`
 
   This gives every content type (conventions, behaviors, shapes, diagrams)
   uniform per-item opt-in without changing how existing selectors work.
@@ -58,7 +59,7 @@ Feature: Cross-Cutting Document Inclusion
     without disrupting what existing selectors already select.
 
   DD-2: One tag replaces arch-view and adds content routing
-    The libar-docs-include tag replaces the experimental arch-view tag
+    The `architect-include` tag replaces the experimental arch-view tag
     entirely. DiagramScope.archView is renamed to DiagramScope.include.
     The same tag values that scope diagrams can also route content via
     ReferenceDocConfig.includeTags. One concept, one name. The arch-view
@@ -66,9 +67,9 @@ Feature: Cross-Cutting Document Inclusion
 
   DD-3: Works on both patterns and declarations
     For patterns (conventions, behaviors), the include tag lives in the
-    file-level or feature-level libar-docs block and is extracted as
+    file-level or feature-level `@architect` block and is extracted as
     part of the directive. For shapes, the include tag lives in the
-    declaration-level JSDoc alongside libar-docs-shape. The shape
+    declaration-level JSDoc alongside `architect-shape`. The shape
     extractor (discoverTaggedShapes) extracts both tags from the same
     JSDoc comment. The include values are stored on ExtractedShape as
     an optional includes: readonly string[] field.
@@ -86,7 +87,7 @@ Feature: Cross-Cutting Document Inclusion
   | Include values are single tokens (no spaces) | Standard tag value convention, hyphen-separated |
   | No wildcard or glob matching on include values | Exact string match keeps selection predictable |
   | Additive only, no exclusion mechanism | Exclusion adds complexity; use separate configs instead |
-  | Shape include requires libar-docs-shape tag too | Include routes a shape, but libar-docs-shape triggers extraction |
+  | Shape include requires `architect-shape` tag too | Include routes a shape, but `architect-shape` triggers extraction |
 
   **Implementation Path:**
   | Layer | Change | Effort |
@@ -94,7 +95,7 @@ Feature: Cross-Cutting Document Inclusion
   | extracted-pattern.ts | Rename archView to include on directive schema | ~5 lines |
   | extracted-shape.ts | Add optional includes: readonly string[] field | ~3 lines |
   | doc-directive.ts | Rename archView to include on DocDirective | ~5 lines |
-  | shape-extractor.ts | Extract libar-docs-include CSV from declaration JSDoc | ~15 lines |
+  | shape-extractor.ts | Extract `architect-include` CSV from declaration JSDoc | ~15 lines |
   | doc-extractor.ts | Rename archView references to include | ~10 lines |
   | ast-parser.ts | Rename arch-view extraction to include | ~5 lines |
   | gherkin-ast-parser.ts | Rename archView field to include | ~5 lines |
@@ -105,7 +106,7 @@ Feature: Cross-Cutting Document Inclusion
   | reference-generators.ts | Update built-in configs from archView to include | ~5 lines |
   | pattern-scanner.ts | Rename arch-view extraction to include | ~3 lines |
   | architect.config.ts | Update showcase config: rename archView, add includeTags | ~5 lines |
-  | Source files (~8 files) | Replace libar-docs-arch-view annotations with libar-docs-include | ~8 lines |
+  | Source files (~8 files) | Replace arch-view annotations with `architect-include` | ~8 lines |
 
   **Integration with Existing Selectors:**
   The reference codec decode method gains a new inclusion pass after the
@@ -147,9 +148,9 @@ Feature: Cross-Cutting Document Inclusion
 
   Rule: Include tag routes content to named documents
 
-    **Invariant:** A pattern or shape with libar-docs-include:X appears in
+    **Invariant:** A pattern or shape with `architect-include:X` appears in
     any reference document whose includeTags contains X. The tag is CSV,
-    so libar-docs-include:X,Y routes the item to both document X and
+    so `architect-include:X,Y` routes the item to both document X and
     document Y. This is additive -- the item also appears in any document
     whose existing selectors (conventionTags, behaviorCategories,
     shapeSelectors) would already select it.
@@ -219,12 +220,7 @@ Feature: Cross-Cutting Document Inclusion
 
   Rule: Include tag scopes diagrams (replaces arch-view)
 
-    **Invariant:** DiagramScope.include matches patterns whose
-    libar-docs-include values contain the specified scope value.
-    This is the same field that existed as archView -- renamed for
-    consistency with the general-purpose include tag. Patterns with
-    libar-docs-include:pipeline-stages appear in any DiagramScope
-    with include: pipeline-stages.
+    **Invariant:** DiagramScope.include matches patterns whose `@architect-include` values contain the specified scope value. This is the same field that existed as archView -- renamed for consistency with the general-purpose include tag. Patterns with `@architect-include:pipeline-stages` appear in any DiagramScope with include: pipeline-stages.
 
     **Rationale:** The experimental arch-view tag was diagram-specific
     routing under a misleading name. Renaming to include unifies the
@@ -263,15 +259,10 @@ Feature: Cross-Cutting Document Inclusion
 
   Rule: Shapes use include tag for document routing
 
-    **Invariant:** A declaration tagged with both libar-docs-shape and
-    libar-docs-include has its include values stored on the ExtractedShape.
-    The reference codec uses these values alongside shapeSelectors for
-    shape filtering. A shape with libar-docs-include:X appears in any
-    document whose includeTags contains X, regardless of whether the
-    shape matches any shapeSelector.
+    **Invariant:** A declaration tagged with both `architect-shape` and `architect-include` has its include values stored on the ExtractedShape. The reference codec uses these values alongside shapeSelectors for shape filtering. A shape with `architect-include:X` appears in any document whose includeTags contains X, regardless of whether the shape matches any shapeSelector.
 
-    **Rationale:** Shape extraction (via libar-docs-shape) and document
-    routing (via libar-docs-include) are orthogonal concerns. A shape
+    **Rationale:** Shape extraction (via `architect-shape`) and document
+    routing (via `architect-include`) are orthogonal concerns. A shape
     must be extracted before it can be routed. The shape tag triggers
     extraction; the include tag controls which documents render it.
     This separation allows one shape to appear in multiple documents
@@ -331,11 +322,7 @@ Feature: Cross-Cutting Document Inclusion
 
   Rule: Conventions use include tag for selective inclusion
 
-    **Invariant:** A decision record or convention pattern with
-    libar-docs-include:X appears in a reference document whose
-    includeTags contains X. This allows selecting a single convention
-    rule for a focused document without pulling all conventions
-    matching a broad conventionTag.
+    **Invariant:** A decision record or convention pattern with `architect-include:X` appears in a reference document whose includeTags contains X. This allows selecting a single convention rule for a focused document without pulling all conventions matching a broad conventionTag.
 
     **Rationale:** Convention content is currently selected by
     conventionTags, which pulls all decision records tagged with a

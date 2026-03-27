@@ -1,6 +1,6 @@
 # @libar-dev/architect
 
-> **Code-first documentation and delivery process toolkit**
+> **Context engineering platform with extraction pipeline and typed codecs**
 
 ---
 
@@ -8,7 +8,7 @@
 
 ### Project Overview
 
-Code-first documentation and delivery process toolkit. Extracts patterns from TypeScript and Gherkin sources using configurable annotations, generates LLM-optimized markdown and Mermaid architecture diagrams, and validates delivery workflow via pre-commit hooks.
+Context engineering platform with extraction pipeline and typed codecs. Extracts patterns from TypeScript and Gherkin sources using configurable annotations, generates LLM-optimized markdown and Mermaid architecture diagrams, and validates delivery workflow via pre-commit hooks.
 
 **Core Principle:** Code is the single source of truth. Generated documentation is a projection of annotated source code.
 
@@ -124,7 +124,7 @@ pnpm architect:query -- overview                            # Project health sum
 
 ### Data API CLI
 
-Query delivery process state directly from the terminal. **Use this instead of reading generated markdown or launching explore agents** — targeted queries use 5-10x less context.
+Query process state directly from the terminal. **Use this instead of reading generated markdown or launching explore agents** — targeted queries use 5-10x less context.
 
 **Run `pnpm architect:query -- --help` for the full command reference**, including workflow recipes, session types, architecture queries, output modifiers, and available API methods.
 
@@ -609,17 +609,17 @@ console.log(JSON.stringify(doc.sections, null, 2));
 
 | Error                     | Cause                                          | Fix                                         |
 | ------------------------- | ---------------------------------------------- | ------------------------------------------- |
-| completed-protection      | File has completed status but no unlock tag    | Add libar-docs-unlock-reason tag            |
+| completed-protection      | File has completed status but no unlock tag    | Add @architect-unlock-reason tag            |
 | invalid-status-transition | Skipped FSM state (e.g., roadmap to completed) | Follow path: roadmap to active to completed |
 | scope-creep               | Added deliverable to active spec               | Remove deliverable OR revert to roadmap     |
 | session-scope (warning)   | Modified file outside session scope            | Add to scope OR use --ignore-session        |
 | session-excluded          | Modified excluded pattern during session       | Remove from exclusion OR override           |
 
-| Situation                    | Solution              | Example                                   |
-| ---------------------------- | --------------------- | ----------------------------------------- |
-| Fix bug in completed spec    | Add unlock reason tag | libar-docs-unlock-reason:Fix-typo         |
-| Modify outside session scope | Use ignore flag       | architect-guard --staged --ignore-session |
-| CI treats warnings as errors | Use strict flag       | architect-guard --all --strict            |
+| Situation                    | Solution              | Example                                |
+| ---------------------------- | --------------------- | -------------------------------------- |
+| Fix bug in completed spec    | Add unlock reason tag | @architect-unlock-reason:Fix-typo      |
+| Modify outside session scope | Use ignore flag       | lint-process --staged --ignore-session |
+| CI treats warnings as errors | Use strict flag       | lint-process --all --strict            |
 
 #### Handoff captures session-end state for continuity
 
@@ -631,7 +631,7 @@ console.log(JSON.stringify(doc.sections, null, 2));
 
 **Invariant:** Phase 39 depends on ClaudeModuleGeneration (Phase 25). Adding `@architect-claude-module` and `@architect-claude-section:workflow` tags to this spec will cause ClaudeModuleGeneration to produce `_claude-md/workflow/` output files. The hand-written `_claude-md/workflow/` files are deleted after successful verified generation.
 
-**Rationale:** The annotation work (Rule blocks in this spec) is immediately useful — queryable via `pnpm architect:query -- rules`. Generation deliverables cannot complete until Phase 25 ships the ClaudeModuleCodec. This sequencing is intentional: the annotation investment has standalone value regardless of whether the codec exists yet.
+**Rationale:** The annotation work (Rule blocks in this spec) is immediately useful — queryable via `pnpm process:query -- rules`. Generation deliverables cannot complete until Phase 25 ships the ClaudeModuleCodec. This sequencing is intentional: the annotation investment has standalone value regardless of whether the codec exists yet.
 
 ---
 

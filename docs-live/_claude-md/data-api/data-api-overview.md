@@ -1,6 +1,6 @@
 ### DataAPI Overview
 
-**How do I query process state?** The Data API provides direct terminal access to delivery process state. It replaces reading generated markdown or launching explore agents — targeted queries use 5-10x less context. The `context` command assembles curated bundles tailored to session type (planning, design, implement).
+**How do I query process state?** The Data API provides direct terminal access to project state. It replaces reading generated markdown or launching explore agents — targeted queries use 5-10x less context. The `context` command assembles curated bundles tailored to session type (planning, design, implement).
 
 #### Key Invariants
 

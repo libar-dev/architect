@@ -120,8 +120,8 @@ Tags for enriching patterns with additional metadata.
 | `since`                  | value        | Design session that created this pattern                                   | No       | `@architect-since DS-A`                                                      |
 | `convention`             | csv          | Convention domains for reference document generation from decision records | No       | `@architect-convention fsm-rules, testing-policy`                            |
 | `claude-module`          | value        | Module identifier for CLAUDE.md module generation (becomes filename)       | No       | `@architect-claude-module process-guard`                                     |
-| `claude-section`         | enum         | Target section directory in \_claude-md/ for module output                 | No       | `@architect-claude-section delivery-process`                                 |
-| `claude-tags`            | csv          | Variation filtering tags for modular-claude-md inclusion                   | No       | `@architect-claude-tags core-mandatory, delivery-process`                    |
+| `claude-section`         | enum         | Target section directory in \_claude-md/ for module output                 | No       | `@architect-claude-section process`                                          |
+| `claude-tags`            | csv          | Variation filtering tags for modular-claude-md inclusion                   | No       | `@architect-claude-tags core-mandatory, process`                             |
 | `sequence-orchestrator`  | value        | Identifies the coordinator module for sequence diagram generation          | No       | `@architect-sequence-orchestrator:init-cli`                                  |
 | `sequence-step`          | number       | Explicit execution ordering number for sequence diagram steps              | No       | `@architect-sequence-step:1`                                                 |
 | `sequence-module`        | csv          | Maps Rule to deliverable module(s) for sequence diagram participants       | No       | `@architect-sequence-module:detect-context`                                  |
@@ -166,7 +166,6 @@ Available configuration presets.
 
 | Preset          | Tag Prefix    | Categories | Use Case                               |
 | --------------- | ------------- | ---------- | -------------------------------------- |
-| `generic`       | `@docs-`      | 3          | Simple projects with @docs- prefix     |
 | `libar-generic` | `@architect-` | 3          | Default preset with @architect- prefix |
 | `ddd-es-cqrs`   | `@architect-` | 21         | Full DDD/ES/CQRS taxonomy              |
 

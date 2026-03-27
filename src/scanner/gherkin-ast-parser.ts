@@ -109,8 +109,8 @@ function kebabToCamel(s: string): string {
  * normalizeTag("@acceptance-criteria")          // "acceptance-criteria"
  *
  * // With custom registry
- * const registry = { tagPrefix: "@docs-", fileOptInTag: "@docs", ... };
- * normalizeTag("@docs-pattern:MyPattern", registry) // "pattern:MyPattern"
+ * const registry = { tagPrefix: "@acme-", fileOptInTag: "@acme", ... };
+ * normalizeTag("@acme-pattern:MyPattern", registry) // "pattern:MyPattern"
  */
 function normalizeTag(tag: string, registry?: TagRegistry): string {
   // Use registry-based builders if provided, otherwise use defaults

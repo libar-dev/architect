@@ -74,16 +74,16 @@ Protection levels determine what modifications are allowed per status.
 
 ```bash
 # Pre-commit (default mode)
-architect-guard --staged
+lint-process --staged
 
 # CI pipeline with strict mode
-architect-guard --all --strict
+lint-process --all --strict
 
 # Override session scope checking
-architect-guard --staged --ignore-session
+lint-process --staged --ignore-session
 
 # Debug: show derived process state
-architect-guard --staged --show-state
+lint-process --staged --show-state
 ```
 
 ### Options
@@ -110,10 +110,10 @@ architect-guard --staged --show-state
 
 Override mechanisms for exceptional situations.
 
-| Situation                    | Solution              | Example                                     |
-| ---------------------------- | --------------------- | ------------------------------------------- |
-| Fix bug in completed spec    | Add unlock reason tag | `@architect-unlock-reason:'Fix-typo'`       |
-| Modify outside session scope | Use ignore flag       | `architect-guard --staged --ignore-session` |
-| CI treats warnings as errors | Use strict flag       | `architect-guard --all --strict`            |
+| Situation                    | Solution              | Example                                  |
+| ---------------------------- | --------------------- | ---------------------------------------- |
+| Fix bug in completed spec    | Add unlock reason tag | `@architect-unlock-reason:'Fix-typo'`    |
+| Modify outside session scope | Use ignore flag       | `lint-process --staged --ignore-session` |
+| CI treats warnings as errors | Use strict flag       | `lint-process --all --strict`            |
 
 ---

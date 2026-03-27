@@ -52,6 +52,7 @@ Feature: Phase State Machine Validation
       Examples:
         | status       |
         | done         |
+        | planned      |
         | in-progress  |
         | implemented  |
         | pending      |

@@ -26,7 +26,7 @@ export const PROCESS_STATUS_VALUES = [
 ] as const;
 
 /**
- * Extended status values accepted for extraction and validation
+ * Status values accepted for extraction and validation
  *
  * FSM states that can be used in annotations.
  * Use only these canonical values: roadmap, active, completed, deferred.

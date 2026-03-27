@@ -39,7 +39,7 @@
 ## CLI Usage
 
 ```bash
-lint-process [options]
+architect-guard [options]
 ```
 
 ### Modes
@@ -170,7 +170,7 @@ Follows the Decider pattern from platform-core: no I/O, no side effects.
 
 ### When to Use
 
-- When validating proposed changes against delivery process rules
+- When validating proposed changes against workflow rules
 - When implementing custom validation rules for the process guard
 - When building pre-commit hooks that enforce FSM transitions
 

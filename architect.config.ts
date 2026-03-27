@@ -98,7 +98,6 @@ export default defineConfig({
     {
       title: 'Process Guard Reference',
       conventionTags: ['process-guard-errors'],
-      shapeSources: [],
       behaviorCategories: [],
       claudeMdSection: 'validation',
       docsFilename: 'PROCESS-GUARD-REFERENCE.md',
@@ -108,7 +107,6 @@ export default defineConfig({
     {
       title: 'Available Codecs Reference',
       conventionTags: ['codec-registry'],
-      shapeSources: [],
       behaviorCategories: [],
       claudeMdSection: 'architecture',
       docsFilename: 'ARCHITECTURE-CODECS.md',
@@ -117,7 +115,6 @@ export default defineConfig({
     {
       title: 'Architecture Types Reference',
       conventionTags: ['pipeline-architecture'],
-      shapeSources: [],
       shapeSelectors: [{ group: 'master-dataset' }],
       behaviorCategories: [],
       shapesFirst: true,
@@ -134,7 +131,6 @@ export default defineConfig({
     {
       title: 'Reference Generation Sample',
       conventionTags: ['taxonomy-rules'],
-      shapeSources: [],
       shapeSelectors: [
         { group: 'reference-sample' },
       ],
@@ -179,7 +175,6 @@ export default defineConfig({
     {
       title: 'Session Workflow Guide',
       conventionTags: [],
-      shapeSources: [],
       behaviorCategories: [],
       includeTags: ['session-workflows'],
       claudeMdSection: 'workflow',
@@ -190,7 +185,6 @@ export default defineConfig({
     {
       title: 'Annotation Reference Guide',
       conventionTags: ['annotation-system'],
-      shapeSources: [],
       behaviorCategories: [],
       claudeMdSection: 'annotation',
       docsFilename: 'ANNOTATION-REFERENCE.md',
@@ -200,7 +194,6 @@ export default defineConfig({
     {
       title: 'Configuration Guide',
       conventionTags: [],
-      shapeSources: [],
       behaviorCategories: [],
       claudeMdSection: 'configuration',
       docsFilename: 'CONFIGURATION-GUIDE.md',
@@ -210,7 +203,6 @@ export default defineConfig({
     {
       title: 'Validation Tools Guide',
       conventionTags: [],
-      shapeSources: [],
       behaviorCategories: [],
       claudeMdSection: 'validation',
       docsFilename: 'VALIDATION-TOOLS-GUIDE.md',
@@ -220,7 +212,6 @@ export default defineConfig({
     {
       title: 'Gherkin Authoring Guide',
       conventionTags: [],
-      shapeSources: [],
       behaviorCategories: [],
       claudeMdSection: 'authoring',
       docsFilename: 'GHERKIN-AUTHORING-GUIDE.md',

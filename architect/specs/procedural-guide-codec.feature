@@ -98,7 +98,7 @@ Feature: Procedural Guide Codec
       | Deliverable | Status | Location | Tests | Test Type |
       | ReferenceDocConfig entry for session workflow guide (DD-1: reuses createReferenceCodec) | complete | architect.config.ts | Yes | integration |
       | ReferenceDocConfig entry for annotation guide (DD-1: reuses createReferenceCodec) | complete | architect.config.ts | Yes | integration |
-      | Add libar-docs-include:session-workflows tag to SessionGuidesModuleSource (DD-2) | complete | architect/specs/session-guides-module-source.feature | No | n/a |
+      | Add @architect-include:session-workflows tag to SessionGuidesModuleSource (DD-2) | complete | architect/specs/session-guides-module-source.feature | No | n/a |
       | Create loadPreambleFromMarkdown() utility (DD-8) | complete | src/renderable/load-preamble.ts | Yes | unit |
       | Create session workflow guide markdown source (DD-7) | complete | docs-sources/session-workflow-guide.md | No | n/a |
       | Create annotation guide markdown source (DD-7) | complete | docs-sources/annotation-guide.md | No | n/a |

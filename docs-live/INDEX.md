@@ -6,13 +6,13 @@
 
 ## Package Metadata
 
-| Field             | Value                                                 |
-| ----------------- | ----------------------------------------------------- |
-| **Package**       | @libar-dev/architect                                  |
-| **Purpose**       | Code-first documentation and delivery process toolkit |
-| **Patterns**      | 386 tracked (258 completed, 74 active, 54 planned)    |
-| **Product Areas** | 7                                                     |
-| **License**       | MIT                                                   |
+| Field             | Value                                                  |
+| ----------------- | ------------------------------------------------------ |
+| **Package**       | @libar-dev/architect                                   |
+| **Purpose**       | Context engineering platform for AI-assisted codebases |
+| **Patterns**      | 396 tracked (262 completed, 81 active, 53 planned)     |
+| **Product Areas** | 7                                                      |
+| **License**       | MIT                                                    |
 
 ---
 
@@ -152,23 +152,23 @@
 | Annotation    | 26       | 23        | 2      | 1       | [███████░] 23/26 88%       |
 | Configuration | 11       | 8         | 0      | 3       | [██████░░] 8/11 73%        |
 | CoreTypes     | 11       | 7         | 4      | 0       | [█████░░░] 7/11 64%        |
-| DataAPI       | 41       | 24        | 14     | 3       | [█████░░░] 24/41 59%       |
+| DataAPI       | 41       | 24        | 15     | 2       | [█████░░░] 24/41 59%       |
 | Generation    | 95       | 81        | 6      | 8       | [███████░] 81/95 85%       |
 | Process       | 11       | 4         | 0      | 7       | [███░░░░░] 4/11 36%        |
 | Validation    | 25       | 16        | 3      | 6       | [█████░░░] 16/25 64%       |
-| **Total**     | **220**  | **163**   | **29** | **28**  | **[██████░░] 163/220 74%** |
+| **Total**     | **220**  | **163**   | **30** | **27**  | **[██████░░] 163/220 74%** |
 
 ---
 
 ## Phase Progress
 
-**386** patterns total: **258** completed (67%), **74** active, **54** planned. [█████████████░░░░░░░] 258/386
+**396** patterns total: **262** completed (66%), **81** active, **53** planned. [█████████████░░░░░░░] 262/396
 
 | Status    | Count | Percentage |
 | --------- | ----- | ---------- |
-| Completed | 258   | 67%        |
-| Active    | 74    | 19%        |
-| Planned   | 54    | 14%        |
+| Completed | 262   | 66%        |
+| Active    | 81    | 20%        |
+| Planned   | 53    | 13%        |
 
 ### By Phase
 

@@ -184,7 +184,7 @@ Feature: Session Guides as Annotated Module Source
     Scenario: Planning session output constraints
       Given a planning session for a new pattern
       When the session completes
-      Then a .feature file exists with libar-docs-status:roadmap
+      Then a .feature file exists with @architect-status:roadmap
       And the file contains a Background with deliverables table
       And no .ts files were created in src/
 
@@ -237,7 +237,7 @@ Feature: Session Guides as Annotated Module Source
 
     Execution order:
     1. Transition to active FIRST (before any code changes)
-    2. Create executable spec stubs (if libar-docs-executable-specs present)
+    2. Create executable spec stubs (if @architect-executable-specs present)
     3. For each deliverable: implement, test, update status to complete
     4. Transition to completed (only when ALL deliverables done)
     5. Regenerate docs: pnpm docs:all
@@ -273,7 +273,7 @@ Feature: Session Guides as Annotated Module Source
     **Verified by:** All FSM errors have documented recovery paths
 
     | Error | Cause | Fix |
-    | completed-protection | File has completed status but no unlock tag | Add libar-docs-unlock-reason tag |
+    | completed-protection | File has completed status but no unlock tag | Add @architect-unlock-reason tag |
     | invalid-status-transition | Skipped FSM state (e.g., roadmap to completed) | Follow path: roadmap to active to completed |
     | scope-creep | Added deliverable to active spec | Remove deliverable OR revert to roadmap |
     | session-scope (warning) | Modified file outside session scope | Add to scope OR use --ignore-session |
@@ -282,7 +282,7 @@ Feature: Session Guides as Annotated Module Source
     Escape hatches for exceptional situations:
 
     | Situation | Solution | Example |
-    | Fix bug in completed spec | Add unlock reason tag | libar-docs-unlock-reason:Fix-typo |
+    | Fix bug in completed spec | Add unlock reason tag | @architect-unlock-reason:Fix-typo |
     | Modify outside session scope | Use ignore flag | lint-process --staged --ignore-session |
     | CI treats warnings as errors | Use strict flag | lint-process --all --strict |
 
@@ -340,7 +340,7 @@ Feature: Session Guides as Annotated Module Source
     whether the codec exists yet.
 
     **Prerequisite:** Phase 25 must add `workflow` to the `claude-section` enum
-    values (currently: core, delivery-process, testing, infrastructure).
+    values (currently: core, process, testing, infrastructure).
 
     **Verified by:** Generated modules replace hand-written workflow files
 

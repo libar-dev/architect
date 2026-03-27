@@ -21,7 +21,7 @@ import { z } from 'zod';
 import {
   ACCEPTED_STATUS_VALUES,
   PROCESS_STATUS_VALUES,
-  type AcceptedStatusValue,
+  type ProcessStatusValue,
 } from '../taxonomy/index.js';
 import { asDirectiveTag } from '../types/branded.js';
 import type { TagRegistry } from './tag-registry.js';
@@ -47,16 +47,16 @@ export type Position = z.infer<typeof PositionSchema>;
 
 /**
  * Creates a DirectiveTag schema for a given tag prefix.
- * This factory enables projects to use custom prefixes (e.g., "@docs-" instead of "@architect-").
+ * This factory enables projects to use custom prefixes (e.g., "@acme-" instead of "@architect-").
  *
- * @param tagPrefix - The tag prefix to validate against (e.g., "@docs-" or "@architect-")
+ * @param tagPrefix - The tag prefix to validate against (e.g., "@acme-" or "@architect-")
  * @returns Zod schema that validates and transforms tags with the given prefix
  *
  * @example
  * ```typescript
  * // Custom prefix
- * const customSchema = createDirectiveTagSchema("@docs-");
- * customSchema.parse("@docs-pattern"); // Valid
+ * const customSchema = createDirectiveTagSchema("@acme-");
+ * customSchema.parse("@acme-pattern"); // Valid
  *
  * // Default prefix
  * const defaultSchema = createDirectiveTagSchema("@architect-");
@@ -93,24 +93,19 @@ const DirectiveTagSchema = createDirectiveTagSchema('@architect-');
 export const DefaultPatternStatusSchema = z.enum(PROCESS_STATUS_VALUES);
 
 /**
- * Extended status values accepted for directive validation
- *
- * Accepts FSM states + legacy values (implemented, partial, in-progress).
- * Legacy values are normalized to FSM states via normalizeStatus().
+ * Status values accepted for directive validation
  *
  * @see src/taxonomy/status-values.ts
- * @see src/taxonomy/normalized-status.ts
  */
 export const AcceptedPatternStatusSchema = z.enum(ACCEPTED_STATUS_VALUES);
 
 /**
  * Pattern status schema for directive validation
  *
- * Uses AcceptedPatternStatusSchema to allow legacy values.
- * Legacy values are normalized to display values via normalizeStatus().
+ * Accepts canonical PDR-005 FSM states only.
  */
-export const PatternStatusSchema = AcceptedPatternStatusSchema;
-export type PatternStatus = AcceptedStatusValue;
+export const PatternStatusSchema = z.enum(PROCESS_STATUS_VALUES);
+export type PatternStatus = ProcessStatusValue;
 
 /**
  * Create pattern status schema from tag registry

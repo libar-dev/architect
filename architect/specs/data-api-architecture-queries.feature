@@ -24,7 +24,7 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
   3. `arch coverage` reports annotation completeness with gaps
   4. `tags` lists all tags in use with counts
   5. `sources` shows file inventory by type
-  6. `unannotated [--path glob]` finds files without the libar-docs opt-in marker
+  6. `unannotated [--path glob]` finds files without the @architect opt-in marker
 
   **Business Value:**
   | Benefit | Impact |
@@ -98,7 +98,7 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
   Rule: Coverage analysis reports annotation completeness with gaps
 
     **Invariant:** Coverage reports identify unannotated files that should have
-    the libar-docs opt-in marker based on their location and content.
+    the @architect opt-in marker based on their location and content.
 
     **Rationale:** Annotation completeness directly impacts the quality of all
     generated documentation and API queries. Files without the opt-in marker are
@@ -107,7 +107,7 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
 
     **Coverage output:**
     | Metric | Source |
-    | Annotated files | Files with libar-docs opt-in |
+    | Annotated files | Files with @architect opt-in |
     | Total scannable files | All .ts files in input globs |
     | Coverage percentage | annotated / total |
     | Missing files | Scannable files without annotations |
@@ -125,7 +125,7 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
 
     @acceptance-criteria @happy-path
     Scenario: Find unannotated files with path filter
-      Given some TypeScript files without the libar-docs opt-in marker
+      Given some TypeScript files without the @architect opt-in marker
       When running "process-api unannotated --path 'src/generators/**/*.ts'"
       Then the output lists only unannotated files matching the glob
       And each file shows its location relative to base directory
@@ -154,8 +154,8 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
 
     **Tags output:**
     | Tag | Count | Example Values |
-    | libar-docs-status | 69 | completed(36), roadmap(30), active(3) |
-    | libar-docs-category | 41 | projection(6), saga(4), handler(5) |
+    | status | 69 | completed(36), roadmap(30), active(3) |
+    | category | 41 | core(16), api(13), infra(12) |
 
     **Sources output:**
     | Source Type | Count | Location Pattern |

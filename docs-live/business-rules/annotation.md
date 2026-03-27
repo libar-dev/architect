@@ -247,9 +247,9 @@ _Tests the discoverTaggedShapes function that scans TypeScript source_
 
 ---
 
-#### Declarations opt in via libar-docs-shape tag
+#### Declarations opt in via architect-shape tag
 
-> **Invariant:** Only declarations with the libar-docs-shape tag in their immediately preceding JSDoc are collected as tagged shapes.
+> **Invariant:** Only declarations with the architect-shape tag in their immediately preceding JSDoc are collected as tagged shapes.
 >
 > **Rationale:** Extracting shapes without an explicit opt-in tag would surface internal implementation details in generated API documentation, violating information hiding.
 
@@ -279,7 +279,7 @@ _Tests the discoverTaggedShapes function that scans TypeScript source_
 - All five declaration kinds are discoverable
 - JSDoc with gap larger than MAX_JSDOC_LINE_DISTANCE is not matched
 - Tag as last line before closing JSDoc delimiter
-- Hypothetical libar-docs-shape-extended tag is not matched
+- Hypothetical architect-shape-extended tag is not matched
 - Tag coexists with other JSDoc content
 - Generic arrow function in non-JSX context parses correctly
 - All 5 declaration kinds supported
@@ -1000,14 +1000,14 @@ _- Gherkin tags are flat strings needing semantic interpretation_
 
 #### Category tags are colon-free tags filtered against known non-categories
 
-> **Invariant:** Tags without colons become categories, except known non-category tags (acceptance-criteria, happy-path) and the libar-docs opt-in marker.
+> **Invariant:** Tags without colons become categories, except known non-category tags (acceptance-criteria, happy-path) and the architect opt-in marker.
 >
 > **Rationale:** Including test-control tags (acceptance-criteria, happy-path) as categories pollutes the pattern taxonomy with non-semantic values.
 
 **Verified by:**
 
 - Extract category tags (no colon)
-- libar-docs opt-in marker is NOT a category
+- architect opt-in marker is NOT a category
 
 ---
 

@@ -79,7 +79,6 @@ export function createProductAreaConfigs(options?: ProductAreaConfigOptions): Re
       title: `${area} Overview`,
       productArea: area,
       conventionTags: [],
-      shapeSources: [],
       shapeSelectors: [],
       behaviorCategories: [],
       claudeMdSection: kebab,

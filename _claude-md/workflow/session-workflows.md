@@ -72,17 +72,17 @@
 
 | Error                     | Cause                                          | Fix                                         |
 | ------------------------- | ---------------------------------------------- | ------------------------------------------- |
-| completed-protection      | File has completed status but no unlock tag    | Add architect-unlock-reason tag             |
+| completed-protection      | File has completed status but no unlock tag    | Add @architect-unlock-reason tag            |
 | invalid-status-transition | Skipped FSM state (e.g., roadmap to completed) | Follow path: roadmap to active to completed |
 | scope-creep               | Added deliverable to active spec               | Remove deliverable OR revert to roadmap     |
 | session-scope (warning)   | Modified file outside session scope            | Add to scope OR use --ignore-session        |
 | session-excluded          | Modified excluded pattern during session       | Remove from exclusion OR override           |
 
-| Situation                    | Solution              | Example                                   |
-| ---------------------------- | --------------------- | ----------------------------------------- |
-| Fix bug in completed spec    | Add unlock reason tag | architect-unlock-reason:Fix-typo          |
-| Modify outside session scope | Use ignore flag       | architect-guard --staged --ignore-session |
-| CI treats warnings as errors | Use strict flag       | architect-guard --all --strict            |
+| Situation                    | Solution              | Example                                |
+| ---------------------------- | --------------------- | -------------------------------------- |
+| Fix bug in completed spec    | Add unlock reason tag | @architect-unlock-reason:Fix-typo      |
+| Modify outside session scope | Use ignore flag       | lint-process --staged --ignore-session |
+| CI treats warnings as errors | Use strict flag       | lint-process --all --strict            |
 
 #### Handoff captures session-end state for continuity
 
@@ -94,4 +94,4 @@
 
 **Invariant:** Phase 39 depends on ClaudeModuleGeneration (Phase 25). Adding `@architect-claude-module` and `@architect-claude-section:workflow` tags to this spec will cause ClaudeModuleGeneration to produce `_claude-md/workflow/` output files. The hand-written `_claude-md/workflow/` files are deleted after successful verified generation.
 
-**Rationale:** The annotation work (Rule blocks in this spec) is immediately useful — queryable via `pnpm architect:query -- rules`. Generation deliverables cannot complete until Phase 25 ships the ClaudeModuleCodec. This sequencing is intentional: the annotation investment has standalone value regardless of whether the codec exists yet.
+**Rationale:** The annotation work (Rule blocks in this spec) is immediately useful — queryable via `pnpm process:query -- rules`. Generation deliverables cannot complete until Phase 25 ships the ClaudeModuleCodec. This sequencing is intentional: the annotation investment has standalone value regardless of whether the codec exists yet.

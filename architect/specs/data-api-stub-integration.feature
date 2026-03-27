@@ -11,22 +11,22 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
 
   **Problem:**
   Design sessions produce code stubs in `architect/stubs/` with rich
-  metadata: `@target` (destination file path), `@since` (design session ID),
+  metadata: `@architect-target` (destination file path), `@architect-since` (design session ID),
   `@see` (PDR references), and `AD-N` numbered decisions. But 14 of 22 stubs
-  lack the libar-docs opt-in marker, making them invisible to the scanner pipeline.
+  lack the @architect opt-in marker, making them invisible to the scanner pipeline.
   The 8 stubs that ARE scanned silently drop the target and see annotations because
-  they are not prefixed with the libar-docs namespace.
+  they are not prefixed with the @architect namespace.
 
   This means: the richest source of design context (stubs with architectural
   decisions, target paths, and session provenance) is invisible to the API.
 
   **Solution:**
-  A two-phase integration approach:
-  1. **Phase A (Annotation):** Add the libar-docs opt-in + implements tag to
-     the 14 non-annotated stubs. This makes them scannable with zero pipeline changes.
-  2. **Phase B (Taxonomy):** Register libar-docs-target and libar-docs-since
-     as new taxonomy tags. Rename existing `@target` and `@since` annotations in
-     all stubs. This gives structured access to stub-specific metadata.
+  A three-phase integration approach:
+  1. **Phase A (Annotation):** Add the @architect opt-in + implements tag to
+    the 14 non-annotated stubs. This makes them scannable with zero pipeline changes.
+  2. **Phase B (Taxonomy):** Register @architect-target and @architect-since
+    as new taxonomy tags. Rename existing `@target` and `@since` annotations in
+    all stubs. This gives structured access to stub-specific metadata.
 
   3. **Phase C (Commands):** Add query commands:
   - `stubs [pattern]` lists design stubs with target paths
@@ -44,8 +44,8 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
       | Scan path configuration (pre-existing) | complete | package.json | No | N/A |
-      | libar-docs-target taxonomy tag | complete | src/taxonomy/registry-builder.ts | Yes | unit |
-      | libar-docs-since taxonomy tag | complete | src/taxonomy/registry-builder.ts | Yes | unit |
+      | @architect-target taxonomy tag | complete | src/taxonomy/registry-builder.ts | Yes | unit |
+      | @architect-since taxonomy tag | complete | src/taxonomy/registry-builder.ts | Yes | unit |
       | stubs subcommand | complete | src/cli/process-api.ts | Yes | integration |
       | decisions subcommand | complete | src/cli/process-api.ts | Yes | integration |
       | pdr subcommand | complete | src/cli/process-api.ts | Yes | integration |
@@ -66,11 +66,11 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
     pattern (via `@architect-pattern`), stub implements it. Per PDR-009, stubs
     must NOT use `@architect-pattern` -- that belongs to the feature file.
 
-    **Boundary note:** Phase A (annotating stubs with libar-docs opt-in and
-    libar-docs-implements tags) is consumer-side work done in each consuming repo.
+    **Boundary note:** Phase A (annotating stubs with `@architect` opt-in and
+    `@architect-implements` tags) is consumer-side work done in each consuming repo.
     Package.json scan paths (`-i 'architect/stubs/**/*.ts'`) are already
     pre-configured in 15 scripts. This spec covers Phase B: taxonomy tag
-    registration (libar-docs-target, libar-docs-since) and CLI query subcommands.
+    registration (@architect-target, @architect-since) and CLI query subcommands.
 
     **Verified by:** All stubs scanned, Stub metadata extracted
 
@@ -89,7 +89,7 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
       And the targetPath is available via ProcessStateAPI queries
 
     @acceptance-criteria @validation
-    Scenario: Stub without libar-docs opt-in is invisible to scanner
+    Scenario: Stub without @architect opt-in is invisible to scanner
       Given a stub file without the @architect marker
       When running the scanner pipeline with stubs input glob
       Then the stub does NOT appear in the MasterDataset

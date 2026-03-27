@@ -79,7 +79,7 @@
 export const ERROR_GUIDE_REFERENCE_CONFIG = {
   title: 'Process Guard Reference',
   conventionTags: ['process-guard-errors'],
-  shapeSources: [],
+  shapeSelectors: [],
   behaviorCategories: [],
   claudeMdSection: 'validation',
   docsFilename: 'PROCESS-GUARD.md',

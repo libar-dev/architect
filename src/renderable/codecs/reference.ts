@@ -187,7 +187,7 @@ export interface DiagramScope {
  * Configuration for a reference document type.
  *
  * Each config object defines one reference document's composition.
- * Convention tags, shape sources, and behavior tags control content assembly.
+ * Convention tags, shape selectors, and behavior tags control content assembly.
  */
 export interface ReferenceDocConfig {
   /** Document title (e.g., "Process Guard Reference") */
@@ -338,8 +338,8 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
       'authoring (Vite convention, zero validation), `ConfigLoader` discovers and loads ' +
       'the file, `ProjectConfigSchema` validates via Zod, `ConfigResolver` applies defaults ' +
       'and merges stubs into sources, and `ArchitectFactory` builds the final instance ' +
-      'with `TagRegistry` and `RegexBuilders`. Three presets define escalating taxonomy ' +
-      'complexity — from 3 categories (`generic`, `libar-generic`) to 21 (`ddd-es-cqrs`). ' +
+      'with `TagRegistry` and `RegexBuilders`. Two presets define escalating taxonomy ' +
+      'complexity — from 3 categories (`libar-generic`) to 21 (`ddd-es-cqrs`). ' +
       '`SourceMerger` computes per-generator source overrides, enabling generators like ' +
       'changelog to pull from different feature sets than the base config.',
     diagramScopes: [
@@ -355,7 +355,7 @@ export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
       },
     ],
     keyInvariants: [
-      'Preset-based taxonomy: `generic` (3 categories, `@architect-`), `libar-generic` (3 categories, `@architect-`), `ddd-es-cqrs` (21 categories, full DDD). Presets replace base categories entirely — they define prefix, categories, and metadata tags as a unit',
+      'Preset-based taxonomy: `libar-generic` (3 categories, `@architect-`) and `ddd-es-cqrs` (21 categories, full DDD). Presets replace base categories entirely — they define prefix, categories, and metadata tags as a unit',
       'Resolution pipeline: defineConfig() → ConfigLoader → ProjectConfigSchema (Zod) → ConfigResolver → ArchitectFactory → ArchitectInstance. Each stage has a single responsibility',
       'Stubs merged at resolution time: Stub directory globs are appended to typescript sources, making stubs transparent to the downstream pipeline',
       'Source override composition: SourceMerger applies per-generator overrides (`replaceFeatures`, `additionalFeatures`, `additionalInput`) to base sources. Exclude is always inherited from base',

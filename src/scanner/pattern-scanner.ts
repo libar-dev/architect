@@ -92,8 +92,8 @@ export async function findFilesToScan(config: ScannerConfig): Promise<readonly s
  * hasFileOptIn(content2); // false
  *
  * // With custom registry
- * const registry = { tagPrefix: "@docs-", fileOptInTag: "@docs", ... };
- * hasFileOptIn(content, registry); // Uses @docs pattern
+ * const registry = { tagPrefix: "@acme-", fileOptInTag: "@acme", ... };
+ * hasFileOptIn(content, registry); // Uses @acme pattern
  * ```
  */
 export function hasFileOptIn(content: string, registry?: TagRegistry): boolean {

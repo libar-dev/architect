@@ -144,9 +144,7 @@ const ReferenceDocConfigSchema = z
   .object({
     title: z.string().min(1),
     conventionTags: z.array(z.string().min(1)).readonly(),
-    shapeSources: z.array(GlobPatternSchema).readonly().optional(),
     behaviorCategories: z.array(z.string().min(1)).readonly(),
-    diagramScope: DiagramScopeSchema.optional(),
     diagramScopes: z.array(DiagramScopeSchema).readonly().optional(),
     claudeMdSection: z.string().min(1),
     docsFilename: z.string().min(1),

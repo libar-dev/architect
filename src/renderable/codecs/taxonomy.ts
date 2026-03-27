@@ -459,7 +459,7 @@ function buildFormatTypesSection(options: Required<TaxonomyCodecOptions>): Secti
  * Build presets comparison section
  */
 function buildPresetsSection(): SectionBlock[] {
-  const presetNames: PresetName[] = ['generic', 'libar-generic', 'ddd-es-cqrs'];
+  const presetNames: PresetName[] = ['libar-generic', 'ddd-es-cqrs'];
 
   const rows = presetNames.map((name) => {
     const preset = PRESETS[name];
@@ -467,9 +467,6 @@ function buildPresetsSection(): SectionBlock[] {
     let useCase = '';
 
     switch (name) {
-      case 'generic':
-        useCase = 'Simple projects with @architect- prefix';
-        break;
       case 'libar-generic':
         useCase = 'Default preset with @architect- prefix';
         break;

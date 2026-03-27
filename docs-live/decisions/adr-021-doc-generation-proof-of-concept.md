@@ -375,12 +375,12 @@ export function extractShapes(
 | Pre-commit Setup  | THIS DECISION (DocString)                       | Fenced code block          |
 | Programmatic API  | THIS DECISION (DocString)                       | Fenced code block          |
 
-| Situation                     | Solution              | Example                                     |
-| ----------------------------- | --------------------- | ------------------------------------------- |
-| Fix bug in completed spec     | Add unlock reason tag | `@architect-unlock-reason:'Fix-typo'`       |
-| Modify outside session scope  | Use ignore flag       | `architect-guard --staged --ignore-session` |
-| CI treats warnings as errors  | Use strict flag       | `architect-guard --all --strict`            |
-| Skip workflow (legacy import) | Multiple transitions  | Set roadmap then completed in same commit   |
+| Situation                     | Solution              | Example                                   |
+| ----------------------------- | --------------------- | ----------------------------------------- |
+| Fix bug in completed spec     | Add unlock reason tag | `@architect-unlock-reason:'Fix-typo'`     |
+| Modify outside session scope  | Use ignore flag       | `lint-process --staged --ignore-session`  |
+| CI treats warnings as errors  | Use strict flag       | `lint-process --all --strict`             |
+| Skip workflow (legacy import) | Multiple transitions  | Set roadmap then completed in same commit |
 
 **Process Guard docs are generated separately from `adr-006-process-guard.feature`.**
 
@@ -395,7 +395,7 @@ export function extractShapes(
     File: `.husky/pre-commit`
 
 ```bash
-npx architect-guard --staged
+npx lint-process --staged
 ```
 
 **Package.json Scripts:**
@@ -403,8 +403,8 @@ npx architect-guard --staged
 ```json
 {
   "scripts": {
-    "lint:process": "architect-guard --staged",
-    "lint:process:ci": "architect-guard --all --strict"
+    "lint:process": "lint-process --staged",
+    "lint:process:ci": "lint-process --all --strict"
   }
 }
 ```

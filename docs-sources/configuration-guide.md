@@ -1,10 +1,9 @@
 ## Quick Reference
 
-| Preset                        | Tag Prefix    | Categories | Use Case                             |
-| ----------------------------- | ------------- | ---------- | ------------------------------------ |
-| **`libar-generic`** (default) | `@architect-` | 3          | Simple projects (this package)       |
-| `generic`                     | `@docs-`      | 3          | Simple projects with `@docs-` prefix |
-| `ddd-es-cqrs`                 | `@architect-` | 21         | DDD/Event Sourcing architectures     |
+| Preset                        | Tag Prefix    | Categories | Use Case                         |
+| ----------------------------- | ------------- | ---------- | -------------------------------- |
+| **`libar-generic`** (default) | `@architect-` | 3          | Simple projects (this package)   |
+| `ddd-es-cqrs`                 | `@architect-` | 21         | DDD/Event Sourcing architectures |
 
 ```typescript
 // architect.config.ts
@@ -30,7 +29,6 @@ export default defineConfig({
 | Preset          | Use When                                                     | Categories                                                                               |
 | --------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
 | `libar-generic` | Simple projects, standard `@architect-` prefix               | 3 (core, api, infra)                                                                     |
-| `generic`       | Prefer shorter `@docs-` prefix                               | 3 (core, api, infra)                                                                     |
 | `ddd-es-cqrs`   | DDD architecture with bounded contexts, event sourcing, CQRS | 21 (domain, ddd, bounded-context, event-sourcing, decider, cqrs, saga, projection, etc.) |
 
 **Design decision:** Presets **replace** the base taxonomy categories entirely (not merged). If you need DDD categories, use the `ddd-es-cqrs` preset.
@@ -136,7 +134,7 @@ my-monorepo/
   architect.config.ts          # Repo-level: ddd-es-cqrs
   packages/
     my-package/
-      architect.config.ts      # Package-level: generic
+      architect.config.ts      # Package-level: libar-generic
 ```
 
 CLI tools use the nearest config file to the working directory. Each package can have its own preset and source globs.
@@ -169,8 +167,8 @@ Define your own taxonomy:
 
 ```typescript
 export default defineConfig({
-  tagPrefix: '@docs-',
-  fileOptInTag: '@docs',
+  tagPrefix: '@architect-',
+  fileOptInTag: '@architect',
   categories: [
     { tag: 'scanner', domain: 'Scanner', priority: 1, description: 'File scanning', aliases: [] },
     {
@@ -230,15 +228,3 @@ const effectiveSources = mergeSourcesForGenerator(
 ```
 
 ---
-
-## Backward Compatibility
-
-The legacy `createArchitect()` API is still exported and supported. Config files using the old format are detected automatically by `loadProjectConfig()` and wrapped in a `ResolvedConfig` with default project settings.
-
-```typescript
-// Legacy format (still works)
-import { createArchitect } from '@libar-dev/architect';
-export default createArchitect({ preset: 'ddd-es-cqrs' });
-```
-
-New projects should use `defineConfig()` for the unified configuration experience.

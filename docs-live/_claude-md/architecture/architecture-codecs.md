@@ -74,9 +74,7 @@
 | Option             | Type            | Description                                                  |
 | ------------------ | --------------- | ------------------------------------------------------------ |
 | conventionTags     | string[]        | Convention tag values to extract from decision records       |
-| diagramScope       | DiagramScope    | Single diagram configuration                                 |
-| diagramScopes      | DiagramScope[]  | Multiple diagrams (takes precedence over diagramScope)       |
-| shapeSources       | string[]        | Glob patterns for TypeScript shape extraction                |
+| diagramScopes      | DiagramScope[]  | Multiple diagrams                                            |
 | shapeSelectors     | ShapeSelector[] | Fine-grained declaration-level shape filtering               |
 | behaviorCategories | string[]        | Category tags for behavior pattern content                   |
 | includeTags        | string[]        | Cross-cutting content routing via include tags               |

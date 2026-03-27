@@ -100,22 +100,22 @@ MasterDatasetSchema = z.object({
  * Status-based grouping of patterns
  *
  * Patterns are normalized to three canonical states:
- * - completed: implemented, completed
- * - active: active, partial, in-progress
- * - planned: roadmap, planned, undefined
+ * - completed: completed
+ * - active: active
+ * - planned: roadmap, deferred, or undefined/unknown
  *
  */
 ```
 
 ```typescript
 StatusGroupsSchema = z.object({
-  /** Patterns with status 'completed' or 'implemented' */
+  /** Patterns with status 'completed' */
   completed: z.array(ExtractedPatternSchema),
 
-  /** Patterns with status 'active', 'partial', or 'in-progress' */
+  /** Patterns with status 'active' */
   active: z.array(ExtractedPatternSchema),
 
-  /** Patterns with status 'roadmap', 'planned', or undefined */
+  /** Patterns with status 'roadmap', 'deferred', or undefined/unknown */
   planned: z.array(ExtractedPatternSchema),
 });
 ```
@@ -403,7 +403,7 @@ and `transformToMasterDataset` with validation summary.
 
 ## Consumer Architecture and PipelineOptions Differentiation
 
-Three consumers share this factory: `architect`, `architect-validate`, and the
+Three consumers share this factory: `process-api`, `validate-patterns`, and the
 generation orchestrator. `PipelineOptions` differentiates behavior by
 `mergeConflictStrategy` (`fatal` vs `concatenate`), `includeValidation` toggles,
 and `failOnScanErrors` policy without forking pipeline logic.

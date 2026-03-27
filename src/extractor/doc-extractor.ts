@@ -353,7 +353,7 @@ export function buildPattern(
  *
  * // From export
  * const name2 = inferPatternName(
- *   { description: '@docs-core', tags: [...] },
+ *   { description: '@architect-core', tags: [...] },
  *   [{ name: 'createUser', type: 'function' }],
  *   registry
  * );
@@ -361,7 +361,7 @@ export function buildPattern(
  *
  * // From tag
  * const name3 = inferPatternName(
- *   { description: '', tags: ['@docs-domain-auth'] },
+ *   { description: '', tags: ['@architect-domain-auth'] },
  *   [],
  *   registry
  * );

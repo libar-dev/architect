@@ -117,6 +117,7 @@ function createTestPattern(overrides?: {
     status?: 'roadmap' | 'active' | 'completed' | 'deferred';
     description?: string;
   };
+  claudeSection?: string;
   rules?: Array<{
     name: string;
     description: string;
@@ -156,6 +157,7 @@ function createTestPattern(overrides?: {
     extractedAt: new Date().toISOString(),
     patternName: effectivePatternName,
     status: overrides?.directive?.status ?? 'active',
+    ...(overrides?.claudeSection !== undefined && { claudeSection: overrides.claudeSection }),
     rules: overrides?.rules,
   } as ExtractedPattern;
 }
@@ -557,6 +559,33 @@ describeFeature(feature, ({ Background, Rule }) => {
           f.path.toLowerCase().includes('fallback')
         );
         expect(hasCompact).toBe(true);
+      });
+    });
+
+    RuleScenario('Pattern claude section routes compact output', ({ Given, When, Then }) => {
+      Given(
+        'a pattern named {string} with claude section {string}',
+        (_ctx: unknown, name: string, claudeSection: string) => {
+          state.pattern = createTestPattern({
+            name,
+            patternName: name,
+            claudeSection,
+          });
+        }
+      );
+
+      When('generating multi-level output', async () => {
+        state.generationResult = await generateFromDecisionMultiLevel(state.pattern!, {
+          baseDir: state.baseDir,
+        });
+      });
+
+      Then('compact path should be {string}', (_ctx: unknown, expected: string) => {
+        expect(state.generationResult).not.toBeNull();
+        const compactFile = state.generationResult!.files.find((file) =>
+          file.path.startsWith('_claude-md/')
+        );
+        expect(compactFile?.path).toBe(expected);
       });
     });
   });

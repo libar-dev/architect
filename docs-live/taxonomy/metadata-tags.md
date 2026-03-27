@@ -64,7 +64,7 @@
 | `since`                  | value        | Design session that created this pattern                                   | No       | No         | -                                                                                                                                                                                                                                    | -        |
 | `convention`             | csv          | Convention domains for reference document generation from decision records | No       | No         | testing-policy, fsm-rules, cli-patterns, output-format, pattern-naming, session-workflow, config-presets, annotation-system, pipeline-architecture, publishing, doc-generation, taxonomy-rules, codec-registry, process-guard-errors | -        |
 | `claude-module`          | value        | Module identifier for CLAUDE.md module generation (becomes filename)       | No       | No         | -                                                                                                                                                                                                                                    | -        |
-| `claude-section`         | enum         | Target section directory in \_claude-md/ for module output                 | No       | No         | core, delivery-process, testing, infrastructure, workflow                                                                                                                                                                            | -        |
+| `claude-section`         | enum         | Target section directory in \_claude-md/ for module output                 | No       | No         | core, process, testing, infrastructure, workflow                                                                                                                                                                                     | -        |
 | `claude-tags`            | csv          | Variation filtering tags for modular-claude-md inclusion                   | No       | No         | -                                                                                                                                                                                                                                    | -        |
 | `sequence-orchestrator`  | value        | Identifies the coordinator module for sequence diagram generation          | No       | No         | -                                                                                                                                                                                                                                    | -        |
 | `sequence-step`          | number       | Explicit execution ordering number for sequence diagram steps              | No       | No         | -                                                                                                                                                                                                                                    | -        |
@@ -635,18 +635,18 @@
 | Purpose      | Target section directory in \_claude-md/ for module output |
 | Required     | No                                                         |
 | Repeatable   | No                                                         |
-| Valid Values | core, delivery-process, testing, infrastructure, workflow  |
-| Example      | `@architect-claude-section delivery-process`               |
+| Valid Values | core, process, testing, infrastructure, workflow           |
+| Example      | `@architect-claude-section process`                        |
 
 ### `claude-tags`
 
-| Property   | Value                                                     |
-| ---------- | --------------------------------------------------------- |
-| Format     | csv                                                       |
-| Purpose    | Variation filtering tags for modular-claude-md inclusion  |
-| Required   | No                                                        |
-| Repeatable | No                                                        |
-| Example    | `@architect-claude-tags core-mandatory, delivery-process` |
+| Property   | Value                                                    |
+| ---------- | -------------------------------------------------------- |
+| Format     | csv                                                      |
+| Purpose    | Variation filtering tags for modular-claude-md inclusion |
+| Required   | No                                                       |
+| Repeatable | No                                                       |
+| Example    | `@architect-claude-tags core-mandatory, process`         |
 
 ### `sequence-orchestrator`
 

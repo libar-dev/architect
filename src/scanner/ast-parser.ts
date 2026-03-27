@@ -221,7 +221,7 @@ function escapeRegex(str: string): string {
  * @internal
  */
 function buildDirectivePatterns(registry: TagRegistry): {
-  /** Matches directive tags (e.g., @architect-pattern, @docs-core) */
+  /** Matches directive tags (e.g., @architect-pattern, @acme-core) */
   readonly tagRegex: RegExp;
   /** Matches start of line with opt-in or directive */
   readonly startsWithOptInOrDirective: RegExp;

@@ -5,7 +5,7 @@
 
 ---
 
-**Domain constraints and invariants extracted from feature specifications. 620 rules from 139 features across 7 product areas.**
+**Domain constraints and invariants extracted from feature specifications. 618 rules from 139 features across 7 product areas.**
 
 ---
 
@@ -14,11 +14,11 @@
 | Product Area                                     | Features | Rules | With Invariants |
 | ------------------------------------------------ | -------- | ----- | --------------- |
 | [Annotation](business-rules/annotation.md)       | 20       | 88    | 88              |
-| [Configuration](business-rules/configuration.md) | 7        | 32    | 32              |
+| [Configuration](business-rules/configuration.md) | 7        | 30    | 30              |
 | [Core Types](business-rules/core-types.md)       | 9        | 34    | 34              |
 | [Data API](business-rules/data-api.md)           | 26       | 95    | 95              |
-| [Generation](business-rules/generation.md)       | 61       | 303   | 303             |
+| [Generation](business-rules/generation.md)       | 61       | 302   | 302             |
 | [Process](business-rules/process.md)             | 2        | 7     | 7               |
-| [Validation](business-rules/validation.md)       | 14       | 61    | 61              |
+| [Validation](business-rules/validation.md)       | 14       | 62    | 62              |
 
 ---
