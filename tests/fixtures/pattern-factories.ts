@@ -47,8 +47,6 @@ export interface TestPatternOptions {
   category?: string;
   /** Override status (default: "completed") */
   status?: 'roadmap' | 'active' | 'completed' | 'deferred';
-  /** Mark as core pattern (default: false) */
-  isCore?: boolean;
   /** Description text (default: generated) */
   description?: string;
   /** Source file path (default: generated) */
@@ -65,8 +63,6 @@ export interface TestPatternOptions {
   usedBy?: string[];
   /** Phase number (default: none) */
   phase?: number;
-  /** Brief link (default: none) */
-  brief?: string;
   /** When to use bullets (default: none) */
   whenToUse?: string[];
   /** Depends on patterns (default: none) */
@@ -173,7 +169,6 @@ let patternCounter = 0;
  * const customPattern = createTestPattern({
  *   name: "CommandOrchestrator",
  *   category: "core",
- *   isCore: true,
  *   useCases: ["When implementing a new command"],
  * });
  * ```
@@ -186,7 +181,6 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     name = 'Test Pattern',
     category = 'core',
     status = 'completed',
-    isCore = false,
     description = `Test description for ${name}.`,
     filePath = `packages/@libar-dev/platform-${category}/src/test.ts`,
     lines = [1, 10] as const,
@@ -195,7 +189,6 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     uses,
     usedBy,
     phase,
-    brief,
     whenToUse,
     dependsOn,
     enables,
@@ -246,7 +239,6 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     ...(uses && uses.length > 0 ? { uses } : {}),
     ...(usedBy && usedBy.length > 0 ? { usedBy } : {}),
     ...(phase !== undefined ? { phase } : {}),
-    ...(brief ? { brief } : {}),
     ...(whenToUse && whenToUse.length > 0 ? { whenToUse } : {}),
     ...(dependsOn && dependsOn.length > 0 ? { dependsOn } : {}),
     ...(enables && enables.length > 0 ? { enables } : {}),
@@ -260,7 +252,6 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     name,
     category: asCategoryName(category),
     status,
-    isCore,
     directive,
     code: `export function ${name.replace(/\s+/g, '')}() {}`,
     source: {
@@ -274,7 +265,6 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     ...(uses && uses.length > 0 ? { uses } : {}),
     ...(usedBy && usedBy.length > 0 ? { usedBy } : {}),
     ...(phase !== undefined ? { phase } : {}),
-    ...(brief ? { brief } : {}),
     ...(whenToUse && whenToUse.length > 0 ? { whenToUse } : {}),
     ...(dependsOn && dependsOn.length > 0 ? { dependsOn } : {}),
     ...(enables && enables.length > 0 ? { enables } : {}),
@@ -372,7 +362,6 @@ export function createTestPatternSet(options: PatternSetOptions = {}): Extracted
         name,
         category,
         status: isFirstInCategory ? 'completed' : 'active',
-        isCore: isFirstInCategory,
         description: `Description for ${category} pattern ${i + 1}. This pattern demonstrates best practices.`,
         filePath: `src/${category}/pattern-${i + 1}.ts`,
         lines: [10 * patternIndex, 10 * patternIndex + 5],
@@ -510,7 +499,6 @@ export function createRoadmapPatterns(): ExtractedPattern[] {
       status: 'roadmap',
       phase: 3,
       dependsOn: ['Domain Model', 'Base Utilities'],
-      brief: 'docs/briefs/advanced-features.md',
     }),
   ];
 }
@@ -603,7 +591,6 @@ export function createTimelinePatterns(): ExtractedPattern[] {
       effort: '2w',
       team: 'platform',
       dependsOn: ['Event Store Enhancement'],
-      brief: 'docs/briefs/advanced-projections.md',
     }),
   ];
 }

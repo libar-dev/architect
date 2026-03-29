@@ -171,7 +171,6 @@ function buildGherkinRawPattern(input: {
   assignIfDefined(rawPattern, 'status', metadata.status);
   assignIfDefined(rawPattern, 'phase', metadata.phase);
   assignIfDefined(rawPattern, 'release', metadata.release);
-  assignIfDefined(rawPattern, 'brief', metadata.brief);
   assignIfNonEmpty(rawPattern, 'dependsOn', metadata.dependsOn);
   assignIfNonEmpty(rawPattern, 'enables', metadata.enables);
   assignIfNonEmpty(rawPattern, 'implementsPatterns', metadata.implementsPatterns);
@@ -354,9 +353,10 @@ export function extractPatternsFromGherkin(
     // Determine pattern name (from @pattern:Name tag or feature name)
     const patternName = metadata.pattern || feature.name;
 
-    // Determine category (from category tags or default to first one)
+    // Determine category (from category tags or first preset category)
     const categories = metadata.categories ?? [];
-    const primaryCategory = categories[0] ?? 'ddd';
+    const defaultCategory = config.tagRegistry?.categories[0]?.tag ?? 'uncategorized';
+    const primaryCategory = categories[0] ?? defaultCategory;
 
     // Extract "When to Use" from scenarios if enabled
     const whenToUse: string[] = [];
@@ -542,7 +542,8 @@ export async function extractPatternsFromGherkinAsync(
 
     const patternName = metadata.pattern || feature.name;
     const categories = metadata.categories ?? [];
-    const primaryCategory = categories[0] ?? 'ddd';
+    const defaultCategory = config.tagRegistry?.categories[0]?.tag ?? 'uncategorized';
+    const primaryCategory = categories[0] ?? defaultCategory;
 
     const whenToUse: string[] = [];
     if (scenariosAsUseCases) {

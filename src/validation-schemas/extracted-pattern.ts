@@ -174,9 +174,6 @@ export const ExtractedPatternSchema = z
     /** Implementation status from @architect-status tag */
     status: PatternStatusSchema.optional(),
 
-    /** Whether this is a core/essential pattern from @architect-core tag */
-    isCore: z.boolean().optional(),
-
     /** Use cases this pattern applies to from @architect-usecase tags */
     useCases: z.array(z.string()).readonly().optional(),
 
@@ -197,9 +194,6 @@ export const ExtractedPatternSchema = z
 
     /** Release version (from @architect-release tag, e.g., "v0.1.0" or "vNEXT") */
     release: z.string().optional(),
-
-    /** Path to pattern brief markdown file (from @architect-brief tag) */
-    brief: z.string().optional(),
 
     /** Patterns this pattern depends on for roadmap planning (from @architect-depends-on tag) */
     dependsOn: z.array(z.string()).readonly().optional(),

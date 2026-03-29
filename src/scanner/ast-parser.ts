@@ -101,6 +101,23 @@ export interface ParseDirectivesResult {
 }
 
 /**
+ * Check if a directive is a shape-only annotation (declaration-level @architect-shape).
+ *
+ * Shape directives annotate individual interfaces/types for documentation extraction.
+ * They inherit context from a parent pattern and should not enter the directive pipeline
+ * as standalone patterns.
+ */
+function isShapeOnlyDirective(directive: DocDirective, registry: TagRegistry): boolean {
+  const shapeTag = `${registry.tagPrefix}shape`;
+  const hasShapeTag = directive.tags.some((t) => t === shapeTag);
+  if (!hasShapeTag) return false;
+  // A block with both @architect-pattern/@architect-implements and @architect-shape is a full pattern
+  const hasPatternIdentity =
+    directive.patternName !== undefined || (directive.implements?.length ?? 0) > 0;
+  return !hasPatternIdentity;
+}
+
+/**
  * Extract single value from comment text for format="value"
  *
  * @example
@@ -432,6 +449,12 @@ export function parseFileDirectives(
     const directive = directiveResult.value;
     if (directive.tags.length === 0) continue;
 
+    // Shape-only annotations (@architect-shape) are metadata on individual
+    // declarations, not pattern directives. Skip them from the directive pipeline.
+    if (isShapeOnlyDirective(directive, effectiveRegistry)) {
+      continue;
+    }
+
     // Find the code block following this comment
     const codeBlock = extractCodeBlockAfterComment(content, ast, comment);
     if (!codeBlock) continue;
@@ -567,12 +590,10 @@ function parseDirective(
   // This mapping translates registry tag names to DocDirective field names
   const patternName = metadataResults.get('pattern') as string | undefined;
   const status = metadataResults.get('status') as ProcessStatusValue | undefined;
-  const isCore = metadataResults.get('core') as boolean | undefined;
   const useCases = metadataResults.get('usecase') as string[] | undefined;
   const uses = metadataResults.get('uses') as string[] | undefined;
   const usedBy = metadataResults.get('used-by') as string[] | undefined;
   const phase = metadataResults.get('phase') as number | undefined;
-  const brief = metadataResults.get('brief') as string | undefined;
   const dependsOn = metadataResults.get('depends-on') as string[] | undefined;
   const enables = metadataResults.get('enables') as string[] | undefined;
   // UML-inspired relationship tags (PatternRelationshipModel)
@@ -662,13 +683,11 @@ function parseDirective(
     // Include optional fields only if present
     ...(patternName && { patternName }),
     ...(status && { status }),
-    ...(isCore && { isCore }),
     ...(useCases && useCases.length > 0 && { useCases }),
     ...(whenToUse && { whenToUse }),
     ...(uses && uses.length > 0 && { uses }),
     ...(usedBy && usedBy.length > 0 && { usedBy }),
     ...(phase !== undefined && { phase }),
-    ...(brief && { brief }),
     ...(dependsOn && dependsOn.length > 0 && { dependsOn }),
     ...(enables && enables.length > 0 && { enables }),
     // UML-inspired relationship fields (PatternRelationshipModel)

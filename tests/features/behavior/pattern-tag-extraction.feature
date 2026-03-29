@@ -25,9 +25,9 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
 
   Rule: Single value tags produce scalar metadata fields
 
-      **Invariant:** Each single-value tag (pattern, phase, status, brief) maps to exactly one metadata field with the correct type.
+      **Invariant:** Each single-value tag (pattern, phase, status) maps to exactly one metadata field with the correct type.
       **Rationale:** Incorrect type coercion (e.g., phase as string instead of number) causes downstream pipeline failures in filtering and sorting.
-      **Verified by:** Extract pattern name tag, Extract phase number tag, Extract status roadmap tag, Extract status deferred tag, Extract status completed tag, Extract status active tag, Extract brief path tag
+      **Verified by:** Extract pattern name tag, Extract phase number tag, Extract status roadmap tag, Extract status deferred tag, Extract status completed tag, Extract status active tag
 
     @happy-path @single-tag
     Scenario: Extract pattern name tag
@@ -65,11 +65,6 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
       When extracting pattern tags
       Then the metadata status should be "active"
 
-    @happy-path @brief
-    Scenario: Extract brief path tag
-      Given feature tags containing "brief:docs/pattern-briefs/01-my-pattern.md"
-      When extracting pattern tags
-      Then the metadata brief should be "docs/pattern-briefs/01-my-pattern.md"
 
   Rule: Array value tags accumulate into list metadata fields
 
@@ -109,7 +104,7 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
       Given feature tags "ddd", "core", "event-sourcing", and "acceptance-criteria"
       When extracting pattern tags
       Then the metadata categories should contain "ddd"
-      And the metadata core flag should be true
+      And the metadata categories should contain "core"
       And the metadata categories should contain "event-sourcing"
       And the metadata categories should not contain "acceptance-criteria"
 
@@ -118,7 +113,7 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
       Given feature tags "architect", "ddd", and "core"
       When extracting pattern tags
       Then the metadata categories should contain "ddd"
-      And the metadata core flag should be true
+      And the metadata categories should contain "core"
       And the metadata categories should not contain "architect"
 
   Rule: Complex tag lists produce fully populated metadata
@@ -129,7 +124,7 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
 
     @happy-path @complex
     Scenario: Extract all metadata from complex tag list
-      Given a complex tag list with pattern, phase, status, dependencies, enables, brief, and categories
+      Given a complex tag list with pattern, phase, status, dependencies, enables, and categories
       When extracting pattern tags
       Then the metadata should have pattern equal to "DCB"
       And the metadata should have phase equal to 16
@@ -137,9 +132,8 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
       And the metadata dependsOn should contain "DeciderTypes"
       And the metadata enables should contain "Reservations"
       And the metadata enables should contain "MultiEntityOps"
-      And the metadata should have brief equal to "pattern-briefs/03-dcb.md"
       And the metadata categories should contain "ddd"
-      And the metadata core flag should be true
+      And the metadata categories should contain "core"
 
   Rule: Edge cases produce safe defaults
 

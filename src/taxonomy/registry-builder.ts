@@ -120,7 +120,7 @@ interface AggregationTagDefinitionForRegistry {
  * - stub: Design session stub metadata
  */
 export const METADATA_TAGS_BY_GROUP = {
-  core: ['pattern', 'status', 'core', 'usecase', 'brief'] as const,
+  core: ['pattern', 'status', 'usecase'] as const,
   relationship: [
     'uses',
     'used-by',
@@ -208,12 +208,6 @@ export function buildRegistry(): TagRegistry {
         example: '@architect-status roadmap',
       },
       {
-        tag: 'core',
-        format: 'flag',
-        purpose: 'Marks as essential/must-know pattern',
-        example: '@architect-core',
-      },
-      {
         tag: 'usecase',
         format: 'quoted-value',
         purpose: 'Use case association',
@@ -243,12 +237,6 @@ export function buildRegistry(): TagRegistry {
         format: 'value',
         purpose: 'Target release version (semver or vNEXT for unreleased work)',
         example: '@architect-release v0.1.0',
-      },
-      {
-        tag: 'brief',
-        format: 'value',
-        purpose: 'Path to pattern brief markdown',
-        example: '@architect-brief docs/briefs/decider-pattern.md',
       },
       {
         tag: 'depends-on',

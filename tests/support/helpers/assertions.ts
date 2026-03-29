@@ -141,7 +141,6 @@ export function assertPatternProperties(
     name?: string;
     category?: string;
     status?: string;
-    isCore?: boolean;
     phase?: number;
   }
 ): void {
@@ -157,10 +156,6 @@ export function assertPatternProperties(
 
   if (expected.status) {
     expect(pattern!.status).toBe(expected.status);
-  }
-
-  if (expected.isCore !== undefined) {
-    expect(pattern!.isCore).toBe(expected.isCore);
   }
 
   if (expected.phase !== undefined) {

@@ -174,9 +174,6 @@ export const DocDirectiveSchema = z
     /** Implementation status from @architect-status tag */
     status: PatternStatusSchema.optional(),
 
-    /** Whether this is a core/essential pattern from @architect-core tag */
-    isCore: z.boolean().optional(),
-
     /** Use cases this pattern applies to from @architect-usecase tags */
     useCases: z.array(z.string()).readonly().optional(),
 
@@ -191,9 +188,6 @@ export const DocDirectiveSchema = z
 
     /** Roadmap phase number (from @architect-phase tag) */
     phase: z.number().int().positive().optional(),
-
-    /** Path to pattern brief markdown file (from @architect-brief tag) */
-    brief: z.string().optional(),
 
     /** Patterns this pattern depends on for roadmap planning (from @architect-depends-on tag) */
     dependsOn: z.array(z.string()).readonly().optional(),

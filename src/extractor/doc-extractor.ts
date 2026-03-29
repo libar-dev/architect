@@ -259,7 +259,6 @@ export function buildPattern(
     // Include optional fields only if present in directive
     ...(directive.patternName !== undefined && { patternName: directive.patternName }),
     ...(directive.status !== undefined && { status: directive.status }),
-    ...(directive.isCore === true && { isCore: directive.isCore }),
     ...(directive.useCases !== undefined &&
       directive.useCases.length > 0 && { useCases: directive.useCases }),
     ...(directive.whenToUse !== undefined && { whenToUse: directive.whenToUse }),
@@ -268,7 +267,6 @@ export function buildPattern(
       directive.usedBy.length > 0 && { usedBy: directive.usedBy }),
     // Roadmap integration fields
     ...(directive.phase !== undefined && { phase: directive.phase }),
-    ...(directive.brief !== undefined && { brief: directive.brief }),
     ...(directive.dependsOn !== undefined &&
       directive.dependsOn.length > 0 && { dependsOn: directive.dependsOn }),
     ...(directive.enables !== undefined &&
@@ -506,14 +504,14 @@ export function inferCategory(tags: readonly string[], registry: TagRegistry): s
     return selectedCategory;
   }
 
-  // Fallback: Extract category from first tag
+  // Fallback: Extract category from first tag, but only if it's a valid category
   const firstTag = tags[0];
   if (firstTag?.startsWith(prefix) === true) {
     const withoutPrefix = firstTag.substring(prefix.length);
     const parts = withoutPrefix.split('-');
     const firstPart = parts[0];
-    if (firstPart) {
-      return firstPart;
+    if (firstPart && priorityMap.has(firstPart)) {
+      return canonicalMap.get(firstPart) ?? firstPart;
     }
   }
 

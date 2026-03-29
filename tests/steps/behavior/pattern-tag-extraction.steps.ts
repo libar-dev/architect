@@ -139,20 +139,6 @@ describeFeature(feature, ({ Rule, Background, BeforeEachScenario }) => {
         expect(state!.metadata.status).toBe('active');
       });
     });
-
-    RuleScenario('Extract brief path tag', ({ Given, When, Then }) => {
-      Given('feature tags containing "brief:docs/pattern-briefs/01-my-pattern.md"', () => {
-        state!.tags = ['brief:docs/pattern-briefs/01-my-pattern.md'];
-      });
-
-      When('extracting pattern tags', () => {
-        state!.metadata = extractPatternTags(state!.tags);
-      });
-
-      Then('the metadata brief should be "docs/pattern-briefs/01-my-pattern.md"', () => {
-        expect(state!.metadata.brief).toBe('docs/pattern-briefs/01-my-pattern.md');
-      });
-    });
   });
 
   // ===========================================================================
@@ -238,8 +224,8 @@ describeFeature(feature, ({ Rule, Background, BeforeEachScenario }) => {
           expect(state!.metadata.categories).toContain('ddd');
         });
 
-        And('the metadata core flag should be true', () => {
-          expect(state!.metadata.core).toBe(true);
+        And('the metadata categories should contain "core"', () => {
+          expect(state!.metadata.categories).toContain('core');
         });
 
         And('the metadata categories should contain "event-sourcing"', () => {
@@ -267,8 +253,8 @@ describeFeature(feature, ({ Rule, Background, BeforeEachScenario }) => {
           expect(state!.metadata.categories).toContain('ddd');
         });
 
-        And('the metadata core flag should be true', () => {
-          expect(state!.metadata.core).toBe(true);
+        And('the metadata categories should contain "core"', () => {
+          expect(state!.metadata.categories).toContain('core');
         });
 
         And('the metadata categories should not contain "architect"', () => {
@@ -286,7 +272,7 @@ describeFeature(feature, ({ Rule, Background, BeforeEachScenario }) => {
   Rule('Complex tag lists produce fully populated metadata', ({ RuleScenario }) => {
     RuleScenario('Extract all metadata from complex tag list', ({ Given, When, Then, And }) => {
       Given(
-        'a complex tag list with pattern, phase, status, dependencies, enables, brief, and categories',
+        'a complex tag list with pattern, phase, status, dependencies, enables, and categories',
         () => {
           state!.tags = [
             'pattern:DCB',
@@ -294,7 +280,6 @@ describeFeature(feature, ({ Rule, Background, BeforeEachScenario }) => {
             'status:roadmap',
             'depends-on:DeciderTypes',
             'enables:Reservations,MultiEntityOps',
-            'brief:pattern-briefs/03-dcb.md',
             'ddd',
             'core',
           ];
@@ -329,16 +314,12 @@ describeFeature(feature, ({ Rule, Background, BeforeEachScenario }) => {
         expect(state!.metadata.enables).toContain('MultiEntityOps');
       });
 
-      And('the metadata should have brief equal to "pattern-briefs/03-dcb.md"', () => {
-        expect(state!.metadata.brief).toBe('pattern-briefs/03-dcb.md');
-      });
-
       And('the metadata categories should contain "ddd"', () => {
         expect(state!.metadata.categories).toContain('ddd');
       });
 
-      And('the metadata core flag should be true', () => {
-        expect(state!.metadata.core).toBe(true);
+      And('the metadata categories should contain "core"', () => {
+        expect(state!.metadata.categories).toContain('core');
       });
     });
   });
