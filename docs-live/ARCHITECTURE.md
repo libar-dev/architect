@@ -25,7 +25,7 @@ Component architecture with bounded context isolation:
 ```mermaid
 graph TB
     subgraph api["Api BC"]
-        MasterDataset["MasterDataset[read-model]"]
+        PatternGraph["PatternGraph[read-model]"]
         MCPToolRegistry["MCPToolRegistry[service]"]
         MCPServerImpl["MCPServerImpl[service]"]
         MCPPipelineSession["MCPPipelineSession[service]"]
@@ -33,7 +33,7 @@ graph TB
         MCPFileWatcher["MCPFileWatcher[infrastructure]"]
         PatternSummarizerImpl["PatternSummarizerImpl[service]"]
         ScopeValidatorImpl["ScopeValidatorImpl[service]"]
-        ProcessStateAPI["ProcessStateAPI[service]"]
+        PatternGraphAPI["PatternGraphAPI[service]"]
         HandoffGeneratorImpl["HandoffGeneratorImpl[service]"]
         FuzzyMatcherImpl["FuzzyMatcherImpl[service]"]
         CoverageAnalyzerImpl["CoverageAnalyzerImpl[service]"]
@@ -69,11 +69,11 @@ graph TB
         ContentDeduplicator["ContentDeduplicator[infrastructure]"]
         CodecBasedGenerator["CodecBasedGenerator[service]"]
         FileCache["FileCache[infrastructure]"]
+        DesignReviewGenerator["DesignReviewGenerator[service]"]
+        DecisionDocGenerator["DecisionDocGenerator[service]"]
         TransformDataset["TransformDataset[service]"]
         SequenceTransformUtils["SequenceTransformUtils[service]"]
         RelationshipResolver["RelationshipResolver[service]"]
-        DesignReviewGenerator["DesignReviewGenerator[service]"]
-        DecisionDocGenerator["DecisionDocGenerator[service]"]
     end
     subgraph lint["Lint BC"]
         LintRules["LintRules[service]"]
@@ -114,12 +114,12 @@ graph TB
     end
     DoDValidator --> DualSourceExtractor
     GherkinScanner --> GherkinASTParser
-    MCPToolRegistry --> ProcessStateAPI
+    MCPToolRegistry --> PatternGraphAPI
     MCPToolRegistry --> MCPPipelineSession
     MCPServerImpl --> MCPPipelineSession
     MCPServerImpl --> MCPToolRegistry
     MCPServerImpl --> MCPFileWatcher
-    MCPPipelineSession --> ProcessStateAPI
+    MCPPipelineSession --> PatternGraphAPI
     MCPPipelineSession --> ConfigLoader
     MCPModule --> MCPServerImpl
     MCPModule --> MCPPipelineSession
@@ -133,45 +133,45 @@ graph TB
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> GherkinASTParser
     Documentation_Generation_Orchestrator --> Pattern_Scanner
-    ReplMode --> ProcessStateAPI
-    ProcessAPICLIImpl --> ProcessStateAPI
-    ProcessAPICLIImpl --> MasterDataset
+    ReplMode --> PatternGraphAPI
+    ProcessAPICLIImpl --> PatternGraphAPI
+    ProcessAPICLIImpl --> PatternGraph
     ProcessAPICLIImpl --> PatternSummarizerImpl
     ProcessAPICLIImpl --> FuzzyMatcherImpl
     ProcessAPICLIImpl --> OutputPipelineImpl
     OutputPipelineImpl --> PatternSummarizerImpl
     MCPServerBin --> MCPServerImpl
+    PatternSummarizerImpl --> PatternGraphAPI
+    ScopeValidatorImpl --> PatternGraphAPI
+    ScopeValidatorImpl --> PatternGraph
+    PatternGraphAPI --> PatternGraph
+    PatternGraphAPI --> FSMValidator
+    HandoffGeneratorImpl --> PatternGraphAPI
+    HandoffGeneratorImpl --> PatternGraph
+    HandoffGeneratorImpl --> ContextFormatterImpl
+    CoverageAnalyzerImpl --> Pattern_Scanner
+    CoverageAnalyzerImpl --> PatternGraph
+    ContextFormatterImpl --> ContextAssemblerImpl
+    ContextAssemblerImpl --> PatternGraphAPI
+    ContextAssemblerImpl --> PatternGraph
+    ContextAssemblerImpl --> PatternSummarizerImpl
+    ContextAssemblerImpl --> FuzzyMatcherImpl
+    ArchQueriesImpl --> PatternGraphAPI
+    ArchQueriesImpl --> PatternGraph
     ConfigResolver --> ArchitectFactory
     ArchitectFactory --> RegexBuilders
     ConfigLoader --> ArchitectFactory
-    PatternSummarizerImpl --> ProcessStateAPI
-    ScopeValidatorImpl --> ProcessStateAPI
-    ScopeValidatorImpl --> MasterDataset
-    ProcessStateAPI --> MasterDataset
-    ProcessStateAPI --> FSMValidator
-    HandoffGeneratorImpl --> ProcessStateAPI
-    HandoffGeneratorImpl --> MasterDataset
-    HandoffGeneratorImpl --> ContextFormatterImpl
-    CoverageAnalyzerImpl --> Pattern_Scanner
-    CoverageAnalyzerImpl --> MasterDataset
-    ContextFormatterImpl --> ContextAssemblerImpl
-    ContextAssemblerImpl --> ProcessStateAPI
-    ContextAssemblerImpl --> MasterDataset
-    ContextAssemblerImpl --> PatternSummarizerImpl
-    ContextAssemblerImpl --> FuzzyMatcherImpl
-    ArchQueriesImpl --> ProcessStateAPI
-    ArchQueriesImpl --> MasterDataset
     FSMValidator --> FSMTransitions
     FSMValidator --> FSMStates
-    DesignReviewCodec --> MasterDataset
-    ArchitectureCodec --> MasterDataset
+    DesignReviewCodec --> PatternGraph
+    ArchitectureCodec --> PatternGraph
     ProcessGuardDecider --> FSMValidator
-    TransformDataset --> MasterDataset
-    SequenceTransformUtils --> MasterDataset
     DesignReviewGenerator --> DesignReviewCodec
-    DesignReviewGenerator --> MasterDataset
+    DesignReviewGenerator --> PatternGraph
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
+    TransformDataset --> PatternGraph
+    SequenceTransformUtils --> PatternGraph
 ```
 
 ---
@@ -196,7 +196,7 @@ All components with architecture annotations:
 | 🚧 Pattern Helpers                                                | api        | -              | domain         | src/api/pattern-helpers.ts                                            |
 | 🚧 MCP File Watcher                                               | api        | infrastructure | infrastructure | src/mcp/file-watcher.ts                                               |
 | 🚧 MCP Module                                                     | api        | infrastructure | application    | src/mcp/index.ts                                                      |
-| ✅ Master Dataset                                                 | api        | read-model     | domain         | src/validation-schemas/master-dataset.ts                              |
+| ✅ Pattern Graph                                                  | api        | read-model     | domain         | src/validation-schemas/pattern-graph.ts                               |
 | 🚧 Arch Queries Impl                                              | api        | service        | domain         | src/api/arch-queries.ts                                               |
 | 🚧 Context Assembler Impl                                         | api        | service        | application    | src/api/context-assembler.ts                                          |
 | 🚧 Context Formatter Impl                                         | api        | service        | application    | src/api/context-formatter.ts                                          |
@@ -206,8 +206,8 @@ All components with architecture annotations:
 | 🚧 MCP Pipeline Session                                           | api        | service        | application    | src/mcp/pipeline-session.ts                                           |
 | 🚧 MCP Server Impl                                                | api        | service        | application    | src/mcp/server.ts                                                     |
 | 🚧 MCP Tool Registry                                              | api        | service        | application    | src/mcp/tool-registry.ts                                              |
+| 🚧 Pattern Graph API                                              | api        | service        | application    | src/api/pattern-graph-api.ts                                          |
 | 🚧 Pattern Summarizer Impl                                        | api        | service        | application    | src/api/summarize.ts                                                  |
-| 🚧 Process State API                                              | api        | service        | application    | src/api/process-state.ts                                              |
 | ✅ Scope Validator Impl                                           | api        | service        | application    | src/api/scope-validator.ts                                            |
 | ✅ CLI Schema                                                     | cli        | -              | domain         | src/cli/cli-schema.ts                                                 |
 | 🚧 Dataset Cache                                                  | cli        | infrastructure | infrastructure | src/cli/dataset-cache.ts                                              |

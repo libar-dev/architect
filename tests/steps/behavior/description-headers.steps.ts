@@ -12,9 +12,9 @@ import { expect } from 'vitest';
 import { createPatternsCodec } from '../../../src/renderable/codecs/patterns.js';
 import { stripLeadingHeaders } from '../../../src/renderable/utils.js';
 import type { RenderableDocument } from '../../../src/renderable/schema.js';
-import type { MasterDataset } from '../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../src/validation-schemas/pattern-graph.js';
 import {
-  createTestMasterDataset,
+  createTestPatternGraph,
   createTestPattern,
   resetPatternCounter,
 } from '../../fixtures/dataset-factories.js';
@@ -26,7 +26,7 @@ import type { DataTableRow } from '../../support/world.js';
 // =============================================================================
 
 interface DescriptionHeadersState {
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   document: RenderableDocument | null;
   patternDocument: RenderableDocument | null;
   inputText: string | null;
@@ -119,7 +119,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           name: 'TestPattern',
           description: docString,
         });
-        state!.dataset = createTestMasterDataset({ patterns: [pattern] });
+        state!.dataset = createTestPatternGraph({ patterns: [pattern] });
       });
 
       When('the pattern detail document is generated', () => {
@@ -161,7 +161,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           name: 'TestPattern',
           description: docString,
         });
-        state!.dataset = createTestMasterDataset({ patterns: [pattern] });
+        state!.dataset = createTestPatternGraph({ patterns: [pattern] });
       });
 
       When('the pattern detail document is generated', () => {
@@ -200,7 +200,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           name: 'TestPattern',
           description: docString,
         });
-        state!.dataset = createTestMasterDataset({ patterns: [pattern] });
+        state!.dataset = createTestPatternGraph({ patterns: [pattern] });
       });
 
       When('the pattern detail document is generated', () => {
@@ -240,7 +240,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           name: 'TestPattern',
           description: docString,
         });
-        state!.dataset = createTestMasterDataset({ patterns: [pattern] });
+        state!.dataset = createTestPatternGraph({ patterns: [pattern] });
       });
 
       When('the pattern detail document is generated', () => {
@@ -267,7 +267,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           name: 'TestPattern',
           description: docString,
         });
-        state!.dataset = createTestMasterDataset({ patterns: [pattern] });
+        state!.dataset = createTestPatternGraph({ patterns: [pattern] });
       });
 
       When('the pattern detail document is generated', () => {
@@ -298,7 +298,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           name: 'TestPattern',
           description: descWithMiddleHeader,
         });
-        state!.dataset = createTestMasterDataset({ patterns: [pattern] });
+        state!.dataset = createTestPatternGraph({ patterns: [pattern] });
       });
 
       When('the pattern detail document is generated', () => {

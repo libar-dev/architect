@@ -15,7 +15,7 @@
 | Enforce delivery process rules | [Process Guard Reference](reference/PROCESS-GUARD-REFERENCE.md) |
 | Learn annotation mechanics     | [Annotation Reference](reference/ANNOTATION-REFERENCE.md)       |
 | See codec patterns and options | [Architecture Codecs](reference/ARCHITECTURE-CODECS.md)         |
-| Understand MasterDataset types | [Architecture Types](reference/ARCHITECTURE-TYPES.md)           |
+| Understand PatternGraph types  | [Architecture Types](reference/ARCHITECTURE-TYPES.md)           |
 
 ---
 
@@ -59,7 +59,7 @@
 | Process API Recipes     | AI/Devs    | CLI workflow recipes and session guides          |
 | Process Guard Reference | Team Leads | Pre-commit hooks, error codes, programmatic API  |
 | Architecture Codecs     | Developers | All codecs with factory patterns and options     |
-| Architecture Types      | Developers | MasterDataset interface and type shapes          |
+| Architecture Types      | Developers | PatternGraph interface and type shapes           |
 
 ---
 
@@ -67,11 +67,11 @@
 
 **Delivery Process** -- A code-first documentation and workflow toolkit. Extracts patterns from annotated TypeScript and Gherkin sources, generates markdown documentation, and validates delivery workflow via pre-commit hooks.
 
-**Pattern** -- An annotated unit of work tracked by the delivery process. Each pattern has a status (roadmap, active, completed, deferred), belongs to a product area, and has deliverables. Patterns are the atomic unit of the MasterDataset.
+**Pattern** -- An annotated unit of work tracked by the delivery process. Each pattern has a status (roadmap, active, completed, deferred), belongs to a product area, and has deliverables. Patterns are the atomic unit of the PatternGraph.
 
-**MasterDataset** -- The single read model (ADR-006) containing all extracted patterns with pre-computed views (byProductArea, byPhase, byStatus, byCategory). All codecs and the Data API consume this dataset.
+**PatternGraph** -- The single read model (ADR-006) containing all extracted patterns with pre-computed views (byProductArea, byPhase, byStatus, byCategory). All codecs and the Data API consume this dataset.
 
-**Codec** -- A Zod-based transformer that decodes MasterDataset into a RenderableDocument. Each codec produces a specific document type. Codecs are pure functions with no I/O.
+**Codec** -- A Zod-based transformer that decodes PatternGraph into a RenderableDocument. Each codec produces a specific document type. Codecs are pure functions with no I/O.
 
 **Dual-Source Architecture** -- Feature files own planning metadata (status, phase, dependencies). TypeScript files own implementation metadata (uses, used-by, category). This split prevents ownership conflicts.
 

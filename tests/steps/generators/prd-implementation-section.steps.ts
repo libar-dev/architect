@@ -12,8 +12,8 @@ import { expect } from 'vitest';
 import { createPatternsCodec } from '../../../src/renderable/codecs/patterns.js';
 import { renderToMarkdown } from '../../../src/renderable/render.js';
 import type { RenderableDocument } from '../../../src/renderable/schema.js';
-import type { RuntimeMasterDataset } from '../../../src/generators/pipeline/transform-types.js';
-import { transformToMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
+import type { RuntimePatternGraph } from '../../../src/generators/pipeline/transform-types.js';
+import { transformToPatternGraph } from '../../../src/generators/pipeline/transform-dataset.js';
 import { createDefaultTagRegistry } from '../../../src/validation-schemas/tag-registry.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
 import { createTestPattern, resetPatternCounter } from '../../fixtures/dataset-factories.js';
@@ -26,7 +26,7 @@ import { toKebabCase } from '../../../src/utils/index.js';
 // =============================================================================
 
 interface PrdImplementationState {
-  dataset: RuntimeMasterDataset | null;
+  dataset: RuntimePatternGraph | null;
   document: RenderableDocument | null;
   markdown: string;
   patterns: ExtractedPattern[];
@@ -104,7 +104,7 @@ function createImplementationPattern(options: {
  * Build the dataset from patterns
  */
 function buildDataset(): void {
-  state!.dataset = transformToMasterDataset({
+  state!.dataset = transformToPatternGraph({
     patterns: state!.patterns,
     tagRegistry: createDefaultTagRegistry(),
     workflow: undefined,

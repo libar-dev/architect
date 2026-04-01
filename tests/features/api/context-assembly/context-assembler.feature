@@ -5,7 +5,7 @@
 Feature: Context Assembler - Session-Oriented Context Bundle Builder
 
   Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and
-  buildOverview() pure functions that operate on MasterDataset.
+  buildOverview() pure functions that operate on PatternGraph.
 
   Rule: assembleContext produces session-tailored context bundles
 

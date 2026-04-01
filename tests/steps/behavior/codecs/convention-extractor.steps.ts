@@ -4,20 +4,20 @@
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
-import type { MasterDataset } from '../../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../../src/validation-schemas/pattern-graph.js';
 import {
   extractConventions,
   type ConventionBundle,
 } from '../../../../src/renderable/codecs/convention-extractor.js';
 import { createTestPattern, resetPatternCounter } from '../../../fixtures/pattern-factories.js';
-import { createTestMasterDataset } from '../../../fixtures/dataset-factories.js';
+import { createTestPatternGraph } from '../../../fixtures/dataset-factories.js';
 
 // ============================================================================
 // State
 // ============================================================================
 
 interface ConventionExtractorState {
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   result: ConventionBundle[];
 }
 
@@ -51,8 +51,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('Empty and missing inputs produce empty results', ({ RuleScenario }) => {
     RuleScenario('Empty convention tags returns empty array', ({ Given, When, Then }) => {
-      Given('an empty MasterDataset', () => {
-        state!.dataset = createTestMasterDataset({ patterns: [] });
+      Given('an empty PatternGraph', () => {
+        state!.dataset = createTestPatternGraph({ patterns: [] });
       });
 
       When('extracting conventions for no tags', () => {
@@ -65,8 +65,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('No matching patterns returns empty array', ({ Given, When, Then }) => {
-      Given('a MasterDataset with patterns but no convention tags', () => {
-        state!.dataset = createTestMasterDataset({
+      Given('a PatternGraph with patterns but no convention tags', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: [createTestPattern({ name: 'PlainPattern' })],
         });
       });
@@ -90,7 +90,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Single pattern with one convention tag produces one bundle',
       ({ Given, When, Then, And }) => {
         Given('a pattern tagged with convention {string}', (_ctx: unknown, tag: string) => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'ADR004',
@@ -132,7 +132,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         Given(
           'a pattern tagged with conventions {string} and {string}',
           (_ctx: unknown, tag1: string, tag2: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'MultiConvention',
@@ -184,9 +184,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
             });
             // Build dataset incrementally — store patterns
             if (!state!.dataset) {
-              state!.dataset = createTestMasterDataset({ patterns: [pattern] });
+              state!.dataset = createTestPatternGraph({ patterns: [pattern] });
             } else {
-              state!.dataset = createTestMasterDataset({
+              state!.dataset = createTestPatternGraph({
                 patterns: [...state!.dataset.patterns, pattern],
               });
             }
@@ -208,7 +208,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
                 },
               ],
             });
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [...state!.dataset!.patterns, pattern],
             });
           }
@@ -244,7 +244,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         Given(
           'a pattern with convention {string} and rule description:',
           (_ctx: unknown, tag: string, docString: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'StructuredADR',
@@ -283,7 +283,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         Given(
           'a pattern with convention {string} and rule description:',
           (_ctx: unknown, tag: string, docString: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'TableADR',
@@ -340,7 +340,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
               '    active --> completed',
               '"""',
             ].join('\n');
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'MermaidADR',
@@ -385,7 +385,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         Given(
           'a pattern with convention {string} and rule description:',
           (_ctx: unknown, tag: string, docString: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'PlainADR',
@@ -437,7 +437,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
               '## Terminal States Are Immutable',
               '**Invariant:** Completed patterns cannot be modified without unlock.',
             ].join('\n');
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'TsConventionPattern',
@@ -482,7 +482,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         Given(
           'a TypeScript pattern {string} with convention {string} and description:',
           (_ctx: unknown, name: string, tag: string, docString: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name,
@@ -535,7 +535,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
                 },
               ],
             });
-            state!.dataset = createTestMasterDataset({ patterns: [pattern] });
+            state!.dataset = createTestPatternGraph({ patterns: [pattern] });
           }
         );
 
@@ -548,7 +548,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
               description: docString,
               filePath: 'src/conventions/ts-conventions.ts',
             });
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [...state!.dataset!.patterns, pattern],
             });
           }
@@ -578,7 +578,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         Given(
           'a TypeScript pattern with convention {string} and empty description',
           (_ctx: unknown, tag: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'EmptyTsPattern',
@@ -618,7 +618,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
               '| roadmap | None |',
               '| active | Scope-locked |',
             ].join('\n');
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'TsTablePattern',
@@ -658,7 +658,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
               '| --- | --- | --- | --- |',
               '| sortBy | "phase" \\| "priority" \\| "effort" \\| "quarter" | "phase" | Sort order |',
             ].join('\n');
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'TsEscapedUnionPattern',
@@ -719,7 +719,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
             '    active --> completed',
             '"""',
           ].join('\n');
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'TsMermaidPattern',

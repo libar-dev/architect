@@ -12,17 +12,17 @@
 Feature: MCP Server Integration
 
   **Problem:**
-  Claude Code accesses ProcessStateAPI through subprocess calls to the process-api
+  Claude Code accesses PatternGraphAPI through subprocess calls to the process-api
   CLI. Each invocation runs the full 8-step pipeline (config, scan, extract, merge,
   hierarchy, workflow, transform, validate), taking 2-5 seconds. During a typical
   session with 10-20 queries, this adds 30-90 seconds of pure pipeline overhead.
   The subprocess model prevents stateful interaction -- there is no way to keep the
-  MasterDataset in memory between queries.
+  PatternGraph in memory between queries.
 
   **Solution:**
-  Implement an MCP (Model Context Protocol) server that wraps ProcessStateAPI:
-  1. Load the pipeline ONCE and keep MasterDataset in memory
-  2. Expose ProcessStateAPI methods and CLI subcommands as MCP tools
+  Implement an MCP (Model Context Protocol) server that wraps PatternGraphAPI:
+  1. Load the pipeline ONCE and keep PatternGraph in memory
+  2. Expose PatternGraphAPI methods and CLI subcommands as MCP tools
   3. Allow Claude Code to call them as native tools with sub-millisecond dispatch
   4. Optionally watch source files and rebuild the dataset on changes
 
@@ -61,7 +61,7 @@ Feature: MCP Server Integration
       Given the MCP server is started with config auto-detection
       When the client sends an MCP initialize request
       Then the server responds with capabilities including tools
-      And the pipeline has been built with MasterDataset in memory
+      And the pipeline has been built with PatternGraph in memory
 
     @acceptance-criteria @happy-path
     Scenario: Server handles shutdown cleanly
@@ -78,7 +78,7 @@ Feature: MCP Server Integration
 
   @architect-sequence-step:2
   @architect-sequence-module:tool-registry
-  Rule: ProcessStateAPI methods and CLI subcommands are registered as MCP tools
+  Rule: PatternGraphAPI methods and CLI subcommands are registered as MCP tools
 
     **Invariant:** Every CLI subcommand is registered as an MCP tool with a JSON
     Schema describing its input parameters. Tool names use snake_case with a "architect_"
@@ -125,10 +125,10 @@ Feature: MCP Server Integration
 
   @architect-sequence-step:3
   @architect-sequence-module:pipeline-session
-  Rule: MasterDataset is loaded once and reused across all tool invocations
+  Rule: PatternGraph is loaded once and reused across all tool invocations
 
     **Invariant:** The pipeline runs exactly once during server initialization. All
-    subsequent tool calls read from in-memory MasterDataset. A manual rebuild can
+    subsequent tool calls read from in-memory PatternGraph. A manual rebuild can
     be triggered via a "architect_rebuild" tool, and overlapping rebuild requests coalesce
     so the final in-memory session reflects the newest completed build.
 

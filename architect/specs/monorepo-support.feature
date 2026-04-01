@@ -12,7 +12,7 @@ Feature: Monorepo Cross-Package Support
   The Architect package is consumed by a large monorepo (~600 files across
   multiple packages), but the config system has no concept of "packages." The
   consumer passes all source paths as repeated --input and --features CLI flags,
-  creating massive duplication across 15+ scripts. MasterDataset has no concept of
+  creating massive duplication across 15+ scripts. PatternGraph has no concept of
   which package a pattern belongs to. There is no --package filter for scoping
   queries, no cross-package dependency visibility, and no per-package coverage.
 
@@ -31,7 +31,7 @@ Feature: Monorepo Cross-Package Support
       | Package-aware source resolver | pending | src/config/resolve-config.ts |
       | Package provenance on ExtractedPattern | pending | src/validation-schemas/extracted-pattern.ts |
       | Scanner package assignment | pending | src/scanner/pattern-scanner.ts |
-      | MasterDataset byPackage view | pending | src/generators/pipeline/transform-dataset.ts |
+      | PatternGraph byPackage view | pending | src/generators/pipeline/transform-dataset.ts |
       | CLI --package filter flag | pending | src/cli/output-pipeline.ts |
       | Cross-package dependency subcommand | pending | src/api/cross-package.ts |
       | Per-package coverage report | pending | src/api/coverage-analyzer.ts |

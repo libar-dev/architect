@@ -14,7 +14,7 @@
  *
  * ## PatternsDocumentCodec
  *
- * Transforms MasterDataset into a RenderableDocument for pattern registry output.
+ * Transforms PatternGraph into a RenderableDocument for pattern registry output.
  * Generates PATTERNS.md and category detail files (patterns/*.md).
  *
  * **Purpose:** Pattern registry with category-based organization.
@@ -49,7 +49,7 @@
  * ```
  */
 
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -181,12 +181,12 @@ export function createPatternsCodec(options?: PatternsCodecOptions): DocumentCod
 /**
  * Default Patterns Document Codec
  *
- * Transforms MasterDataset → RenderableDocument for pattern registry.
+ * Transforms PatternGraph → RenderableDocument for pattern registry.
  * Uses default options with all features enabled.
  *
  * @example
  * ```typescript
- * const doc = PatternsDocumentCodec.decode(masterDataset);
+ * const doc = PatternsDocumentCodec.decode(patternGraph);
  * const markdown = renderToMarkdown(doc);
  * ```
  */
@@ -208,7 +208,7 @@ export const codecMeta = {
  * Build the patterns document from dataset
  */
 function buildPatternsDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<PatternsCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
@@ -263,9 +263,9 @@ function buildPatternsDocument(
  * Always excludes ADR patterns (they belong to the ADR codec).
  */
 function applyPatternFilters(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<PatternsCodecOptions>
-): MasterDataset {
+): PatternGraph {
   // Always exclude ADR patterns — they belong to the ADR codec, not patterns
   const nonAdrPatterns = dataset.patterns.filter((p) => p.adr === undefined);
 
@@ -298,7 +298,7 @@ function applyPatternFilters(
 /**
  * Build progress summary section
  */
-function buildProgressSummary(dataset: MasterDataset): SectionBlock[] {
+function buildProgressSummary(dataset: PatternGraph): SectionBlock[] {
   const { counts } = dataset;
   const progress = completionPercentage(counts);
   const progressBar = renderProgressBar(counts.completed, counts.total, 20);
@@ -323,7 +323,7 @@ function buildProgressSummary(dataset: MasterDataset): SectionBlock[] {
  * Build quick navigation section
  * Links to category anchors within the main document (categories are H3 sections)
  */
-function buildQuickNavigation(dataset: MasterDataset): SectionBlock[] {
+function buildQuickNavigation(dataset: PatternGraph): SectionBlock[] {
   const categories = Object.keys(dataset.byCategory).sort();
 
   if (categories.length === 0) {
@@ -344,7 +344,7 @@ function buildQuickNavigation(dataset: MasterDataset): SectionBlock[] {
 /**
  * Build pattern table section
  */
-function buildPatternTable(dataset: MasterDataset): SectionBlock[] {
+function buildPatternTable(dataset: PatternGraph): SectionBlock[] {
   const patterns = sortByStatusAndName([...dataset.patterns]);
 
   const rows = patterns.map((p) => {
@@ -369,7 +369,7 @@ function buildPatternTable(dataset: MasterDataset): SectionBlock[] {
  * Each pattern links to its individual detail file when generateDetailFiles is enabled
  */
 function buildCategorySections(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<PatternsCodecOptions>
 ): SectionBlock[] {
   const sections: SectionBlock[] = [];
@@ -412,7 +412,7 @@ function buildCategorySections(
  * - implements → dotted arrow (..->)
  * - extends → solid open arrow (-->>)
  */
-function buildDependencyGraph(dataset: MasterDataset): SectionBlock[] {
+function buildDependencyGraph(dataset: PatternGraph): SectionBlock[] {
   const relationships = dataset.relationshipIndex ?? {};
   const patternNames = Object.keys(relationships);
 
@@ -494,7 +494,7 @@ function patternToSlug(patternName: string): string {
  * Build individual pattern files (progressive disclosure)
  * Creates one file per pattern instead of grouping by category
  */
-function buildIndividualPatternFiles(dataset: MasterDataset): Record<string, RenderableDocument> {
+function buildIndividualPatternFiles(dataset: PatternGraph): Record<string, RenderableDocument> {
   const files: Record<string, RenderableDocument> = {};
 
   for (const pattern of dataset.patterns) {
@@ -513,7 +513,7 @@ function buildIndividualPatternFiles(dataset: MasterDataset): Record<string, Ren
  */
 function buildSinglePatternDocument(
   pattern: ExtractedPattern,
-  dataset: MasterDataset
+  dataset: PatternGraph
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
   const emoji = getStatusEmoji(pattern.status);

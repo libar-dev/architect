@@ -8,13 +8,13 @@
  * @architect-arch-context renderer
  * @architect-arch-layer application
  * @architect-include codec-transformation
- * @architect-uses MasterDataset, ArchIndex
+ * @architect-uses PatternGraph, ArchIndex
  * @architect-convention codec-registry
  * @architect-product-area:Generation
  *
  * ## ArchitectureDocumentCodec
  *
- * Transforms MasterDataset into a RenderableDocument containing
+ * Transforms PatternGraph into a RenderableDocument containing
  * architecture diagrams (Mermaid) generated from source annotations.
  *
  * **Purpose:** Architecture diagrams (Mermaid) generated from source annotations. Supports component and layered views.
@@ -54,7 +54,7 @@
  * - **layered**: Components organized by architectural layer
  */
 
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -156,12 +156,12 @@ export function createArchitectureCodec(options?: ArchitectureCodecOptions): Doc
 /**
  * Default Architecture Document Codec
  *
- * Transforms MasterDataset → RenderableDocument for architecture diagrams.
+ * Transforms PatternGraph → RenderableDocument for architecture diagrams.
  * Uses default options with component diagram type.
  *
  * @example
  * ```typescript
- * const doc = ArchitectureDocumentCodec.decode(masterDataset);
+ * const doc = ArchitectureDocumentCodec.decode(patternGraph);
  * const markdown = renderToMarkdown(doc);
  * ```
  */
@@ -183,7 +183,7 @@ export const codecMeta = {
  * Build the architecture document from dataset
  */
 function buildArchitectureDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<ArchitectureCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
@@ -244,9 +244,9 @@ function buildArchitectureDocument(
  * Apply context filter to architecture index
  */
 function applyContextFilter(
-  archIndex: NonNullable<MasterDataset['archIndex']>,
+  archIndex: NonNullable<PatternGraph['archIndex']>,
   filterContexts: string[]
-): NonNullable<MasterDataset['archIndex']> {
+): NonNullable<PatternGraph['archIndex']> {
   if (filterContexts.length === 0) {
     return archIndex;
   }
@@ -312,8 +312,8 @@ function applyContextFilter(
  * are excluded from diagrams but remain in the component inventory.
  */
 function filterToKeyComponents(
-  archIndex: NonNullable<MasterDataset['archIndex']>
-): NonNullable<MasterDataset['archIndex']> {
+  archIndex: NonNullable<PatternGraph['archIndex']>
+): NonNullable<PatternGraph['archIndex']> {
   const hasRole = (p: ExtractedPattern): boolean => p.archRole !== undefined;
 
   const filteredAll = archIndex.all.filter(hasRole);
@@ -367,7 +367,7 @@ function filterToKeyComponents(
  * Build summary section with component counts
  */
 function buildSummarySection(
-  diagramIndex: NonNullable<MasterDataset['archIndex']>,
+  diagramIndex: NonNullable<PatternGraph['archIndex']>,
   totalAnnotated: number,
   keyComponentsOnly: boolean
 ): SectionBlock[] {
@@ -409,8 +409,8 @@ function buildSummarySection(
  * - extends → solid open arrow (-->>)
  */
 function buildComponentDiagram(
-  archIndex: NonNullable<MasterDataset['archIndex']>,
-  dataset: MasterDataset
+  archIndex: NonNullable<PatternGraph['archIndex']>,
+  dataset: PatternGraph
 ): SectionBlock[] {
   const lines: string[] = ['graph TB'];
   const nodeIds = new Map<string, string>(); // pattern name → node ID
@@ -514,8 +514,8 @@ function buildComponentDiagram(
  * Build layered architecture diagram organized by layer
  */
 function buildLayeredDiagram(
-  archIndex: NonNullable<MasterDataset['archIndex']>,
-  dataset: MasterDataset
+  archIndex: NonNullable<PatternGraph['archIndex']>,
+  dataset: PatternGraph
 ): SectionBlock[] {
   const lines: string[] = ['graph TB'];
   const nodeIds = new Map<string, string>();
@@ -616,7 +616,7 @@ function buildLegendSection(): SectionBlock[] {
 /**
  * Build component inventory table
  */
-function buildInventorySection(archIndex: NonNullable<MasterDataset['archIndex']>): SectionBlock[] {
+function buildInventorySection(archIndex: NonNullable<PatternGraph['archIndex']>): SectionBlock[] {
   const rows: string[][] = [];
 
   // Sort patterns by context, then by role, then by name

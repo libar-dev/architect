@@ -56,7 +56,7 @@ Use `architect.config.ts` or `.js` as the main integration contract and keep scr
 ## Architecture Snapshot
 
 - Pipeline: `Config -> Scanner -> Extractor -> Transformer -> Codec`.
-- Central read model: `MasterDataset` (consumed by docs generation, Data API, and validators).
+- Central read model: `PatternGraph` (consumed by docs generation, Data API, and validators).
 - Preset in this repo config: `libar-generic` (`@architect-*` tags).
 - Source ownership invariant:
   - TypeScript owns runtime relationships (`uses`, `used-by`, category-like tags).

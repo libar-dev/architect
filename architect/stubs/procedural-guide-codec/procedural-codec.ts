@@ -63,7 +63,7 @@
  * - ~5% auto-generated: Tag reference summary table derived from taxonomy
  *   registry data via `createReferenceCodec()`'s existing convention or
  *   shape extraction. Tag groups, format types, and example values are
- *   already in MasterDataset.
+ *   already in PatternGraph.
  *
  * **Rationale (DD-5):** The annotation guide content is highly stable --
  * the getting-started walkthrough, shape extraction modes, and Zod gotcha

@@ -8,13 +8,13 @@
  * @architect-arch-context renderer
  * @architect-arch-layer application
  * @architect-include codec-transformation
- * @architect-uses MasterDataset, SequenceIndex, MermaidDiagramUtils
+ * @architect-uses PatternGraph, SequenceIndex, MermaidDiagramUtils
  * @architect-convention codec-registry
  * @architect-product-area:Generation
  *
  * ## DesignReviewCodec
  *
- * Transforms MasterDataset into a RenderableDocument containing design review
+ * Transforms PatternGraph into a RenderableDocument containing design review
  * artifacts: sequence diagrams, component diagrams, type definition tables,
  * and design question templates.
  *
@@ -32,10 +32,10 @@
  */
 
 import type {
-  MasterDataset,
+  PatternGraph,
   SequenceIndexEntry,
   SequenceStep,
-} from '../../validation-schemas/master-dataset.js';
+} from '../../validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -93,7 +93,7 @@ const DEFAULT_DESIGN_REVIEW_OPTIONS: Required<DesignReviewCodecOptions> = {
  * Create a DesignReviewCodec with the given options.
  *
  * @param options - Codec configuration (patternName is required)
- * @returns Configured Zod codec that transforms MasterDataset → RenderableDocument
+ * @returns Configured Zod codec that transforms PatternGraph → RenderableDocument
  */
 export function createDesignReviewCodec(options: DesignReviewCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_DESIGN_REVIEW_OPTIONS, options);
@@ -109,7 +109,7 @@ export function createDesignReviewCodec(options: DesignReviewCodecOptions): Docu
  * Build the design review document from dataset
  */
 function buildDesignReviewDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<DesignReviewCodecOptions>
 ): RenderableDocument {
   const { patternName } = options;

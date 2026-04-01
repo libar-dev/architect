@@ -19,7 +19,7 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
 
   **Solution:**
   Two integration capabilities:
-  1. **MCP Server Mode** -- Expose ProcessStateAPI as an MCP server that Claude
+  1. **MCP Server Mode** -- Expose PatternGraphAPI as an MCP server that Claude
      Code connects to directly. Eliminates CLI overhead and enables stateful
      queries (pipeline loaded once, multiple queries without re-scanning).
   2. **Monorepo Support** -- Cross-package dependency views, package-scoped
@@ -54,9 +54,9 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
   # RULE 1: MCP Server Mode
   # ============================================================================
 
-  Rule: ProcessStateAPI is accessible as an MCP server for Claude Code
+  Rule: PatternGraphAPI is accessible as an MCP server for Claude Code
 
-    **Invariant:** The MCP server exposes all ProcessStateAPI methods as MCP tools
+    **Invariant:** The MCP server exposes all PatternGraphAPI methods as MCP tools
     with typed input/output schemas. The pipeline is loaded once on server start
     and refreshed on source file changes.
 
@@ -81,10 +81,10 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
     **Verified by:** MCP server starts, MCP tool invocation, Auto-refresh on change
 
     @acceptance-criteria @happy-path
-    Scenario: MCP server exposes ProcessStateAPI tools
+    Scenario: MCP server exposes PatternGraphAPI tools
       Given the MCP server is started with input globs
       When Claude Code requests tool listing
-      Then all ProcessStateAPI methods appear as MCP tools
+      Then all PatternGraphAPI methods appear as MCP tools
       And each tool has typed input and output schemas
 
     @acceptance-criteria @happy-path

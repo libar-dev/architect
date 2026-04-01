@@ -31,8 +31,8 @@ Feature: Data API Relationship Graph - Deep Dependency Analysis
   | Blocking chains | Understand what prevents progress |
   | Path finding | Discover non-obvious relationships |
 
-  **Relationship to ProcessStateAPIRelationshipQueries:**
-  This spec supersedes the earlier ProcessStateAPIRelationshipQueries spec,
+  **Relationship to PatternGraphAPIRelationshipQueries:**
+  This spec supersedes the earlier PatternGraphAPIRelationshipQueries spec,
   which focused on implementation/inheritance convenience methods. The
   underlying data is available via getPatternRelationships(). This spec
   adds graph-level operations that traverse relationships recursively.
@@ -146,7 +146,7 @@ Feature: Data API Relationship Graph - Deep Dependency Analysis
     don't match any pattern definition) are detectable. Orphan patterns (no
     relationships at all) are identifiable.
 
-    **Rationale:** The MasterDataset transformer already computes dangling
+    **Rationale:** The PatternGraph transformer already computes dangling
     references during Pass 3 (relationship resolution) but does not expose them
     via the API. Orphan patterns indicate missing annotations. Both are data
     quality signals that improve over time with attention.

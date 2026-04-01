@@ -159,7 +159,7 @@ export function composeDocuments(
 
 /**
  * Create a CompositeCodec that decodes each child codec against the same
- * MasterDataset and composes their outputs into a single RenderableDocument.
+ * PatternGraph and composes their outputs into a single RenderableDocument.
  */
 export function createCompositeCodec(
   codecs: readonly DocumentCodec[],

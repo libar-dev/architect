@@ -7,7 +7,7 @@
 
 ## ValidationRulesCodec
 
-Transforms MasterDataset into a RenderableDocument for Process Guard validation
+Transforms PatternGraph into a RenderableDocument for Process Guard validation
 rules reference. Generates VALIDATION-RULES.md and detail files (validation/\*.md).
 
 **Purpose:** Process Guard validation rules reference with FSM diagrams and protection level matrix.
@@ -91,7 +91,7 @@ const doc = ValidationRulesCodec.decode(dataset);
 
 ## TaxonomyDocumentCodec
 
-Transforms MasterDataset into a RenderableDocument for taxonomy reference output.
+Transforms PatternGraph into a RenderableDocument for taxonomy reference output.
 Generates TAXONOMY.md and detail files (taxonomy/\*.md).
 
 **Purpose:** Taxonomy reference documentation with tag definitions, preset comparison, and format type reference.
@@ -161,7 +161,7 @@ const doc = TaxonomyDocumentCodec.decode(dataset);
 
 ## RequirementsDocumentCodec
 
-Transforms MasterDataset into RenderableDocument for PRD/requirements output.
+Transforms PatternGraph into RenderableDocument for PRD/requirements output.
 Generates PRODUCT-REQUIREMENTS.md and detail files (requirements/\*.md).
 
 **Purpose:** Product requirements documentation grouped by product area or user role.
@@ -302,7 +302,7 @@ const doc = codec.decode(dataset);
 
 ## PrChangesCodec
 
-Transforms MasterDataset into RenderableDocument for PR-scoped output.
+Transforms PatternGraph into RenderableDocument for PR-scoped output.
 Filters patterns by changed files and/or release version tags.
 
 **Purpose:** PR-scoped view filtered by changed files or release version.
@@ -389,7 +389,7 @@ const doc = codec.decode(dataset);
 
 ## PatternsDocumentCodec
 
-Transforms MasterDataset into a RenderableDocument for pattern registry output.
+Transforms PatternGraph into a RenderableDocument for pattern registry output.
 Generates PATTERNS.md and category detail files (patterns/\*.md).
 
 **Purpose:** Pattern registry with category-based organization.
@@ -429,7 +429,7 @@ const doc = PatternsDocumentCodec.decode(dataset);
 
 ## IndexCodec
 
-**Purpose:** Navigation hub composing editorial preamble with MasterDataset statistics.
+**Purpose:** Navigation hub composing editorial preamble with PatternGraph statistics.
 
 **Output Files:** `INDEX.md` (single page, no detail files)
 
@@ -454,7 +454,7 @@ const doc = PatternsDocumentCodec.decode(dataset);
 
 ## DesignReviewCodec
 
-Transforms MasterDataset into a RenderableDocument containing design review
+Transforms PatternGraph into a RenderableDocument containing design review
 artifacts: sequence diagrams, component diagrams, type definition tables,
 and design question templates.
 
@@ -509,7 +509,7 @@ const doc = composeDocuments([docA, docB], { title: 'Combined' });
 
 ## ClaudeModuleCodec
 
-Transforms MasterDataset into RenderableDocuments for CLAUDE.md module generation.
+Transforms PatternGraph into RenderableDocuments for CLAUDE.md module generation.
 Filters patterns with `claudeModule` tags and generates compact markdown modules
 suitable for the `_claude-md/` directory structure.
 
@@ -537,7 +537,7 @@ const doc = codec.decode(dataset);
 
 ## BusinessRulesCodec
 
-Transforms MasterDataset into a RenderableDocument for business rules output.
+Transforms PatternGraph into a RenderableDocument for business rules output.
 Generates BUSINESS-RULES.md organized by product area, phase, and feature.
 
 **Purpose:** Business rules documentation organized by product area, phase, and feature. Extracts domain constraints from Gherkin Rule: blocks.
@@ -592,7 +592,7 @@ const doc = codec.decode(dataset);
 
 ## ArchitectureDocumentCodec
 
-Transforms MasterDataset into a RenderableDocument containing
+Transforms PatternGraph into a RenderableDocument containing
 architecture diagrams (Mermaid) generated from source annotations.
 
 **Purpose:** Architecture diagrams (Mermaid) generated from source annotations. Supports component and layered views.
@@ -637,7 +637,7 @@ const doc = ArchitectureDocumentCodec.decode(dataset);
 
 ## AdrDocumentCodec
 
-Transforms MasterDataset into RenderableDocument for Architecture Decision Records.
+Transforms PatternGraph into RenderableDocument for Architecture Decision Records.
 Extracts ADRs from patterns with `@architect-adr` tags.
 
 **Purpose:** Architecture Decision Records extracted from patterns with @architect-adr tags.

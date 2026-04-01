@@ -21,7 +21,7 @@
  *
  * Architecture:
  * ```
- * GeneratorContext.masterDataset → Codec.decode() → RenderableDocument → renderDocumentWithFiles() → OutputFile[]
+ * GeneratorContext.patternGraph → Codec.decode() → RenderableDocument → renderDocumentWithFiles() → OutputFile[]
  * ```
  */
 
@@ -34,7 +34,7 @@ import type { CodecContextEnrichment } from '../renderable/codecs/types/base.js'
  * Codec-based generator that wraps the new RDM system.
  *
  * Each instance handles a single document type and uses the corresponding
- * codec to transform MasterDataset into RenderableDocument, then renders
+ * codec to transform PatternGraph into RenderableDocument, then renders
  * to markdown.
  */
 export class CodecBasedGenerator implements DocumentGenerator {
@@ -51,7 +51,7 @@ export class CodecBasedGenerator implements DocumentGenerator {
     _patterns: readonly ExtractedPattern[],
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
-    const { masterDataset: dataset } = context;
+    const { patternGraph: dataset } = context;
 
     // Build context enrichment from generator context fields
     const contextEnrichment: CodecContextEnrichment = {

@@ -116,7 +116,7 @@ generated equivalents. Work packages in this gap analysis should map to its phas
 | `process-api-hybrid-generation.feature`      | ProcessApiHybridGeneration      | completed | 43    | CLI schema as single source for reference tables |
 | `claude-module-generation.feature`           | ClaudeModuleGeneration          | completed | 25    | Claude module tags + behavior spec sourcing      |
 | `reference-doc-showcase.feature`             | ReferenceDocShowcase            | completed | 30    | All 9 content block types across 3 detail levels |
-| `validator-read-model-consolidation.feature` | ValidatorReadModelConsolidation | completed | 100   | MasterDataset as single read model (ADR-006)     |
+| `validator-read-model-consolidation.feature` | ValidatorReadModelConsolidation | completed | 100   | PatternGraph as single read model (ADR-006)      |
 
 **Query these specs:** `pnpm architect:query -- decisions DocsConsolidationStrategy`
 
@@ -183,7 +183,7 @@ Step 5: Replace manual doc section with pointer to generated output
 | Tag Value               | Used By                | Produces                             |
 | ----------------------- | ---------------------- | ------------------------------------ |
 | `codec-registry`        | ARCHITECTURE-CODECS.md | All 20 codecs with factory patterns  |
-| `pipeline-architecture` | ARCHITECTURE-TYPES.md  | MasterDataset interface, shapes      |
+| `pipeline-architecture` | ARCHITECTURE-TYPES.md  | PatternGraph interface, shapes       |
 | `taxonomy-rules`        | REFERENCE-SAMPLE.md    | Tag rules + 6 diagram types showcase |
 
 ### What This Means for New Work
@@ -739,7 +739,7 @@ ProceduralGuideCodec) have completed design sessions with findings and code stub
 - **CliRecipeCodec** creates a sibling `CliRecipeGenerator` to `ProcessApiReferenceGenerator`,
   both standalone `DocumentGenerator` implementations consuming `CLI_SCHEMA` directly.
 - **EnhancedIndexGeneration** creates a new `IndexCodec` registered in `CodecRegistry`,
-  composing MasterDataset-driven statistics with editorial preamble navigation content.
+  composing PatternGraph-driven statistics with editorial preamble navigation content.
 
 **Master spec status:** 11/15 deliverables complete. WP-2 (IndexCodec) implementation
 is complete but manual docs/ files are preserved as reference — Phase 1 (taxonomy

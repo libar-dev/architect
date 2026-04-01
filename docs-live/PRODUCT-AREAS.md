@@ -29,7 +29,7 @@ Configuration is the entry boundary — it transforms a user-authored `architect
 
 > **How does code become docs?**
 
-The generation pipeline transforms annotated source code into markdown documents through a four-stage architecture: Scanner discovers files, Extractor produces `ExtractedPattern` objects, Transformer builds MasterDataset with pre-computed views, and Codecs render to markdown via RenderableDocument IR. Nine specialized codecs handle reference docs, planning, session, reporting, timeline, ADRs, business rules, taxonomy, and composite output — each supporting three detail levels (detailed, standard, summary). The Orchestrator runs generators in registration order, producing both detailed `docs-live/` references and compact `_claude-md/` summaries.
+The generation pipeline transforms annotated source code into markdown documents through a four-stage architecture: Scanner discovers files, Extractor produces `ExtractedPattern` objects, Transformer builds PatternGraph with pre-computed views, and Codecs render to markdown via RenderableDocument IR. Nine specialized codecs handle reference docs, planning, session, reporting, timeline, ADRs, business rules, taxonomy, and composite output — each supporting three detail levels (detailed, standard, summary). The Orchestrator runs generators in registration order, producing both detailed `docs-live/` references and compact `_claude-md/` summaries.
 
 **96 patterns** — 82 completed, 6 active, 8 planned
 
@@ -53,7 +53,7 @@ The Data API provides direct terminal access to project state. It replaces readi
 
 **40 patterns** — 23 completed, 15 active, 2 planned
 
-**Key patterns:** DataAPIContextAssembly, ProcessStateAPICLI, DataAPIDesignSessionSupport, DataAPIRelationshipGraph, DataAPIOutputShaping
+**Key patterns:** DataAPIContextAssembly, PatternGraphAPICLI, DataAPIDesignSessionSupport, DataAPIRelationshipGraph, DataAPIOutputShaping
 
 ## [CoreTypes](product-areas/CORE-TYPES.md)
 
@@ -120,9 +120,9 @@ C4Context
     System(DataAPIContextAssembly, "DataAPIContextAssembly")
     System(CrossCuttingDocumentInclusion, "CrossCuttingDocumentInclusion")
     System(CodecDrivenReferenceGeneration, "CodecDrivenReferenceGeneration")
+    System(StringUtils, "StringUtils")
     System(ResultMonad, "ResultMonad")
     System(ErrorFactories, "ErrorFactories")
-    System(StringUtils, "StringUtils")
     System(ExtractionPipelineEnhancementsTesting, "ExtractionPipelineEnhancementsTesting")
     System(KebabCaseSlugs, "KebabCaseSlugs")
     System(ErrorHandlingUnification, "ErrorHandlingUnification")
@@ -199,9 +199,9 @@ graph LR
     DataAPIContextAssembly["DataAPIContextAssembly"]
     CrossCuttingDocumentInclusion["CrossCuttingDocumentInclusion"]
     CodecDrivenReferenceGeneration["CodecDrivenReferenceGeneration"]
+    StringUtils["StringUtils"]
     ResultMonad["ResultMonad"]
     ErrorFactories["ErrorFactories"]
-    StringUtils["StringUtils"]
     ExtractionPipelineEnhancementsTesting["ExtractionPipelineEnhancementsTesting"]
     KebabCaseSlugs["KebabCaseSlugs"]
     ErrorHandlingUnification["ErrorHandlingUnification"]

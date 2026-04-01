@@ -7,7 +7,7 @@
  * ## Document Codecs
  *
  * Barrel export for all document codecs.
- * Each codec transforms MasterDataset → RenderableDocument.
+ * Each codec transforms PatternGraph → RenderableDocument.
  *
  * ### When to Use
  *
@@ -218,7 +218,7 @@ export {
   DEFAULT_CLAUDE_MODULE_OPTIONS,
 } from './claude-module.js';
 
-// Index (navigation hub with MasterDataset statistics + editorial preamble)
+// Index (navigation hub with PatternGraph statistics + editorial preamble)
 export {
   IndexCodec,
   createIndexCodec,

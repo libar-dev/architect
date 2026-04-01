@@ -1,19 +1,19 @@
 /**
  * @architect
  * @architect-validation @architect-core
- * @architect-pattern MasterDataset
+ * @architect-pattern PatternGraph
  * @architect-status completed
  * @architect-uses Zod, ExtractedPattern, TagRegistry
  * @architect-used-by Orchestrator, SectionRenderer, ReportCodecs
  * @architect-usecase "When providing pre-computed views to section renderers"
  * @architect-usecase "When eliminating redundant filtering across generators"
- * @architect-extract-shapes MasterDatasetSchema, StatusGroupsSchema, StatusCountsSchema, PhaseGroupSchema, SourceViewsSchema, RelationshipEntrySchema, ArchIndexSchema
+ * @architect-extract-shapes PatternGraphSchema, StatusGroupsSchema, StatusCountsSchema, PhaseGroupSchema, SourceViewsSchema, RelationshipEntrySchema, ArchIndexSchema
  * @architect-arch-role read-model
  * @architect-arch-context api
  * @architect-arch-layer domain
  * @architect-include codec-transformation
  *
- * ## MasterDataset - Unified Pattern Views Schema
+ * ## PatternGraph - Unified Pattern Views Schema
  *
  * Defines the schema for a pre-computed dataset that holds all extracted patterns
  * along with derived views (by status, phase, quarter, category, source). This enables
@@ -51,7 +51,7 @@ import { TagRegistrySchema } from './tag-registry.js';
  * - active: active
  * - planned: roadmap, deferred, or undefined/unknown
  *
- * @architect-shape master-dataset
+ * @architect-shape pattern-graph
  */
 export const StatusGroupsSchema = z.object({
   /** Patterns with status 'completed' */
@@ -67,7 +67,7 @@ export const StatusGroupsSchema = z.object({
 /**
  * Status counts for aggregate statistics
  *
- * @architect-shape master-dataset
+ * @architect-shape pattern-graph
  */
 export const StatusCountsSchema = z.object({
   /** Number of completed patterns */
@@ -89,7 +89,7 @@ export const StatusCountsSchema = z.object({
  * Groups patterns by their phase number, with pre-computed
  * status counts for each phase.
  *
- * @architect-shape master-dataset
+ * @architect-shape pattern-graph
  */
 export const PhaseGroupSchema = z.object({
   /** Phase number (e.g., 1, 2, 3, 14, 39) */
@@ -108,7 +108,7 @@ export const PhaseGroupSchema = z.object({
 /**
  * Source-based views for different data origins
  *
- * @architect-shape master-dataset
+ * @architect-shape pattern-graph
  */
 export const SourceViewsSchema = z.object({
   /** Patterns from TypeScript files (.ts) */
@@ -146,7 +146,7 @@ export const ImplementationRefSchema = z.object({
  *
  * Maps pattern names to their relationship metadata.
  *
- * @architect-shape master-dataset
+ * @architect-shape pattern-graph
  */
 export const RelationshipEntrySchema = z.object({
   /** Patterns this pattern uses (from @architect-uses) */
@@ -260,9 +260,9 @@ export const SequenceIndexSchema = z.record(z.string().trim().min(1), SequenceIn
  * Contains raw patterns plus pre-computed views and statistics.
  * This is the primary data structure passed to generators and sections.
  *
- * @architect-shape master-dataset
+ * @architect-shape pattern-graph
  */
-export const MasterDatasetSchema = z.object({
+export const PatternGraphSchema = z.object({
   // ─────────────────────────────────────────────────────────────────────────
   // Raw Data
   // ─────────────────────────────────────────────────────────────────────────
@@ -338,7 +338,7 @@ export const MasterDatasetSchema = z.object({
 // Type Exports
 // ═══════════════════════════════════════════════════════════════════════════
 
-export type MasterDataset = z.infer<typeof MasterDatasetSchema>;
+export type PatternGraph = z.infer<typeof PatternGraphSchema>;
 export type StatusGroups = z.infer<typeof StatusGroupsSchema>;
 export type StatusCounts = z.infer<typeof StatusCountsSchema>;
 export type PhaseGroup = z.infer<typeof PhaseGroupSchema>;

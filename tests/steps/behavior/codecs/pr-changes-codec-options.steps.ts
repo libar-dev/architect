@@ -39,7 +39,7 @@ import {
   createPatternsOfAllStatuses,
   createDeferredPatterns,
   createCompletedPatterns,
-  createTestMasterDataset,
+  createTestPatternGraph,
 } from '../../../support/helpers/pr-changes-codec-state.js';
 import type { DataTableRow } from '../../../support/world.js';
 
@@ -78,8 +78,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'Review checklist generated with standard items',
         ({ Given, When, Then, And }) => {
-          Given('a MasterDataset with PR-relevant patterns', () => {
-            state!.dataset = createTestMasterDataset({ patterns: createPrRelevantPatterns() });
+          Given('a PatternGraph with PR-relevant patterns', () => {
+            state!.dataset = createTestPatternGraph({ patterns: createPrRelevantPatterns() });
           });
 
           When('decoding with includeReviewChecklist enabled', () => {
@@ -109,8 +109,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'Review checklist includes completed patterns item when applicable',
         ({ Given, When, Then }) => {
-          Given('a MasterDataset with completed patterns', () => {
-            state!.dataset = createTestMasterDataset({ patterns: createCompletedPatterns() });
+          Given('a PatternGraph with completed patterns', () => {
+            state!.dataset = createTestPatternGraph({ patterns: createCompletedPatterns() });
           });
 
           When('decoding with includeReviewChecklist enabled', () => {
@@ -129,8 +129,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'Review checklist includes active work item when applicable',
         ({ Given, When, Then }) => {
-          Given('a MasterDataset with active patterns', () => {
-            state!.dataset = createTestMasterDataset({ patterns: createActivePatterns() });
+          Given('a PatternGraph with active patterns', () => {
+            state!.dataset = createTestPatternGraph({ patterns: createActivePatterns() });
           });
 
           When('decoding with includeReviewChecklist enabled', () => {
@@ -149,8 +149,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'Review checklist includes dependencies item when patterns have dependencies',
         ({ Given, When, Then }) => {
-          Given('a MasterDataset with patterns with dependencies', () => {
-            state!.dataset = createTestMasterDataset({
+          Given('a PatternGraph with patterns with dependencies', () => {
+            state!.dataset = createTestPatternGraph({
               patterns: createPatternsWithDependencies(),
             });
           });
@@ -171,8 +171,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'Review checklist includes deliverables item when patterns have deliverables',
         ({ Given, When, Then }) => {
-          Given('a MasterDataset with patterns with deliverables', () => {
-            state!.dataset = createTestMasterDataset({
+          Given('a PatternGraph with patterns with deliverables', () => {
+            state!.dataset = createTestPatternGraph({
               patterns: createPatternsWithDeliverables(),
             });
           });
@@ -193,8 +193,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'No review checklist when includeReviewChecklist is disabled',
         ({ Given, When, Then }) => {
-          Given('a MasterDataset with PR-relevant patterns', () => {
-            state!.dataset = createTestMasterDataset({ patterns: createPrRelevantPatterns() });
+          Given('a PatternGraph with PR-relevant patterns', () => {
+            state!.dataset = createTestPatternGraph({ patterns: createPrRelevantPatterns() });
           });
 
           When('decoding with includeReviewChecklist disabled', () => {
@@ -223,8 +223,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'Dependencies section shows depends on relationships',
         ({ Given, When, Then, And }) => {
-          Given('a MasterDataset with patterns with dependsOn relationships', () => {
-            state!.dataset = createTestMasterDataset({ patterns: createPatternsWithDependsOn() });
+          Given('a PatternGraph with patterns with dependsOn relationships', () => {
+            state!.dataset = createTestPatternGraph({ patterns: createPatternsWithDependsOn() });
           });
 
           When('decoding with includeDependencies enabled', () => {
@@ -248,8 +248,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       );
 
       RuleScenario('Dependencies section shows enables relationships', ({ Given, When, Then }) => {
-        Given('a MasterDataset with patterns with enables relationships', () => {
-          state!.dataset = createTestMasterDataset({ patterns: createPatternsWithEnables() });
+        Given('a PatternGraph with patterns with enables relationships', () => {
+          state!.dataset = createTestPatternGraph({ patterns: createPatternsWithEnables() });
         });
 
         When('decoding with includeDependencies enabled', () => {
@@ -270,8 +270,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'No dependencies section when patterns have no dependencies',
         ({ Given, When, Then }) => {
-          Given('a MasterDataset with patterns without dependencies', () => {
-            state!.dataset = createTestMasterDataset({
+          Given('a PatternGraph with patterns without dependencies', () => {
+            state!.dataset = createTestPatternGraph({
               patterns: createPatternsWithoutDependencies(),
             });
           });
@@ -293,8 +293,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'No dependencies section when includeDependencies is disabled',
         ({ Given, When, Then }) => {
-          Given('a MasterDataset with patterns with dependencies', () => {
-            state!.dataset = createTestMasterDataset({
+          Given('a PatternGraph with patterns with dependencies', () => {
+            state!.dataset = createTestPatternGraph({
               patterns: createPatternsWithDependencies(),
             });
           });
@@ -321,8 +321,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('PrChangesCodec filters patterns by changedFiles', ({ RuleScenario }) => {
     RuleScenario('Patterns filtered by changedFiles match', ({ Given, When, Then }) => {
-      Given('a MasterDataset with patterns from various files', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createPatternsFromVariousFiles() });
+      Given('a PatternGraph with patterns from various files', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createPatternsFromVariousFiles() });
       });
 
       When('decoding with changedFiles filter matching specific patterns', () => {
@@ -341,8 +341,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('changedFiles filter matches partial paths', ({ Given, When, Then }) => {
-      Given('a MasterDataset with patterns from various files', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createPatternsFromVariousFiles() });
+      Given('a PatternGraph with patterns from various files', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createPatternsFromVariousFiles() });
       });
 
       When('decoding with changedFiles filter for a directory path', () => {
@@ -365,8 +365,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('PrChangesCodec filters patterns by releaseFilter', ({ RuleScenario }) => {
     RuleScenario('Patterns filtered by release version', ({ Given, When, Then }) => {
-      Given('a MasterDataset with patterns with different release deliverables', () => {
-        state!.dataset = createTestMasterDataset({
+      Given('a PatternGraph with patterns with different release deliverables', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: createPatternsWithDifferentReleases(),
         });
       });
@@ -392,8 +392,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario(
       'Combined filters match patterns meeting either criterion',
       ({ Given, When, Then }) => {
-        Given('a MasterDataset with patterns matching file or release', () => {
-          state!.dataset = createTestMasterDataset({
+        Given('a PatternGraph with patterns matching file or release', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: createPatternsMatchingFileOrRelease(),
           });
         });
@@ -415,8 +415,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     );
 
     RuleScenario('Patterns matching both criteria are not duplicated', ({ Given, When, Then }) => {
-      Given('a MasterDataset with a pattern matching both file and release', () => {
-        state!.dataset = createTestMasterDataset({
+      Given('a PatternGraph with a pattern matching both file and release', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: createPatternMatchingBothFileAndRelease(),
         });
       });
@@ -445,8 +445,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('PrChangesCodec only includes active and completed patterns', ({ RuleScenario }) => {
     RuleScenario('Roadmap patterns are excluded', ({ Given, When, Then }) => {
-      Given('a MasterDataset with patterns of all statuses', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createPatternsOfAllStatuses() });
+      Given('a PatternGraph with patterns of all statuses', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createPatternsOfAllStatuses() });
       });
 
       When('decoding with PrChangesCodec', () => {
@@ -462,8 +462,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Deferred patterns are excluded', ({ Given, When, Then }) => {
-      Given('a MasterDataset with deferred patterns', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createDeferredPatterns() });
+      Given('a PatternGraph with deferred patterns', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createDeferredPatterns() });
       });
 
       When('decoding with PrChangesCodec', () => {

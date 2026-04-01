@@ -32,7 +32,7 @@ And these specs are scope for the features introduced:
 
 	```
 	                     ┌── DataAPIOutputShaping (25a) ─────── [DONE] 8/8
-	ProcessStateAPI ─────┤
+	PatternGraphAPI ─────┤
 	(V1, exists)         └── DataAPIContextAssembly (25b) ───── [DONE] 7/7
 	                              │
 	                              └── DataAPIDesignSessionSupport (25c) ── [PARTIALLY-DESIGNED]

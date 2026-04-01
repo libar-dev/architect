@@ -179,11 +179,11 @@ export {
   PhaseGroupSchema,
   SourceViewsSchema,
   RelationshipEntrySchema,
-  MasterDatasetSchema,
-  type MasterDataset,
+  PatternGraphSchema,
+  type PatternGraph,
   type StatusGroups,
   type StatusCounts,
   type PhaseGroup,
   type SourceViews,
   type RelationshipEntry,
-} from './master-dataset.js';
+} from './pattern-graph.js';

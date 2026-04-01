@@ -72,7 +72,7 @@ Feature: Process API CLI - Core Infrastructure
 
   Rule: CLI status subcommand shows delivery state
 
-    **Invariant:** The status subcommand must return structured JSON containing delivery progress derived from the MasterDataset.
+    **Invariant:** The status subcommand must return structured JSON containing delivery progress derived from the PatternGraph.
     **Rationale:** Consumers depend on machine-readable status output for scripting and CI integration; unstructured output breaks downstream automation.
 
     @happy-path
@@ -142,7 +142,7 @@ Feature: Process API CLI - Core Infrastructure
 
   Rule: CLI arch subcommand queries architecture
 
-    **Invariant:** The arch subcommand must expose role, bounded context, and layer queries over the MasterDataset's architecture metadata.
+    **Invariant:** The arch subcommand must expose role, bounded context, and layer queries over the PatternGraph's architecture metadata.
     **Rationale:** Architecture queries replace manual exploration of annotated sources; missing or incorrect results lead to wrong structural assumptions during design sessions.
 
     @happy-path

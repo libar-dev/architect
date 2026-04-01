@@ -6,10 +6,10 @@
  * @architect
  */
 import type { RenderableDocument, TableBlock } from '../../../src/renderable/schema.js';
-import type { MasterDataset } from '../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../src/validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
 import {
-  createTestMasterDataset,
+  createTestPatternGraph,
   createTestPattern,
   resetPatternCounter,
 } from '../../fixtures/dataset-factories.js';
@@ -29,7 +29,7 @@ import type { DataTableRow } from '../world.js';
 // =============================================================================
 
 export interface PrChangesCodecState {
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   document: RenderableDocument | null;
 }
 
@@ -177,8 +177,8 @@ export function getDocumentText(doc: RenderableDocument): string {
 // =============================================================================
 
 export { findHeadings, findTableWithHeader, findLists };
-export { createTestMasterDataset, createTestPattern };
-export type { DataTableRow, RenderableDocument, MasterDataset, ExtractedPattern };
+export { createTestPatternGraph, createTestPattern };
+export type { DataTableRow, RenderableDocument, PatternGraph, ExtractedPattern };
 
 // =============================================================================
 // Pattern Factory Helpers

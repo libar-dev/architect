@@ -11,7 +11,7 @@
  * Generates `PROCESS-API-RECIPES.md` from the declarative CLI schema.
  * Sibling to `ProcessApiReferenceGenerator` — both implement
  * `DocumentGenerator`, both consume `CLI_SCHEMA` directly, neither depends
- * on MasterDataset (ADR-006 compliant).
+ * on PatternGraph (ADR-006 compliant).
  *
  * ### When to Use
  *

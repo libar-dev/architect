@@ -8,7 +8,7 @@
  * ## Codec-Based Generator Registration
  *
  * Registers codec-based generators for the RenderableDocument Model (RDM) system.
- * These generators use Zod 4 codecs to transform MasterDataset into RenderableDocuments,
+ * These generators use Zod 4 codecs to transform PatternGraph into RenderableDocuments,
  * which are then rendered to markdown via the universal renderer.
  *
  * ### When to Use
@@ -162,7 +162,7 @@ generatorRegistry.register(createCodecGenerator('claude-modules', 'claude-module
 
 /**
  * Index Generator
- * Generates INDEX.md navigation hub with editorial preamble + MasterDataset statistics
+ * Generates INDEX.md navigation hub with editorial preamble + PatternGraph statistics
  */
 generatorRegistry.register(createCodecGenerator('index', 'index'));
 
@@ -195,7 +195,7 @@ generatorRegistry.register(createDesignReviewGenerator());
 /**
  * Process API CLI Reference Generator
  * Generates PROCESS-API-REFERENCE.md from declarative CLI schema.
- * Standalone: does not consume MasterDataset (ADR-006).
+ * Standalone: does not consume PatternGraph (ADR-006).
  */
 generatorRegistry.register(createProcessApiReferenceGenerator());
 
@@ -206,7 +206,7 @@ generatorRegistry.register(createProcessApiReferenceGenerator());
 /**
  * CLI Recipe & Workflow Guide Generator
  * Generates PROCESS-API-RECIPES.md from declarative CLI schema.
- * Standalone: does not consume MasterDataset (ADR-006).
+ * Standalone: does not consume PatternGraph (ADR-006).
  */
 let cliRecipePreamble: readonly SectionBlock[] = [];
 try {

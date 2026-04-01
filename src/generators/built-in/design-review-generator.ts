@@ -7,13 +7,13 @@
  * @architect-arch-role service
  * @architect-arch-context generator
  * @architect-arch-layer application
- * @architect-uses DesignReviewCodec, MasterDataset, SequenceIndex
+ * @architect-uses DesignReviewCodec, PatternGraph, SequenceIndex
  * @architect-product-area:Generation
  *
  * ## DesignReviewGenerator
  *
  * Generates design review documents for patterns with sequence annotations.
- * Auto-discovers annotated patterns from MasterDataset.sequenceIndex and
+ * Auto-discovers annotated patterns from PatternGraph.sequenceIndex and
  * produces one design review per entry.
  *
  * Output: `architect/design-reviews/{pattern-name}.md`
@@ -65,7 +65,7 @@ class DesignReviewGeneratorImpl implements DocumentGenerator {
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
     const files: OutputFile[] = [];
-    const dataset = context.masterDataset;
+    const dataset = context.patternGraph;
 
     const sequenceIndex = dataset.sequenceIndex;
     if (!sequenceIndex || Object.keys(sequenceIndex).length === 0) {

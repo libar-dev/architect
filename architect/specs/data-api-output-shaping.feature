@@ -10,7 +10,7 @@
 Feature: Data API Output Shaping - Compact Output for AI Agents
 
   **Problem:**
-  The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`.
+  The PatternGraphAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`.
   List queries (e.g., `getCurrentWork`) produce ~594KB of JSON because each pattern
   includes full `directive` (raw JSDoc AST), `code` (source text), and dozens of
   empty/null fields. AI agents waste context tokens parsing verbose output that is

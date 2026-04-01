@@ -13,7 +13,7 @@ Feature: Architecture Document Refactoring
   **Problem:**
   ARCHITECTURE.md is 1,287 lines of manually-maintained documentation covering 14
   sections. The codec system already generates much of this content (codec references
-  via convention tags, MasterDataset types via shape extraction, pipeline diagrams
+  via convention tags, PatternGraph types via shape extraction, pipeline diagrams
   via architecture annotations). Maintaining parallel manual and generated versions
   creates drift and duplication.
 
@@ -37,7 +37,7 @@ Feature: Architecture Document Refactoring
   | Executive Summary | 28-69 | Keep | Editorial narrative |
   | Configuration Architecture | 70-139 | Phase 4: absorb | Configuration product area |
   | Four-Stage Pipeline | 140-343 | Keep, trim | Editorial narrative (core concepts) |
-  | Unified Transformation | 345-478 | Phase 4: generate | Shapes reference doc (MasterDataset types) |
+  | Unified Transformation | 345-478 | Phase 4: generate | Shapes reference doc (PatternGraph types) |
   | Codec Architecture | 481-527 | Keep | Editorial narrative (concepts only) |
   | Available Codecs | 529-534 | Phase 2: done | Pointer to ARCHITECTURE-CODECS.md |
   | Progressive Disclosure | 535-584 | Keep | Editorial narrative |
@@ -58,7 +58,7 @@ Feature: Architecture Document Refactoring
       | Convention-extractor heading match bugfix | complete | src/renderable/codecs/convention-extractor.ts | Yes | unit |
       | Available Codecs section replaced with pointer | complete | docs/ARCHITECTURE.md | No | n/a |
       | Configuration Architecture to product area | complete | docs/ARCHITECTURE.md | Yes | integration |
-      | MasterDataset Schema to shapes reference | complete | docs/ARCHITECTURE.md | Yes | integration |
+      | PatternGraph Schema to shapes reference | complete | docs/ARCHITECTURE.md | Yes | integration |
       | Source Systems to Annotation product area | complete | docs/ARCHITECTURE.md | Yes | integration |
       | Data Flow Diagrams to architecture diagrams | complete | docs/ARCHITECTURE.md | Yes | integration |
       | Workflow Integration to Process product area | complete | docs/ARCHITECTURE.md | Yes | integration |
@@ -207,7 +207,7 @@ Feature: Architecture Document Refactoring
     for its content type.
 
     **Verified by:** Product area absorption captures equivalent content,
-    Shape reference covers MasterDataset documentation,
+    Shape reference covers PatternGraph documentation,
     No content is lost in routing
 
     @acceptance-criteria @happy-path
@@ -219,10 +219,10 @@ Feature: Architecture Document Refactoring
       And the ARCHITECTURE.md section can be replaced with a pointer
 
     @acceptance-criteria @happy-path
-    Scenario: Shape reference covers MasterDataset documentation
-      Given the Unified Transformation section with MasterDataset schema
+    Scenario: Shape reference covers PatternGraph documentation
+      Given the Unified Transformation section with PatternGraph schema
       And TypeScript types tagged with @architect-shape in the source
-      When a shapes reference doc config targets MasterDataset types
+      When a shapes reference doc config targets PatternGraph types
       Then the generated shapes section contains the same type definitions
       And the manual schema documentation can be replaced
 
@@ -287,35 +287,35 @@ Feature: Architecture Document Refactoring
       Then the annotation format examples appear in the Four-Stage Pipeline section
       And the examples explain how to read and write architect tags
 
-  Rule: MasterDataset shapes generate a dedicated ARCHITECTURE-TYPES reference document
+  Rule: PatternGraph shapes generate a dedicated ARCHITECTURE-TYPES reference document
 
     **Invariant:** DD-6: A new ReferenceDocConfig produces ARCHITECTURE-TYPES.md using
-    shapeSelectors with group master-dataset to extract MasterDataset schema types,
-    RuntimeMasterDataset, RawDataset, PipelineOptions, and PipelineResult. Source files
-    tagged with @architect-shape master-dataset and @architect-include master-dataset
+    shapeSelectors with group master-dataset to extract PatternGraph schema types,
+    RuntimePatternGraph, RawDataset, PipelineOptions, and PipelineResult. Source files
+    tagged with @architect-shape pattern-graph and @architect-include master-dataset
     contribute shapes to the reference doc. The Unified Transformation section (L345-478)
     is replaced with a condensed narrative (~15 lines) and pointer to ARCHITECTURE-TYPES.md.
 
-    **Rationale:** The MasterDataset is the central data structure -- the sole read model
+    **Rationale:** The PatternGraph is the central data structure -- the sole read model
     per ADR-006. It deserves dedicated reference doc treatment alongside ARCHITECTURE-CODECS.md.
     Shape extraction from TypeScript declarations provides exact type signatures that stay
     in sync with code, unlike the manual schema table in ARCHITECTURE.md.
 
-    **Verified by:** MasterDataset shapes extracted into reference doc,
+    **Verified by:** PatternGraph shapes extracted into reference doc,
     Pipeline types included alongside schema types,
     Unified Transformation section replaced with pointer
 
     @acceptance-criteria @happy-path
-    Scenario: MasterDataset shapes extracted via shape selectors
-      Given source files tagged with @architect-shape master-dataset
+    Scenario: PatternGraph shapes extracted via shape selectors
+      Given source files tagged with @architect-shape pattern-graph
       And a ReferenceDocConfig with shapeSelectors targeting master-dataset group
       When the reference codec generates ARCHITECTURE-TYPES.md
-      Then MasterDatasetSchema, RuntimeMasterDataset, and RawDataset types appear
+      Then PatternGraphSchema, RuntimePatternGraph, and RawDataset types appear
       And each shape includes its TypeScript declaration and JSDoc description
 
     @acceptance-criteria @happy-path
     Scenario: Pipeline types included in ARCHITECTURE-TYPES reference doc
-      Given PipelineOptions and PipelineResult tagged with @architect-shape master-dataset
+      Given PipelineOptions and PipelineResult tagged with @architect-shape pattern-graph
       And @architect-include master-dataset on their source files
       When the reference codec generates ARCHITECTURE-TYPES.md
       Then PipelineOptions and PipelineResult shapes appear in the API Types section
@@ -324,10 +324,10 @@ Feature: Architecture Document Refactoring
     @acceptance-criteria @happy-path
     Scenario: Unified Transformation section replaced with pointer and narrative
       Given the Unified Transformation section in ARCHITECTURE.md (L345-478)
-      And ARCHITECTURE-TYPES.md generated with MasterDataset shapes
+      And ARCHITECTURE-TYPES.md generated with PatternGraph shapes
       When the section is consolidated
       Then the section is replaced with a condensed narrative and pointer
-      And the narrative explains MasterDataset role as the sole read model
+      And the narrative explains PatternGraph role as the sole read model
       And no type definitions remain in ARCHITECTURE.md
 
   Rule: Pipeline architecture convention content replaces ASCII data flow diagrams
@@ -336,7 +336,7 @@ Feature: Architecture Document Refactoring
     diagrams totaling ~183 lines. These are replaced using a hybrid approach: convention
     tag pipeline-architecture (already registered, currently unused) on orchestrator.ts
     and build-pipeline.ts produces prose descriptions of pipeline steps and consumer
-    architecture. A new master-dataset-views hardcoded diagram source generates a
+    architecture. A new pattern-graph-views hardcoded diagram source generates a
     Mermaid fan-out diagram showing dataset view relationships. DD-8: Both convention
     content and diagram source are configured on the ARCHITECTURE-TYPES.md ReferenceDocConfig,
     keeping all architecture reference content in one generated document.
@@ -360,12 +360,12 @@ Feature: Architecture Document Refactoring
       And consumer architecture patterns from build-pipeline.ts appear
 
     @acceptance-criteria @happy-path
-    Scenario: master-dataset-views diagram source generates Mermaid fan-out diagram
-      Given master-dataset-views added to DIAGRAM_SOURCE_VALUES in reference.ts
-      And buildMasterDatasetViewsDiagram builder function implemented
-      And ARCHITECTURE-TYPES.md config includes master-dataset-views in diagramScopes
+    Scenario: pattern-graph-views diagram source generates Mermaid fan-out diagram
+      Given pattern-graph-views added to DIAGRAM_SOURCE_VALUES in reference.ts
+      And buildPatternGraphViewsDiagram builder function implemented
+      And ARCHITECTURE-TYPES.md config includes pattern-graph-views in diagramScopes
       When the reference codec generates the document
-      Then a Mermaid diagram showing MasterDataset view fan-out is rendered
+      Then a Mermaid diagram showing PatternGraph view fan-out is rendered
       And the diagram appears in both detailed and compact outputs
 
     @acceptance-criteria @happy-path

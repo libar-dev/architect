@@ -2,14 +2,14 @@
  * @architect
  * @architect-status completed
  * @architect-implements MCPServerIntegration
- * @architect-uses ProcessStateAPI, MCPPipelineSession
+ * @architect-uses PatternGraphAPI, MCPPipelineSession
  * @architect-used-by MCPServerImpl
  * @architect-target src/mcp/tool-registry.ts
  * @architect-since DS-MCP
  *
  * ## MCPToolRegistry — Tool Definitions with Zod Schemas
  *
- * Defines 25 MCP tools mapping to ProcessStateAPI methods and CLI subcommands.
+ * Defines 25 MCP tools mapping to PatternGraphAPI methods and CLI subcommands.
  * Each tool has a architect_ prefix, a Zod input schema for parameter validation,
  * and a handler that delegates to existing API functions.
  *

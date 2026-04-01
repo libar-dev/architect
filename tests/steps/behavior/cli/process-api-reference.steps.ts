@@ -34,7 +34,7 @@ function createMockGeneratorContext(): GeneratorContext {
     baseDir: process.cwd(),
     outputDir: 'docs-live',
     registry: {} as GeneratorContext['registry'],
-    masterDataset: {} as GeneratorContext['masterDataset'],
+    patternGraph: {} as GeneratorContext['patternGraph'],
   } as GeneratorContext;
 }
 

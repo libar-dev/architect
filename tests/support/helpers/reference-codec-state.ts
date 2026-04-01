@@ -6,7 +6,7 @@
  * reference-codec-diagram-types.steps.ts, and reference-codec-detail-rendering.steps.ts.
  */
 
-import type { MasterDataset } from '../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../src/validation-schemas/pattern-graph.js';
 import type { RenderableDocument } from '../../../src/renderable/schema.js';
 import type { DetailLevel } from '../../../src/renderable/codecs/types/base.js';
 import {
@@ -14,7 +14,7 @@ import {
   type ReferenceDocConfig,
 } from '../../../src/renderable/codecs/reference.js';
 import { createTestPattern, resetPatternCounter } from '../../fixtures/pattern-factories.js';
-import { createTestMasterDataset } from '../../fixtures/dataset-factories.js';
+import { createTestPatternGraph } from '../../fixtures/dataset-factories.js';
 import {
   findHeadings,
   findLists,
@@ -29,7 +29,7 @@ import {
 export {
   createReferenceCodec,
   createTestPattern,
-  createTestMasterDataset,
+  createTestPatternGraph,
   findHeadings,
   findLists,
   findParagraphs,
@@ -38,7 +38,7 @@ export {
   findCollapsibles,
   findLinkOuts,
 };
-export type { MasterDataset, RenderableDocument, DetailLevel, ReferenceDocConfig };
+export type { PatternGraph, RenderableDocument, DetailLevel, ReferenceDocConfig };
 
 // ============================================================================
 // State
@@ -46,7 +46,7 @@ export type { MasterDataset, RenderableDocument, DetailLevel, ReferenceDocConfig
 
 export interface ReferenceCodecState {
   config: ReferenceDocConfig | null;
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   document: RenderableDocument | null;
 }
 

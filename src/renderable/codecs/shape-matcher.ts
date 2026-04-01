@@ -2,12 +2,12 @@
  * Shape Selector Matcher
  *
  * Resolves selector-based shape filters against pattern `source.file` paths
- * in MasterDataset. Uses in-memory string matching (no filesystem access).
+ * in PatternGraph. Uses in-memory string matching (no filesystem access).
  *
  * @see CodecDrivenReferenceGeneration AD-6: In-memory glob matching
  */
 
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import type { ExtractedShape } from '../../validation-schemas/extracted-shape.js';
 
 // ============================================================================
@@ -78,7 +78,7 @@ export function matchesShapePattern(filePath: string, pattern: string): boolean 
 // ============================================================================
 
 /**
- * Filter shapes from MasterDataset using fine-grained ShapeSelectors.
+ * Filter shapes from PatternGraph using fine-grained ShapeSelectors.
  *
  * Three selector modes (DD-6):
  * - `{ group }` — all shapes where `shape.group` matches
@@ -87,12 +87,12 @@ export function matchesShapePattern(filePath: string, pattern: string): boolean 
  *
  * Returns a deduplicated list in selector iteration order.
  *
- * @param dataset - MasterDataset with all extracted patterns
+ * @param dataset - PatternGraph with all extracted patterns
  * @param selectors - Fine-grained shape selectors
  * @returns Aggregated ExtractedShape array from matching selectors
  */
 export function filterShapesBySelectors(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   selectors: readonly ShapeSelector[]
 ): readonly ExtractedShape[] {
   if (selectors.length === 0) return [];

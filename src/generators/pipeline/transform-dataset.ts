@@ -8,15 +8,15 @@
  * @architect-arch-context generator
  * @architect-arch-layer application
  * @architect-include pipeline-stages
- * @architect-uses MasterDataset, ExtractedPattern, TagRegistry, NormalizeStatus
+ * @architect-uses PatternGraph, ExtractedPattern, TagRegistry, NormalizeStatus
  * @architect-used-by Orchestrator
  * @architect-usecase "When computing all pattern views in a single pass"
  * @architect-usecase "When transforming raw extracted data for generators"
- * @architect-extract-shapes RuntimeMasterDataset, RawDataset, transformToMasterDataset
+ * @architect-extract-shapes RuntimePatternGraph, RawDataset, transformToPatternGraph
  *
  * ## TransformDataset - Single-Pass Pattern Transformation
  *
- * Transforms raw extracted patterns into a MasterDataset with all pre-computed
+ * Transforms raw extracted patterns into a PatternGraph with all pre-computed
  * views. This is the core of the unified transformation pipeline, computing
  * status groups, phase groups, quarter groups, category groups, and source
  * groups in a single iteration over the pattern array.
@@ -29,7 +29,7 @@
  * ### Key Concepts
  *
  * - **Single-pass**: O(n) complexity regardless of view count
- * - **Immutable output**: Returns a new MasterDataset object
+ * - **Immutable output**: Returns a new PatternGraph object
  * - **Workflow integration**: Uses workflow config for phase names
  */
 
@@ -44,7 +44,7 @@ import type {
   RelationshipEntry,
   ArchIndex,
   SequenceIndexEntry,
-} from '../../validation-schemas/master-dataset.js';
+} from '../../validation-schemas/pattern-graph.js';
 
 import { normalizeStatus, ACCEPTED_STATUS_VALUES } from '../../taxonomy/index.js';
 import { buildSequenceIndexEntryWithValidation } from './sequence-utils.js';
@@ -54,7 +54,7 @@ import type {
   MalformedPattern,
   ValidationSummary,
   TransformResult,
-  RuntimeMasterDataset,
+  RuntimePatternGraph,
   RawDataset,
 } from './transform-types.js';
 
@@ -67,7 +67,7 @@ function isKnownStatus(status: string | undefined): boolean {
 }
 
 /**
- * Transform raw extracted data into a MasterDataset with all pre-computed views.
+ * Transform raw extracted data into a PatternGraph with all pre-computed views.
  *
  * This is a ONE-PASS transformation that computes:
  * - Status-based groupings (completed/active/planned)
@@ -79,17 +79,17 @@ function isKnownStatus(status: string | undefined): boolean {
  * - Optional relationship index
  *
  * Convenience wrapper that returns just the dataset.
- * Use `transformToMasterDatasetWithValidation` to get validation summary.
+ * Use `transformToPatternGraphWithValidation` to get validation summary.
  *
  * @param raw - Raw dataset with patterns, registry, and optional workflow
- * @returns MasterDataset with all pre-computed views
+ * @returns PatternGraph with all pre-computed views
  */
-export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset {
-  return transformToMasterDatasetWithValidation(raw).dataset;
+export function transformToPatternGraph(raw: RawDataset): RuntimePatternGraph {
+  return transformToPatternGraphWithValidation(raw).dataset;
 }
 
 /**
- * Transform raw extracted data into a MasterDataset with validation summary.
+ * Transform raw extracted data into a PatternGraph with validation summary.
  *
  * This is the full transformation that includes:
  * - Pre-loop validation against ExtractedPatternSchema
@@ -105,7 +105,7 @@ export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset 
  * @param raw - Raw dataset with patterns, registry, and optional workflow
  * @returns TransformResult with dataset and validation summary
  */
-export function transformToMasterDatasetWithValidation(raw: RawDataset): TransformResult {
+export function transformToPatternGraphWithValidation(raw: RawDataset): TransformResult {
   const { patterns, tagRegistry, workflow, contextInferenceRules } = raw;
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -336,7 +336,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
     });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Assemble final MasterDataset
+  // Assemble final PatternGraph
   // ─────────────────────────────────────────────────────────────────────────
 
   const byCategory = Object.fromEntries(byCategoryMap);
@@ -357,7 +357,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
     warningCount: malformedPatterns.length + danglingReferences.length + unknownStatuses.length,
   };
 
-  const dataset: RuntimeMasterDataset = {
+  const dataset: RuntimePatternGraph = {
     patterns: patterns as ExtractedPattern[],
     tagRegistry,
     byStatus,

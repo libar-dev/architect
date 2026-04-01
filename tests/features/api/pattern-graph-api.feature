@@ -1,9 +1,9 @@
 @architect
-@architect-implements:ProcessStateAPICLI
+@architect-implements:PatternGraphAPICLI
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
-@behavior @process-state-api
-@architect-pattern:ProcessStateAPITesting
+@behavior @pattern-graph-api
+@architect-pattern:PatternGraphAPITesting
 @architect-product-area:DataAPI
 Feature: Process State API
   Programmatic interface for querying delivery process state.
@@ -12,15 +12,15 @@ Feature: Process State API
   **Problem:**
   - Markdown generation is not ideal for programmatic access
   - Claude Code needs structured data to answer process questions
-  - Multiple queries require redundant parsing of MasterDataset
+  - Multiple queries require redundant parsing of PatternGraph
 
   **Solution:**
-  - ProcessStateAPI wraps MasterDataset with typed query methods
+  - PatternGraphAPI wraps PatternGraph with typed query methods
   - Returns structured data suitable for programmatic consumption
   - Integrates FSM validation for transition checks
 
   Background:
-    Given a test MasterDataset is initialized
+    Given a test PatternGraph is initialized
 
   # ==========================================================================
   # Status Queries

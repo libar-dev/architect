@@ -5,7 +5,7 @@
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import { z } from 'zod';
-import type { MasterDataset } from '../../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../../src/validation-schemas/pattern-graph.js';
 import type { RenderableDocument, SectionBlock } from '../../../../src/renderable/schema.js';
 import { paragraph, document } from '../../../../src/renderable/schema.js';
 import type { DocumentCodec } from '../../../../src/renderable/codecs/types/base.js';
@@ -13,9 +13,9 @@ import {
   createCompositeCodec,
   composeDocuments,
 } from '../../../../src/renderable/codecs/composite.js';
-import { MasterDatasetSchema } from '../../../../src/validation-schemas/master-dataset.js';
+import { PatternGraphSchema } from '../../../../src/validation-schemas/pattern-graph.js';
 import { RenderableDocumentOutputSchema } from '../../../../src/renderable/codecs/shared-schema.js';
-import { createTestMasterDataset } from '../../../fixtures/dataset-factories.js';
+import { createTestPatternGraph } from '../../../fixtures/dataset-factories.js';
 import { resetPatternCounter } from '../../../fixtures/pattern-factories.js';
 import { findParagraphs, findBlocksByType } from '../../../support/helpers/document-assertions.js';
 
@@ -26,7 +26,7 @@ import { findParagraphs, findBlocksByType } from '../../../support/helpers/docum
 interface CompositeCodecState {
   codecs: DocumentCodec[];
   documents: RenderableDocument[];
-  dataset: MasterDataset;
+  dataset: PatternGraph;
   result: RenderableDocument | null;
 }
 
@@ -35,7 +35,7 @@ function initState(): CompositeCodecState {
   return {
     codecs: [],
     documents: [],
-    dataset: createTestMasterDataset({ patterns: [] }),
+    dataset: createTestPatternGraph({ patterns: [] }),
     result: null,
   };
 }
@@ -47,8 +47,8 @@ let state: CompositeCodecState | null = null;
 // ============================================================================
 
 function stubCodec(doc: RenderableDocument): DocumentCodec {
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (_dataset: MasterDataset): RenderableDocument => doc,
+  return z.codec(PatternGraphSchema, RenderableDocumentOutputSchema, {
+    decode: (_dataset: PatternGraph): RenderableDocument => doc,
     encode: (): never => {
       throw new Error('stub codec is decode-only');
     },

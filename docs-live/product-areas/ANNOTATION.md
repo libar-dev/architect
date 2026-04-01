@@ -210,21 +210,6 @@ interface CategoryDefinition {
 type CategoryTag = (typeof CATEGORIES)[number]['tag'];
 ```
 
-### buildRegistry (function)
-
-```typescript
-/**
- * Build the complete tag registry from TypeScript constants
- *
- * This is THE single source of truth for the taxonomy.
- * All consumers should use this function instead of loading JSON.
- */
-```
-
-```typescript
-function buildRegistry(): TagRegistry;
-```
-
 ### isShapeOnlyDirective (function)
 
 ```typescript
@@ -239,6 +224,21 @@ function buildRegistry(): TagRegistry;
 
 ```typescript
 function isShapeOnlyDirective(directive: DocDirective, registry: TagRegistry): boolean;
+```
+
+### buildRegistry (function)
+
+```typescript
+/**
+ * Build the complete tag registry from TypeScript constants
+ *
+ * This is THE single source of truth for the taxonomy.
+ * All consumers should use this function instead of loading JSON.
+ */
+```
+
+```typescript
+function buildRegistry(): TagRegistry;
 ```
 
 ### METADATA_TAGS_BY_GROUP (const)

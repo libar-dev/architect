@@ -11,9 +11,9 @@ import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import { RemainingWorkCodec } from '../../../src/renderable/codecs/session.js';
 import type { RenderableDocument, TableBlock } from '../../../src/renderable/schema.js';
-import type { MasterDataset } from '../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../src/validation-schemas/pattern-graph.js';
 import {
-  createTestMasterDataset,
+  createTestPatternGraph,
   createTestPattern,
   resetPatternCounter,
 } from '../../fixtures/dataset-factories.js';
@@ -25,7 +25,7 @@ import type { DataTableRow } from '../../support/world.js';
 // =============================================================================
 
 interface RemainingWorkTotalsState {
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   document: RenderableDocument | null;
   patternData: Array<{
     id: string;
@@ -331,7 +331,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       ({ Given, When, Then, And }) => {
         Given('a dataset with patterns:', (_ctx: unknown, dataTable: DataTableRow[]) => {
           const { patterns, patternData } = createPatternsFromTable(dataTable);
-          state!.dataset = createTestMasterDataset({ patterns });
+          state!.dataset = createTestPatternGraph({ patterns });
           state!.patternData = patternData;
         });
 
@@ -368,7 +368,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario('Summary includes completed patterns correctly', ({ Given, When, Then, And }) => {
       Given('a dataset with patterns:', (_ctx: unknown, dataTable: DataTableRow[]) => {
         const { patterns, patternData } = createPatternsFromTable(dataTable);
-        state!.dataset = createTestMasterDataset({ patterns });
+        state!.dataset = createTestPatternGraph({ patterns });
         state!.patternData = patternData;
       });
 
@@ -412,7 +412,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       ({ Given, When, Then, And }) => {
         Given('a dataset with patterns:', (_ctx: unknown, dataTable: DataTableRow[]) => {
           const { patterns, patternData } = createPatternsFromTable(dataTable);
-          state!.dataset = createTestMasterDataset({ patterns });
+          state!.dataset = createTestPatternGraph({ patterns });
           state!.patternData = patternData;
         });
 
@@ -464,7 +464,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario('All patterns in backlog when none have phases', ({ Given, When, Then, And }) => {
       Given('a dataset with patterns:', (_ctx: unknown, dataTable: DataTableRow[]) => {
         const { patterns, patternData } = createPatternsFromTable(dataTable);
-        state!.dataset = createTestMasterDataset({ patterns });
+        state!.dataset = createTestPatternGraph({ patterns });
         state!.patternData = patternData;
       });
 
@@ -503,7 +503,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       ({ Given, When, Then, And }) => {
         Given('a dataset with patterns:', (_ctx: unknown, dataTable: DataTableRow[]) => {
           const { patterns, patternData } = createPatternsFromTable(dataTable);
-          state!.dataset = createTestMasterDataset({ patterns });
+          state!.dataset = createTestPatternGraph({ patterns });
           state!.patternData = patternData;
         });
 
@@ -545,7 +545,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario('Mixed patterns with and without patternName', ({ Given, When, Then, And }) => {
       Given('a dataset with patterns:', (_ctx: unknown, dataTable: DataTableRow[]) => {
         const { patterns, patternData } = createPatternsFromTable(dataTable);
-        state!.dataset = createTestMasterDataset({ patterns });
+        state!.dataset = createTestPatternGraph({ patterns });
         state!.patternData = patternData;
       });
 
@@ -602,7 +602,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario('Multiple phases shown in order', ({ Given, When, Then, And }) => {
       Given('a dataset with patterns:', (_ctx: unknown, dataTable: DataTableRow[]) => {
         const { patterns, patternData } = createPatternsFromTable(dataTable);
-        state!.dataset = createTestMasterDataset({ patterns });
+        state!.dataset = createTestPatternGraph({ patterns });
         state!.patternData = patternData;
       });
 
@@ -641,7 +641,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario('Completed phases not shown in remaining work', ({ Given, When, Then, And }) => {
       Given('a dataset with patterns:', (_ctx: unknown, dataTable: DataTableRow[]) => {
         const { patterns, patternData } = createPatternsFromTable(dataTable);
-        state!.dataset = createTestMasterDataset({ patterns });
+        state!.dataset = createTestPatternGraph({ patterns });
         state!.patternData = patternData;
       });
 

@@ -26,7 +26,7 @@
  *
  * **Rationale (DD-4):** A glossary entry for "Delivery Workflow FSM" needs a
  * reader-friendly 2-sentence explanation plus an ASCII state diagram. Pattern
- * descriptions are structured for MasterDataset consumers (codecs, API queries),
+ * descriptions are structured for PatternGraph consumers (codecs, API queries),
  * not for human onboarding. Attempting to derive glossary content from pattern
  * metadata would produce entries like "FSM enforcement, pre-commit hooks" —
  * accurate but unhelpful for someone encountering the concept for the first
@@ -158,7 +158,7 @@ export const READING_ORDER_SECTIONS: readonly SectionBlock[] = [
   {
     type: 'paragraph' as const,
     text: [
-      '4. **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** -- Four-stage pipeline, codecs, MasterDataset',
+      '4. **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** -- Four-stage pipeline, codecs, PatternGraph',
       '5. **[PROCESS-API.md](docs/PROCESS-API.md)** -- Data API CLI query interface',
       '6. **[SESSION-GUIDES.md](docs/SESSION-GUIDES.md)** -- Planning/Design/Implementation workflows',
       '7. **[GHERKIN-PATTERNS.md](docs/GHERKIN-PATTERNS.md)** -- Writing effective Gherkin specs',
@@ -233,11 +233,11 @@ export const KEY_CONCEPTS_SECTIONS: readonly SectionBlock[] = [
     text: [
       '**Delivery Process** -- A code-first documentation and workflow toolkit. Extracts patterns from annotated TypeScript and Gherkin sources, generates markdown documentation, and validates delivery workflow via pre-commit hooks.',
       '',
-      '**Pattern** -- An annotated unit of work tracked by the delivery process. Each pattern has a status (roadmap, active, completed, deferred), belongs to a product area, and has deliverables. Patterns are the atomic unit of the MasterDataset.',
+      '**Pattern** -- An annotated unit of work tracked by the delivery process. Each pattern has a status (roadmap, active, completed, deferred), belongs to a product area, and has deliverables. Patterns are the atomic unit of the PatternGraph.',
       '',
-      '**MasterDataset** -- The single read model (ADR-006) containing all extracted patterns with pre-computed views (byProductArea, byPhase, byStatus, byCategory). All codecs and the Data API consume this dataset. No consumer re-derives data from raw scanner output.',
+      '**PatternGraph** -- The single read model (ADR-006) containing all extracted patterns with pre-computed views (byProductArea, byPhase, byStatus, byCategory). All codecs and the Data API consume this dataset. No consumer re-derives data from raw scanner output.',
       '',
-      '**Codec** -- A Zod-based transformer that decodes MasterDataset into a RenderableDocument. Each codec produces a specific document type (e.g., PatternsDocumentCodec produces PATTERNS.md). Codecs are pure functions with no I/O.',
+      '**Codec** -- A Zod-based transformer that decodes PatternGraph into a RenderableDocument. Each codec produces a specific document type (e.g., PatternsDocumentCodec produces PATTERNS.md). Codecs are pure functions with no I/O.',
       '',
       '**Dual-Source Architecture** -- Feature files own planning metadata (status, phase, dependencies). TypeScript files own implementation metadata (uses, used-by, category). This split prevents ownership conflicts and enables independent annotation cadences.',
       '',
@@ -307,7 +307,7 @@ export const INDEX_DOCUMENT_ENTRIES: readonly DocumentEntry[] = [
   {
     title: 'Architecture',
     path: 'docs/ARCHITECTURE.md',
-    description: 'Four-stage pipeline, codecs, MasterDataset, schemas',
+    description: 'Four-stage pipeline, codecs, PatternGraph, schemas',
     audience: 'Developers',
     topic: 'Architecture',
   },

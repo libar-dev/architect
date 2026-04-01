@@ -2,15 +2,15 @@
  * @architect
  * @architect-status roadmap
  * @architect-implements DataAPIDesignSessionSupport
- * @architect-uses ProcessStateAPI, MasterDataset, ContextFormatterImpl
+ * @architect-uses PatternGraphAPI, PatternGraph, ContextFormatterImpl
  * @architect-used-by ProcessAPICLIImpl
  * @architect-target src/api/handoff-generator.ts
  * @architect-since DS-E
  *
  * ## HandoffGenerator — Session-End State Summary
  *
- * Pure function that assembles a handoff document from ProcessStateAPI
- * and MasterDataset. Captures everything the next session needs to
+ * Pure function that assembles a handoff document from PatternGraphAPI
+ * and PatternGraph. Captures everything the next session needs to
  * continue work without context loss.
  *
  * ### Algorithm
@@ -115,8 +115,8 @@ export interface HandoffDocument {
  * Assembles completed/in-progress deliverables, discovered items,
  * blockers, and next priorities into a structured document.
  *
- * @param api - ProcessStateAPI for pattern/deliverable/dependency queries
- * @param dataset - MasterDataset (unused currently, reserved for future)
+ * @param api - PatternGraphAPI for pattern/deliverable/dependency queries
+ * @param dataset - PatternGraph (unused currently, reserved for future)
  * @param options - Pattern name, optional session type override, optional git files
  * @returns Assembled handoff document
  */

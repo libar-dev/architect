@@ -8,14 +8,14 @@
  * @architect-arch-context generator
  * @architect-arch-layer application
  * @architect-include pipeline-stages
- * @architect-uses MasterDataset, ExtractedPattern
+ * @architect-uses PatternGraph, ExtractedPattern
  * @architect-product-area:Generation
  *
  * ## SequenceTransformUtils - Sequence Index Builder
  *
  * Builds pre-computed SequenceIndexEntry objects from patterns that have
  * sequence diagram annotations. Used during the single-pass transform to
- * populate MasterDataset.sequenceIndex.
+ * populate PatternGraph.sequenceIndex.
  *
  * ### Layer Boundary
  *
@@ -26,7 +26,7 @@
  */
 
 import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
-import type { SequenceStep, SequenceIndexEntry } from '../../validation-schemas/master-dataset.js';
+import type { SequenceStep, SequenceIndexEntry } from '../../validation-schemas/pattern-graph.js';
 
 // =============================================================================
 // Tag Parsing (simple string split — no dependency on extractPatternTags)

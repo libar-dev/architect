@@ -15,7 +15,7 @@ Context engineering platform with extraction pipeline and typed codecs. Extracts
 **Key Capabilities:**
 
 - Pattern extraction from TypeScript JSDoc and Gherkin tags
-- MasterDataset transformation with pre-computed views (O(1) access)
+- PatternGraph transformation with pre-computed views (O(1) access)
 - Codec-based markdown generation with progressive disclosure
 - FSM-enforced delivery workflow validation via pre-commit hooks
 
@@ -139,7 +139,7 @@ See the **Context Gathering Protocol** section above for mandatory session start
 
 ### MCP Server — Native AI Context Tools
 
-When the MCP server is running, **use `architect_*` tools instead of CLI commands** (`pnpm architect:query --`). The MCP server keeps the MasterDataset in memory — tool calls dispatch in sub-milliseconds vs 2-5 seconds for CLI subprocess invocations. All 25 tools wrap the same ProcessStateAPI methods available via CLI.
+When the MCP server is running, **use `architect_*` tools instead of CLI commands** (`pnpm architect:query --`). The MCP server keeps the PatternGraph in memory — tool calls dispatch in sub-milliseconds vs 2-5 seconds for CLI subprocess invocations. All 25 tools wrap the same PatternGraphAPI methods available via CLI.
 
 #### Session Start (MCP Protocol)
 
@@ -269,13 +269,13 @@ The `--watch` flag enables auto-rebuild when `.ts` or `.feature` files change (5
 
 ```
 CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
-         (files)   (patterns)   (MasterDataset)  (Markdown)
+         (files)   (patterns)   (PatternGraph)  (Markdown)
 ```
 
 1. **Scanner** (`src/scanner/`): File discovery, AST parsing, opt-in detection via `@architect` marker
 2. **Extractor** (`src/extractor/`): Pattern extraction from TypeScript JSDoc and Gherkin tags
-3. **Transformer** (`src/generators/pipeline/`): Builds MasterDataset with pre-computed views
-4. **Codec** (`src/renderable/`): Zod 4 codecs transform MasterDataset → RenderableDocument → Markdown
+3. **Transformer** (`src/generators/pipeline/`): Builds PatternGraph with pre-computed views
+4. **Codec** (`src/renderable/`): Zod 4 codecs transform PatternGraph → RenderableDocument → Markdown
 
 ### Key Design Patterns
 
@@ -283,8 +283,8 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 - **Schema-First**: Zod schemas in `src/validation-schemas/` define types with runtime validation
 - **Registry Pattern**: Tag registry (`src/taxonomy/`) defines categories, status values, and tag formats
 - **Codec-Based Rendering**: Generators in `src/generators/` use codecs to transform data to markdown
-- **Pipeline Factory**: Shared `buildMasterDataset()` in `src/generators/pipeline/build-pipeline.ts` — all consumers (orchestrator, process-api, validate-patterns) call this instead of wiring inline pipelines. Per-consumer behavior via `PipelineOptions`.
-- **Single Read Model** (ADR-006): MasterDataset is the sole read model. No consumer re-derives data from raw scanner/extractor output. Anti-patterns: Parallel Pipeline, Lossy Local Type, Re-derived Relationship.
+- **Pipeline Factory**: Shared `buildPatternGraph()` in `src/generators/pipeline/build-pipeline.ts` — all consumers (orchestrator, process-api, validate-patterns) call this instead of wiring inline pipelines. Per-consumer behavior via `PipelineOptions`.
+- **Single Read Model** (ADR-006): PatternGraph is the sole read model. No consumer re-derives data from raw scanner/extractor output. Anti-patterns: Parallel Pipeline, Lossy Local Type, Re-derived Relationship.
 
 **Live module inventory:** `pnpm architect:query -- arch context` and `pnpm architect:query -- arch layer`
 
@@ -292,14 +292,14 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 
 Architecture and process decisions are recorded as annotated Gherkin specs in `architect/decisions/`:
 
-| Spec    | Key Decision                                                               |
-| ------- | -------------------------------------------------------------------------- |
-| ADR-001 | Taxonomy canonical values — tag registry is the single source of truth     |
-| ADR-002 | Gherkin-only testing — no `.test.ts` files, all tests are `.feature`       |
-| ADR-003 | Source-first pattern architecture — code drives docs, not the reverse      |
-| ADR-005 | Codec-based markdown rendering — Zod codecs transform data to markdown     |
-| ADR-006 | Single read model — MasterDataset is the sole read model for all consumers |
-| PDR-001 | Session workflow commands — Process Data API CLI design decisions          |
+| Spec    | Key Decision                                                              |
+| ------- | ------------------------------------------------------------------------- |
+| ADR-001 | Taxonomy canonical values — tag registry is the single source of truth    |
+| ADR-002 | Gherkin-only testing — no `.test.ts` files, all tests are `.feature`      |
+| ADR-003 | Source-first pattern architecture — code drives docs, not the reverse     |
+| ADR-005 | Codec-based markdown rendering — Zod codecs transform data to markdown    |
+| ADR-006 | Single read model — PatternGraph is the sole read model for all consumers |
+| PDR-001 | Session workflow commands — Process Data API CLI design decisions         |
 
 Query decisions: `pnpm architect:query -- decisions <pattern>`
 
@@ -522,9 +522,9 @@ The project has strict linting rules. Save time by coding defensively.
 ```typescript
 // debug-codec.ts
 import { RemainingWorkCodec } from './src/renderable/codecs/session.js';
-import { createTestMasterDataset } from './tests/fixtures/dataset-factories.js';
+import { createTestPatternGraph } from './tests/fixtures/dataset-factories.js';
 
-const dataset = createTestMasterDataset({ ... });
+const dataset = createTestPatternGraph({ ... });
 const doc = RemainingWorkCodec.decode(dataset);
 console.log(JSON.stringify(doc.sections, null, 2));
 ```

@@ -34,7 +34,7 @@ Feature: Reference Codec - Diagram Type Rendering
     @acceptance-criteria @happy-path
     Scenario: Default diagramType produces flowchart
       Given a reference config with diagramScopes archContext "orders"
-      And a MasterDataset with arch-annotated patterns in context "orders"
+      And a PatternGraph with arch-annotated patterns in context "orders"
       When decoding at detail level "detailed"
       Then the document contains a mermaid block
       And the mermaid content starts with "graph"
@@ -42,7 +42,7 @@ Feature: Reference Codec - Diagram Type Rendering
     @acceptance-criteria @happy-path
     Scenario: Sequence diagram renders participant-message format
       Given a reference config with diagramScopes archContext "orders" and diagramType "sequenceDiagram"
-      And a MasterDataset with patterns in context "orders" with uses relationships
+      And a PatternGraph with patterns in context "orders" with uses relationships
       When decoding at detail level "detailed"
       Then the document contains a mermaid block
       And the mermaid content starts with "sequenceDiagram"
@@ -52,7 +52,7 @@ Feature: Reference Codec - Diagram Type Rendering
     @acceptance-criteria @happy-path
     Scenario: State diagram renders state transitions
       Given a reference config with diagramScopes archContext "workflow" and diagramType "stateDiagram-v2"
-      And a MasterDataset with patterns in context "workflow" with dependsOn relationships
+      And a PatternGraph with patterns in context "workflow" with dependsOn relationships
       When decoding at detail level "detailed"
       Then the document contains a mermaid block
       And the mermaid content starts with "stateDiagram-v2"
@@ -61,14 +61,14 @@ Feature: Reference Codec - Diagram Type Rendering
     @acceptance-criteria @edge-case
     Scenario: Sequence diagram includes neighbor patterns as participants
       Given a reference config with diagramScopes archContext "orders" and diagramType "sequenceDiagram"
-      And a MasterDataset with an orders pattern that uses an external pattern
+      And a PatternGraph with an orders pattern that uses an external pattern
       When decoding at detail level "detailed"
       Then the mermaid content contains participant declarations for both scope and neighbor patterns
 
     @acceptance-criteria @edge-case
     Scenario: State diagram adds start and end pseudo-states
       Given a reference config with diagramScopes archContext "workflow" and diagramType "stateDiagram-v2"
-      And a MasterDataset with a linear dependsOn chain of workflow patterns
+      And a PatternGraph with a linear dependsOn chain of workflow patterns
       When decoding at detail level "detailed"
       Then the mermaid content contains a start pseudo-state transition
       And the mermaid content contains an end pseudo-state transition
@@ -76,7 +76,7 @@ Feature: Reference Codec - Diagram Type Rendering
     @acceptance-criteria @happy-path
     Scenario: C4 diagram renders system boundary format
       Given a reference config with diagramScopes archContext "orders" and diagramType "C4Context"
-      And a MasterDataset with patterns in context "orders" with uses relationships
+      And a PatternGraph with patterns in context "orders" with uses relationships
       When decoding at detail level "detailed"
       Then the mermaid content starts with "C4Context"
       And the mermaid content contains a Boundary block for "orders"
@@ -86,14 +86,14 @@ Feature: Reference Codec - Diagram Type Rendering
     @acceptance-criteria @happy-path
     Scenario: C4 diagram renders neighbor patterns as external systems
       Given a reference config with diagramScopes archContext "orders" and diagramType "C4Context"
-      And a MasterDataset with an orders pattern that uses an external pattern
+      And a PatternGraph with an orders pattern that uses an external pattern
       When decoding at detail level "detailed"
       Then the mermaid content contains a System_Ext declaration
 
     @acceptance-criteria @happy-path
     Scenario: Class diagram renders class members and relationships
       Given a reference config with diagramScopes archContext "orders" and diagramType "classDiagram"
-      And a MasterDataset with patterns in context "orders" with uses relationships
+      And a PatternGraph with patterns in context "orders" with uses relationships
       When decoding at detail level "detailed"
       Then the mermaid content starts with "classDiagram"
       And the mermaid content contains class declarations with members
@@ -102,7 +102,7 @@ Feature: Reference Codec - Diagram Type Rendering
     @acceptance-criteria @happy-path
     Scenario: Class diagram renders archRole as stereotype
       Given a reference config with diagramScopes archContext "orders" and diagramType "classDiagram"
-      And a MasterDataset with a service pattern and a projection pattern in context "orders"
+      And a PatternGraph with a service pattern and a projection pattern in context "orders"
       When decoding at detail level "detailed"
       Then the mermaid content contains a service stereotype
       And the mermaid content contains a projection stereotype
@@ -126,21 +126,21 @@ Feature: Reference Codec - Diagram Type Rendering
     @acceptance-criteria @happy-path
     Scenario: Relationship edges display type labels by default
       Given a reference config with diagramScopes archContext "orders"
-      And a MasterDataset with patterns in context "orders" with uses relationships
+      And a PatternGraph with patterns in context "orders" with uses relationships
       When decoding at detail level "detailed"
       Then the mermaid content contains labeled edges with relationship type text
 
     @acceptance-criteria @happy-path
     Scenario: Edge labels can be disabled for compact diagrams
       Given a reference config with diagramScopes archContext "orders" and showEdgeLabels false
-      And a MasterDataset with patterns in context "orders" with uses relationships
+      And a PatternGraph with patterns in context "orders" with uses relationships
       When decoding at detail level "detailed"
       Then the mermaid content contains unlabeled edges
 
     @acceptance-criteria @happy-path
     Scenario: archRole controls Mermaid node shape
       Given a reference config with diagramScopes archContext "orders"
-      And a MasterDataset with a service pattern and a projection pattern in context "orders"
+      And a PatternGraph with a service pattern and a projection pattern in context "orders"
       When decoding at detail level "detailed"
       Then the service node uses rounded rectangle syntax
       And the projection node uses cylinder syntax
@@ -148,6 +148,6 @@ Feature: Reference Codec - Diagram Type Rendering
     @acceptance-criteria @edge-case
     Scenario: Pattern without archRole uses default rectangle shape
       Given a reference config with diagramScopes archContext "orders"
-      And a MasterDataset with a pattern without archRole in context "orders"
+      And a PatternGraph with a pattern without archRole in context "orders"
       When decoding at detail level "detailed"
       Then the node uses default rectangle syntax

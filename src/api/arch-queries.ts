@@ -3,7 +3,7 @@
  * @architect-pattern ArchQueriesImpl
  * @architect-status active
  * @architect-implements DataAPIArchitectureQueries
- * @architect-uses ProcessStateAPI, MasterDataset
+ * @architect-uses PatternGraphAPI, PatternGraph
  * @architect-used-by ProcessAPICLIImpl
  * @architect-arch-role service
  * @architect-arch-context api
@@ -11,17 +11,17 @@
  *
  * ## ArchQueries — Neighborhood, Comparison, Tags, Sources
  *
- * Pure functions over MasterDataset for deep architecture exploration.
+ * Pure functions over PatternGraph for deep architecture exploration.
  * No I/O — all data comes from pre-computed views.
  *
  * **When to Use:** When exploring architecture structure (neighborhoods, comparisons, tags, sources) via the Data API CLI.
  */
 
 import type {
-  MasterDataset,
+  PatternGraph,
   RelationshipEntry,
   ArchIndex,
-} from '../validation-schemas/master-dataset.js';
+} from '../validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { NeighborEntry } from './types.js';
 import { getPatternName, findPatternByName, getRelationships } from './pattern-helpers.js';
@@ -125,7 +125,7 @@ export interface SourceInventory {
 
 export function computeNeighborhood(
   name: string,
-  dataset: MasterDataset
+  dataset: PatternGraph
 ): NeighborhoodResult | undefined {
   const pattern = findPatternByName(dataset.patterns, name);
   if (pattern === undefined) return undefined;
@@ -230,7 +230,7 @@ function findIntegrationPoints(
 export function compareContexts(
   ctx1: string,
   ctx2: string,
-  dataset: MasterDataset
+  dataset: PatternGraph
 ): ContextComparison | undefined {
   const archIndex: ArchIndex | undefined = dataset.archIndex;
   if (archIndex === undefined) return undefined;
@@ -293,7 +293,7 @@ export function compareContexts(
 // aggregateTagUsage
 // ---------------------------------------------------------------------------
 
-export function aggregateTagUsage(dataset: MasterDataset): TagUsageReport {
+export function aggregateTagUsage(dataset: PatternGraph): TagUsageReport {
   const tagMap = new Map<string, Map<string, number>>();
 
   function increment(tag: string, value: string): void {
@@ -363,7 +363,7 @@ function deriveLocationPattern(files: readonly string[]): string {
   return prefix !== '' ? `${prefix}/**/*.${ext}` : `**/*.${ext}`;
 }
 
-export function buildSourceInventory(dataset: MasterDataset): SourceInventory {
+export function buildSourceInventory(dataset: PatternGraph): SourceInventory {
   const groupSets = new Map<string, Set<string>>();
 
   for (const p of dataset.patterns) {
@@ -410,7 +410,7 @@ export interface OrphanEntry {
  * A pattern is an orphan if it has no uses, usedBy, dependsOn, enables,
  * implementsPatterns, implementedBy, extendedBy, seeAlso, or extendsPattern.
  */
-export function findOrphanPatterns(dataset: MasterDataset): readonly OrphanEntry[] {
+export function findOrphanPatterns(dataset: PatternGraph): readonly OrphanEntry[] {
   const index = dataset.relationshipIndex;
   if (index === undefined) return [];
 

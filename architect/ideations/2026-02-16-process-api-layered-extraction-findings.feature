@@ -24,7 +24,7 @@ Feature: Process API Layered Extraction — Investigation Findings
     **Domain Logic** (~500+ lines): handleRules (183 lines), handleStubs
     (42 lines), handleDecisions (39 lines), handlePdr (65 lines), plus
     supporting types and helpers. These are feature consumers of the
-    MasterDataset that belong in src/api/ modules.
+    PatternGraph that belong in src/api/ modules.
 
     | Handler | Lines | Complexity | API Counterpart Exists? |
     | handleRules | 1096-1279 | High: nested Map hierarchies, parseBusinessRuleAnnotations | No — needs src/api/rules-query.ts |
@@ -52,7 +52,7 @@ Feature: Process API Layered Extraction — Investigation Findings
 
     The Process Guard (derive-state.ts) is a partial consumer. It only
     scans Gherkin files and extracts deliverables for FSM state derivation.
-    It does NOT need a full MasterDataset — its use case is lightweight
+    It does NOT need a full PatternGraph — its use case is lightweight
     state derivation from annotations, not feature consumption.
 
     **Design question for the pipeline factory:** Should derive-state.ts
@@ -82,7 +82,7 @@ Feature: Process API Layered Extraction — Investigation Findings
     should be:
 
     | Input | Type | Source |
-    | dataset | RuntimeMasterDataset | Pipeline output |
+    | dataset | RuntimePatternGraph | Pipeline output |
     | filters | RulesFilters | Parsed from subArgs |
     | modifiers | OutputModifiers | --count, --names-only |
 
@@ -100,11 +100,11 @@ Feature: Process API Layered Extraction — Investigation Findings
     | Pattern merging | mergePatterns() | mergePatterns() |
     | Hierarchy | computeHierarchyChildren() | computeHierarchyChildren() |
     | Workflow | loadDefaultWorkflow() | loadDefaultWorkflow() or loadWorkflowFromPath() |
-    | Transform | transformToMasterDataset() | transformToMasterDatasetWithValidation() |
+    | Transform | transformToPatternGraph() | transformToPatternGraphWithValidation() |
 
     The pipeline factory must accommodate both: orchestrator needs the
-    basic MasterDataset, process-api needs the validation summary too.
-    transformToMasterDatasetWithValidation returns both — the factory
+    basic PatternGraph, process-api needs the validation summary too.
+    transformToPatternGraphWithValidation returns both — the factory
     should return TransformResult and let callers destructure what they need.
 
   Rule: Suggestions for deeper analysis in a dedicated design session
@@ -142,7 +142,7 @@ Feature: Process API Layered Extraction — Investigation Findings
 
     **5. Test strategy**
     The extracted API modules (rules-query.ts, etc.) become independently
-    testable with mock MasterDataset inputs. This is a major testability
+    testable with mock PatternGraph inputs. This is a major testability
     improvement. The design session should define the test approach:
     Gherkin feature files (consistent with project policy) using factory
-    helpers to build test MasterDataset instances.
+    helpers to build test PatternGraph instances.

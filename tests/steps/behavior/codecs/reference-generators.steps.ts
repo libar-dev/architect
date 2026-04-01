@@ -4,7 +4,7 @@
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
-import type { MasterDataset } from '../../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../../src/validation-schemas/pattern-graph.js';
 import type { ExtractedShape } from '../../../../src/validation-schemas/extracted-shape.js';
 import type { GeneratorOutput, GeneratorContext } from '../../../../src/generators/types.js';
 import { GeneratorRegistry } from '../../../../src/generators/registry.js';
@@ -14,7 +14,7 @@ import {
 } from '../../../../src/generators/built-in/reference-generators.js';
 import type { ReferenceDocConfig } from '../../../../src/renderable/codecs/reference.js';
 import { createTestPattern, resetPatternCounter } from '../../../fixtures/pattern-factories.js';
-import { createTestMasterDataset } from '../../../fixtures/dataset-factories.js';
+import { createTestPatternGraph } from '../../../fixtures/dataset-factories.js';
 import { buildRegistry } from '../../../../src/taxonomy/registry-builder.js';
 
 // ============================================================================
@@ -30,12 +30,12 @@ const TEST_CONFIGS: readonly ReferenceDocConfig[] = [
   {
     title: 'Architecture Types Reference',
     conventionTags: ['pipeline-architecture'],
-    shapeSelectors: [{ group: 'master-dataset' }],
+    shapeSelectors: [{ group: 'pattern-graph' }],
     behaviorCategories: [],
     claudeMdSection: 'architecture',
     docsFilename: 'ARCHITECTURE-TYPES.md',
     claudeMdFilename: 'architecture-types.md',
-    diagramScopes: [{ title: 'MasterDataset View Fan-out', source: 'master-dataset-views' }],
+    diagramScopes: [{ title: 'PatternGraph View Fan-out', source: 'pattern-graph-views' }],
   },
   {
     title: 'Reference Generation Sample',
@@ -55,7 +55,7 @@ const TEST_CONFIGS: readonly ReferenceDocConfig[] = [
 
 interface ReferenceGeneratorState {
   registry: GeneratorRegistry;
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   output: GeneratorOutput | null;
 }
 
@@ -70,12 +70,12 @@ let state: ReferenceGeneratorState | null = null;
 // Helpers
 // ============================================================================
 
-function makeMinimalContext(dataset: MasterDataset): GeneratorContext {
+function makeMinimalContext(dataset: PatternGraph): GeneratorContext {
   return {
     baseDir: '/tmp/test',
     outputDir: '/tmp/test/output',
     registry: buildRegistry(),
-    masterDataset: dataset as GeneratorContext['masterDataset'],
+    patternGraph: dataset as GeneratorContext['patternGraph'],
   };
 }
 
@@ -206,9 +206,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Product area generator with matching data produces non-empty output',
       ({ Given, When, Then, And }) => {
         Given(
-          'a MasterDataset with a pattern in product area {string}',
+          'a PatternGraph with a pattern in product area {string}',
           (_ctx: unknown, area: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'TestAnnotationPattern',
@@ -252,8 +252,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario(
       'Product area generator with no patterns still produces intro',
       ({ Given, When, Then, And }) => {
-        Given('an empty MasterDataset', () => {
-          state!.dataset = createTestMasterDataset({ patterns: [] });
+        Given('an empty PatternGraph', () => {
+          state!.dataset = createTestPatternGraph({ patterns: [] });
         });
 
         When('running the {string} generator', async (_ctx: unknown, generatorName: string) => {
@@ -278,9 +278,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'ARCHITECTURE-TYPES generator produces shapes and convention content',
       ({ Given, When, Then, And }) => {
         Given(
-          'a MasterDataset with pipeline architecture conventions and master dataset shapes',
+          'a PatternGraph with pipeline architecture conventions and master dataset shapes',
           () => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'Documentation Generation Orchestrator',
@@ -295,11 +295,11 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 Codec decode and file write happen after shared dataset build.`,
                 }),
                 createTestPattern({
-                  name: 'MasterDataset',
+                  name: 'PatternGraph',
                   category: 'core',
                   extractedShapes: [
-                    createShape('MasterDatasetSchema', 'master-dataset'),
-                    createShape('PipelineOptions', 'master-dataset'),
+                    createShape('PatternGraphSchema', 'pattern-graph'),
+                    createShape('PipelineOptions', 'pattern-graph'),
                   ],
                 }),
               ],

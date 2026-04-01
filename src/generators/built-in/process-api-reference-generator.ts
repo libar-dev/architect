@@ -10,7 +10,7 @@
  * ## Standalone Generator for Process API CLI Reference
  *
  * Generates `PROCESS-API-REFERENCE.md` from the declarative CLI schema.
- * Does NOT consume MasterDataset (ADR-006 compliant — CLI schema is static
+ * Does NOT consume PatternGraph (ADR-006 compliant — CLI schema is static
  * TypeScript, not annotation-derived data).
  */
 

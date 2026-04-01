@@ -55,7 +55,7 @@ sequenceDiagram
         mcp_server->>mcp_server: exit(1)
     end
 
-    Note over mcp_server: Rule 3 — The pipeline runs exactly once during server initialization. All subsequent tool calls read from in-memory MasterDataset. A manual rebuild can be triggered via a &quot;architect_rebuild&quot; tool, and overlapping rebuild requests coalesce so the final in-memory session reflects the newest completed build.
+    Note over mcp_server: Rule 3 — The pipeline runs exactly once during server initialization. All subsequent tool calls read from in-memory PatternGraph. A manual rebuild can be triggered via a &quot;architect_rebuild&quot; tool, and overlapping rebuild requests coalesce so the final in-memory session reflects the newest completed build.
 
     mcp_server->>+pipeline_session: ToolCallRequest
     pipeline_session-->>-mcp_server: ToolCallResult

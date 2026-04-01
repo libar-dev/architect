@@ -664,6 +664,88 @@ _Validates the output pipeline transforms: summarization, modifiers,_
 
 _output-pipeline.feature_
 
+### Pattern Graph API
+
+_- Markdown generation is not ideal for programmatic access_
+
+---
+
+#### Status queries return correct patterns
+
+> **Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
+>
+> **Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
+
+**Verified by:**
+
+- Get patterns by normalized status
+- Get patterns by FSM status
+- Get current work returns active patterns
+- Get roadmap items returns roadmap and deferred
+- Get status counts
+- Get completion percentage
+
+---
+
+#### Phase queries return correct phase data
+
+> **Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
+>
+> **Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
+
+**Verified by:**
+
+- Get patterns by phase
+- Get phase progress
+- Get nonexistent phase returns undefined
+- Get active phases
+
+---
+
+#### FSM queries expose transition validation
+
+> **Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
+>
+> **Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
+
+**Verified by:**
+
+- Check valid transition
+- Check invalid transition
+- Get valid transitions from status
+- Get protection info
+
+---
+
+#### Pattern queries find and retrieve pattern data
+
+> **Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
+>
+> **Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
+
+**Verified by:**
+
+- Find pattern by name (case insensitive)
+- Find nonexistent pattern returns undefined
+- Get patterns by category
+- Get all categories with counts
+
+---
+
+#### Timeline queries group patterns by time
+
+> **Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
+>
+> **Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
+
+**Verified by:**
+
+- Get patterns by quarter
+- Get all quarters
+- Get recently completed sorted by date
+
+_pattern-graph-api.feature_
+
 ### Pattern Summarize Tests
 
 _Validates that summarizePattern() projects ExtractedPattern (~3.5KB) to_
@@ -699,13 +781,13 @@ _summarize.feature_
 
 ### Process Api Cli Cache
 
-_MasterDataset caching between CLI invocations: cache hits, mtime invalidation, and --no-cache bypass._
+_PatternGraph caching between CLI invocations: cache hits, mtime invalidation, and --no-cache bypass._
 
 ---
 
-#### MasterDataset is cached between invocations
+#### PatternGraph is cached between invocations
 
-> **Invariant:** When source files have not changed between CLI invocations, the second invocation must use the cached MasterDataset and report cache.hit as true alongside pipeline timing metadata.
+> **Invariant:** When source files have not changed between CLI invocations, the second invocation must use the cached PatternGraph and report cache.hit as true alongside pipeline timing metadata.
 >
 > **Rationale:** The pipeline rebuild costs 2-5 seconds per invocation. Caching eliminates this cost for repeated queries against unchanged sources, which is the common case during interactive AI sessions.
 
@@ -753,7 +835,7 @@ _Core CLI infrastructure: help, version, input validation, status, query, patter
 
 #### CLI status subcommand shows delivery state
 
-> **Invariant:** The status subcommand must return structured JSON containing delivery progress derived from the MasterDataset.
+> **Invariant:** The status subcommand must return structured JSON containing delivery progress derived from the PatternGraph.
 >
 > **Rationale:** Consumers depend on machine-readable status output for scripting and CI integration; unstructured output breaks downstream automation.
 
@@ -792,7 +874,7 @@ _Core CLI infrastructure: help, version, input validation, status, query, patter
 
 #### CLI arch subcommand queries architecture
 
-> **Invariant:** The arch subcommand must expose role, bounded context, and layer queries over the MasterDataset's architecture metadata.
+> **Invariant:** The arch subcommand must expose role, bounded context, and layer queries over the PatternGraph's architecture metadata.
 >
 > **Rationale:** Architecture queries replace manual exploration of annotated sources; missing or incorrect results lead to wrong structural assumptions during design sessions.
 
@@ -1101,88 +1183,6 @@ _Verifies that the declarative CLI schema drives reference table generation_
 - Help text includes schema-defined options
 
 _process-api-reference.feature_
-
-### Process State API
-
-_- Markdown generation is not ideal for programmatic access_
-
----
-
-#### Status queries return correct patterns
-
-> **Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
->
-> **Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
-
-**Verified by:**
-
-- Get patterns by normalized status
-- Get patterns by FSM status
-- Get current work returns active patterns
-- Get roadmap items returns roadmap and deferred
-- Get status counts
-- Get completion percentage
-
----
-
-#### Phase queries return correct phase data
-
-> **Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
->
-> **Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
-
-**Verified by:**
-
-- Get patterns by phase
-- Get phase progress
-- Get nonexistent phase returns undefined
-- Get active phases
-
----
-
-#### FSM queries expose transition validation
-
-> **Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
->
-> **Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
-
-**Verified by:**
-
-- Check valid transition
-- Check invalid transition
-- Get valid transitions from status
-- Get protection info
-
----
-
-#### Pattern queries find and retrieve pattern data
-
-> **Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
->
-> **Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
-
-**Verified by:**
-
-- Find pattern by name (case insensitive)
-- Find nonexistent pattern returns undefined
-- Get patterns by category
-- Get all categories with counts
-
----
-
-#### Timeline queries group patterns by time
-
-> **Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
->
-> **Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
-
-**Verified by:**
-
-- Get patterns by quarter
-- Get all quarters
-- Get recently completed sorted by date
-
-_process-state-api.feature_
 
 ### Scope Validator Tests
 

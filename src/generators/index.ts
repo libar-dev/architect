@@ -6,7 +6,7 @@
  * @architect-pattern Generators Module
  *
  * RDM (RenderableDocument Model) based document generation system.
- * Uses Zod 4 codecs to transform MasterDataset into RenderableDocuments.
+ * Uses Zod 4 codecs to transform PatternGraph into RenderableDocuments.
  *
  * ### When to Use
  *
@@ -55,14 +55,14 @@ export {
   type GenerationWarning,
 } from './orchestrator.js';
 
-// Pipeline - MasterDataset transformation for ProcessStateAPI usage
+// Pipeline - PatternGraph transformation for PatternGraphAPI usage
 export {
-  buildMasterDataset,
+  buildPatternGraph,
   type PipelineOptions,
   mergePatterns,
-  transformToMasterDataset,
+  transformToPatternGraph,
   type RawDataset,
-  type RuntimeMasterDataset,
+  type RuntimePatternGraph,
 } from './pipeline/index.js';
 
 // Product area and reference document config helpers (for downstream repo configs)

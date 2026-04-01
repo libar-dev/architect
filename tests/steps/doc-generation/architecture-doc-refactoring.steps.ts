@@ -328,8 +328,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     );
   });
 
-  Rule('MasterDataset shapes appear in ARCHITECTURE-TYPES reference', ({ RuleScenario }) => {
-    RuleScenario('Core MasterDataset types appear in ARCHITECTURE-TYPES', ({ When, Then }) => {
+  Rule('PatternGraph shapes appear in ARCHITECTURE-TYPES reference', ({ RuleScenario }) => {
+    RuleScenario('Core PatternGraph types appear in ARCHITECTURE-TYPES', ({ When, Then }) => {
       When('reading file {string}', (_ctx: unknown, filePath: string) => {
         const fullPath = path.join(process.cwd(), filePath);
         state!.currentFileContent = fs.readFileSync(fullPath, 'utf-8');
@@ -360,7 +360,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario(
-      'Unified Transformation section has full MasterDataset content',
+      'Unified Transformation section has full PatternGraph content',
       ({ When, Then, And }) => {
         When('reading the {string} section', (_ctx: unknown, section: string) => {
           state!.currentSectionName = section;

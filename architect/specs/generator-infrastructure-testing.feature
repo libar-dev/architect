@@ -146,8 +146,8 @@ Feature: Generator Infrastructure Testing
   Rule: CodecBasedGenerator adapts codecs to generator interface
 
     **Invariant:** Generator delegates to underlying codec for transformation.
-    Missing MasterDataset produces descriptive error.
-    **Rationale:** If the adapter silently proceeds without a MasterDataset, codecs
+    Missing PatternGraph produces descriptive error.
+    **Rationale:** If the adapter silently proceeds without a PatternGraph, codecs
     receive undefined input and produce corrupt or empty documents.
 
     **API:** See `src/generators/codec-based.ts`
@@ -157,15 +157,15 @@ Feature: Generator Infrastructure Testing
     @acceptance-criteria @happy-path
     Scenario: Generator delegates to codec
       Given CodecBasedGenerator wrapping PatternsDocumentCodec
-      And context with MasterDataset
+      And context with PatternGraph
       When generator.generate() is called
       Then codec.decode() is invoked with dataset
       And RenderableDocument is returned
 
     @acceptance-criteria @validation
-    Scenario: Missing MasterDataset returns error
+    Scenario: Missing PatternGraph returns error
       Given CodecBasedGenerator for patterns
-      And context WITHOUT MasterDataset
+      And context WITHOUT PatternGraph
       When generator.generate() is called
       Then error file is returned
       And error message indicates missing dataset
@@ -173,7 +173,7 @@ Feature: Generator Infrastructure Testing
     @acceptance-criteria @happy-path
     Scenario: Codec options are passed through
       Given CodecBasedGenerator with codecOptions
-      And context with MasterDataset
+      And context with PatternGraph
       When generator.generate() is called
       Then codec receives codecOptions
 

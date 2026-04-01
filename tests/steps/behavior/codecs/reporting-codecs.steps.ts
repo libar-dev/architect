@@ -21,11 +21,11 @@ import {
   OverviewCodec,
 } from '../../../../src/renderable/codecs/reporting.js';
 import type { RenderableDocument, TableBlock } from '../../../../src/renderable/schema.js';
-import type { MasterDataset } from '../../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../../src/validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../../../src/validation-schemas/index.js';
 import {
-  createTestMasterDataset,
-  createMasterDatasetWithStatus,
+  createTestPatternGraph,
+  createPatternGraphWithStatus,
   createTestPattern,
   resetPatternCounter,
 } from '../../../fixtures/dataset-factories.js';
@@ -43,7 +43,7 @@ import type { DataTableRow } from '../../../support/world.js';
 // =============================================================================
 
 interface ReportingCodecState {
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   document: RenderableDocument | null;
 }
 
@@ -461,8 +461,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario(
       'Decode empty dataset produces changelog header only',
       ({ Given, When, Then, And }) => {
-        Given('an empty MasterDataset for changelog', () => {
-          state!.dataset = createTestMasterDataset();
+        Given('an empty PatternGraph for changelog', () => {
+          state!.dataset = createTestPatternGraph();
         });
 
         When('decoding with ChangelogCodec', () => {
@@ -484,8 +484,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario(
       'Unreleased section shows active and vNEXT patterns',
       ({ Given, When, Then, And }) => {
-        Given('a MasterDataset with unreleased patterns', () => {
-          state!.dataset = createTestMasterDataset({
+        Given('a PatternGraph with unreleased patterns', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: createUnreleasedPatterns(),
           });
         });
@@ -518,9 +518,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Release sections sorted by semver descending', ({ Given, When, Then }) => {
       Given(
-        'a MasterDataset with multiple releases:',
+        'a PatternGraph with multiple releases:',
         (_ctx: unknown, dataTable: DataTableRow[]) => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: createPatternsWithReleases(dataTable),
           });
         }
@@ -550,8 +550,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Quarter fallback for patterns without release', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with completed patterns without release tag', () => {
-        state!.dataset = createTestMasterDataset({
+      Given('a PatternGraph with completed patterns without release tag', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: createCompletedPatternsWithoutRelease(),
         });
       });
@@ -577,8 +577,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Earlier section for undated patterns', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with undated completed patterns', () => {
-        state!.dataset = createTestMasterDataset({
+      Given('a PatternGraph with undated completed patterns', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: createUndatedCompletedPatterns(),
         });
       });
@@ -602,9 +602,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Category mapping to change types', ({ Given, When, Then }) => {
       Given(
-        'a MasterDataset with category-mapped patterns:',
+        'a PatternGraph with category-mapped patterns:',
         (_ctx: unknown, dataTable: DataTableRow[]) => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: createCategoryMappedPatterns(dataTable),
           });
         }
@@ -624,8 +624,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Exclude unreleased when option disabled', ({ Given, When, Then }) => {
-      Given('a MasterDataset with unreleased patterns', () => {
-        state!.dataset = createTestMasterDataset({
+      Given('a PatternGraph with unreleased patterns', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: createUnreleasedPatterns(),
         });
       });
@@ -646,8 +646,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Change type sections follow standard order', ({ Given, When, Then }) => {
-      Given('a MasterDataset with mixed change types', () => {
-        state!.dataset = createTestMasterDataset({
+      Given('a PatternGraph with mixed change types', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: createMixedChangeTypePatterns(),
         });
       });
@@ -683,9 +683,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('TraceabilityCodec maps timeline patterns to behavior tests', ({ RuleScenario }) => {
     RuleScenario('No timeline patterns produces empty message', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with no timeline patterns', () => {
+      Given('a PatternGraph with no timeline patterns', () => {
         // Create patterns without phase (not timeline patterns)
-        state!.dataset = createTestMasterDataset({
+        state!.dataset = createTestPatternGraph({
           patterns: [
             createTestPattern({
               id: generatePatternId(1),
@@ -714,9 +714,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Coverage statistics show totals and percentage', ({ Given, When, Then }) => {
       Given(
-        'a MasterDataset with traceability patterns:',
+        'a PatternGraph with traceability patterns:',
         (_ctx: unknown, dataTable: DataTableRow[]) => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: createTraceabilityPatterns(dataTable),
           });
         }
@@ -741,8 +741,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Coverage gaps table shows missing coverage', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with coverage gaps', () => {
-        state!.dataset = createTestMasterDataset({
+      Given('a PatternGraph with coverage gaps', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: createCoverageGapPatterns(),
         });
       });
@@ -768,8 +768,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Covered phases in collapsible section', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with covered patterns', () => {
-        state!.dataset = createTestMasterDataset({
+      Given('a PatternGraph with covered patterns', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: createCoveredPatterns(),
         });
       });
@@ -798,8 +798,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Exclude gaps when option disabled', ({ Given, When, Then }) => {
-      Given('a MasterDataset with coverage gaps', () => {
-        state!.dataset = createTestMasterDataset({
+      Given('a PatternGraph with coverage gaps', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: createCoverageGapPatterns(),
         });
       });
@@ -821,9 +821,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Exclude stats when option disabled', ({ Given, When, Then }) => {
       Given(
-        'a MasterDataset with traceability patterns:',
+        'a PatternGraph with traceability patterns:',
         (_ctx: unknown, dataTable: DataTableRow[]) => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: createTraceabilityPatterns(dataTable),
           });
         }
@@ -845,8 +845,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Exclude covered when option disabled', ({ Given, When, Then }) => {
-      Given('a MasterDataset with covered patterns', () => {
-        state!.dataset = createTestMasterDataset({
+      Given('a PatternGraph with covered patterns', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: createCoveredPatterns(),
         });
       });
@@ -864,8 +864,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Verified behavior files indicated in output', ({ Given, When, Then }) => {
-      Given('a MasterDataset with verified behavior files', () => {
-        state!.dataset = createTestMasterDataset({
+      Given('a PatternGraph with verified behavior files', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: createVerifiedBehaviorPatterns(),
         });
       });
@@ -888,8 +888,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('OverviewCodec provides project architecture summary', ({ RuleScenario }) => {
     RuleScenario('Decode empty dataset produces minimal overview', ({ Given, When, Then, And }) => {
-      Given('an empty MasterDataset for overview', () => {
-        state!.dataset = createTestMasterDataset();
+      Given('an empty PatternGraph for overview', () => {
+        state!.dataset = createTestPatternGraph();
       });
 
       When('decoding with OverviewCodec', () => {
@@ -909,8 +909,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario(
       'Architecture section from overview-tagged patterns',
       ({ Given, When, Then, And }) => {
-        Given('a MasterDataset with overview patterns', () => {
-          state!.dataset = createTestMasterDataset({
+        Given('a PatternGraph with overview patterns', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: createOverviewPatterns(),
           });
         });
@@ -935,13 +935,13 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Patterns summary with progress bar', ({ Given, When, Then, And }) => {
       Given(
-        'a MasterDataset with status distribution for overview:',
+        'a PatternGraph with status distribution for overview:',
         (_ctx: unknown, dataTable: DataTableRow[]) => {
           const counts: Record<string, number> = {};
           for (const row of dataTable) {
             counts[row.status ?? 'completed'] = parseInt(row.count ?? '0', 10);
           }
-          state!.dataset = createMasterDatasetWithStatus(counts);
+          state!.dataset = createPatternGraphWithStatus(counts);
         }
       );
 
@@ -970,8 +970,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Timeline summary with phase counts', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with phased patterns', () => {
-        state!.dataset = createTestMasterDataset({
+      Given('a PatternGraph with phased patterns', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: createPhasedPatterns(),
         });
       });
@@ -999,8 +999,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Exclude architecture when option disabled', ({ Given, When, Then }) => {
-      Given('a MasterDataset with overview patterns', () => {
-        state!.dataset = createTestMasterDataset({
+      Given('a PatternGraph with overview patterns', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: createOverviewPatterns(),
         });
       });
@@ -1022,13 +1022,13 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Exclude patterns summary when option disabled', ({ Given, When, Then }) => {
       Given(
-        'a MasterDataset with status distribution for overview:',
+        'a PatternGraph with status distribution for overview:',
         (_ctx: unknown, dataTable: DataTableRow[]) => {
           const counts: Record<string, number> = {};
           for (const row of dataTable) {
             counts[row.status ?? 'completed'] = parseInt(row.count ?? '0', 10);
           }
-          state!.dataset = createMasterDatasetWithStatus(counts);
+          state!.dataset = createPatternGraphWithStatus(counts);
         }
       );
 
@@ -1048,8 +1048,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Exclude timeline summary when option disabled', ({ Given, When, Then }) => {
-      Given('a MasterDataset with phased patterns', () => {
-        state!.dataset = createTestMasterDataset({
+      Given('a PatternGraph with phased patterns', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: createPhasedPatterns(),
         });
       });
@@ -1073,9 +1073,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Multiple overview patterns create multiple architecture subsections',
       ({ Given, When, Then }) => {
         Given(
-          'a MasterDataset with multiple overview patterns:',
+          'a PatternGraph with multiple overview patterns:',
           (_ctx: unknown, dataTable: DataTableRow[]) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: createMultipleOverviewPatterns(dataTable),
             });
           }

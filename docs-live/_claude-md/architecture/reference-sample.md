@@ -121,7 +121,7 @@
 
 | Rule                                                              | Description                                                                                                           |
 | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Codecs implement a decode-only contract                           | **Invariant:** Every codec is a pure function that accepts a MasterDataset<br> and returns a RenderableDocument....   |
+| Codecs implement a decode-only contract                           | **Invariant:** Every codec is a pure function that accepts a PatternGraph<br> and returns a RenderableDocument....    |
 | RenderableDocument is a typed intermediate representation         | **Invariant:** RenderableDocument contains a title, an ordered array of<br> SectionBlock elements, and an optional... |
 | CompositeCodec assembles documents from child codecs              | **Invariant:** CompositeCodec accepts an array of child codecs and<br> produces a single RenderableDocument by...     |
 | ADR content comes from both Feature description and Rule prefixes | **Invariant:** ADR structured content (Context, Decision, Consequences)<br> can appear in two locations within a...   |

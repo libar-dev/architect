@@ -10,7 +10,7 @@ Feature: Stub Resolver - Design Stub Discovery and Resolution
 
   **Solution:**
   StubResolver functions identify, resolve, and group stubs from
-  the MasterDataset with filesystem existence checks.
+  the PatternGraph with filesystem existence checks.
 
   Rule: Stubs are identified by path or target metadata
 

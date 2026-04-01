@@ -5,7 +5,7 @@
  * output modifiers, arch health, and rules subcommand.
  *
  * @architect
- * @architect-implements ProcessStateAPICLI
+ * @architect-implements PatternGraphAPICLI
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -19,7 +19,7 @@ import {
   writeDanglingRefFiles,
   writeFeatureFilesWithRules,
   createTempDir,
-} from '../../support/helpers/process-api-state.js';
+} from '../../support/helpers/pattern-graph-api-state.js';
 
 // =============================================================================
 // Module-level state (reset per scenario)

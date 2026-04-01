@@ -16,9 +16,9 @@ import {
 } from '../../../src/renderable/codecs/index-codec.js';
 import type { RenderableDocument, SectionBlock } from '../../../src/renderable/schema.js';
 import { heading, paragraph } from '../../../src/renderable/schema.js';
-import { createTestMasterDataset } from '../../fixtures/dataset-factories.js';
+import { createTestPatternGraph } from '../../fixtures/dataset-factories.js';
 import { createTestPattern } from '../../fixtures/pattern-factories.js';
-import type { MasterDataset } from '../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../src/validation-schemas/pattern-graph.js';
 
 const feature = await loadFeature('tests/features/doc-generation/index-codec.feature');
 
@@ -29,7 +29,7 @@ const feature = await loadFeature('tests/features/doc-generation/index-codec.fea
 interface TestState {
   // Input
   options: Partial<IndexCodecOptions>;
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   documentEntries: DocumentEntry[];
 
   // Output
@@ -150,7 +150,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('Document metadata is correctly set', ({ RuleScenario }) => {
     RuleScenario('Document title is Documentation Index', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -163,7 +163,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Document purpose references @libar-dev/architect', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -176,7 +176,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Default options produce all sections', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -201,7 +201,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('Package metadata section renders correctly', ({ RuleScenario }) => {
     RuleScenario('Package name shows @libar-dev/architect', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -224,7 +224,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Purpose shows context engineering platform description', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -246,7 +246,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('License shows MIT', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -268,7 +268,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Pattern counts reflect dataset', ({ When, Then }) => {
       When('decoding with a dataset containing 3 completed and 2 active patterns', () => {
-        state.dataset = createTestMasterDataset({
+        state.dataset = createTestPatternGraph({
           statusDistribution: { completed: 3, active: 2 },
         });
         const codec = createIndexCodec();
@@ -296,7 +296,7 @@ describeFeature(feature, ({ Background, Rule }) => {
           createTestPattern({ name: 'PatternA', productArea: 'Generation', status: 'completed' }),
           createTestPattern({ name: 'PatternB', productArea: 'Analysis', status: 'completed' }),
         ];
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
         const codec = createIndexCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -322,7 +322,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Package metadata section can be disabled', ({ When, Then }) => {
       When('decoding with includePackageMetadata disabled', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec({ includePackageMetadata: false });
         state.document = codec.decode(state.dataset);
       });
@@ -345,7 +345,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('Document inventory groups entries by topic', ({ RuleScenario }) => {
     RuleScenario('Empty entries produces no inventory section', ({ When, Then }) => {
       When('decoding with no document entries', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec({ documentEntries: [] });
         state.document = codec.decode(state.dataset);
       });
@@ -371,7 +371,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             topic,
           },
         ];
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec({ documentEntries: state.documentEntries });
         state.document = codec.decode(state.dataset);
       });
@@ -403,7 +403,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             topic: 'Reference',
           },
         ];
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec({
           includeDocumentInventory: false,
           documentEntries: state.documentEntries,
@@ -435,7 +435,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             createTestPattern({ name: 'PatternA', productArea: area1, status: 'completed' }),
             createTestPattern({ name: 'PatternB', productArea: area2, status: 'completed' }),
           ];
-          state.dataset = createTestMasterDataset({ patterns });
+          state.dataset = createTestPatternGraph({ patterns });
           const codec = createIndexCodec();
           state.document = codec.decode(state.dataset);
         }
@@ -469,7 +469,7 @@ describeFeature(feature, ({ Background, Rule }) => {
           createTestPattern({ name: 'PatternA', productArea: 'Generation', status: 'completed' }),
           createTestPattern({ name: 'PatternB', productArea: 'Analysis', status: 'completed' }),
         ];
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
         const codec = createIndexCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -496,7 +496,7 @@ describeFeature(feature, ({ Background, Rule }) => {
           createTestPattern({ name: 'P3', productArea: 'Generation', status: 'completed' }),
           createTestPattern({ name: 'P4', productArea: 'Generation', status: 'completed' }),
         ];
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
         const codec = createIndexCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -517,7 +517,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Product area stats can be disabled', ({ When, Then }) => {
       When('decoding with includeProductAreaStats disabled', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec({ includeProductAreaStats: false });
         state.document = codec.decode(state.dataset);
       });
@@ -540,7 +540,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('Phase progress summarizes pattern status', ({ RuleScenario }) => {
     RuleScenario('Phase progress shows total counts', ({ When, Then }) => {
       When('decoding with a dataset containing 3 completed and 2 active patterns', () => {
-        state.dataset = createTestMasterDataset({
+        state.dataset = createTestPatternGraph({
           statusDistribution: { completed: 3, active: 2 },
         });
         const codec = createIndexCodec();
@@ -561,7 +561,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Status distribution table shows completed/active/planned', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -589,7 +589,7 @@ describeFeature(feature, ({ Background, Rule }) => {
           createTestPattern({ name: 'PhasePattern1', phase: 1, status: 'completed' }),
           createTestPattern({ name: 'PhasePattern2', phase: 2, status: 'active' }),
         ];
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
         const codec = createIndexCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -606,7 +606,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Phase progress can be disabled', ({ When, Then }) => {
       When('decoding with includePhaseProgress disabled', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec({ includePhaseProgress: false });
         state.document = codec.decode(state.dataset);
       });
@@ -629,7 +629,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('Regeneration footer contains commands', ({ RuleScenario }) => {
     RuleScenario('Regeneration section has heading "Regeneration"', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -643,7 +643,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Code blocks contain pnpm commands', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -673,7 +673,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       'Default layout order is metadata, stats, progress, regeneration',
       ({ When, Then }) => {
         When('decoding with default options', () => {
-          state.dataset = createTestMasterDataset();
+          state.dataset = createTestPatternGraph();
           const codec = createIndexCodec();
           state.document = codec.decode(state.dataset);
         });
@@ -712,7 +712,7 @@ describeFeature(feature, ({ Background, Rule }) => {
               topic,
             },
           ];
-          state.dataset = createTestMasterDataset();
+          state.dataset = createTestPatternGraph();
           const preambleSection = paragraph('This is the editorial preamble.');
           const codec = createIndexCodec({
             preamble: [preambleSection],
@@ -758,7 +758,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Separators appear between sections', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -781,7 +781,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('Custom purpose text overrides default', ({ RuleScenario }) => {
     RuleScenario('purposeText replaces auto-generated purpose', ({ When, Then }) => {
       When('decoding with purposeText {string}', (_ctx: unknown, purposeText: string) => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec({ purposeText });
         state.document = codec.decode(state.dataset);
       });
@@ -794,7 +794,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Empty purposeText uses auto-generated purpose', ({ When, Then }) => {
       When('decoding with empty purposeText', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec({ purposeText: '' });
         state.document = codec.decode(state.dataset);
       });
@@ -813,7 +813,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('Epilogue replaces regeneration footer', ({ RuleScenario }) => {
     RuleScenario('Epilogue replaces built-in footer', ({ When, Then, And }) => {
       When('decoding with epilogue sections', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const epilogueSections = [
           heading(2, 'Custom Footer'),
           paragraph('This is a custom footer replacing regeneration.'),
@@ -840,7 +840,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Empty epilogue preserves regeneration footer', ({ When, Then }) => {
       When('decoding with empty epilogue', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createIndexCodec({ epilogue: [] });
         state.document = codec.decode(state.dataset);
       });
@@ -862,7 +862,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       When(
         'decoding with packageMetadataOverrides name {string}',
         (_ctx: unknown, name: string) => {
-          state.dataset = createTestMasterDataset();
+          state.dataset = createTestPatternGraph();
           const codec = createIndexCodec({
             packageMetadataOverrides: { name },
           });
@@ -892,7 +892,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       When(
         'decoding with packageMetadataOverrides purpose {string}',
         (_ctx: unknown, purpose: string) => {
-          state.dataset = createTestMasterDataset();
+          state.dataset = createTestPatternGraph();
           const codec = createIndexCodec({
             packageMetadataOverrides: { purpose },
           });
@@ -919,7 +919,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       When(
         'decoding with packageMetadataOverrides license {string}',
         (_ctx: unknown, license: string) => {
-          state.dataset = createTestMasterDataset();
+          state.dataset = createTestPatternGraph();
           const codec = createIndexCodec({
             packageMetadataOverrides: { license },
           });
@@ -946,7 +946,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       When(
         'decoding with packageMetadataOverrides name {string}',
         (_ctx: unknown, name: string) => {
-          state.dataset = createTestMasterDataset();
+          state.dataset = createTestPatternGraph();
           const codec = createIndexCodec({
             packageMetadataOverrides: { name },
           });

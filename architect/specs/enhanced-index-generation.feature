@@ -20,7 +20,7 @@ Feature: Enhanced Index Generation
 
   **Solution:**
   Create an `IndexCodec` that generates a comprehensive navigation hub by composing
-  auto-generated statistics from MasterDataset pre-computed views with editorial
+  auto-generated statistics from PatternGraph pre-computed views with editorial
   navigation content via the preamble mechanism. The codec produces document listings,
   pattern counts per product area, and phase progress from `byCategory`, `byPhase`,
   `byProductArea`, and `byStatus` views. Audience reading paths, the document roles
@@ -31,14 +31,14 @@ Feature: Enhanced Index Generation
   **Why It Matters:**
   | Benefit | How |
   | Single navigation hub | Unifies manual docs/ and generated docs-live/ listings in one document |
-  | Zero-drift statistics | Pattern counts, phase progress, product area coverage regenerated from MasterDataset |
+  | Zero-drift statistics | Pattern counts, phase progress, product area coverage regenerated from PatternGraph |
   | Audience paths preserved | Editorial reading orders carried via preamble, not duplicated manually |
   | Document roles matrix | Audience-to-document mapping maintained in config, rendered in output |
   | Closes Phase 6 | Completes DocsConsolidationStrategy Phase 6 (Index navigation update, pending) |
 
   **Scope:**
   | Content Type | Auto-generatable? | Source |
-  | Product area and generated doc listing | Yes | Static documentEntries config plus MasterDataset views |
+  | Product area and generated doc listing | Yes | Static documentEntries config plus PatternGraph views |
   | Pattern statistics per area | Yes | dataset.byProductArea view |
   | Phase progress summary | Yes | dataset.byStatus plus dataset.byPhase |
   | Audience reading paths (New User, Developer, Team Lead) | No | Preamble SectionBlock[] |
@@ -49,7 +49,7 @@ Feature: Enhanced Index Generation
 
   **Design Questions (for design session):**
   | Question | Options | Recommendation |
-  | Create new IndexCodec or extend existing index generator? | (A) New IndexCodec, (B) Extend docs-live/INDEX.md generator | (A) New codec -- current generator is a simple file lister with no MasterDataset access |
+  | Create new IndexCodec or extend existing index generator? | (A) New IndexCodec, (B) Extend docs-live/INDEX.md generator | (A) New codec -- current generator is a simple file lister with no PatternGraph access |
   | How to merge manual and generated doc listings? | (A) Unified table, (B) Separate sections | (A) Unified -- users should not need to know which docs are manual vs generated |
   | Should audience paths be preamble or a new annotation type? | (A) Preamble, (B) New annotation | (A) Preamble -- reading orders are editorial judgment, not code-derivable |
   | Can key concepts be derived from pattern metadata? | (A) Yes from descriptions, (B) No, use preamble | (B) Preamble -- pattern descriptions are too granular for a glossary |
@@ -57,7 +57,7 @@ Feature: Enhanced Index Generation
 
   **Design Session Findings (2026-03-06):**
   | Finding | Impact | Resolution |
-  | DD-1: New IndexCodec registered in CodecRegistry as document type index | Enables MasterDataset access via standard codec.decode(dataset) pipeline and free integration with generateDocument, generateAllDocuments, CodecOptions | Create createIndexCodec() factory following OverviewCodec pattern, register in CodecRegistry and DOCUMENT_TYPES |
+  | DD-1: New IndexCodec registered in CodecRegistry as document type index | Enables PatternGraph access via standard codec.decode(dataset) pipeline and free integration with generateDocument, generateAllDocuments, CodecOptions | Create createIndexCodec() factory following OverviewCodec pattern, register in CodecRegistry and DOCUMENT_TYPES |
   | DD-2: Document entries configured statically, not via filesystem discovery | Codec remains pure (no I/O), deterministic, testable. Config updated alongside document changes | IndexCodecOptions.documentEntries: readonly DocumentEntry[] with title, path, description, audience, topic |
   | DD-3: Audience reading paths are full preamble SectionBlock arrays | Reading order is editorial judgment -- no annotation can express pedagogical sequencing. Most-cited navigation aid preserved | IndexCodecOptions.preamble contains READING_ORDER_SECTIONS with 3 audience profiles |
   | DD-4: Key concepts glossary uses preamble, not annotation extraction | Pattern descriptions too granular for reader-friendly glossary. Future @architect-glossary annotation could replace this | KEY_CONCEPTS_SECTIONS in preamble with 6 core concept definitions |
@@ -75,7 +75,7 @@ Feature: Enhanced Index Generation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Create IndexCodec with MasterDataset-driven statistics | complete | src/renderable/codecs/index-codec.ts | Yes | unit |
+      | Create IndexCodec with PatternGraph-driven statistics | complete | src/renderable/codecs/index-codec.ts | Yes | unit |
       | Register IndexCodec in codec registry and generator config | complete | src/renderable/generate.ts | Yes | integration |
       | Preamble content for audience paths, document roles, quick finder | complete | docs-sources/index-navigation.md | No | n/a |
       | CodecOptions entry for enhanced INDEX.md | complete | architect.config.ts | Yes | integration |
@@ -85,7 +85,7 @@ Feature: Enhanced Index Generation
   Rule: IndexCodec composes generated statistics with editorial navigation
 
     **Invariant:** The IndexCodec generates document listings and pattern statistics
-    from MasterDataset pre-computed views (`byCategory`, `byPhase`, `byProductArea`,
+    from PatternGraph pre-computed views (`byCategory`, `byPhase`, `byProductArea`,
     `byStatus`), while audience reading paths, the document roles matrix, and the
     quick finder table use the `ReferenceDocConfig.preamble` mechanism as manually
     authored `SectionBlock[]`. The codec does not hardcode document metadata -- all
@@ -94,28 +94,28 @@ Feature: Enhanced Index Generation
 
     **Rationale:** Approximately 40% of INDEX.md content (product area lists, file
     inventories, pattern statistics, phase progress) is directly derivable from
-    MasterDataset views and drifts when patterns change status or new patterns are
+    PatternGraph views and drifts when patterns change status or new patterns are
     added. The remaining 60% (audience paths, document roles, quick finder) requires
     human editorial judgment about which documents serve which readers. The preamble
     mechanism cleanly separates these two content types within a single generated
     output, as proven by CodecDrivenReferenceGeneration and DocsConsolidationStrategy
     Phase 2.
 
-    **Verified by:** Codec produces statistics from MasterDataset,
+    **Verified by:** Codec produces statistics from PatternGraph,
     Preamble editorial content appears before generated sections
 
     @acceptance-criteria @happy-path
-    Scenario: IndexCodec generates pattern statistics from MasterDataset
-      Given a MasterDataset with patterns across 7 product areas
+    Scenario: IndexCodec generates pattern statistics from PatternGraph
+      Given a PatternGraph with patterns across 7 product areas
       And patterns have statuses including roadmap, active, and completed
       When the IndexCodec generates the index document
       Then a product area statistics table shows pattern counts per area
       And a phase progress summary shows counts by status
-      And all statistics match the MasterDataset view contents
+      And all statistics match the PatternGraph view contents
 
     @acceptance-criteria @validation
     Scenario: Statistics update when patterns change status
-      Given a MasterDataset where 3 patterns moved from roadmap to completed
+      Given a PatternGraph where 3 patterns moved from roadmap to completed
       When the IndexCodec regenerates the index document
       Then the phase progress summary reflects the updated status counts
       And product area statistics reflect the new completed count
@@ -153,7 +153,7 @@ Feature: Enhanced Index Generation
     Scenario: Reading paths are not derived from pattern metadata
       Given an IndexCodec with audience paths defined in preamble
       When inspecting the codec source code
-      Then no audience path content is computed from MasterDataset
+      Then no audience path content is computed from PatternGraph
       And all reading order content originates from the preamble SectionBlock array
 
   Rule: Index unifies manual and generated doc listings
@@ -195,7 +195,7 @@ Feature: Enhanced Index Generation
   Rule: Document metadata drives auto-generated sections
 
     **Invariant:** Pattern counts per product area, phase progress summaries, and
-    product area coverage percentages are derived from MasterDataset pre-computed views
+    product area coverage percentages are derived from PatternGraph pre-computed views
     at generation time. The IndexCodec accesses `dataset.byProductArea` for area
     statistics, `dataset.byStatus` for status distribution, and `dataset.byPhase` for
     phase ordering. No statistics are hardcoded in the codec or config. When a pattern
@@ -203,18 +203,18 @@ Feature: Enhanced Index Generation
     change without any manual update.
 
     **Rationale:** The manual INDEX.md has no statistics section because maintaining
-    accurate counts manually is unsustainable across 196+ patterns. The MasterDataset
+    accurate counts manually is unsustainable across 196+ patterns. The PatternGraph
     pre-computed views provide O(1) access to grouped pattern data. Surfacing these
     statistics in the index gives readers an at-a-glance project health overview
     (how many patterns per area, what percentage are completed, which phases are
     active) that was previously only available via the Process Data API CLI.
 
-    **Verified by:** Statistics section renders from MasterDataset views,
+    **Verified by:** Statistics section renders from PatternGraph views,
     No hardcoded counts exist in codec or config
 
     @acceptance-criteria @happy-path
-    Scenario: Product area statistics render from MasterDataset
-      Given a MasterDataset with byProductArea containing 7 product areas
+    Scenario: Product area statistics render from PatternGraph
+      Given a PatternGraph with byProductArea containing 7 product areas
       And each area has between 5 and 40 patterns
       When the IndexCodec generates the auto-generated statistics section
       Then a table shows each product area with its pattern count
@@ -222,14 +222,14 @@ Feature: Enhanced Index Generation
 
     @acceptance-criteria @happy-path
     Scenario: Phase progress summary shows status distribution
-      Given a MasterDataset with byStatus containing roadmap, active, and completed patterns
+      Given a PatternGraph with byStatus containing roadmap, active, and completed patterns
       When the IndexCodec generates the phase progress section
       Then a summary shows the count of patterns in each status
       And a completion percentage is calculated from completed vs total
 
     @acceptance-criteria @validation
     Scenario: Empty product area still appears in statistics
-      Given a MasterDataset where the CoreTypes product area has zero patterns
+      Given a PatternGraph where the CoreTypes product area has zero patterns
       When the IndexCodec generates the statistics section
       Then CoreTypes appears in the table with a count of zero
       And no error occurs due to the empty area

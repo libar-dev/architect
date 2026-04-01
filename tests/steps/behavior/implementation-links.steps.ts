@@ -10,10 +10,10 @@
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import { createPatternsCodec, normalizeImplPath } from '../../../src/renderable/codecs/patterns.js';
-import { transformToMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
+import { transformToPatternGraph } from '../../../src/generators/pipeline/transform-dataset.js';
 import { createDefaultTagRegistry } from '../../../src/validation-schemas/tag-registry.js';
 import type { RenderableDocument } from '../../../src/renderable/schema.js';
-import type { RuntimeMasterDataset } from '../../../src/generators/pipeline/transform-types.js';
+import type { RuntimePatternGraph } from '../../../src/generators/pipeline/transform-types.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
 import { createTestPattern, resetPatternCounter } from '../../fixtures/pattern-factories.js';
 import type { DataTableRow } from '../../support/world.js';
@@ -23,7 +23,7 @@ import type { DataTableRow } from '../../support/world.js';
 // =============================================================================
 
 interface ImplementationLinksState {
-  dataset: RuntimeMasterDataset | null;
+  dataset: RuntimePatternGraph | null;
   document: RenderableDocument | null;
   patternDocument: RenderableDocument | null;
   filePath: string | null;
@@ -54,10 +54,10 @@ function initState(): ImplementationLinksState {
 // =============================================================================
 
 /**
- * Build the dataset from patterns using transformToMasterDataset
+ * Build the dataset from patterns using transformToPatternGraph
  */
 function buildDataset(): void {
-  state!.dataset = transformToMasterDataset({
+  state!.dataset = transformToPatternGraph({
     patterns: state!.patterns,
     tagRegistry: createDefaultTagRegistry(),
     workflow: undefined,

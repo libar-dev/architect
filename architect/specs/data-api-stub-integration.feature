@@ -78,7 +78,7 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
     Scenario: Annotated stubs are discoverable by the scanner
       Given stub files with @architect and @architect-implements tags
       When running the scanner pipeline with stubs input glob
-      Then all annotated stubs appear in the MasterDataset
+      Then all annotated stubs appear in the PatternGraph
       And each stub has an implementsPatterns relationship
 
     @acceptance-criteria @happy-path
@@ -86,13 +86,13 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
       Given a stub with "@architect-target:platform-core/src/agent/router.ts"
       When the stub is scanned and extracted
       Then the pattern's targetPath field contains "platform-core/src/agent/router.ts"
-      And the targetPath is available via ProcessStateAPI queries
+      And the targetPath is available via PatternGraphAPI queries
 
     @acceptance-criteria @validation
     Scenario: Stub without @architect opt-in is invisible to scanner
       Given a stub file without the @architect marker
       When running the scanner pipeline with stubs input glob
-      Then the stub does NOT appear in the MasterDataset
+      Then the stub does NOT appear in the PatternGraph
       And no error is raised for the missing marker
 
   # ============================================================================

@@ -2,7 +2,7 @@
  * @architect
  * @architect-status roadmap
  * @architect-implements DataAPIArchitectureQueries
- * @architect-uses Pattern Scanner, MasterDataset
+ * @architect-uses Pattern Scanner, PatternGraph
  * @architect-used-by ProcessAPICLIImpl
  * @architect-target src/api/coverage-analyzer.ts
  * @architect-since DS-D
@@ -10,7 +10,7 @@
  * ## CoverageAnalyzer — Annotation Coverage and Taxonomy Gap Detection
  *
  * Reports annotation completeness by comparing scannable files (from glob)
- * against annotated patterns in MasterDataset. Also detects unused taxonomy
+ * against annotated patterns in PatternGraph. Also detects unused taxonomy
  * values defined in TagRegistry but never applied.
  *
  * ### Coverage Data Access Strategy (DS-D-1)
@@ -92,7 +92,7 @@ export interface CoverageReport {
  *
  * Async because findFilesToScan() uses glob (filesystem I/O).
  *
- * @param dataset - MasterDataset with extracted patterns
+ * @param dataset - PatternGraph with extracted patterns
  * @param inputGlobs - CLI --input glob patterns
  * @param baseDir - Base directory for file discovery
  * @param registry - TagRegistry for unused taxonomy detection
@@ -139,7 +139,7 @@ export async function findUnannotatedFiles(
  * 4. Collect all statuses used: similarly
  * 5. Diff against registry definitions
  *
- * @param dataset - MasterDataset with patterns
+ * @param dataset - PatternGraph with patterns
  * @param registry - TagRegistry with definitions
  * @returns Report of unused taxonomy values
  */

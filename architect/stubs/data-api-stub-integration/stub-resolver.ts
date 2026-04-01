@@ -2,14 +2,14 @@
  * @architect
  * @architect-status roadmap
  * @architect-implements DataAPIStubIntegration
- * @architect-uses ProcessStateAPI
+ * @architect-uses PatternGraphAPI
  * @architect-used-by ProcessAPICLIImpl
  * @architect-target src/api/stub-resolver.ts
  * @architect-since DS-B
  *
  * ## StubResolver — Design Stub Discovery and Resolution
  *
- * Identifies design session stubs in the MasterDataset and resolves them
+ * Identifies design session stubs in the PatternGraph and resolves them
  * against the filesystem to determine implementation status.
  *
  * Stub identification heuristic:
@@ -66,13 +66,13 @@ export interface StubSummary {
 // ---------------------------------------------------------------------------
 
 /**
- * Identify stub patterns from the MasterDataset.
+ * Identify stub patterns from the PatternGraph.
  *
  * A pattern is a stub if:
  * 1. Its source file path contains '/stubs/' (lives in stubs directory), OR
  * 2. It has a `targetPath` field (from @architect-target tag)
  *
- * @param dataset - MasterDataset with all patterns
+ * @param dataset - PatternGraph with all patterns
  * @returns Array of patterns identified as stubs
  */
 export function findStubPatterns(_dataset: unknown): readonly unknown[] {
@@ -138,7 +138,7 @@ export function extractDecisionItems(
  * Scans pattern descriptions, ADR fields, and seeAlso references
  * for `PDR-{number}` occurrences.
  *
- * @param patterns - All patterns from MasterDataset
+ * @param patterns - All patterns from PatternGraph
  * @param pdrNumber - PDR number to search for (e.g., "012")
  * @returns Patterns referencing this PDR
  */

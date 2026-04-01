@@ -7,7 +7,7 @@ Feature: Design Review Generation Pipeline
 
   Tests the full design review generation pipeline: sequence annotations are
   extracted from patterns with business rules, pre-computed into a SequenceIndex
-  on MasterDataset, then rendered through DesignReviewCodec into markdown with
+  on PatternGraph, then rendered through DesignReviewCodec into markdown with
   Mermaid sequence diagrams, component diagrams, type definition tables, and
   design question templates.
 
@@ -17,7 +17,7 @@ Feature: Design Review Generation Pipeline
   Rule: SequenceIndex pre-computes ordered steps from annotated rules
 
     **Invariant:** buildSequenceIndexEntry produces a SequenceIndexEntry with steps sorted by stepNumber, participants deduplicated with orchestrator first, and data flow types collected from Input/Output annotations.
-    **Rationale:** Pre-computing in the transform pass avoids repeated parsing in the codec. ADR-006 mandates the MasterDataset as the sole read model.
+    **Rationale:** Pre-computing in the transform pass avoids repeated parsing in the codec. ADR-006 mandates the PatternGraph as the sole read model.
     **Verified by:** SequenceIndex populated for annotated pattern, Steps sorted by step number, Patterns without sequence annotations have no entry
 
     @acceptance-criteria @happy-path

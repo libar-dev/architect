@@ -162,7 +162,7 @@
     "mermaid",
     "traceability",
     "dual-source",
-    "master-dataset",
+    "pattern-graph",
     "gherkin",
     "bdd",
     "typescript-annotations",

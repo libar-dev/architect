@@ -16,7 +16,7 @@ import {
   getResult,
   runCLICommand,
   createTempDir,
-} from '../../support/helpers/process-api-state.js';
+} from '../../support/helpers/pattern-graph-api-state.js';
 
 // =============================================================================
 // Module-level state (reset per scenario)

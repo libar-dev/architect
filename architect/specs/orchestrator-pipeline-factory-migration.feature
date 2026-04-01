@@ -25,7 +25,7 @@ Feature: Orchestrator Pipeline Factory Migration
   **Current violations in orchestrator.ts:**
 
   | Anti-Pattern | Location | Evidence |
-  | Parallel Pipeline | Lines 282-427 | 8-step pipeline: loadConfig, scanPatterns, extractPatterns, scanGherkinFiles, extractPatternsFromGherkin, mergePatterns, computeHierarchyChildren, transformToMasterDataset |
+  | Parallel Pipeline | Lines 282-427 | 8-step pipeline: loadConfig, scanPatterns, extractPatterns, scanGherkinFiles, extractPatternsFromGherkin, mergePatterns, computeHierarchyChildren, transformToPatternGraph |
 
   Additionally, `mergePatterns()` is defined in orchestrator.ts (line 701)
   but imported by `build-pipeline.ts` from `../orchestrator.js`. This
@@ -48,7 +48,7 @@ Feature: Orchestrator Pipeline Factory Migration
   **Solution:**
   Enrich the pipeline factory's `PipelineResult` with structured warnings
   that capture the granularity the orchestrator needs, then migrate
-  `generateDocumentation()` to call `buildMasterDataset()`. Move
+  `generateDocumentation()` to call `buildPatternGraph()`. Move
   `mergePatterns()` to `src/generators/pipeline/merge-patterns.ts` as a
   standalone pipeline step.
 
@@ -85,8 +85,8 @@ Feature: Orchestrator Pipeline Factory Migration
   - The public API (`mergePatterns`) stays available, just moves home
 
   DD-3: Pipeline factory gains an includeValidation option.
-  The orchestrator calls `transformToMasterDataset` (no validation),
-  while process-api calls `transformToMasterDatasetWithValidation`.
+  The orchestrator calls `transformToPatternGraph` (no validation),
+  while process-api calls `transformToPatternGraphWithValidation`.
   The factory already calls the validation variant. Adding
   `includeValidation?: boolean` (default true) lets the orchestrator
   opt out, since doc generation doesn't need validation summaries.
@@ -128,7 +128,7 @@ Feature: Orchestrator Pipeline Factory Migration
   loading (`loadConfig`) is replaced by the factory's internal config
   step — `tagRegistry` is accessed via `dataset.tagRegistry`. The merged
   patterns array for `GenerateResult.patterns` and generator context is
-  `dataset.patterns` from the MasterDataset.
+  `dataset.patterns` from the PatternGraph.
 
   DD-7: validate-patterns.ts and process-api.ts are unaffected.
   They already consume the factory. The only change they see is
@@ -180,7 +180,7 @@ Feature: Orchestrator Pipeline Factory Migration
 
   Rule: Orchestrator delegates pipeline to factory
 
-    **Invariant:** `generateDocumentation()` calls `buildMasterDataset()`
+    **Invariant:** `generateDocumentation()` calls `buildPatternGraph()`
     for the scan-extract-merge-transform sequence. It does not import
     from `scanner/` or `extractor/` for pipeline orchestration. Direct
     imports are permitted only for types used in GenerateResult (e.g.,
@@ -206,8 +206,8 @@ Feature: Orchestrator Pipeline Factory Migration
     @acceptance-criteria
     Scenario: Factory is sole pipeline definition
       Given the three CLI consumers: process-api, validate-patterns, orchestrator
-      When each needs a MasterDataset
-      Then each calls buildMasterDataset from build-pipeline.ts
+      When each needs a PatternGraph
+      Then each calls buildPatternGraph from build-pipeline.ts
       And no consumer wires the 8-step pipeline inline
 
   Rule: mergePatterns lives in pipeline module

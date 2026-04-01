@@ -9,7 +9,7 @@
  *
  * ## RequirementsDocumentCodec
  *
- * Transforms MasterDataset into RenderableDocument for PRD/requirements output.
+ * Transforms PatternGraph into RenderableDocument for PRD/requirements output.
  * Generates PRODUCT-REQUIREMENTS.md and detail files (requirements/*.md).
  *
  * **Purpose:** Product requirements documentation grouped by product area or user role.
@@ -40,7 +40,7 @@
  * ```
  */
 
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -168,7 +168,7 @@ export function createRequirementsCodec(options?: RequirementsCodecOptions): Doc
 /**
  * Default Requirements Document Codec
  *
- * Transforms MasterDataset → RenderableDocument for product requirements.
+ * Transforms PatternGraph → RenderableDocument for product requirements.
  * Features grouped by product area and user role.
  */
 export const RequirementsDocumentCodec = createRequirementsCodec();
@@ -189,7 +189,7 @@ export const codecMeta = {
  * Build requirements document
  */
 function buildRequirementsDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<RequirementsCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
@@ -508,7 +508,7 @@ export function requirementToSlug(patternName: string, phase: number | undefined
 function buildRequirementsDetailFiles(
   patterns: ExtractedPattern[],
   options: Required<RequirementsCodecOptions>,
-  dataset: MasterDataset
+  dataset: PatternGraph
 ): Record<string, RenderableDocument> {
   const files: Record<string, RenderableDocument> = {};
 
@@ -526,7 +526,7 @@ function buildRequirementsDetailFiles(
 function buildSingleRequirementDocument(
   pattern: ExtractedPattern,
   options: Required<RequirementsCodecOptions>,
-  dataset: MasterDataset
+  dataset: PatternGraph
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
   const emoji = getStatusEmoji(pattern.status);

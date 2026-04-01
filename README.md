@@ -77,16 +77,16 @@ This validates FSM transitions and blocks invalid status changes.
  * @architect
  * @architect-pattern TransformDataset
  * @architect-status completed
- * @architect-uses MasterDataset, ExtractedPattern, TagRegistry
+ * @architect-uses PatternGraph, ExtractedPattern, TagRegistry
  */
-export function transformToMasterDataset(input: TransformInput): MasterDataset {
+export function transformToPatternGraph(input: TransformInput): PatternGraph {
   // ...
 }
 ```
 
-**Gherkin feature files** own planning metadata (status, phase, deliverables). The generator merges both sources into a unified MasterDataset.
+**Gherkin feature files** own planning metadata (status, phase, deliverables). The generator merges both sources into a unified PatternGraph.
 
-**Pipeline:** `Config → Scanner → Extractor → Transformer → Codec` — files become patterns, patterns become a MasterDataset, the MasterDataset renders to Markdown and JSON.
+**Pipeline:** `Config → Scanner → Extractor → Transformer → Codec` — files become patterns, patterns become a PatternGraph, the PatternGraph renders to Markdown and JSON.
 
 ---
 

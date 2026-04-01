@@ -14,7 +14,7 @@
 
 import type { DocumentGenerator, GeneratorContext, GeneratorOutput } from '../types.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import type { DetailLevel } from '../../renderable/codecs/types/base.js';
 import type { RenderableDocument, SectionBlock } from '../../renderable/schema.js';
 import { heading, paragraph, separator, table, document } from '../../renderable/schema.js';
@@ -110,7 +110,7 @@ class ReferenceDocGenerator implements DocumentGenerator {
     _patterns: readonly ExtractedPattern[],
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
-    const dataset = context.masterDataset;
+    const dataset = context.patternGraph;
 
     const codec = createReferenceCodec(this.config, {
       detailLevel: this.detailLevel,
@@ -141,7 +141,7 @@ function toGeneratorName(title: string): string {
  */
 function generateDualOutputFiles(
   configs: readonly ReferenceDocConfig[],
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   pathPrefix: string
 ): Array<{ path: string; content: string }> {
   const files: Array<{ path: string; content: string }> = [];
@@ -192,7 +192,7 @@ class ReferenceDocsGenerator implements DocumentGenerator {
     _patterns: readonly ExtractedPattern[],
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
-    const dataset = context.masterDataset;
+    const dataset = context.patternGraph;
 
     const files = generateDualOutputFiles(this.configs, dataset, 'reference');
     return Promise.resolve({ files });
@@ -218,7 +218,7 @@ class ProductAreaDocsGenerator implements DocumentGenerator {
     _patterns: readonly ExtractedPattern[],
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
-    const dataset = context.masterDataset;
+    const dataset = context.patternGraph;
 
     const files = generateDualOutputFiles(this.configs, dataset, 'product-areas');
 
@@ -235,13 +235,13 @@ class ProductAreaDocsGenerator implements DocumentGenerator {
 /**
  * Builds a progressive disclosure index for product area documents.
  *
- * Data-driven: computes per-area statistics from MasterDataset patterns,
+ * Data-driven: computes per-area statistics from PatternGraph patterns,
  * renders cross-area progress table, and generates live Mermaid diagrams
  * from annotation relationship data via buildScopedDiagram.
  */
 function buildProductAreaIndex(
   configs: readonly ReferenceDocConfig[],
-  dataset: MasterDataset
+  dataset: PatternGraph
 ): string {
   const sections: SectionBlock[] = [];
 

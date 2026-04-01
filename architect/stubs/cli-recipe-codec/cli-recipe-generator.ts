@@ -9,7 +9,7 @@
  * Produces `docs-live/reference/PROCESS-API-RECIPES.md` from the declarative
  * CLI schema. Sibling to `ProcessApiReferenceGenerator` — both implement
  * `DocumentGenerator`, both consume `CLI_SCHEMA` directly, neither depends
- * on MasterDataset (ADR-006 compliant).
+ * on PatternGraph (ADR-006 compliant).
  *
  * **Design Decision DD-1 (Separate generator, not extension):**
  * Reference tables and recipe guides serve different audiences and change at
@@ -241,7 +241,7 @@ export interface CliRecipeGeneratorConfig {
  *
  * Follows the same pattern as ProcessApiReferenceGenerator:
  * - Implements DocumentGenerator interface
- * - Consumes CLI_SCHEMA directly (no MasterDataset dependency)
+ * - Consumes CLI_SCHEMA directly (no PatternGraph dependency)
  * - Returns OutputFile[] via standard orchestrator write path
  * - Registered in architect.config.ts generatorOverrides
  *

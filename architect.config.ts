@@ -61,7 +61,7 @@ const INDEX_DOCUMENT_ENTRIES: readonly DocumentEntry[] = [
   { title: 'Process API Recipes', path: 'reference/PROCESS-API-RECIPES.md', description: 'CLI workflow recipes and session guides', audience: 'AI/Devs', topic: 'Reference Guides' },
   { title: 'Process Guard Reference', path: 'reference/PROCESS-GUARD-REFERENCE.md', description: 'Pre-commit hooks, error codes, programmatic API', audience: 'Team Leads', topic: 'Reference Guides' },
   { title: 'Architecture Codecs', path: 'reference/ARCHITECTURE-CODECS.md', description: 'All codecs with factory patterns and options', audience: 'Developers', topic: 'Reference Guides' },
-  { title: 'Architecture Types', path: 'reference/ARCHITECTURE-TYPES.md', description: 'MasterDataset interface and type shapes', audience: 'Developers', topic: 'Reference Guides' },
+  { title: 'Architecture Types', path: 'reference/ARCHITECTURE-TYPES.md', description: 'PatternGraph interface and type shapes', audience: 'Developers', topic: 'Reference Guides' },
   { title: 'Configuration Guide', path: 'reference/CONFIGURATION-GUIDE.md', description: 'Presets, config files, sources, output, and monorepo setup', audience: 'Users', topic: 'Reference Guides' },
   { title: 'Validation Tools Guide', path: 'reference/VALIDATION-TOOLS-GUIDE.md', description: 'lint-patterns, lint-steps, lint-process, validate-patterns reference', audience: 'CI/CD', topic: 'Reference Guides' },
   { title: 'Gherkin Authoring Guide', path: 'reference/GHERKIN-AUTHORING-GUIDE.md', description: 'Roadmap specs, Rule blocks, DataTables, tag conventions', audience: 'Developers', topic: 'Reference Guides' },
@@ -115,7 +115,7 @@ export default defineConfig({
     {
       title: 'Architecture Types Reference',
       conventionTags: ['pipeline-architecture'],
-      shapeSelectors: [{ group: 'master-dataset' }],
+      shapeSelectors: [{ group: 'pattern-graph' }],
       behaviorCategories: [],
       shapesFirst: true,
       claudeMdSection: 'architecture',
@@ -123,8 +123,8 @@ export default defineConfig({
       claudeMdFilename: 'architecture-types.md',
       diagramScopes: [
         {
-          title: 'MasterDataset View Fan-out',
-          source: 'master-dataset-views',
+          title: 'PatternGraph View Fan-out',
+          source: 'pattern-graph-views',
         },
       ],
     },

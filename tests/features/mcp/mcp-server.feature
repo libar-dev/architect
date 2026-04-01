@@ -3,15 +3,15 @@ Feature: MCP Server Integration Tests
 
   Verifies the MCP-specific layer: tool registration, pipeline session
   lifecycle, file watcher behavior, CLI argument parsing, and output
-  formatting. ProcessStateAPI correctness is tested separately.
+  formatting. PatternGraphAPI correctness is tested separately.
 
   Background: Test infrastructure
-    Given a test MasterDataset is initialized for MCP
+    Given a test PatternGraph is initialized for MCP
 
   Rule: Pipeline session manager loads once and supports atomic rebuild
 
     **Invariant:** The pipeline runs exactly once during initialization.
-    All subsequent calls read from in-memory MasterDataset. Rebuild
+    All subsequent calls read from in-memory PatternGraph. Rebuild
     atomically replaces the session.
 
     **Rationale:** Verifies the core lifecycle contract of PipelineSessionManager
@@ -28,7 +28,7 @@ Feature: MCP Server Integration Tests
     Scenario: Session initializes and contains dataset
       Given a PipelineSessionManager initialized with test data
       When getSession is called
-      Then the session contains a MasterDataset with patterns
+      Then the session contains a PatternGraph with patterns
       And the session records build time in milliseconds
 
     Scenario: getSession throws before initialization

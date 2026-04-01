@@ -3,7 +3,7 @@
  * @architect-pattern ScopeValidatorImpl
  * @architect-status completed
  * @architect-implements DataAPIDesignSessionSupport
- * @architect-uses ProcessStateAPI, MasterDataset, StubResolverImpl
+ * @architect-uses PatternGraphAPI, PatternGraph, StubResolverImpl
  * @architect-used-by ProcessAPICLIImpl
  * @architect-target src/api/scope-validator.ts
  * @architect-arch-role service
@@ -12,15 +12,15 @@
  *
  * ## ScopeValidator — Pre-flight Session Readiness Checker
  *
- * Pure function composition over ProcessStateAPI and MasterDataset.
+ * Pure function composition over PatternGraphAPI and PatternGraph.
  * Runs a checklist of prerequisite validations before starting a
  * design or implementation session.
  *
  * **When to Use:** When running pre-flight checks before a session via the `scope-validate` CLI subcommand.
  */
 
-import type { ProcessStateAPI } from './process-state.js';
-import type { MasterDataset } from '../validation-schemas/master-dataset.js';
+import type { PatternGraphAPI } from './pattern-graph-api.js';
+import type { PatternGraph } from '../validation-schemas/pattern-graph.js';
 import { QueryApiError } from './types.js';
 import { getPatternName, findPatternByName, firstImplements } from './pattern-helpers.js';
 import { findStubPatterns, resolveStubs, extractDecisionItems } from './stub-resolver.js';
@@ -79,8 +79,8 @@ const VALID_STATUSES = VALID_PROCESS_STATUS_SET;
 // ---------------------------------------------------------------------------
 
 export function validateScope(
-  api: ProcessStateAPI,
-  dataset: MasterDataset,
+  api: PatternGraphAPI,
+  dataset: PatternGraph,
   options: ScopeValidationOptions
 ): ScopeValidationResult {
   const { patternName, scopeType, baseDir, strict } = options;
@@ -172,7 +172,7 @@ export function formatScopeValidation(result: ScopeValidationResult): string {
 // ---------------------------------------------------------------------------
 
 export function checkDependenciesCompleted(
-  api: ProcessStateAPI,
+  api: PatternGraphAPI,
   patternName: string
 ): ValidationCheck {
   const deps = api.getPatternDependencies(patternName);
@@ -215,7 +215,7 @@ export function checkDependenciesCompleted(
 }
 
 export function checkDeliverablesDefined(
-  api: ProcessStateAPI,
+  api: PatternGraphAPI,
   patternName: string
 ): ValidationCheck {
   const deliverables = api.getPatternDeliverables(patternName);
@@ -238,7 +238,7 @@ export function checkDeliverablesDefined(
 }
 
 export function checkFsmAllowsTransition(
-  api: ProcessStateAPI,
+  api: PatternGraphAPI,
   patternName: string
 ): ValidationCheck {
   const pattern = api.getPattern(patternName);
@@ -287,7 +287,7 @@ export function checkFsmAllowsTransition(
 }
 
 export function checkDesignDecisionsRecorded(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   patternName: string
 ): ValidationCheck {
   const stubs = findStubPatterns(dataset);
@@ -322,7 +322,7 @@ export function checkDesignDecisionsRecorded(
 }
 
 export function checkExecutableSpecsSet(
-  api: ProcessStateAPI,
+  api: PatternGraphAPI,
   patternName: string
 ): ValidationCheck {
   const pattern = api.getPattern(patternName);
@@ -349,7 +349,7 @@ export function checkExecutableSpecsSet(
 // ---------------------------------------------------------------------------
 
 export function checkStubsFromDepsExist(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   patternName: string,
   baseDir: string
 ): ValidationCheck {

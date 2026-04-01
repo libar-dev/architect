@@ -1,19 +1,19 @@
 /**
- * MasterDataset Factory Utilities for Testing
+ * PatternGraph Factory Utilities for Testing
  *
- * Provides convenient factories for creating MasterDataset objects
+ * Provides convenient factories for creating PatternGraph objects
  * for use in Gherkin step definitions and unit tests. These factories
- * wrap the pattern factories and transformToMasterDataset to produce
+ * wrap the pattern factories and transformToPatternGraph to produce
  * fully-formed datasets with all pre-computed views.
  *
  * @architect
  */
 
 import type { ExtractedPattern } from '../../src/validation-schemas/index.js';
-import type { StatusCounts } from '../../src/validation-schemas/master-dataset.js';
-import type { RuntimeMasterDataset } from '../../src/generators/pipeline/transform-types.js';
+import type { StatusCounts } from '../../src/validation-schemas/pattern-graph.js';
+import type { RuntimePatternGraph } from '../../src/generators/pipeline/transform-types.js';
 
-import { transformToMasterDataset } from '../../src/generators/pipeline/transform-dataset.js';
+import { transformToPatternGraph } from '../../src/generators/pipeline/transform-dataset.js';
 import { createDefaultTagRegistry } from '../../src/validation-schemas/tag-registry.js';
 import {
   createTestPattern,
@@ -31,9 +31,9 @@ import {
 // ============================================================================
 
 /**
- * Options for creating a test MasterDataset
+ * Options for creating a test PatternGraph
  */
-export interface TestMasterDatasetOptions {
+export interface TestPatternGraphOptions {
   /**
    * Pre-built patterns to use (bypasses pattern generation)
    * If provided, all other pattern-generation options are ignored.
@@ -82,39 +82,37 @@ export interface TestMasterDatasetOptions {
 // ============================================================================
 
 /**
- * Create a test MasterDataset with all pre-computed views
+ * Create a test PatternGraph with all pre-computed views
  *
  * This is the primary factory for creating test datasets. It wraps pattern
  * generation and transformation into a single convenient call.
  *
  * @param options - Configuration for the dataset
- * @returns Fully-formed MasterDataset with all views computed
+ * @returns Fully-formed PatternGraph with all views computed
  *
  * @example
  * ```typescript
  * // Empty dataset
- * const empty = createTestMasterDataset();
+ * const empty = createTestPatternGraph();
  *
  * // Dataset with 10 patterns across 3 categories
- * const dataset = createTestMasterDataset({
+ * const dataset = createTestPatternGraph({
  *   patternCount: 10,
  *   categories: ["core", "ddd", "saga"],
  * });
  *
  * // Dataset with specific status distribution
- * const mixed = createTestMasterDataset({
+ * const mixed = createTestPatternGraph({
  *   statusDistribution: { completed: 5, active: 3, planned: 2 },
  * });
  *
  * // Dataset with relationships for dependency graph testing
- * const withDeps = createTestMasterDataset({
+ * const withDeps = createTestPatternGraph({
  *   withRelationships: true,
  * });
  * ```
  */
-export function createTestMasterDataset(
-  options: TestMasterDatasetOptions = {}
-): RuntimeMasterDataset {
+export function createTestPatternGraph(options: TestPatternGraphOptions = {}): RuntimePatternGraph {
   const {
     patterns: providedPatterns,
     patternCount = 0,
@@ -155,7 +153,7 @@ export function createTestMasterDataset(
     patterns = [];
   }
 
-  return transformToMasterDataset({
+  return transformToPatternGraph({
     patterns,
     tagRegistry: createDefaultTagRegistry(),
     workflow: undefined,
@@ -167,27 +165,27 @@ export function createTestMasterDataset(
 // ============================================================================
 
 /**
- * Create an empty MasterDataset
+ * Create an empty PatternGraph
  *
  * Useful for testing edge cases where no patterns exist.
  *
- * @returns MasterDataset with all counts at 0 and empty views
+ * @returns PatternGraph with all counts at 0 and empty views
  */
-export function createEmptyMasterDataset(): RuntimeMasterDataset {
-  return createTestMasterDataset();
+export function createEmptyPatternGraph(): RuntimePatternGraph {
+  return createTestPatternGraph();
 }
 
 /**
- * Create a MasterDataset with specific status counts
+ * Create a PatternGraph with specific status counts
  *
  * Generates patterns to match the specified status distribution.
  *
  * @param counts - Status counts to achieve
- * @returns MasterDataset with specified status distribution
+ * @returns PatternGraph with specified status distribution
  *
  * @example
  * ```typescript
- * const dataset = createMasterDatasetWithStatus({
+ * const dataset = createPatternGraphWithStatus({
  *   completed: 5,
  *   active: 3,
  *   planned: 2,
@@ -199,55 +197,55 @@ export function createEmptyMasterDataset(): RuntimeMasterDataset {
  * expect(dataset.counts.total).toBe(10);
  * ```
  */
-export function createMasterDatasetWithStatus(counts: Partial<StatusCounts>): RuntimeMasterDataset {
-  return createTestMasterDataset({
+export function createPatternGraphWithStatus(counts: Partial<StatusCounts>): RuntimePatternGraph {
+  return createTestPatternGraph({
     statusDistribution: counts,
   });
 }
 
 /**
- * Create a MasterDataset with relationship data
+ * Create a PatternGraph with relationship data
  *
  * Uses the diamond dependency graph for testing dependency-related features.
  *
- * @returns MasterDataset with 4 patterns in a diamond dependency structure
+ * @returns PatternGraph with 4 patterns in a diamond dependency structure
  */
-export function createMasterDatasetWithRelationships(): RuntimeMasterDataset {
-  return createTestMasterDataset({ withRelationships: true });
+export function createPatternGraphWithRelationships(): RuntimePatternGraph {
+  return createTestPatternGraph({ withRelationships: true });
 }
 
 /**
- * Create a MasterDataset with timeline metadata
+ * Create a PatternGraph with timeline metadata
  *
  * Includes patterns with phases, quarters, completion dates, and deliverables.
  *
- * @returns MasterDataset with timeline-enriched patterns
+ * @returns PatternGraph with timeline-enriched patterns
  */
-export function createMasterDatasetWithTimeline(): RuntimeMasterDataset {
-  return createTestMasterDataset({ withTimeline: true });
+export function createPatternGraphWithTimeline(): RuntimePatternGraph {
+  return createTestPatternGraph({ withTimeline: true });
 }
 
 /**
- * Create a MasterDataset with roadmap phases
+ * Create a PatternGraph with roadmap phases
  *
  * Includes patterns across multiple phases with dependencies.
  *
- * @returns MasterDataset with phase-structured patterns
+ * @returns PatternGraph with phase-structured patterns
  */
-export function createMasterDatasetWithRoadmap(): RuntimeMasterDataset {
-  return createTestMasterDataset({ withRoadmap: true });
+export function createPatternGraphWithRoadmap(): RuntimePatternGraph {
+  return createTestPatternGraph({ withRoadmap: true });
 }
 
 /**
- * Create a MasterDataset with patterns in specific categories
+ * Create a PatternGraph with patterns in specific categories
  *
  * @param categories - Categories to include (e.g., ["core", "ddd", "saga"])
  * @param patternsPerCategory - Number of patterns per category
- * @returns MasterDataset with patterns distributed across categories
+ * @returns PatternGraph with patterns distributed across categories
  *
  * @example
  * ```typescript
- * const dataset = createMasterDatasetWithCategories(
+ * const dataset = createPatternGraphWithCategories(
  *   ["core", "ddd", "saga"],
  *   2
  * );
@@ -256,26 +254,26 @@ export function createMasterDatasetWithRoadmap(): RuntimeMasterDataset {
  * expect(Object.keys(dataset.byCategory)).toEqual(["core", "ddd", "saga"]);
  * ```
  */
-export function createMasterDatasetWithCategories(
+export function createPatternGraphWithCategories(
   categories: string[],
   patternsPerCategory = 2
-): RuntimeMasterDataset {
+): RuntimePatternGraph {
   const patterns = createTestPatternSet({
     categories,
     patternsPerCategory,
     stable: true,
   });
 
-  return createTestMasterDataset({ patterns });
+  return createTestPatternGraph({ patterns });
 }
 
 /**
- * Create a MasterDataset with ADR patterns
+ * Create a PatternGraph with ADR patterns
  *
  * @param count - Number of ADR patterns to create
- * @returns MasterDataset with ADR-tagged patterns
+ * @returns PatternGraph with ADR-tagged patterns
  */
-export function createMasterDatasetWithADRs(count = 3): RuntimeMasterDataset {
+export function createPatternGraphWithADRs(count = 3): RuntimePatternGraph {
   const patterns: ExtractedPattern[] = [];
 
   for (let i = 1; i <= count; i++) {
@@ -290,7 +288,7 @@ export function createMasterDatasetWithADRs(count = 3): RuntimeMasterDataset {
     );
   }
 
-  return createTestMasterDataset({ patterns });
+  return createTestPatternGraph({ patterns });
 }
 
 // ============================================================================

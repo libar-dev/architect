@@ -5,23 +5,23 @@
  * the SequenceIndex builder and DesignReviewCodec pipeline.
  *
  * @architect
- * @architect-uses SequenceIndex, DesignReviewCodec, MasterDataset
+ * @architect-uses SequenceIndex, DesignReviewCodec, PatternGraph
  */
 
 import type { BusinessRule } from '../../../src/validation-schemas/extracted-pattern.js';
 import type {
   SequenceIndexEntry,
-  MasterDataset,
-} from '../../../src/validation-schemas/master-dataset.js';
+  PatternGraph,
+} from '../../../src/validation-schemas/pattern-graph.js';
 import type { RenderableDocument } from '../../../src/renderable/schema.js';
 import { getSequenceEntry } from '../../../src/api/pattern-helpers.js';
 import { buildSequenceIndexEntry } from '../../../src/generators/pipeline/sequence-utils.js';
 import type { ValidationSummary } from '../../../src/generators/pipeline/transform-types.js';
-import { transformToMasterDatasetWithValidation } from '../../../src/generators/pipeline/transform-dataset.js';
+import { transformToPatternGraphWithValidation } from '../../../src/generators/pipeline/transform-dataset.js';
 import { createDesignReviewCodec } from '../../../src/renderable/codecs/design-review.js';
 import { renderToMarkdown } from '../../../src/renderable/render.js';
 import { createDefaultTagRegistry } from '../../../src/validation-schemas/tag-registry.js';
-import { createTestMasterDataset, createTestPattern } from '../../fixtures/dataset-factories.js';
+import { createTestPatternGraph, createTestPattern } from '../../fixtures/dataset-factories.js';
 
 // =============================================================================
 // State Types
@@ -37,10 +37,10 @@ export interface DesignReviewState {
   /** Result of buildSequenceIndexEntry */
   entry: SequenceIndexEntry | undefined;
 
-  /** MasterDataset for codec tests */
-  dataset: MasterDataset | null;
+  /** PatternGraph for codec tests */
+  dataset: PatternGraph | null;
 
-  /** Validation summary from transformToMasterDatasetWithValidation */
+  /** Validation summary from transformToPatternGraphWithValidation */
   validation: ValidationSummary | null;
 
   /** Pattern name for codec lookup */
@@ -139,7 +139,7 @@ export function buildEntry(state: DesignReviewState): void {
 }
 
 /**
- * Build a MasterDataset with a single pattern that has sequence data,
+ * Build a PatternGraph with a single pattern that has sequence data,
  * and generate the design review document from it.
  */
 export function generateDesignReview(state: DesignReviewState): void {
@@ -158,7 +158,7 @@ export function generateDesignReview(state: DesignReviewState): void {
   });
 
   // Build the dataset with this pattern
-  const dataset = createTestMasterDataset({ patterns: [pattern] });
+  const dataset = createTestPatternGraph({ patterns: [pattern] });
 
   // The transform pipeline should have built the sequenceIndex
   state.dataset = dataset;
@@ -181,7 +181,7 @@ export function transformWithValidation(state: DesignReviewState): void {
     sequenceOrchestrator: state.orchestrator,
   });
 
-  const result = transformToMasterDatasetWithValidation({
+  const result = transformToPatternGraphWithValidation({
     patterns: [pattern],
     tagRegistry: createDefaultTagRegistry(),
     workflow: undefined,
@@ -207,7 +207,7 @@ export function resolveSequenceEntry(
     sequenceOrchestrator: state.orchestrator,
   });
 
-  state.dataset = createTestMasterDataset({ patterns: [pattern] });
+  state.dataset = createTestPatternGraph({ patterns: [pattern] });
   state.entry = getSequenceEntry(state.dataset, queryName);
   return state.entry;
 }

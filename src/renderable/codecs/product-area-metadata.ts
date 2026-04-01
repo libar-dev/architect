@@ -138,7 +138,7 @@ export const PRODUCT_AREA_META: Readonly<Record<ProductAreaKey, ProductAreaMeta>
     intro:
       'The generation pipeline transforms annotated source code into markdown documents through a ' +
       'four-stage architecture: Scanner discovers files, Extractor produces `ExtractedPattern` objects, ' +
-      'Transformer builds MasterDataset with pre-computed views, and Codecs render to markdown via ' +
+      'Transformer builds PatternGraph with pre-computed views, and Codecs render to markdown via ' +
       'RenderableDocument IR. Nine specialized codecs handle reference docs, planning, session, reporting, ' +
       'timeline, ADRs, business rules, taxonomy, and composite output — each supporting three detail levels ' +
       '(detailed, standard, summary). The Orchestrator runs generators in registration order, producing both ' +
@@ -157,12 +157,12 @@ export const PRODUCT_AREA_META: Readonly<Record<ProductAreaKey, ProductAreaMeta>
           [
             'Transformer',
             '`src/generators/pipeline/`',
-            'MasterDataset with pre-computed views for O(1) access (ADR-006)',
+            'PatternGraph with pre-computed views for O(1) access (ADR-006)',
           ],
           [
             'Codec',
             '`src/renderable/`',
-            'Pure functions: MasterDataset → RenderableDocument → Markdown',
+            'Pure functions: PatternGraph → RenderableDocument → Markdown',
           ],
         ]
       ),
@@ -187,7 +187,7 @@ export const PRODUCT_AREA_META: Readonly<Record<ProductAreaKey, ProductAreaMeta>
     ],
     keyInvariants: [
       'Codec purity: Every codec is a pure function (dataset in, document out). No side effects, no filesystem access. Same input always produces same output',
-      'Single read model (ADR-006): All codecs consume MasterDataset. No codec reads raw scanner/extractor output. Anti-patterns: Parallel Pipeline, Lossy Local Type, Re-derived Relationship',
+      'Single read model (ADR-006): All codecs consume PatternGraph. No codec reads raw scanner/extractor output. Anti-patterns: Parallel Pipeline, Lossy Local Type, Re-derived Relationship',
       'Progressive disclosure: Every document renders at three detail levels (detailed, standard, summary) from the same codec. Summary feeds `_claude-md/` modules; detailed feeds `docs-live/reference/`',
       'Config-driven generation: A single `ReferenceDocConfig` produces a complete document. Content sources compose in fixed order: conventions, diagrams, shapes, behaviors',
       'RenderableDocument IR: Codecs express intent ("this is a table"), the renderer handles syntax ("pipe-delimited markdown"). Switching output format requires only a new renderer',
@@ -260,7 +260,7 @@ export const PRODUCT_AREA_META: Readonly<Record<ProductAreaKey, ProductAreaMeta>
     ],
     keyPatterns: [
       'DataAPIContextAssembly',
-      'ProcessStateAPICLI',
+      'PatternGraphAPICLI',
       'DataAPIDesignSessionSupport',
       'DataAPIRelationshipGraph',
       'DataAPIOutputShaping',

@@ -1,5 +1,5 @@
 @architect
-@architect-pattern:ProcessStateAPICLI
+@architect-pattern:PatternGraphAPICLI
 @architect-status:completed
 @architect-completed:2026-02-09
 @architect-unlock-reason:Normalize-deliverable-status-taxonomy
@@ -9,10 +9,10 @@
 @architect-priority:high
 @architect-business-value:direct-api-queries-for-planning
 @architect-executable-specs:tests/features/api
-Feature: ProcessStateAPI CLI - Direct Queries for Planning Sessions
+Feature: PatternGraphAPI CLI - Direct Queries for Planning Sessions
 
   **Problem:**
-  The ProcessStateAPI provides 27 typed query methods for efficient state queries, but
+  The PatternGraphAPI provides 27 typed query methods for efficient state queries, but
   Claude Code sessions cannot use it directly:
   - Import paths require built packages with correct ESM resolution
   - No CLI command exposes the API for shell invocation
@@ -20,7 +20,7 @@ Feature: ProcessStateAPI CLI - Direct Queries for Planning Sessions
   - Documentation claims API is "directly usable" but practical usage is blocked
 
   **Solution:**
-  Add a CLI command `pnpm process:query` that exposes key ProcessStateAPI methods:
+  Add a CLI command `pnpm process:query` that exposes key PatternGraphAPI methods:
   - `--status active|roadmap|completed` - Filter patterns by status
   - `--phase N` - Get patterns in specific phase
   - `--progress` - Show completion percentage and counts
@@ -52,7 +52,7 @@ Feature: ProcessStateAPI CLI - Direct Queries for Planning Sessions
 
   Rule: CLI supports status-based pattern queries
 
-    **Invariant:** Every ProcessStateAPI status query method is accessible via CLI.
+    **Invariant:** Every PatternGraphAPI status query method is accessible via CLI.
 
     **Rationale:** The most common planning question is "what's the current state?"
     Status queries (active, roadmap, completed) answer this directly without reading docs.

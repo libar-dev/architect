@@ -6,7 +6,7 @@
  * tags/sources, extended arch, unannotated.
  *
  * @architect
- * @architect-implements ProcessStateAPICLI
+ * @architect-implements PatternGraphAPICLI
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -22,7 +22,7 @@ import {
   writeTwoContextFiles,
   writeMixedAnnotationFiles,
   createTempDir,
-} from '../../support/helpers/process-api-state.js';
+} from '../../support/helpers/pattern-graph-api-state.js';
 
 // =============================================================================
 // Module-level state (reset per scenario)

@@ -35,7 +35,7 @@ Feature: Architecture Diagram Generation - Core
       | DocDirective schema fields | complete | validation-schemas/doc-directive.ts | Yes | unit |
       | ExtractedPattern schema fields | complete | validation-schemas/extracted-pattern.ts | Yes | unit |
       | AST parser tag extraction | complete | scanner/ast-parser.ts | Yes | unit |
-      | MasterDataset archIndex | complete | generators/pipeline/transform-dataset.ts | Yes | unit |
+      | PatternGraph archIndex | complete | generators/pipeline/transform-dataset.ts | Yes | unit |
       | ArchitectureCodec (component) | complete | renderable/codecs/architecture.ts | Yes | unit |
 
   # ============================================================================
@@ -172,12 +172,12 @@ Feature: Architecture Diagram Generation - Core
       And the directive should have archLayer undefined
 
   # ============================================================================
-  # RULE 3: MasterDataset ArchIndex
+  # RULE 3: PatternGraph ArchIndex
   # ============================================================================
 
-  Rule: MasterDataset builds archIndex during transformation
+  Rule: PatternGraph builds archIndex during transformation
 
-    **Invariant:** The `transformToMasterDataset` function must build an `archIndex`
+    **Invariant:** The `transformToPatternGraph` function must build an `archIndex`
     that groups patterns by role, context, and layer for efficient diagram generation.
 
     **Rationale:** Single-pass extraction during dataset transformation avoids
@@ -193,7 +193,7 @@ Feature: Architecture Diagram Generation - Core
         | Handler1 | command-handler |
         | Handler2 | command-handler |
         | Projection1 | projection |
-      When transformToMasterDataset runs
+      When transformToPatternGraph runs
       Then archIndex.byRole["command-handler"] contains 2 patterns
       And archIndex.byRole["projection"] contains 1 pattern
 
@@ -204,7 +204,7 @@ Feature: Architecture Diagram Generation - Core
         | OrderHandler | orders |
         | OrderProjection | orders |
         | InventoryHandler | inventory |
-      When transformToMasterDataset runs
+      When transformToPatternGraph runs
       Then archIndex.byContext["orders"] contains 2 patterns
       And archIndex.byContext["inventory"] contains 1 pattern
 
@@ -215,7 +215,7 @@ Feature: Architecture Diagram Generation - Core
         | Decider1 | domain |
         | Handler1 | application |
         | Infra1 | infrastructure |
-      When transformToMasterDataset runs
+      When transformToPatternGraph runs
       Then archIndex.byLayer["domain"] contains 1 pattern
       And archIndex.byLayer["application"] contains 1 pattern
       And archIndex.byLayer["infrastructure"] contains 1 pattern
@@ -228,7 +228,7 @@ Feature: Architecture Diagram Generation - Core
         | WithRole | saga | - | - |
         | WithContext | - | inventory | - |
         | NoArchTags | - | - | - |
-      When transformToMasterDataset runs
+      When transformToPatternGraph runs
       Then archIndex.all contains 3 patterns
       And archIndex.all does not contain "NoArchTags"
 

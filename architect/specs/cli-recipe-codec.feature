@@ -105,10 +105,10 @@ Feature: CLI Recipe Codec
       And neither generator imports nor depends on the other
 
     @acceptance-criteria @validation
-    Scenario: Recipe generator has no MasterDataset dependency
+    Scenario: Recipe generator has no PatternGraph dependency
       Given the CliRecipeGenerator source file
       When inspecting its import statements
-      Then it does not import MasterDataset or any pipeline module
+      Then it does not import PatternGraph or any pipeline module
       And it imports only from src/cli/cli-schema.ts and generator infrastructure
 
   Rule: Recipe content uses a structured schema extension

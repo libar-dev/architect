@@ -298,7 +298,7 @@ npx validate-patterns \
 
 ### Architecture Note (ADR-006)
 
-Cross-source validation now consumes the `MasterDataset` via the shared pipeline factory (`buildMasterDataset()`) with `mergeConflictStrategy: 'concatenate'`. This enables implements-aware matching through `relationshipIndex.implementedBy` — the validator no longer re-derives cross-source relationships from raw scanner output.
+Cross-source validation now consumes the `PatternGraph` via the shared pipeline factory (`buildPatternGraph()`) with `mergeConflictStrategy: 'concatenate'`. This enables implements-aware matching through `relationshipIndex.implementedBy` — the validator no longer re-derives cross-source relationships from raw scanner output.
 
 Raw scans are retained only for DoD and anti-pattern detection, which are stage-1 consumers that validate annotation syntax directly on scanned files (no relationship resolution needed).
 
@@ -402,7 +402,7 @@ import { deriveProcessState, validateChanges } from '@libar-dev/architect/lint';
 import { detectAntiPatterns, validateDoD } from '@libar-dev/architect/validation';
 ```
 
-`validatePatterns()` now accepts a `RuntimeMasterDataset`. Build one via `buildMasterDataset()` from `@libar-dev/architect/generators`.
+`validatePatterns()` now accepts a `RuntimePatternGraph`. Build one via `buildPatternGraph()` from `@libar-dev/architect/generators`.
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed API documentation.
 

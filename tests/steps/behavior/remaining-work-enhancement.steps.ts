@@ -22,9 +22,9 @@ import type {
   HeadingBlock,
   ListBlock,
 } from '../../../src/renderable/schema.js';
-import type { MasterDataset } from '../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../src/validation-schemas/pattern-graph.js';
 import {
-  createTestMasterDataset,
+  createTestPatternGraph,
   createTestPattern,
   resetPatternCounter,
 } from '../../fixtures/dataset-factories.js';
@@ -41,7 +41,7 @@ import type { DataTableRow } from '../../support/world.js';
 // =============================================================================
 
 interface RemainingWorkEnhancementState {
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   document: RenderableDocument | null;
   options: Partial<RemainingWorkCodecOptions>;
   effortString: string | null;
@@ -212,7 +212,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
           });
         });
 
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
       });
 
       When('generating remaining work with sortBy: priority', () => {
@@ -258,7 +258,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
           });
         });
 
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
       });
 
       When('generating remaining work with sortBy: priority', () => {
@@ -301,7 +301,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
           });
         });
 
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
       });
 
       When('generating remaining work with sortBy: priority', () => {
@@ -346,7 +346,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
           });
         });
 
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
       });
 
       When('generating remaining work with sortBy: effort', () => {
@@ -448,7 +448,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
             });
           });
 
-          state.dataset = createTestMasterDataset({ patterns });
+          state.dataset = createTestPatternGraph({ patterns });
         }
       );
 
@@ -494,7 +494,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
           });
         });
 
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
       });
 
       And('all phases have incomplete deliverables', () => {
@@ -544,7 +544,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
             });
           });
 
-          state.dataset = createTestMasterDataset({ patterns });
+          state.dataset = createTestPatternGraph({ patterns });
         }
       );
 
@@ -593,7 +593,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
               })
             );
           }
-          state.dataset = createTestMasterDataset({ patterns });
+          state.dataset = createTestPatternGraph({ patterns });
         });
 
         And('maxPlannedToShow is {int}', (_ctx: unknown, _max: number) => {
@@ -650,7 +650,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
                 })
               );
             }
-            state.dataset = createTestMasterDataset({ patterns });
+            state.dataset = createTestPatternGraph({ patterns });
           });
 
           And('maxNextActionable is {int}', (_ctx: unknown, max: number) => {
@@ -697,7 +697,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
     RuleScenario('Empty backlog handling', ({ Given, When, Then }) => {
       Given('no roadmap phases', () => {
         state = initState();
-        state.dataset = createTestMasterDataset({ patterns: [] });
+        state.dataset = createTestPatternGraph({ patterns: [] });
       });
 
       When('generating remaining work with sortBy: priority', () => {
@@ -736,7 +736,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
             });
           });
 
-          state.dataset = createTestMasterDataset({ patterns });
+          state.dataset = createTestPatternGraph({ patterns });
         }
       );
 
@@ -778,7 +778,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
           });
         });
 
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
       });
 
       When('generating remaining work with default config', () => {
@@ -811,7 +811,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
           });
         });
 
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
       });
 
       And('all phases have incomplete deliverables', () => {

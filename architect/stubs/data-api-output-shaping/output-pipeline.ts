@@ -58,7 +58,7 @@ export const DEFAULT_OUTPUT_MODIFIERS: OutputModifiers = {
  * Composable list filters for the `list` subcommand.
  *
  * Filters combine via AND logic. Each filter narrows the result set.
- * The pipeline uses Set-based intersection on pre-computed MasterDataset views.
+ * The pipeline uses Set-based intersection on pre-computed PatternGraph views.
  */
 export interface ListFilters {
   /** Filter by FSM status (roadmap, active, completed, deferred) */
@@ -95,7 +95,7 @@ export type PipelineInput =
   | { readonly kind: 'scalar'; readonly data: unknown };
 
 /**
- * Set of ProcessStateAPI method names that return ExtractedPattern[].
+ * Set of PatternGraphAPI method names that return ExtractedPattern[].
  *
  * Used by the router to tag results with `kind: 'patterns'` for the pipeline.
  */
@@ -138,12 +138,12 @@ export function applyOutputPipeline(
 }
 
 /**
- * Apply composable filters to the pattern list using MasterDataset views.
+ * Apply composable filters to the pattern list using PatternGraph views.
  *
  * Uses Set-based intersection for O(n) composition across pre-computed views.
  * Pagination (offset/limit) applies after all filters.
  *
- * @param dataset - MasterDataset with pre-computed views
+ * @param dataset - PatternGraph with pre-computed views
  * @param filters - Composable list filters
  * @returns Filtered array of ExtractedPatterns
  */

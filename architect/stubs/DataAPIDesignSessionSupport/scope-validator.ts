@@ -2,14 +2,14 @@
  * @architect
  * @architect-status roadmap
  * @architect-implements DataAPIDesignSessionSupport
- * @architect-uses ProcessStateAPI, MasterDataset, StubResolver
+ * @architect-uses PatternGraphAPI, PatternGraph, StubResolver
  * @architect-used-by ProcessAPICLIImpl
  * @architect-target src/api/scope-validator.ts
  * @architect-since DS-E
  *
  * ## ScopeValidator — Pre-flight Session Readiness Checker
  *
- * Pure function composition over ProcessStateAPI and MasterDataset.
+ * Pure function composition over PatternGraphAPI and PatternGraph.
  * Runs a checklist of prerequisite validations before starting a
  * design or implementation session.
  *
@@ -138,8 +138,8 @@ export interface ScopeValidationResult {
  * Selects and runs checks based on scopeType, then aggregates results
  * into a verdict.
  *
- * @param api - ProcessStateAPI for pattern/FSM queries
- * @param dataset - MasterDataset for stub resolution
+ * @param api - PatternGraphAPI for pattern/FSM queries
+ * @param dataset - PatternGraph for stub resolution
  * @param options - Pattern name, scope type, base directory
  * @returns Aggregated validation result with verdict
  */

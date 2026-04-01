@@ -6,7 +6,7 @@
 @architect-implements:CodecBehaviorTesting
 @behavior @requirements-adr-codecs
 Feature: Requirements and ADR Document Codecs
-  The RequirementsDocumentCodec and AdrDocumentCodec transform MasterDataset
+  The RequirementsDocumentCodec and AdrDocumentCodec transform PatternGraph
   into RenderableDocuments for PRD-style and architecture decision documentation.
 
   **Problem:**
@@ -26,20 +26,20 @@ Feature: Requirements and ADR Document Codecs
 
   Rule: RequirementsDocumentCodec generates PRD-style documentation from patterns
 
-    **Invariant:** RequirementsDocumentCodec transforms MasterDataset patterns into a PRD-style document with flexible grouping (product area, user role, or phase), optional detail file generation, and business value rendering.
+    **Invariant:** RequirementsDocumentCodec transforms PatternGraph patterns into a PRD-style document with flexible grouping (product area, user role, or phase), optional detail file generation, and business value rendering.
     **Rationale:** Flexible grouping lets stakeholders view requirements through their preferred lens (area, role, or phase), and detail files provide deep-dive context without bloating the summary document.
     **Verified by:** No patterns with PRD metadata produces empty message, Summary shows counts and groupings, By product area section groups patterns correctly, By user role section uses collapsible groups, Group by phase option changes primary grouping, Filter by status option limits patterns, All features table shows complete list, Business value rendering when enabled, Generate individual requirement detail files when enabled, Requirement detail file contains acceptance criteria from scenarios, Requirement detail file contains business rules section, Implementation links from relationshipIndex
 
     @happy-path @edge-case
     Scenario: No patterns with PRD metadata produces empty message
-      Given an empty MasterDataset
+      Given an empty PatternGraph
       When decoding with RequirementsDocumentCodec
       Then the document title is "Product Requirements"
       And the document contains "No Product Requirements"
 
     @happy-path
     Scenario: Summary shows counts and groupings
-      Given a MasterDataset with PRD patterns
+      Given a PatternGraph with PRD patterns
       When decoding with RequirementsDocumentCodec
       Then the document title is "Product Requirements"
       And the document contains a "Summary" section
@@ -51,30 +51,30 @@ Feature: Requirements and ADR Document Codecs
 
     @happy-path
     Scenario: By product area section groups patterns correctly
-      Given a MasterDataset with PRD patterns
+      Given a PatternGraph with PRD patterns
       When decoding with RequirementsDocumentCodec
       Then the document contains a "By Product Area" section
       And the product areas show their features
 
     Scenario: By user role section uses collapsible groups
-      Given a MasterDataset with PRD patterns
+      Given a PatternGraph with PRD patterns
       When decoding with RequirementsDocumentCodec
       Then the document contains a "By User Role" section
       And user role sections are collapsible
 
     Scenario: Group by phase option changes primary grouping
-      Given a MasterDataset with PRD patterns
+      Given a PatternGraph with PRD patterns
       When decoding with RequirementsDocumentCodec using groupBy phase
       Then the document contains a "By Phase" section
       And phase 1 shows its features
 
     Scenario: Filter by status option limits patterns
-      Given a MasterDataset with PRD patterns
+      Given a PatternGraph with PRD patterns
       When decoding with RequirementsDocumentCodec filtering to completed status
       Then the document shows only completed patterns
 
     Scenario: All features table shows complete list
-      Given a MasterDataset with PRD patterns
+      Given a PatternGraph with PRD patterns
       When decoding with RequirementsDocumentCodec
       Then the document contains an "All Features" section
       And the all features table has columns:
@@ -85,12 +85,12 @@ Feature: Requirements and ADR Document Codecs
         | Status       |
 
     Scenario: Business value rendering when enabled
-      Given a MasterDataset with PRD patterns with business value
+      Given a PatternGraph with PRD patterns with business value
       When decoding with RequirementsDocumentCodec
       Then the feature list shows business value descriptions
 
     Scenario: Generate individual requirement detail files when enabled
-      Given a MasterDataset with PRD patterns
+      Given a PatternGraph with PRD patterns
       When decoding with generateDetailFiles enabled for requirements
       Then the document has requirement detail files:
         | path                                           |
@@ -100,18 +100,18 @@ Feature: Requirements and ADR Document Codecs
         | requirements/phase-02-admin-dashboard.md       |
 
     Scenario: Requirement detail file contains acceptance criteria from scenarios
-      Given a MasterDataset with PRD patterns with scenarios
+      Given a PatternGraph with PRD patterns with scenarios
       When decoding with generateDetailFiles enabled for requirements
       Then the requirement detail files contain acceptance criteria sections
       And the acceptance criteria shows scenario steps
 
     Scenario: Requirement detail file contains business rules section
-      Given a MasterDataset with PRD patterns with rules
+      Given a PatternGraph with PRD patterns with rules
       When decoding with generateDetailFiles enabled for requirements
       Then the requirement detail files contain business rules sections
 
     Scenario: Implementation links from relationshipIndex
-      Given a MasterDataset with PRD patterns with implementations
+      Given a PatternGraph with PRD patterns with implementations
       When decoding with generateDetailFiles enabled for requirements
       Then the requirement detail files contain implementations sections
 
@@ -121,20 +121,20 @@ Feature: Requirements and ADR Document Codecs
 
   Rule: AdrDocumentCodec documents architecture decisions
 
-    **Invariant:** AdrDocumentCodec transforms MasterDataset ADR patterns into an architecture decision record document with status tracking, category/phase/date grouping, supersession relationships, and optional detail file generation.
+    **Invariant:** AdrDocumentCodec transforms PatternGraph ADR patterns into an architecture decision record document with status tracking, category/phase/date grouping, supersession relationships, and optional detail file generation.
     **Rationale:** Architecture decisions lose value without status tracking and supersession chains; without them, teams act on outdated decisions and cannot trace why a previous approach was abandoned.
     **Verified by:** No ADR patterns produces empty message, Summary shows status counts and categories, ADRs grouped by category, ADRs grouped by phase option, ADRs grouped by date (quarter) option, ADR index table with all decisions, ADR entries use clean text without emojis, Context, Decision, Consequences sections from Rule keywords, ADR supersedes rendering, Generate individual ADR detail files when enabled, ADR detail file contains full content
 
     @happy-path @edge-case
     Scenario: No ADR patterns produces empty message
-      Given a MasterDataset with no ADR patterns
+      Given a PatternGraph with no ADR patterns
       When decoding with AdrDocumentCodec
       Then the document title is "Architecture Decision Records"
       And the document contains "No Architecture Decisions"
 
     @happy-path
     Scenario: Summary shows status counts and categories
-      Given a MasterDataset with ADR patterns
+      Given a PatternGraph with ADR patterns
       When decoding with AdrDocumentCodec
       Then the document title is "Architecture Decision Records"
       And the document contains a "Summary" section
@@ -148,25 +148,25 @@ Feature: Requirements and ADR Document Codecs
 
     @happy-path
     Scenario: ADRs grouped by category
-      Given a MasterDataset with ADR patterns
+      Given a PatternGraph with ADR patterns
       When decoding with AdrDocumentCodec
       Then the document contains a "By Category" section
       And the ADR categories show their decisions
 
     Scenario: ADRs grouped by phase option
-      Given a MasterDataset with ADR patterns
+      Given a PatternGraph with ADR patterns
       When decoding with AdrDocumentCodec using groupBy phase
       Then the document contains a "By Phase" section
       And ADR phase sections are collapsible
 
     Scenario: ADRs grouped by date (quarter) option
-      Given a MasterDataset with ADR patterns with quarters
+      Given a PatternGraph with ADR patterns with quarters
       When decoding with AdrDocumentCodec using groupBy date
       Then the document contains a "By Date" section
       And ADR date sections show quarters
 
     Scenario: ADR index table with all decisions
-      Given a MasterDataset with ADR patterns
+      Given a PatternGraph with ADR patterns
       When decoding with AdrDocumentCodec
       Then the document contains an "ADR Index" section
       And the ADR index table has columns:
@@ -177,23 +177,23 @@ Feature: Requirements and ADR Document Codecs
         | Category |
 
     Scenario: ADR entries use clean text without emojis
-      Given a MasterDataset with ADR patterns
+      Given a PatternGraph with ADR patterns
       When decoding with AdrDocumentCodec
       Then ADR index entries contain no emojis
 
     Scenario: Context, Decision, Consequences sections from Rule keywords
-      Given a MasterDataset with ADR patterns with semantic rules
+      Given a PatternGraph with ADR patterns with semantic rules
       When decoding with AdrDocumentCodec
       Then ADR entries contain semantic sections
 
     Scenario: ADR supersedes rendering
-      Given a MasterDataset with ADR patterns with supersession
+      Given a PatternGraph with ADR patterns with supersession
       When decoding with AdrDocumentCodec
       Then ADR entries show supersedes relationships
       And ADR entries show supersededBy relationships
 
     Scenario: Generate individual ADR detail files when enabled
-      Given a MasterDataset with ADR patterns
+      Given a PatternGraph with ADR patterns
       When decoding with generateDetailFiles enabled for ADR
       Then the document has ADR detail files:
         | path                                        |
@@ -203,7 +203,7 @@ Feature: Requirements and ADR Document Codecs
         | decisions/adr-004-use-temporal.md           |
 
     Scenario: ADR detail file contains full content
-      Given a MasterDataset with ADR patterns with semantic rules
+      Given a PatternGraph with ADR patterns with semantic rules
       When decoding with generateDetailFiles enabled for ADR
       Then the ADR detail files contain overview sections
       And the ADR detail files contain back links

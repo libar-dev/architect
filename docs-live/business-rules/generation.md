@@ -362,17 +362,17 @@ _Validates that ARCHITECTURE.md retains its full reference content and that_
 
 ---
 
-#### MasterDataset shapes appear in ARCHITECTURE-TYPES reference
+#### PatternGraph shapes appear in ARCHITECTURE-TYPES reference
 
-> **Invariant:** The ARCHITECTURE-TYPES.md reference document contains core MasterDataset types (MasterDataset, RuntimeMasterDataset, RawDataset) and pipeline types (PipelineOptions, PipelineResult) extracted from shape annotations.
+> **Invariant:** The ARCHITECTURE-TYPES.md reference document contains core PatternGraph types (PatternGraph, RuntimePatternGraph, RawDataset) and pipeline types (PipelineOptions, PipelineResult) extracted from shape annotations.
 >
 > **Rationale:** Type shapes are the structural backbone of the pipeline. Generating their documentation from annotations ensures the reference always matches the actual TypeScript interfaces, eliminating manual drift.
 
 **Verified by:**
 
-- Core MasterDataset types appear in ARCHITECTURE-TYPES
+- Core PatternGraph types appear in ARCHITECTURE-TYPES
 - Pipeline types appear in ARCHITECTURE-TYPES reference
-- Unified Transformation section has full MasterDataset content
+- Unified Transformation section has full PatternGraph content
 
 ---
 
@@ -554,7 +554,7 @@ _arch-tag-extraction.feature_
 
 ### Business Rules Document Codec
 
-_Tests the BusinessRulesCodec transformation from MasterDataset to RenderableDocument._
+_Tests the BusinessRulesCodec transformation from PatternGraph to RenderableDocument._
 
 ---
 
@@ -709,7 +709,7 @@ _Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)_
 
 > **Invariant:** CodecBasedGenerator delegates document generation to the underlying codec and surfaces codec errors through the generator interface.
 >
-> **Rationale:** The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side. MasterDataset is required in context — enforced by the TypeScript type system, not at runtime.
+> **Rationale:** The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side. PatternGraph is required in context — enforced by the TypeScript type system, not at runtime.
 
 **Verified by:**
 
@@ -1003,7 +1003,7 @@ _content-deduplication.feature_
 
 ### Convention Extractor
 
-_Extracts convention content from MasterDataset decision records_
+_Extracts convention content from PatternGraph decision records_
 
 ---
 
@@ -1476,7 +1476,7 @@ _Tests the full design review generation pipeline: sequence annotations are_
 
 > **Invariant:** buildSequenceIndexEntry produces a SequenceIndexEntry with steps sorted by stepNumber, participants deduplicated with orchestrator first, and data flow types collected from Input/Output annotations.
 >
-> **Rationale:** Pre-computing in the transform pass avoids repeated parsing in the codec. ADR-006 mandates the MasterDataset as the sole read model.
+> **Rationale:** Pre-computing in the transform pass avoids repeated parsing in the codec. ADR-006 mandates the PatternGraph as the sole read model.
 
 **Verified by:**
 
@@ -1906,7 +1906,7 @@ _implementation-links.feature_
 
 ### Index Codec
 
-_Validates the Index Codec that transforms MasterDataset into a_
+_Validates the Index Codec that transforms PatternGraph into a_
 
 ---
 
@@ -3263,12 +3263,12 @@ _Scoped diagram generation from diagramScopes config, including archContext,_
 
 > **Invariant:** Hardcoded diagram sources render without relationship-scoping input and emit stable, source-specific Mermaid content.
 >
-> **Rationale:** Domain diagrams such as pipeline and MasterDataset fan-out encode canonical architecture views that should not depend on ad-hoc test dataset shape.
+> **Rationale:** Domain diagrams such as pipeline and PatternGraph fan-out encode canonical architecture views that should not depend on ad-hoc test dataset shape.
 
 **Verified by:**
 
-- master-dataset-views source produces MasterDataset fan-out diagram
-- master-dataset-views source renders expected fan-out nodes
+- pattern-graph-views source produces PatternGraph fan-out diagram
+- pattern-graph-views source renders expected fan-out nodes
 
 ---
 
@@ -3788,7 +3788,7 @@ _- Need to generate product requirements documents with flexible groupings_
 
 #### RequirementsDocumentCodec generates PRD-style documentation from patterns
 
-> **Invariant:** RequirementsDocumentCodec transforms MasterDataset patterns into a PRD-style document with flexible grouping (product area, user role, or phase), optional detail file generation, and business value rendering.
+> **Invariant:** RequirementsDocumentCodec transforms PatternGraph patterns into a PRD-style document with flexible grouping (product area, user role, or phase), optional detail file generation, and business value rendering.
 >
 > **Rationale:** Flexible grouping lets stakeholders view requirements through their preferred lens (area, role, or phase), and detail files provide deep-dive context without bloating the summary document.
 
@@ -3811,7 +3811,7 @@ _- Need to generate product requirements documents with flexible groupings_
 
 #### AdrDocumentCodec documents architecture decisions
 
-> **Invariant:** AdrDocumentCodec transforms MasterDataset ADR patterns into an architecture decision record document with status tracking, category/phase/date grouping, supersession relationships, and optional detail file generation.
+> **Invariant:** AdrDocumentCodec transforms PatternGraph ADR patterns into an architecture decision record document with status tracking, category/phase/date grouping, supersession relationships, and optional detail file generation.
 >
 > **Rationale:** Architecture decisions lose value without status tracking and supersession chains; without them, teams act on outdated decisions and cannot trace why a previous approach was abandoned.
 
@@ -4317,7 +4317,7 @@ _table-extraction.feature_
 
 ### Taxonomy Codec
 
-_Validates the Taxonomy Codec that transforms MasterDataset into a_
+_Validates the Taxonomy Codec that transforms PatternGraph into a_
 
 ---
 
@@ -4485,7 +4485,7 @@ _- Generators need multiple views of the same pattern data_
 
 #### Empty dataset produces valid zero-state views
 
-> **Invariant:** An empty input produces a MasterDataset with all counts at zero and no groupings.
+> **Invariant:** An empty input produces a PatternGraph with all counts at zero and no groupings.
 >
 > **Rationale:** Generators must handle the zero-state gracefully; a missing or malformed empty dataset would cause null-reference errors across all rendering codecs.
 
@@ -4570,7 +4570,7 @@ _- Generators need multiple views of the same pattern data_
 
 #### Workflow integration conditionally includes delivery process data
 
-> **Invariant:** The workflow is included in the MasterDataset only when provided, and phase names are resolved from the workflow configuration.
+> **Invariant:** The workflow is included in the PatternGraph only when provided, and phase names are resolved from the workflow configuration.
 >
 > **Rationale:** Projects without a delivery workflow must still produce valid datasets; unconditionally requiring workflow data would break standalone documentation generation.
 
@@ -4583,7 +4583,7 @@ _transform-dataset.feature_
 
 ### Validation Rules Codec
 
-_Validates the Validation Rules Codec that transforms MasterDataset into a_
+_Validates the Validation Rules Codec that transforms PatternGraph into a_
 
 ---
 

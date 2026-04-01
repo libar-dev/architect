@@ -29,7 +29,7 @@
 
 ## Shared Pipeline Factory Responsibilities
 
-**Invariant:** `buildMasterDataset()` is the shared factory for Steps 1-8 of the architecture pipeline and returns `Result<PipelineResult, PipelineError>` without process-level side effects.
+**Invariant:** `buildPatternGraph()` is the shared factory for Steps 1-8 of the architecture pipeline and returns `Result<PipelineResult, PipelineError>` without process-level side effects.
 
 **Rationale:** Centralizing scan/extract/merge/transform flow prevents divergence between CLI consumers and preserves a single ADR-006 read-model path.
 
@@ -39,7 +39,7 @@
 
 The factory owns: configuration load, TypeScript scan + extraction, Gherkin scan +
 extraction, merge conflict handling, hierarchy child derivation, workflow load,
-and `transformToMasterDataset` with validation summary.
+and `transformToPatternGraph` with validation summary.
 
 ---
 
@@ -52,7 +52,7 @@ and `failOnScanErrors` policy without forking pipeline logic.
 
 ### When to Use
 
-- Any consumer needs a MasterDataset without rewriting scan/extract/merge flow
+- Any consumer needs a PatternGraph without rewriting scan/extract/merge flow
 - CLI consumers require differentiated conflict strategy and validation behavior
 - Orchestrator needs a shared steps 1-8 implementation before codec/file execution
 
@@ -65,22 +65,22 @@ Scoped architecture diagram showing component relationships:
 ```mermaid
 graph TB
     subgraph api["Api"]
-        MasterDataset[/"MasterDataset"/]
-        MCPToolRegistry("MCPToolRegistry")
-        MCPServerImpl("MCPServerImpl")
-        MCPPipelineSession("MCPPipelineSession")
-        MCPModule[/"MCPModule"/]
-        MCPFileWatcher[/"MCPFileWatcher"/]
+        PatternGraph[/"PatternGraph"/]
         PatternSummarizerImpl("PatternSummarizerImpl")
         ScopeValidatorImpl("ScopeValidatorImpl")
-        ProcessStateAPI("ProcessStateAPI")
         PatternHelpers["PatternHelpers"]
+        PatternGraphAPI("PatternGraphAPI")
         HandoffGeneratorImpl("HandoffGeneratorImpl")
         FuzzyMatcherImpl("FuzzyMatcherImpl")
         CoverageAnalyzerImpl("CoverageAnalyzerImpl")
         ContextFormatterImpl("ContextFormatterImpl")
         ContextAssemblerImpl("ContextAssemblerImpl")
         ArchQueriesImpl("ArchQueriesImpl")
+        MCPToolRegistry("MCPToolRegistry")
+        MCPServerImpl("MCPServerImpl")
+        MCPPipelineSession("MCPPipelineSession")
+        MCPModule[/"MCPModule"/]
+        MCPFileWatcher[/"MCPFileWatcher"/]
     end
     subgraph cli["Cli"]
         ReplMode("ReplMode")
@@ -98,9 +98,9 @@ graph TB
         RulesQueryModule["RulesQueryModule"]:::neighbor
         FSMValidator["FSMValidator"]:::neighbor
         PipelineFactory["PipelineFactory"]:::neighbor
-        ProcessStateAPICLI["ProcessStateAPICLI"]:::neighbor
         ProcessApiHybridGeneration["ProcessApiHybridGeneration"]:::neighbor
         PhaseStateMachineValidation["PhaseStateMachineValidation"]:::neighbor
+        PatternGraphAPICLI["PatternGraphAPICLI"]:::neighbor
         MCPServerIntegration["MCPServerIntegration"]:::neighbor
         DataAPIDesignSessionSupport["DataAPIDesignSessionSupport"]:::neighbor
         DataAPIOutputShaping["DataAPIOutputShaping"]:::neighbor
@@ -108,33 +108,17 @@ graph TB
         DataAPICLIErgonomics["DataAPICLIErgonomics"]:::neighbor
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
     end
-    MCPToolRegistry -->|uses| ProcessStateAPI
-    MCPToolRegistry -->|uses| MCPPipelineSession
-    MCPToolRegistry ..->|implements| MCPServerIntegration
-    MCPServerImpl -->|uses| MCPPipelineSession
-    MCPServerImpl -->|uses| MCPToolRegistry
-    MCPServerImpl -->|uses| MCPFileWatcher
-    MCPServerImpl ..->|implements| MCPServerIntegration
-    MCPPipelineSession -->|uses| PipelineFactory
-    MCPPipelineSession -->|uses| ProcessStateAPI
-    MCPPipelineSession -->|uses| ConfigLoader
-    MCPPipelineSession ..->|implements| MCPServerIntegration
-    MCPModule -->|uses| MCPServerImpl
-    MCPModule -->|uses| MCPPipelineSession
-    MCPModule -->|uses| MCPFileWatcher
-    MCPModule -->|uses| MCPToolRegistry
-    MCPFileWatcher ..->|implements| MCPServerIntegration
     ReplMode -->|uses| PipelineFactory
-    ReplMode -->|uses| ProcessStateAPI
+    ReplMode -->|uses| PatternGraphAPI
     ReplMode ..->|implements| DataAPICLIErgonomics
-    ProcessAPICLIImpl -->|uses| ProcessStateAPI
-    ProcessAPICLIImpl -->|uses| MasterDataset
+    ProcessAPICLIImpl -->|uses| PatternGraphAPI
+    ProcessAPICLIImpl -->|uses| PatternGraph
     ProcessAPICLIImpl -->|uses| PipelineFactory
     ProcessAPICLIImpl -->|uses| RulesQueryModule
     ProcessAPICLIImpl -->|uses| PatternSummarizerImpl
     ProcessAPICLIImpl -->|uses| FuzzyMatcherImpl
     ProcessAPICLIImpl -->|uses| OutputPipelineImpl
-    ProcessAPICLIImpl ..->|implements| ProcessStateAPICLI
+    ProcessAPICLIImpl ..->|implements| PatternGraphAPICLI
     OutputPipelineImpl -->|uses| PatternSummarizerImpl
     OutputPipelineImpl ..->|implements| DataAPIOutputShaping
     MCPServerBin -->|uses| MCPServerImpl
@@ -143,38 +127,54 @@ graph TB
     DatasetCache -->|uses| WorkflowConfigSchema
     DatasetCache ..->|implements| DataAPICLIErgonomics
     CLISchema ..->|implements| ProcessApiHybridGeneration
-    PatternSummarizerImpl -->|uses| ProcessStateAPI
+    PatternSummarizerImpl -->|uses| PatternGraphAPI
     PatternSummarizerImpl ..->|implements| DataAPIOutputShaping
-    ScopeValidatorImpl -->|uses| ProcessStateAPI
-    ScopeValidatorImpl -->|uses| MasterDataset
+    ScopeValidatorImpl -->|uses| PatternGraphAPI
+    ScopeValidatorImpl -->|uses| PatternGraph
     ScopeValidatorImpl -->|uses| StubResolverImpl
     ScopeValidatorImpl ..->|implements| DataAPIDesignSessionSupport
-    ProcessStateAPI -->|uses| MasterDataset
-    ProcessStateAPI -->|uses| FSMValidator
-    ProcessStateAPI ..->|implements| PhaseStateMachineValidation
     PatternHelpers ..->|implements| DataAPIOutputShaping
-    HandoffGeneratorImpl -->|uses| ProcessStateAPI
-    HandoffGeneratorImpl -->|uses| MasterDataset
+    PatternGraphAPI -->|uses| PatternGraph
+    PatternGraphAPI -->|uses| FSMValidator
+    PatternGraphAPI ..->|implements| PhaseStateMachineValidation
+    HandoffGeneratorImpl -->|uses| PatternGraphAPI
+    HandoffGeneratorImpl -->|uses| PatternGraph
     HandoffGeneratorImpl -->|uses| ContextFormatterImpl
     HandoffGeneratorImpl ..->|implements| DataAPIDesignSessionSupport
     FuzzyMatcherImpl ..->|implements| DataAPIOutputShaping
     CoverageAnalyzerImpl -->|uses| Pattern_Scanner
-    CoverageAnalyzerImpl -->|uses| MasterDataset
+    CoverageAnalyzerImpl -->|uses| PatternGraph
     CoverageAnalyzerImpl ..->|implements| DataAPIArchitectureQueries
     ContextFormatterImpl -->|uses| ContextAssemblerImpl
     ContextFormatterImpl ..->|implements| DataAPIContextAssembly
-    ContextAssemblerImpl -->|uses| ProcessStateAPI
-    ContextAssemblerImpl -->|uses| MasterDataset
+    ContextAssemblerImpl -->|uses| PatternGraphAPI
+    ContextAssemblerImpl -->|uses| PatternGraph
     ContextAssemblerImpl -->|uses| PatternSummarizerImpl
     ContextAssemblerImpl -->|uses| FuzzyMatcherImpl
     ContextAssemblerImpl -->|uses| StubResolverImpl
     ContextAssemblerImpl ..->|implements| DataAPIContextAssembly
-    ArchQueriesImpl -->|uses| ProcessStateAPI
-    ArchQueriesImpl -->|uses| MasterDataset
+    ArchQueriesImpl -->|uses| PatternGraphAPI
+    ArchQueriesImpl -->|uses| PatternGraph
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
-    StubResolverImpl -->|uses| ProcessStateAPI
+    MCPToolRegistry -->|uses| PatternGraphAPI
+    MCPToolRegistry -->|uses| MCPPipelineSession
+    MCPToolRegistry ..->|implements| MCPServerIntegration
+    MCPServerImpl -->|uses| MCPPipelineSession
+    MCPServerImpl -->|uses| MCPToolRegistry
+    MCPServerImpl -->|uses| MCPFileWatcher
+    MCPServerImpl ..->|implements| MCPServerIntegration
+    MCPPipelineSession -->|uses| PipelineFactory
+    MCPPipelineSession -->|uses| PatternGraphAPI
+    MCPPipelineSession -->|uses| ConfigLoader
+    MCPPipelineSession ..->|implements| MCPServerIntegration
+    MCPModule -->|uses| MCPServerImpl
+    MCPModule -->|uses| MCPPipelineSession
+    MCPModule -->|uses| MCPFileWatcher
+    MCPModule -->|uses| MCPToolRegistry
+    MCPFileWatcher ..->|implements| MCPServerIntegration
+    StubResolverImpl -->|uses| PatternGraphAPI
     FSMValidator ..->|implements| PhaseStateMachineValidation
-    PipelineFactory -->|uses| MasterDataset
+    PipelineFactory -->|uses| PatternGraph
     MCPServerIntegration -.->|depends on| DataAPICLIErgonomics
     DataAPIDesignSessionSupport -.->|depends on| DataAPIContextAssembly
     DataAPIContextAssembly -.->|depends on| DataAPIOutputShaping
@@ -190,7 +190,7 @@ graph TB
 
 ```typescript
 /**
- * Options for building a MasterDataset via the shared pipeline.
+ * Options for building a PatternGraph via the shared pipeline.
  *
  * DD-1: Factory lives at src/generators/pipeline/build-pipeline.ts.
  * DD-2: mergeConflictStrategy controls per-consumer conflict handling.
@@ -235,14 +235,14 @@ interface PipelineOptions {
 
 ```typescript
 interface PipelineResult {
-  readonly dataset: RuntimeMasterDataset;
+  readonly dataset: RuntimePatternGraph;
   readonly validation: ValidationSummary;
   readonly warnings: readonly PipelineWarning[];
   readonly scanMetadata: ScanMetadata;
 }
 ```
 
-### MasterDatasetSchema (const)
+### PatternGraphSchema (const)
 
 ```typescript
 /**
@@ -255,7 +255,7 @@ interface PipelineResult {
 ```
 
 ```typescript
-MasterDatasetSchema = z.object({
+PatternGraphSchema = z.object({
   // ─────────────────────────────────────────────────────────────────────────
   // Raw Data
   // ─────────────────────────────────────────────────────────────────────────
@@ -550,17 +550,17 @@ ArchIndexSchema = z.object({
 
 ### Data API CLI Ergonomics
 
-| Rule                                                                      | Invariant                                                                                                                                | Rationale                                                                                                                                                                                                                                                                                                                                                      |
-| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MasterDataset is cached between invocations with file-change invalidation | Cache is automatically invalidated when any source file (TypeScript or Gherkin) has a modification time newer than the cache.            | The pipeline (scan -> extract -> transform) runs fresh on every invocation (~2-5 seconds). Most queries during a session don't need fresh data -- the source files haven't changed between queries. Caching the MasterDataset to a temp file with file-modification-time invalidation makes subsequent queries instant while ensuring staleness is impossible. |
-| REPL mode keeps pipeline loaded for interactive multi-query sessions      | REPL mode loads the pipeline once and accepts multiple queries on stdin, with optional tab completion for pattern names and subcommands. | Design sessions often involve 10-20 exploratory queries in sequence (check status, look up pattern, check deps, look up another pattern). REPL mode eliminates per-query pipeline overhead entirely.                                                                                                                                                           |
-| Per-subcommand help and diagnostic modes aid discoverability              | Every subcommand supports `--help` with usage, flags, and examples. Dry-run shows pipeline scope without executing.                      | AI agents read `--help` output to discover available commands and flags. Without per-subcommand help, agents must read external documentation. Dry-run mode helps diagnose "why no patterns found?" issues by showing what would be scanned.                                                                                                                   |
+| Rule                                                                     | Invariant                                                                                                                                | Rationale                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PatternGraph is cached between invocations with file-change invalidation | Cache is automatically invalidated when any source file (TypeScript or Gherkin) has a modification time newer than the cache.            | The pipeline (scan -> extract -> transform) runs fresh on every invocation (~2-5 seconds). Most queries during a session don't need fresh data -- the source files haven't changed between queries. Caching the PatternGraph to a temp file with file-modification-time invalidation makes subsequent queries instant while ensuring staleness is impossible. |
+| REPL mode keeps pipeline loaded for interactive multi-query sessions     | REPL mode loads the pipeline once and accepts multiple queries on stdin, with optional tab completion for pattern names and subcommands. | Design sessions often involve 10-20 exploratory queries in sequence (check status, look up pattern, check deps, look up another pattern). REPL mode eliminates per-query pipeline overhead entirely.                                                                                                                                                          |
+| Per-subcommand help and diagnostic modes aid discoverability             | Every subcommand supports `--help` with usage, flags, and examples. Dry-run shows pipeline scope without executing.                      | AI agents read `--help` output to discover available commands and flags. Without per-subcommand help, agents must read external documentation. Dry-run mode helps diagnose "why no patterns found?" issues by showing what would be scanned.                                                                                                                  |
 
 ### Data API Context Assembly
 
 | Rule                                                           | Invariant                                                                                                                                                                                           | Rationale                                                                                                                                                                                                                                                                                                  |
 | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Context command assembles curated context for a single pattern | Given a pattern name, `context` returns everything needed to start working on that pattern: metadata, file locations, dependency status, and architecture position -- in ~1.5KB of structured text. | This is the core value proposition. The command crosses five gaps simultaneously: it assembles data from multiple MasterDataset indexes, shapes it compactly, resolves file paths from pattern names, discovers stubs by convention, and tailors output by session type.                                   |
+| Context command assembles curated context for a single pattern | Given a pattern name, `context` returns everything needed to start working on that pattern: metadata, file locations, dependency status, and architecture position -- in ~1.5KB of structured text. | This is the core value proposition. The command crosses five gaps simultaneously: it assembles data from multiple PatternGraph indexes, shapes it compactly, resolves file paths from pattern names, discovers stubs by convention, and tailors output by session type.                                    |
 | Files command returns only file paths organized by relevance   | `files` returns the most token-efficient output possible -- just file paths that Claude Code can read directly.                                                                                     | Most context tokens are spent reading actual files, not metadata. The `files` command tells Claude Code _which_ files to read, organized by importance. Claude Code then reads what it needs. This is more efficient than `context` when the agent already knows the pattern and just needs the file list. |
 | Dep-tree command shows recursive dependency chain with status  | The dependency tree walks both `dependsOn`/`enables` (planning) and `uses`/`usedBy` (implementation) relationships with configurable depth.                                                         | Before starting work on a pattern, agents need to know the full dependency chain: what must be complete first, what this unblocks, and where the current pattern sits in the sequence. A tree visualization with status markers makes blocking relationships immediately visible.                          |
 | Context command supports multiple patterns with merged output  | Multi-pattern context deduplicates shared dependencies and highlights overlap between patterns.                                                                                                     | Design sessions often span multiple related patterns (e.g., reviewing DS-2 through DS-5 together). Separate `context` calls would duplicate shared dependencies. Merged context shows the union of all dependencies with overlap analysis.                                                                 |
@@ -587,19 +587,19 @@ ArchIndexSchema = z.object({
 
 | Rule                                                              | Invariant                                                                                                                                                                          | Rationale                                                                                                                                                                                                                                                                                                      |
 | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ProcessStateAPI is accessible as an MCP server for Claude Code    | The MCP server exposes all ProcessStateAPI methods as MCP tools with typed input/output schemas. The pipeline is loaded once on server start and refreshed on source file changes. | MCP is Claude Code's native tool integration protocol. An MCP server eliminates the CLI subprocess overhead (2-5s per query) and enables Claude Code to call process queries as naturally as it calls other tools. Stateful operation means the pipeline loads once and serves many queries.                   |
+| PatternGraphAPI is accessible as an MCP server for Claude Code    | The MCP server exposes all PatternGraphAPI methods as MCP tools with typed input/output schemas. The pipeline is loaded once on server start and refreshed on source file changes. | MCP is Claude Code's native tool integration protocol. An MCP server eliminates the CLI subprocess overhead (2-5s per query) and enables Claude Code to call process queries as naturally as it calls other tools. Stateful operation means the pipeline loads once and serves many queries.                   |
 | Process state can be auto-generated as CLAUDE.md context sections | Generated CLAUDE.md sections are additive layers that provide pattern metadata, relationships, and reading lists for specific scopes.                                              | CLAUDE.md is the primary mechanism for providing persistent context to Claude Code sessions. Auto-generating CLAUDE.md sections from process state ensures the context is always fresh and consistent with the source annotations. This applies the "code-first documentation" principle to AI context itself. |
 | Cross-package views show dependencies spanning multiple packages  | Cross-package queries aggregate patterns from multiple input sources and resolve cross-package relationships.                                                                      | In the monorepo, patterns in `platform-core` are used by patterns in `platform-bc`, which are used by the example app. Understanding these cross-package dependencies is essential for release planning and impact analysis. Currently each package must be queried independently with separate input globs.   |
 | Process validation integrates with git hooks and file watching    | Pre-commit hooks validate annotation consistency. Watch mode re-generates docs on source changes.                                                                                  | Git hooks catch annotation errors at commit time (e.g., new `uses` reference to non-existent pattern, invalid `arch-role` value, stub `@target` to non-existent directory). Watch mode enables live documentation regeneration during implementation sessions.                                                 |
 
 ### Data API Relationship Graph
 
-| Rule                                                                      | Invariant                                                                                                                                                                                     | Rationale                                                                                                                                                                                                                                                           |
-| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Graph command traverses relationships recursively with configurable depth | Graph traversal walks both planning relationships (`dependsOn`, `enables`) and implementation relationships (`uses`, `usedBy`) with cycle detection to prevent infinite loops.                | Flat lookups show direct connections. Recursive traversal shows the full picture: transitive dependencies, indirect consumers, and the complete chain from root to leaf. Depth limiting prevents overwhelming output on deeply connected graphs.                    |
-| Impact analysis shows transitive dependents of a pattern                  | Impact analysis answers "if I change X, what else is affected?" by walking `usedBy` + `enables` recursively.                                                                                  | Before modifying a completed pattern (which requires unlock), understanding the blast radius prevents unintended breakage. Impact analysis is the reverse of dependency traversal -- it looks forward, not backward.                                                |
-| Path finding discovers relationship chains between two patterns           | Path finding returns the shortest chain of relationships connecting two patterns, or indicates no path exists. Traversal considers all relationship types (uses, usedBy, dependsOn, enables). | Understanding how two seemingly unrelated patterns connect helps agents assess indirect dependencies before making changes. When pattern A and pattern D are connected through B and C, modifying A requires understanding that chain.                              |
-| Graph health commands detect broken references and isolated patterns      | Dangling references (pattern names in `uses`/`dependsOn` that don't match any pattern definition) are detectable. Orphan patterns (no relationships at all) are identifiable.                 | The MasterDataset transformer already computes dangling references during Pass 3 (relationship resolution) but does not expose them via the API. Orphan patterns indicate missing annotations. Both are data quality signals that improve over time with attention. |
+| Rule                                                                      | Invariant                                                                                                                                                                                     | Rationale                                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Graph command traverses relationships recursively with configurable depth | Graph traversal walks both planning relationships (`dependsOn`, `enables`) and implementation relationships (`uses`, `usedBy`) with cycle detection to prevent infinite loops.                | Flat lookups show direct connections. Recursive traversal shows the full picture: transitive dependencies, indirect consumers, and the complete chain from root to leaf. Depth limiting prevents overwhelming output on deeply connected graphs.                   |
+| Impact analysis shows transitive dependents of a pattern                  | Impact analysis answers "if I change X, what else is affected?" by walking `usedBy` + `enables` recursively.                                                                                  | Before modifying a completed pattern (which requires unlock), understanding the blast radius prevents unintended breakage. Impact analysis is the reverse of dependency traversal -- it looks forward, not backward.                                               |
+| Path finding discovers relationship chains between two patterns           | Path finding returns the shortest chain of relationships connecting two patterns, or indicates no path exists. Traversal considers all relationship types (uses, usedBy, dependsOn, enables). | Understanding how two seemingly unrelated patterns connect helps agents assess indirect dependencies before making changes. When pattern A and pattern D are connected through B and C, modifying A requires understanding that chain.                             |
+| Graph health commands detect broken references and isolated patterns      | Dangling references (pattern names in `uses`/`dependsOn` that don't match any pattern definition) are detectable. Orphan patterns (no relationships at all) are identifiable.                 | The PatternGraph transformer already computes dangling references during Pass 3 (relationship resolution) but does not expose them via the API. Orphan patterns indicate missing annotations. Both are data quality signals that improve over time with attention. |
 
 ### Data API Stub Integration
 
@@ -660,13 +660,13 @@ ArchIndexSchema = z.object({
 
 ### MCP Server Integration
 
-| Rule                                                                    | Invariant                                                                                                                                                                                                                                                                                                 | Rationale                                                                                                                                                                                                                                                                               |
-| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MCP server starts via stdio transport and manages its own lifecycle     | The MCP server communicates over stdio using JSON-RPC. It builds the pipeline once during initialization, then enters a request-response loop. No non-MCP output is written to stdout (no console.log, no pnpm banners).                                                                                  | MCP defines stdio as the standard transport for local tool servers. Claude Code spawns the process and communicates over stdin/stdout pipes. Any extraneous stdout output corrupts the JSON-RPC stream. Loading the pipeline during initialization ensures the first tool call is fast. |
-| ProcessStateAPI methods and CLI subcommands are registered as MCP tools | Every CLI subcommand is registered as an MCP tool with a JSON Schema describing its input parameters. Tool names use snake*case with a "architect*" prefix to avoid collisions with other MCP servers.                                                                                                    | MCP tools are the unit of interaction. Each tool needs a name, description (for LLM tool selection), and JSON Schema for input validation. The "architect\_" prefix prevents collisions in multi-server setups.                                                                         |
-| MasterDataset is loaded once and reused across all tool invocations     | The pipeline runs exactly once during server initialization. All subsequent tool calls read from in-memory MasterDataset. A manual rebuild can be triggered via a "architect_rebuild" tool, and overlapping rebuild requests coalesce so the final in-memory session reflects the newest completed build. | The pipeline costs 2-5 seconds. Running it per tool call negates MCP benefits. Pre-computed views provide O(1) access ideal for a query server.                                                                                                                                         |
-| Source file changes trigger automatic dataset rebuild with debouncing   | When --watch is enabled, changes to source files trigger an automatic pipeline rebuild. Multiple rapid changes are debounced into a single rebuild (default 500ms window).                                                                                                                                | During implementation sessions, source files change frequently. Without auto-rebuild, agents must manually call architect_rebuild. Debouncing prevents redundant rebuilds during rapid-fire saves.                                                                                      |
-| MCP server is configurable via standard client configuration            | The server works with .mcp.json (Claude Code), claude_desktop_config.json (Claude Desktop), and any MCP client. It accepts --input, --features, --base-dir args, auto-detects architect.config.ts, and reports the package version accurately through the CLI.                                            | MCP clients discover servers through configuration files. The server must work with sensible defaults (config auto-detection) while supporting explicit overrides for monorepo setups.                                                                                                  |
+| Rule                                                                    | Invariant                                                                                                                                                                                                                                                                                                | Rationale                                                                                                                                                                                                                                                                               |
+| ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MCP server starts via stdio transport and manages its own lifecycle     | The MCP server communicates over stdio using JSON-RPC. It builds the pipeline once during initialization, then enters a request-response loop. No non-MCP output is written to stdout (no console.log, no pnpm banners).                                                                                 | MCP defines stdio as the standard transport for local tool servers. Claude Code spawns the process and communicates over stdin/stdout pipes. Any extraneous stdout output corrupts the JSON-RPC stream. Loading the pipeline during initialization ensures the first tool call is fast. |
+| PatternGraphAPI methods and CLI subcommands are registered as MCP tools | Every CLI subcommand is registered as an MCP tool with a JSON Schema describing its input parameters. Tool names use snake*case with a "architect*" prefix to avoid collisions with other MCP servers.                                                                                                   | MCP tools are the unit of interaction. Each tool needs a name, description (for LLM tool selection), and JSON Schema for input validation. The "architect\_" prefix prevents collisions in multi-server setups.                                                                         |
+| PatternGraph is loaded once and reused across all tool invocations      | The pipeline runs exactly once during server initialization. All subsequent tool calls read from in-memory PatternGraph. A manual rebuild can be triggered via a "architect_rebuild" tool, and overlapping rebuild requests coalesce so the final in-memory session reflects the newest completed build. | The pipeline costs 2-5 seconds. Running it per tool call negates MCP benefits. Pre-computed views provide O(1) access ideal for a query server.                                                                                                                                         |
+| Source file changes trigger automatic dataset rebuild with debouncing   | When --watch is enabled, changes to source files trigger an automatic pipeline rebuild. Multiple rapid changes are debounced into a single rebuild (default 500ms window).                                                                                                                               | During implementation sessions, source files change frequently. Without auto-rebuild, agents must manually call architect_rebuild. Debouncing prevents redundant rebuilds during rapid-fire saves.                                                                                      |
+| MCP server is configurable via standard client configuration            | The server works with .mcp.json (Claude Code), claude_desktop_config.json (Claude Desktop), and any MCP client. It accepts --input, --features, --base-dir args, auto-detects architect.config.ts, and reports the package version accurately through the CLI.                                           | MCP clients discover servers through configuration files. The server must work with sensible defaults (config auto-detection) while supporting explicit overrides for monorepo setups.                                                                                                  |
 
 ### Output Pipeline Tests
 
@@ -676,6 +676,36 @@ ArchIndexSchema = z.object({
 | Modifier conflicts are rejected                | Mutually exclusive modifier combinations (full+names-only, full+count, full+fields) and invalid field names must be rejected with clear error messages.                               | Conflicting modifiers produce ambiguous intent — rejecting early with a clear message is better than silently picking one modifier and ignoring the other. |
 | List filters compose via AND logic             | Multiple list filters (status, category) must compose via AND logic, with pagination (limit/offset) applied after filtering and empty results for out-of-range offsets.               | AND composition is the intuitive default for filters — "status=active AND category=core" should narrow results, not widen them via OR logic.               |
 | Empty stripping removes noise                  | Null and empty values must be stripped from output objects to reduce noise in API responses.                                                                                          | Empty fields in pattern summaries create visual clutter and waste tokens in AI context windows — stripping them keeps output focused on meaningful data.   |
+
+### Pattern Graph API CLI
+
+| Rule                                      | Invariant                                                        | Rationale                                                                                                                                                                                                                                     |
+| ----------------------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CLI supports status-based pattern queries | Every PatternGraphAPI status query method is accessible via CLI. | The most common planning question is "what's the current state?" Status queries (active, roadmap, completed) answer this directly without reading docs. Without CLI access, Claude Code must regenerate markdown and parse unstructured text. |
+| CLI supports phase-based queries          | Patterns can be filtered by phase number.                        | Phase 18 (Event Durability) is the current focus per roadmap priorities. Quick phase queries help assess progress and remaining work within a phase. Phase-based planning is the primary organization method for roadmap work.                |
+| CLI provides progress summary queries     | Overall and per-phase progress is queryable in a single command. | Planning sessions need quick answers to "where are we?" without reading the full PATTERNS.md generated file. Progress metrics drive prioritization and help identify where to focus effort.                                                   |
+| CLI supports multiple output formats      | JSON output is parseable by AI agents without transformation.    | Claude Code can parse JSON directly. Text format is for human reading. JSON format enables scripting and integration with other tools. The primary use case is AI agent parsing where structured output reduces context and errors.           |
+| CLI supports individual pattern lookup    | Any pattern can be queried by name with full details.            | During implementation, Claude Code needs to check specific pattern status, deliverables, and dependencies without reading the full spec file. Pattern lookup is essential for focused implementation work.                                    |
+| CLI provides discoverable help            | All flags are documented via --help with examples.               | Claude Code can read --help output to understand available queries without needing external documentation. Self-documenting CLIs reduce the need for Claude Code to read additional context files.                                            |
+
+### Pattern Graph API Relationship Queries
+
+| Rule                                             | Invariant                                                               | Rationale                                                                                                                                                                                                        |
+| ------------------------------------------------ | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| API provides implementation relationship queries | Every pattern with `implementedBy` entries is discoverable via the API. | Claude Code needs to navigate from abstract patterns to concrete code. Without this, exploration requires manual grep + file reading, wasting context tokens.                                                    |
+| API provides inheritance hierarchy queries       | Pattern inheritance chains are fully navigable in both directions.      | Patterns form specialization hierarchies (e.g., ReactiveProjections extends ProjectionCategories). Claude Code needs to understand what specializes a base pattern and what a specialized pattern inherits from. |
+| API provides combined relationship views         | All relationship types are accessible through a unified interface.      | Claude Code often needs the complete picture: dependencies AND implementations AND inheritance. A single call reduces round-trips and context switching.                                                         |
+| API supports bidirectional traceability queries  | Navigation from spec to code and code to spec is symmetric.             | Traceability is bidirectional by definition. If a spec links to code, the code should link back to the spec. The API should surface broken links.                                                                |
+
+### Pattern Graph API Testing
+
+| Rule                                           | Invariant                                                                                                                     | Rationale                                                                                                                    |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Status queries return correct patterns         | Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).   | The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.          |
+| Phase queries return correct phase data        | Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.      | Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages. |
+| FSM queries expose transition validation       | FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.              | Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.          |
+| Pattern queries find and retrieve pattern data | Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.  | Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.                      |
+| Timeline queries group patterns by time        | Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit. | Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.               |
 
 ### Pattern Helpers Tests
 
@@ -707,9 +737,9 @@ ArchIndexSchema = z.object({
 
 ### Process Api Cli Cache
 
-| Rule                                        | Invariant                                                                                                                                                                            | Rationale                                                                                                                                                                                    |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MasterDataset is cached between invocations | When source files have not changed between CLI invocations, the second invocation must use the cached MasterDataset and report cache.hit as true alongside pipeline timing metadata. | The pipeline rebuild costs 2-5 seconds per invocation. Caching eliminates this cost for repeated queries against unchanged sources, which is the common case during interactive AI sessions. |
+| Rule                                       | Invariant                                                                                                                                                                           | Rationale                                                                                                                                                                                    |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PatternGraph is cached between invocations | When source files have not changed between CLI invocations, the second invocation must use the cached PatternGraph and report cache.hit as true alongside pipeline timing metadata. | The pipeline rebuild costs 2-5 seconds per invocation. Caching eliminates this cost for repeated queries against unchanged sources, which is the common case during interactive AI sessions. |
 
 ### Process Api Cli Core
 
@@ -717,10 +747,10 @@ ArchIndexSchema = z.object({
 | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | CLI displays help and version information         | The CLI must always provide discoverable usage and version information via standard flags.                                    | Without accessible help and version output, users cannot self-serve CLI usage or report issues with a specific version.                                                                                                          |
 | CLI requires input flag for subcommands           | Every data-querying subcommand must receive either an explicit `--input` glob or a project config that provides source globs. | Without an input source, the pipeline has no files to scan and would produce empty or misleading results instead of a clear error, but project config auto-detection should remove that boilerplate when the repo is configured. |
-| CLI status subcommand shows delivery state        | The status subcommand must return structured JSON containing delivery progress derived from the MasterDataset.                | Consumers depend on machine-readable status output for scripting and CI integration; unstructured output breaks downstream automation.                                                                                           |
+| CLI status subcommand shows delivery state        | The status subcommand must return structured JSON containing delivery progress derived from the PatternGraph.                 | Consumers depend on machine-readable status output for scripting and CI integration; unstructured output breaks downstream automation.                                                                                           |
 | CLI query subcommand executes API methods         | The query subcommand must dispatch to any public Data API method by name and pass positional arguments through.               | The CLI is the primary interface for ad-hoc queries; failing to resolve a valid method name or its arguments silently drops the user's request.                                                                                  |
 | CLI pattern subcommand shows pattern detail       | The pattern subcommand must return the full JSON detail for an exact pattern name match, or a clear error if not found.       | Pattern lookup is the primary debugging tool for annotation issues; ambiguous or silent failures waste investigation time.                                                                                                       |
-| CLI arch subcommand queries architecture          | The arch subcommand must expose role, bounded context, and layer queries over the MasterDataset's architecture metadata.      | Architecture queries replace manual exploration of annotated sources; missing or incorrect results lead to wrong structural assumptions during design sessions.                                                                  |
+| CLI arch subcommand queries architecture          | The arch subcommand must expose role, bounded context, and layer queries over the PatternGraph's architecture metadata.       | Architecture queries replace manual exploration of annotated sources; missing or incorrect results lead to wrong structural assumptions during design sessions.                                                                  |
 | CLI shows errors for missing subcommand arguments | Subcommands that require arguments must reject invocations with missing arguments and display usage guidance.                 | Silent acceptance of incomplete input would produce confusing pipeline errors instead of actionable feedback at the CLI boundary.                                                                                                |
 | CLI handles argument edge cases                   | The CLI must gracefully handle non-standard argument forms including numeric coercion and the `--` pnpm separator.            | Real-world invocations via pnpm pass `--` separators and numeric strings; mishandling these causes silent data loss or crashes in automated workflows.                                                                           |
 
@@ -770,13 +800,13 @@ ArchIndexSchema = z.object({
 
 ### Process API Layered Extraction
 
-| Rule                                                              | Invariant                                                                                                                                                                                                                                                                                                                                  | Rationale                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CLI file contains only routing, no domain logic                   | `process-api.ts` parses arguments, calls the pipeline factory for the MasterDataset, routes subcommands to API modules, and formats output. It does not build Maps, filter patterns, group data, or resolve relationships. Thin view projections (3-5 line `.map()` calls over pre-computed archIndex views) are acceptable as formatting. | Domain logic in the CLI file is only accessible via the command line. Extracting it to `src/api/` makes it programmatically testable, reusable by future consumers (MCP server, watch mode), and aligned with the feature-consumption layer defined in ADR-006.                                                                                                                                               |
-| Pipeline factory is shared across CLI consumers                   | The scan-extract-transform sequence is defined once in `src/generators/pipeline/build-pipeline.ts`. CLI consumers that need a MasterDataset call the factory rather than wiring the pipeline independently. The factory accepts `mergeConflictStrategy` to handle behavioral differences between consumers.                                | Three consumers (process-api, validate-patterns, orchestrator) independently wire the same 8-step sequence: loadConfig, scanPatterns, extractPatterns, scanGherkinFiles, extractPatternsFromGherkin, mergePatterns, computeHierarchyChildren, transformToMasterDataset. The only semantic difference is merge-conflict handling (fatal vs concatenate). This is a Parallel Pipeline anti-pattern per ADR-006. |
-| Domain logic lives in API modules                                 | Query logic that operates on MasterDataset lives in `src/api/` modules. The `rules-query.ts` module provides business rules querying with the same grouping logic that was inline in handleRules: filter by product area and pattern, group by area -> phase -> feature -> rules, parse annotations, compute totals.                       | `handleRules` is 184 lines with 5 Map/Set constructions, codec-layer imports (`parseBusinessRuleAnnotations`, `deduplicateScenarioNames`), and a complex 3-level grouping algorithm. This is the last significant inline domain logic in process-api.ts. Moving it to `src/api/` follows the same pattern as the 12 existing API modules (context-assembler, arch-queries, scope-validator, etc.).            |
-| Pipeline factory returns Result for consumer-owned error handling | The factory returns `Result<PipelineResult, PipelineError>` rather than throwing or calling `process.exit()`. Each consumer maps the error to its own strategy: process-api.ts calls `process.exit(1)`, validate-patterns.ts throws, and orchestrator.ts (future) returns `Result.err()`.                                                  | The current `buildPipeline()` in process-api.ts calls `process.exit(1)` on errors, making it non-reusable. The factory must work across consumers with different error handling models. The Result monad is the project's established pattern for this (see `src/types/result.ts`).                                                                                                                           |
-| End-to-end verification confirms behavioral equivalence           | After extraction, all CLI commands produce identical output to pre-refactor behavior with zero build, test, lint, and validation errors.                                                                                                                                                                                                   | The refactor must not change observable behavior. Full CLI verification confirms the extraction is a pure refactor.                                                                                                                                                                                                                                                                                           |
+| Rule                                                              | Invariant                                                                                                                                                                                                                                                                                                                                 | Rationale                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| CLI file contains only routing, no domain logic                   | `process-api.ts` parses arguments, calls the pipeline factory for the PatternGraph, routes subcommands to API modules, and formats output. It does not build Maps, filter patterns, group data, or resolve relationships. Thin view projections (3-5 line `.map()` calls over pre-computed archIndex views) are acceptable as formatting. | Domain logic in the CLI file is only accessible via the command line. Extracting it to `src/api/` makes it programmatically testable, reusable by future consumers (MCP server, watch mode), and aligned with the feature-consumption layer defined in ADR-006.                                                                                                                                              |
+| Pipeline factory is shared across CLI consumers                   | The scan-extract-transform sequence is defined once in `src/generators/pipeline/build-pipeline.ts`. CLI consumers that need a PatternGraph call the factory rather than wiring the pipeline independently. The factory accepts `mergeConflictStrategy` to handle behavioral differences between consumers.                                | Three consumers (process-api, validate-patterns, orchestrator) independently wire the same 8-step sequence: loadConfig, scanPatterns, extractPatterns, scanGherkinFiles, extractPatternsFromGherkin, mergePatterns, computeHierarchyChildren, transformToPatternGraph. The only semantic difference is merge-conflict handling (fatal vs concatenate). This is a Parallel Pipeline anti-pattern per ADR-006. |
+| Domain logic lives in API modules                                 | Query logic that operates on PatternGraph lives in `src/api/` modules. The `rules-query.ts` module provides business rules querying with the same grouping logic that was inline in handleRules: filter by product area and pattern, group by area -> phase -> feature -> rules, parse annotations, compute totals.                       | `handleRules` is 184 lines with 5 Map/Set constructions, codec-layer imports (`parseBusinessRuleAnnotations`, `deduplicateScenarioNames`), and a complex 3-level grouping algorithm. This is the last significant inline domain logic in process-api.ts. Moving it to `src/api/` follows the same pattern as the 12 existing API modules (context-assembler, arch-queries, scope-validator, etc.).           |
+| Pipeline factory returns Result for consumer-owned error handling | The factory returns `Result<PipelineResult, PipelineError>` rather than throwing or calling `process.exit()`. Each consumer maps the error to its own strategy: process-api.ts calls `process.exit(1)`, validate-patterns.ts throws, and orchestrator.ts (future) returns `Result.err()`.                                                 | The current `buildPipeline()` in process-api.ts calls `process.exit(1)` on errors, making it non-reusable. The factory must work across consumers with different error handling models. The Result monad is the project's established pattern for this (see `src/types/result.ts`).                                                                                                                          |
+| End-to-end verification confirms behavioral equivalence           | After extraction, all CLI commands produce identical output to pre-refactor behavior with zero build, test, lint, and validation errors.                                                                                                                                                                                                  | The refactor must not change observable behavior. Full CLI verification confirms the extraction is a pure refactor.                                                                                                                                                                                                                                                                                          |
 
 ### Process Api Reference Tests
 
@@ -785,36 +815,6 @@ ArchIndexSchema = z.object({
 | Generated reference file contains all three table sections | PROCESS-API-REFERENCE.md contains Global Options, Output Modifiers, and List Filters tables generated from the CLI schema.          |           |
 | CLI schema stays in sync with parser                       | Every flag recognized by parseArgs() has a corresponding entry in the CLI schema. A missing schema entry means the sync test fails. |           |
 | showHelp output reflects CLI schema                        | The help text rendered by showHelp() includes all options from the CLI schema, formatted for terminal display.                      |           |
-
-### Process State API CLI
-
-| Rule                                      | Invariant                                                        | Rationale                                                                                                                                                                                                                                     |
-| ----------------------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CLI supports status-based pattern queries | Every ProcessStateAPI status query method is accessible via CLI. | The most common planning question is "what's the current state?" Status queries (active, roadmap, completed) answer this directly without reading docs. Without CLI access, Claude Code must regenerate markdown and parse unstructured text. |
-| CLI supports phase-based queries          | Patterns can be filtered by phase number.                        | Phase 18 (Event Durability) is the current focus per roadmap priorities. Quick phase queries help assess progress and remaining work within a phase. Phase-based planning is the primary organization method for roadmap work.                |
-| CLI provides progress summary queries     | Overall and per-phase progress is queryable in a single command. | Planning sessions need quick answers to "where are we?" without reading the full PATTERNS.md generated file. Progress metrics drive prioritization and help identify where to focus effort.                                                   |
-| CLI supports multiple output formats      | JSON output is parseable by AI agents without transformation.    | Claude Code can parse JSON directly. Text format is for human reading. JSON format enables scripting and integration with other tools. The primary use case is AI agent parsing where structured output reduces context and errors.           |
-| CLI supports individual pattern lookup    | Any pattern can be queried by name with full details.            | During implementation, Claude Code needs to check specific pattern status, deliverables, and dependencies without reading the full spec file. Pattern lookup is essential for focused implementation work.                                    |
-| CLI provides discoverable help            | All flags are documented via --help with examples.               | Claude Code can read --help output to understand available queries without needing external documentation. Self-documenting CLIs reduce the need for Claude Code to read additional context files.                                            |
-
-### Process State API Relationship Queries
-
-| Rule                                             | Invariant                                                               | Rationale                                                                                                                                                                                                        |
-| ------------------------------------------------ | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| API provides implementation relationship queries | Every pattern with `implementedBy` entries is discoverable via the API. | Claude Code needs to navigate from abstract patterns to concrete code. Without this, exploration requires manual grep + file reading, wasting context tokens.                                                    |
-| API provides inheritance hierarchy queries       | Pattern inheritance chains are fully navigable in both directions.      | Patterns form specialization hierarchies (e.g., ReactiveProjections extends ProjectionCategories). Claude Code needs to understand what specializes a base pattern and what a specialized pattern inherits from. |
-| API provides combined relationship views         | All relationship types are accessible through a unified interface.      | Claude Code often needs the complete picture: dependencies AND implementations AND inheritance. A single call reduces round-trips and context switching.                                                         |
-| API supports bidirectional traceability queries  | Navigation from spec to code and code to spec is symmetric.             | Traceability is bidirectional by definition. If a spec links to code, the code should link back to the spec. The API should surface broken links.                                                                |
-
-### Process State API Testing
-
-| Rule                                           | Invariant                                                                                                                     | Rationale                                                                                                                    |
-| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| Status queries return correct patterns         | Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).   | The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.          |
-| Phase queries return correct phase data        | Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.      | Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages. |
-| FSM queries expose transition validation       | FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.              | Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.          |
-| Pattern queries find and retrieve pattern data | Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.  | Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.                      |
-| Timeline queries group patterns by time        | Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit. | Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.               |
 
 ### Scope Validator Tests
 

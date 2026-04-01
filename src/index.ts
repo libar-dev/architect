@@ -99,7 +99,7 @@ export * as generators from './generators/index.js';
 /**
  * RenderableDocument Model for codec-based document generation.
  *
- * New architecture that uses Zod 4 codecs to transform MasterDataset into
+ * New architecture that uses Zod 4 codecs to transform PatternGraph into
  * RenderableDocuments, which are rendered to markdown via a universal renderer.
  *
  * @example
@@ -107,10 +107,10 @@ export * as generators from './generators/index.js';
  * import { generateDocument, generateAllDocuments } from '@libar-dev/architect/renderable';
  *
  * // Generate a single document type
- * const files = generateDocument("patterns", masterDataset);
+ * const files = generateDocument("patterns", patternGraph);
  *
  * // Generate all document types
- * const allFiles = generateAllDocuments(masterDataset);
+ * const allFiles = generateAllDocuments(patternGraph);
  * ```
  */
 export * as renderable from './renderable/index.js';

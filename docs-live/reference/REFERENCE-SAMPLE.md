@@ -226,8 +226,8 @@ sequenceDiagram
     Orchestrator ->> Extractor: extractFromGherkin(docs)
     Extractor -->> Orchestrator: ExtractedPattern[]
     Orchestrator ->> Orchestrator: mergePatterns(ts, gherkin)
-    Orchestrator ->> Transformer: transformToMasterDataset(patterns)
-    Transformer -->> Orchestrator: MasterDataset
+    Orchestrator ->> Transformer: transformToPatternGraph(patterns)
+    Transformer -->> Orchestrator: PatternGraph
     Orchestrator ->> Codec: codec.decode(dataset)
     Codec -->> Orchestrator: RenderableDocument
     Orchestrator ->> Renderer: render(document)
@@ -255,16 +255,6 @@ classDiagram
     class Documentation_Generation_Orchestrator {
         <<service>>
     }
-    class ProcessApiReferenceGenerator {
-    }
-    class DesignReviewGenerator {
-        <<service>>
-    }
-    class DecisionDocGenerator {
-        <<service>>
-    }
-    class CliRecipeGenerator {
-    }
     class TransformTypes {
     }
     class TransformDataset {
@@ -279,7 +269,17 @@ classDiagram
     class ContextInferenceImpl {
         +ContextInferenceRule interface
     }
-    class MasterDataset
+    class ProcessApiReferenceGenerator {
+    }
+    class DesignReviewGenerator {
+        <<service>>
+    }
+    class DecisionDocGenerator {
+        <<service>>
+    }
+    class CliRecipeGenerator {
+    }
+    class PatternGraph
     class Pattern_Scanner
     class GherkinASTParser
     class ShapeExtractor
@@ -297,21 +297,21 @@ classDiagram
     SourceMapper ..> ShapeExtractor : depends on
     SourceMapper ..> GherkinASTParser : depends on
     Documentation_Generation_Orchestrator ..> Pattern_Scanner : uses
+    TransformTypes ..> PatternGraph : uses
+    TransformDataset ..> PatternGraph : uses
+    TransformDataset ..|> PatternRelationshipModel : implements
+    SequenceTransformUtils ..> PatternGraph : uses
+    SequenceTransformUtils ..|> DesignReviewGeneration : implements
+    RelationshipResolver ..> PatternHelpers : uses
+    ContextInferenceImpl ..|> ContextInference : implements
     ProcessApiReferenceGenerator ..|> ProcessApiHybridGeneration : implements
     DesignReviewGenerator ..> DesignReviewCodec : uses
-    DesignReviewGenerator ..> MasterDataset : uses
+    DesignReviewGenerator ..> PatternGraph : uses
     DesignReviewGenerator ..|> DesignReviewGeneration : implements
     DecisionDocGenerator ..> DecisionDocCodec : depends on
     DecisionDocGenerator ..> SourceMapper : depends on
     CliRecipeGenerator ..|> CliRecipeCodec : implements
-    TransformTypes ..> MasterDataset : uses
-    TransformDataset ..> MasterDataset : uses
-    TransformDataset ..|> PatternRelationshipModel : implements
-    SequenceTransformUtils ..> MasterDataset : uses
-    SequenceTransformUtils ..|> DesignReviewGeneration : implements
-    RelationshipResolver ..> PatternHelpers : uses
-    ContextInferenceImpl ..|> ContextInference : implements
-    DesignReviewCodec ..> MasterDataset : uses
+    DesignReviewCodec ..> PatternGraph : uses
     DesignReviewCodec ..|> DesignReviewGeneration : implements
     CliRecipeCodec ..> ProcessApiHybridGeneration : depends on
 ```
@@ -388,7 +388,7 @@ Scoped architecture diagram showing component relationships:
 ```mermaid
 graph LR
     subgraph api["Api"]
-        MasterDataset[/"MasterDataset"/]
+        PatternGraph[/"PatternGraph"/]
         PatternHelpers["PatternHelpers"]
         ArchQueriesImpl("ArchQueriesImpl")
     end
@@ -411,7 +411,7 @@ graph LR
         FSMStates[/"FSMStates"/]
     end
     subgraph related["Related"]
-        ProcessStateAPI["ProcessStateAPI"]:::neighbor
+        PatternGraphAPI["PatternGraphAPI"]:::neighbor
         TypeScriptTaxonomyImplementation["TypeScriptTaxonomyImplementation"]:::neighbor
         ProcessApiHybridGeneration["ProcessApiHybridGeneration"]:::neighbor
         ProceduralGuideCodec["ProceduralGuideCodec"]:::neighbor
@@ -421,18 +421,18 @@ graph LR
     end
     TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
     loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
+    CLISchema ..->|implements| ProcessApiHybridGeneration
     ProjectConfigTypes -->|uses| ConfigurationTypes
     ProjectConfigTypes -->|uses| ConfigurationPresets
     ConfigurationPresets -->|uses| ConfigurationTypes
     PatternHelpers ..->|implements| DataAPIOutputShaping
-    ArchQueriesImpl -->|uses| ProcessStateAPI
-    ArchQueriesImpl -->|uses| MasterDataset
+    ArchQueriesImpl -->|uses| PatternGraphAPI
+    ArchQueriesImpl -->|uses| PatternGraph
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
-    CLISchema ..->|implements| ProcessApiHybridGeneration
     FSMTransitions ..->|implements| PhaseStateMachineValidation
     FSMStates ..->|implements| PhaseStateMachineValidation
-    ProcessStateAPI -->|uses| MasterDataset
-    ProcessStateAPI ..->|implements| PhaseStateMachineValidation
+    PatternGraphAPI -->|uses| PatternGraph
+    PatternGraphAPI ..->|implements| PhaseStateMachineValidation
     DataAPIArchitectureQueries -.->|depends on| DataAPIOutputShaping
     classDef neighbor stroke-dasharray: 5 5
 ```
@@ -591,7 +591,7 @@ Validation happens later at load time via Zod schema in `loadProjectConfig()`.
 
 **Context:**
 The documentation generator needs to transform structured pattern data
-(MasterDataset) into markdown files. The initial approach used direct
+(PatternGraph) into markdown files. The initial approach used direct
 string concatenation in generator functions, mixing data selection,
 formatting logic, and output assembly in a single pass. This made
 generators hard to test, difficult to compose, and impossible to
@@ -600,7 +600,7 @@ AI context).
 
 **Decision:**
 Adopt a codec architecture inspired by serialization codecs (encode/decode).
-Each document type has a codec that decodes a MasterDataset into a
+Each document type has a codec that decodes a PatternGraph into a
 RenderableDocument — an intermediate representation of sections, headings,
 tables, paragraphs, and code blocks. A separate renderer transforms the
 RenderableDocument into markdown. This separates data selection (what to
@@ -627,15 +627,15 @@ include) from formatting (how it looks) from serialization (markdown syntax).
 
 #### Codecs implement a decode-only contract
 
-**Invariant:** Every codec is a pure function that accepts a MasterDataset and returns a RenderableDocument. Codecs do not perform side effects, do not write files, and do not access the filesystem. The codec contract is decode-only because the transformation is one-directional: structured data becomes a document, never the reverse.
+**Invariant:** Every codec is a pure function that accepts a PatternGraph and returns a RenderableDocument. Codecs do not perform side effects, do not write files, and do not access the filesystem. The codec contract is decode-only because the transformation is one-directional: structured data becomes a document, never the reverse.
 
-**Rationale:** Pure functions are deterministic and trivially testable. For the same MasterDataset, a codec always produces the same RenderableDocument. This makes snapshot testing reliable and enables codec output comparison across versions.
+**Rationale:** Pure functions are deterministic and trivially testable. For the same PatternGraph, a codec always produces the same RenderableDocument. This makes snapshot testing reliable and enables codec output comparison across versions.
 
 **Codec call signature:**
 
 ```typescript
 interface DocumentCodec {
-  decode(dataset: MasterDataset): RenderableDocument;
+  decode(dataset: PatternGraph): RenderableDocument;
 }
 ```
 

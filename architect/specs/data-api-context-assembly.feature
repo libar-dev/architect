@@ -15,7 +15,7 @@ Feature: Data API Context Assembly - One-Command Session Context
   30-100KB of curated, multi-source context from hundreds of annotated files.
   Today this requires either manual context compilation by the user or 5-10
   explore agents burning context and time. The Architect pipeline already
-  has rich data (MasterDataset with archIndex, relationshipIndex, byPhase,
+  has rich data (PatternGraph with archIndex, relationshipIndex, byPhase,
   byStatus views) but no command combines data from multiple indexes around
   a focal pattern into a compact, session-oriented context bundle.
 
@@ -60,12 +60,12 @@ Feature: Data API Context Assembly - One-Command Session Context
     and architecture position -- in ~1.5KB of structured text.
 
     **Rationale:** This is the core value proposition. The command crosses five
-    gaps simultaneously: it assembles data from multiple MasterDataset indexes,
+    gaps simultaneously: it assembles data from multiple PatternGraph indexes,
     shapes it compactly, resolves file paths from pattern names, discovers stubs
     by convention, and tailors output by session type.
 
     **Assembly steps:**
-    1. Find pattern in MasterDataset via `getPattern()`
+    1. Find pattern in PatternGraph via `getPattern()`
     2. Resolve spec file from `pattern.filePath`
     3. Find stubs via `implementedBy` in relationshipIndex
     4. Walk `dependsOn` chain with status for each dependency

@@ -15,10 +15,10 @@ import { inferBehaviorFilePath } from '../../../src/extractor/gherkin-extractor.
 import { TraceabilityCodec } from '../../../src/renderable/codecs/reporting.js';
 import { RemainingWorkCodec } from '../../../src/renderable/codecs/session.js';
 import type { RenderableDocument, TableBlock } from '../../../src/renderable/schema.js';
-import type { MasterDataset } from '../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../src/validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../../src/types/index.js';
 import {
-  createTestMasterDataset,
+  createTestPatternGraph,
   createTestPattern,
   resetPatternCounter,
 } from '../../fixtures/dataset-factories.js';
@@ -30,7 +30,7 @@ import type { DataTableRow } from '../../support/world.js';
 // =============================================================================
 
 interface DescriptionQualityState {
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   document: RenderableDocument | null;
   pattern: ExtractedPattern | null;
   displayName: string | null;
@@ -264,7 +264,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
                   behaviorFileVerified: row.BehaviorFile ? verified : undefined,
                 });
               });
-              state.dataset = createTestMasterDataset({ patterns });
+              state.dataset = createTestPatternGraph({ patterns });
             }
           );
 
@@ -419,7 +419,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
                 name: 'TestPattern',
                 status: 'roadmap',
               });
-              state.dataset = createTestMasterDataset({ patterns: [state.pattern] });
+              state.dataset = createTestPatternGraph({ patterns: [state.pattern] });
             }
           );
 
@@ -455,7 +455,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
             name: 'TestPattern',
             status: 'roadmap',
           });
-          state.dataset = createTestMasterDataset({ patterns: [state.pattern] });
+          state.dataset = createTestPatternGraph({ patterns: [state.pattern] });
         });
 
         When('generating PRD with includeScenarioSteps disabled', () => {
@@ -486,7 +486,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
                 name: 'LongDescriptionPattern',
                 description: longDescription,
               });
-              state.dataset = createTestMasterDataset({ patterns: [state.pattern] });
+              state.dataset = createTestPatternGraph({ patterns: [state.pattern] });
             }
           );
 
@@ -540,7 +540,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
                 businessValue: row.BusinessValue,
               });
             });
-            state.dataset = createTestMasterDataset({ patterns });
+            state.dataset = createTestPatternGraph({ patterns });
           }
         );
 

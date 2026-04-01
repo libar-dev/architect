@@ -3,7 +3,7 @@
 > **Status:** Ready for Planning Session
 > **Scope:** New capability for `@libar-dev/architect`
 > **Phase:** TBD (after DataAPIDesignSessionSupport)
-> **Depends on:** DataAPIDesignSessionSupport (completed), ProcessStateAPI (completed)
+> **Depends on:** DataAPIDesignSessionSupport (completed), PatternGraphAPI (completed)
 
 ---
 
@@ -22,7 +22,7 @@ The Process API already solves the _dynamic data_ half of this problem (`context
 
 Generate complete session prompts by composing:
 
-- **Dynamic pattern data** from ProcessStateAPI (already exists)
+- **Dynamic pattern data** from PatternGraphAPI (already exists)
 - **Static conventions** from tagged decision records (new capability)
 - **Session-type rules** that filter conventions by applicability (new capability)
 
@@ -41,10 +41,10 @@ pnpm architect:query -- session-prompt <pattern> --type design
 
 The codebase has two deliberate rendering architectures:
 
-| Path           | Pipeline                                                 | Audience                  | Format                    |
-| -------------- | -------------------------------------------------------- | ------------------------- | ------------------------- |
-| **Codec path** | MasterDataset -> Codec -> RenderableDocument -> Markdown | Human docs / AI reference | Markdown                  |
-| **Text path**  | MasterDataset -> Assembler -> Formatter -> Plain text    | AI session context        | `=== SECTION ===` markers |
+| Path           | Pipeline                                                | Audience                  | Format                    |
+| -------------- | ------------------------------------------------------- | ------------------------- | ------------------------- |
+| **Codec path** | PatternGraph -> Codec -> RenderableDocument -> Markdown | Human docs / AI reference | Markdown                  |
+| **Text path**  | PatternGraph -> Assembler -> Formatter -> Plain text    | AI session context        | `=== SECTION ===` markers |
 
 Session prompts are AI session context. They belong on the **text path**.
 
@@ -75,7 +75,7 @@ Follow the established pattern from `scope-validator.ts` and `handoff-generator.
 ```
 Decision Records (tagged @convention) ---+
                                          +--> assembleSessionPrompt() --> SessionPromptBundle --> formatSessionPrompt()
-ProcessStateAPI queries -----------------+                                                            |
+PatternGraphAPI queries -----------------+                                                            |
                                                                                                 Structured text
 ```
 
@@ -95,7 +95,7 @@ ProcessStateAPI queries -----------------+                                      
 | `validateScope()`       | Yes            | Pre-flight readiness checks                        |
 | `generateHandoff()`     | Yes            | Session-end state summary                          |
 | `formatContextBundle()` | Yes            | Text rendering with `=== SECTION ===` markers      |
-| MasterDataset patterns  | Yes            | Decision records are already extracted as patterns |
+| PatternGraph patterns   | Yes            | Decision records are already extracted as patterns |
 
 **Only truly new piece:** Convention extraction — filter `dataset.patterns` for decision records with `@architect-convention` tags, extract their Rule block content, group by topic.
 

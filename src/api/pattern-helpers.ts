@@ -16,10 +16,10 @@
 
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type {
-  MasterDataset,
+  PatternGraph,
   RelationshipEntry,
   SequenceIndexEntry,
-} from '../validation-schemas/master-dataset.js';
+} from '../validation-schemas/pattern-graph.js';
 import { findBestMatch } from './fuzzy-match.js';
 
 /**
@@ -48,7 +48,7 @@ export function findPatternByName(
  * case-insensitive scan if the exact key is not found.
  */
 export function getRelationships(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   name: string
 ): RelationshipEntry | undefined {
   if (dataset.relationshipIndex === undefined) return undefined;
@@ -65,7 +65,7 @@ export function getRelationships(
  * Look up a sequenceIndex entry by pattern name with case-insensitive fallback.
  */
 export function getSequenceEntry(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   name: string
 ): SequenceIndexEntry | undefined {
   if (dataset.sequenceIndex === undefined) return undefined;
@@ -81,7 +81,7 @@ export function getSequenceEntry(
 /**
  * Get all pattern display names from the dataset.
  */
-export function allPatternNames(dataset: MasterDataset): readonly string[] {
+export function allPatternNames(dataset: PatternGraph): readonly string[] {
   return dataset.patterns.map((p) => getPatternName(p));
 }
 

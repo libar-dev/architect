@@ -1,15 +1,15 @@
 /**
  * Process State API Step Definitions
  *
- * BDD step definitions for testing the ProcessStateAPI query interface.
+ * BDD step definitions for testing the PatternGraphAPI query interface.
  *
  * @architect
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
-import { createProcessStateAPI, type ProcessStateAPI } from '../../../src/api/index.js';
-import { transformToMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
+import { createPatternGraphAPI, type PatternGraphAPI } from '../../../src/api/index.js';
+import { transformToPatternGraph } from '../../../src/generators/pipeline/transform-dataset.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
 import { createDefaultTagRegistry } from '../../../src/validation-schemas/tag-registry.js';
 import type { ProcessStatusValue } from '../../../src/taxonomy/index.js';
@@ -20,7 +20,7 @@ import { createTestPattern } from '../../fixtures/pattern-factories.js';
 // =============================================================================
 
 interface APITestState {
-  api: ProcessStateAPI | null;
+  api: PatternGraphAPI | null;
   patterns: ExtractedPattern[];
   queryResult: ExtractedPattern[] | undefined;
   phaseProgress:
@@ -59,18 +59,18 @@ function initState(): APITestState {
 
 function buildAPI(): void {
   const tagRegistry = createDefaultTagRegistry();
-  const dataset = transformToMasterDataset({
+  const dataset = transformToPatternGraph({
     patterns: state!.patterns,
     tagRegistry,
   });
-  state!.api = createProcessStateAPI(dataset);
+  state!.api = createPatternGraphAPI(dataset);
 }
 
 // =============================================================================
 // Feature Definition
 // =============================================================================
 
-const feature = await loadFeature('tests/features/api/process-state-api.feature');
+const feature = await loadFeature('tests/features/api/pattern-graph-api.feature');
 
 describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   AfterEachScenario(() => {
@@ -78,7 +78,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   });
 
   Background(({ Given }) => {
-    Given('a test MasterDataset is initialized', () => {
+    Given('a test PatternGraph is initialized', () => {
       state = initState();
     });
   });

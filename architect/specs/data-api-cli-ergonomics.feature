@@ -19,7 +19,7 @@ Feature: Data API CLI Ergonomics - Performance and Interactive Mode
 
   **Solution:**
   Add performance and ergonomic improvements:
-  1. **Pipeline caching** -- Cache MasterDataset to temp file with mtime invalidation
+  1. **Pipeline caching** -- Cache PatternGraph to temp file with mtime invalidation
   2. **REPL mode** -- `process-api repl` keeps pipeline loaded for interactive queries
   3. **FSM short-circuit** -- FSM queries skip the scan pipeline entirely
   4. **Per-subcommand help** -- `process-api <subcommand> --help` with examples
@@ -36,7 +36,7 @@ Feature: Data API CLI Ergonomics - Performance and Interactive Mode
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | MasterDataset cache with mtime invalidation | complete | src/cli/dataset-cache.ts | Yes | unit |
+      | PatternGraph cache with mtime invalidation | complete | src/cli/dataset-cache.ts | Yes | unit |
       | REPL mode handler | complete | src/cli/repl.ts | Yes | integration |
       | FSM short-circuit for static queries | complete | src/cli/process-api.ts | Yes | unit |
       | Per-subcommand help system | complete | src/cli/process-api.ts | Yes | integration |
@@ -47,14 +47,14 @@ Feature: Data API CLI Ergonomics - Performance and Interactive Mode
   # RULE 1: Pipeline Caching
   # ============================================================================
 
-  Rule: MasterDataset is cached between invocations with file-change invalidation
+  Rule: PatternGraph is cached between invocations with file-change invalidation
 
     **Invariant:** Cache is automatically invalidated when any source file
     (TypeScript or Gherkin) has a modification time newer than the cache.
 
     **Rationale:** The pipeline (scan -> extract -> transform) runs fresh on every
     invocation (~2-5 seconds). Most queries during a session don't need fresh data
-    -- the source files haven't changed between queries. Caching the MasterDataset
+    -- the source files haven't changed between queries. Caching the PatternGraph
     to a temp file with file-modification-time invalidation makes subsequent
     queries instant while ensuring staleness is impossible.
 
@@ -62,7 +62,7 @@ Feature: Data API CLI Ergonomics - Performance and Interactive Mode
 
     @acceptance-criteria @happy-path
     Scenario: Second query uses cached dataset
-      Given a previous query has cached the MasterDataset
+      Given a previous query has cached the PatternGraph
       And no source files have been modified since
       When running "process-api status"
       Then the query completes in under 200ms
@@ -70,7 +70,7 @@ Feature: Data API CLI Ergonomics - Performance and Interactive Mode
 
     @acceptance-criteria @happy-path
     Scenario: Cache invalidated on source file change
-      Given a cached MasterDataset exists
+      Given a cached PatternGraph exists
       And a source TypeScript file has been modified
       When running "process-api status"
       Then the pipeline runs fresh (cache miss)

@@ -9,7 +9,7 @@
  *
  * ## PrChangesCodec
  *
- * Transforms MasterDataset into RenderableDocument for PR-scoped output.
+ * Transforms PatternGraph into RenderableDocument for PR-scoped output.
  * Filters patterns by changed files and/or release version tags.
  *
  * **Purpose:** PR-scoped view filtered by changed files or release version.
@@ -42,7 +42,7 @@
  * If both are specified, patterns must match at least one criterion.
  */
 
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -154,7 +154,7 @@ export function createPrChangesCodec(options?: PrChangesCodecOptions): DocumentC
 /**
  * Default PR Changes Document Codec
  *
- * Transforms MasterDataset → RenderableDocument for PR changes.
+ * Transforms PatternGraph → RenderableDocument for PR changes.
  * Without options, shows all patterns (no filtering).
  */
 export const PrChangesCodec = createPrChangesCodec();
@@ -175,7 +175,7 @@ export const codecMeta = {
  * Build PR changes document
  */
 function buildPrChangesDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<PrChangesCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];

@@ -6,7 +6,7 @@
 @architect-product-area:Generation
 @behavior @pr-changes-codec
 Feature: PR Changes Codec - Options and Filters
-  The PrChangesCodec transforms MasterDataset into RenderableDocument for
+  The PrChangesCodec transforms PatternGraph into RenderableDocument for
   PR-scoped documentation. It filters patterns by changed files and/or
   release version tags, groups by phase or priority, and generates
   review-focused output.
@@ -36,7 +36,7 @@ Feature: PR Changes Codec - Options and Filters
 
     @happy-path
     Scenario: Review checklist generated with standard items
-      Given a MasterDataset with PR-relevant patterns
+      Given a PatternGraph with PR-relevant patterns
       When decoding with includeReviewChecklist enabled
       Then the document contains a "Review Checklist" section
       And the review checklist contains standard items:
@@ -46,27 +46,27 @@ Feature: PR Changes Codec - Options and Filters
         | Documentation updated if needed    |
 
     Scenario: Review checklist includes completed patterns item when applicable
-      Given a MasterDataset with completed patterns
+      Given a PatternGraph with completed patterns
       When decoding with includeReviewChecklist enabled
       Then the review checklist contains "Completed patterns verified working"
 
     Scenario: Review checklist includes active work item when applicable
-      Given a MasterDataset with active patterns
+      Given a PatternGraph with active patterns
       When decoding with includeReviewChecklist enabled
       Then the review checklist contains "Active work is in a consistent state"
 
     Scenario: Review checklist includes dependencies item when patterns have dependencies
-      Given a MasterDataset with patterns with dependencies
+      Given a PatternGraph with patterns with dependencies
       When decoding with includeReviewChecklist enabled
       Then the review checklist contains "Dependencies are satisfied"
 
     Scenario: Review checklist includes deliverables item when patterns have deliverables
-      Given a MasterDataset with patterns with deliverables
+      Given a PatternGraph with patterns with deliverables
       When decoding with includeReviewChecklist enabled
       Then the review checklist contains "Deliverables tracked in feature files"
 
     Scenario: No review checklist when includeReviewChecklist is disabled
-      Given a MasterDataset with PR-relevant patterns
+      Given a PatternGraph with PR-relevant patterns
       When decoding with includeReviewChecklist disabled
       Then the document does not contain a "Review Checklist" section
 
@@ -82,23 +82,23 @@ Feature: PR Changes Codec - Options and Filters
 
     @happy-path
     Scenario: Dependencies section shows depends on relationships
-      Given a MasterDataset with patterns with dependsOn relationships
+      Given a PatternGraph with patterns with dependsOn relationships
       When decoding with includeDependencies enabled
       Then the document contains a "Dependencies" section
       And the dependencies section contains "Depends On" subsection
 
     Scenario: Dependencies section shows enables relationships
-      Given a MasterDataset with patterns with enables relationships
+      Given a PatternGraph with patterns with enables relationships
       When decoding with includeDependencies enabled
       Then the dependencies section contains "Enables" subsection
 
     Scenario: No dependencies section when patterns have no dependencies
-      Given a MasterDataset with patterns without dependencies
+      Given a PatternGraph with patterns without dependencies
       When decoding with includeDependencies enabled
       Then the document does not contain a "Dependencies" section
 
     Scenario: No dependencies section when includeDependencies is disabled
-      Given a MasterDataset with patterns with dependencies
+      Given a PatternGraph with patterns with dependencies
       When decoding with includeDependencies disabled
       Then the document does not contain a "Dependencies" section
 
@@ -114,12 +114,12 @@ Feature: PR Changes Codec - Options and Filters
 
     @happy-path
     Scenario: Patterns filtered by changedFiles match
-      Given a MasterDataset with patterns from various files
+      Given a PatternGraph with patterns from various files
       When decoding with changedFiles filter matching specific patterns
       Then only patterns from those files are included
 
     Scenario: changedFiles filter matches partial paths
-      Given a MasterDataset with patterns from various files
+      Given a PatternGraph with patterns from various files
       When decoding with changedFiles filter for a directory path
       Then patterns under that directory are included
 
@@ -131,7 +131,7 @@ Feature: PR Changes Codec - Options and Filters
 
     @happy-path
     Scenario: Patterns filtered by release version
-      Given a MasterDataset with patterns with different release deliverables
+      Given a PatternGraph with patterns with different release deliverables
       When decoding with releaseFilter "v0.2.0"
       Then only patterns with v0.2.0 deliverables are included
 
@@ -143,12 +143,12 @@ Feature: PR Changes Codec - Options and Filters
 
     @happy-path
     Scenario: Combined filters match patterns meeting either criterion
-      Given a MasterDataset with patterns matching file or release
+      Given a PatternGraph with patterns matching file or release
       When decoding with both changedFiles and releaseFilter
       Then patterns matching either filter are included
 
     Scenario: Patterns matching both criteria are not duplicated
-      Given a MasterDataset with a pattern matching both file and release
+      Given a PatternGraph with a pattern matching both file and release
       When decoding with both changedFiles and releaseFilter
       Then the pattern appears only once
 
@@ -164,11 +164,11 @@ Feature: PR Changes Codec - Options and Filters
 
     @happy-path
     Scenario: Roadmap patterns are excluded
-      Given a MasterDataset with patterns of all statuses
+      Given a PatternGraph with patterns of all statuses
       When decoding with PrChangesCodec
       Then roadmap patterns are not included
 
     Scenario: Deferred patterns are excluded
-      Given a MasterDataset with deferred patterns
+      Given a PatternGraph with deferred patterns
       When decoding with PrChangesCodec
       Then deferred patterns are not included

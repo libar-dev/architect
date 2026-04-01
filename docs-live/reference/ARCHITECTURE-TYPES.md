@@ -7,7 +7,7 @@
 
 ## API Types
 
-### MasterDatasetSchema (const)
+### PatternGraphSchema (const)
 
 ```typescript
 /**
@@ -20,7 +20,7 @@
 ```
 
 ```typescript
-MasterDatasetSchema = z.object({
+PatternGraphSchema = z.object({
   // ─────────────────────────────────────────────────────────────────────────
   // Raw Data
   // ─────────────────────────────────────────────────────────────────────────
@@ -244,13 +244,13 @@ RelationshipEntrySchema = z.object({
 });
 ```
 
-### RuntimeMasterDataset (interface)
+### RuntimePatternGraph (interface)
 
 ```typescript
 /**
- * Runtime MasterDataset with optional workflow
+ * Runtime PatternGraph with optional workflow
  *
- * Extends the Zod-compatible MasterDataset with workflow reference.
+ * Extends the Zod-compatible PatternGraph with workflow reference.
  * LoadedWorkflow contains Maps which aren't JSON-serializable,
  * so it's kept separate from the Zod schema.
  *
@@ -258,7 +258,7 @@ RelationshipEntrySchema = z.object({
 ```
 
 ```typescript
-interface RuntimeMasterDataset extends MasterDataset {
+interface RuntimePatternGraph extends PatternGraph {
   /** Optional workflow configuration (not serializable) */
   readonly workflow?: LoadedWorkflow;
 }
@@ -304,7 +304,7 @@ interface RawDataset {
 
 ```typescript
 /**
- * Options for building a MasterDataset via the shared pipeline.
+ * Options for building a PatternGraph via the shared pipeline.
  *
  * DD-1: Factory lives at src/generators/pipeline/build-pipeline.ts.
  * DD-2: mergeConflictStrategy controls per-consumer conflict handling.
@@ -349,7 +349,7 @@ interface PipelineOptions {
 
 ```typescript
 interface PipelineResult {
-  readonly dataset: RuntimeMasterDataset;
+  readonly dataset: RuntimePatternGraph;
   readonly validation: ValidationSummary;
   readonly warnings: readonly PipelineWarning[];
   readonly scanMetadata: ScanMetadata;
@@ -366,11 +366,11 @@ interface PipelineResult {
 
 ---
 
-## Steps 1-8 via buildMasterDataset()
+## Steps 1-8 via buildPatternGraph()
 
 Steps 1-8 (config load, TypeScript/Gherkin scan + extraction, merge, hierarchy
-derivation, workflow load, and `transformToMasterDataset`) are delegated to
-`buildMasterDataset()`.
+derivation, workflow load, and `transformToPatternGraph`) are delegated to
+`buildPatternGraph()`.
 
 ---
 
@@ -390,7 +390,7 @@ policy, and persisted file writes).
 
 ## Shared Pipeline Factory Responsibilities
 
-**Invariant:** `buildMasterDataset()` is the shared factory for Steps 1-8 of the architecture pipeline and returns `Result<PipelineResult, PipelineError>` without process-level side effects.
+**Invariant:** `buildPatternGraph()` is the shared factory for Steps 1-8 of the architecture pipeline and returns `Result<PipelineResult, PipelineError>` without process-level side effects.
 
 **Rationale:** Centralizing scan/extract/merge/transform flow prevents divergence between CLI consumers and preserves a single ADR-006 read-model path.
 
@@ -400,7 +400,7 @@ policy, and persisted file writes).
 
 The factory owns: configuration load, TypeScript scan + extraction, Gherkin scan +
 extraction, merge conflict handling, hierarchy child derivation, workflow load,
-and `transformToMasterDataset` with validation summary.
+and `transformToPatternGraph` with validation summary.
 
 ---
 
@@ -413,19 +413,19 @@ and `failOnScanErrors` policy without forking pipeline logic.
 
 ### When to Use
 
-- Any consumer needs a MasterDataset without rewriting scan/extract/merge flow
+- Any consumer needs a PatternGraph without rewriting scan/extract/merge flow
 - CLI consumers require differentiated conflict strategy and validation behavior
 - Orchestrator needs a shared steps 1-8 implementation before codec/file execution
 
 ---
 
-## MasterDataset View Fan-out
+## PatternGraph View Fan-out
 
-Pre-computed view fan-out from MasterDataset (single-pass transform):
+Pre-computed view fan-out from PatternGraph (single-pass transform):
 
 ```mermaid
 graph TB
-    MD[MasterDataset]
+    MD[PatternGraph]
     MD --> byStatus["byStatus<br/>(completed / active / planned)"]
     MD --> byPhase["byPhase<br/>(sorted, with counts)"]
     MD --> byQuarter["byQuarter<br/>(keyed by Q-YYYY)"]

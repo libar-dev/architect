@@ -2,14 +2,14 @@
  * @architect
  * @architect-status completed
  * @architect-implements MCPServerIntegration
- * @architect-uses PipelineFactory, ProcessStateAPI, ConfigLoader
+ * @architect-uses PipelineFactory, PatternGraphAPI, ConfigLoader
  * @architect-used-by MCPServerImpl, MCPToolRegistry, MCPFileWatcher
  * @architect-target src/mcp/pipeline-session.ts
  * @architect-since DS-MCP
  *
- * ## PipelineSessionManager — In-Memory MasterDataset Lifecycle
+ * ## PipelineSessionManager — In-Memory PatternGraph Lifecycle
  *
- * Manages the persistent MasterDataset that all MCP tool calls read from.
+ * Manages the persistent PatternGraph that all MCP tool calls read from.
  * Loads config via auto-detection or explicit globs, builds the pipeline once,
  * and provides atomic rebuild with concurrent-read safety.
  *
@@ -21,8 +21,8 @@
  *     v
  * PipelineSessionManager.initialize()
  *     |-- loadConfig() / applyProjectSourceDefaults()
- *     |-- buildMasterDataset()
- *     |-- createProcessStateAPI()
+ *     |-- buildPatternGraph()
+ *     |-- createPatternGraphAPI()
  *     v
  * PipelineSession { dataset, api, registry, baseDir, sourceGlobs, buildTimeMs }
  * ```
@@ -56,8 +56,8 @@ export interface SessionOptions {
 }
 
 export interface PipelineSession {
-  readonly dataset: import('../../src/generators/pipeline/index.js').RuntimeMasterDataset;
-  readonly api: import('../../src/api/process-state.js').ProcessStateAPI;
+  readonly dataset: import('../../src/generators/pipeline/index.js').RuntimePatternGraph;
+  readonly api: import('../../src/api/pattern-graph-api.js').PatternGraphAPI;
   readonly registry: import('../../src/validation-schemas/tag-registry.js').TagRegistry;
   readonly baseDir: string;
   readonly sourceGlobs: {

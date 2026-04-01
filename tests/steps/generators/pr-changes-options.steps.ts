@@ -9,7 +9,7 @@
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import { generateDocument } from '../../../src/renderable/generate.js';
-import { transformToMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
+import { transformToPatternGraph } from '../../../src/generators/pipeline/transform-dataset.js';
 import {
   createTestPattern,
   resetPatternCounter,
@@ -17,7 +17,7 @@ import {
 } from '../../fixtures/dataset-factories.js';
 import type { CodecOptions } from '../../../src/renderable/generate.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
-import type { RuntimeMasterDataset } from '../../../src/generators/pipeline/transform-types.js';
+import type { RuntimePatternGraph } from '../../../src/generators/pipeline/transform-types.js';
 import type { OutputFile } from '../../../src/renderable/render.js';
 import type { DataTableRow } from '../../support/world.js';
 
@@ -27,7 +27,7 @@ import type { DataTableRow } from '../../support/world.js';
 
 interface PrChangesOptionsState {
   patterns: ExtractedPattern[];
-  dataset: RuntimeMasterDataset | null;
+  dataset: RuntimePatternGraph | null;
   outputFiles: OutputFile[];
   markdown: string;
   codecOptions: CodecOptions;
@@ -55,10 +55,10 @@ function initState(): PrChangesOptionsState {
 // =============================================================================
 
 /**
- * Build MasterDataset from current patterns
+ * Build PatternGraph from current patterns
  */
-function buildDataset(): RuntimeMasterDataset {
-  return transformToMasterDataset({
+function buildDataset(): RuntimePatternGraph {
+  return transformToPatternGraph({
     patterns: state!.patterns,
     tagRegistry: createDefaultTagRegistry(),
     workflow: undefined,

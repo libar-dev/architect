@@ -7,7 +7,7 @@
  *
  * ## ClaudeModuleCodec
  *
- * Transforms MasterDataset into RenderableDocuments for CLAUDE.md module generation.
+ * Transforms PatternGraph into RenderableDocuments for CLAUDE.md module generation.
  * Filters patterns with `claudeModule` tags and generates compact markdown modules
  * suitable for the `_claude-md/` directory structure.
  *
@@ -31,7 +31,7 @@
  * ```
  */
 
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
 import {
@@ -110,7 +110,7 @@ export function createClaudeModuleCodec(options?: ClaudeModuleCodecOptions): Doc
 /**
  * Default Claude Module Codec
  *
- * Transforms MasterDataset → RenderableDocument for CLAUDE.md modules.
+ * Transforms PatternGraph → RenderableDocument for CLAUDE.md modules.
  * Uses default options with standard detail level.
  */
 export const ClaudeModuleCodec = createClaudeModuleCodec();
@@ -133,7 +133,7 @@ export const codecMeta = {
  * with each module as an additionalFile.
  */
 function buildClaudeModuleDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<ClaudeModuleCodecOptions>
 ): RenderableDocument {
   // Filter to patterns with claudeModule set

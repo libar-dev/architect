@@ -9,29 +9,29 @@
  * @architect-arch-role service
  * @architect-arch-context api
  * @architect-arch-layer application
- * @architect-uses PipelineFactory, ProcessStateAPI, ConfigLoader
+ * @architect-uses PipelineFactory, PatternGraphAPI, ConfigLoader
  * @architect-implements MCPServerIntegration
  *
  * ## MCP Pipeline Session Manager
  *
- * Manages the in-memory MasterDataset lifecycle for the MCP server.
+ * Manages the in-memory PatternGraph lifecycle for the MCP server.
  * Loads config, builds the pipeline once, and provides atomic rebuild.
  *
  * ### When to Use
  *
- * - When the MCP server needs a persistent ProcessStateAPI instance
+ * - When the MCP server needs a persistent PatternGraphAPI instance
  * - When rebuilding the dataset after source file changes
  */
 
 import * as fs from 'node:fs';
 import * as path from 'path';
 import {
-  buildMasterDataset,
+  buildPatternGraph,
   type PipelineResult,
-  type RuntimeMasterDataset,
+  type RuntimePatternGraph,
 } from '../generators/pipeline/index.js';
-import { createProcessStateAPI } from '../api/process-state.js';
-import type { ProcessStateAPI } from '../api/process-state.js';
+import { createPatternGraphAPI } from '../api/pattern-graph-api.js';
+import type { PatternGraphAPI } from '../api/pattern-graph-api.js';
 import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 import { applyProjectSourceDefaults } from '../config/config-loader.js';
 
@@ -47,8 +47,8 @@ export interface SessionOptions {
 }
 
 export interface PipelineSession {
-  readonly dataset: RuntimeMasterDataset;
-  readonly api: ProcessStateAPI;
+  readonly dataset: RuntimePatternGraph;
+  readonly api: PatternGraphAPI;
   readonly registry: TagRegistry;
   readonly baseDir: string;
   readonly sourceGlobs: { readonly input: readonly string[]; readonly features: readonly string[] };
@@ -157,7 +157,7 @@ export class PipelineSessionManager {
   ): Promise<PipelineSession> {
     const startMs = Date.now();
 
-    const result = await buildMasterDataset({
+    const result = await buildPatternGraph({
       input,
       features,
       baseDir,
@@ -170,7 +170,7 @@ export class PipelineSessionManager {
 
     const pipelineResult: PipelineResult = result.value;
     const dataset = pipelineResult.dataset;
-    const api = createProcessStateAPI(dataset);
+    const api = createPatternGraphAPI(dataset);
     const buildTimeMs = Date.now() - startMs;
 
     return {

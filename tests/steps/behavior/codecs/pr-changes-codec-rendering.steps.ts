@@ -38,7 +38,7 @@ import {
   createPatternWithBusinessValue,
   createPatternsWithScenarios,
   createPatternsWithBusinessRules,
-  createTestMasterDataset,
+  createTestPatternGraph,
 } from '../../../support/helpers/pr-changes-codec-state.js';
 import type { DataTableRow } from '../../../support/world.js';
 
@@ -75,8 +75,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario(
       'No changes when no patterns match changedFiles filter',
       ({ Given, When, Then, And }) => {
-        Given('a MasterDataset with active patterns', () => {
-          state!.dataset = createTestMasterDataset({ patterns: createActivePatterns() });
+        Given('a PatternGraph with active patterns', () => {
+          state!.dataset = createTestPatternGraph({ patterns: createActivePatterns() });
         });
 
         When('decoding with changedFiles filter for non-matching paths', () => {
@@ -105,8 +105,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario(
       'No changes when no patterns match releaseFilter',
       ({ Given, When, Then, And }) => {
-        Given('a MasterDataset with active patterns', () => {
-          state!.dataset = createTestMasterDataset({ patterns: createActivePatterns() });
+        Given('a PatternGraph with active patterns', () => {
+          state!.dataset = createTestPatternGraph({ patterns: createActivePatterns() });
         });
 
         When('decoding with releaseFilter {string}', (_ctx: unknown, release: string) => {
@@ -129,8 +129,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario(
       'No changes with combined filters when nothing matches',
       ({ Given, When, Then, And }) => {
-        Given('a MasterDataset with active patterns', () => {
-          state!.dataset = createTestMasterDataset({ patterns: createActivePatterns() });
+        Given('a PatternGraph with active patterns', () => {
+          state!.dataset = createTestPatternGraph({ patterns: createActivePatterns() });
         });
 
         When('decoding with changedFiles and releaseFilter that match nothing', () => {
@@ -161,8 +161,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('PrChangesCodec generates summary with filter information', ({ RuleScenario }) => {
     RuleScenario('Summary section shows pattern counts', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with PR-relevant patterns', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createPrRelevantPatterns() });
+      Given('a PatternGraph with PR-relevant patterns', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createPrRelevantPatterns() });
       });
 
       When('decoding with PrChangesCodec', () => {
@@ -192,8 +192,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Summary shows release tag when releaseFilter is set', ({ Given, When, Then }) => {
-      Given('a MasterDataset with PR-relevant patterns with deliverables', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createPatternsWithDeliverables() });
+      Given('a PatternGraph with PR-relevant patterns with deliverables', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createPatternsWithDeliverables() });
       });
 
       When('decoding with releaseFilter {string}', (_ctx: unknown, release: string) => {
@@ -212,8 +212,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario(
       'Summary shows files filter count when changedFiles is set',
       ({ Given, When, Then }) => {
-        Given('a MasterDataset with PR-relevant patterns', () => {
-          state!.dataset = createTestMasterDataset({ patterns: createPrRelevantPatterns() });
+        Given('a PatternGraph with PR-relevant patterns', () => {
+          state!.dataset = createTestPatternGraph({ patterns: createPrRelevantPatterns() });
         });
 
         When('decoding with changedFiles filter for matching paths', () => {
@@ -239,8 +239,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('PrChangesCodec groups changes by phase when sortBy is "phase"', ({ RuleScenario }) => {
     RuleScenario('Changes grouped by phase with default sortBy', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with patterns in multiple phases', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createPatternsInMultiplePhases() });
+      Given('a PatternGraph with patterns in multiple phases', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createPatternsInMultiplePhases() });
       });
 
       When('decoding with PrChangesCodec', () => {
@@ -266,8 +266,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Pattern details shown within phase groups', ({ Given, When, Then }) => {
-      Given('a MasterDataset with patterns in multiple phases', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createPatternsInMultiplePhases() });
+      Given('a PatternGraph with patterns in multiple phases', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createPatternsInMultiplePhases() });
       });
 
       When('decoding with PrChangesCodec', () => {
@@ -293,8 +293,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     'PrChangesCodec groups changes by priority when sortBy is "priority"',
     ({ RuleScenario }) => {
       RuleScenario('Changes grouped by priority', ({ Given, When, Then, And }) => {
-        Given('a MasterDataset with patterns with different priorities', () => {
-          state!.dataset = createTestMasterDataset({ patterns: createPatternsWithPriorities() });
+        Given('a PatternGraph with patterns with different priorities', () => {
+          state!.dataset = createTestPatternGraph({ patterns: createPatternsWithPriorities() });
         });
 
         When('decoding with sortBy {string}', (_ctx: unknown, sortBy: string) => {
@@ -324,8 +324,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       });
 
       RuleScenario('Priority groups show correct patterns', ({ Given, When, Then, And }) => {
-        Given('a MasterDataset with patterns with different priorities', () => {
-          state!.dataset = createTestMasterDataset({ patterns: createPatternsWithPriorities() });
+        Given('a PatternGraph with patterns with different priorities', () => {
+          state!.dataset = createTestPatternGraph({ patterns: createPatternsWithPriorities() });
         });
 
         When('decoding with sortBy {string}', (_ctx: unknown, sortBy: string) => {
@@ -352,8 +352,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('PrChangesCodec shows flat list when sortBy is "workflow"', ({ RuleScenario }) => {
     RuleScenario('Flat changes list with workflow sort', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with PR-relevant patterns', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createPrRelevantPatterns() });
+      Given('a PatternGraph with PR-relevant patterns', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createPrRelevantPatterns() });
       });
 
       When('decoding with sortBy {string}', (_ctx: unknown, sortBy: string) => {
@@ -381,8 +381,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     'PrChangesCodec renders pattern details with metadata and description',
     ({ RuleScenario }) => {
       RuleScenario('Pattern detail shows metadata table', ({ Given, When, Then }) => {
-        Given('a MasterDataset with a detailed pattern', () => {
-          state!.dataset = createTestMasterDataset({ patterns: createDetailedPattern() });
+        Given('a PatternGraph with a detailed pattern', () => {
+          state!.dataset = createTestPatternGraph({ patterns: createDetailedPattern() });
         });
 
         When('decoding with PrChangesCodec', () => {
@@ -407,8 +407,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'Pattern detail shows business value when available',
         ({ Given, When, Then }) => {
-          Given('a MasterDataset with a pattern with business value', () => {
-            state!.dataset = createTestMasterDataset({
+          Given('a PatternGraph with a pattern with business value', () => {
+            state!.dataset = createTestPatternGraph({
               patterns: createPatternWithBusinessValue(),
             });
           });
@@ -434,8 +434,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       );
 
       RuleScenario('Pattern detail shows description', ({ Given, When, Then }) => {
-        Given('a MasterDataset with a detailed pattern', () => {
-          state!.dataset = createTestMasterDataset({ patterns: createDetailedPattern() });
+        Given('a PatternGraph with a detailed pattern', () => {
+          state!.dataset = createTestPatternGraph({ patterns: createDetailedPattern() });
         });
 
         When('decoding with PrChangesCodec', () => {
@@ -460,8 +460,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'Deliverables shown when patterns have deliverables',
         ({ Given, When, Then }) => {
-          Given('a MasterDataset with patterns with deliverables', () => {
-            state!.dataset = createTestMasterDataset({
+          Given('a PatternGraph with patterns with deliverables', () => {
+            state!.dataset = createTestPatternGraph({
               patterns: createPatternsWithDeliverables(),
             });
           });
@@ -482,8 +482,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'Deliverables filtered by release when releaseFilter is set',
         ({ Given, When, Then }) => {
-          Given('a MasterDataset with patterns with mixed release deliverables', () => {
-            state!.dataset = createTestMasterDataset({
+          Given('a PatternGraph with patterns with mixed release deliverables', () => {
+            state!.dataset = createTestPatternGraph({
               patterns: createPatternsWithMixedReleaseDeliverables(),
             });
           });
@@ -510,8 +510,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'No deliverables section when includeDeliverables is disabled',
         ({ Given, When, Then }) => {
-          Given('a MasterDataset with patterns with deliverables', () => {
-            state!.dataset = createTestMasterDataset({
+          Given('a PatternGraph with patterns with deliverables', () => {
+            state!.dataset = createTestPatternGraph({
               patterns: createPatternsWithDeliverables(),
             });
           });
@@ -538,8 +538,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario(
       'Acceptance criteria rendered when patterns have scenarios',
       ({ Given, When, Then }) => {
-        Given('a MasterDataset with patterns with scenarios', () => {
-          state!.dataset = createTestMasterDataset({ patterns: createPatternsWithScenarios() });
+        Given('a PatternGraph with patterns with scenarios', () => {
+          state!.dataset = createTestPatternGraph({ patterns: createPatternsWithScenarios() });
         });
 
         When('decoding with PrChangesCodec', () => {
@@ -553,8 +553,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     );
 
     RuleScenario('Acceptance criteria shows scenario steps', ({ Given, When, Then }) => {
-      Given('a MasterDataset with patterns with scenarios and steps', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createPatternsWithScenarios() });
+      Given('a PatternGraph with patterns with scenarios and steps', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createPatternsWithScenarios() });
       });
 
       When('decoding with PrChangesCodec', () => {
@@ -580,8 +580,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('PrChangesCodec renders business rules from Gherkin Rule keyword', ({ RuleScenario }) => {
     RuleScenario('Business rules rendered when patterns have rules', ({ Given, When, Then }) => {
-      Given('a MasterDataset with patterns with business rules', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createPatternsWithBusinessRules() });
+      Given('a PatternGraph with patterns with business rules', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createPatternsWithBusinessRules() });
       });
 
       When('decoding with PrChangesCodec', () => {
@@ -596,8 +596,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario(
       'Business rules show rule names and verification info',
       ({ Given, When, Then, And }) => {
-        Given('a MasterDataset with patterns with business rules', () => {
-          state!.dataset = createTestMasterDataset({ patterns: createPatternsWithBusinessRules() });
+        Given('a PatternGraph with patterns with business rules', () => {
+          state!.dataset = createTestPatternGraph({ patterns: createPatternsWithBusinessRules() });
         });
 
         When('decoding with PrChangesCodec', () => {

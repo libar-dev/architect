@@ -6,8 +6,8 @@
 @architect-product-area:Generation
 @behavior @transform-dataset
 Feature: Transform Dataset Pipeline
-  The transformToMasterDataset function transforms raw extracted patterns
-  into a MasterDataset with all pre-computed views in a single pass.
+  The transformToPatternGraph function transforms raw extracted patterns
+  into a PatternGraph with all pre-computed views in a single pass.
   This is the core of the unified transformation pipeline.
 
   **Problem:**
@@ -18,14 +18,14 @@ Feature: Transform Dataset Pipeline
   **Solution:**
   - Single-pass transformation computes all views in O(n)
   - All views are immutable and pre-computed
-  - MasterDataset is the source of truth for all generators
+  - PatternGraph is the source of truth for all generators
 
   Background:
     Given a transform dataset test context
 
   Rule: Empty dataset produces valid zero-state views
 
-    **Invariant:** An empty input produces a MasterDataset with all counts at zero and no groupings.
+    **Invariant:** An empty input produces a PatternGraph with all counts at zero and no groupings.
     **Rationale:** Generators must handle the zero-state gracefully; a missing or malformed empty dataset would cause null-reference errors across all rendering codecs.
 
     **Verified by:** Transform empty dataset
@@ -33,7 +33,7 @@ Feature: Transform Dataset Pipeline
     @happy-path @edge-case
     Scenario: Transform empty dataset
       Given an empty raw dataset
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then the dataset has 0 patterns
       And all status counts are 0
       And the phase count is 0
@@ -54,7 +54,7 @@ Feature: Transform Dataset Pipeline
         | completed | 5     |
         | active    | 3     |
         | planned   | 2     |
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then byStatus.completed has 5 patterns
       And byStatus.active has 3 patterns
       And byStatus.planned has 2 patterns
@@ -67,7 +67,7 @@ Feature: Transform Dataset Pipeline
         | active    | active       |
         | roadmap   | planned      |
         | deferred  | planned      |
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then each pattern is grouped in the expected status bucket
 
     @happy-path @phase-grouping
@@ -77,7 +77,7 @@ Feature: Transform Dataset Pipeline
         | 1     | 2     |
         | 2     | 3     |
         | 3     | 1     |
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then byPhase has 3 phase groups with counts:
         | phase | count |
         | 1     | 2     |
@@ -86,12 +86,12 @@ Feature: Transform Dataset Pipeline
 
     Scenario: Sort phases by phase number
       Given patterns in phases 3, 1, 2 (out of order)
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then byPhase is sorted as [1, 2, 3]
 
     Scenario: Compute per-phase status counts
       Given phase 1 with 2 completed and 1 active patterns
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then phase 1 counts are:
         | field     | value |
         | completed | 2     |
@@ -102,7 +102,7 @@ Feature: Transform Dataset Pipeline
     Scenario: Patterns without phase are not in byPhase
       Given 3 patterns without phase metadata
       And 2 patterns in phase 1
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then byPhase has 1 phase group
       And phaseCount is 1
 
@@ -120,7 +120,7 @@ Feature: Transform Dataset Pipeline
         | Q1-2024 | 2     |
         | Q2-2024 | 3     |
         | Q4-2024 | 1     |
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then byQuarter has 3 quarters with counts:
         | quarter | count |
         | Q1-2024 | 2     |
@@ -130,7 +130,7 @@ Feature: Transform Dataset Pipeline
     Scenario: Patterns without quarter are not in byQuarter
       Given 3 patterns without quarter
       And 2 patterns in quarter "Q1-2024"
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then byQuarter has 1 quarter
 
     @happy-path @category-grouping
@@ -140,7 +140,7 @@ Feature: Transform Dataset Pipeline
         | core     | 3     |
         | ddd      | 2     |
         | saga     | 1     |
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then byCategory has 3 categories with counts:
         | category | count |
         | core     | 3     |
@@ -162,14 +162,14 @@ Feature: Transform Dataset Pipeline
         | src/patterns/core.ts            | typescript   |
         | src/patterns/ddd.ts             | typescript   |
         | tests/features/saga.feature     | gherkin      |
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then bySourceType.typescript has 2 patterns
       And bySourceType.gherkin has 1 pattern
 
     Scenario: Patterns with phase are also in roadmap view
       Given 3 patterns with phase metadata
       And 2 patterns without phase
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then bySourceType.roadmap has 3 patterns
 
   Rule: Relationship index builds bidirectional dependency graph
@@ -184,7 +184,7 @@ Feature: Transform Dataset Pipeline
     Scenario: Build relationship index from patterns
       Given a pattern "Core" that uses "Base"
       And a pattern "Base" that is used by "Core"
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then the relationship index for "Core" uses contains "Base"
       And the relationship index for "Base" usedBy contains "Core"
 
@@ -195,7 +195,7 @@ Feature: Transform Dataset Pipeline
         | usedBy    | Application    |
         | dependsOn | Infrastructure |
         | enables   | Extension      |
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then the relationship index for "Feature" contains:
         | field     | value          |
         | uses      | Utility        |
@@ -207,21 +207,21 @@ Feature: Transform Dataset Pipeline
     Scenario: Reverse lookup computes enables from dependsOn
       Given a pattern "Infra" with no relationships
       And a pattern "App" that depends on "Infra"
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then the relationship index for "Infra" enables contains "App"
 
     @happy-path @relationships
     Scenario: Reverse lookup computes usedBy from uses
       Given a pattern "Lib" with no relationships
       And a pattern "Consumer" that uses "Lib"
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then the relationship index for "Lib" usedBy contains "Consumer"
 
     @happy-path @relationships
     Scenario: Reverse lookup merges with explicit annotations without duplicates
       Given a pattern "Base" that enables "Feature" explicitly
       And a pattern "Feature" that depends on "Base"
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then the relationship index for "Base" enables contains "Feature"
       And the relationship index for "Base" enables has exactly 1 entry
 
@@ -264,7 +264,7 @@ Feature: Transform Dataset Pipeline
 
   Rule: Workflow integration conditionally includes delivery process data
 
-    **Invariant:** The workflow is included in the MasterDataset only when provided, and phase names are resolved from the workflow configuration.
+    **Invariant:** The workflow is included in the PatternGraph only when provided, and phase names are resolved from the workflow configuration.
     **Rationale:** Projects without a delivery workflow must still produce valid datasets; unconditionally requiring workflow data would break standalone documentation generation.
 
     **Verified by:** Include workflow in result when provided, Result omits workflow when not provided
@@ -284,5 +284,5 @@ Feature: Transform Dataset Pipeline
 
     Scenario: Result omits workflow when not provided
       Given patterns without a workflow
-      When transforming to MasterDataset
+      When transforming to PatternGraph
       Then the result does not include workflow

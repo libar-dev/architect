@@ -31,9 +31,9 @@ Feature: Process API Layered Extraction
   in process-api.ts, 13 are thin wrappers over `src/api/` modules:
 
   | Handler | Delegates To |
-  | handleStatus | ProcessStateAPI methods |
+  | handleStatus | PatternGraphAPI methods |
   | handleQuery | Dynamic API method dispatch |
-  | handlePattern | ProcessStateAPI methods |
+  | handlePattern | PatternGraphAPI methods |
   | handleList | output-pipeline.ts |
   | handleSearch | fuzzy-match.ts, pattern-helpers.ts |
   | handleStubs | stub-resolver.ts |
@@ -70,7 +70,7 @@ Feature: Process API Layered Extraction
   `Result<PipelineResult, PipelineError>` so each consumer can map errors
   to its own strategy (process-api calls `process.exit(1)`,
   validate-patterns throws, orchestrator returns `Result.err()`).
-  `PipelineResult` contains `{ dataset: RuntimeMasterDataset, validation:
+  `PipelineResult` contains `{ dataset: RuntimePatternGraph, validation:
   ValidationSummary }`. The `TagRegistry` is accessible via
   `dataset.tagRegistry` and does not need a separate field.
 
@@ -92,7 +92,7 @@ Feature: Process API Layered Extraction
   validate-patterns.ts only.
 
   DD-4: handleRules domain logic extracts to `src/api/rules-query.ts`.
-  The new module exports `queryBusinessRules(dataset: RuntimeMasterDataset,
+  The new module exports `queryBusinessRules(dataset: RuntimePatternGraph,
   filters: RulesFilters): RulesQueryResult`. The `RulesFilters` interface,
   `RuleOutput` interface, and all nested Map construction move to this module.
   The `parseBusinessRuleAnnotations` and `deduplicateScenarioNames` imports
@@ -116,7 +116,7 @@ Feature: Process API Layered Extraction
   calls would add indirection with no architectural benefit.
 
   DD-7: validate-patterns.ts partially adopts the pipeline factory.
-  The factory replaces the MasterDataset construction pipeline (steps 1-8).
+  The factory replaces the PatternGraph construction pipeline (steps 1-8).
   DoD validation and anti-pattern detection remain as direct stage-1
   consumers using raw scanned files (`scanResult.value.files`,
   `gherkinScanResult.value.files`). This is correct per ADR-006: the
@@ -144,7 +144,7 @@ Feature: Process API Layered Extraction
   | 2 | Export from src/generators/pipeline/index.ts barrel | pnpm typecheck |
   | 3 | Migrate process-api.ts buildPipeline to factory call | pnpm typecheck, pnpm process:query -- overview |
   | 4 | Remove unused scanner/extractor imports from process-api.ts | pnpm lint |
-  | 5 | Migrate validate-patterns.ts MasterDataset pipeline to factory call | pnpm validate:patterns (0 errors, 0 warnings) |
+  | 5 | Migrate validate-patterns.ts PatternGraph pipeline to factory call | pnpm validate:patterns (0 errors, 0 warnings) |
   | 6 | Create src/api/rules-query.ts with queryBusinessRules | pnpm typecheck |
   | 7 | Slim handleRules in process-api.ts to thin delegation | pnpm process:query -- rules |
   | 8 | Export from src/api/index.ts barrel | pnpm typecheck |
@@ -158,7 +158,7 @@ Feature: Process API Layered Extraction
   | src/api/rules-query.ts | NEW: business rules query from handleRules | +~200 |
   | src/api/index.ts | Add re-exports for rules-query | +5 |
   | src/cli/process-api.ts | Replace buildPipeline + handleRules with delegations | -~280 net |
-  | src/cli/validate-patterns.ts | Replace MasterDataset pipeline with factory call | -~30 net |
+  | src/cli/validate-patterns.ts | Replace PatternGraph pipeline with factory call | -~30 net |
 
   **What does NOT change:**
 
@@ -176,7 +176,7 @@ Feature: Process API Layered Extraction
       | Deliverable | Status | Location |
       | Create shared pipeline factory | complete | src/generators/pipeline/build-pipeline.ts |
       | process-api.ts consumes pipeline factory | complete | src/cli/process-api.ts |
-      | validate-patterns.ts consumes pipeline factory (MasterDataset only) | complete | src/cli/validate-patterns.ts |
+      | validate-patterns.ts consumes pipeline factory (PatternGraph only) | complete | src/cli/validate-patterns.ts |
       | Extract handleRules to rules-query.ts | complete | src/api/rules-query.ts |
       | Update barrel exports | complete | src/api/index.ts, src/generators/pipeline/index.ts |
       | End-to-end verification | complete | CLI output |
@@ -184,7 +184,7 @@ Feature: Process API Layered Extraction
   Rule: CLI file contains only routing, no domain logic
 
     **Invariant:** `process-api.ts` parses arguments, calls the pipeline
-    factory for the MasterDataset, routes subcommands to API modules, and
+    factory for the PatternGraph, routes subcommands to API modules, and
     formats output. It does not build Maps, filter patterns, group data,
     or resolve relationships. Thin view projections (3-5 line `.map()`
     calls over pre-computed archIndex views) are acceptable as formatting.
@@ -209,14 +209,14 @@ Feature: Process API Layered Extraction
       Given handleRules business rules grouping
       When extracted to src/api/rules-query.ts
       Then the CLI handler parses filters, calls queryBusinessRules, and formats output
-      And the queryBusinessRules function is a pure function taking RuntimeMasterDataset
+      And the queryBusinessRules function is a pure function taking RuntimePatternGraph
       And the nested Map construction lives in rules-query.ts, not process-api.ts
 
   Rule: Pipeline factory is shared across CLI consumers
 
     **Invariant:** The scan-extract-transform sequence is defined once in
     `src/generators/pipeline/build-pipeline.ts`. CLI consumers that need a
-    MasterDataset call the factory rather than wiring the pipeline
+    PatternGraph call the factory rather than wiring the pipeline
     independently. The factory accepts `mergeConflictStrategy` to handle
     behavioral differences between consumers.
 
@@ -224,7 +224,7 @@ Feature: Process API Layered Extraction
     orchestrator) independently wire the same 8-step sequence: loadConfig,
     scanPatterns, extractPatterns, scanGherkinFiles,
     extractPatternsFromGherkin, mergePatterns, computeHierarchyChildren,
-    transformToMasterDataset. The only semantic difference is merge-conflict
+    transformToPatternGraph. The only semantic difference is merge-conflict
     handling (fatal vs concatenate). This is a Parallel Pipeline anti-pattern
     per ADR-006.
 
@@ -233,10 +233,10 @@ Feature: Process API Layered Extraction
     @acceptance-criteria
     Scenario: CLI consumers use factory
       Given process-api.ts and validate-patterns.ts
-      When each needs a MasterDataset
+      When each needs a PatternGraph
       Then each calls the shared pipeline factory from build-pipeline.ts
       And process-api.ts does not import from scanner/ or extractor/
-      And validate-patterns.ts uses the factory for MasterDataset but retains direct scans for DoD and anti-patterns
+      And validate-patterns.ts uses the factory for PatternGraph but retains direct scans for DoD and anti-patterns
 
     @acceptance-criteria
     Scenario: Orchestrator migration deferred
@@ -248,7 +248,7 @@ Feature: Process API Layered Extraction
 
   Rule: Domain logic lives in API modules
 
-    **Invariant:** Query logic that operates on MasterDataset lives in
+    **Invariant:** Query logic that operates on PatternGraph lives in
     `src/api/` modules. The `rules-query.ts` module provides business rules
     querying with the same grouping logic that was inline in handleRules:
     filter by product area and pattern, group by area -> phase -> feature ->
@@ -267,7 +267,7 @@ Feature: Process API Layered Extraction
     Scenario: rules-query module exports
       Given the new src/api/rules-query.ts
       When inspecting the module
-      Then it exports queryBusinessRules taking RuntimeMasterDataset and RulesFilters
+      Then it exports queryBusinessRules taking RuntimePatternGraph and RulesFilters
       And it exports RulesQueryResult, RulesFilters, and RuleOutput types
       And it is re-exported from src/api/index.ts
 
@@ -298,7 +298,7 @@ Feature: Process API Layered Extraction
 
     @acceptance-criteria
     Scenario: Factory uses Result monad
-      Given the pipeline factory buildMasterDataset
+      Given the pipeline factory buildPatternGraph
       When a config error, scan error, or merge conflict occurs
       Then the factory returns Result.err with a structured PipelineError
       And it does not call process.exit or throw

@@ -131,7 +131,7 @@ const overviewNarrative: CommandNarrative = {
     '318 patterns (224 completed, 47 active, 47 planned) = 70%',
     '',
     '=== ACTIVE PHASES ===',
-    'Phase 24: ProcessStateAPIRelationshipQueries (1 active)',
+    'Phase 24: PatternGraphAPIRelationshipQueries (1 active)',
     'Phase 25: DataAPIStubIntegration (1 active)',
     '',
     '=== BLOCKING ===',

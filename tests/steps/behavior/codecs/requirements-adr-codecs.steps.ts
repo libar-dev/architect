@@ -17,14 +17,14 @@ import {
 } from '../../../../src/renderable/codecs/requirements.js';
 import { createAdrCodec, AdrDocumentCodec } from '../../../../src/renderable/codecs/adr.js';
 import type { RenderableDocument, TableBlock } from '../../../../src/renderable/schema.js';
-import type { MasterDataset } from '../../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../../src/validation-schemas/pattern-graph.js';
 import type {
   ExtractedPattern,
   BusinessRule,
   ScenarioRef,
 } from '../../../../src/validation-schemas/index.js';
 import {
-  createTestMasterDataset,
+  createTestPatternGraph,
   createTestPattern,
   resetPatternCounter,
 } from '../../../fixtures/dataset-factories.js';
@@ -62,7 +62,7 @@ type AdrPattern = ExtractedPattern & {
 // =============================================================================
 
 interface RequirementsAdrCodecState {
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   document: RenderableDocument | null;
 }
 
@@ -468,8 +468,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'No patterns with PRD metadata produces empty message',
         ({ Given, When, Then, And }) => {
-          Given('an empty MasterDataset', () => {
-            state!.dataset = createTestMasterDataset();
+          Given('an empty PatternGraph', () => {
+            state!.dataset = createTestPatternGraph();
           });
 
           When('decoding with RequirementsDocumentCodec', () => {
@@ -489,8 +489,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       );
 
       RuleScenario('Summary shows counts and groupings', ({ Given, When, Then, And }) => {
-        Given('a MasterDataset with PRD patterns', () => {
-          state!.dataset = createTestMasterDataset({ patterns: createPrdPatterns() });
+        Given('a PatternGraph with PRD patterns', () => {
+          state!.dataset = createTestPatternGraph({ patterns: createPrdPatterns() });
         });
 
         When('decoding with RequirementsDocumentCodec', () => {
@@ -524,8 +524,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'By product area section groups patterns correctly',
         ({ Given, When, Then, And }) => {
-          Given('a MasterDataset with PRD patterns', () => {
-            state!.dataset = createTestMasterDataset({ patterns: createPrdPatterns() });
+          Given('a PatternGraph with PRD patterns', () => {
+            state!.dataset = createTestPatternGraph({ patterns: createPrdPatterns() });
           });
 
           When('decoding with RequirementsDocumentCodec', () => {
@@ -546,8 +546,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       );
 
       RuleScenario('By user role section uses collapsible groups', ({ Given, When, Then, And }) => {
-        Given('a MasterDataset with PRD patterns', () => {
-          state!.dataset = createTestMasterDataset({ patterns: createPrdPatterns() });
+        Given('a PatternGraph with PRD patterns', () => {
+          state!.dataset = createTestPatternGraph({ patterns: createPrdPatterns() });
         });
 
         When('decoding with RequirementsDocumentCodec', () => {
@@ -569,8 +569,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'Group by phase option changes primary grouping',
         ({ Given, When, Then, And }) => {
-          Given('a MasterDataset with PRD patterns', () => {
-            state!.dataset = createTestMasterDataset({ patterns: createPrdPatterns() });
+          Given('a PatternGraph with PRD patterns', () => {
+            state!.dataset = createTestPatternGraph({ patterns: createPrdPatterns() });
           });
 
           When('decoding with RequirementsDocumentCodec using groupBy phase', () => {
@@ -593,8 +593,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       );
 
       RuleScenario('Filter by status option limits patterns', ({ Given, When, Then }) => {
-        Given('a MasterDataset with PRD patterns', () => {
-          state!.dataset = createTestMasterDataset({ patterns: createPrdPatterns() });
+        Given('a PatternGraph with PRD patterns', () => {
+          state!.dataset = createTestPatternGraph({ patterns: createPrdPatterns() });
         });
 
         When('decoding with RequirementsDocumentCodec filtering to completed status', () => {
@@ -613,8 +613,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       });
 
       RuleScenario('All features table shows complete list', ({ Given, When, Then, And }) => {
-        Given('a MasterDataset with PRD patterns', () => {
-          state!.dataset = createTestMasterDataset({ patterns: createPrdPatterns() });
+        Given('a PatternGraph with PRD patterns', () => {
+          state!.dataset = createTestPatternGraph({ patterns: createPrdPatterns() });
         });
 
         When('decoding with RequirementsDocumentCodec', () => {
@@ -638,8 +638,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       });
 
       RuleScenario('Business value rendering when enabled', ({ Given, When, Then }) => {
-        Given('a MasterDataset with PRD patterns with business value', () => {
-          state!.dataset = createTestMasterDataset({ patterns: createPrdPatterns() });
+        Given('a PatternGraph with PRD patterns with business value', () => {
+          state!.dataset = createTestPatternGraph({ patterns: createPrdPatterns() });
         });
 
         When('decoding with RequirementsDocumentCodec', () => {
@@ -662,8 +662,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'Generate individual requirement detail files when enabled',
         ({ Given, When, Then }) => {
-          Given('a MasterDataset with PRD patterns', () => {
-            state!.dataset = createTestMasterDataset({ patterns: createPrdPatterns() });
+          Given('a PatternGraph with PRD patterns', () => {
+            state!.dataset = createTestPatternGraph({ patterns: createPrdPatterns() });
           });
 
           When('decoding with generateDetailFiles enabled for requirements', () => {
@@ -688,8 +688,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'Requirement detail file contains acceptance criteria from scenarios',
         ({ Given, When, Then, And }) => {
-          Given('a MasterDataset with PRD patterns with scenarios', () => {
-            state!.dataset = createTestMasterDataset({
+          Given('a PatternGraph with PRD patterns with scenarios', () => {
+            state!.dataset = createTestPatternGraph({
               patterns: createPrdPatternsWithScenarios(),
             });
           });
@@ -720,8 +720,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       RuleScenario(
         'Requirement detail file contains business rules section',
         ({ Given, When, Then }) => {
-          Given('a MasterDataset with PRD patterns with rules', () => {
-            state!.dataset = createTestMasterDataset({ patterns: createPrdPatternsWithRules() });
+          Given('a PatternGraph with PRD patterns with rules', () => {
+            state!.dataset = createTestPatternGraph({ patterns: createPrdPatternsWithRules() });
           });
 
           When('decoding with generateDetailFiles enabled for requirements', () => {
@@ -742,10 +742,10 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       );
 
       RuleScenario('Implementation links from relationshipIndex', ({ Given, When, Then }) => {
-        Given('a MasterDataset with PRD patterns with implementations', () => {
+        Given('a PatternGraph with PRD patterns with implementations', () => {
           // Create patterns with implementations via relationshipIndex
           const patterns = createPrdPatterns();
-          state!.dataset = createTestMasterDataset({ patterns });
+          state!.dataset = createTestPatternGraph({ patterns });
 
           // Manually add relationshipIndex entries with full structure
           const patternKey = patterns[0].patternName ?? patterns[0].name;
@@ -792,9 +792,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('AdrDocumentCodec documents architecture decisions', ({ RuleScenario }) => {
     RuleScenario('No ADR patterns produces empty message', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with no ADR patterns', () => {
+      Given('a PatternGraph with no ADR patterns', () => {
         // Empty dataset has no ADR patterns
-        state!.dataset = createTestMasterDataset();
+        state!.dataset = createTestPatternGraph();
       });
 
       When('decoding with AdrDocumentCodec', () => {
@@ -813,8 +813,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Summary shows status counts and categories', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with ADR patterns', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createAdrPatterns() });
+      Given('a PatternGraph with ADR patterns', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createAdrPatterns() });
       });
 
       When('decoding with AdrDocumentCodec', () => {
@@ -846,8 +846,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('ADRs grouped by category', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with ADR patterns', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createAdrPatterns() });
+      Given('a PatternGraph with ADR patterns', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createAdrPatterns() });
       });
 
       When('decoding with AdrDocumentCodec', () => {
@@ -867,8 +867,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('ADRs grouped by phase option', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with ADR patterns', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createAdrPatterns() });
+      Given('a PatternGraph with ADR patterns', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createAdrPatterns() });
       });
 
       When('decoding with AdrDocumentCodec using groupBy phase', () => {
@@ -889,8 +889,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('ADRs grouped by date (quarter) option', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with ADR patterns with quarters', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createAdrPatternsWithQuarters() });
+      Given('a PatternGraph with ADR patterns with quarters', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createAdrPatternsWithQuarters() });
       });
 
       When('decoding with AdrDocumentCodec using groupBy date', () => {
@@ -914,8 +914,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('ADR index table with all decisions', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with ADR patterns', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createAdrPatterns() });
+      Given('a PatternGraph with ADR patterns', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createAdrPatterns() });
       });
 
       When('decoding with AdrDocumentCodec', () => {
@@ -939,8 +939,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('ADR entries use clean text without emojis', ({ Given, When, Then }) => {
-      Given('a MasterDataset with ADR patterns', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createAdrPatterns() });
+      Given('a PatternGraph with ADR patterns', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createAdrPatterns() });
       });
 
       When('decoding with AdrDocumentCodec', () => {
@@ -968,8 +968,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario(
       'Context, Decision, Consequences sections from Rule keywords',
       ({ Given, When, Then }) => {
-        Given('a MasterDataset with ADR patterns with semantic rules', () => {
-          state!.dataset = createTestMasterDataset({
+        Given('a PatternGraph with ADR patterns with semantic rules', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: createAdrPatternsWithSemanticRules(),
           });
         });
@@ -1009,8 +1009,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     );
 
     RuleScenario('ADR supersedes rendering', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with ADR patterns with supersession', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createAdrPatternsWithSupersession() });
+      Given('a PatternGraph with ADR patterns with supersession', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createAdrPatternsWithSupersession() });
       });
 
       When('decoding with AdrDocumentCodec', () => {
@@ -1027,8 +1027,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Generate individual ADR detail files when enabled', ({ Given, When, Then }) => {
-      Given('a MasterDataset with ADR patterns', () => {
-        state!.dataset = createTestMasterDataset({ patterns: createAdrPatterns() });
+      Given('a PatternGraph with ADR patterns', () => {
+        state!.dataset = createTestPatternGraph({ patterns: createAdrPatterns() });
       });
 
       When('decoding with generateDetailFiles enabled for ADR', () => {
@@ -1047,8 +1047,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('ADR detail file contains full content', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with ADR patterns with semantic rules', () => {
-        state!.dataset = createTestMasterDataset({
+      Given('a PatternGraph with ADR patterns with semantic rules', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: createAdrPatternsWithSemanticRules(),
         });
       });

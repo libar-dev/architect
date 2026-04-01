@@ -28,7 +28,7 @@ Feature: Procedural Guide Codec
   **Solution:**
   Create a `ProceduralGuideCodec` that uses a dual-source composition pattern: auto-generated
   reference sections (tag reference tables, pattern statistics, session type contracts) are
-  derived from MasterDataset and taxonomy sources, while procedural content (checklists,
+  derived from PatternGraph and taxonomy sources, while procedural content (checklists,
   decision trees, getting-started walkthrough, troubleshooting tables) is authored as markdown
   files in `docs-sources/` and parsed into `SectionBlock[]` at config load time by
   `loadPreambleFromMarkdown()`. The codec produces two separate generated files -- one for
@@ -62,7 +62,7 @@ Feature: Procedural Guide Codec
   | Getting-started annotation walkthrough | Cannot derive from annotations | Markdown source -> loadPreambleFromMarkdown() |
   | Shape extraction mode explanations | Cannot derive from annotations | Markdown source -> loadPreambleFromMarkdown() |
   | Zod schema gotcha and troubleshooting | Cannot derive from annotations | Markdown source -> loadPreambleFromMarkdown() |
-  | Tag reference summary table | Taxonomy registry data | Auto-generated from MasterDataset |
+  | Tag reference summary table | Taxonomy registry data | Auto-generated from PatternGraph |
   | Verification CLI recipes | Cannot derive from annotations | Markdown source -> loadPreambleFromMarkdown() |
 
   **Design Questions (for design session):**
@@ -110,7 +110,7 @@ Feature: Procedural Guide Codec
   Rule: Procedural guides use a dual-source codec
 
     **Invariant:** The ProceduralGuideCodec composes auto-generated reference sections
-    (from MasterDataset and taxonomy) with manually-authored procedural content (from
+    (from PatternGraph and taxonomy) with manually-authored procedural content (from
     preamble `SectionBlock[]`). Auto-generated content covers ~5% of the output (tag
     reference tables, pattern statistics, session type contract tables extracted from
     Rule: blocks). The remaining ~95% is editorial preamble: checklists, decision trees,
@@ -136,7 +136,7 @@ Feature: Procedural Guide Codec
     @acceptance-criteria @happy-path
     Scenario: ProceduralGuideCodec composes preamble with generated reference
       Given a ProceduralGuideCodec configured with preamble checklist content
-      And the MasterDataset contains session type metadata from SessionGuidesModuleSource
+      And the PatternGraph contains session type metadata from SessionGuidesModuleSource
       When the codec generates the session workflow guide
       Then preamble checklist sections appear first in the output
       And auto-generated session type contract tables follow the preamble
@@ -158,7 +158,7 @@ Feature: Procedural Guide Codec
     statements for `_claude-md/workflow/` modules at the summary level. Two audiences
     (public developers and AI sessions) are served from a single annotated source with
     different rendering detail levels. The codec does not duplicate or re-derive Rule:
-    block content -- it reads from MasterDataset's behavior extraction views.
+    block content -- it reads from PatternGraph's behavior extraction views.
 
     **Rationale:** SessionGuidesModuleSource already captures session type contracts
     (Rule 3), planning constraints (Rule 4), design constraints (Rule 5), implementation

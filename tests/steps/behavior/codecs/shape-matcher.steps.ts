@@ -8,10 +8,10 @@ import {
   matchesShapePattern,
   filterShapesBySelectors,
 } from '../../../../src/renderable/codecs/shape-matcher.js';
-import type { MasterDataset } from '../../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../../src/validation-schemas/pattern-graph.js';
 import type { ExtractedShape } from '../../../../src/validation-schemas/extracted-shape.js';
 import { createTestPattern, resetPatternCounter } from '../../../fixtures/pattern-factories.js';
-import { createTestMasterDataset } from '../../../fixtures/dataset-factories.js';
+import { createTestPatternGraph } from '../../../fixtures/dataset-factories.js';
 
 // ============================================================================
 // State
@@ -19,7 +19,7 @@ import { createTestMasterDataset } from '../../../fixtures/dataset-factories.js'
 
 interface ShapeMatcherState {
   matchResult: boolean | null;
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   extractedShapes: readonly ExtractedShape[];
 }
 
@@ -191,7 +191,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Shapes are selected from matching source glob patterns',
       ({ Given, When, Then, And }) => {
         Given(
-          'a MasterDataset with patterns:',
+          'a PatternGraph with patterns:',
           (_ctx: unknown, dataTable: Array<Record<string, string>>) => {
             const patterns = dataTable.map((row) =>
               createTestPattern({
@@ -207,7 +207,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
                 ],
               })
             );
-            state!.dataset = createTestMasterDataset({ patterns });
+            state!.dataset = createTestPatternGraph({ patterns });
           }
         );
 
@@ -232,7 +232,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Duplicate shape names are deduplicated', ({ Given, When, Then }) => {
       Given(
-        'a MasterDataset with patterns:',
+        'a PatternGraph with patterns:',
         (_ctx: unknown, dataTable: Array<Record<string, string>>) => {
           const patterns = dataTable.map((row) =>
             createTestPattern({
@@ -248,7 +248,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
               ],
             })
           );
-          state!.dataset = createTestMasterDataset({ patterns });
+          state!.dataset = createTestPatternGraph({ patterns });
         }
       );
 
@@ -263,7 +263,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('No shapes returned when glob does not match', ({ Given, When, Then }) => {
       Given(
-        'a MasterDataset with patterns:',
+        'a PatternGraph with patterns:',
         (_ctx: unknown, dataTable: Array<Record<string, string>>) => {
           const patterns = dataTable.map((row) =>
             createTestPattern({
@@ -279,7 +279,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
               ],
             })
           );
-          state!.dataset = createTestMasterDataset({ patterns });
+          state!.dataset = createTestPatternGraph({ patterns });
         }
       );
 

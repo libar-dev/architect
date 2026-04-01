@@ -6,7 +6,7 @@
 @architect-product-area:Generation
 Feature: Index Document Codec
 
-  Validates the Index Codec that transforms MasterDataset into a
+  Validates the Index Codec that transforms PatternGraph into a
   RenderableDocument for the main documentation navigation index (INDEX.md).
 
   Background: Codec setup

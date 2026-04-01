@@ -69,7 +69,7 @@
  * ```
  */
 
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import {
   type RenderableDocument,
   type SectionBlock,
@@ -328,7 +328,7 @@ export function createReferenceCodec(
  * 5. Behavior specifications (all patterns with rules/descriptions)
  */
 function decodeProductArea(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   config: ReferenceDocConfig,
   opts: Required<ReferenceCodecOptions>
 ): RenderableDocument {

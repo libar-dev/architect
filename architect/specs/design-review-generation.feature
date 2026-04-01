@@ -19,14 +19,14 @@ Feature: Design Review Diagram Generation
   A generation pipeline that reads sequence annotations (`architect-sequence-*`) from
   feature files and produces design review documents with Mermaid sequence and component
   diagrams. The pipeline fits into the existing codec/generator architecture: sequence
-  data is pre-computed in a SequenceIndex view on MasterDataset, then a standalone
+  data is pre-computed in a SequenceIndex view on PatternGraph, then a standalone
   DesignReviewCodec renders the diagrams and supporting tables. Output goes to
   architect/design-reviews/.
 
   Background: Deliverables
     Given the following deliverables:
       | Deliverable                     | Status   | Location                                          |
-      | SequenceIndex schema            | complete | src/validation-schemas/master-dataset.ts           |
+      | SequenceIndex schema            | complete | src/validation-schemas/pattern-graph.ts           |
       | Sequence transform utilities    | complete | src/generators/pipeline/sequence-utils.ts          |
       | Transform dataset integration   | complete | src/generators/pipeline/transform-dataset.ts       |
       | BusinessRule errorScenarioNames | complete | src/validation-schemas/extracted-pattern.ts        |
@@ -37,10 +37,10 @@ Feature: Design Review Diagram Generation
 
   Rule: SequenceIndex pre-computes ordered steps from rule-level tags
 
-    **Invariant:** The MasterDataset sequenceIndex contains one entry per pattern that has the `architect-sequence-orchestrator` tag and at least one rule with the `architect-sequence-step` tag. Steps are sorted by stepNumber. Participants are deduplicated and ordered with orchestrator first.
+    **Invariant:** The PatternGraph sequenceIndex contains one entry per pattern that has the `architect-sequence-orchestrator` tag and at least one rule with the `architect-sequence-step` tag. Steps are sorted by stepNumber. Participants are deduplicated and ordered with orchestrator first.
 
     **Rationale:** Pre-computing in the transform pass avoids repeated parsing
-    in the codec. ADR-006 mandates the MasterDataset as the sole read model.
+    in the codec. ADR-006 mandates the PatternGraph as the sole read model.
     Downstream consumers (codec, process API) read structured data, not raw tags.
 
     **Verified by:** SequenceIndex populated for annotated pattern,
@@ -49,14 +49,14 @@ Feature: Design Review Diagram Generation
     @acceptance-criteria @happy-path
     Scenario: SequenceIndex populated for annotated pattern
       Given a pattern with @architect-sequence-orchestrator and 6 @architect-sequence-step rules
-      When the pattern is transformed to MasterDataset
+      When the pattern is transformed to PatternGraph
       Then sequenceIndex contains an entry for the pattern
       And the entry has 6 ordered steps with modules and data flow types
 
     @acceptance-criteria @validation
     Scenario: Patterns without sequence annotations excluded
       Given a pattern with no @architect-sequence-orchestrator tag
-      When the pattern is transformed to MasterDataset
+      When the pattern is transformed to PatternGraph
       Then sequenceIndex does not contain an entry for the pattern
 
   Rule: DesignReviewCodec generates sequence diagrams from ordered steps

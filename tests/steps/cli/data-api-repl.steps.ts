@@ -16,7 +16,7 @@ import {
   initState,
   writePatternFiles,
   createTempDir,
-} from '../../support/helpers/process-api-state.js';
+} from '../../support/helpers/pattern-graph-api-state.js';
 import { runCLI } from '../../support/helpers/cli-runner.js';
 
 // =============================================================================

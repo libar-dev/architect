@@ -13,7 +13,7 @@
  *
  * ### When to Use
  *
- * - When transforming extracted patterns into a MasterDataset
+ * - When transforming extracted patterns into a PatternGraph
  * - When building custom generation pipelines
  * - When accessing pre-computed indexes and views from the dataset
  *
@@ -25,8 +25,8 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 export {
-  transformToMasterDataset,
-  transformToMasterDatasetWithValidation,
+  transformToPatternGraph,
+  transformToPatternGraphWithValidation,
   completionPercentage,
   isFullyCompleted,
 } from './transform-dataset.js';
@@ -35,7 +35,7 @@ export type { ContextInferenceRule } from './context-inference.js';
 
 export type {
   RawDataset,
-  RuntimeMasterDataset,
+  RuntimePatternGraph,
   ValidationSummary,
   MalformedPattern,
   DanglingReference,
@@ -53,7 +53,7 @@ export { mergePatterns } from './merge-patterns.js';
 // ═══════════════════════════════════════════════════════════════════════════
 
 export {
-  buildMasterDataset,
+  buildPatternGraph,
   type PipelineOptions,
   type PipelineResult,
   type PipelineError,

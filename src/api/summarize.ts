@@ -4,7 +4,7 @@
  * @architect-pattern PatternSummarizerImpl
  * @architect-status active
  * @architect-implements DataAPIOutputShaping
- * @architect-uses ProcessStateAPI
+ * @architect-uses PatternGraphAPI
  * @architect-used-by OutputPipeline, ProcessAPICLIImpl
  * @architect-arch-role service
  * @architect-arch-context api

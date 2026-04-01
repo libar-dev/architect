@@ -40,7 +40,7 @@ Feature: PROCESS-API.md Hybrid Generation
   | Finding | Impact | Resolution |
   | Original spec references src/cli/parser.ts | File does not exist | Fix to src/cli/process-api.ts + src/cli/output-pipeline.ts |
   | Orchestrator only does full-file writes | Marker-based partial replacement not supported | Split Output Reference into separate generated file |
-  | ReferenceDocConfig is MasterDataset-sourced | CLI schema data is not annotation-derived | Standalone generator, not ReferenceDocConfig (ADR-006) |
+  | ReferenceDocConfig is PatternGraph-sourced | CLI schema data is not annotation-derived | Standalone generator, not ReferenceDocConfig (ADR-006) |
   | --format in Output Modifiers table but not in OutputModifiers interface | Would produce incomplete table | Schema includes --format alongside modifiers |
   | --session parsed as global option but absent from Global Options table | Intentional, documented in Session Types | Schema captures in separate sessionOptions group |
   | showHelp() lines 271-370 is third copy of same data | Three-way sync risk | Schema drives both help text and doc generation |
@@ -88,7 +88,7 @@ Feature: PROCESS-API.md Hybrid Generation
     (lines 43-83 of `src/cli/output-pipeline.ts`). A declarative schema extracts this
     into a single structured definition that both documentation and help text consume.
     The existing `ReferenceDocConfig` system cannot be used because it sources from
-    MasterDataset (annotation-derived data), not static constants (ADR-006).
+    PatternGraph (annotation-derived data), not static constants (ADR-006).
 
     **Verified by:** Tables match parser definitions, showHelp output matches schema,
     sync test catches drift
@@ -136,17 +136,17 @@ Feature: PROCESS-API.md Hybrid Generation
   Rule: Standalone generator respects ADR-006 single read model
 
     **Invariant:** The `ProcessApiReferenceGenerator` imports CLI schema data directly
-    from `src/cli/cli-schema.ts`. It does NOT inject CLI data into MasterDataset or
-    consume MasterDataset for table generation. It implements `DocumentGenerator` and
+    from `src/cli/cli-schema.ts`. It does NOT inject CLI data into PatternGraph or
+    consume PatternGraph for table generation. It implements `DocumentGenerator` and
     returns `OutputFile[]` via the standard orchestrator write path.
 
-    **Rationale:** ADR-006 establishes MasterDataset as the sole read model for
+    **Rationale:** ADR-006 establishes PatternGraph as the sole read model for
     annotation-sourced data. CLI schema is a static TypeScript constant, not extracted
-    from annotations. Forcing it through MasterDataset would violate the "no parallel
+    from annotations. Forcing it through PatternGraph would violate the "no parallel
     pipeline" anti-pattern. A standalone generator with its own data source is
     architecturally correct.
 
-    **Verified by:** Generator has no MasterDataset import, output file written by orchestrator
+    **Verified by:** Generator has no PatternGraph import, output file written by orchestrator
 
     @acceptance-criteria @integration
     Scenario: Generator produces complete reference file

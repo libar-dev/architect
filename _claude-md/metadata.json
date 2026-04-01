@@ -50,7 +50,7 @@
         {
           "path": "api/mcp-server.md",
           "tags": ["core"],
-          "description": "MCP server tools for native AI agent access to ProcessStateAPI"
+          "description": "MCP server tools for native AI agent access to PatternGraphAPI"
         }
       ]
     },

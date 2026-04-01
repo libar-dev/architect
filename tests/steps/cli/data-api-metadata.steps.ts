@@ -17,7 +17,7 @@ import {
   runCLICommand,
   writePatternFiles,
   createTempDir,
-} from '../../support/helpers/process-api-state.js';
+} from '../../support/helpers/pattern-graph-api-state.js';
 
 // =============================================================================
 // JSON Metadata Parsing

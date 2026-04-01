@@ -7,7 +7,7 @@ Context engineering platform with extraction pipeline and typed codecs. Extracts
 **Key Capabilities:**
 
 - Pattern extraction from TypeScript JSDoc and Gherkin tags
-- MasterDataset transformation with pre-computed views (O(1) access)
+- PatternGraph transformation with pre-computed views (O(1) access)
 - Codec-based markdown generation with progressive disclosure
 - FSM-enforced delivery workflow validation via pre-commit hooks
 

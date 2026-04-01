@@ -19,12 +19,12 @@
  *
  * ```typescript
  * import {
- *   createProcessStateAPI,
- *   type ProcessStateAPI,
+ *   createPatternGraphAPI,
+ *   type PatternGraphAPI,
  *   type QueryResult,
  * } from "@libar-dev/architect/api";
  *
- * const api = createProcessStateAPI(masterDataset);
+ * const api = createPatternGraphAPI(patternGraph);
  *
  * // Query current work
  * const activeWork = api.getCurrentWork();
@@ -59,8 +59,8 @@ export { createSuccess, createError, QueryApiError } from './types.js';
 export type { NeighborEntry } from './types.js';
 
 // Process State API
-export type { ProcessStateAPI } from './process-state.js';
-export { createProcessStateAPI } from './process-state.js';
+export type { PatternGraphAPI } from './pattern-graph-api.js';
+export { createPatternGraphAPI } from './pattern-graph-api.js';
 
 // Pattern Summarization
 export type { PatternSummary } from './summarize.js';

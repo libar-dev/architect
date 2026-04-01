@@ -12,14 +12,14 @@
  *
  * Computes reverse relationship lookups (implementedBy, extendedBy, enables, usedBy)
  * and detects dangling references in the pattern graph. These are the 2nd and 3rd
- * passes of the MasterDataset transformation pipeline.
+ * passes of the PatternGraph transformation pipeline.
  */
 
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import type {
   RelationshipEntry,
   ImplementationRef,
-} from '../../validation-schemas/master-dataset.js';
+} from '../../validation-schemas/pattern-graph.js';
 import { getPatternName } from '../../api/pattern-helpers.js';
 import type { DanglingReference } from './transform-types.js';
 
