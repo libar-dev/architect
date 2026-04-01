@@ -51,6 +51,20 @@ export class CodecBasedGenerator implements DocumentGenerator {
     _patterns: readonly ExtractedPattern[],
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
+    // Defensive guard for plain JS consumers that may omit masterDataset
+    // despite the required type (TS callers are checked at compile time)
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- JS runtime safety
+    if (context.masterDataset === undefined) {
+      return Promise.resolve({
+        files: [],
+        errors: [
+          {
+            type: 'generator' as const,
+            message: `Generator "${this.name}" requires MasterDataset in context but none was provided.`,
+          },
+        ],
+      });
+    }
     const dataset = context.masterDataset;
 
     // Build context enrichment from generator context fields

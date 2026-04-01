@@ -153,7 +153,7 @@ const TagExampleOverrideSchema = z
   .strict();
 
 const TagExampleOverridesSchema = z
-  .record(z.enum(FORMAT_TYPES), TagExampleOverrideSchema)
+  .record(z.enum(FORMAT_TYPES), TagExampleOverrideSchema.optional())
   .optional();
 
 /**
