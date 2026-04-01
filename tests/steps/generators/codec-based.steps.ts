@@ -2,8 +2,8 @@
  * Codec-Based Generator Step Definitions
  *
  * BDD step definitions for testing the CodecBasedGenerator class.
- * Tests codec delegation, error handling for missing MasterDataset,
- * and codec options pass-through.
+ * Tests codec delegation and codec options pass-through.
+ * MasterDataset is required by type — no runtime null guard needed.
  *
  * Uses Rule() + RuleScenario() pattern as feature file uses Rule: blocks.
  */
@@ -25,8 +25,7 @@ import type { DataTableRow } from '../../support/world.js';
 // =============================================================================
 
 /**
- * Extended GeneratorOutput that includes the errors array
- * returned by CodecBasedGenerator when MasterDataset is missing.
+ * Extended GeneratorOutput that includes the optional errors array.
  */
 interface CodecBasedGeneratorOutput extends GeneratorOutput {
   readonly errors?: readonly GenerationError[];
@@ -128,53 +127,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         const errors = state!.output!.errors ?? [];
         expect(errors).toHaveLength(0);
       });
-    });
-
-    // -------------------------------------------------------------------------
-    // Scenario: Missing MasterDataset returns error (validation)
-    // -------------------------------------------------------------------------
-    RuleScenario('Missing MasterDataset returns error', ({ Given, And, When, Then }) => {
-      Given(
-        'a CodecBasedGenerator for {string} document type',
-        (_ctx: unknown, documentType: string) => {
-          state!.generator = new CodecBasedGenerator(
-            `${documentType}-generator`,
-            documentType as DocumentType
-          );
-        }
-      );
-
-      And('a context WITHOUT MasterDataset', () => {
-        state!.context = {
-          baseDir: '/test',
-          outputDir: '/test/output',
-          registry: createDefaultTagRegistry(),
-          // masterDataset intentionally omitted
-        };
-      });
-
-      When('the generator generate method is called', async () => {
-        const result = await state!.generator!.generate([], state!.context!);
-        state!.output = result as CodecBasedGeneratorOutput;
-      });
-
-      Then('the output should have no files', () => {
-        expect(state!.output).not.toBeNull();
-        expect(state!.output!.files).toHaveLength(0);
-      });
-
-      And(
-        'the output should contain an error mentioning {string}',
-        (_ctx: unknown, expectedText: string) => {
-          const errors = state!.output!.errors;
-          expect(errors).toBeDefined();
-          expect(errors!.length).toBeGreaterThan(0);
-
-          const errorMessages = errors!.map((e) => e.message);
-          const hasExpectedText = errorMessages.some((msg) => msg.includes(expectedText));
-          expect(hasExpectedText).toBe(true);
-        }
-      );
     });
 
     // -------------------------------------------------------------------------

@@ -31,12 +31,10 @@
  * ```
  */
 
-import { z } from 'zod';
-import {
-  MasterDatasetSchema,
-  type MasterDataset,
-  type SequenceIndexEntry,
-  type SequenceStep,
+import type {
+  MasterDataset,
+  SequenceIndexEntry,
+  SequenceStep,
 } from '../../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
@@ -50,8 +48,13 @@ import {
   document,
 } from '../schema.js';
 import { getPatternName, findPatternByName } from '../../api/pattern-helpers.js';
-import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
-import { RenderableDocumentOutputSchema } from './shared-schema.js';
+import {
+  type BaseCodecOptions,
+  type DocumentCodec,
+  DEFAULT_BASE_OPTIONS,
+  mergeOptions,
+  createDecodeOnlyCodec,
+} from './types/base.js';
 import { sanitizeNodeId } from './diagram-utils.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -92,20 +95,10 @@ const DEFAULT_DESIGN_REVIEW_OPTIONS: Required<DesignReviewCodecOptions> = {
  * @param options - Codec configuration (patternName is required)
  * @returns Configured Zod codec that transforms MasterDataset → RenderableDocument
  */
-export function createDesignReviewCodec(
-  options: DesignReviewCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+export function createDesignReviewCodec(options: DesignReviewCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_DESIGN_REVIEW_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildDesignReviewDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('DesignReviewCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  return createDecodeOnlyCodec(({ dataset }) => buildDesignReviewDocument(dataset, opts));
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

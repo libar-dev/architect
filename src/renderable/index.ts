@@ -81,6 +81,14 @@ export {
 } from './render.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Render Options & Splitting Exports
+// ═══════════════════════════════════════════════════════════════════════════
+
+export { DEFAULT_SIZE_BUDGET, type SizeBudget, type RenderOptions } from './render-options.js';
+
+export { splitOversizedDocument, measureDocumentSize } from './split.js';
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Codec Exports
 // ═══════════════════════════════════════════════════════════════════════════
 

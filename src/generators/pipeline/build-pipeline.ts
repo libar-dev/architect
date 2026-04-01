@@ -57,6 +57,7 @@ import {
 } from './transform-dataset.js';
 import { Result } from '../../types/result.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
+import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
 import type { RuntimeMasterDataset, ValidationSummary } from './transform-types.js';
 import type { ContextInferenceRule } from './context-inference.js';
 
@@ -86,6 +87,8 @@ export interface PipelineOptions {
   readonly includeValidation?: boolean;
   /** DD-5: When true, return error on individual scan failures (default false). */
   readonly failOnScanErrors?: boolean;
+  /** Pre-loaded tag registry. When provided, skips internal config load (Step 1). */
+  readonly tagRegistry?: TagRegistry;
 }
 
 /**
@@ -168,15 +171,20 @@ export async function buildMasterDataset(
   const baseDir = path.resolve(options.baseDir);
   const warnings: PipelineWarning[] = [];
 
-  // Step 1: Load configuration
-  const configResult = await loadConfig(baseDir);
-  if (!configResult.ok) {
-    return Result.err({
-      step: 'config',
-      message: formatConfigError(configResult.error),
-    });
+  // Step 1: Get tag registry (pre-loaded or from config)
+  let registry: TagRegistry;
+  if (options.tagRegistry !== undefined) {
+    registry = options.tagRegistry;
+  } else {
+    const configResult = await loadConfig(baseDir);
+    if (!configResult.ok) {
+      return Result.err({
+        step: 'config',
+        message: formatConfigError(configResult.error),
+      });
+    }
+    registry = configResult.value.instance.registry;
   }
-  const registry = configResult.value.instance.registry;
 
   // Step 2: Scan TypeScript source files
   const scanResult = await scanPatterns(

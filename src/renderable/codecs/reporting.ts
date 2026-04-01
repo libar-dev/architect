@@ -3,6 +3,7 @@
  * @architect-core
  * @architect-pattern ReportingCodecs
  * @architect-status completed
+ * @architect-unlock-reason:Add-createDecodeOnlyCodec-helper
  * @architect-convention codec-registry
  * @architect-product-area:Generation
  *
@@ -43,11 +44,7 @@
  * - When combining completion stats with architecture context
  */
 
-import { z } from 'zod';
-import {
-  MasterDatasetSchema,
-  type MasterDataset,
-} from '../../validation-schemas/master-dataset.js';
+import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -67,7 +64,13 @@ import {
   renderProgressBar,
 } from '../utils.js';
 import { groupBy } from '../../utils/index.js';
-import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
+import {
+  type BaseCodecOptions,
+  type DocumentCodec,
+  DEFAULT_BASE_OPTIONS,
+  mergeOptions,
+  createDecodeOnlyCodec,
+} from './types/base.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Reporting Codec Options (co-located with codecs)
@@ -144,7 +147,6 @@ export const DEFAULT_OVERVIEW_OPTIONS: Required<OverviewCodecOptions> = {
   includePatternsSummary: true,
   includeTimelineSummary: true,
 };
-import { RenderableDocumentOutputSchema } from './shared-schema.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Changelog Codec
@@ -153,20 +155,10 @@ import { RenderableDocumentOutputSchema } from './shared-schema.js';
 /**
  * Create a ChangelogCodec with custom options.
  */
-export function createChangelogCodec(
-  options?: ChangelogCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+export function createChangelogCodec(options?: ChangelogCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_CHANGELOG_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildChangelogDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('ChangelogCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  return createDecodeOnlyCodec(({ dataset }) => buildChangelogDocument(dataset, opts));
 }
 
 export const ChangelogCodec = createChangelogCodec();
@@ -178,20 +170,10 @@ export const ChangelogCodec = createChangelogCodec();
 /**
  * Create a TraceabilityCodec with custom options.
  */
-export function createTraceabilityCodec(
-  options?: TraceabilityCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+export function createTraceabilityCodec(options?: TraceabilityCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_TRACEABILITY_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildTraceabilityDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('TraceabilityCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  return createDecodeOnlyCodec(({ dataset }) => buildTraceabilityDocument(dataset, opts));
 }
 
 export const TraceabilityCodec = createTraceabilityCodec();
@@ -203,23 +185,37 @@ export const TraceabilityCodec = createTraceabilityCodec();
 /**
  * Create an OverviewCodec with custom options.
  */
-export function createOverviewCodec(
-  options?: OverviewCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+export function createOverviewCodec(options?: OverviewCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_OVERVIEW_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildOverviewDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('OverviewCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  return createDecodeOnlyCodec(({ dataset }) => buildOverviewDocument(dataset, opts));
 }
 
 export const OverviewCodec = createOverviewCodec();
+
+export const codecMetas = [
+  {
+    type: 'changelog',
+    outputPath: 'CHANGELOG-GENERATED.md',
+    description: 'Keep a Changelog format changelog',
+    factory: createChangelogCodec,
+    defaultInstance: ChangelogCodec,
+  },
+  {
+    type: 'traceability',
+    outputPath: 'TRACEABILITY.md',
+    description: 'Timeline to behavior file coverage',
+    factory: createTraceabilityCodec,
+    defaultInstance: TraceabilityCodec,
+  },
+  {
+    type: 'overview',
+    outputPath: 'OVERVIEW.md',
+    description: 'Project architecture overview',
+    factory: createOverviewCodec,
+    defaultInstance: OverviewCodec,
+  },
+] as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Changelog Builder
@@ -385,7 +381,7 @@ function buildTraceabilityDocument(
   const sections: SectionBlock[] = [];
 
   // Get timeline patterns (from Gherkin with phase)
-  const timelinePatterns = dataset.bySource.gherkin.filter((p) => p.phase !== undefined);
+  const timelinePatterns = dataset.bySourceType.gherkin.filter((p) => p.phase !== undefined);
 
   if (timelinePatterns.length === 0) {
     sections.push(

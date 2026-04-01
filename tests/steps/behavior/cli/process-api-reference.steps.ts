@@ -85,11 +85,12 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
 
       When('the ProcessApiReferenceGenerator produces output', async () => {
         const generator = createProcessApiReferenceGenerator();
-        const context: GeneratorContext = {
+        // ProcessApiReferenceGenerator ignores context entirely (_context param)
+        const context = {
           baseDir: process.cwd(),
           outputDir: 'docs-live',
           registry: {} as GeneratorContext['registry'],
-        };
+        } as GeneratorContext;
         const output = await generator.generate([], context);
         state!.generatedContent = output.files[0].content;
       });
@@ -123,11 +124,12 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
 
       When('the ProcessApiReferenceGenerator produces output', async () => {
         const generator = createProcessApiReferenceGenerator();
-        const context: GeneratorContext = {
+        // ProcessApiReferenceGenerator ignores context entirely (_context param)
+        const context = {
           baseDir: process.cwd(),
           outputDir: 'docs-live',
           registry: {} as GeneratorContext['registry'],
-        };
+        } as GeneratorContext;
         const output = await generator.generate([], context);
         state!.generatedContent = output.files[0].content;
       });
@@ -161,11 +163,12 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
 
       When('the ProcessApiReferenceGenerator produces output', async () => {
         const generator = createProcessApiReferenceGenerator();
-        const context: GeneratorContext = {
+        // ProcessApiReferenceGenerator ignores context entirely (_context param)
+        const context = {
           baseDir: process.cwd(),
           outputDir: 'docs-live',
           registry: {} as GeneratorContext['registry'],
-        };
+        } as GeneratorContext;
         const output = await generator.generate([], context);
         state!.generatedContent = output.files[0].content;
       });
@@ -196,11 +199,12 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
 
       When('the ProcessApiReferenceGenerator produces output', async () => {
         const generator = createProcessApiReferenceGenerator();
-        const context: GeneratorContext = {
+        // ProcessApiReferenceGenerator ignores context entirely (_context param)
+        const context = {
           baseDir: process.cwd(),
           outputDir: 'docs-live',
           registry: {} as GeneratorContext['registry'],
-        };
+        } as GeneratorContext;
         const output = await generator.generate([], context);
         state!.generatedContent = output.files[0].content;
       });

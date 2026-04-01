@@ -30,6 +30,7 @@ import type { ArchitectProjectConfig } from './project-config.js';
 // Cross-layer: config → renderable (see comment in project-config.ts)
 import { DIAGRAM_SOURCE_VALUES } from '../renderable/codecs/reference.js';
 import { SectionBlockSchema } from '../renderable/schema.js';
+import { FORMAT_TYPES } from '../taxonomy/format-types.js';
 
 /**
  * Glob pattern validation — replicates the security rules from
@@ -112,6 +113,50 @@ const ContextInferenceRuleSchema = z
   .strict();
 
 /**
+ * Schema for regeneration command.
+ */
+const RegenerationCommandSchema = z
+  .object({
+    label: z.string().min(1),
+    command: z.string().min(1),
+  })
+  .strict();
+
+/**
+ * Schema for project metadata.
+ */
+const ProjectMetadataSchema = z
+  .object({
+    name: z.string().min(1).optional(),
+    purpose: z.string().min(1).optional(),
+    license: z.string().min(1).optional(),
+    version: z.string().min(1).optional(),
+    regeneration: z
+      .object({
+        commands: z.array(RegenerationCommandSchema).readonly(),
+        note: z.string().optional(),
+      })
+      .strict()
+      .optional(),
+  })
+  .strict();
+
+/**
+ * Schema for tag example overrides.
+ * Keys constrained to valid FormatType values.
+ */
+const TagExampleOverrideSchema = z
+  .object({
+    description: z.string().optional(),
+    example: z.string().optional(),
+  })
+  .strict();
+
+const TagExampleOverridesSchema = z
+  .record(z.enum(FORMAT_TYPES), TagExampleOverrideSchema)
+  .optional();
+
+/**
  * Known preset names.
  */
 const PresetNameSchema = z.enum(['libar-generic', 'ddd-es-cqrs']);
@@ -143,8 +188,8 @@ const DiagramScopeSchema = z
 const ReferenceDocConfigSchema = z
   .object({
     title: z.string().min(1),
-    conventionTags: z.array(z.string().min(1)).readonly(),
-    behaviorCategories: z.array(z.string().min(1)).readonly(),
+    conventionTags: z.array(z.string().min(1)).readonly().default([]),
+    behaviorCategories: z.array(z.string().min(1)).readonly().default([]),
     diagramScopes: z.array(DiagramScopeSchema).readonly().optional(),
     claudeMdSection: z.string().min(1),
     docsFilename: z.string().min(1),
@@ -216,6 +261,10 @@ export const ArchitectProjectConfigSchema = z
     generators: z.array(z.string().min(1)).readonly().optional(),
     generatorOverrides: z.record(z.string(), GeneratorSourceOverrideSchema).optional(),
 
+    // Project Identity
+    project: ProjectMetadataSchema.optional(),
+    tagExampleOverrides: TagExampleOverridesSchema,
+
     // Codec Options
     codecOptions: z.record(z.string(), z.record(z.string(), z.unknown())).optional(),
 
@@ -248,6 +297,8 @@ export function isProjectConfig(value: unknown): value is ArchitectProjectConfig
     'output',
     'generators',
     'generatorOverrides',
+    'project',
+    'tagExampleOverrides',
     'codecOptions',
     'contextInferenceRules',
     'workflowPath',

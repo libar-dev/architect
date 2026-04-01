@@ -153,7 +153,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
   const byQuarter: Record<string, ExtractedPattern[]> = {};
   const byCategoryMap = new Map<string, ExtractedPattern[]>();
 
-  const bySource: SourceViews = {
+  const bySourceType: SourceViews = {
     typescript: [],
     gherkin: [],
     roadmap: [],
@@ -186,7 +186,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
       const existing = byPhaseMap.get(pattern.phase) ?? [];
       existing.push(pattern);
       byPhaseMap.set(pattern.phase, existing);
-      bySource.roadmap.push(pattern);
+      bySourceType.roadmap.push(pattern);
     }
 
     // ─── Quarter grouping ──────────────────────────────────────────────────
@@ -204,14 +204,14 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
 
     // ─── Source grouping ───────────────────────────────────────────────────
     if (pattern.source.file.endsWith('.feature') || pattern.source.file.endsWith('.feature.md')) {
-      bySource.gherkin.push(pattern);
+      bySourceType.gherkin.push(pattern);
     } else {
-      bySource.typescript.push(pattern);
+      bySourceType.typescript.push(pattern);
     }
 
     // ─── PRD grouping (has productArea, userRole, or businessValue) ────────
     if (pattern.productArea || pattern.userRole || pattern.businessValue) {
-      bySource.prd.push(pattern);
+      bySourceType.prd.push(pattern);
     }
 
     // ─── Product area grouping ──────────────────────────────────────────
@@ -364,7 +364,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
     byPhase,
     byQuarter,
     byCategory,
-    bySource,
+    bySourceType,
     byProductArea: byProductAreaMap,
     counts,
     phaseCount: byPhaseMap.size,

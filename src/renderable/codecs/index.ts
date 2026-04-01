@@ -63,12 +63,16 @@ export {
   createRoadmapCodec,
   createMilestonesCodec,
   createCurrentWorkCodec,
+  // Unified factory (view discriminant: 'all' | 'completed' | 'active')
+  createTimelineCodec,
   type RoadmapCodecOptions,
   type CompletedMilestonesCodecOptions,
   type CurrentWorkCodecOptions,
+  type TimelineCodecOptions,
   DEFAULT_ROADMAP_OPTIONS,
   DEFAULT_MILESTONES_OPTIONS,
   DEFAULT_CURRENT_WORK_OPTIONS,
+  DEFAULT_TIMELINE_OPTIONS,
 } from './timeline.js';
 
 // Requirements (includes RequirementsCodecOptions)
@@ -85,10 +89,14 @@ export {
   RemainingWorkCodec,
   createSessionContextCodec,
   createRemainingWorkCodec,
+  // Unified factory (view discriminant: 'context' | 'remaining')
+  createSessionCodec,
   type SessionCodecOptions,
   type RemainingWorkCodecOptions,
+  type UnifiedSessionCodecOptions,
   DEFAULT_SESSION_OPTIONS,
   DEFAULT_REMAINING_WORK_OPTIONS,
+  DEFAULT_UNIFIED_SESSION_OPTIONS,
 } from './session.js';
 
 // PR Changes (includes PrChangesCodecOptions)
@@ -243,3 +251,6 @@ export {
   type CompositeCodecOptions,
   type ComposeOptions,
 } from './composite.js';
+
+// Codec Registry (all codec metas, for auto-registration and introspection)
+export { ALL_CODEC_METAS } from './codec-registry.js';

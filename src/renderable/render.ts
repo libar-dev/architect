@@ -31,6 +31,8 @@ import type {
   ListItem,
   CollapsibleBlock,
 } from './schema.js';
+import type { RenderOptions } from './render-options.js';
+import { splitOversizedDocument } from './split.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Escape Utilities
@@ -405,16 +407,29 @@ export interface OutputFile {
 /**
  * Render a document and all its additional files.
  *
+ * Supports two call signatures for backward compatibility:
+ * - Legacy: `renderDocumentWithFiles(doc, basePath, renderer?)` — passes renderer function directly
+ * - New:    `renderDocumentWithFiles(doc, basePath, options?)` — passes RenderOptions object
+ *
+ * When `options.sizeBudget.detailFile` is set, additional files that exceed the
+ * line budget are auto-split at H2 boundaries into sub-files with back-links.
+ *
  * @param doc - The document to render
  * @param basePath - Base path for the main document
- * @param renderer - Render function to use (defaults to renderToMarkdown)
+ * @param rendererOrOptions - Render function (legacy) or RenderOptions (new)
  * @returns Array of output files
  */
 export function renderDocumentWithFiles(
   doc: RenderableDocument,
   basePath: string,
-  renderer: (d: RenderableDocument) => string = renderToMarkdown
+  rendererOrOptions?: ((d: RenderableDocument) => string) | RenderOptions
 ): OutputFile[] {
+  // Handle backward compatibility — old signature passes renderer function directly
+  const options: RenderOptions | undefined =
+    typeof rendererOrOptions === 'function' ? { renderer: rendererOrOptions } : rendererOrOptions;
+  const renderer = options?.renderer ?? renderToMarkdown;
+  const generateBackLinks = options?.generateBackLinks ?? true;
+
   const files: OutputFile[] = [];
 
   // Main document
@@ -426,10 +441,31 @@ export function renderDocumentWithFiles(
   // Additional files (progressive disclosure)
   if (doc.additionalFiles) {
     for (const [relativePath, subDoc] of Object.entries(doc.additionalFiles)) {
-      files.push({
-        path: relativePath,
-        content: renderer(subDoc),
-      });
+      const additionalContent = renderer(subDoc);
+
+      // Auto-split if over budget
+      const detailFileBudget = options?.sizeBudget?.detailFile;
+      if (detailFileBudget !== undefined && detailFileBudget > 0) {
+        const lineCount = additionalContent.split('\n').length;
+        if (lineCount > detailFileBudget) {
+          const { parent, subFiles } = splitOversizedDocument(
+            subDoc,
+            detailFileBudget,
+            relativePath,
+            renderer,
+            generateBackLinks
+          );
+          // Replace with split parent
+          files.push({ path: relativePath, content: renderer(parent) });
+          // Add sub-files
+          for (const [subPath, subFileDoc] of Object.entries(subFiles)) {
+            files.push({ path: subPath, content: renderer(subFileDoc) });
+          }
+          continue;
+        }
+      }
+
+      files.push({ path: relativePath, content: additionalContent });
     }
   }
 

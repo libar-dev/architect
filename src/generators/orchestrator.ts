@@ -53,7 +53,9 @@ import type {
   ResolvedSourcesConfig,
   OutputConfig,
   GeneratorSourceOverride,
+  ProjectMetadata,
 } from '../config/project-config.js';
+import type { FormatType } from '../taxonomy/index.js';
 import { mergeSourcesForGenerator } from '../config/merge-sources.js';
 import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../config/defaults.js';
 import { generatorRegistry } from './registry.js';
@@ -161,6 +163,28 @@ export interface GenerateOptions {
    * Computed options take precedence over user-provided options.
    */
   codecOptions?: CodecOptions;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Project Identity (threaded to codecs via CodecContext enrichment)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Pre-loaded tag registry. When provided, skips internal config load inside
+   * buildMasterDataset (avoids loading config twice when caller already has it).
+   */
+  tagRegistry?: TagRegistry;
+
+  /**
+   * Project identity metadata for customizing generated docs.
+   * Passed through to codecs via CodecContext enrichment.
+   */
+  projectMetadata?: ProjectMetadata;
+
+  /**
+   * Override format type examples in TaxonomyCodec output.
+   * Passed through to codecs via CodecContext enrichment.
+   */
+  tagExampleOverrides?: Partial<Record<FormatType, { description?: string; example?: string }>>;
 }
 
 /**
@@ -299,6 +323,7 @@ export async function generateDocumentation(
       ? { workflowPath: options.workflowPath }
       : {}),
     ...(mergedContextRules !== undefined ? { contextInferenceRules: mergedContextRules } : {}),
+    ...(options.tagRegistry !== undefined ? { tagRegistry: options.tagRegistry } : {}),
     includeValidation: false, // DD-3: orchestrator doesn't need validation
     failOnScanErrors: false, // DD-5: orchestrator collects errors as warnings
   });
@@ -388,6 +413,12 @@ export async function generateDocumentation(
       masterDataset,
       ...(workflow !== undefined ? { workflow } : {}),
       ...(codecOptions !== undefined ? { codecOptions } : {}),
+      ...(options.projectMetadata !== undefined
+        ? { projectMetadata: options.projectMetadata }
+        : {}),
+      ...(options.tagExampleOverrides !== undefined
+        ? { tagExampleOverrides: options.tagExampleOverrides }
+        : {}),
     };
 
     // Generate files with merged patterns (TypeScript + Gherkin)
@@ -694,6 +725,46 @@ interface GeneratorGroup {
 }
 
 /**
+ * Deep-merge two CodecOptions objects.
+ *
+ * Nested objects are merged one level deep (per-codec option bags). Scalar
+ * values and arrays in `override` replace their counterparts in `base`.
+ * Returns `undefined` only when both inputs are undefined.
+ *
+ * @param base - Base codec options (e.g., from project config)
+ * @param override - Override codec options (e.g., from runtime CLI flags)
+ * @returns Merged CodecOptions, or undefined if both inputs are undefined
+ */
+function deepMergeCodecOptions(
+  base: CodecOptions | undefined,
+  override: CodecOptions | undefined
+): CodecOptions | undefined {
+  if (base === undefined && override === undefined) return undefined;
+  if (base === undefined) return override;
+  if (override === undefined) return base;
+
+  const result: Record<string, unknown> = { ...base };
+  for (const [key, value] of Object.entries(override)) {
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value) &&
+      typeof result[key] === 'object' &&
+      result[key] !== null &&
+      !Array.isArray(result[key])
+    ) {
+      result[key] = {
+        ...(result[key] as Record<string, unknown>),
+        ...(value as Record<string, unknown>),
+      };
+    } else {
+      result[key] = value;
+    }
+  }
+  return result as CodecOptions;
+}
+
+/**
  * Groups generators by their effective source config and output directory.
  *
  * Generators that share the same resolved sources (after applying per-generator
@@ -814,10 +885,11 @@ export async function generateFromConfig(
 
   for (const group of groups) {
     // Merge codec options: config-level → runtime options (runtime takes precedence)
-    const mergedCodecOptions: CodecOptions | undefined =
-      config.project.codecOptions !== undefined || options?.codecOptions !== undefined
-        ? { ...config.project.codecOptions, ...options?.codecOptions }
-        : undefined;
+    // Deep merge preserves nested per-codec option bags; shallow spread would clobber them.
+    const mergedCodecOptions = deepMergeCodecOptions(
+      config.project.codecOptions,
+      options?.codecOptions
+    );
 
     const generateOptions: GenerateOptions = {
       input: [...group.sources.typescript],
@@ -825,6 +897,7 @@ export async function generateFromConfig(
       outputDir: group.outputDirectory,
       generators: [...group.generators],
       overwrite: config.project.output.overwrite,
+      tagRegistry: config.instance.registry,
       ...(group.sources.features.length > 0 && { features: [...group.sources.features] }),
       ...(group.sources.exclude.length > 0 && { exclude: [...group.sources.exclude] }),
       ...(config.project.workflowPath !== null && { workflowPath: config.project.workflowPath }),
@@ -833,6 +906,10 @@ export async function generateFromConfig(
       ...(options?.changedFiles !== undefined && { changedFiles: [...options.changedFiles] }),
       ...(options?.releaseFilter !== undefined && { releaseFilter: options.releaseFilter }),
       ...(mergedCodecOptions !== undefined && { codecOptions: mergedCodecOptions }),
+      ...(config.project.project !== undefined && { projectMetadata: config.project.project }),
+      ...(config.project.tagExampleOverrides !== undefined && {
+        tagExampleOverrides: config.project.tagExampleOverrides,
+      }),
     };
 
     const result = await generateDocumentation(generateOptions);

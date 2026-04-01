@@ -406,8 +406,8 @@ function hasGherkinImplementsMatch(
  */
 export function validatePatterns(dataset: RuntimeMasterDataset): ValidationSummary {
   const issues: ValidationIssue[] = [];
-  const tsPatterns = dataset.bySource.typescript;
-  const gherkinPatterns = dataset.bySource.gherkin;
+  const tsPatterns = dataset.bySourceType.typescript;
+  const gherkinPatterns = dataset.bySourceType.gherkin;
 
   // Phase 1: Build name-based maps for efficient lookups
   const tsByName = new Map<string, ExtractedPattern>();
@@ -766,10 +766,10 @@ async function main(): Promise<void> {
     }
 
     // Warn if no patterns found (common misconfiguration)
-    if (dataset.bySource.typescript.length === 0) {
+    if (dataset.bySourceType.typescript.length === 0) {
       console.warn('⚠️  Warning: No TypeScript patterns found. Check your --input patterns.');
     }
-    if (dataset.bySource.gherkin.length === 0) {
+    if (dataset.bySourceType.gherkin.length === 0) {
       console.warn('⚠️  Warning: No Gherkin patterns found. Check your --features patterns.');
     }
 

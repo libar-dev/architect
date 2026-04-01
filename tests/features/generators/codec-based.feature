@@ -1,7 +1,7 @@
 @architect
 @architect-pattern:CodecBasedGeneratorTesting
 @architect-status:completed
-@architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-unlock-reason:Remove-obsolete-null-guard-scenario
 @architect-product-area:Generation
 @architect-implements:CodecBasedGenerator,GeneratorInfrastructureTesting
 Feature: Codec-Based Generator
@@ -20,8 +20,8 @@ Feature: Codec-Based Generator
   Rule: CodecBasedGenerator adapts codecs to generator interface
 
     **Invariant:** CodecBasedGenerator delegates document generation to the underlying codec and surfaces codec errors through the generator interface.
-    **Rationale:** The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side.
-    **Verified by:** Generator delegates to codec, Missing MasterDataset returns error, Codec options are passed through
+    **Rationale:** The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side. MasterDataset is required in context — enforced by the TypeScript type system, not at runtime.
+    **Verified by:** Generator delegates to codec, Codec options are passed through
 
     @acceptance-criteria @happy-path
     Scenario: Generator delegates to codec
@@ -30,14 +30,6 @@ Feature: Codec-Based Generator
       When the generator generate method is called
       Then the output should contain a file with path "PATTERNS.md"
       And the output should have no errors
-
-    @acceptance-criteria @validation
-    Scenario: Missing MasterDataset returns error
-      Given a CodecBasedGenerator for "patterns" document type
-      And a context WITHOUT MasterDataset
-      When the generator generate method is called
-      Then the output should have no files
-      And the output should contain an error mentioning "MasterDataset"
 
     @acceptance-criteria @happy-path
     Scenario: Codec options are passed through

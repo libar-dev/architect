@@ -23,60 +23,13 @@
 
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import type { RenderableDocument } from './schema.js';
-import { renderDocumentWithFiles, renderToClaudeMdModule, type OutputFile } from './render.js';
+import { renderDocumentWithFiles, type OutputFile } from './render.js';
 import { Result } from '../types/result.js';
 
-// Default codec instances
-import {
-  PatternsDocumentCodec,
-  RoadmapDocumentCodec,
-  CompletedMilestonesCodec,
-  CurrentWorkCodec,
-  RequirementsDocumentCodec,
-  SessionContextCodec,
-  RemainingWorkCodec,
-  PrChangesCodec,
-  AdrDocumentCodec,
-  PlanningChecklistCodec,
-  SessionPlanCodec,
-  SessionFindingsCodec,
-  ChangelogCodec,
-  TraceabilityCodec,
-  OverviewCodec,
-  BusinessRulesCodec,
-  ArchitectureDocumentCodec,
-  TaxonomyDocumentCodec,
-  ValidationRulesCodec,
-  ClaudeModuleCodec,
-  IndexCodec,
-} from './codecs/index.js';
+// Auto-registration: each codec file exports codecMeta; barrel collects all
+import { ALL_CODEC_METAS } from './codecs/codec-registry.js';
 
-// Factory functions for creating codecs with options
-import {
-  createPatternsCodec,
-  createRoadmapCodec,
-  createMilestonesCodec,
-  createCurrentWorkCodec,
-  createRequirementsCodec,
-  createSessionContextCodec,
-  createRemainingWorkCodec,
-  createPrChangesCodec,
-  createAdrCodec,
-  createPlanningChecklistCodec,
-  createSessionPlanCodec,
-  createSessionFindingsCodec,
-  createChangelogCodec,
-  createTraceabilityCodec,
-  createOverviewCodec,
-  createBusinessRulesCodec,
-  createArchitectureCodec,
-  createTaxonomyCodec,
-  createValidationRulesCodec,
-  createClaudeModuleCodec,
-  createIndexCodec,
-} from './codecs/index.js';
-
-// Codec options types
+// Codec options types (retained for CodecOptions interface type safety)
 import type {
   PatternsCodecOptions,
   RoadmapCodecOptions,
@@ -102,7 +55,12 @@ import type {
 } from './codecs/index.js';
 
 // Shared codec types for type-safe factory invocation
-import type { DocumentCodec, BaseCodecOptions } from './codecs/types/base.js';
+import type {
+  DocumentCodec,
+  BaseCodecOptions,
+  CodecContextEnrichment,
+} from './codecs/types/base.js';
+import { setCodecContextEnrichment, clearCodecContextEnrichment } from './codecs/types/base.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Document Types
@@ -202,12 +160,15 @@ export type DocumentType = keyof typeof DOCUMENT_TYPES;
 
 /**
  * Per-document-type renderer overrides.
- * Document types not listed here use the default `renderToMarkdown`.
+ * Derived from codecMeta.renderer fields — document types without a custom
+ * renderer use the default `renderToMarkdown`.
  */
 const DOCUMENT_TYPE_RENDERERS: Partial<Record<DocumentType, (doc: RenderableDocument) => string>> =
-  {
-    'claude-modules': renderToClaudeMdModule,
-  };
+  Object.fromEntries(
+    ALL_CODEC_METAS.filter(
+      (m): m is typeof m & { renderer: NonNullable<typeof m.renderer> } => m.renderer !== undefined
+    ).map((m) => [m.type, m.renderer])
+  );
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Codec Options Type
@@ -367,54 +328,14 @@ export const CodecRegistry = {
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Registry Initialization
+// Registry Initialization (Auto-registered from codecMeta exports)
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Register all default codecs
-CodecRegistry.register('patterns', PatternsDocumentCodec);
-CodecRegistry.register('roadmap', RoadmapDocumentCodec);
-CodecRegistry.register('milestones', CompletedMilestonesCodec);
-CodecRegistry.register('current', CurrentWorkCodec);
-CodecRegistry.register('requirements', RequirementsDocumentCodec);
-CodecRegistry.register('session', SessionContextCodec);
-CodecRegistry.register('remaining', RemainingWorkCodec);
-CodecRegistry.register('pr-changes', PrChangesCodec);
-CodecRegistry.register('adrs', AdrDocumentCodec);
-CodecRegistry.register('planning-checklist', PlanningChecklistCodec);
-CodecRegistry.register('session-plan', SessionPlanCodec);
-CodecRegistry.register('session-findings', SessionFindingsCodec);
-CodecRegistry.register('changelog', ChangelogCodec);
-CodecRegistry.register('traceability', TraceabilityCodec);
-CodecRegistry.register('overview', OverviewCodec);
-CodecRegistry.register('business-rules', BusinessRulesCodec);
-CodecRegistry.register('architecture', ArchitectureDocumentCodec);
-CodecRegistry.register('taxonomy', TaxonomyDocumentCodec);
-CodecRegistry.register('validation-rules', ValidationRulesCodec);
-CodecRegistry.register('claude-modules', ClaudeModuleCodec);
-CodecRegistry.register('index', IndexCodec);
-
-// Register all factory functions (used when codec options are provided)
-CodecRegistry.registerFactory('patterns', createPatternsCodec);
-CodecRegistry.registerFactory('roadmap', createRoadmapCodec);
-CodecRegistry.registerFactory('milestones', createMilestonesCodec);
-CodecRegistry.registerFactory('current', createCurrentWorkCodec);
-CodecRegistry.registerFactory('requirements', createRequirementsCodec);
-CodecRegistry.registerFactory('session', createSessionContextCodec);
-CodecRegistry.registerFactory('remaining', createRemainingWorkCodec);
-CodecRegistry.registerFactory('pr-changes', createPrChangesCodec);
-CodecRegistry.registerFactory('adrs', createAdrCodec);
-CodecRegistry.registerFactory('planning-checklist', createPlanningChecklistCodec);
-CodecRegistry.registerFactory('session-plan', createSessionPlanCodec);
-CodecRegistry.registerFactory('session-findings', createSessionFindingsCodec);
-CodecRegistry.registerFactory('changelog', createChangelogCodec);
-CodecRegistry.registerFactory('traceability', createTraceabilityCodec);
-CodecRegistry.registerFactory('overview', createOverviewCodec);
-CodecRegistry.registerFactory('business-rules', createBusinessRulesCodec);
-CodecRegistry.registerFactory('architecture', createArchitectureCodec);
-CodecRegistry.registerFactory('taxonomy', createTaxonomyCodec);
-CodecRegistry.registerFactory('validation-rules', createValidationRulesCodec);
-CodecRegistry.registerFactory('claude-modules', createClaudeModuleCodec);
-CodecRegistry.registerFactory('index', createIndexCodec);
+for (const meta of ALL_CODEC_METAS) {
+  const type = meta.type as DocumentType;
+  CodecRegistry.register(type, meta.defaultInstance);
+  CodecRegistry.registerFactory(type, meta.factory);
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Error Types
@@ -486,7 +407,8 @@ function resolveCodec(type: DocumentType, options?: CodecOptions): DocumentCodec
 export function generateDocumentSafe(
   type: DocumentType,
   dataset: MasterDataset,
-  options?: CodecOptions
+  options?: CodecOptions,
+  contextEnrichment?: CodecContextEnrichment
 ): Result<OutputFile[], GenerationError> {
   const outputPath = DOCUMENT_TYPES[type].outputPath;
 
@@ -499,31 +421,42 @@ export function generateDocumentSafe(
     });
   }
 
-  // Decode: MasterDataset → RenderableDocument (with error handling)
-  let doc: RenderableDocument;
-  try {
-    doc = codec.decode(dataset) as RenderableDocument;
-  } catch (err) {
-    return Result.err({
-      documentType: type,
-      message: err instanceof Error ? err.message : String(err),
-      cause: err instanceof Error ? err : undefined,
-      phase: 'decode',
-    });
+  // Set context enrichment before decode (cleared in finally)
+  if (contextEnrichment) {
+    setCodecContextEnrichment(contextEnrichment);
   }
 
-  // Render: RenderableDocument → OutputFile[] (with error handling)
   try {
-    const renderer = DOCUMENT_TYPE_RENDERERS[type];
-    const files = renderDocumentWithFiles(doc, outputPath, renderer);
-    return Result.ok(files);
-  } catch (err) {
-    return Result.err({
-      documentType: type,
-      message: err instanceof Error ? err.message : String(err),
-      cause: err instanceof Error ? err : undefined,
-      phase: 'render',
-    });
+    // Decode: MasterDataset → RenderableDocument (with error handling)
+    let doc: RenderableDocument;
+    try {
+      doc = codec.decode(dataset) as RenderableDocument;
+    } catch (err) {
+      return Result.err({
+        documentType: type,
+        message: err instanceof Error ? err.message : String(err),
+        cause: err instanceof Error ? err : undefined,
+        phase: 'decode',
+      });
+    }
+
+    // Render: RenderableDocument → OutputFile[] (with error handling)
+    try {
+      const renderer = DOCUMENT_TYPE_RENDERERS[type];
+      const files = renderDocumentWithFiles(doc, outputPath, renderer);
+      return Result.ok(files);
+    } catch (err) {
+      return Result.err({
+        documentType: type,
+        message: err instanceof Error ? err.message : String(err),
+        cause: err instanceof Error ? err : undefined,
+        phase: 'render',
+      });
+    }
+  } finally {
+    if (contextEnrichment) {
+      clearCodecContextEnrichment();
+    }
   }
 }
 
@@ -557,7 +490,8 @@ export function generateDocumentSafe(
 export function generateDocument(
   type: DocumentType,
   dataset: MasterDataset,
-  options?: CodecOptions
+  options?: CodecOptions,
+  contextEnrichment?: CodecContextEnrichment
 ): OutputFile[] {
   const outputPath = DOCUMENT_TYPES[type].outputPath;
 
@@ -566,12 +500,23 @@ export function generateDocument(
     throw new Error(`No codec registered for document type: ${type}`);
   }
 
-  // Decode: MasterDataset → RenderableDocument
-  const doc = codec.decode(dataset) as RenderableDocument;
+  // Set context enrichment before decode (cleared in finally)
+  if (contextEnrichment) {
+    setCodecContextEnrichment(contextEnrichment);
+  }
 
-  // Render: RenderableDocument → OutputFile[]
-  const renderer = DOCUMENT_TYPE_RENDERERS[type];
-  return renderDocumentWithFiles(doc, outputPath, renderer);
+  try {
+    // Decode: MasterDataset → RenderableDocument
+    const doc = codec.decode(dataset) as RenderableDocument;
+
+    // Render: RenderableDocument → OutputFile[]
+    const renderer = DOCUMENT_TYPE_RENDERERS[type];
+    return renderDocumentWithFiles(doc, outputPath, renderer);
+  } finally {
+    if (contextEnrichment) {
+      clearCodecContextEnrichment();
+    }
+  }
 }
 
 /**
@@ -580,17 +525,19 @@ export function generateDocument(
  * @param types - Document types to generate
  * @param dataset - MasterDataset with pattern data
  * @param options - Optional codec-specific options
+ * @param contextEnrichment - Optional runtime context (projectMetadata, tagExampleOverrides)
  * @returns Array of all output files
  */
 export function generateDocuments(
   types: DocumentType[],
   dataset: MasterDataset,
-  options?: CodecOptions
+  options?: CodecOptions,
+  contextEnrichment?: CodecContextEnrichment
 ): OutputFile[] {
   const allFiles: OutputFile[] = [];
 
   for (const type of types) {
-    const files = generateDocument(type, dataset, options);
+    const files = generateDocument(type, dataset, options, contextEnrichment);
     allFiles.push(...files);
   }
 
@@ -602,11 +549,16 @@ export function generateDocuments(
  *
  * @param dataset - MasterDataset with pattern data
  * @param options - Optional codec-specific options
+ * @param contextEnrichment - Optional runtime context (projectMetadata, tagExampleOverrides)
  * @returns Array of all output files
  */
-export function generateAllDocuments(dataset: MasterDataset, options?: CodecOptions): OutputFile[] {
+export function generateAllDocuments(
+  dataset: MasterDataset,
+  options?: CodecOptions,
+  contextEnrichment?: CodecContextEnrichment
+): OutputFile[] {
   const types = Object.keys(DOCUMENT_TYPES) as DocumentType[];
-  return generateDocuments(types, dataset, options);
+  return generateDocuments(types, dataset, options, contextEnrichment);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

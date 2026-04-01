@@ -110,7 +110,6 @@ class ReferenceDocGenerator implements DocumentGenerator {
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
     const dataset = context.masterDataset;
-    if (!dataset) return Promise.resolve({ files: [] });
 
     const codec = createReferenceCodec(this.config, {
       detailLevel: this.detailLevel,
@@ -193,7 +192,6 @@ class ReferenceDocsGenerator implements DocumentGenerator {
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
     const dataset = context.masterDataset;
-    if (!dataset) return Promise.resolve({ files: [] });
 
     const files = generateDualOutputFiles(this.configs, dataset, 'reference');
     return Promise.resolve({ files });
@@ -220,7 +218,6 @@ class ProductAreaDocsGenerator implements DocumentGenerator {
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
     const dataset = context.masterDataset;
-    if (!dataset) return Promise.resolve({ files: [] });
 
     const files = generateDualOutputFiles(this.configs, dataset, 'product-areas');
 

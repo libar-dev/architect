@@ -166,8 +166,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         });
       });
 
-      Then('output directory should be "docs/architecture"', () => {
-        expect(state!.resolvedConfig!.project.output.directory).toBe('docs/architecture');
+      Then('output directory should be "docs-live"', () => {
+        expect(state!.resolvedConfig!.project.output.directory).toBe('docs-live');
       });
 
       And('output overwrite should be false', () => {

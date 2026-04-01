@@ -3,6 +3,7 @@
  * @architect-core
  * @architect-pattern PlanningCodecs
  * @architect-status completed
+ * @architect-unlock-reason:Add-createDecodeOnlyCodec-helper
  * @architect-convention codec-registry
  * @architect-product-area:Generation
  *
@@ -50,11 +51,7 @@
  * - `pattern.discoveredLearnings` -- Learned insights
  */
 
-import { z } from 'zod';
-import {
-  MasterDatasetSchema,
-  type MasterDataset,
-} from '../../validation-schemas/master-dataset.js';
+import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -78,8 +75,10 @@ import { groupBy } from '../../utils/index.js';
 import {
   type BaseCodecOptions,
   type NormalizedStatusFilter,
+  type DocumentCodec,
   DEFAULT_BASE_OPTIONS,
   mergeOptions,
+  createDecodeOnlyCodec,
 } from './types/base.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -201,7 +200,6 @@ export const DEFAULT_SESSION_FINDINGS_OPTIONS: Required<SessionFindingsCodecOpti
   includeLinks: true,
   groupBy: 'category',
 };
-import { RenderableDocumentOutputSchema } from './shared-schema.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Planning Checklist Codec
@@ -212,18 +210,10 @@ import { RenderableDocumentOutputSchema } from './shared-schema.js';
  */
 export function createPlanningChecklistCodec(
   options?: PlanningChecklistCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+): DocumentCodec {
   const opts = mergeOptions(DEFAULT_PLANNING_CHECKLIST_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildPlanningChecklistDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('PlanningChecklistCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  return createDecodeOnlyCodec(({ dataset }) => buildPlanningChecklistDocument(dataset, opts));
 }
 
 export const PlanningChecklistCodec = createPlanningChecklistCodec();
@@ -235,20 +225,10 @@ export const PlanningChecklistCodec = createPlanningChecklistCodec();
 /**
  * Create a SessionPlanCodec with custom options.
  */
-export function createSessionPlanCodec(
-  options?: SessionPlanCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+export function createSessionPlanCodec(options?: SessionPlanCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_SESSION_PLAN_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildSessionPlanDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('SessionPlanCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  return createDecodeOnlyCodec(({ dataset }) => buildSessionPlanDocument(dataset, opts));
 }
 
 export const SessionPlanCodec = createSessionPlanCodec();
@@ -260,23 +240,37 @@ export const SessionPlanCodec = createSessionPlanCodec();
 /**
  * Create a SessionFindingsCodec with custom options.
  */
-export function createSessionFindingsCodec(
-  options?: SessionFindingsCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+export function createSessionFindingsCodec(options?: SessionFindingsCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_SESSION_FINDINGS_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildSessionFindingsDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('SessionFindingsCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  return createDecodeOnlyCodec(({ dataset }) => buildSessionFindingsDocument(dataset, opts));
 }
 
 export const SessionFindingsCodec = createSessionFindingsCodec();
+
+export const codecMetas = [
+  {
+    type: 'planning-checklist',
+    outputPath: 'PLANNING-CHECKLIST.md',
+    description: 'Pre-planning questions and Definition of Done',
+    factory: createPlanningChecklistCodec,
+    defaultInstance: PlanningChecklistCodec,
+  },
+  {
+    type: 'session-plan',
+    outputPath: 'SESSION-PLAN.md',
+    description: 'Implementation plans for phases',
+    factory: createSessionPlanCodec,
+    defaultInstance: SessionPlanCodec,
+  },
+  {
+    type: 'session-findings',
+    outputPath: 'SESSION-FINDINGS.md',
+    description: 'Retrospective discoveries for roadmap refinement',
+    factory: createSessionFindingsCodec,
+    defaultInstance: SessionFindingsCodec,
+  },
+] as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Planning Checklist Builder

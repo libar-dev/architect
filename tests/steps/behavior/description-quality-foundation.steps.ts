@@ -254,7 +254,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
               const patterns = dataTable.map((row) => {
                 const phase = parseInt(row.Phase ?? '0', 10);
                 const verified = row.Verified === 'true';
-                // Use .feature file path so patterns appear in bySource.gherkin
+                // Use .feature file path so patterns appear in bySourceType.gherkin
                 return createTestPattern({
                   name: row.Name ?? 'Pattern',
                   phase,

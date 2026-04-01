@@ -3,6 +3,7 @@
  * @architect-core
  * @architect-pattern PrChangesCodec
  * @architect-status completed
+ * @architect-unlock-reason:Add-createDecodeOnlyCodec-helper
  * @architect-convention codec-registry
  * @architect-product-area:Generation
  *
@@ -41,11 +42,7 @@
  * If both are specified, patterns must match at least one criterion.
  */
 
-import { z } from 'zod';
-import {
-  MasterDatasetSchema,
-  type MasterDataset,
-} from '../../validation-schemas/master-dataset.js';
+import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -66,7 +63,13 @@ import {
   formatBusinessValue,
   sortByPhaseAndName,
 } from '../utils.js';
-import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
+import {
+  type BaseCodecOptions,
+  type DocumentCodec,
+  DEFAULT_BASE_OPTIONS,
+  mergeOptions,
+  createDecodeOnlyCodec,
+} from './types/base.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PR Changes Codec Options (co-located with codec)
@@ -113,7 +116,6 @@ export const DEFAULT_PR_CHANGES_OPTIONS: Required<PrChangesCodecOptions> = {
   includeDependencies: true,
   sortBy: 'phase',
 };
-import { RenderableDocumentOutputSchema } from './shared-schema.js';
 import { renderAcceptanceCriteria, renderBusinessRulesSection } from './helpers.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -143,20 +145,10 @@ import { renderAcceptanceCriteria, renderBusinessRulesSection } from './helpers.
  * });
  * ```
  */
-export function createPrChangesCodec(
-  options?: PrChangesCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+export function createPrChangesCodec(options?: PrChangesCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_PR_CHANGES_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildPrChangesDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('PrChangesCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  return createDecodeOnlyCodec(({ dataset }) => buildPrChangesDocument(dataset, opts));
 }
 
 /**
@@ -166,6 +158,14 @@ export function createPrChangesCodec(
  * Without options, shows all patterns (no filtering).
  */
 export const PrChangesCodec = createPrChangesCodec();
+
+export const codecMeta = {
+  type: 'pr-changes',
+  outputPath: 'working/PR-CHANGES.md',
+  description: 'PR-scoped changes for review',
+  factory: createPrChangesCodec,
+  defaultInstance: PrChangesCodec,
+} as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Document Builder

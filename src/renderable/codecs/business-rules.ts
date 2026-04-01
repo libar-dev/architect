@@ -60,11 +60,7 @@
  * ```
  */
 
-import { z } from 'zod';
-import {
-  MasterDatasetSchema,
-  type MasterDataset,
-} from '../../validation-schemas/master-dataset.js';
+import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
 import {
@@ -77,7 +73,13 @@ import {
   linkOut,
   document,
 } from '../schema.js';
-import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
+import {
+  type BaseCodecOptions,
+  type DocumentCodec,
+  DEFAULT_BASE_OPTIONS,
+  mergeOptions,
+  createDecodeOnlyCodec,
+} from './types/base.js';
 import { toKebabCase, camelCaseToTitleCase } from '../../utils/index.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -144,7 +146,6 @@ export const DEFAULT_BUSINESS_RULES_OPTIONS: Required<BusinessRulesCodecOptions>
   maxDescriptionLength: 150,
   excludeSourcePaths: [],
 };
-import { RenderableDocumentOutputSchema } from './shared-schema.js';
 import {
   parseBusinessRuleAnnotations,
   type BusinessRuleAnnotations,
@@ -209,20 +210,10 @@ interface ProductAreaGroup {
  * const codec = createBusinessRulesCodec({ filterDomains: ["ddd", "event-sourcing"] });
  * ```
  */
-export function createBusinessRulesCodec(
-  options?: BusinessRulesCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+export function createBusinessRulesCodec(options?: BusinessRulesCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_BUSINESS_RULES_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildBusinessRulesDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('BusinessRulesCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  return createDecodeOnlyCodec(({ dataset }) => buildBusinessRulesDocument(dataset, opts));
 }
 
 /**
@@ -238,6 +229,14 @@ export function createBusinessRulesCodec(
  * ```
  */
 export const BusinessRulesCodec = createBusinessRulesCodec();
+
+export const codecMeta = {
+  type: 'business-rules',
+  outputPath: 'BUSINESS-RULES.md',
+  description: 'Business rules and invariants by domain',
+  factory: createBusinessRulesCodec,
+  defaultInstance: BusinessRulesCodec,
+} as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Document Builder

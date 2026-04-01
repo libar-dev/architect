@@ -3,6 +3,7 @@
  * @architect-core
  * @architect-pattern ArchitectureCodec
  * @architect-status completed
+ * @architect-unlock-reason:Add-createDecodeOnlyCodec-helper
  * @architect-arch-role projection
  * @architect-arch-context renderer
  * @architect-arch-layer application
@@ -53,11 +54,7 @@
  * - **layered**: Components organized by architectural layer
  */
 
-import { z } from 'zod';
-import {
-  MasterDatasetSchema,
-  type MasterDataset,
-} from '../../validation-schemas/master-dataset.js';
+import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -71,8 +68,13 @@ import {
 } from '../schema.js';
 import { getDisplayName, getStatusEmoji } from '../utils.js';
 import { getPatternName } from '../../api/pattern-helpers.js';
-import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
-import { RenderableDocumentOutputSchema } from './shared-schema.js';
+import {
+  type BaseCodecOptions,
+  type DocumentCodec,
+  DEFAULT_BASE_OPTIONS,
+  mergeOptions,
+  createDecodeOnlyCodec,
+} from './types/base.js';
 import { sanitizeNodeId, EDGE_STYLES } from './diagram-utils.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -145,20 +147,10 @@ export const DEFAULT_ARCHITECTURE_OPTIONS: Required<ArchitectureCodecOptions> = 
  * const codec = createArchitectureCodec({ filterContexts: ["orders", "inventory"] });
  * ```
  */
-export function createArchitectureCodec(
-  options?: ArchitectureCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+export function createArchitectureCodec(options?: ArchitectureCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_ARCHITECTURE_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildArchitectureDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('ArchitectureDocumentCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  return createDecodeOnlyCodec(({ dataset }) => buildArchitectureDocument(dataset, opts));
 }
 
 /**
@@ -174,6 +166,14 @@ export function createArchitectureCodec(
  * ```
  */
 export const ArchitectureDocumentCodec = createArchitectureCodec();
+
+export const codecMeta = {
+  type: 'architecture',
+  outputPath: 'ARCHITECTURE.md',
+  description: 'Architecture diagrams (component and layered views)',
+  factory: createArchitectureCodec,
+  defaultInstance: ArchitectureDocumentCodec,
+} as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Document Builder

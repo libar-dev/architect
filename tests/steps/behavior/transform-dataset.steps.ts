@@ -407,12 +407,12 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         state!.dataset = transformToMasterDataset(createRawDataset());
       });
 
-      Then('bySource.typescript has {int} patterns', (_ctx: unknown, count: number) => {
-        expect(state!.dataset!.bySource.typescript.length).toBe(count);
+      Then('bySourceType.typescript has {int} patterns', (_ctx: unknown, count: number) => {
+        expect(state!.dataset!.bySourceType.typescript.length).toBe(count);
       });
 
-      And('bySource.gherkin has {int} pattern', (_ctx: unknown, count: number) => {
-        expect(state!.dataset!.bySource.gherkin.length).toBe(count);
+      And('bySourceType.gherkin has {int} pattern', (_ctx: unknown, count: number) => {
+        expect(state!.dataset!.bySourceType.gherkin.length).toBe(count);
       });
     });
 
@@ -433,8 +433,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         state!.dataset = transformToMasterDataset(createRawDataset());
       });
 
-      Then('bySource.roadmap has {int} patterns', (_ctx: unknown, count: number) => {
-        expect(state!.dataset!.bySource.roadmap.length).toBe(count);
+      Then('bySourceType.roadmap has {int} patterns', (_ctx: unknown, count: number) => {
+        expect(state!.dataset!.bySourceType.roadmap.length).toBe(count);
       });
     });
   });

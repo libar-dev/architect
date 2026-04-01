@@ -3,6 +3,7 @@
  * @architect-core
  * @architect-pattern TaxonomyCodec
  * @architect-status completed
+ * @architect-unlock-reason:Add-createDecodeOnlyCodec-helper
  * @architect-convention codec-registry
  * @architect-product-area:Generation
  *
@@ -42,11 +43,6 @@
  * ```
  */
 
-import { z } from 'zod';
-import {
-  MasterDatasetSchema,
-  type MasterDataset,
-} from '../../validation-schemas/master-dataset.js';
 import {
   type RenderableDocument,
   type SectionBlock,
@@ -59,8 +55,14 @@ import {
   linkOut,
   document,
 } from '../schema.js';
-import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
-import { RenderableDocumentOutputSchema } from './shared-schema.js';
+import {
+  type BaseCodecOptions,
+  type CodecContext,
+  type DocumentCodec,
+  DEFAULT_BASE_OPTIONS,
+  mergeOptions,
+  createDecodeOnlyCodec,
+} from './types/base.js';
 import { PRESETS, type PresetName } from '../../config/presets.js';
 import { FORMAT_TYPES, type FormatType } from '../../taxonomy/format-types.js';
 import type { TagRegistry, MetadataTagDefinition } from '../../validation-schemas/tag-registry.js';
@@ -116,20 +118,10 @@ export const DEFAULT_TAXONOMY_OPTIONS: Required<TaxonomyCodecOptions> = {
  * const codec = createTaxonomyCodec({ includePresets: false });
  * ```
  */
-export function createTaxonomyCodec(
-  options?: TaxonomyCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+export function createTaxonomyCodec(options?: TaxonomyCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_TAXONOMY_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildTaxonomyDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('TaxonomyDocumentCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  return createDecodeOnlyCodec((context) => buildTaxonomyDocument(context, opts));
 }
 
 /**
@@ -146,17 +138,26 @@ export function createTaxonomyCodec(
  */
 export const TaxonomyDocumentCodec = createTaxonomyCodec();
 
+export const codecMeta = {
+  type: 'taxonomy',
+  outputPath: 'TAXONOMY.md',
+  description: 'Tag taxonomy configuration reference',
+  factory: createTaxonomyCodec,
+  defaultInstance: TaxonomyDocumentCodec,
+} as const;
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Document Builder
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Build the taxonomy document from dataset
+ * Build the taxonomy document from context and options
  */
 function buildTaxonomyDocument(
-  dataset: MasterDataset,
+  context: CodecContext,
   options: Required<TaxonomyCodecOptions>
 ): RenderableDocument {
+  const { dataset } = context;
   const sections: SectionBlock[] = [];
   const tagRegistry = dataset.tagRegistry;
 
@@ -174,7 +175,7 @@ function buildTaxonomyDocument(
 
   // 5. Format Types section (if enabled)
   if (options.includeFormatTypes) {
-    sections.push(...buildFormatTypesSection(options));
+    sections.push(...buildFormatTypesSection(context, options));
   }
 
   // 6. Presets section (if enabled)
@@ -189,7 +190,7 @@ function buildTaxonomyDocument(
 
   // Build additional files for progressive disclosure (if enabled)
   const additionalFiles = options.generateDetailFiles
-    ? buildTaxonomyDetailFiles(tagRegistry, options)
+    ? buildTaxonomyDetailFiles(context, tagRegistry, options)
     : {};
 
   const docOpts: {
@@ -418,10 +419,15 @@ function buildAggregationTagsSection(tagRegistry: TagRegistry): SectionBlock[] {
 }
 
 /**
- * Build format types reference section
+ * Build format types reference section.
+ *
+ * Applies tagExampleOverrides from CodecContext on top of hardcoded defaults.
  */
-function buildFormatTypesSection(options: Required<TaxonomyCodecOptions>): SectionBlock[] {
-  const formatDescriptions: Record<FormatType, { description: string; example: string }> = {
+function buildFormatTypesSection(
+  context: CodecContext,
+  options: Required<TaxonomyCodecOptions>
+): SectionBlock[] {
+  const defaults: Record<FormatType, { description: string; example: string }> = {
     value: { description: 'Simple string value', example: '@architect-pattern MyPattern' },
     enum: {
       description: 'Constrained to predefined values',
@@ -436,8 +442,20 @@ function buildFormatTypesSection(options: Required<TaxonomyCodecOptions>): Secti
     flag: { description: 'Boolean presence (no value)', example: '@architect-core' },
   };
 
+  // Apply overrides from config
+  const overrides = context.tagExampleOverrides;
+  const getFormatInfo = (format: FormatType): { description: string; example: string } => {
+    const base = defaults[format];
+    const override = overrides?.[format];
+    if (!override) return base;
+    return {
+      description: override.description ?? base.description,
+      example: override.example ?? base.example,
+    };
+  };
+
   const rows = FORMAT_TYPES.map((format) => {
-    const info = formatDescriptions[format];
+    const info = getFormatInfo(format);
     return [`\`${format}\``, info.description, `\`${info.example}\``];
   });
 
@@ -527,6 +545,7 @@ function buildArchitectureSection(): SectionBlock[] {
  * Build additional taxonomy detail files
  */
 function buildTaxonomyDetailFiles(
+  context: CodecContext,
   tagRegistry: TagRegistry,
   _options: Required<TaxonomyCodecOptions>
 ): Record<string, RenderableDocument> {
@@ -539,7 +558,7 @@ function buildTaxonomyDetailFiles(
   files['taxonomy/metadata-tags.md'] = buildMetadataTagsDetailDocument(tagRegistry);
 
   // taxonomy/format-types.md - Format type parsing details
-  files['taxonomy/format-types.md'] = buildFormatTypesDetailDocument();
+  files['taxonomy/format-types.md'] = buildFormatTypesDetailDocument(context);
 
   return files;
 }
@@ -654,10 +673,14 @@ function buildMetadataTagsDetailDocument(tagRegistry: TagRegistry): RenderableDo
 }
 
 /**
- * Build format types detail document
+ * Build format types detail document.
+ *
+ * Applies tagExampleOverrides from CodecContext on top of hardcoded defaults
+ * for description and example fields.
  */
-function buildFormatTypesDetailDocument(): RenderableDocument {
+function buildFormatTypesDetailDocument(context: CodecContext): RenderableDocument {
   const sections: SectionBlock[] = [];
+  const overrides = context.tagExampleOverrides;
 
   const formatDetails: Record<
     FormatType,
@@ -713,14 +736,17 @@ function buildFormatTypesDetailDocument(): RenderableDocument {
 
   for (const format of FORMAT_TYPES) {
     const info = formatDetails[format];
+    const override = overrides?.[format];
+    const description = override?.description ?? info.description;
+    const example = override?.example ?? info.example;
     sections.push(
       heading(3, `\`${format}\``),
       table(
         ['Property', 'Value'],
         [
-          ['Description', info.description],
+          ['Description', description],
           ['Parsing Behavior', info.parsingBehavior],
-          ['Example', `\`${info.example}\``],
+          ['Example', `\`${example}\``],
           ['Notes', info.notes],
         ]
       )
