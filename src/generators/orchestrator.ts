@@ -735,6 +735,32 @@ interface GeneratorGroup {
  * @param override - Override codec options (e.g., from runtime CLI flags)
  * @returns Merged CodecOptions, or undefined if both inputs are undefined
  */
+function deepMergePlainObjects(
+  base: Record<string, unknown>,
+  override: Record<string, unknown>
+): Record<string, unknown> {
+  const result: Record<string, unknown> = { ...base };
+  for (const [key, value] of Object.entries(override)) {
+    const baseValue = result[key];
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value) &&
+      typeof baseValue === 'object' &&
+      baseValue !== null &&
+      !Array.isArray(baseValue)
+    ) {
+      result[key] = deepMergePlainObjects(
+        baseValue as Record<string, unknown>,
+        value as Record<string, unknown>
+      );
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+
 function deepMergeCodecOptions(
   base: CodecOptions | undefined,
   override: CodecOptions | undefined
@@ -743,25 +769,10 @@ function deepMergeCodecOptions(
   if (base === undefined) return override;
   if (override === undefined) return base;
 
-  const result: Record<string, unknown> = { ...base };
-  for (const [key, value] of Object.entries(override)) {
-    if (
-      typeof value === 'object' &&
-      value !== null &&
-      !Array.isArray(value) &&
-      typeof result[key] === 'object' &&
-      result[key] !== null &&
-      !Array.isArray(result[key])
-    ) {
-      result[key] = {
-        ...(result[key] as Record<string, unknown>),
-        ...(value as Record<string, unknown>),
-      };
-    } else {
-      result[key] = value;
-    }
-  }
-  return result as CodecOptions;
+  return deepMergePlainObjects(
+    base as Record<string, unknown>,
+    override as Record<string, unknown>
+  ) as CodecOptions;
 }
 
 /**

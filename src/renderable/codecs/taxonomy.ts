@@ -439,7 +439,7 @@ function buildFormatTypesSection(
     },
     csv: { description: 'Comma-separated values', example: '@architect-uses A, B, C' },
     number: { description: 'Numeric value', example: '@architect-phase 14' },
-    flag: { description: 'Boolean presence (no value)', example: '@architect-core' },
+    flag: { description: 'Boolean presence (no value)', example: '@architect-sequence-error' },
   };
 
   // Apply overrides from config
@@ -724,8 +724,8 @@ function buildFormatTypesDetailDocument(context: CodecContext): RenderableDocume
     flag: {
       description: 'Boolean presence (no value needed)',
       parsingBehavior: 'Presence of tag indicates true; absence indicates false',
-      example: '@architect-core',
-      notes: 'Used for boolean markers like core, overview, decision',
+      example: '@architect-sequence-error',
+      notes: 'Used for boolean markers like sequence-error',
     },
   };
 
