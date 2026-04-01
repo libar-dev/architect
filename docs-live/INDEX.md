@@ -10,7 +10,7 @@
 | ----------------- | ------------------------------------------------------ |
 | **Package**       | @libar-dev/architect                                   |
 | **Purpose**       | Context engineering platform for AI-assisted codebases |
-| **Patterns**      | 395 tracked (262 completed, 81 active, 52 planned)     |
+| **Patterns**      | 401 tracked (266 completed, 83 active, 52 planned)     |
 | **Product Areas** | 7                                                      |
 | **License**       | MIT                                                    |
 
@@ -149,25 +149,25 @@
 
 | Area          | Patterns | Completed | Active | Planned | Progress                   |
 | ------------- | -------- | --------- | ------ | ------- | -------------------------- |
-| Annotation    | 27       | 24        | 2      | 1       | [███████░] 24/27 89%       |
+| Annotation    | 27       | 23        | 3      | 1       | [███████░] 23/27 85%       |
 | Configuration | 11       | 8         | 0      | 3       | [██████░░] 8/11 73%        |
 | CoreTypes     | 11       | 7         | 4      | 0       | [█████░░░] 7/11 64%        |
 | DataAPI       | 40       | 23        | 15     | 2       | [█████░░░] 23/40 57%       |
-| Generation    | 95       | 81        | 6      | 8       | [███████░] 81/95 85%       |
+| Generation    | 96       | 82        | 6      | 8       | [███████░] 82/96 85%       |
 | Process       | 11       | 4         | 0      | 7       | [███░░░░░] 4/11 36%        |
 | Validation    | 25       | 16        | 3      | 6       | [█████░░░] 16/25 64%       |
-| **Total**     | **220**  | **163**   | **30** | **27**  | **[██████░░] 163/220 74%** |
+| **Total**     | **221**  | **163**   | **31** | **27**  | **[██████░░] 163/221 74%** |
 
 ---
 
 ## Phase Progress
 
-**395** patterns total: **262** completed (66%), **81** active, **52** planned. [█████████████░░░░░░░] 262/395
+**401** patterns total: **266** completed (66%), **83** active, **52** planned. [█████████████░░░░░░░] 266/401
 
 | Status    | Count | Percentage |
 | --------- | ----- | ---------- |
-| Completed | 262   | 66%        |
-| Active    | 81    | 21%        |
+| Completed | 266   | 66%        |
+| Active    | 83    | 21%        |
 | Planned   | 52    | 13%        |
 
 ### By Phase

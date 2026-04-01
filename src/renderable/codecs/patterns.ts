@@ -3,6 +3,7 @@
  * @architect-core
  * @architect-pattern PatternsCodec
  * @architect-status completed
+ * @architect-unlock-reason:Add-createDecodeOnlyCodec-helper
  * @architect-arch-role projection
  * @architect-arch-context renderer
  * @architect-arch-layer application
@@ -48,11 +49,7 @@
  * ```
  */
 
-import { z } from 'zod';
-import {
-  MasterDatasetSchema,
-  type MasterDataset,
-} from '../../validation-schemas/master-dataset.js';
+import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -79,7 +76,13 @@ import {
   stripLeadingHeaders,
 } from '../utils.js';
 import { toKebabCase } from '../../utils/index.js';
-import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
+import {
+  type BaseCodecOptions,
+  type DocumentCodec,
+  DEFAULT_BASE_OPTIONS,
+  mergeOptions,
+  createDecodeOnlyCodec,
+} from './types/base.js';
 import { getPatternName } from '../../api/pattern-helpers.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -148,7 +151,6 @@ export const DEFAULT_PATTERNS_OPTIONS: Required<PatternsCodecOptions> = {
   includeUseCases: true,
   filterCategories: [],
 };
-import { RenderableDocumentOutputSchema } from './shared-schema.js';
 import { renderAcceptanceCriteria, renderBusinessRulesSection } from './helpers.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -170,20 +172,10 @@ import { renderAcceptanceCriteria, renderBusinessRulesSection } from './helpers.
  * const codec = createPatternsCodec({ filterCategories: ["core", "generator"] });
  * ```
  */
-export function createPatternsCodec(
-  options?: PatternsCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+export function createPatternsCodec(options?: PatternsCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_PATTERNS_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildPatternsDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('PatternsDocumentCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  return createDecodeOnlyCodec(({ dataset }) => buildPatternsDocument(dataset, opts));
 }
 
 /**
@@ -199,6 +191,14 @@ export function createPatternsCodec(
  * ```
  */
 export const PatternsDocumentCodec = createPatternsCodec();
+
+export const codecMeta = {
+  type: 'patterns',
+  outputPath: 'PATTERNS.md',
+  description: 'Pattern registry with category details',
+  factory: createPatternsCodec,
+  defaultInstance: PatternsDocumentCodec,
+} as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Document Builder

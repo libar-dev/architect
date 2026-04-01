@@ -65,6 +65,7 @@ export interface WithTagRegistry {
 export type AntiPatternId =
   | 'tag-duplication' // Dependencies in features (should be code-only)
   | 'process-in-code' // Process metadata in code (should be features-only)
+  | 'removed-tag' // Removed tag still present in source (silent data loss)
   | 'magic-comments' // Generator hints in features
   | 'scenario-bloat' // Too many scenarios per feature
   | 'mega-feature'; // Feature file too large

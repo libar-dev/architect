@@ -62,7 +62,7 @@ Feature: Config Resolution - Defaults and Merging
 
   Rule: Output defaults are applied
 
-    **Invariant:** Missing output configuration must resolve to "docs/architecture" with overwrite=false.
+    **Invariant:** Missing output configuration must resolve to "docs-live" with overwrite=false.
     **Rationale:** Consistent defaults prevent accidental overwrites and establish a predictable output location.
     **Verified by:** Default output directory and overwrite, Explicit output overrides defaults
 
@@ -70,7 +70,7 @@ Feature: Config Resolution - Defaults and Merging
     Scenario: Default output directory and overwrite
       Given a raw config with no output specified
       When resolving the project config
-      Then output directory should be "docs/architecture"
+      Then output directory should be "docs-live"
       And output overwrite should be false
 
     @happy-path

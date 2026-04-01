@@ -3,6 +3,7 @@
  * @architect-core
  * @architect-pattern SessionCodec
  * @architect-status completed
+ * @architect-unlock-reason:Add-createDecodeOnlyCodec-helper
  * @architect-arch-role projection
  * @architect-arch-context renderer
  * @architect-arch-layer application
@@ -38,12 +39,7 @@
  * | groupPlannedBy | "quarter" \| "priority" \| "level" \| "none" | "none" | Group planned items |
  */
 
-import { z } from 'zod';
-import {
-  MasterDatasetSchema,
-  type MasterDataset,
-  type PhaseGroup,
-} from '../../validation-schemas/master-dataset.js';
+import type { MasterDataset, PhaseGroup } from '../../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -73,7 +69,15 @@ import {
   sortByPhaseAndName,
   formatBusinessValue,
 } from '../utils.js';
-import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
+import {
+  type BaseCodecOptions,
+  type DocumentCodec,
+  DEFAULT_BASE_OPTIONS,
+  mergeOptions,
+  createDecodeOnlyCodec,
+} from './types/base.js';
+import { renderAcceptanceCriteria, renderBusinessRulesSection } from './helpers.js';
+import { toKebabCase } from '../../utils/index.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Session Codec Options (co-located with codecs)
@@ -150,12 +154,98 @@ export const DEFAULT_REMAINING_WORK_OPTIONS: Required<RemainingWorkCodecOptions>
   sortBy: 'phase',
   groupPlannedBy: 'none',
 };
-import { RenderableDocumentOutputSchema } from './shared-schema.js';
-import { renderAcceptanceCriteria, renderBusinessRulesSection } from './helpers.js';
-import { toKebabCase } from '../../utils/index.js';
+
+/**
+ * Unified options for SessionCodec.
+ *
+ * The `view` discriminant selects which session perspective to render:
+ * - `'context'` — current session context for AI agents and developers (default)
+ * - `'remaining'` — aggregate view of all incomplete work across phases
+ *
+ * All view-specific options are available; unused options for the selected
+ * view are silently ignored.
+ */
+export interface UnifiedSessionCodecOptions extends BaseCodecOptions {
+  /** Session view (default: 'context') */
+  readonly view?: 'context' | 'remaining';
+
+  // Context ('context') options
+  includeAcceptanceCriteria?: boolean;
+  includeDependencies?: boolean;
+  includeDeliverables?: boolean;
+  includeRelatedPatterns?: boolean;
+  includeHandoffContext?: boolean;
+
+  // Remaining work ('remaining') options
+  includeIncomplete?: boolean;
+  includeBlocked?: boolean;
+  includeNextActionable?: boolean;
+  maxNextActionable?: number;
+  includeStats?: boolean;
+  sortBy?: 'phase' | 'priority' | 'effort' | 'quarter';
+  groupPlannedBy?: 'quarter' | 'priority' | 'level' | 'none';
+}
+
+/**
+ * Default options for the unified SessionCodec
+ */
+export const DEFAULT_UNIFIED_SESSION_OPTIONS: Required<UnifiedSessionCodecOptions> = {
+  ...DEFAULT_BASE_OPTIONS,
+  view: 'context',
+  // Context options
+  includeAcceptanceCriteria: true,
+  includeDependencies: true,
+  includeDeliverables: true,
+  includeRelatedPatterns: false,
+  includeHandoffContext: true,
+  // Remaining work options
+  includeIncomplete: true,
+  includeBlocked: true,
+  includeNextActionable: true,
+  maxNextActionable: 5,
+  includeStats: true,
+  sortBy: 'phase',
+  groupPlannedBy: 'none',
+};
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Session Context Document Codec
+// Unified Session Codec
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Create a unified SessionCodec with the given options.
+ *
+ * The `view` option selects the session perspective:
+ * - `'context'` (default) — current session context for AI agents and developers
+ * - `'remaining'` — aggregate view of all incomplete work across phases
+ *
+ * @param options - Codec configuration options including `view`
+ * @returns Configured DocumentCodec
+ *
+ * @example
+ * ```typescript
+ * // Session context with related patterns
+ * const codec = createSessionCodec({ view: 'context', includeRelatedPatterns: true });
+ *
+ * // Remaining work sorted by priority
+ * const codec = createSessionCodec({ view: 'remaining', sortBy: 'priority' });
+ * ```
+ */
+export function createSessionCodec(options?: UnifiedSessionCodecOptions): DocumentCodec {
+  const view = options?.view ?? 'context';
+
+  if (view === 'remaining') {
+    const opts = mergeOptions(DEFAULT_REMAINING_WORK_OPTIONS, options);
+    return createDecodeOnlyCodec(({ dataset }) => buildRemainingWorkDocument(dataset, opts));
+  }
+
+  // Default: 'context'
+  const opts = mergeOptions(DEFAULT_SESSION_OPTIONS, options);
+  return createDecodeOnlyCodec(({ dataset }) => buildSessionContextDocument(dataset, opts));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Backward-Compatible Factory Aliases
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
@@ -173,20 +263,8 @@ import { toKebabCase } from '../../utils/index.js';
  * const codec = createSessionContextCodec({ generateDetailFiles: false });
  * ```
  */
-export function createSessionContextCodec(
-  options?: SessionCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
-  const opts = mergeOptions(DEFAULT_SESSION_OPTIONS, options);
-
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildSessionContextDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('SessionContextCodec is decode-only. See zod-codecs.md');
-    },
-  });
+export function createSessionContextCodec(options?: SessionCodecOptions): DocumentCodec {
+  return createSessionCodec({ ...options, view: 'context' });
 }
 
 /**
@@ -212,20 +290,8 @@ export const SessionContextCodec = createSessionContextCodec();
  * const codec = createRemainingWorkCodec({ groupPlannedBy: "quarter" });
  * ```
  */
-export function createRemainingWorkCodec(
-  options?: RemainingWorkCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
-  const opts = mergeOptions(DEFAULT_REMAINING_WORK_OPTIONS, options);
-
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildRemainingWorkDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('RemainingWorkCodec is decode-only. See zod-codecs.md');
-    },
-  });
+export function createRemainingWorkCodec(options?: RemainingWorkCodecOptions): DocumentCodec {
+  return createSessionCodec({ ...options, view: 'remaining' });
 }
 
 /**
@@ -235,6 +301,23 @@ export function createRemainingWorkCodec(
  * Aggregates all incomplete work across phases.
  */
 export const RemainingWorkCodec = createRemainingWorkCodec();
+
+export const codecMetas = [
+  {
+    type: 'session',
+    outputPath: 'SESSION-CONTEXT.md',
+    description: 'Current session context and focus',
+    factory: createSessionContextCodec,
+    defaultInstance: SessionContextCodec,
+  },
+  {
+    type: 'remaining',
+    outputPath: 'REMAINING-WORK.md',
+    description: 'Aggregate view of incomplete work',
+    factory: createRemainingWorkCodec,
+    defaultInstance: RemainingWorkCodec,
+  },
+] as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Session Context Document Builder

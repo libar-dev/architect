@@ -33,9 +33,9 @@ Scoped architecture diagram showing component relationships:
 ```mermaid
 C4Context
     title Core Type System
-    System(StringUtils, "StringUtils")
     System(ResultMonad, "ResultMonad")
     System(ErrorFactories, "ErrorFactories")
+    System(StringUtils, "StringUtils")
     System(KebabCaseSlugs, "KebabCaseSlugs")
     System(ErrorHandlingUnification, "ErrorHandlingUnification")
     Rel(KebabCaseSlugs, StringUtils, "depends on")
@@ -51,9 +51,9 @@ Scoped architecture diagram showing component relationships:
 
 ```mermaid
 graph LR
-    StringUtils["StringUtils"]
     ResultMonad["ResultMonad"]
     ErrorFactories["ErrorFactories"]
+    StringUtils["StringUtils"]
     KebabCaseSlugs["KebabCaseSlugs"]
     ErrorHandlingUnification["ErrorHandlingUnification"]
     KebabCaseSlugs -.->|depends on| StringUtils

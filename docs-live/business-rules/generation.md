@@ -4,7 +4,7 @@
 
 ---
 
-**302 rules** from 61 features. 302 rules have explicit invariants.
+**312 rules** from 62 features. 312 rules have explicit invariants.
 
 ---
 
@@ -709,12 +709,11 @@ _Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)_
 
 > **Invariant:** CodecBasedGenerator delegates document generation to the underlying codec and surfaces codec errors through the generator interface.
 >
-> **Rationale:** The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side.
+> **Rationale:** The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side. MasterDataset is required in context — enforced by the TypeScript type system, not at runtime.
 
 **Verified by:**
 
 - Generator delegates to codec
-- Missing MasterDataset returns error
 - Codec options are passed through
 
 _codec-based.feature_
@@ -1904,6 +1903,159 @@ _Links to implementation files in generated pattern documents should have_
 - Only strips prefix at start of path
 
 _implementation-links.feature_
+
+### Index Codec
+
+_Validates the Index Codec that transforms MasterDataset into a_
+
+---
+
+#### Document metadata is correctly set
+
+> **Invariant:** The index document must have the title "Documentation Index", a purpose string referencing @libar-dev/architect, and all sections enabled when using default options.
+>
+> **Rationale:** Document metadata drives navigation and table of contents generation — incorrect titles or missing purpose strings produce broken index pages in generated doc sites.
+
+**Verified by:**
+
+- Document title is Documentation Index
+- Document purpose references @libar-dev/architect
+- Default options produce all sections
+
+---
+
+#### Package metadata section renders correctly
+
+> **Invariant:** The Package Metadata section must always render a table with hardcoded fields: Package (@libar-dev/architect), Purpose, Patterns count derived from dataset, Product Areas count derived from dataset, and License (MIT).
+>
+> **Rationale:** Package metadata provides readers with an instant snapshot of the project — hardcoded fields ensure consistent branding while dataset-derived counts stay accurate.
+
+**Verified by:**
+
+- Package name shows @libar-dev/architect
+- Purpose shows context engineering platform description
+- License shows MIT
+- Pattern counts reflect dataset
+- Product area count reflects dataset
+- Package metadata section can be disabled
+
+---
+
+#### Document inventory groups entries by topic
+
+> **Invariant:** When documentEntries is non-empty and includeDocumentInventory is true, entries must be grouped by topic with one H3 sub-heading and one table per topic group. When entries are empty, no inventory section is rendered.
+>
+> **Rationale:** A flat list of all documents becomes unnavigable beyond a small count — topic grouping gives readers a structured entry point into the documentation set.
+
+**Verified by:**
+
+- Empty entries produces no inventory section
+- Entries grouped by topic produce per-topic tables
+- Inventory section can be disabled
+
+---
+
+#### Product area statistics are computed from dataset
+
+> **Invariant:** The Product Area Statistics table must list each product area alphabetically with Patterns, Completed, Active, Planned, and Progress columns, plus a bolded Total row aggregating all areas. The progress column must contain a visual progress bar and percentage.
+>
+> **Rationale:** Product area statistics give team leads a cross-cutting view of work distribution — alphabetical order and a total row enable fast scanning and aggregate assessment.
+
+**Verified by:**
+
+- Product area table includes all areas alphabetically
+- Total row aggregates all areas
+- Progress bar and percentage are computed
+- Product area stats can be disabled
+
+---
+
+#### Phase progress summarizes pattern status
+
+> **Invariant:** The Phase Progress section must render a summary paragraph with total, completed, active, and planned counts, a status distribution table with Status/Count/Percentage columns, and — when patterns have phase numbers — a "By Phase" sub-section with a per-phase breakdown table.
+>
+> **Rationale:** Phase progress is the primary indicator of delivery health — the summary paragraph provides instant context while the distribution table enables deeper analysis.
+
+**Verified by:**
+
+- Phase progress shows total counts
+- Status distribution table shows completed/active/planned
+- Per-phase breakdown appears when phases exist
+- Phase progress can be disabled
+
+---
+
+#### Regeneration footer contains commands
+
+> **Invariant:** The Regeneration section must always be present (it is not optional), must contain the heading "Regeneration", and must include at least one code block with pnpm commands.
+>
+> **Rationale:** The regeneration footer ensures consumers always know how to rebuild the docs — it is unconditional so it cannot be accidentally omitted.
+
+**Verified by:**
+
+- Regeneration section has heading "Regeneration"
+- Code blocks contain pnpm commands
+
+---
+
+#### Section ordering follows layout contract
+
+> **Invariant:** Sections must appear in this fixed order: Package Metadata, preamble (if any), Document Inventory (if any), Product Area Statistics, Phase Progress, Regeneration. Separators must appear after each non-final section group. This order is the layout contract for INDEX.md.
+>
+> **Rationale:** Consumers depend on a predictable INDEX.md structure for navigation links — reordering sections would break existing bookmarks and tool-generated cross-references.
+
+**Verified by:**
+
+- Default layout order is metadata, stats, progress, regeneration
+- Preamble appears after metadata and before inventory
+- Separators appear between sections
+- Default layout order is metadata
+- stats
+- progress
+- regeneration
+
+---
+
+#### Custom purpose text overrides default
+
+> **Invariant:** When purposeText is set to a non-empty string, the document purpose must use that string instead of the auto-generated default. When purposeText is empty or omitted, the auto-generated purpose is used.
+>
+> **Rationale:** Consumers with different documentation sets need to customize the navigation purpose without post-processing the generated output.
+
+**Verified by:**
+
+- purposeText replaces auto-generated purpose
+- Empty purposeText uses auto-generated purpose
+
+---
+
+#### Epilogue replaces regeneration footer
+
+> **Invariant:** When epilogue sections are provided, they completely replace the built-in regeneration footer. When epilogue is empty, the regeneration footer is rendered as before.
+>
+> **Rationale:** Consumers may need a custom footer (e.g., links to CI, contribution guides) that has nothing to do with regeneration commands.
+
+**Verified by:**
+
+- Epilogue replaces built-in footer
+- Empty epilogue preserves regeneration footer
+
+---
+
+#### Package metadata overrides work
+
+> **Invariant:** When packageMetadataOverrides provides a value for name, purpose, or license, that value replaces the corresponding default or projectMetadata value in the Package Metadata table. Unset override keys fall through to the default chain.
+>
+> **Rationale:** Consumers reusing the IndexCodec for different packages need to override individual metadata fields without providing a full projectMetadata object.
+
+**Verified by:**
+
+- Name override replaces package name
+- Purpose override replaces purpose
+- License override replaces license
+- Unset overrides fall through to defaults
+
+_index-codec.feature_
 
 ### Layered Diagram Generation
 

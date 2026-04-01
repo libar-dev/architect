@@ -284,6 +284,16 @@ interface ArchitectProjectConfig {
   /** Path to custom workflow config JSON (relative to config file) */
   readonly workflowPath?: string;
 
+  // --- Project Identity ---
+
+  /** Project metadata for customizing generated docs (package name, purpose, license) */
+  readonly project?: ProjectMetadata;
+
+  /** Override format type examples in TaxonomyCodec output */
+  readonly tagExampleOverrides?: Partial<
+    Record<FormatType, { description?: string; example?: string }>
+  >;
+
   // --- Codec Options ---
 
   /**
@@ -320,6 +330,8 @@ interface ArchitectProjectConfig {
 | generatorOverrides    | Per-generator source and output overrides                                                                                                                                                                                                                                                                                                                               |
 | contextInferenceRules | Rules for auto-inferring bounded context from file paths                                                                                                                                                                                                                                                                                                                |
 | workflowPath          | Path to custom workflow config JSON (relative to config file)                                                                                                                                                                                                                                                                                                           |
+| project               | Project metadata for customizing generated docs (package name, purpose, license)                                                                                                                                                                                                                                                                                        |
+| tagExampleOverrides   | Override format type examples in TaxonomyCodec output                                                                                                                                                                                                                                                                                                                   |
 | codecOptions          | Per-codec options for fine-tuning document generation. Keys match codec names (e.g., 'business-rules', 'patterns'). Passed through to codec factories at generation time.                                                                                                                                                                                               |
 | referenceDocConfigs   | Reference document configurations for convention-based doc generation. Each config defines one reference document's content composition via convention tags, shape selectors, behavior categories, and diagram scopes. When not specified, no reference generators are registered. Import `LIBAR_REFERENCE_CONFIGS` from the generators module to use the built-in set. |
 
@@ -372,17 +384,17 @@ interface SourcesConfig {
 
 ```typescript
 interface OutputConfig {
-  /** Output directory for generated docs (default: 'docs/architecture') */
+  /** Output directory for generated docs (default: 'docs-live') */
   readonly directory?: string;
   /** Overwrite existing files (default: false) */
   readonly overwrite?: boolean;
 }
 ```
 
-| Property  | Description                                                        |
-| --------- | ------------------------------------------------------------------ |
-| directory | Output directory for generated docs (default: 'docs/architecture') |
-| overwrite | Overwrite existing files (default: false)                          |
+| Property  | Description                                                |
+| --------- | ---------------------------------------------------------- |
+| directory | Output directory for generated docs (default: 'docs-live') |
+| overwrite | Overwrite existing files (default: false)                  |
 
 ### GeneratorSourceOverride (interface)
 
@@ -463,19 +475,27 @@ interface ResolvedProjectConfig {
   readonly codecOptions?: CodecOptions;
   /** Reference document configurations (empty array if none) */
   readonly referenceDocConfigs: readonly ReferenceDocConfig[];
+  /** Project metadata (auto-read from package.json if not provided) */
+  readonly project?: ProjectMetadata;
+  /** Format type example overrides */
+  readonly tagExampleOverrides?: Partial<
+    Record<FormatType, { description?: string; example?: string }>
+  >;
 }
 ```
 
-| Property              | Description                                                |
-| --------------------- | ---------------------------------------------------------- |
-| sources               | Resolved source globs (stubs merged, defaults applied)     |
-| output                | Resolved output config with all defaults                   |
-| generators            | Default generator names                                    |
-| generatorOverrides    | Per-generator source overrides                             |
-| contextInferenceRules | Context inference rules (user rules prepended to defaults) |
-| workflowPath          | Workflow config path (null if not specified)               |
-| codecOptions          | Per-codec options for document generation (empty if none)  |
-| referenceDocConfigs   | Reference document configurations (empty array if none)    |
+| Property              | Description                                                    |
+| --------------------- | -------------------------------------------------------------- |
+| sources               | Resolved source globs (stubs merged, defaults applied)         |
+| output                | Resolved output config with all defaults                       |
+| generators            | Default generator names                                        |
+| generatorOverrides    | Per-generator source overrides                                 |
+| contextInferenceRules | Context inference rules (user rules prepended to defaults)     |
+| workflowPath          | Workflow config path (null if not specified)                   |
+| codecOptions          | Per-codec options for document generation (empty if none)      |
+| referenceDocConfigs   | Reference document configurations (empty array if none)        |
+| project               | Project metadata (auto-read from package.json if not provided) |
+| tagExampleOverrides   | Format type example overrides                                  |
 
 ### ResolvedSourcesConfig (interface)
 
@@ -974,7 +994,7 @@ const PRESETS: Record<PresetName, ArchitectConfig>;
 | Default config provides sensible fallbacks | A config created without user input must have isDefault=true and empty source collections. | Downstream consumers need a safe starting point when no config file exists.                               |
 | Preset creates correct taxonomy instance   | Each preset must produce a taxonomy with the correct number of categories and tag prefix.  | Presets are the primary user-facing configuration — wrong category counts break downstream scanning.      |
 | Stubs are merged into typescript sources   | Stub glob patterns must appear in resolved typescript sources alongside original globs.    | Stubs extend the scanner's source set without requiring users to manually list them.                      |
-| Output defaults are applied                | Missing output configuration must resolve to "docs/architecture" with overwrite=false.     | Consistent defaults prevent accidental overwrites and establish a predictable output location.            |
+| Output defaults are applied                | Missing output configuration must resolve to "docs-live" with overwrite=false.             | Consistent defaults prevent accidental overwrites and establish a predictable output location.            |
 | Generator defaults are applied             | A config with no generators specified must default to the "patterns" generator.            | Patterns is the most commonly needed output — defaulting to it reduces boilerplate.                       |
 | Context inference rules are prepended      | User-defined inference rules must appear before built-in defaults in the resolved array.   | Prepending gives user rules priority during context matching without losing defaults.                     |
 | Config path is carried from options        | The configPath from resolution options must be preserved unchanged in resolved config.     | Downstream tools need the original config file location for error reporting and relative path resolution. |

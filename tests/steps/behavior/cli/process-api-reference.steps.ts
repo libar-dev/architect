@@ -29,6 +29,15 @@ function getContent(): string {
   return state.generatedContent;
 }
 
+function createMockGeneratorContext(): GeneratorContext {
+  return {
+    baseDir: process.cwd(),
+    outputDir: 'docs-live',
+    registry: {} as GeneratorContext['registry'],
+    masterDataset: {} as GeneratorContext['masterDataset'],
+  } as GeneratorContext;
+}
+
 function extractTableRows(content: string, afterHeading: string): string[] {
   const lines = content.split('\n');
   let inSection = false;
@@ -85,12 +94,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
 
       When('the ProcessApiReferenceGenerator produces output', async () => {
         const generator = createProcessApiReferenceGenerator();
-        const context: GeneratorContext = {
-          baseDir: process.cwd(),
-          outputDir: 'docs-live',
-          registry: {} as GeneratorContext['registry'],
-        };
-        const output = await generator.generate([], context);
+        const output = await generator.generate([], createMockGeneratorContext());
         state!.generatedContent = output.files[0].content;
       });
 
@@ -123,12 +127,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
 
       When('the ProcessApiReferenceGenerator produces output', async () => {
         const generator = createProcessApiReferenceGenerator();
-        const context: GeneratorContext = {
-          baseDir: process.cwd(),
-          outputDir: 'docs-live',
-          registry: {} as GeneratorContext['registry'],
-        };
-        const output = await generator.generate([], context);
+        const output = await generator.generate([], createMockGeneratorContext());
         state!.generatedContent = output.files[0].content;
       });
 
@@ -161,12 +160,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
 
       When('the ProcessApiReferenceGenerator produces output', async () => {
         const generator = createProcessApiReferenceGenerator();
-        const context: GeneratorContext = {
-          baseDir: process.cwd(),
-          outputDir: 'docs-live',
-          registry: {} as GeneratorContext['registry'],
-        };
-        const output = await generator.generate([], context);
+        const output = await generator.generate([], createMockGeneratorContext());
         state!.generatedContent = output.files[0].content;
       });
 
@@ -196,12 +190,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
 
       When('the ProcessApiReferenceGenerator produces output', async () => {
         const generator = createProcessApiReferenceGenerator();
-        const context: GeneratorContext = {
-          baseDir: process.cwd(),
-          outputDir: 'docs-live',
-          registry: {} as GeneratorContext['registry'],
-        };
-        const output = await generator.generate([], context);
+        const output = await generator.generate([], createMockGeneratorContext());
         state!.generatedContent = output.files[0].content;
       });
 

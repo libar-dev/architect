@@ -59,11 +59,11 @@ Scoped architecture diagram showing component relationships:
 ```mermaid
 graph TB
     subgraph generator["Generator"]
-        SourceMapper[/"SourceMapper"/]
-        Documentation_Generation_Orchestrator("Documentation Generation Orchestrator")
         GitModule["GitModule"]
         GitHelpers["GitHelpers"]
         GitBranchDiff["GitBranchDiff"]
+        SourceMapper[/"SourceMapper"/]
+        Documentation_Generation_Orchestrator("Documentation Generation Orchestrator")
         TransformTypes["TransformTypes"]
         TransformDataset("TransformDataset")
         SequenceTransformUtils("SequenceTransformUtils")
@@ -97,13 +97,13 @@ graph TB
         CliRecipeCodec["CliRecipeCodec"]:::neighbor
         ContextInference["ContextInference"]:::neighbor
     end
+    GitModule -->|uses| GitBranchDiff
+    GitModule -->|uses| GitHelpers
     loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
     SourceMapper -.->|depends on| DecisionDocCodec
     SourceMapper -.->|depends on| ShapeExtractor
     SourceMapper -.->|depends on| GherkinASTParser
     Documentation_Generation_Orchestrator -->|uses| Pattern_Scanner
-    GitModule -->|uses| GitBranchDiff
-    GitModule -->|uses| GitHelpers
     PatternsCodec ..->|implements| PatternRelationshipModel
     DesignReviewCodec -->|uses| MasterDataset
     DesignReviewCodec -->|uses| MermaidDiagramUtils
@@ -293,7 +293,7 @@ function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 
 ## Business Rules
 
-92 patterns, 441 rules with invariants (442 total)
+93 patterns, 451 rules with invariants (452 total)
 
 ### ADR 005 Codec Based Markdown Rendering
 
@@ -437,9 +437,9 @@ function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 
 ### Codec Based Generator Testing
 
-| Rule                                                     | Invariant                                                                                                                            | Rationale                                                                                                                    |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| CodecBasedGenerator adapts codecs to generator interface | CodecBasedGenerator delegates document generation to the underlying codec and surfaces codec errors through the generator interface. | The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side. |
+| Rule                                                     | Invariant                                                                                                                            | Rationale                                                                                                                                                                                                                   |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CodecBasedGenerator adapts codecs to generator interface | CodecBasedGenerator delegates document generation to the underlying codec and surfaces codec errors through the generator interface. | The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side. MasterDataset is required in context — enforced by the TypeScript type system, not at runtime. |
 
 ### Codec Behavior Testing
 
@@ -712,6 +712,21 @@ function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 | Repository prefixes are stripped from implementation paths | Implementation file paths must not contain repository-level prefixes like "libar-platform/" or "monorepo/".                          | Generated links are relative to the output directory; repository prefixes produce broken paths.                                                   |
 | All implementation links in a pattern are normalized       | Every implementation link in a pattern document must have its path normalized, regardless of how many implementations exist.         | A single un-normalized link in a multi-implementation pattern produces a broken reference that undermines trust in the entire generated document. |
 | normalizeImplPath strips known prefixes                    | normalizeImplPath removes only recognized repository prefixes from the start of a path and leaves all other path segments unchanged. | Over-stripping would corrupt legitimate path segments that happen to match a prefix name, producing silent broken links.                          |
+
+### Index Codec Testing
+
+| Rule                                              | Invariant                                                                                                                                                                                                                                                                           | Rationale                                                                                                                                                             |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Document metadata is correctly set                | The index document must have the title "Documentation Index", a purpose string referencing @libar-dev/architect, and all sections enabled when using default options.                                                                                                               | Document metadata drives navigation and table of contents generation — incorrect titles or missing purpose strings produce broken index pages in generated doc sites. |
+| Package metadata section renders correctly        | The Package Metadata section must always render a table with hardcoded fields: Package (@libar-dev/architect), Purpose, Patterns count derived from dataset, Product Areas count derived from dataset, and License (MIT).                                                           | Package metadata provides readers with an instant snapshot of the project — hardcoded fields ensure consistent branding while dataset-derived counts stay accurate.   |
+| Document inventory groups entries by topic        | When documentEntries is non-empty and includeDocumentInventory is true, entries must be grouped by topic with one H3 sub-heading and one table per topic group. When entries are empty, no inventory section is rendered.                                                           | A flat list of all documents becomes unnavigable beyond a small count — topic grouping gives readers a structured entry point into the documentation set.             |
+| Product area statistics are computed from dataset | The Product Area Statistics table must list each product area alphabetically with Patterns, Completed, Active, Planned, and Progress columns, plus a bolded Total row aggregating all areas. The progress column must contain a visual progress bar and percentage.                 | Product area statistics give team leads a cross-cutting view of work distribution — alphabetical order and a total row enable fast scanning and aggregate assessment. |
+| Phase progress summarizes pattern status          | The Phase Progress section must render a summary paragraph with total, completed, active, and planned counts, a status distribution table with Status/Count/Percentage columns, and — when patterns have phase numbers — a "By Phase" sub-section with a per-phase breakdown table. | Phase progress is the primary indicator of delivery health — the summary paragraph provides instant context while the distribution table enables deeper analysis.     |
+| Regeneration footer contains commands             | The Regeneration section must always be present (it is not optional), must contain the heading "Regeneration", and must include at least one code block with pnpm commands.                                                                                                         | The regeneration footer ensures consumers always know how to rebuild the docs — it is unconditional so it cannot be accidentally omitted.                             |
+| Section ordering follows layout contract          | Sections must appear in this fixed order: Package Metadata, preamble (if any), Document Inventory (if any), Product Area Statistics, Phase Progress, Regeneration. Separators must appear after each non-final section group. This order is the layout contract for INDEX.md.       | Consumers depend on a predictable INDEX.md structure for navigation links — reordering sections would break existing bookmarks and tool-generated cross-references.   |
+| Custom purpose text overrides default             | When purposeText is set to a non-empty string, the document purpose must use that string instead of the auto-generated default. When purposeText is empty or omitted, the auto-generated purpose is used.                                                                           | Consumers with different documentation sets need to customize the navigation purpose without post-processing the generated output.                                    |
+| Epilogue replaces regeneration footer             | When epilogue sections are provided, they completely replace the built-in regeneration footer. When epilogue is empty, the regeneration footer is rendered as before.                                                                                                               | Consumers may need a custom footer (e.g., links to CI, contribution guides) that has nothing to do with regeneration commands.                                        |
+| Package metadata overrides work                   | When packageMetadataOverrides provides a value for name, purpose, or license, that value replaces the corresponding default or projectMetadata value in the Package Metadata table. Unset override keys fall through to the default chain.                                          | Consumers reusing the IndexCodec for different packages need to override individual metadata fields without providing a full projectMetadata object.                  |
 
 ### Layered Diagram Generation
 

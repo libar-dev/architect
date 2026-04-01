@@ -37,7 +37,6 @@ Feature: Tag Registry Builder
         | pattern | value  |
         | status  | enum   |
         | phase   | number |
-        | core    | flag   |
 
   Rule: Metadata tags have correct configuration
 

@@ -213,13 +213,16 @@ interface PipelineOptions {
   readonly includeValidation?: boolean;
   /** DD-5: When true, return error on individual scan failures (default false). */
   readonly failOnScanErrors?: boolean;
+  /** Pre-loaded tag registry. When provided, skips internal config load (Step 1). */
+  readonly tagRegistry?: TagRegistry;
 }
 ```
 
-| Property          | Description                                                                |
-| ----------------- | -------------------------------------------------------------------------- |
-| includeValidation | DD-3: When false, skip validation pass (default true).                     |
-| failOnScanErrors  | DD-5: When true, return error on individual scan failures (default false). |
+| Property          | Description                                                                  |
+| ----------------- | ---------------------------------------------------------------------------- |
+| includeValidation | DD-3: When false, skip validation pass (default true).                       |
+| failOnScanErrors  | DD-5: When true, return error on individual scan failures (default false).   |
+| tagRegistry       | Pre-loaded tag registry. When provided, skips internal config load (Step 1). |
 
 ### PipelineResult (interface)
 
@@ -284,7 +287,7 @@ MasterDatasetSchema = z.object({
   byCategory: z.record(z.string(), z.array(ExtractedPatternSchema)),
 
   /** Patterns grouped by source type */
-  bySource: SourceViewsSchema,
+  bySourceType: SourceViewsSchema,
 
   /** Patterns grouped by product area (for O(1) product area lookups) */
   byProductArea: z.record(z.string(), z.array(ExtractedPatternSchema)),
@@ -509,7 +512,7 @@ ArchIndexSchema = z.object({
 
 ## Business Rules
 
-38 patterns, 146 rules with invariants (146 total)
+38 patterns, 147 rules with invariants (147 total)
 
 ### Arch Queries Test
 
@@ -644,15 +647,16 @@ ArchIndexSchema = z.object({
 
 ### Lint Process Cli
 
-| Rule                                       | Invariant                                                                                                                                            | Rationale                                                                                                                                                                 |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CLI displays help and version information  | The --help/-h and --version/-v flags must produce usage/version output and exit successfully without requiring other arguments.                      | Help and version are universal CLI conventions — both short and long flag forms must work for discoverability and scripting compatibility.                                |
-| CLI requires git repository for validation | The lint-process CLI must fail with a clear error when run outside a git repository in both staged and all modes.                                    | Process guard validation depends on git diff for change detection — running without git produces undefined behavior rather than useful validation results.                |
-| CLI validates file mode input              | In file mode, the CLI must require at least one file path via positional argument or --file flag, and fail with a clear error when none is provided. | File mode is for targeted validation of specific files — accepting zero files would silently produce a "no violations" result that falsely implies the files are valid.   |
-| CLI handles no changes gracefully          | When no relevant changes are detected (empty diff), the CLI must exit successfully with a zero exit code.                                            | No changes means no violations are possible — failing on empty diffs would break CI pipelines on commits that only modify non-spec files.                                 |
-| CLI supports multiple output formats       | The CLI must support JSON and pretty (human-readable) output formats, with pretty as the default.                                                    | Pretty format serves interactive pre-commit use while JSON format enables CI/CD pipeline integration and automated violation processing.                                  |
-| CLI supports debug options                 | The --show-state flag must display the derived process state (FSM states, protection levels, deliverables) without affecting validation behavior.    | Process guard decisions are derived from complex state — exposing the intermediate state helps developers understand why a specific validation passed or failed.          |
-| CLI warns about unknown flags              | Unrecognized CLI flags must produce a warning message but allow execution to continue.                                                               | Process validation is critical-path at commit time — hard-failing on a typo in an optional flag would block commits unnecessarily when the core validation would succeed. |
+| Rule                                       | Invariant                                                                                                                                                                                                 | Rationale                                                                                                                                                                                       |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CLI displays help and version information  | The --help/-h and --version/-v flags must produce usage/version output and exit successfully without requiring other arguments.                                                                           | Help and version are universal CLI conventions — both short and long flag forms must work for discoverability and scripting compatibility.                                                      |
+| CLI requires git repository for validation | The lint-process CLI must fail with a clear error when run outside a git repository in both staged and all modes.                                                                                         | Process guard validation depends on git diff for change detection — running without git produces undefined behavior rather than useful validation results.                                      |
+| CLI validates file mode input              | In file mode, the CLI must require at least one file path via positional argument or --file flag, and fail with a clear error when none is provided.                                                      | File mode is for targeted validation of specific files — accepting zero files would silently produce a "no violations" result that falsely implies the files are valid.                         |
+| CLI handles no changes gracefully          | When no relevant changes are detected (empty diff), the CLI must exit successfully with a zero exit code.                                                                                                 | No changes means no violations are possible — failing on empty diffs would break CI pipelines on commits that only modify non-spec files.                                                       |
+| CLI supports multiple output formats       | The CLI must support JSON and pretty (human-readable) output formats, with pretty as the default.                                                                                                         | Pretty format serves interactive pre-commit use while JSON format enables CI/CD pipeline integration and automated violation processing.                                                        |
+| CLI supports debug options                 | The --show-state flag must display the derived process state (FSM states, protection levels, deliverables) without affecting validation behavior.                                                         | Process guard decisions are derived from complex state — exposing the intermediate state helps developers understand why a specific validation passed or failed.                                |
+| CLI warns about unknown flags              | Unrecognized CLI flags must produce a warning message but allow execution to continue.                                                                                                                    | Process validation is critical-path at commit time — hard-failing on a typo in an optional flag would block commits unnecessarily when the core validation would succeed.                       |
+| CLI honors config-defined feature scope    | Process guard must derive state and diff transitions from the configured feature globs, including `tests/features/**/*.feature`, while ignoring non-feature files that only contain annotation-like text. | Rebrand cleanup imports completed artifacts under multiple feature roots — using hardcoded feature locations misses valid unlock reasons and creates false positives from docs or helper files. |
 
 ### MCP Server Integration
 
@@ -703,9 +707,9 @@ ArchIndexSchema = z.object({
 
 ### Process Api Cli Cache
 
-| Rule                                        | Invariant                                                                                                                                                                 | Rationale                                                                                                                                                                                    |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MasterDataset is cached between invocations | When source files have not changed between CLI invocations, the second invocation must use the cached MasterDataset and report cache.hit as true with reduced pipelineMs. | The pipeline rebuild costs 2-5 seconds per invocation. Caching eliminates this cost for repeated queries against unchanged sources, which is the common case during interactive AI sessions. |
+| Rule                                        | Invariant                                                                                                                                                                            | Rationale                                                                                                                                                                                    |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MasterDataset is cached between invocations | When source files have not changed between CLI invocations, the second invocation must use the cached MasterDataset and report cache.hit as true alongside pipeline timing metadata. | The pipeline rebuild costs 2-5 seconds per invocation. Caching eliminates this cost for repeated queries against unchanged sources, which is the common case during interactive AI sessions. |
 
 ### Process Api Cli Core
 

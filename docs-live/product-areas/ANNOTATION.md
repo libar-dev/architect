@@ -198,12 +198,6 @@ interface CategoryDefinition {
 | description | Brief description of the category's purpose and typical patterns                  |
 | aliases     | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
 
-### TagDefinition (type)
-
-```typescript
-type TagDefinition = MetadataTagDefinitionForRegistry;
-```
-
 ### CategoryTag (type)
 
 ```typescript
@@ -231,6 +225,22 @@ type CategoryTag = (typeof CATEGORIES)[number]['tag'];
 function buildRegistry(): TagRegistry;
 ```
 
+### isShapeOnlyDirective (function)
+
+```typescript
+/**
+ * Check if a directive is a shape-only annotation (declaration-level @architect-shape).
+ *
+ * Shape directives annotate individual interfaces/types for documentation extraction.
+ * They inherit context from a parent pattern and should not enter the directive pipeline
+ * as standalone patterns.
+ */
+```
+
+```typescript
+function isShapeOnlyDirective(directive: DocDirective, registry: TagRegistry): boolean;
+```
+
 ### METADATA_TAGS_BY_GROUP (const)
 
 ```typescript
@@ -239,7 +249,7 @@ function buildRegistry(): TagRegistry;
  * Used for documentation generation to create organized sections.
  *
  * Groups:
- * - core: Essential pattern identification (pattern, status, core, usecase, brief)
+ * - core: Essential pattern identification (pattern, status, usecase)
  * - relationship: Pattern dependencies and connections
  * - process: Timeline and assignment tracking
  * - prd: Product requirements documentation
@@ -255,7 +265,7 @@ function buildRegistry(): TagRegistry;
 
 ```typescript
 METADATA_TAGS_BY_GROUP = {
-  core: ['pattern', 'status', 'core', 'usecase', 'brief'] as const,
+  core: ['pattern', 'status', 'usecase'] as const,
   relationship: [
     'uses',
     'used-by',
@@ -521,7 +531,7 @@ CATEGORY_TAGS = CATEGORIES.map((c) => c.tag) as readonly CategoryTag[];
 
 | Rule                                                                        | Invariant                                                                                                                                  | Rationale                                                                                                                                                 |
 | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Single value tags produce scalar metadata fields                            | Each single-value tag (pattern, phase, status, brief) maps to exactly one metadata field with the correct type.                            | Incorrect type coercion (e.g., phase as string instead of number) causes downstream pipeline failures in filtering and sorting.                           |
+| Single value tags produce scalar metadata fields                            | Each single-value tag (pattern, phase, status) maps to exactly one metadata field with the correct type.                                   | Incorrect type coercion (e.g., phase as string instead of number) causes downstream pipeline failures in filtering and sorting.                           |
 | Array value tags accumulate into list metadata fields                       | Tags for depends-on and enables split comma-separated values and accumulate across multiple tag occurrences.                               | Missing a dependency value silently breaks the dependency graph, causing incorrect build ordering and orphaned pattern references.                        |
 | Category tags are colon-free tags filtered against known non-categories     | Tags without colons become categories, except known non-category tags (acceptance-criteria, happy-path) and the architect opt-in marker.   | Including test-control tags (acceptance-criteria, happy-path) as categories pollutes the pattern taxonomy with non-semantic values.                       |
 | Complex tag lists produce fully populated metadata                          | All tag types (scalar, array, category) are correctly extracted from a single mixed tag list.                                              | Real feature files combine many tag types; extraction must handle all types simultaneously without interference between parsers.                          |

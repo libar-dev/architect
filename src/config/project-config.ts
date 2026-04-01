@@ -37,6 +37,7 @@
 import type { PresetName } from './presets.js';
 import type { ArchitectConfig, ArchitectInstance } from './types.js';
 import type { ContextInferenceRule } from '../generators/pipeline/context-inference.js';
+import type { FormatType } from '../taxonomy/index.js';
 // ═══ Cross-Layer Imports: config → renderable ═══════════════════════════════
 // Project configuration declares which reference documents to generate,
 // requiring knowledge of renderer capability types (ReferenceDocConfig,
@@ -89,10 +90,43 @@ export interface ResolvedSourcesConfig {
  * Output configuration for generated documentation.
  */
 export interface OutputConfig {
-  /** Output directory for generated docs (default: 'docs/architecture') */
+  /** Output directory for generated docs (default: 'docs-live') */
   readonly directory?: string;
   /** Overwrite existing files (default: false) */
   readonly overwrite?: boolean;
+}
+
+/**
+ * Regeneration command for documentation footer.
+ */
+export interface RegenerationCommand {
+  /** Human-readable label (e.g., "Regenerate all docs") */
+  readonly label: string;
+  /** Shell command (e.g., "pnpm docs:all") */
+  readonly command: string;
+}
+
+/**
+ * Project identity metadata for generated documentation.
+ *
+ * Used by codecs (via CodecContext) to customize hardcoded project-specific
+ * values like package name, purpose, and license in generated docs.
+ * Falls back to package.json auto-read or hardcoded defaults when absent.
+ */
+export interface ProjectMetadata {
+  /** Package name (e.g., "@libar-dev/architect") */
+  readonly name?: string;
+  /** One-line purpose description */
+  readonly purpose?: string;
+  /** License type (e.g., "MIT") */
+  readonly license?: string;
+  /** Package version */
+  readonly version?: string;
+  /** Regeneration commands for doc footer */
+  readonly regeneration?: {
+    readonly commands: readonly RegenerationCommand[];
+    readonly note?: string;
+  };
 }
 
 /**
@@ -196,6 +230,16 @@ export interface ArchitectProjectConfig {
   /** Path to custom workflow config JSON (relative to config file) */
   readonly workflowPath?: string;
 
+  // --- Project Identity ---
+
+  /** Project metadata for customizing generated docs (package name, purpose, license) */
+  readonly project?: ProjectMetadata;
+
+  /** Override format type examples in TaxonomyCodec output */
+  readonly tagExampleOverrides?: Partial<
+    Record<FormatType, { description?: string; example?: string }>
+  >;
+
   // --- Codec Options ---
 
   /**
@@ -239,6 +283,12 @@ export interface ResolvedProjectConfig {
   readonly codecOptions?: CodecOptions;
   /** Reference document configurations (empty array if none) */
   readonly referenceDocConfigs: readonly ReferenceDocConfig[];
+  /** Project metadata (auto-read from package.json if not provided) */
+  readonly project?: ProjectMetadata;
+  /** Format type example overrides */
+  readonly tagExampleOverrides?: Partial<
+    Record<FormatType, { description?: string; example?: string }>
+  >;
 }
 
 /**

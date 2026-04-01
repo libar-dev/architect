@@ -121,7 +121,6 @@ export function extractProcessMetadata(feature: ScannedGherkinFile): ProcessMeta
   const completedTag = tags.find((t) => t.startsWith('completed:'));
   const effortActualTag = tags.find((t) => t.startsWith('effort-actual:'));
   const riskTag = tags.find((t) => t.startsWith('risk:'));
-  const briefTag = tags.find((t) => t.startsWith('brief:'));
   const productAreaTag = tags.find((t) => t.startsWith('product-area:'));
   const userRoleTag = tags.find((t) => t.startsWith('user-role:'));
   const businessValueTag = tags.find((t) => t.startsWith('business-value:'));
@@ -133,7 +132,6 @@ export function extractProcessMetadata(feature: ScannedGherkinFile): ProcessMeta
   const completed = completedTag?.replace('completed:', '');
   const effortActual = effortActualTag?.replace('effort-actual:', '');
   const risk = riskTag?.replace('risk:', '');
-  const brief = briefTag?.replace('brief:', '');
   const productArea = productAreaTag?.replace('product-area:', '');
   const userRole = userRoleTag?.replace('user-role:', '');
   // Business value may have surrounding quotes - strip them
@@ -152,7 +150,6 @@ export function extractProcessMetadata(feature: ScannedGherkinFile): ProcessMeta
     ...(completed && { completed }),
     ...(effortActual && { effortActual }),
     ...(risk && { risk }),
-    ...(brief && { brief }),
     ...(productArea && { productArea }),
     ...(userRole && { userRole }),
     ...(businessValue && { businessValue }),

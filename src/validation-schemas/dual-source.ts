@@ -101,8 +101,6 @@ export const ProcessMetadataSchema = z
     effortActual: z.string().optional(),
     /** Risk level */
     risk: RiskLevelSchema.optional(),
-    /** Pattern brief path */
-    brief: z.string().optional(),
     /** Product area for PRD grouping */
     productArea: z.string().optional(),
     /** Target user persona */

@@ -27,6 +27,7 @@
 | formatDoDSummary                   | function  |
 | detectAntiPatterns                 | function  |
 | detectProcessInCode                | function  |
+| detectRemovedTags                  | function  |
 | detectMagicComments                | function  |
 | detectScenarioBloat                | function  |
 | detectMegaFeature                  | function  |
@@ -34,4 +35,3 @@
 | toValidationIssues                 | function  |
 | filterRulesBySeverity              | function  |
 | isValidTransition                  | function  |
-| getValidTransitionsFrom            | function  |

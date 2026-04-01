@@ -163,14 +163,14 @@ Feature: Transform Dataset Pipeline
         | src/patterns/ddd.ts             | typescript   |
         | tests/features/saga.feature     | gherkin      |
       When transforming to MasterDataset
-      Then bySource.typescript has 2 patterns
-      And bySource.gherkin has 1 pattern
+      Then bySourceType.typescript has 2 patterns
+      And bySourceType.gherkin has 1 pattern
 
     Scenario: Patterns with phase are also in roadmap view
       Given 3 patterns with phase metadata
       And 2 patterns without phase
       When transforming to MasterDataset
-      Then bySource.roadmap has 3 patterns
+      Then bySourceType.roadmap has 3 patterns
 
   Rule: Relationship index builds bidirectional dependency graph
 

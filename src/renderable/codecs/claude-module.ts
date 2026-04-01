@@ -31,11 +31,7 @@
  * ```
  */
 
-import { z } from 'zod';
-import {
-  MasterDatasetSchema,
-  type MasterDataset,
-} from '../../validation-schemas/master-dataset.js';
+import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
 import {
@@ -48,8 +44,14 @@ import {
   linkOut,
   document,
 } from '../schema.js';
-import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
-import { RenderableDocumentOutputSchema } from './shared-schema.js';
+import {
+  type BaseCodecOptions,
+  type DocumentCodec,
+  DEFAULT_BASE_OPTIONS,
+  mergeOptions,
+  createDecodeOnlyCodec,
+} from './types/base.js';
+import { renderToClaudeMdModule } from '../render.js';
 import { parseBusinessRuleAnnotations } from './helpers.js';
 import { extractTablesAsSectionBlocks } from './convention-extractor.js';
 import type { ClaudeSectionValue } from '../../taxonomy/claude-section-values.js';
@@ -84,7 +86,7 @@ export interface ClaudeModuleCodecOptions extends BaseCodecOptions {
  */
 export const DEFAULT_CLAUDE_MODULE_OPTIONS: Required<ClaudeModuleCodecOptions> = {
   ...DEFAULT_BASE_OPTIONS,
-  fullDocsPath: 'docs/',
+  fullDocsPath: 'docs-live/',
   includeRationale: true,
   includeTables: true,
 };
@@ -99,20 +101,10 @@ export const DEFAULT_CLAUDE_MODULE_OPTIONS: Required<ClaudeModuleCodecOptions> =
  * @param options - Codec configuration options
  * @returns Configured Zod codec
  */
-export function createClaudeModuleCodec(
-  options?: ClaudeModuleCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+export function createClaudeModuleCodec(options?: ClaudeModuleCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_CLAUDE_MODULE_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildClaudeModuleDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('ClaudeModuleCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  return createDecodeOnlyCodec(({ dataset }) => buildClaudeModuleDocument(dataset, opts));
 }
 
 /**
@@ -122,6 +114,15 @@ export function createClaudeModuleCodec(
  * Uses default options with standard detail level.
  */
 export const ClaudeModuleCodec = createClaudeModuleCodec();
+
+export const codecMeta = {
+  type: 'claude-modules',
+  outputPath: 'CLAUDE-MODULES.md',
+  description: 'CLAUDE.md modules generated from annotated behavior specs',
+  factory: createClaudeModuleCodec,
+  defaultInstance: ClaudeModuleCodec,
+  renderer: renderToClaudeMdModule,
+} as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Document Builder

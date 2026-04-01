@@ -3,6 +3,7 @@
  * @architect-core
  * @architect-pattern TimelineCodec
  * @architect-status completed
+ * @architect-unlock-reason:Add-createDecodeOnlyCodec-helper
  * @architect-convention codec-registry
  * @architect-product-area:Generation
  *
@@ -45,12 +46,7 @@
  * - When checking which patterns are currently being worked on
  */
 
-import { z } from 'zod';
-import {
-  MasterDatasetSchema,
-  type MasterDataset,
-  type PhaseGroup,
-} from '../../validation-schemas/master-dataset.js';
+import type { MasterDataset, PhaseGroup } from '../../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -85,9 +81,12 @@ import { toKebabCase, groupBy } from '../../utils/index.js';
 import {
   type BaseCodecOptions,
   type NormalizedStatusFilter,
+  type DocumentCodec,
   DEFAULT_BASE_OPTIONS,
   mergeOptions,
+  createDecodeOnlyCodec,
 } from './types/base.js';
+import { renderAcceptanceCriteria, renderBusinessRulesSection } from './helpers.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Timeline Codec Options (co-located with codecs)
@@ -164,11 +163,100 @@ export const DEFAULT_CURRENT_WORK_OPTIONS: Required<CurrentWorkCodecOptions> = {
   includeDeliverables: true,
   includeProcess: true,
 };
-import { RenderableDocumentOutputSchema } from './shared-schema.js';
-import { renderAcceptanceCriteria, renderBusinessRulesSection } from './helpers.js';
+
+/**
+ * Unified options for TimelineCodec.
+ *
+ * The `view` discriminant selects which timeline perspective to render:
+ * - `'all'` — development roadmap across all statuses (default)
+ * - `'completed'` — historical record of completed milestones
+ * - `'active'` — active development work currently in progress
+ *
+ * All view-specific options are available; unused options for the selected
+ * view are silently ignored.
+ */
+export interface TimelineCodecOptions extends BaseCodecOptions {
+  /** Timeline view (default: 'all') */
+  readonly view?: 'all' | 'completed' | 'active';
+
+  // Roadmap ('all') options
+  filterStatus?: NormalizedStatusFilter[];
+  includeProcess?: boolean;
+  includeDeliverables?: boolean;
+  filterPhases?: number[];
+
+  // Milestones ('completed') options
+  filterQuarters?: string[];
+  includeLinks?: boolean;
+}
+
+/**
+ * Default options for TimelineCodec
+ */
+export const DEFAULT_TIMELINE_OPTIONS: Required<TimelineCodecOptions> = {
+  ...DEFAULT_BASE_OPTIONS,
+  view: 'all',
+  // Roadmap options
+  filterStatus: [],
+  includeProcess: true,
+  includeDeliverables: true,
+  filterPhases: [],
+  // Milestones options
+  filterQuarters: [],
+  includeLinks: true,
+};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Roadmap Document Codec
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Unified Timeline Codec
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Create a unified TimelineCodec with the given options.
+ *
+ * The `view` option selects the timeline perspective:
+ * - `'all'` (default) — development roadmap across all statuses
+ * - `'completed'` — historical completed milestones by quarter
+ * - `'active'` — active development work currently in progress
+ *
+ * @param options - Codec configuration options including `view`
+ * @returns Configured DocumentCodec
+ *
+ * @example
+ * ```typescript
+ * // All phases roadmap
+ * const codec = createTimelineCodec({ view: 'all' });
+ *
+ * // Completed milestones filtered to a quarter
+ * const codec = createTimelineCodec({ view: 'completed', filterQuarters: ['Q1-2025'] });
+ *
+ * // Active work without detail files
+ * const codec = createTimelineCodec({ view: 'active', generateDetailFiles: false });
+ * ```
+ */
+export function createTimelineCodec(options?: TimelineCodecOptions): DocumentCodec {
+  const view = options?.view ?? 'all';
+
+  if (view === 'completed') {
+    const opts = mergeOptions(DEFAULT_MILESTONES_OPTIONS, options);
+    return createDecodeOnlyCodec(({ dataset }) => buildCompletedMilestonesDocument(dataset, opts));
+  }
+
+  if (view === 'active') {
+    const opts = mergeOptions(DEFAULT_CURRENT_WORK_OPTIONS, options);
+    return createDecodeOnlyCodec(({ dataset }) => buildCurrentWorkDocument(dataset, opts));
+  }
+
+  // Default: 'all' (roadmap)
+  const opts = mergeOptions(DEFAULT_ROADMAP_OPTIONS, options);
+  return createDecodeOnlyCodec(({ dataset }) => buildRoadmapDocument(dataset, opts));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Backward-Compatible Factory Aliases
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
@@ -186,20 +274,8 @@ import { renderAcceptanceCriteria, renderBusinessRulesSection } from './helpers.
  * const codec = createRoadmapCodec({ filterPhases: [1, 2, 3] });
  * ```
  */
-export function createRoadmapCodec(
-  options?: RoadmapCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
-  const opts = mergeOptions(DEFAULT_ROADMAP_OPTIONS, options);
-
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildRoadmapDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('RoadmapDocumentCodec is decode-only. See zod-codecs.md');
-    },
-  });
+export function createRoadmapCodec(options?: RoadmapCodecOptions): DocumentCodec {
+  return createTimelineCodec({ ...options, view: 'all' });
 }
 
 /**
@@ -222,20 +298,8 @@ export const RoadmapDocumentCodec = createRoadmapCodec();
  * const codec = createMilestonesCodec({ filterQuarters: ["Q1-2025"] });
  * ```
  */
-export function createMilestonesCodec(
-  options?: CompletedMilestonesCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
-  const opts = mergeOptions(DEFAULT_MILESTONES_OPTIONS, options);
-
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildCompletedMilestonesDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('CompletedMilestonesCodec is decode-only. See zod-codecs.md');
-    },
-  });
+export function createMilestonesCodec(options?: CompletedMilestonesCodecOptions): DocumentCodec {
+  return createTimelineCodec({ ...options, view: 'completed' });
 }
 
 /**
@@ -261,20 +325,8 @@ export const CompletedMilestonesCodec = createMilestonesCodec();
  * const codec = createCurrentWorkCodec({ generateDetailFiles: false });
  * ```
  */
-export function createCurrentWorkCodec(
-  options?: CurrentWorkCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
-  const opts = mergeOptions(DEFAULT_CURRENT_WORK_OPTIONS, options);
-
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildCurrentWorkDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('CurrentWorkCodec is decode-only. See zod-codecs.md');
-    },
-  });
+export function createCurrentWorkCodec(options?: CurrentWorkCodecOptions): DocumentCodec {
+  return createTimelineCodec({ ...options, view: 'active' });
 }
 
 /**
@@ -284,6 +336,30 @@ export function createCurrentWorkCodec(
  * Shows active phases with deliverables and progress tracking.
  */
 export const CurrentWorkCodec = createCurrentWorkCodec();
+
+export const codecMetas = [
+  {
+    type: 'roadmap',
+    outputPath: 'ROADMAP.md',
+    description: 'Development roadmap by phase',
+    factory: createRoadmapCodec,
+    defaultInstance: RoadmapDocumentCodec,
+  },
+  {
+    type: 'milestones',
+    outputPath: 'COMPLETED-MILESTONES.md',
+    description: 'Historical completed milestones',
+    factory: createMilestonesCodec,
+    defaultInstance: CompletedMilestonesCodec,
+  },
+  {
+    type: 'current',
+    outputPath: 'CURRENT-WORK.md',
+    description: 'Active development work in progress',
+    factory: createCurrentWorkCodec,
+    defaultInstance: CurrentWorkCodec,
+  },
+] as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Roadmap Document Builder

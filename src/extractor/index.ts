@@ -41,5 +41,3 @@ export {
   processExtractShapesTag,
   type ProcessExtractShapesResult,
 } from './shape-extractor.js';
-
-export { renderShapesAsMarkdown } from '../renderable/codecs/helpers.js';

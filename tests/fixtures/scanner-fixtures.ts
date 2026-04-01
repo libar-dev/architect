@@ -403,8 +403,6 @@ export interface GherkinContentOptions {
   enables?: string[];
   /** Category tags */
   categories?: string[];
-  /** Brief path */
-  briefPath?: string;
   /** Scenario names */
   scenarios?: Array<{ name: string; status?: string }>;
   /** Include malformed Gherkin (for error testing) */
@@ -439,7 +437,6 @@ export function buildGherkinContent(options: GherkinContentOptions = {}): string
     dependencies = [],
     enables = [],
     categories = [],
-    briefPath,
     scenarios = [],
     malformed = false,
     omitFeature = false,
@@ -477,9 +474,6 @@ Scenario: Orphan scenario
   }
   if (patternName) {
     lines.push(`@architect-pattern:${patternName}`);
-  }
-  if (briefPath) {
-    lines.push(`@architect-brief:${briefPath}`);
   }
   for (const dep of dependencies) {
     lines.push(`@architect-depends-on:${dep}`);

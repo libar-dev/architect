@@ -7,14 +7,14 @@
 
 ## Overview
 
-**3 categories** | **60 metadata tags** | **3 aggregation tags**
+**3 categories** | **58 metadata tags** | **3 aggregation tags**
 
 Current configuration uses `@architect-` prefix with `@architect` file opt-in.
 
 | Component        | Count | Description                          |
 | ---------------- | ----- | ------------------------------------ |
 | Categories       | 3     | Pattern classification by domain     |
-| Metadata Tags    | 60    | Pattern enrichment and relationships |
+| Metadata Tags    | 58    | Pattern enrichment and relationships |
 | Aggregation Tags | 3     | Document routing                     |
 
 ---
@@ -43,7 +43,6 @@ Tags for enriching patterns with additional metadata.
 | --------- | ------------ | -------------------------------------------- | -------- | ----------------------------------------------------- |
 | `pattern` | value        | Explicit pattern name                        | Yes      | `@architect-pattern CommandOrchestrator`              |
 | `status`  | enum         | Work item lifecycle status (per PDR-005 FSM) | No       | `@architect-status roadmap`                           |
-| `core`    | flag         | Marks as essential/must-know pattern         | No       | `@architect-core`                                     |
 | `usecase` | quoted-value | Use case association                         | No       | `@architect-usecase "When handling command failures"` |
 
 ### Relationship Tags
@@ -98,7 +97,6 @@ Tags for enriching patterns with additional metadata.
 
 | Tag                      | Format       | Purpose                                                                    | Required | Example                                                                      |
 | ------------------------ | ------------ | -------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------- |
-| `brief`                  | value        | Path to pattern brief markdown                                             | No       | `@architect-brief docs/briefs/decider-pattern.md`                            |
 | `product-area`           | value        | Product area for PRD grouping                                              | No       | `@architect-product-area PlatformCore`                                       |
 | `user-role`              | value        | Target user persona for this feature                                       | No       | `@architect-user-role Developer`                                             |
 | `business-value`         | value        | Business value statement (hyphenated for tag format)                       | No       | `@architect-business-value eliminates-event-replay-complexity`               |
@@ -154,7 +152,7 @@ How tag values are parsed and validated.
 | `quoted-value` | String in quotes (preserves spaces) | `@architect-usecase "When X happens"` |
 | `csv`          | Comma-separated values              | `@architect-uses A, B, C`             |
 | `number`       | Numeric value                       | `@architect-phase 14`                 |
-| `flag`         | Boolean presence (no value)         | `@architect-core`                     |
+| `flag`         | Boolean presence (no value)         | `@architect-sequence-error`           |
 
 [Format type details](taxonomy/format-types.md)
 

@@ -3,6 +3,7 @@
  * @architect-core
  * @architect-pattern AdrDocumentCodec
  * @architect-status completed
+ * @architect-unlock-reason:Add-createDecodeOnlyCodec-helper
  * @architect-convention codec-registry
  * @architect-product-area:Generation
  *
@@ -42,11 +43,7 @@
  * - **Consequences**: Positive and negative outcomes
  */
 
-import { z } from 'zod';
-import {
-  MasterDatasetSchema,
-  type MasterDataset,
-} from '../../validation-schemas/master-dataset.js';
+import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   partitionRulesByPrefix,
@@ -69,7 +66,13 @@ import {
 } from '../schema.js';
 import { getDisplayName } from '../utils.js';
 import { groupBy } from '../../utils/index.js';
-import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
+import {
+  type BaseCodecOptions,
+  type DocumentCodec,
+  DEFAULT_BASE_OPTIONS,
+  mergeOptions,
+  createDecodeOnlyCodec,
+} from './types/base.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ADR Codec Options (co-located with codec)
@@ -102,7 +105,6 @@ export const DEFAULT_ADR_OPTIONS: Required<AdrCodecOptions> = {
   includeDecision: true,
   includeConsequences: true,
 };
-import { RenderableDocumentOutputSchema } from './shared-schema.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ADR Document Codec
@@ -126,20 +128,10 @@ import { RenderableDocumentOutputSchema } from './shared-schema.js';
  * const codec = createAdrCodec({ generateDetailFiles: false });
  * ```
  */
-export function createAdrCodec(
-  options?: AdrCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+export function createAdrCodec(options?: AdrCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_ADR_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildAdrDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('AdrDocumentCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  return createDecodeOnlyCodec(({ dataset }) => buildAdrDocument(dataset, opts));
 }
 
 /**
@@ -149,6 +141,14 @@ export function createAdrCodec(
  * Groups ADRs by category with progressive disclosure.
  */
 export const AdrDocumentCodec = createAdrCodec();
+
+export const codecMeta = {
+  type: 'adrs',
+  outputPath: 'DECISIONS.md',
+  description: 'Architecture Decision Records',
+  factory: createAdrCodec,
+  defaultInstance: AdrDocumentCodec,
+} as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Document Builder

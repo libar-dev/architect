@@ -43,11 +43,6 @@
  * ```
  */
 
-import { z } from 'zod';
-import {
-  MasterDatasetSchema,
-  type MasterDataset,
-} from '../../validation-schemas/master-dataset.js';
 import {
   type RenderableDocument,
   type SectionBlock,
@@ -60,8 +55,13 @@ import {
   linkOut,
   document,
 } from '../schema.js';
-import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
-import { RenderableDocumentOutputSchema } from './shared-schema.js';
+import {
+  type BaseCodecOptions,
+  type DocumentCodec,
+  DEFAULT_BASE_OPTIONS,
+  mergeOptions,
+  createDecodeOnlyCodec,
+} from './types/base.js';
 import { VALID_TRANSITIONS } from '../../validation/fsm/transitions.js';
 import {
   PROTECTION_LEVELS,
@@ -226,23 +226,13 @@ export function composeRationaleIntoRules(
  * const codec = createValidationRulesCodec({ includeFSMDiagram: false });
  * ```
  */
-export function createValidationRulesCodec(
-  options?: ValidationRulesCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+export function createValidationRulesCodec(options?: ValidationRulesCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_VALIDATION_RULES_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    // TODO: The _dataset parameter is unused because this codec builds from constants.
-    // Kept for interface consistency with other codecs that do use dataset.
-    // Future enhancement: derive validation rules from dataset if rules become dynamic.
-    decode: (_dataset: MasterDataset): RenderableDocument => {
-      return buildValidationRulesDocument(opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('ValidationRulesCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  // TODO: The context.dataset is unused because this codec builds from constants.
+  // Kept for interface consistency with other codecs that do use dataset.
+  // Future enhancement: derive validation rules from dataset if rules become dynamic.
+  return createDecodeOnlyCodec((_context) => buildValidationRulesDocument(opts));
 }
 
 /**
@@ -258,6 +248,14 @@ export function createValidationRulesCodec(
  * ```
  */
 export const ValidationRulesCodec = createValidationRulesCodec();
+
+export const codecMeta = {
+  type: 'validation-rules',
+  outputPath: 'VALIDATION-RULES.md',
+  description: 'Process Guard validation rules reference',
+  factory: createValidationRulesCodec,
+  defaultInstance: ValidationRulesCodec,
+} as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Document Builder

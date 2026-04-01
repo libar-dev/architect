@@ -67,10 +67,6 @@ class DesignReviewGeneratorImpl implements DocumentGenerator {
     const files: OutputFile[] = [];
     const dataset = context.masterDataset;
 
-    if (!dataset) {
-      return { files };
-    }
-
     const sequenceIndex = dataset.sequenceIndex;
     if (!sequenceIndex || Object.keys(sequenceIndex).length === 0) {
       return { files };

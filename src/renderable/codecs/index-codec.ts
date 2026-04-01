@@ -3,6 +3,7 @@
  * @architect-core
  * @architect-pattern IndexCodec
  * @architect-status completed
+ * @architect-unlock-reason:Add-createDecodeOnlyCodec-helper
  * @architect-convention codec-registry
  * @architect-product-area:Generation
  * @architect-implements EnhancedIndexGeneration
@@ -31,11 +32,7 @@
  * - DD-5: Standalone codec, not routed through reference codec pipeline
  */
 
-import { z } from 'zod';
-import {
-  MasterDatasetSchema,
-  type MasterDataset,
-} from '../../validation-schemas/master-dataset.js';
+import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import {
   type RenderableDocument,
   type SectionBlock,
@@ -47,8 +44,14 @@ import {
   code,
 } from '../schema.js';
 import { computeStatusCounts, completionPercentage, renderProgressBar } from '../utils.js';
-import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
-import { RenderableDocumentOutputSchema } from './shared-schema.js';
+import {
+  type BaseCodecOptions,
+  type CodecContext,
+  type DocumentCodec,
+  DEFAULT_BASE_OPTIONS,
+  mergeOptions,
+  createDecodeOnlyCodec,
+} from './types/base.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Types
@@ -82,6 +85,12 @@ export interface IndexCodecOptions extends BaseCodecOptions {
   readonly includePackageMetadata?: boolean;
   /** Document entries for the unified inventory */
   readonly documentEntries?: readonly DocumentEntry[];
+  /** Override the document purpose text (default: auto-generated from project name) */
+  readonly purposeText?: string;
+  /** Custom footer sections replacing the regeneration commands (default: []) */
+  readonly epilogue?: readonly SectionBlock[];
+  /** Override individual metadata table values */
+  readonly packageMetadataOverrides?: Partial<Record<'name' | 'purpose' | 'license', string>>;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -97,6 +106,9 @@ export const DEFAULT_INDEX_OPTIONS: Required<IndexCodecOptions> = {
   includeDocumentInventory: true,
   includePackageMetadata: true,
   documentEntries: [],
+  purposeText: '',
+  epilogue: [],
+  packageMetadataOverrides: {},
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -109,37 +121,36 @@ export const DEFAULT_INDEX_OPTIONS: Required<IndexCodecOptions> = {
  * DD-1: Registered in CodecRegistry as document type 'index'.
  * DD-5: Standalone codec, not a ReferenceDocConfig entry.
  */
-export function createIndexCodec(
-  options?: IndexCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+export function createIndexCodec(options?: IndexCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_INDEX_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildIndexDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('IndexCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  return createDecodeOnlyCodec((context) => buildIndexDocument(context, opts));
 }
 
 export const IndexCodec = createIndexCodec();
+
+export const codecMeta = {
+  type: 'index',
+  outputPath: 'INDEX.md',
+  description: 'Navigation hub with editorial preamble and MasterDataset statistics',
+  factory: createIndexCodec,
+  defaultInstance: IndexCodec,
+} as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Document Builder
 // ═══════════════════════════════════════════════════════════════════════════
 
 function buildIndexDocument(
-  dataset: MasterDataset,
+  context: CodecContext,
   options: Required<IndexCodecOptions>
 ): RenderableDocument {
+  const { dataset } = context;
   const sections: SectionBlock[] = [];
 
   // 1. Package metadata header
   if (options.includePackageMetadata) {
-    sections.push(...buildPackageMetadata(dataset));
+    sections.push(...buildPackageMetadata(context, options));
     sections.push(separator());
   }
 
@@ -167,37 +178,54 @@ function buildIndexDocument(
     sections.push(separator());
   }
 
-  // 6. Regeneration commands footer
-  sections.push(...buildRegenerationFooter());
+  // 6. Footer: epilogue > projectMetadata.regeneration > built-in default
+  if (options.epilogue.length > 0) {
+    sections.push(...options.epilogue);
+  } else {
+    sections.push(...buildRegenerationFooter(context));
+  }
 
-  return document('Documentation Index', sections, {
-    purpose:
-      'Navigate the full documentation set for @libar-dev/architect. ' +
-      'Use section links for targeted reading.',
-  });
+  const packageName = context.projectMetadata?.name ?? '@libar-dev/architect';
+  const defaultPurpose =
+    `Navigate the full documentation set for ${packageName}. ` +
+    'Use section links for targeted reading.';
+  const purpose = options.purposeText || defaultPurpose;
+
+  return document('Documentation Index', sections, { purpose });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Section Builders
 // ═══════════════════════════════════════════════════════════════════════════
 
-function buildPackageMetadata(dataset: MasterDataset): SectionBlock[] {
+function buildPackageMetadata(
+  context: CodecContext,
+  options: Required<IndexCodecOptions>
+): SectionBlock[] {
+  const { dataset } = context;
+  const meta = context.projectMetadata;
+  const overrides = options.packageMetadataOverrides;
   const totalPatterns = dataset.patterns.length;
   const counts = computeStatusCounts(dataset.patterns);
+
+  const name = overrides.name ?? meta?.name ?? '@libar-dev/architect';
+  const purpose =
+    overrides.purpose ?? meta?.purpose ?? 'Context engineering platform for AI-assisted codebases';
+  const license = overrides.license ?? meta?.license ?? 'MIT';
 
   return [
     heading(2, 'Package Metadata'),
     table(
       ['Field', 'Value'],
       [
-        ['**Package**', '@libar-dev/architect'],
-        ['**Purpose**', 'Context engineering platform for AI-assisted codebases'],
+        ['**Package**', name],
+        ['**Purpose**', purpose],
         [
           '**Patterns**',
           `${totalPatterns} tracked (${counts.completed} completed, ${counts.active} active, ${counts.planned} planned)`,
         ],
         ['**Product Areas**', `${Object.keys(dataset.byProductArea).length}`],
-        ['**License**', 'MIT'],
+        ['**License**', license],
       ]
     ),
   ];
@@ -331,7 +359,27 @@ function buildPhaseProgress(dataset: MasterDataset): SectionBlock[] {
   return sections;
 }
 
-function buildRegenerationFooter(): SectionBlock[] {
+function buildRegenerationFooter(context: CodecContext): SectionBlock[] {
+  const regen = context.projectMetadata?.regeneration;
+
+  // Use configured regeneration commands if available, otherwise fall back to defaults
+  if (regen && regen.commands.length > 0) {
+    const sections: SectionBlock[] = [
+      heading(2, 'Regeneration'),
+      paragraph(regen.note ?? 'Regenerate documentation from annotated sources:'),
+      code(
+        regen.commands
+          .map(
+            (cmd) => `${cmd.command}  ${cmd.label.startsWith('#') ? cmd.label : `# ${cmd.label}`}`
+          )
+          .join('\n'),
+        'bash'
+      ),
+    ];
+    return sections;
+  }
+
+  // Default regeneration commands (backward compatible)
   return [
     heading(2, 'Regeneration'),
     paragraph('Regenerate all documentation from annotated sources:'),

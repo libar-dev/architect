@@ -23,6 +23,7 @@ import { renderToMarkdown, renderToClaudeMdModule } from '../../renderable/rende
 import {
   createReferenceCodec,
   PRODUCT_AREA_META,
+  isProductAreaKey,
   buildScopedDiagram,
   type ReferenceDocConfig,
   type DiagramScope,
@@ -110,7 +111,6 @@ class ReferenceDocGenerator implements DocumentGenerator {
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
     const dataset = context.masterDataset;
-    if (!dataset) return Promise.resolve({ files: [] });
 
     const codec = createReferenceCodec(this.config, {
       detailLevel: this.detailLevel,
@@ -193,7 +193,6 @@ class ReferenceDocsGenerator implements DocumentGenerator {
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
     const dataset = context.masterDataset;
-    if (!dataset) return Promise.resolve({ files: [] });
 
     const files = generateDualOutputFiles(this.configs, dataset, 'reference');
     return Promise.resolve({ files });
@@ -220,7 +219,6 @@ class ProductAreaDocsGenerator implements DocumentGenerator {
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
     const dataset = context.masterDataset;
-    if (!dataset) return Promise.resolve({ files: [] });
 
     const files = generateDualOutputFiles(this.configs, dataset, 'product-areas');
 
@@ -256,9 +254,8 @@ function buildProductAreaIndex(
   // Per-area sections with intro prose and live statistics
   for (const config of configs) {
     const area = config.productArea;
-    if (area === undefined) continue;
+    if (area === undefined || !isProductAreaKey(area)) continue;
     const meta = PRODUCT_AREA_META[area];
-    if (meta === undefined) continue;
 
     sections.push(heading(2, `[${area}](product-areas/${config.docsFilename})`));
     sections.push(paragraph(`> **${meta.question}**`));
@@ -327,11 +324,9 @@ function buildProductAreaIndex(
   const allKeyPatterns: string[] = [];
   for (const config of configs) {
     const area = config.productArea;
-    if (area === undefined) continue;
+    if (area === undefined || !isProductAreaKey(area)) continue;
     const meta = PRODUCT_AREA_META[area];
-    if (meta !== undefined) {
-      allKeyPatterns.push(...meta.keyPatterns);
-    }
+    allKeyPatterns.push(...meta.keyPatterns);
   }
 
   // Diagram 1: C4Context cross-area system overview

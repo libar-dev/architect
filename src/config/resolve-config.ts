@@ -98,7 +98,7 @@ export function resolveProjectConfig(
 
   // 3. Resolve output — apply defaults
   const output: Readonly<Required<{ directory: string; overwrite: boolean }>> = {
-    directory: raw.output?.directory ?? 'docs/architecture',
+    directory: raw.output?.directory ?? 'docs-live',
     overwrite: raw.output?.overwrite ?? false,
   };
 
@@ -128,6 +128,8 @@ export function resolveProjectConfig(
     workflowPath,
     ...(raw.codecOptions !== undefined && { codecOptions: raw.codecOptions }),
     referenceDocConfigs,
+    ...(raw.project !== undefined && { project: raw.project }),
+    ...(raw.tagExampleOverrides !== undefined && { tagExampleOverrides: raw.tagExampleOverrides }),
   };
 
   return {
@@ -159,7 +161,7 @@ export function createDefaultResolvedConfig(): ResolvedConfig {
   const project: ResolvedProjectConfig = {
     sources,
     output: {
-      directory: 'docs/architecture',
+      directory: 'docs-live',
       overwrite: false,
     },
     generators: ['patterns'],

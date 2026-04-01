@@ -294,7 +294,7 @@ export const MasterDatasetSchema = z.object({
   byCategory: z.record(z.string(), z.array(ExtractedPatternSchema)),
 
   /** Patterns grouped by source type */
-  bySource: SourceViewsSchema,
+  bySourceType: SourceViewsSchema,
 
   /** Patterns grouped by product area (for O(1) product area lookups) */
   byProductArea: z.record(z.string(), z.array(ExtractedPatternSchema)),

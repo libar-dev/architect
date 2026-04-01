@@ -7,14 +7,14 @@
 
 ## Overview
 
-This diagram shows 65 key components with explicit architectural roles across 10 bounded contexts.
+This diagram shows 66 key components with explicit architectural roles across 10 bounded contexts.
 
 | Metric             | Count |
 | ------------------ | ----- |
-| Diagram Components | 65    |
+| Diagram Components | 66    |
 | Bounded Contexts   | 10    |
 | Component Roles    | 5     |
-| Total Annotated    | 168   |
+| Total Annotated    | 173   |
 
 ---
 
@@ -69,11 +69,11 @@ graph TB
         ContentDeduplicator["ContentDeduplicator[infrastructure]"]
         CodecBasedGenerator["CodecBasedGenerator[service]"]
         FileCache["FileCache[infrastructure]"]
-        DesignReviewGenerator["DesignReviewGenerator[service]"]
-        DecisionDocGenerator["DecisionDocGenerator[service]"]
         TransformDataset["TransformDataset[service]"]
         SequenceTransformUtils["SequenceTransformUtils[service]"]
         RelationshipResolver["RelationshipResolver[service]"]
+        DesignReviewGenerator["DesignReviewGenerator[service]"]
+        DecisionDocGenerator["DecisionDocGenerator[service]"]
     end
     subgraph lint["Lint BC"]
         LintRules["LintRules[service]"]
@@ -89,6 +89,7 @@ graph TB
         DesignReviewCodec["DesignReviewCodec[projection]"]
         DecisionDocCodec["DecisionDocCodec[projection]"]
         CompositeCodec["CompositeCodec[projection]"]
+        CodecRegistryBarrel["CodecRegistryBarrel[service]"]
         ArchitectureCodec["ArchitectureCodec[projection]"]
     end
     subgraph scanner["Scanner BC"]
@@ -112,6 +113,7 @@ graph TB
         Convention_Annotation_Example___DD_3_Decision["Convention Annotation Example — DD-3 Decision[decider]"]
     end
     DoDValidator --> DualSourceExtractor
+    GherkinScanner --> GherkinASTParser
     MCPToolRegistry --> ProcessStateAPI
     MCPToolRegistry --> MCPPipelineSession
     MCPServerImpl --> MCPPipelineSession
@@ -124,16 +126,13 @@ graph TB
     MCPModule --> MCPFileWatcher
     MCPModule --> MCPToolRegistry
     LintEngine --> LintRules
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> GherkinASTParser
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
     GherkinExtractor --> GherkinASTParser
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
     Document_Extractor --> Pattern_Scanner
-    ConfigResolver --> ArchitectFactory
-    ArchitectFactory --> RegexBuilders
-    ConfigLoader --> ArchitectFactory
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> GherkinASTParser
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
     ReplMode --> ProcessStateAPI
     ProcessAPICLIImpl --> ProcessStateAPI
     ProcessAPICLIImpl --> MasterDataset
@@ -142,6 +141,9 @@ graph TB
     ProcessAPICLIImpl --> OutputPipelineImpl
     OutputPipelineImpl --> PatternSummarizerImpl
     MCPServerBin --> MCPServerImpl
+    ConfigResolver --> ArchitectFactory
+    ArchitectFactory --> RegexBuilders
+    ConfigLoader --> ArchitectFactory
     PatternSummarizerImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
     ScopeValidatorImpl --> MasterDataset
@@ -159,18 +161,17 @@ graph TB
     ContextAssemblerImpl --> FuzzyMatcherImpl
     ArchQueriesImpl --> ProcessStateAPI
     ArchQueriesImpl --> MasterDataset
-    GherkinScanner --> GherkinASTParser
     FSMValidator --> FSMTransitions
     FSMValidator --> FSMStates
     DesignReviewCodec --> MasterDataset
     ArchitectureCodec --> MasterDataset
     ProcessGuardDecider --> FSMValidator
+    TransformDataset --> MasterDataset
+    SequenceTransformUtils --> MasterDataset
     DesignReviewGenerator --> DesignReviewCodec
     DesignReviewGenerator --> MasterDataset
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
-    TransformDataset --> MasterDataset
-    SequenceTransformUtils --> MasterDataset
 ```
 
 ---
@@ -259,6 +260,7 @@ All components with architecture annotations:
 | ✅ Patterns Codec                                                 | renderer   | projection     | application    | src/renderable/codecs/patterns.ts                                     |
 | ✅ Session Codec                                                  | renderer   | projection     | application    | src/renderable/codecs/session.ts                                      |
 | ✅ Renderable Document                                            | renderer   | read-model     | domain         | src/renderable/schema.ts                                              |
+| 🚧 Codec Registry Barrel                                          | renderer   | service        | application    | src/renderable/codecs/codec-registry.ts                               |
 | ✅ Document Generator                                             | renderer   | service        | application    | src/renderable/generate.ts                                            |
 | ✅ Universal Renderer                                             | renderer   | service        | application    | src/renderable/render.ts                                              |
 | ✅ Gherkin AST Parser                                             | scanner    | infrastructure | infrastructure | src/scanner/gherkin-ast-parser.ts                                     |
@@ -328,6 +330,10 @@ All components with architecture annotations:
 | ✅ Process Guard Testing                                          | -          | -              | -              | tests/features/validation/process-guard.feature                       |
 | 🚧 Process Guard Types                                            | -          | -              | -              | src/lint/process-guard/types.ts                                       |
 | 🚧 Process State Types                                            | -          | -              | -              | src/api/types.ts                                                      |
+| ✅ Reference Codec                                                | -          | -              | -              | src/renderable/codecs/reference-types.ts                              |
+| ✅ Reference Codec                                                | -          | -              | -              | src/renderable/codecs/reference-diagrams.ts                           |
+| ✅ Reference Codec                                                | -          | -              | -              | src/renderable/codecs/reference-builders.ts                           |
+| ✅ Reference Codec                                                | -          | -              | -              | src/renderable/codecs/product-area-metadata.ts                        |
 | 🚧 Reference Document Codec                                       | -          | -              | -              | src/renderable/codecs/reference.ts                                    |
 | 🚧 Reference Generator Registration                               | -          | -              | -              | src/generators/built-in/reference-generators.ts                       |
 | ✅ Renderable Document Model(RDM)                                 | -          | -              | -              | src/renderable/index.ts                                               |

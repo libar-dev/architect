@@ -267,7 +267,7 @@ function createTraceabilityPatterns(spec: DataTableRow[]): ExtractedPattern[] {
       behaviorFileVerified?: boolean;
     };
 
-    // Mark as Gherkin source for bySource.gherkin filtering
+    // Mark as Gherkin source for bySourceType.gherkin filtering
     (pattern.source as { file: string }).file = `tests/features/timeline/phase-${phase}.feature`;
 
     if (hasBehaviorFile) {

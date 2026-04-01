@@ -43,14 +43,13 @@
  * ```
  */
 
-import { z } from 'zod';
-import {
-  MasterDatasetSchema,
-  type MasterDataset,
-} from '../../validation-schemas/master-dataset.js';
 import { type RenderableDocument, type SectionBlock, separator, document } from '../schema.js';
-import { type BaseCodecOptions, type DocumentCodec, DEFAULT_BASE_OPTIONS } from './types/base.js';
-import { RenderableDocumentOutputSchema } from './shared-schema.js';
+import {
+  type BaseCodecOptions,
+  type DocumentCodec,
+  DEFAULT_BASE_OPTIONS,
+  createDecodeOnlyCodec,
+} from './types/base.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Options
@@ -169,23 +168,18 @@ export function createCompositeCodec(
   const separateSections = options.separateSections ?? true;
   const detailLevel = options.detailLevel ?? DEFAULT_BASE_OPTIONS.detailLevel;
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      const documents = codecs.map((codec) => codec.decode(dataset) as RenderableDocument);
+  return createDecodeOnlyCodec(({ dataset }) => {
+    const documents = codecs.map((codec) => codec.decode(dataset) as RenderableDocument);
 
-      const composeOpts: ComposeOptions = {
-        title: options.title,
-        detailLevel,
-        separateSections,
-      };
+    const composeOpts: ComposeOptions = {
+      title: options.title,
+      detailLevel,
+      separateSections,
+    };
 
-      return composeDocuments(
-        documents,
-        options.purpose !== undefined ? { ...composeOpts, purpose: options.purpose } : composeOpts
-      );
-    },
-    encode: (): never => {
-      throw new Error('CompositeCodec is decode-only');
-    },
+    return composeDocuments(
+      documents,
+      options.purpose !== undefined ? { ...composeOpts, purpose: options.purpose } : composeOpts
+    );
   });
 }

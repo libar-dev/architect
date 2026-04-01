@@ -7,7 +7,7 @@
  * @architect-arch-context validation
  * @architect-arch-layer application
  * @architect-uses DoDValidationTypes, GherkinTypes
- * @architect-extract-shapes AntiPatternDetectionOptions, detectAntiPatterns, detectProcessInCode, detectMagicComments, detectScenarioBloat, detectMegaFeature, formatAntiPatternReport, toValidationIssues
+ * @architect-extract-shapes AntiPatternDetectionOptions, detectAntiPatterns, detectProcessInCode, detectRemovedTags, detectMagicComments, detectScenarioBloat, detectMegaFeature, formatAntiPatternReport, toValidationIssues
  *
  * ## AntiPatternDetector - Documentation Anti-Pattern Detection
  *
@@ -20,6 +20,7 @@
  * |----|----------|-------------|
  * | tag-duplication | error | Dependencies in features (should be code-only) |
  * | process-in-code | error | Process metadata in code (should be features-only) |
+ * | removed-tag | error | Removed tag still present (silent data loss) |
  * | magic-comments | warning | Generator hints in features |
  * | scenario-bloat | warning | Too many scenarios per feature |
  * | mega-feature | warning | Feature file too large |
@@ -54,6 +55,12 @@ const FEATURE_ONLY_TAG_SUFFIXES = [
   'completed',
   'effort-actual',
 ] as const;
+
+/**
+ * Tag suffixes that have been removed from the registry.
+ * Using these tags causes silent data loss — the scanner skips unrecognized tags.
+ */
+const REMOVED_TAG_SUFFIXES = ['brief'] as const;
 
 /**
  * Builds feature-only annotation list from the tag prefix.
@@ -122,6 +129,63 @@ export function detectProcessInCode(
           }
         }
       }
+    }
+  }
+
+  return violations;
+}
+
+/**
+ * Detect removed tags in feature files
+ *
+ * Finds tags that were removed from the registry but still appear in source files.
+ * These tags are silently discarded by the scanner, causing data loss without
+ * any diagnostic. This detector makes the failure explicit.
+ *
+ * @param features - Array of scanned feature files
+ * @param registry - Optional tag registry for prefix-aware detection (defaults to @architect-)
+ * @returns Array of anti-pattern violations
+ */
+export function detectRemovedTags(
+  features: readonly ScannedGherkinFile[],
+  registry?: TagRegistry
+): AntiPatternViolation[] {
+  const violations: AntiPatternViolation[] = [];
+  const tagPrefix = registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
+
+  for (const feature of features) {
+    try {
+      const content = readFileSync(feature.filePath, 'utf-8');
+      const lines = content.split('\n');
+
+      for (let i = 0; i < lines.length; i++) {
+        const rawLine = lines[i];
+        if (!rawLine) continue;
+        const trimmed = rawLine.trim();
+        if (!trimmed.startsWith('@')) continue;
+
+        const tokens = trimmed.split(/\s+/);
+        for (const token of tokens) {
+          if (!token.startsWith('@')) continue;
+          const normalized = token.toLowerCase();
+
+          for (const suffix of REMOVED_TAG_SUFFIXES) {
+            const removed = `${tagPrefix}${suffix}`.toLowerCase();
+            if (normalized === removed || normalized.startsWith(`${removed}:`)) {
+              violations.push({
+                id: 'removed-tag',
+                message: `Tag "${token}" has been removed and is no longer recognized. Data annotated with this tag is silently discarded.`,
+                file: feature.filePath,
+                line: i + 1,
+                severity: 'error',
+                fix: `Remove the ${token} annotation. The "${suffix}" metadata field no longer exists.`,
+              });
+            }
+          }
+        }
+      }
+    } catch {
+      // Ignore read errors - file may have been deleted
     }
   }
 
@@ -288,6 +352,7 @@ export function detectAntiPatterns(
   return [
     // Error-level (architectural violations)
     ...detectProcessInCode(scannedFiles, registry),
+    ...detectRemovedTags(features, registry),
     // Warning-level (hygiene issues)
     ...detectMagicComments(features, mergedThresholds.magicCommentThreshold),
     ...detectScenarioBloat(features, mergedThresholds.scenarioBloatThreshold),

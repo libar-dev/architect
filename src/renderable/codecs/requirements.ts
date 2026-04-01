@@ -3,6 +3,7 @@
  * @architect-core
  * @architect-pattern RequirementsCodec
  * @architect-status completed
+ * @architect-unlock-reason:Add-createDecodeOnlyCodec-helper
  * @architect-convention codec-registry
  * @architect-product-area:Generation
  *
@@ -39,11 +40,7 @@
  * ```
  */
 
-import { z } from 'zod';
-import {
-  MasterDatasetSchema,
-  type MasterDataset,
-} from '../../validation-schemas/master-dataset.js';
+import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -73,8 +70,10 @@ import { getPatternName } from '../../api/pattern-helpers.js';
 import {
   type BaseCodecOptions,
   type NormalizedStatusFilter,
+  type DocumentCodec,
   DEFAULT_BASE_OPTIONS,
   mergeOptions,
+  createDecodeOnlyCodec,
 } from './types/base.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -140,7 +139,6 @@ export const DEFAULT_REQUIREMENTS_OPTIONS: Required<RequirementsCodecOptions> = 
   includeBusinessRules: true,
   includeStepDetails: true,
 };
-import { RenderableDocumentOutputSchema } from './shared-schema.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Requirements Document Codec
@@ -161,20 +159,10 @@ import { RenderableDocumentOutputSchema } from './shared-schema.js';
  * const codec = createRequirementsCodec({ filterStatus: ["completed"] });
  * ```
  */
-export function createRequirementsCodec(
-  options?: RequirementsCodecOptions
-): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+export function createRequirementsCodec(options?: RequirementsCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_REQUIREMENTS_OPTIONS, options);
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
-      return buildRequirementsDocument(dataset, opts);
-    },
-    /** @throws Always - this codec is decode-only. See zod-codecs.md */
-    encode: (): never => {
-      throw new Error('RequirementsDocumentCodec is decode-only. See zod-codecs.md');
-    },
-  });
+  return createDecodeOnlyCodec(({ dataset }) => buildRequirementsDocument(dataset, opts));
 }
 
 /**
@@ -184,6 +172,14 @@ export function createRequirementsCodec(
  * Features grouped by product area and user role.
  */
 export const RequirementsDocumentCodec = createRequirementsCodec();
+
+export const codecMeta = {
+  type: 'requirements',
+  outputPath: 'PRODUCT-REQUIREMENTS.md',
+  description: 'Product requirements by area/role',
+  factory: createRequirementsCodec,
+  defaultInstance: RequirementsDocumentCodec,
+} as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Document Builder
@@ -200,7 +196,7 @@ function buildRequirementsDocument(
 
   // Get PRD patterns (patterns with product metadata), excluding ADR/PDR decisions
   // (decisions belong to the ADR codec, not requirements)
-  let prdPatterns = dataset.bySource.prd.filter((p) => p.adr === undefined);
+  let prdPatterns = dataset.bySourceType.prd.filter((p) => p.adr === undefined);
 
   // Apply status filter if specified
   if (options.filterStatus.length > 0) {

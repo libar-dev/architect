@@ -28,6 +28,7 @@
 import type { DocumentGenerator, GeneratorContext, GeneratorOutput } from './types.js';
 import type { ExtractedPattern } from '../validation-schemas/index.js';
 import { generateDocument, type DocumentType, DOCUMENT_TYPES } from '../renderable/generate.js';
+import type { CodecContextEnrichment } from '../renderable/codecs/types/base.js';
 
 /**
  * Codec-based generator that wraps the new RDM system.
@@ -50,25 +51,28 @@ export class CodecBasedGenerator implements DocumentGenerator {
     _patterns: readonly ExtractedPattern[],
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
-    // Codec-based generation requires MasterDataset
-    if (!context.masterDataset) {
-      return Promise.resolve({
-        files: [],
-        errors: [
-          {
-            type: 'generator' as const,
-            message: `Generator "${this.name}" requires MasterDataset in context but none was provided. Ensure the orchestrator creates a MasterDataset before running codec-based generators.`,
-          },
-        ],
-      });
-    }
+    const { masterDataset: dataset } = context;
 
-    // Convert RuntimeMasterDataset to MasterDataset format
-    // The RDM codecs expect the Zod-inferred MasterDataset type
-    const dataset = context.masterDataset;
+    // Build context enrichment from generator context fields
+    const contextEnrichment: CodecContextEnrichment = {
+      ...(context.projectMetadata !== undefined
+        ? { projectMetadata: context.projectMetadata }
+        : {}),
+      ...(context.tagExampleOverrides !== undefined
+        ? { tagExampleOverrides: context.tagExampleOverrides }
+        : {}),
+    };
+
+    // Only pass enrichment if there are fields to enrich
+    const hasEnrichment = Object.keys(contextEnrichment).length > 0;
 
     // Generate document using codec, passing through any codec-specific options
-    const outputFiles = generateDocument(this.documentType, dataset, context.codecOptions);
+    const outputFiles = generateDocument(
+      this.documentType,
+      dataset,
+      context.codecOptions,
+      hasEnrichment ? contextEnrichment : undefined
+    );
 
     return Promise.resolve({
       files: outputFiles,

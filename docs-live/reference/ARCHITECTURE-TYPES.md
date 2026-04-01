@@ -52,7 +52,7 @@ MasterDatasetSchema = z.object({
   byCategory: z.record(z.string(), z.array(ExtractedPatternSchema)),
 
   /** Patterns grouped by source type */
-  bySource: SourceViewsSchema,
+  bySourceType: SourceViewsSchema,
 
   /** Patterns grouped by product area (for O(1) product area lookups) */
   byProductArea: z.record(z.string(), z.array(ExtractedPatternSchema)),
@@ -327,13 +327,16 @@ interface PipelineOptions {
   readonly includeValidation?: boolean;
   /** DD-5: When true, return error on individual scan failures (default false). */
   readonly failOnScanErrors?: boolean;
+  /** Pre-loaded tag registry. When provided, skips internal config load (Step 1). */
+  readonly tagRegistry?: TagRegistry;
 }
 ```
 
-| Property          | Description                                                                |
-| ----------------- | -------------------------------------------------------------------------- |
-| includeValidation | DD-3: When false, skip validation pass (default true).                     |
-| failOnScanErrors  | DD-5: When true, return error on individual scan failures (default false). |
+| Property          | Description                                                                  |
+| ----------------- | ---------------------------------------------------------------------------- |
+| includeValidation | DD-3: When false, skip validation pass (default true).                       |
+| failOnScanErrors  | DD-5: When true, return error on individual scan failures (default false).   |
+| tagRegistry       | Pre-loaded tag registry. When provided, skips internal config load (Step 1). |
 
 ### PipelineResult (interface)
 
@@ -427,7 +430,7 @@ graph TB
     MD --> byPhase["byPhase<br/>(sorted, with counts)"]
     MD --> byQuarter["byQuarter<br/>(keyed by Q-YYYY)"]
     MD --> byCategory["byCategory<br/>(keyed by category name)"]
-    MD --> bySource["bySource<br/>(typescript / gherkin / roadmap / prd)"]
+    MD --> bySourceType["bySourceType<br/>(typescript / gherkin / roadmap / prd)"]
     MD --> counts["counts<br/>(aggregate statistics)"]
     MD --> RI["relationshipIndex?<br/>(forward + reverse lookups)"]
     MD --> AI["archIndex?<br/>(role / context / layer / view)"]

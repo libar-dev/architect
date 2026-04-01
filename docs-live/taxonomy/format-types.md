@@ -59,8 +59,8 @@ Detailed parsing behavior for each format type.
 | ---------------- | ------------------------------------------------------- |
 | Description      | Boolean presence (no value needed)                      |
 | Parsing Behavior | Presence of tag indicates true; absence indicates false |
-| Example          | `@architect-core`                                       |
-| Notes            | Used for boolean markers like core, overview, decision  |
+| Example          | `@architect-sequence-error`                             |
+| Notes            | Used for boolean markers like sequence-error            |
 
 ---
 

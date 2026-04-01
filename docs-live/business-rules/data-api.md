@@ -4,7 +4,7 @@
 
 ---
 
-**90 rules** from 25 features. 90 rules have explicit invariants.
+**91 rules** from 25 features. 91 rules have explicit invariants.
 
 ---
 
@@ -583,6 +583,19 @@ _Command-line interface for validating changes against delivery process rules._
 
 - Warn on unknown flag but continue
 
+---
+
+#### CLI honors config-defined feature scope
+
+> **Invariant:** Process guard must derive state and diff transitions from the configured feature globs, including `tests/features/**/*.feature`, while ignoring non-feature files that only contain annotation-like text.
+>
+> **Rationale:** Rebrand cleanup imports completed artifacts under multiple feature roots — using hardcoded feature locations misses valid unlock reasons and creates false positives from docs or helper files.
+
+**Verified by:**
+
+- Config includes completed test features in process state
+- Non-feature files with status-like text are ignored
+
 _lint-process.feature_
 
 ### Output Pipeline Tests
@@ -692,7 +705,7 @@ _MasterDataset caching between CLI invocations: cache hits, mtime invalidation, 
 
 #### MasterDataset is cached between invocations
 
-> **Invariant:** When source files have not changed between CLI invocations, the second invocation must use the cached MasterDataset and report cache.hit as true with reduced pipelineMs.
+> **Invariant:** When source files have not changed between CLI invocations, the second invocation must use the cached MasterDataset and report cache.hit as true alongside pipeline timing metadata.
 >
 > **Rationale:** The pipeline rebuild costs 2-5 seconds per invocation. Caching eliminates this cost for repeated queries against unchanged sources, which is the common case during interactive AI sessions.
 
