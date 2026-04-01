@@ -3,7 +3,7 @@
  * @architect-core
  * @architect-pattern CodecGeneratorRegistration
  * @architect-status completed
- * @architect-uses DesignReviewGenerator, DecisionDocGenerator, ProcessApiReferenceGenerator, CliRecipeGenerator
+ * @architect-uses DesignReviewGenerator, DecisionDocGenerator, CliReferenceGenerator, CliRecipeGenerator
  *
  * ## Codec-Based Generator Registration
  *
@@ -30,7 +30,7 @@ import { generatorRegistry } from '../registry.js';
 import { createCodecGenerator } from '../codec-based.js';
 import { createDecisionDocGenerator } from './decision-doc-generator.js';
 import { createDesignReviewGenerator } from './design-review-generator.js';
-import { createProcessApiReferenceGenerator } from './process-api-reference-generator.js';
+import { createCliReferenceGenerator } from './cli-reference-generator.js';
 import { createCliRecipeGenerator } from './cli-recipe-generator.js';
 import { loadPreambleFromMarkdown } from '../../renderable/load-preamble.js';
 import type { SectionBlock } from '../../renderable/schema.js';
@@ -194,10 +194,10 @@ generatorRegistry.register(createDesignReviewGenerator());
 
 /**
  * Process API CLI Reference Generator
- * Generates PROCESS-API-REFERENCE.md from declarative CLI schema.
+ * Generates CLI-REFERENCE.md from declarative CLI schema.
  * Standalone: does not consume PatternGraph (ADR-006).
  */
-generatorRegistry.register(createProcessApiReferenceGenerator());
+generatorRegistry.register(createCliReferenceGenerator());
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CLI Recipe Generator (Schema-Based, not Codec-Based)
@@ -210,7 +210,7 @@ generatorRegistry.register(createProcessApiReferenceGenerator());
  */
 let cliRecipePreamble: readonly SectionBlock[] = [];
 try {
-  cliRecipePreamble = loadPreambleFromMarkdown('docs-sources/process-api-recipes.md');
+  cliRecipePreamble = loadPreambleFromMarkdown('docs-sources/cli-recipes.md');
 } catch {
   // Preamble file may not exist in test environments (e.g., CLI integration tests
   // that run generate-docs in a temp directory). Fall back to empty preamble.

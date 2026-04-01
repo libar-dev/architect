@@ -4,7 +4,7 @@
 @architect-status:completed
 @architect-unlock-reason:'Split-from-original'
 @architect-product-area:DataAPI
-@cli @process-api
+@cli @pattern-graph-cli
 Feature: Process API CLI - Output Modifiers and Rules
   Output modifiers, arch health, and rules subcommand.
 
@@ -26,21 +26,21 @@ Feature: Process API CLI - Output Modifiers and Rules
     @happy-path
     Scenario: Count modifier after list subcommand returns count
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' list --count"
+      When running "pattern-graph-cli -i 'src/**/*.ts' list --count"
       Then exit code is 0
       And stdout JSON data is a number
 
     @happy-path
     Scenario: Names-only modifier after list subcommand returns names
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' list --names-only"
+      When running "pattern-graph-cli -i 'src/**/*.ts' list --names-only"
       Then exit code is 0
       And stdout JSON data is a string array
 
     @happy-path
     Scenario: Count modifier combined with list filter
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' list --status completed --count"
+      When running "pattern-graph-cli -i 'src/**/*.ts' list --status completed --count"
       Then exit code is 0
       And stdout JSON data is a number
 
@@ -59,7 +59,7 @@ Feature: Process API CLI - Output Modifiers and Rules
     @happy-path
     Scenario: Arch dangling returns broken references
       Given TypeScript files with a dangling reference
-      When running "process-api -i 'src/**/*.ts' arch dangling"
+      When running "pattern-graph-cli -i 'src/**/*.ts' arch dangling"
       Then exit code is 0
       And stdout JSON data is an array
       And stdout JSON data contains an entry with field "missing"
@@ -67,7 +67,7 @@ Feature: Process API CLI - Output Modifiers and Rules
     @happy-path
     Scenario: Arch orphans returns isolated patterns
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' arch orphans"
+      When running "pattern-graph-cli -i 'src/**/*.ts' arch orphans"
       Then exit code is 0
       And stdout JSON data is an array
       And stdout JSON data contains an entry with field "pattern"
@@ -75,7 +75,7 @@ Feature: Process API CLI - Output Modifiers and Rules
     @happy-path
     Scenario: Arch blocking returns blocked patterns
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' arch blocking"
+      When running "pattern-graph-cli -i 'src/**/*.ts' arch blocking"
       Then exit code is 0
       And stdout JSON data is an array
 
@@ -95,7 +95,7 @@ Feature: Process API CLI - Output Modifiers and Rules
     Scenario: Rules returns business rules from feature files
       Given TypeScript files with pattern annotations
       And Gherkin feature files with business rules
-      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules"
+      When running "pattern-graph-cli -i 'src/**/*.ts' -f 'specs/**/*.feature' rules"
       Then exit code is 0
       And stdout JSON data has fields:
         | field            |
@@ -107,7 +107,7 @@ Feature: Process API CLI - Output Modifiers and Rules
     Scenario: Rules filters by product area
       Given TypeScript files with pattern annotations
       And Gherkin feature files with business rules
-      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --product-area Validation"
+      When running "pattern-graph-cli -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --product-area Validation"
       Then exit code is 0
       And stdout JSON data has field "productAreas"
 
@@ -115,7 +115,7 @@ Feature: Process API CLI - Output Modifiers and Rules
     Scenario: Rules with count modifier returns totals
       Given TypeScript files with pattern annotations
       And Gherkin feature files with business rules
-      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --count"
+      When running "pattern-graph-cli -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --count"
       Then exit code is 0
       And stdout JSON data has fields:
         | field            |
@@ -126,7 +126,7 @@ Feature: Process API CLI - Output Modifiers and Rules
     Scenario: Rules with names-only returns flat array
       Given TypeScript files with pattern annotations
       And Gherkin feature files with business rules
-      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --names-only"
+      When running "pattern-graph-cli -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --names-only"
       Then exit code is 0
       And stdout JSON data is an array
 
@@ -134,7 +134,7 @@ Feature: Process API CLI - Output Modifiers and Rules
     Scenario: Rules filters by pattern name
       Given TypeScript files with pattern annotations
       And Gherkin feature files with business rules
-      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --pattern CoreUtilsTest --count"
+      When running "pattern-graph-cli -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --pattern CoreUtilsTest --count"
       Then exit code is 0
       And stdout JSON data has field values:
         | field           | value |
@@ -145,7 +145,7 @@ Feature: Process API CLI - Output Modifiers and Rules
     Scenario: Rules with only-invariants excludes rules without invariants
       Given TypeScript files with pattern annotations
       And Gherkin feature files with business rules
-      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --only-invariants --count"
+      When running "pattern-graph-cli -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --only-invariants --count"
       Then exit code is 0
       And stdout JSON data has field values:
         | field           | value |
@@ -156,7 +156,7 @@ Feature: Process API CLI - Output Modifiers and Rules
     Scenario: Rules product area filter excludes non-matching areas
       Given TypeScript files with pattern annotations
       And Gherkin feature files with business rules
-      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --product-area Validation --count"
+      When running "pattern-graph-cli -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --product-area Validation --count"
       Then exit code is 0
       And stdout JSON data has field values:
         | field      | value |
@@ -166,7 +166,7 @@ Feature: Process API CLI - Output Modifiers and Rules
     Scenario: Rules for non-existent product area returns hint
       Given TypeScript files with pattern annotations
       And Gherkin feature files with business rules
-      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --product-area NonExistent --count"
+      When running "pattern-graph-cli -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --product-area NonExistent --count"
       Then exit code is 0
       And stdout JSON data has field "hint"
 
@@ -174,7 +174,7 @@ Feature: Process API CLI - Output Modifiers and Rules
     Scenario: Rules combines product area and only-invariants filters
       Given TypeScript files with pattern annotations
       And Gherkin feature files with business rules
-      When running "process-api -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --product-area CoreTypes --only-invariants --count"
+      When running "pattern-graph-cli -i 'src/**/*.ts' -f 'specs/**/*.feature' rules --product-area CoreTypes --only-invariants --count"
       Then exit code is 0
       And stdout JSON data has field values:
         | field           | value |

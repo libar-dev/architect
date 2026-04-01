@@ -3,7 +3,7 @@
  * @architect-status roadmap
  * @architect-implements DataAPIArchitectureQueries
  * @architect-uses Pattern Scanner, PatternGraph
- * @architect-used-by ProcessAPICLIImpl
+ * @architect-used-by PatternGraphCLIImpl
  * @architect-target src/api/coverage-analyzer.ts
  * @architect-since DS-D
  *

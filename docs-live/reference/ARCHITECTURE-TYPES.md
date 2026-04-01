@@ -11,7 +11,7 @@
 
 ```typescript
 /**
- * Master Dataset - Unified view of all extracted patterns
+ * PatternGraph - Unified view of all extracted patterns
  *
  * Contains raw patterns plus pre-computed views and statistics.
  * This is the primary data structure passed to generators and sections.
@@ -406,7 +406,7 @@ and `transformToPatternGraph` with validation summary.
 
 ## Consumer Architecture and PipelineOptions Differentiation
 
-Three consumers share this factory: `process-api`, `validate-patterns`, and the
+Three consumers share this factory: `pattern-graph-cli`, `validate-patterns`, and the
 generation orchestrator. `PipelineOptions` differentiates behavior by
 `mergeConflictStrategy` (`fatal` vs `concatenate`), `includeValidation` toggles,
 and `failOnScanErrors` policy without forking pipeline logic.

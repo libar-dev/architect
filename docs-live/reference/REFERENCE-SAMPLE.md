@@ -269,13 +269,13 @@ classDiagram
     class ContextInferenceImpl {
         +ContextInferenceRule interface
     }
-    class ProcessApiReferenceGenerator {
-    }
     class DesignReviewGenerator {
         <<service>>
     }
     class DecisionDocGenerator {
         <<service>>
+    }
+    class CliReferenceGenerator {
     }
     class CliRecipeGenerator {
     }
@@ -286,9 +286,9 @@ classDiagram
     class PatternHelpers
     class DesignReviewCodec
     class DecisionDocCodec
-    class ProcessApiHybridGeneration
     class PatternRelationshipModel
     class DesignReviewGeneration
+    class CliReferenceGeneration
     class CliRecipeCodec
     class ContextInference
     GitModule ..> GitBranchDiff : uses
@@ -304,16 +304,16 @@ classDiagram
     SequenceTransformUtils ..|> DesignReviewGeneration : implements
     RelationshipResolver ..> PatternHelpers : uses
     ContextInferenceImpl ..|> ContextInference : implements
-    ProcessApiReferenceGenerator ..|> ProcessApiHybridGeneration : implements
     DesignReviewGenerator ..> DesignReviewCodec : uses
     DesignReviewGenerator ..> PatternGraph : uses
     DesignReviewGenerator ..|> DesignReviewGeneration : implements
     DecisionDocGenerator ..> DecisionDocCodec : depends on
     DecisionDocGenerator ..> SourceMapper : depends on
+    CliReferenceGenerator ..|> CliReferenceGeneration : implements
     CliRecipeGenerator ..|> CliRecipeCodec : implements
     DesignReviewCodec ..> PatternGraph : uses
     DesignReviewCodec ..|> DesignReviewGeneration : implements
-    CliRecipeCodec ..> ProcessApiHybridGeneration : depends on
+    CliRecipeCodec ..> CliReferenceGeneration : depends on
 ```
 
 ---
@@ -413,15 +413,15 @@ graph LR
     subgraph related["Related"]
         PatternGraphAPI["PatternGraphAPI"]:::neighbor
         TypeScriptTaxonomyImplementation["TypeScriptTaxonomyImplementation"]:::neighbor
-        ProcessApiHybridGeneration["ProcessApiHybridGeneration"]:::neighbor
         ProceduralGuideCodec["ProceduralGuideCodec"]:::neighbor
         PhaseStateMachineValidation["PhaseStateMachineValidation"]:::neighbor
         DataAPIOutputShaping["DataAPIOutputShaping"]:::neighbor
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
+        CliReferenceGeneration["CliReferenceGeneration"]:::neighbor
     end
     TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
     loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
-    CLISchema ..->|implements| ProcessApiHybridGeneration
+    CLISchema ..->|implements| CliReferenceGeneration
     ProjectConfigTypes -->|uses| ConfigurationTypes
     ProjectConfigTypes -->|uses| ConfigurationPresets
     ConfigurationPresets -->|uses| ConfigurationTypes
@@ -935,7 +935,7 @@ Design Decisions (DS-1, 2026-02-15):
 
 **Invariant:** `loadDefaultWorkflow()` returns a `LoadedWorkflow` without file system access. It cannot fail. The default workflow constant uses only canonical status values from `src/taxonomy/status-values.ts`.
 
-**Rationale:** The file-based loading path (`catalogue/workflows/`) has been dead code since monorepo extraction. Both callers (orchestrator, process-api) already handle the failure gracefully, proving the system works without it. Making the function synchronous and infallible removes the try-catch ceremony and the warning noise.
+**Rationale:** The file-based loading path (`catalogue/workflows/`) has been dead code since monorepo extraction. Both callers (orchestrator, pattern-graph-cli) already handle the failure gracefully, proving the system works without it. Making the function synchronous and infallible removes the try-catch ceremony and the warning noise.
 
 **Verified by:**
 

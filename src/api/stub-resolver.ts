@@ -4,7 +4,7 @@
  * @architect-status active
  * @architect-implements DataAPIStubIntegration
  * @architect-uses PatternGraphAPI
- * @architect-used-by ProcessAPICLIImpl
+ * @architect-used-by PatternGraphCLIImpl
  *
  * ## StubResolver — Design Stub Discovery and Resolution
  *

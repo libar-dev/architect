@@ -122,7 +122,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           );
         });
 
-        When('transforming to master dataset with rules', () => {
+        When('transforming to pattern graph with rules', () => {
           if (!state) throw new Error('State not initialized');
           state.dataset = transformToPatternGraph({
             patterns: state.patterns,
@@ -180,7 +180,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           );
         });
 
-        When('transforming to master dataset with rules', () => {
+        When('transforming to pattern graph with rules', () => {
           if (!state) throw new Error('State not initialized');
           state.dataset = transformToPatternGraph({
             patterns: state.patterns,
@@ -235,7 +235,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           );
         });
 
-        When('transforming to master dataset with rules', () => {
+        When('transforming to pattern graph with rules', () => {
           if (!state) throw new Error('State not initialized');
           state.dataset = transformToPatternGraph({
             patterns: state.patterns,
@@ -288,7 +288,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       );
 
-      When('transforming to master dataset with rules', () => {
+      When('transforming to pattern graph with rules', () => {
         if (!state) throw new Error('State not initialized');
         state.dataset = transformToPatternGraph({
           patterns: state.patterns,
@@ -336,7 +336,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       );
 
-      When('transforming to master dataset with rules', () => {
+      When('transforming to pattern graph with rules', () => {
         if (!state) throw new Error('State not initialized');
         state.dataset = transformToPatternGraph({
           patterns: state.patterns,
@@ -390,7 +390,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       );
 
-      When('transforming to master dataset with rules', () => {
+      When('transforming to pattern graph with rules', () => {
         if (!state) throw new Error('State not initialized');
         state.dataset = transformToPatternGraph({
           patterns: state.patterns,
@@ -444,7 +444,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           }
         );
 
-        When('transforming to master dataset with rules', () => {
+        When('transforming to pattern graph with rules', () => {
           if (!state) throw new Error('State not initialized');
           state.dataset = transformToPatternGraph({
             patterns: state.patterns,
@@ -496,7 +496,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           }
         );
 
-        When('transforming to master dataset with rules', () => {
+        When('transforming to pattern graph with rules', () => {
           if (!state) throw new Error('State not initialized');
           state.dataset = transformToPatternGraph({
             patterns: state.patterns,
@@ -557,7 +557,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           }
         );
 
-        When('transforming to master dataset with rules', () => {
+        When('transforming to pattern graph with rules', () => {
           if (!state) throw new Error('State not initialized');
           state.dataset = transformToPatternGraph({
             patterns: state.patterns,
@@ -609,7 +609,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           );
         });
 
-        When('transforming to master dataset with rules', () => {
+        When('transforming to pattern graph with rules', () => {
           if (!state) throw new Error('State not initialized');
           state.dataset = transformToPatternGraph({
             patterns: state.patterns,

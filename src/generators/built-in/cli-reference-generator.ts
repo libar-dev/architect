@@ -1,15 +1,15 @@
 /**
  * @architect
- * @architect-pattern ProcessApiReferenceGenerator
+ * @architect-pattern CliReferenceGenerator
  * @architect-status completed
- * @architect-implements ProcessApiHybridGeneration
+ * @architect-implements CliReferenceGeneration
  * @architect-arch-context generator
  * @architect-arch-layer application
  * @architect-product-area:Generation
  *
  * ## Standalone Generator for Process API CLI Reference
  *
- * Generates `PROCESS-API-REFERENCE.md` from the declarative CLI schema.
+ * Generates `CLI-REFERENCE.md` from the declarative CLI schema.
  * Does NOT consume PatternGraph (ADR-006 compliant — CLI schema is static
  * TypeScript, not annotation-derived data).
  */
@@ -90,8 +90,8 @@ function buildReferenceDocument(): string {
 // Generator
 // =============================================================================
 
-class ProcessApiReferenceGeneratorImpl implements DocumentGenerator {
-  readonly name = 'process-api-reference';
+class CliReferenceGeneratorImpl implements DocumentGenerator {
+  readonly name = 'cli-reference';
   readonly description = 'Generate CLI reference tables from declarative schema';
 
   generate(_patterns: readonly unknown[], _context: GeneratorContext): Promise<GeneratorOutput> {
@@ -100,7 +100,7 @@ class ProcessApiReferenceGeneratorImpl implements DocumentGenerator {
     return Promise.resolve({
       files: [
         {
-          path: 'reference/PROCESS-API-REFERENCE.md',
+          path: 'reference/CLI-REFERENCE.md',
           content,
         },
       ],
@@ -108,6 +108,6 @@ class ProcessApiReferenceGeneratorImpl implements DocumentGenerator {
   }
 }
 
-export function createProcessApiReferenceGenerator(): DocumentGenerator {
-  return new ProcessApiReferenceGeneratorImpl();
+export function createCliReferenceGenerator(): DocumentGenerator {
+  return new CliReferenceGeneratorImpl();
 }

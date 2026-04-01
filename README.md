@@ -116,7 +116,7 @@ All output goes to [`docs-live/`](docs-live/INDEX.md) — 57+ auto-generated fil
 | Command                   | Purpose                                                | Docs                                                                      |
 | ------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------- |
 | `architect-generate`      | Generate documentation from annotated sources          | `architect-generate --help`                                               |
-| `architect`               | Query delivery state for AI coding sessions            | [Process API Reference](docs-live/reference/PROCESS-API-REFERENCE.md)     |
+| `architect`               | Query delivery state for AI coding sessions            | [Process API Reference](docs-live/reference/CLI-REFERENCE.md)             |
 | `architect-lint-patterns` | Validate annotation quality (missing tags, etc.)       | [Validation Rules](docs-live/VALIDATION-RULES.md)                         |
 | `architect-guard`         | Validate delivery workflow FSM transitions             | [Process Guard Reference](docs-live/reference/PROCESS-GUARD-REFERENCE.md) |
 | `architect-lint-steps`    | Validate vitest-cucumber feature/step compatibility    | [Validation Rules](docs-live/VALIDATION-RULES.md)                         |

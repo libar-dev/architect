@@ -55,10 +55,10 @@ consume the same pre-computed read model.
 
 **Rationale:** Bypassing the read model forces consumers to re-derive data that the PatternGraph already computes, creating duplicate logic and divergent behavior when the pipeline evolves.
 
-| Layer                  | May Import                      | Examples                                            |
-| ---------------------- | ------------------------------- | --------------------------------------------------- |
-| Pipeline Orchestration | scanner/, extractor/, pipeline/ | orchestrator.ts, process-api.ts pipeline setup      |
-| Feature Consumption    | PatternGraph, relationshipIndex | codecs, PatternGraphAPI, validators, query handlers |
+| Layer                  | May Import                      | Examples                                             |
+| ---------------------- | ------------------------------- | ---------------------------------------------------- |
+| Pipeline Orchestration | scanner/, extractor/, pipeline/ | orchestrator.ts, pattern-graph-cli.ts pipeline setup |
+| Feature Consumption    | PatternGraph, relationshipIndex | codecs, PatternGraphAPI, validators, query handlers  |
 
 **Verified by:**
 

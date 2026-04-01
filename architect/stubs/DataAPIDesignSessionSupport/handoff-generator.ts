@@ -3,7 +3,7 @@
  * @architect-status roadmap
  * @architect-implements DataAPIDesignSessionSupport
  * @architect-uses PatternGraphAPI, PatternGraph, ContextFormatterImpl
- * @architect-used-by ProcessAPICLIImpl
+ * @architect-used-by PatternGraphCLIImpl
  * @architect-target src/api/handoff-generator.ts
  * @architect-since DS-E
  *

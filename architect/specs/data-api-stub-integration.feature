@@ -46,9 +46,9 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
       | Scan path configuration (pre-existing) | complete | package.json | No | N/A |
       | @architect-target taxonomy tag | complete | src/taxonomy/registry-builder.ts | Yes | unit |
       | @architect-since taxonomy tag | complete | src/taxonomy/registry-builder.ts | Yes | unit |
-      | stubs subcommand | complete | src/cli/process-api.ts | Yes | integration |
-      | decisions subcommand | complete | src/cli/process-api.ts | Yes | integration |
-      | pdr subcommand | complete | src/cli/process-api.ts | Yes | integration |
+      | stubs subcommand | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
+      | decisions subcommand | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
+      | pdr subcommand | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
       | Stub-to-implementation resolver | complete | src/api/stub-resolver.ts | Yes | unit |
 
   # ============================================================================
@@ -122,7 +122,7 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
     @acceptance-criteria @happy-path
     Scenario: List all stubs with implementation status
       Given stubs exist for 4 patterns with targets
-      When running "process-api stubs"
+      When running "pattern-graph-cli stubs"
       Then the output lists each stub with its target path
       And each stub shows whether the target file exists
       And stubs are grouped by parent pattern
@@ -130,20 +130,20 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
     @acceptance-criteria @happy-path
     Scenario: List stubs for a specific pattern
       Given 5 stubs implement "AgentCommandInfrastructure"
-      When running "process-api stubs AgentCommandInfrastructure"
+      When running "pattern-graph-cli stubs AgentCommandInfrastructure"
       Then only stubs for that pattern are returned
       And each stub shows target, session, and implementation status
 
     @acceptance-criteria @happy-path
     Scenario: Filter unresolved stubs
       Given 3 stubs with existing targets and 2 without
-      When running "process-api stubs --unresolved"
+      When running "pattern-graph-cli stubs --unresolved"
       Then only the 2 stubs without existing target files are returned
 
     @acceptance-criteria @validation
     Scenario: Stubs for nonexistent pattern returns empty result
       Given no stubs implement "NonExistentPattern"
-      When running "process-api stubs NonExistentPattern"
+      When running "pattern-graph-cli stubs NonExistentPattern"
       Then the result is empty
       And the error message suggests checking the pattern name
 
@@ -185,7 +185,7 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
     @acceptance-criteria @happy-path
     Scenario: Query design decisions for a pattern
       Given stubs for "AgentCommandInfrastructure" with AD-N items
-      When running "process-api decisions AgentCommandInfrastructure"
+      When running "pattern-graph-cli decisions AgentCommandInfrastructure"
       Then the output lists each AD-N decision with its description
       And the output shows referenced PDR numbers
       And the output shows the source design session
@@ -193,7 +193,7 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
     @acceptance-criteria @happy-path
     Scenario: Cross-reference a PDR number
       Given patterns and stubs referencing "PDR-012"
-      When running "process-api pdr 012"
+      When running "pattern-graph-cli pdr 012"
       Then the output lists all patterns referencing PDR-012
       And the output shows the decision feature file location
       And the output shows stub count per pattern
@@ -201,6 +201,6 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
     @acceptance-criteria @validation
     Scenario: PDR query for nonexistent number returns empty
       Given no patterns or stubs reference "PDR-999"
-      When running "process-api pdr 999"
+      When running "pattern-graph-cli pdr 999"
       Then the result indicates no references found
       And the output includes "No patterns reference PDR-999"

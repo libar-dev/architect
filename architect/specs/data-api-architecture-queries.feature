@@ -36,12 +36,12 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | arch neighborhood handler | complete | src/cli/process-api.ts | Yes | integration |
-      | arch compare handler | complete | src/cli/process-api.ts | Yes | integration |
+      | arch neighborhood handler | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
+      | arch compare handler | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
       | arch coverage analyzer | complete | src/api/coverage-analyzer.ts | Yes | unit |
-      | tags subcommand | complete | src/cli/process-api.ts | Yes | integration |
-      | sources subcommand | complete | src/cli/process-api.ts | Yes | integration |
-      | unannotated subcommand | complete | src/cli/process-api.ts | Yes | integration |
+      | tags subcommand | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
+      | sources subcommand | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
+      | unannotated subcommand | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
 
   # ============================================================================
   # RULE 1: Extended Architecture Queries
@@ -71,7 +71,7 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
       Given a pattern "OrderSaga" in the "orders" context
       And "OrderSaga" uses "CommandBus" and "EventStore"
       And "OrderSaga" is used by "SagaRouter"
-      When running "process-api arch neighborhood OrderSaga"
+      When running "pattern-graph-cli arch neighborhood OrderSaga"
       Then the output shows "Uses: CommandBus, EventStore"
       And the output shows "Used by: SagaRouter"
       And the output shows sibling patterns in the "orders" context
@@ -79,7 +79,7 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
     @acceptance-criteria @happy-path
     Scenario: Cross-context comparison
       Given contexts "orders" and "inventory" with some shared dependencies
-      When running "process-api arch compare orders inventory"
+      When running "pattern-graph-cli arch compare orders inventory"
       Then the output shows shared dependencies between contexts
       And the output shows unique dependencies per context
       And the output identifies integration points
@@ -87,7 +87,7 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
     @acceptance-criteria @validation
     Scenario: Neighborhood for nonexistent pattern returns error
       Given no pattern named "NonExistent" exists
-      When running "process-api arch neighborhood NonExistent"
+      When running "pattern-graph-cli arch neighborhood NonExistent"
       Then the command fails with a pattern-not-found error
       And the error message suggests checking the pattern name
 
@@ -118,7 +118,7 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
     @acceptance-criteria @happy-path
     Scenario: Architecture coverage report
       Given 41 annotated files out of 50 scannable files
-      When running "process-api arch coverage"
+      When running "pattern-graph-cli arch coverage"
       Then the output shows "41/50 files annotated (82%)"
       And the output lists the 9 unannotated files
       And the output shows unused taxonomy values
@@ -126,14 +126,14 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
     @acceptance-criteria @happy-path
     Scenario: Find unannotated files with path filter
       Given some TypeScript files without the @architect opt-in marker
-      When running "process-api unannotated --path 'src/generators/**/*.ts'"
+      When running "pattern-graph-cli unannotated --path 'src/generators/**/*.ts'"
       Then the output lists only unannotated files matching the glob
       And each file shows its location relative to base directory
 
     @acceptance-criteria @validation
     Scenario: Coverage with no scannable files returns zero coverage
       Given the input globs match 0 files
-      When running "process-api arch coverage"
+      When running "pattern-graph-cli arch coverage"
       Then the output shows "0/0 files annotated (0%)"
       And the unannotated files list is empty
 
@@ -169,7 +169,7 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
     @acceptance-criteria @happy-path
     Scenario: List all tags with usage counts
       Given patterns with various tags applied
-      When running "process-api tags"
+      When running "pattern-graph-cli tags"
       Then the output lists each tag name with its usage count
       And category tags show their value distribution
       And status tags show their value distribution
@@ -177,7 +177,7 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
     @acceptance-criteria @happy-path
     Scenario: Source file inventory
       Given TypeScript, Gherkin, and stub files in the pipeline
-      When running "process-api sources"
+      When running "pattern-graph-cli sources"
       Then the output shows file counts by type
       And the output shows location patterns for each type
       And the total matches the pipeline scan count
@@ -185,6 +185,6 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
     @acceptance-criteria @validation
     Scenario: Tags listing with no patterns returns empty report
       Given the pipeline has 0 patterns
-      When running "process-api tags"
+      When running "pattern-graph-cli tags"
       Then the output shows an empty tag report with 0 pattern count
       And no tag entries are listed

@@ -5,7 +5,7 @@
  * @architect-status active
  * @architect-implements DataAPIOutputShaping
  * @architect-uses PatternGraphAPI
- * @architect-used-by OutputPipeline, ProcessAPICLIImpl
+ * @architect-used-by OutputPipeline, PatternGraphCLIImpl
  * @architect-arch-role service
  * @architect-arch-context api
  * @architect-arch-layer application

@@ -172,7 +172,7 @@ export {
   type RegistryMetadataOutput,
 } from './output-schemas.js';
 
-// Master Dataset schemas and types (unified transformation pipeline)
+// Pattern Graph schemas and types (unified transformation pipeline)
 export {
   StatusGroupsSchema,
   StatusCountsSchema,

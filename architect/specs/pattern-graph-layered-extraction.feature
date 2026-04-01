@@ -7,12 +7,12 @@
 @architect-product-area:DataAPI
 @architect-include:process-workflow
 @architect-depends-on:ValidatorReadModelConsolidation
-@architect-business-value:separate-cli-shell-from-domain-logic-in-process-api
+@architect-business-value:separate-cli-shell-from-domain-logic-in-pattern-graph-cli
 @architect-priority:high
 Feature: Process API Layered Extraction
 
   **Problem:**
-  `process-api.ts` is 1,700 lines containing two remaining architectural
+  `pattern-graph-cli.ts` is 1,700 lines containing two remaining architectural
   violations of ADR-006:
 
   1. **Parallel Pipeline**: `buildPipeline()` (lines 488-561) wires the
@@ -28,7 +28,7 @@ Feature: Process API Layered Extraction
      API layer, not the CLI file.
 
   Most subcommand handlers already delegate correctly. Of the 16 handlers
-  in process-api.ts, 13 are thin wrappers over `src/api/` modules:
+  in pattern-graph-cli.ts, 13 are thin wrappers over `src/api/` modules:
 
   | Handler | Delegates To |
   | handleStatus | PatternGraphAPI methods |
@@ -68,7 +68,7 @@ Feature: Process API Layered Extraction
   Location: `src/generators/pipeline/build-pipeline.ts`, re-exported from
   `src/generators/pipeline/index.ts`. The factory returns
   `Result<PipelineResult, PipelineError>` so each consumer can map errors
-  to its own strategy (process-api calls `process.exit(1)`,
+  to its own strategy (pattern-graph-cli calls `process.exit(1)`,
   validate-patterns throws, orchestrator returns `Result.err()`).
   `PipelineResult` contains `{ dataset: RuntimePatternGraph, validation:
   ValidationSummary }`. The `TagRegistry` is accessible via
@@ -76,7 +76,7 @@ Feature: Process API Layered Extraction
 
   DD-2: Merge conflict strategy as a pipeline option.
   The factory accepts `mergeConflictStrategy: 'fatal' | 'concatenate'`.
-  `'fatal'` returns `Result.err()` on conflicts (process-api behavior).
+  `'fatal'` returns `Result.err()` on conflicts (pattern-graph-cli behavior).
   `'concatenate'` falls back to `[...ts, ...gherkin]` (validate-patterns
   behavior per DD-1 in ValidatorReadModelConsolidation). This is the most
   significant semantic difference between consumers.
@@ -88,7 +88,7 @@ Feature: Process API Layered Extraction
   orchestrator has 155 lines of pipeline with structured warning collection
   (scan errors, extraction errors, Gherkin parse errors as
   `GenerationWarning[]`). Integrating this into the factory adds risk to a
-  first extraction. This spec migrates process-api.ts and
+  first extraction. This spec migrates pattern-graph-cli.ts and
   validate-patterns.ts only.
 
   DD-4: handleRules domain logic extracts to `src/api/rules-query.ts`.
@@ -127,7 +127,7 @@ Feature: Process API Layered Extraction
   placement on raw scanned files).
 
   DD-8: Line count invariant replaced with qualitative criterion.
-  The original 500-line target for process-api.ts is unrealistic. After
+  The original 500-line target for pattern-graph-cli.ts is unrealistic. After
   extracting buildPipeline (74 lines) and handleRules (184 lines), the
   file is ~1,400 lines. The remaining code is legitimate CLI responsibility:
   parseArgs (134), showHelp (143), routeSubcommand (96), main (59), 13 thin
@@ -142,11 +142,11 @@ Feature: Process API Layered Extraction
   | Step | What | Verification |
   | 1 | Create src/generators/pipeline/build-pipeline.ts with PipelineOptions and factory | pnpm typecheck |
   | 2 | Export from src/generators/pipeline/index.ts barrel | pnpm typecheck |
-  | 3 | Migrate process-api.ts buildPipeline to factory call | pnpm typecheck, pnpm process:query -- overview |
-  | 4 | Remove unused scanner/extractor imports from process-api.ts | pnpm lint |
+  | 3 | Migrate pattern-graph-cli.ts buildPipeline to factory call | pnpm typecheck, pnpm process:query -- overview |
+  | 4 | Remove unused scanner/extractor imports from pattern-graph-cli.ts | pnpm lint |
   | 5 | Migrate validate-patterns.ts PatternGraph pipeline to factory call | pnpm validate:patterns (0 errors, 0 warnings) |
   | 6 | Create src/api/rules-query.ts with queryBusinessRules | pnpm typecheck |
-  | 7 | Slim handleRules in process-api.ts to thin delegation | pnpm process:query -- rules |
+  | 7 | Slim handleRules in pattern-graph-cli.ts to thin delegation | pnpm process:query -- rules |
   | 8 | Export from src/api/index.ts barrel | pnpm typecheck |
   | 9 | Full verification | pnpm build, pnpm test, pnpm lint, pnpm validate:patterns |
 
@@ -157,7 +157,7 @@ Feature: Process API Layered Extraction
   | src/generators/pipeline/index.ts | Add re-export of build-pipeline | +2 |
   | src/api/rules-query.ts | NEW: business rules query from handleRules | +~200 |
   | src/api/index.ts | Add re-exports for rules-query | +5 |
-  | src/cli/process-api.ts | Replace buildPipeline + handleRules with delegations | -~280 net |
+  | src/cli/pattern-graph-cli.ts | Replace buildPipeline + handleRules with delegations | -~280 net |
   | src/cli/validate-patterns.ts | Replace PatternGraph pipeline with factory call | -~30 net |
 
   **What does NOT change:**
@@ -175,7 +175,7 @@ Feature: Process API Layered Extraction
     Given the following deliverables:
       | Deliverable | Status | Location |
       | Create shared pipeline factory | complete | src/generators/pipeline/build-pipeline.ts |
-      | process-api.ts consumes pipeline factory | complete | src/cli/process-api.ts |
+      | pattern-graph-cli.ts consumes pipeline factory | complete | src/cli/pattern-graph-cli.ts |
       | validate-patterns.ts consumes pipeline factory (PatternGraph only) | complete | src/cli/validate-patterns.ts |
       | Extract handleRules to rules-query.ts | complete | src/api/rules-query.ts |
       | Update barrel exports | complete | src/api/index.ts, src/generators/pipeline/index.ts |
@@ -183,7 +183,7 @@ Feature: Process API Layered Extraction
 
   Rule: CLI file contains only routing, no domain logic
 
-    **Invariant:** `process-api.ts` parses arguments, calls the pipeline
+    **Invariant:** `pattern-graph-cli.ts` parses arguments, calls the pipeline
     factory for the PatternGraph, routes subcommands to API modules, and
     formats output. It does not build Maps, filter patterns, group data,
     or resolve relationships. Thin view projections (3-5 line `.map()`
@@ -198,7 +198,7 @@ Feature: Process API Layered Extraction
 
     @acceptance-criteria
     Scenario: No domain data structures in handlers
-      Given the refactored process-api.ts
+      Given the refactored pattern-graph-cli.ts
       When inspecting handler functions
       Then no Map or Set construction exists for domain data grouping
       And no imports from renderable/codecs/ exist in the CLI file
@@ -210,7 +210,7 @@ Feature: Process API Layered Extraction
       When extracted to src/api/rules-query.ts
       Then the CLI handler parses filters, calls queryBusinessRules, and formats output
       And the queryBusinessRules function is a pure function taking RuntimePatternGraph
-      And the nested Map construction lives in rules-query.ts, not process-api.ts
+      And the nested Map construction lives in rules-query.ts, not pattern-graph-cli.ts
 
   Rule: Pipeline factory is shared across CLI consumers
 
@@ -220,7 +220,7 @@ Feature: Process API Layered Extraction
     independently. The factory accepts `mergeConflictStrategy` to handle
     behavioral differences between consumers.
 
-    **Rationale:** Three consumers (process-api, validate-patterns,
+    **Rationale:** Three consumers (pattern-graph-cli, validate-patterns,
     orchestrator) independently wire the same 8-step sequence: loadConfig,
     scanPatterns, extractPatterns, scanGherkinFiles,
     extractPatternsFromGherkin, mergePatterns, computeHierarchyChildren,
@@ -232,10 +232,10 @@ Feature: Process API Layered Extraction
 
     @acceptance-criteria
     Scenario: CLI consumers use factory
-      Given process-api.ts and validate-patterns.ts
+      Given pattern-graph-cli.ts and validate-patterns.ts
       When each needs a PatternGraph
       Then each calls the shared pipeline factory from build-pipeline.ts
-      And process-api.ts does not import from scanner/ or extractor/
+      And pattern-graph-cli.ts does not import from scanner/ or extractor/
       And validate-patterns.ts uses the factory for PatternGraph but retains direct scans for DoD and anti-patterns
 
     @acceptance-criteria
@@ -257,7 +257,7 @@ Feature: Process API Layered Extraction
     **Rationale:** `handleRules` is 184 lines with 5 Map/Set constructions,
     codec-layer imports (`parseBusinessRuleAnnotations`,
     `deduplicateScenarioNames`), and a complex 3-level grouping algorithm.
-    This is the last significant inline domain logic in process-api.ts.
+    This is the last significant inline domain logic in pattern-graph-cli.ts.
     Moving it to `src/api/` follows the same pattern as the 12 existing API
     modules (context-assembler, arch-queries, scope-validator, etc.).
 
@@ -273,7 +273,7 @@ Feature: Process API Layered Extraction
 
     @acceptance-criteria
     Scenario: handleRules slim wrapper
-      Given the refactored handleRules in process-api.ts
+      Given the refactored handleRules in pattern-graph-cli.ts
       When inspecting the function
       Then it parses filters from CLI sub-args
       And calls queryBusinessRules for the domain result
@@ -284,11 +284,11 @@ Feature: Process API Layered Extraction
 
     **Invariant:** The factory returns `Result<PipelineResult, PipelineError>`
     rather than throwing or calling `process.exit()`. Each consumer maps the
-    error to its own strategy: process-api.ts calls `process.exit(1)`,
+    error to its own strategy: pattern-graph-cli.ts calls `process.exit(1)`,
     validate-patterns.ts throws, and orchestrator.ts (future) returns
     `Result.err()`.
 
-    **Rationale:** The current `buildPipeline()` in process-api.ts calls
+    **Rationale:** The current `buildPipeline()` in pattern-graph-cli.ts calls
     `process.exit(1)` on errors, making it non-reusable. The factory must
     work across consumers with different error handling models. The Result
     monad is the project's established pattern for this (see

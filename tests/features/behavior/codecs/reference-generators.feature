@@ -85,7 +85,7 @@ Feature: Reference Document Generator Registration
 
     @integration
     Scenario: ARCHITECTURE-TYPES generator produces shapes and convention content
-      Given a PatternGraph with pipeline architecture conventions and master dataset shapes
+      Given a PatternGraph with pipeline architecture conventions and pattern graph shapes
       When running the "architecture-types-reference" generator
       Then the output has 1 file
       And the output file path starts with "reference/"

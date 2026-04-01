@@ -3,7 +3,7 @@
  * @architect-status roadmap
  * @architect-implements DataAPIArchitectureQueries
  * @architect-uses PatternGraphAPI, PatternGraph, Pattern Scanner
- * @architect-used-by ProcessAPICLIImpl
+ * @architect-used-by PatternGraphCLIImpl
  * @architect-target src/api/arch-queries.ts
  * @architect-since DS-D
  *

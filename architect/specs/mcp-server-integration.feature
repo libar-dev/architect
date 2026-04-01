@@ -12,7 +12,7 @@
 Feature: MCP Server Integration
 
   **Problem:**
-  Claude Code accesses PatternGraphAPI through subprocess calls to the process-api
+  Claude Code accesses PatternGraphAPI through subprocess calls to the pattern-graph-cli
   CLI. Each invocation runs the full 8-step pipeline (config, scan, extract, merge,
   hierarchy, workflow, transform, validate), taking 2-5 seconds. During a typical
   session with 10-20 queries, this adds 30-90 seconds of pure pipeline overhead.

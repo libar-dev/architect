@@ -1,7 +1,7 @@
 /**
  * Process API CLI Shared Test State and Fixture Builders
  *
- * Extracted from process-api.steps.ts to be shared across
+ * Extracted from pattern-graph-cli.steps.ts to be shared across
  * the split test files (core, subcommands, modifiers-rules).
  *
  * @architect

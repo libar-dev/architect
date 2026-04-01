@@ -3,7 +3,7 @@
  * @architect-pattern CLISchema
  * @architect-status completed
  * @architect-unlock-reason:Add-recipe-and-narrative-fields-for-CliRecipeCodec
- * @architect-implements ProcessApiHybridGeneration
+ * @architect-implements CliReferenceGeneration
  * @architect-arch-context cli
  * @architect-arch-layer domain
  * @architect-product-area:DataAPI
@@ -12,8 +12,8 @@
  *
  * Declarative schema defining all CLI options for the architect command.
  * Consumed by:
- * - `showHelp()` in process-api.ts (terminal help text)
- * - `ProcessApiReferenceGenerator` (generated markdown reference)
+ * - `showHelp()` in pattern-graph-cli.ts (terminal help text)
+ * - `CliReferenceGenerator` (generated markdown reference)
  *
  * This eliminates three-way sync between parser code, help text, and docs.
  */
@@ -295,7 +295,7 @@ export const CLI_SCHEMA: CLISchema = {
             '',
             '=== CONSUMERS ===',
             'ContextFormatterImpl (active)',
-            'ProcessAPICLIImpl (active)',
+            'PatternGraphCLIImpl (active)',
             '',
             '=== ARCHITECTURE (context: api) ===',
             'PatternGraph (completed, read-model)',
@@ -318,7 +318,7 @@ export const CLI_SCHEMA: CLISchema = {
           usageExample: 'pnpm architect:query -- files MyPattern --related',
           expectedOutput: [
             '=== PRIMARY ===',
-            'src/cli/process-api.ts',
+            'src/cli/pattern-graph-cli.ts',
             '',
             '=== ARCHITECTURE NEIGHBORS ===',
             'src/cli/version.ts',

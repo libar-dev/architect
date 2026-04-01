@@ -16,7 +16,7 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 - **Schema-First**: Zod schemas in `src/validation-schemas/` define types with runtime validation
 - **Registry Pattern**: Tag registry (`src/taxonomy/`) defines categories, status values, and tag formats
 - **Codec-Based Rendering**: Generators in `src/generators/` use codecs to transform data to markdown
-- **Pipeline Factory**: Shared `buildPatternGraph()` in `src/generators/pipeline/build-pipeline.ts` — all consumers (orchestrator, process-api, validate-patterns) call this instead of wiring inline pipelines. Per-consumer behavior via `PipelineOptions`.
+- **Pipeline Factory**: Shared `buildPatternGraph()` in `src/generators/pipeline/build-pipeline.ts` — all consumers (orchestrator, pattern-graph-cli, validate-patterns) call this instead of wiring inline pipelines. Per-consumer behavior via `PipelineOptions`.
 - **Single Read Model** (ADR-006): PatternGraph is the sole read model. No consumer re-derives data from raw scanner/extractor output. Anti-patterns: Parallel Pipeline, Lossy Local Type, Re-derived Relationship.
 
 **Live module inventory:** `pnpm architect:query -- arch context` and `pnpm architect:query -- arch layer`

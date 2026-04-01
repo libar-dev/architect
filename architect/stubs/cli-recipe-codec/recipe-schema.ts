@@ -66,7 +66,7 @@
  * | `commandNarratives` | `CommandNarrativeGroup[]` | Per-command narrative descriptions |
  *
  * Both are optional to preserve backward compatibility with existing consumers
- * (ProcessApiReferenceGenerator, showHelp).
+ * (CliReferenceGenerator, showHelp).
  */
 
 // =============================================================================

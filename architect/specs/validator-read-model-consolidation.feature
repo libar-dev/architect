@@ -60,9 +60,9 @@ Feature: Validator Read Model Consolidation
 
   **Design Decisions:**
 
-  DD-1: Reuse the same pipeline as process-api.ts — not a shared factory yet.
+  DD-1: Reuse the same pipeline as pattern-graph-cli.ts — not a shared factory yet.
   The validator will wire scan-extract-merge-transform inline, mirroring
-  how process-api.ts does it today (lines 490-558). Extracting a shared
+  how pattern-graph-cli.ts does it today (lines 490-558). Extracting a shared
   pipeline factory is scoped to ProcessAPILayeredExtraction, not this spec.
   This keeps the refactoring focused on data-access only.
 
@@ -79,7 +79,7 @@ Feature: Validator Read Model Consolidation
 
   DD-4: The validator will import transformToPatternGraphWithValidation
   from generators/pipeline/index.js, plus the merge and hierarchy helpers
-  already used by process-api.ts. This is a temporary parallel pipeline
+  already used by pattern-graph-cli.ts. This is a temporary parallel pipeline
   (acknowledged) that will be replaced when the pipeline factory exists.
 
   DD-5: Phase tag removal from utility patterns is a separate atomic step

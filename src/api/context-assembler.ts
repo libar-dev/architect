@@ -4,7 +4,7 @@
  * @architect-status active
  * @architect-implements DataAPIContextAssembly
  * @architect-uses PatternGraphAPI, PatternGraph, PatternSummarizerImpl, FuzzyMatcherImpl, StubResolverImpl
- * @architect-used-by ProcessAPICLIImpl, ContextFormatterImpl
+ * @architect-used-by PatternGraphCLIImpl, ContextFormatterImpl
  * @architect-arch-role service
  * @architect-arch-context api
  * @architect-arch-layer application

@@ -27,7 +27,7 @@
 | Understand the tag taxonomy    | [TAXONOMY.md](TAXONOMY.md)                                      |
 | Check validation rules         | [VALIDATION-RULES.md](VALIDATION-RULES.md)                      |
 | Browse the changelog           | [CHANGELOG-GENERATED.md](CHANGELOG-GENERATED.md)                |
-| Query process state via CLI    | [Process API Reference](reference/PROCESS-API-REFERENCE.md)     |
+| Query process state via CLI    | [Process API Reference](reference/CLI-REFERENCE.md)             |
 | Find CLI workflow recipes      | [Process API Recipes](reference/PROCESS-API-RECIPES.md)         |
 | Run AI coding sessions         | [Session Workflow Guide](reference/SESSION-WORKFLOW-GUIDE.md)   |
 | Enforce delivery process rules | [Process Guard Reference](reference/PROCESS-GUARD-REFERENCE.md) |
@@ -55,7 +55,7 @@
 
 1. **[Annotation Reference](reference/ANNOTATION-REFERENCE.md)** -- Annotation mechanics and tag reference
 2. **[Session Workflow Guide](reference/SESSION-WORKFLOW-GUIDE.md)** -- Planning, Design, Implementation workflows
-3. **[Process API Reference](reference/PROCESS-API-REFERENCE.md)** -- CLI command reference with flags and examples
+3. **[Process API Reference](reference/CLI-REFERENCE.md)** -- CLI command reference with flags and examples
 4. **[Process Guard Reference](reference/PROCESS-GUARD-REFERENCE.md)** -- Pre-commit hooks, error codes, programmatic API
 
 ---
@@ -122,7 +122,7 @@
 | --------------------------------------------------------------- | -------------------------------------------------------------------- | ---------- |
 | [Annotation Reference](reference/ANNOTATION-REFERENCE.md)       | Annotation mechanics, shape extraction, tag reference                | Developers |
 | [Session Workflow Guide](reference/SESSION-WORKFLOW-GUIDE.md)   | Planning, Design, Implementation session workflows                   | AI/Devs    |
-| [Process API Reference](reference/PROCESS-API-REFERENCE.md)     | CLI command reference with flags and examples                        | AI/Devs    |
+| [Process API Reference](reference/CLI-REFERENCE.md)             | CLI command reference with flags and examples                        | AI/Devs    |
 | [Process API Recipes](reference/PROCESS-API-RECIPES.md)         | CLI workflow recipes and session guides                              | AI/Devs    |
 | [Process Guard Reference](reference/PROCESS-GUARD-REFERENCE.md) | Pre-commit hooks, error codes, programmatic API                      | Team Leads |
 | [Architecture Codecs](reference/ARCHITECTURE-CODECS.md)         | All codecs with factory patterns and options                         | Developers |
@@ -226,6 +226,6 @@ pnpm docs:business-rules        # Business rules
 pnpm docs:taxonomy              # Taxonomy reference
 pnpm docs:validation            # Validation rules
 pnpm docs:claude-modules        # Claude context modules
-pnpm docs:process-api-reference # Process API CLI reference
+pnpm docs:cli-reference # Process API CLI reference
 pnpm docs:cli-recipe            # CLI recipes & workflow guide
 ```

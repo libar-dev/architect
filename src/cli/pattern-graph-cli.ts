@@ -2,7 +2,7 @@
 /**
  * @architect
  * @architect-core @architect-cli
- * @architect-pattern ProcessAPICLIImpl
+ * @architect-pattern PatternGraphCLIImpl
  * @architect-status active
  * @architect-implements PatternGraphAPICLI
  * @architect-arch-role service
@@ -143,7 +143,7 @@ import type { RulesFilters } from '../api/rules-query.js';
 // CLI Config
 // =============================================================================
 
-interface ProcessAPICLIConfig {
+interface PatternGraphCLIConfig {
   input: string[];
   features: string[];
   baseDir: string;
@@ -166,7 +166,7 @@ interface ProcessAPICLIConfig {
 
 /** Mutable state accumulated during argument parsing. */
 interface ParseState {
-  readonly config: ProcessAPICLIConfig;
+  readonly config: PatternGraphCLIConfig;
   namesOnly: boolean;
   count: boolean;
   fields: string[] | null;
@@ -305,7 +305,7 @@ function handlePositionalArg(state: ParseState, arg: string): void {
   }
 }
 
-function parseArgs(argv: string[] = process.argv.slice(2)): ProcessAPICLIConfig {
+function parseArgs(argv: string[] = process.argv.slice(2)): PatternGraphCLIConfig {
   const state: ParseState = {
     config: {
       input: [],
@@ -596,7 +596,7 @@ function getSubcommandOptionGroups(subcommand: string): readonly string[] {
 /**
  * Execute dry-run: show pipeline scope (files, config, cache) without processing.
  */
-async function executeDryRun(opts: ProcessAPICLIConfig): Promise<void> {
+async function executeDryRun(opts: PatternGraphCLIConfig): Promise<void> {
   const baseDir = path.resolve(opts.baseDir);
 
   // Resolve globs to file lists
@@ -640,7 +640,7 @@ async function executeDryRun(opts: ProcessAPICLIConfig): Promise<void> {
  * Prefers loadProjectConfig() for repos with a project config file,
  * falls back to filesystem auto-detection for repos without one.
  */
-async function applyConfigDefaults(config: ProcessAPICLIConfig): Promise<void> {
+async function applyConfigDefaults(config: PatternGraphCLIConfig): Promise<void> {
   const applied = await applyProjectSourceDefaults(config);
   if (applied) {
     return;
@@ -654,7 +654,7 @@ async function applyConfigDefaults(config: ProcessAPICLIConfig): Promise<void> {
  * Filesystem-based auto-detection fallback for repos without a config file.
  * Checks for conventional directory structures and applies defaults.
  */
-async function applyConfigDefaultsFallback(config: ProcessAPICLIConfig): Promise<void> {
+async function applyConfigDefaultsFallback(config: PatternGraphCLIConfig): Promise<void> {
   const baseDir = path.resolve(config.baseDir);
 
   if (config.input.length === 0) {
@@ -692,7 +692,7 @@ function formatConfigStatus(configPath: string | null): string {
 // Pipeline
 // =============================================================================
 
-async function buildPipeline(config: ProcessAPICLIConfig): Promise<PipelineResult> {
+async function buildPipeline(config: PatternGraphCLIConfig): Promise<PipelineResult> {
   const result = await buildPatternGraph({
     input: config.input,
     features: config.features,

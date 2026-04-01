@@ -4,7 +4,7 @@
 @architect-status:completed
 @architect-unlock-reason:'Split-from-original'
 @architect-product-area:DataAPI
-@cli @process-api
+@cli @pattern-graph-cli
 Feature: Process API CLI - Discovery Subcommands
   Discovery subcommands: list, search, context assembly, tags/sources, extended arch, unannotated.
 
@@ -23,14 +23,14 @@ Feature: Process API CLI - Discovery Subcommands
     @happy-path
     Scenario: List all patterns returns JSON array
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' list"
+      When running "pattern-graph-cli -i 'src/**/*.ts' list"
       Then exit code is 0
       And stdout is valid JSON with key "success"
 
     @validation
     Scenario: List with invalid phase shows error
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' list --phase abc"
+      When running "pattern-graph-cli -i 'src/**/*.ts' list --phase abc"
       Then exit code is 1
       And output contains "Invalid --phase"
 
@@ -46,7 +46,7 @@ Feature: Process API CLI - Discovery Subcommands
     @happy-path
     Scenario: Search returns matching patterns
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' search Completed"
+      When running "pattern-graph-cli -i 'src/**/*.ts' search Completed"
       Then exit code is 0
       And stdout is valid JSON
       And stdout contains "CompletedPattern"
@@ -54,7 +54,7 @@ Feature: Process API CLI - Discovery Subcommands
     @validation
     Scenario: Search without query shows error
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' search"
+      When running "pattern-graph-cli -i 'src/**/*.ts' search"
       Then exit code is 1
       And output contains "Usage:"
 
@@ -70,7 +70,7 @@ Feature: Process API CLI - Discovery Subcommands
     @happy-path
     Scenario: Context returns curated text bundle
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' context CompletedPattern"
+      When running "pattern-graph-cli -i 'src/**/*.ts' context CompletedPattern"
       Then exit code is 0
       And stdout is non-empty
       And stdout contains "CompletedPattern"
@@ -78,14 +78,14 @@ Feature: Process API CLI - Discovery Subcommands
     @validation
     Scenario: Context without pattern name shows error
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' context"
+      When running "pattern-graph-cli -i 'src/**/*.ts' context"
       Then exit code is 1
       And output contains "Usage:"
 
     @happy-path
     Scenario: Overview returns executive summary text
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' overview"
+      When running "pattern-graph-cli -i 'src/**/*.ts' overview"
       Then exit code is 0
       And stdout is non-empty
       And stdout contains "PROGRESS"
@@ -93,7 +93,7 @@ Feature: Process API CLI - Discovery Subcommands
     @happy-path
     Scenario: Dep-tree returns dependency tree text
       Given TypeScript files with architecture annotations and dependencies
-      When running "process-api -i 'src/**/*.ts' dep-tree ScannerService"
+      When running "pattern-graph-cli -i 'src/**/*.ts' dep-tree ScannerService"
       Then exit code is 0
       And stdout is non-empty
 
@@ -109,14 +109,14 @@ Feature: Process API CLI - Discovery Subcommands
     @happy-path
     Scenario: Tags returns tag usage counts
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' tags"
+      When running "pattern-graph-cli -i 'src/**/*.ts' tags"
       Then exit code is 0
       And stdout is valid JSON with key "data"
 
     @happy-path
     Scenario: Sources returns file inventory
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' sources"
+      When running "pattern-graph-cli -i 'src/**/*.ts' sources"
       Then exit code is 0
       And stdout is valid JSON
 
@@ -132,7 +132,7 @@ Feature: Process API CLI - Discovery Subcommands
     @happy-path
     Scenario: Arch neighborhood returns pattern relationships
       Given TypeScript files with architecture annotations and dependencies
-      When running "process-api -i 'src/**/*.ts' arch neighborhood ScannerService"
+      When running "pattern-graph-cli -i 'src/**/*.ts' arch neighborhood ScannerService"
       Then exit code is 0
       And stdout is valid JSON
       And stdout contains "ScannerService"
@@ -140,14 +140,14 @@ Feature: Process API CLI - Discovery Subcommands
     @happy-path
     Scenario: Arch compare returns context comparison
       Given TypeScript files with two architecture contexts
-      When running "process-api -i 'src/**/*.ts' arch compare scanner codec"
+      When running "pattern-graph-cli -i 'src/**/*.ts' arch compare scanner codec"
       Then exit code is 0
       And stdout is valid JSON
 
     @happy-path
     Scenario: Arch coverage returns annotation coverage
       Given TypeScript files with architecture annotations
-      When running "process-api -i 'src/**/*.ts' arch coverage"
+      When running "pattern-graph-cli -i 'src/**/*.ts' arch coverage"
       Then exit code is 0
       And stdout is valid JSON
 
@@ -163,6 +163,6 @@ Feature: Process API CLI - Discovery Subcommands
     @happy-path
     Scenario: Unannotated finds files missing architect marker
       Given TypeScript files with mixed annotations
-      When running "process-api -i 'src/**/*.ts' unannotated"
+      When running "pattern-graph-cli -i 'src/**/*.ts' unannotated"
       Then exit code is 0
       And stdout is valid JSON

@@ -3,7 +3,7 @@
 @architect-implements:DataAPICLIErgonomics
 @architect-status:active
 @architect-product-area:DataAPI
-@cli @process-api @repl
+@cli @pattern-graph-cli @repl
 Feature: Process API CLI - REPL Mode
   Interactive REPL mode keeps the pipeline loaded for multi-query sessions and supports reload.
 

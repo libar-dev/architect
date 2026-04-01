@@ -1,7 +1,7 @@
 /**
  * @architect
  * @architect-core
- * @architect-pattern ProcessStateTypes
+ * @architect-pattern PatternGraphAPITypes
  * @architect-status active
  * @architect-depends-on:PatternGraph
  *

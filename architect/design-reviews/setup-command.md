@@ -74,7 +74,7 @@ sequenceDiagram
         init_cli->>init_cli: exit(1)
     end
 
-    Note over init_cli: Rule 4 — Injected scripts reference bin names (process-api, generate-docs) resolved via node_modules/.bin, not dist paths. Existing scripts are preserved. The package.json &quot;type&quot; field is preserved. ESM migration is an explicit opt-in via —esm flag.
+    Note over init_cli: Rule 4 — Injected scripts reference bin names (pattern-graph-cli, generate-docs) resolved via node_modules/.bin, not dist paths. Existing scripts are preserved. The package.json &quot;type&quot; field is preserved. ESM migration is an explicit opt-in via —esm flag.
 
     init_cli->>+augment_package_json: InitConfig
     augment_package_json-->>-init_cli: package.json updated with process and docs scripts
@@ -86,7 +86,7 @@ sequenceDiagram
     init_cli->>+generate_example: InitConfig
     generate_example-->>-init_cli: directories created for source globs, example annotated .ts file
 
-    Note over init_cli: Rule 6 — After all files are generated, init runs process-api overview and reports whether the pipeline detected the example pattern. Success prints a summary and next steps. Failure prints diagnostic information.
+    Note over init_cli: Rule 6 — After all files are generated, init runs pattern-graph-cli overview and reports whether the pipeline detected the example pattern. Success prints a summary and next steps. Failure prints diagnostic information.
 
     init_cli->>+validate_setup: targetDir: string
     validate_setup-->>-init_cli: SetupResult

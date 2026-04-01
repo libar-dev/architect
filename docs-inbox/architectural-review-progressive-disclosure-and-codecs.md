@@ -331,7 +331,7 @@ When `generateFromConfig()` is used (the high-level orchestrator path), config i
 1. **Externally** by `loadProjectConfig()` → `ResolvedConfig`
 2. **Inside** `buildPatternGraph()` at `build-pipeline.ts:172` which calls `loadConfig(baseDir)` again
 
-The second load exists because `buildPatternGraph()` is designed as a standalone entry point (used by 5 consumers: orchestrator, process-api CLI, validate-patterns CLI, REPL, MCP server).
+The second load exists because `buildPatternGraph()` is designed as a standalone entry point (used by 5 consumers: orchestrator, pattern-graph-cli CLI, validate-patterns CLI, REPL, MCP server).
 
 **Fix:** `PipelineOptions` should accept an optional pre-loaded `TagRegistry`. When provided, skip the internal `loadConfig()`. The 4 non-orchestrator consumers continue to omit it. The orchestrator passes its already-loaded config. Zero behavioral change, one fewer disk read + config resolution.
 

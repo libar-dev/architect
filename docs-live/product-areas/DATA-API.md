@@ -45,7 +45,7 @@ and `transformToPatternGraph` with validation summary.
 
 ## Consumer Architecture and PipelineOptions Differentiation
 
-Three consumers share this factory: `process-api`, `validate-patterns`, and the
+Three consumers share this factory: `pattern-graph-cli`, `validate-patterns`, and the
 generation orchestrator. `PipelineOptions` differentiates behavior by
 `mergeConflictStrategy` (`fatal` vs `concatenate`), `includeValidation` toggles,
 and `failOnScanErrors` policy without forking pipeline logic.
@@ -66,6 +66,11 @@ Scoped architecture diagram showing component relationships:
 graph TB
     subgraph api["Api"]
         PatternGraph[/"PatternGraph"/]
+        MCPToolRegistry("MCPToolRegistry")
+        MCPServerImpl("MCPServerImpl")
+        MCPPipelineSession("MCPPipelineSession")
+        MCPModule[/"MCPModule"/]
+        MCPFileWatcher[/"MCPFileWatcher"/]
         PatternSummarizerImpl("PatternSummarizerImpl")
         ScopeValidatorImpl("ScopeValidatorImpl")
         PatternHelpers["PatternHelpers"]
@@ -76,15 +81,10 @@ graph TB
         ContextFormatterImpl("ContextFormatterImpl")
         ContextAssemblerImpl("ContextAssemblerImpl")
         ArchQueriesImpl("ArchQueriesImpl")
-        MCPToolRegistry("MCPToolRegistry")
-        MCPServerImpl("MCPServerImpl")
-        MCPPipelineSession("MCPPipelineSession")
-        MCPModule[/"MCPModule"/]
-        MCPFileWatcher[/"MCPFileWatcher"/]
     end
     subgraph cli["Cli"]
         ReplMode("ReplMode")
-        ProcessAPICLIImpl("ProcessAPICLIImpl")
+        PatternGraphCLIImpl("PatternGraphCLIImpl")
         OutputPipelineImpl("OutputPipelineImpl")
         MCPServerBin[/"MCPServerBin"/]
         DatasetCache[/"DatasetCache"/]
@@ -98,7 +98,6 @@ graph TB
         RulesQueryModule["RulesQueryModule"]:::neighbor
         FSMValidator["FSMValidator"]:::neighbor
         PipelineFactory["PipelineFactory"]:::neighbor
-        ProcessApiHybridGeneration["ProcessApiHybridGeneration"]:::neighbor
         PhaseStateMachineValidation["PhaseStateMachineValidation"]:::neighbor
         PatternGraphAPICLI["PatternGraphAPICLI"]:::neighbor
         MCPServerIntegration["MCPServerIntegration"]:::neighbor
@@ -107,18 +106,35 @@ graph TB
         DataAPIContextAssembly["DataAPIContextAssembly"]:::neighbor
         DataAPICLIErgonomics["DataAPICLIErgonomics"]:::neighbor
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
+        CliReferenceGeneration["CliReferenceGeneration"]:::neighbor
     end
+    MCPToolRegistry -->|uses| PatternGraphAPI
+    MCPToolRegistry -->|uses| MCPPipelineSession
+    MCPToolRegistry ..->|implements| MCPServerIntegration
+    MCPServerImpl -->|uses| MCPPipelineSession
+    MCPServerImpl -->|uses| MCPToolRegistry
+    MCPServerImpl -->|uses| MCPFileWatcher
+    MCPServerImpl ..->|implements| MCPServerIntegration
+    MCPPipelineSession -->|uses| PipelineFactory
+    MCPPipelineSession -->|uses| PatternGraphAPI
+    MCPPipelineSession -->|uses| ConfigLoader
+    MCPPipelineSession ..->|implements| MCPServerIntegration
+    MCPModule -->|uses| MCPServerImpl
+    MCPModule -->|uses| MCPPipelineSession
+    MCPModule -->|uses| MCPFileWatcher
+    MCPModule -->|uses| MCPToolRegistry
+    MCPFileWatcher ..->|implements| MCPServerIntegration
     ReplMode -->|uses| PipelineFactory
     ReplMode -->|uses| PatternGraphAPI
     ReplMode ..->|implements| DataAPICLIErgonomics
-    ProcessAPICLIImpl -->|uses| PatternGraphAPI
-    ProcessAPICLIImpl -->|uses| PatternGraph
-    ProcessAPICLIImpl -->|uses| PipelineFactory
-    ProcessAPICLIImpl -->|uses| RulesQueryModule
-    ProcessAPICLIImpl -->|uses| PatternSummarizerImpl
-    ProcessAPICLIImpl -->|uses| FuzzyMatcherImpl
-    ProcessAPICLIImpl -->|uses| OutputPipelineImpl
-    ProcessAPICLIImpl ..->|implements| PatternGraphAPICLI
+    PatternGraphCLIImpl -->|uses| PatternGraphAPI
+    PatternGraphCLIImpl -->|uses| PatternGraph
+    PatternGraphCLIImpl -->|uses| PipelineFactory
+    PatternGraphCLIImpl -->|uses| RulesQueryModule
+    PatternGraphCLIImpl -->|uses| PatternSummarizerImpl
+    PatternGraphCLIImpl -->|uses| FuzzyMatcherImpl
+    PatternGraphCLIImpl -->|uses| OutputPipelineImpl
+    PatternGraphCLIImpl ..->|implements| PatternGraphAPICLI
     OutputPipelineImpl -->|uses| PatternSummarizerImpl
     OutputPipelineImpl ..->|implements| DataAPIOutputShaping
     MCPServerBin -->|uses| MCPServerImpl
@@ -126,7 +142,7 @@ graph TB
     DatasetCache -->|uses| PipelineFactory
     DatasetCache -->|uses| WorkflowConfigSchema
     DatasetCache ..->|implements| DataAPICLIErgonomics
-    CLISchema ..->|implements| ProcessApiHybridGeneration
+    CLISchema ..->|implements| CliReferenceGeneration
     PatternSummarizerImpl -->|uses| PatternGraphAPI
     PatternSummarizerImpl ..->|implements| DataAPIOutputShaping
     ScopeValidatorImpl -->|uses| PatternGraphAPI
@@ -156,22 +172,6 @@ graph TB
     ArchQueriesImpl -->|uses| PatternGraphAPI
     ArchQueriesImpl -->|uses| PatternGraph
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
-    MCPToolRegistry -->|uses| PatternGraphAPI
-    MCPToolRegistry -->|uses| MCPPipelineSession
-    MCPToolRegistry ..->|implements| MCPServerIntegration
-    MCPServerImpl -->|uses| MCPPipelineSession
-    MCPServerImpl -->|uses| MCPToolRegistry
-    MCPServerImpl -->|uses| MCPFileWatcher
-    MCPServerImpl ..->|implements| MCPServerIntegration
-    MCPPipelineSession -->|uses| PipelineFactory
-    MCPPipelineSession -->|uses| PatternGraphAPI
-    MCPPipelineSession -->|uses| ConfigLoader
-    MCPPipelineSession ..->|implements| MCPServerIntegration
-    MCPModule -->|uses| MCPServerImpl
-    MCPModule -->|uses| MCPPipelineSession
-    MCPModule -->|uses| MCPFileWatcher
-    MCPModule -->|uses| MCPToolRegistry
-    MCPFileWatcher ..->|implements| MCPServerIntegration
     StubResolverImpl -->|uses| PatternGraphAPI
     FSMValidator ..->|implements| PhaseStateMachineValidation
     PipelineFactory -->|uses| PatternGraph
@@ -246,7 +246,7 @@ interface PipelineResult {
 
 ```typescript
 /**
- * Master Dataset - Unified view of all extracted patterns
+ * PatternGraph - Unified view of all extracted patterns
  *
  * Contains raw patterns plus pre-computed views and statistics.
  * This is the primary data structure passed to generators and sections.
@@ -800,19 +800,19 @@ ArchIndexSchema = z.object({
 
 ### Process API Layered Extraction
 
-| Rule                                                              | Invariant                                                                                                                                                                                                                                                                                                                                 | Rationale                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| CLI file contains only routing, no domain logic                   | `process-api.ts` parses arguments, calls the pipeline factory for the PatternGraph, routes subcommands to API modules, and formats output. It does not build Maps, filter patterns, group data, or resolve relationships. Thin view projections (3-5 line `.map()` calls over pre-computed archIndex views) are acceptable as formatting. | Domain logic in the CLI file is only accessible via the command line. Extracting it to `src/api/` makes it programmatically testable, reusable by future consumers (MCP server, watch mode), and aligned with the feature-consumption layer defined in ADR-006.                                                                                                                                              |
-| Pipeline factory is shared across CLI consumers                   | The scan-extract-transform sequence is defined once in `src/generators/pipeline/build-pipeline.ts`. CLI consumers that need a PatternGraph call the factory rather than wiring the pipeline independently. The factory accepts `mergeConflictStrategy` to handle behavioral differences between consumers.                                | Three consumers (process-api, validate-patterns, orchestrator) independently wire the same 8-step sequence: loadConfig, scanPatterns, extractPatterns, scanGherkinFiles, extractPatternsFromGherkin, mergePatterns, computeHierarchyChildren, transformToPatternGraph. The only semantic difference is merge-conflict handling (fatal vs concatenate). This is a Parallel Pipeline anti-pattern per ADR-006. |
-| Domain logic lives in API modules                                 | Query logic that operates on PatternGraph lives in `src/api/` modules. The `rules-query.ts` module provides business rules querying with the same grouping logic that was inline in handleRules: filter by product area and pattern, group by area -> phase -> feature -> rules, parse annotations, compute totals.                       | `handleRules` is 184 lines with 5 Map/Set constructions, codec-layer imports (`parseBusinessRuleAnnotations`, `deduplicateScenarioNames`), and a complex 3-level grouping algorithm. This is the last significant inline domain logic in process-api.ts. Moving it to `src/api/` follows the same pattern as the 12 existing API modules (context-assembler, arch-queries, scope-validator, etc.).           |
-| Pipeline factory returns Result for consumer-owned error handling | The factory returns `Result<PipelineResult, PipelineError>` rather than throwing or calling `process.exit()`. Each consumer maps the error to its own strategy: process-api.ts calls `process.exit(1)`, validate-patterns.ts throws, and orchestrator.ts (future) returns `Result.err()`.                                                 | The current `buildPipeline()` in process-api.ts calls `process.exit(1)` on errors, making it non-reusable. The factory must work across consumers with different error handling models. The Result monad is the project's established pattern for this (see `src/types/result.ts`).                                                                                                                          |
-| End-to-end verification confirms behavioral equivalence           | After extraction, all CLI commands produce identical output to pre-refactor behavior with zero build, test, lint, and validation errors.                                                                                                                                                                                                  | The refactor must not change observable behavior. Full CLI verification confirms the extraction is a pure refactor.                                                                                                                                                                                                                                                                                          |
+| Rule                                                              | Invariant                                                                                                                                                                                                                                                                                                                                       | Rationale                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| CLI file contains only routing, no domain logic                   | `pattern-graph-cli.ts` parses arguments, calls the pipeline factory for the PatternGraph, routes subcommands to API modules, and formats output. It does not build Maps, filter patterns, group data, or resolve relationships. Thin view projections (3-5 line `.map()` calls over pre-computed archIndex views) are acceptable as formatting. | Domain logic in the CLI file is only accessible via the command line. Extracting it to `src/api/` makes it programmatically testable, reusable by future consumers (MCP server, watch mode), and aligned with the feature-consumption layer defined in ADR-006.                                                                                                                                                    |
+| Pipeline factory is shared across CLI consumers                   | The scan-extract-transform sequence is defined once in `src/generators/pipeline/build-pipeline.ts`. CLI consumers that need a PatternGraph call the factory rather than wiring the pipeline independently. The factory accepts `mergeConflictStrategy` to handle behavioral differences between consumers.                                      | Three consumers (pattern-graph-cli, validate-patterns, orchestrator) independently wire the same 8-step sequence: loadConfig, scanPatterns, extractPatterns, scanGherkinFiles, extractPatternsFromGherkin, mergePatterns, computeHierarchyChildren, transformToPatternGraph. The only semantic difference is merge-conflict handling (fatal vs concatenate). This is a Parallel Pipeline anti-pattern per ADR-006. |
+| Domain logic lives in API modules                                 | Query logic that operates on PatternGraph lives in `src/api/` modules. The `rules-query.ts` module provides business rules querying with the same grouping logic that was inline in handleRules: filter by product area and pattern, group by area -> phase -> feature -> rules, parse annotations, compute totals.                             | `handleRules` is 184 lines with 5 Map/Set constructions, codec-layer imports (`parseBusinessRuleAnnotations`, `deduplicateScenarioNames`), and a complex 3-level grouping algorithm. This is the last significant inline domain logic in pattern-graph-cli.ts. Moving it to `src/api/` follows the same pattern as the 12 existing API modules (context-assembler, arch-queries, scope-validator, etc.).           |
+| Pipeline factory returns Result for consumer-owned error handling | The factory returns `Result<PipelineResult, PipelineError>` rather than throwing or calling `process.exit()`. Each consumer maps the error to its own strategy: pattern-graph-cli.ts calls `process.exit(1)`, validate-patterns.ts throws, and orchestrator.ts (future) returns `Result.err()`.                                                 | The current `buildPipeline()` in pattern-graph-cli.ts calls `process.exit(1)` on errors, making it non-reusable. The factory must work across consumers with different error handling models. The Result monad is the project's established pattern for this (see `src/types/result.ts`).                                                                                                                          |
+| End-to-end verification confirms behavioral equivalence           | After extraction, all CLI commands produce identical output to pre-refactor behavior with zero build, test, lint, and validation errors.                                                                                                                                                                                                        | The refactor must not change observable behavior. Full CLI verification confirms the extraction is a pure refactor.                                                                                                                                                                                                                                                                                                |
 
 ### Process Api Reference Tests
 
 | Rule                                                       | Invariant                                                                                                                           | Rationale |
 | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| Generated reference file contains all three table sections | PROCESS-API-REFERENCE.md contains Global Options, Output Modifiers, and List Filters tables generated from the CLI schema.          |           |
+| Generated reference file contains all three table sections | CLI-REFERENCE.md contains Global Options, Output Modifiers, and List Filters tables generated from the CLI schema.                  |           |
 | CLI schema stays in sync with parser                       | Every flag recognized by parseArgs() has a corresponding entry in the CLI schema. A missing schema entry means the sync test fails. |           |
 | showHelp output reflects CLI schema                        | The help text rendered by showHelp() includes all options from the CLI schema, formatted for terminal display.                      |           |
 

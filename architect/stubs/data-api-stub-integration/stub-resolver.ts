@@ -3,7 +3,7 @@
  * @architect-status roadmap
  * @architect-implements DataAPIStubIntegration
  * @architect-uses PatternGraphAPI
- * @architect-used-by ProcessAPICLIImpl
+ * @architect-used-by PatternGraphCLIImpl
  * @architect-target src/api/stub-resolver.ts
  * @architect-since DS-B
  *

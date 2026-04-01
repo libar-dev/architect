@@ -4,7 +4,7 @@
  * @architect-status completed
  * @architect-implements DataAPIDesignSessionSupport
  * @architect-uses PatternGraphAPI, PatternGraph, StubResolverImpl
- * @architect-used-by ProcessAPICLIImpl
+ * @architect-used-by PatternGraphCLIImpl
  * @architect-target src/api/scope-validator.ts
  * @architect-arch-role service
  * @architect-arch-context api

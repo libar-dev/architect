@@ -1,6 +1,6 @@
 # Data API CLI
 
-> **Deprecated:** The full CLI documentation is now auto-generated. See [CLI Reference Tables](../docs-live/reference/PROCESS-API-REFERENCE.md) and [Recipes & Workflow Guide](../docs-live/reference/PROCESS-API-RECIPES.md). This file retains only quick-start guidance and operational reference (JSON envelope, exit codes).
+> **Deprecated:** The full CLI documentation is now auto-generated. See [CLI Reference Tables](../docs-live/reference/CLI-REFERENCE.md) and [Recipes & Workflow Guide](../docs-live/reference/PROCESS-API-RECIPES.md). This file retains only quick-start guidance and operational reference (JSON envelope, exit codes).
 >
 > Query process state directly from annotated source code.
 
@@ -17,7 +17,7 @@
 > This document retains operational reference (JSON envelope, exit codes, piping).
 > For full CLI documentation, see the generated references below.
 
-- **[CLI Reference Tables](../docs-live/reference/PROCESS-API-REFERENCE.md)** — all flags, options, filters, and modifiers
+- **[CLI Reference Tables](../docs-live/reference/CLI-REFERENCE.md)** — all flags, options, filters, and modifiers
 - **[Recipes & Workflow Guide](../docs-live/reference/PROCESS-API-RECIPES.md)** — command descriptions, usage examples, and common recipes
 
 ---
@@ -58,8 +58,8 @@ On error:
 
 ### JSON Piping
 
-`pnpm` outputs a banner line to stdout (`> @libar-dev/...`). For clean JSON piping, use `npx tsx src/cli/process-api.ts` directly:
+`pnpm` outputs a banner line to stdout (`> @libar-dev/...`). For clean JSON piping, use `npx tsx src/cli/pattern-graph-cli.ts` directly:
 
 ```bash
-npx tsx src/cli/process-api.ts list --status roadmap --names-only | jq '.data[]'
+npx tsx src/cli/pattern-graph-cli.ts list --status roadmap --names-only | jq '.data[]'
 ```

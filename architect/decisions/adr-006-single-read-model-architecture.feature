@@ -54,7 +54,7 @@ Feature: ADR-006 - Single Read Model Architecture
     **Verified by:** Feature consumers import from PatternGraph not from raw pipeline stages
 
     | Layer | May Import | Examples |
-    | Pipeline Orchestration | scanner/, extractor/, pipeline/ | orchestrator.ts, process-api.ts pipeline setup |
+    | Pipeline Orchestration | scanner/, extractor/, pipeline/ | orchestrator.ts, pattern-graph-cli.ts pipeline setup |
     | Feature Consumption | PatternGraph, relationshipIndex | codecs, PatternGraphAPI, validators, query handlers |
 
     Exception: `lint-patterns.ts` is a pure stage-1 consumer. It validates

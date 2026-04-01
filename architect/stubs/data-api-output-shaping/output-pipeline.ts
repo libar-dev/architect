@@ -3,7 +3,7 @@
  * @architect-status roadmap
  * @architect-implements DataAPIOutputShaping
  * @architect-uses PatternSummarizer
- * @architect-used-by ProcessAPICLIImpl
+ * @architect-used-by PatternGraphCLIImpl
  * @architect-target src/cli/output-pipeline.ts
  * @architect-since DS-A
  *

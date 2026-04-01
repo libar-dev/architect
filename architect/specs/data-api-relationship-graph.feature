@@ -41,7 +41,7 @@ Feature: Data API Relationship Graph - Deep Dependency Analysis
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
       | Graph traversal engine | pending | src/api/graph-traversal.ts | Yes | unit |
-      | graph subcommand | pending | src/cli/process-api.ts | Yes | integration |
+      | graph subcommand | pending | src/cli/pattern-graph-cli.ts | Yes | integration |
       | Impact analysis | pending | src/api/graph-traversal.ts | Yes | unit |
       | Path finding algorithm | pending | src/api/graph-traversal.ts | Yes | unit |
       | Dangling reference detector | pending | src/api/graph-health.ts | Yes | unit |
@@ -67,14 +67,14 @@ Feature: Data API Relationship Graph - Deep Dependency Analysis
     @acceptance-criteria @happy-path
     Scenario: Recursive graph traversal
       Given a chain: A -> B -> C -> D with uses relationships
-      When running "process-api graph A --depth 3 --direction down"
+      When running "pattern-graph-cli graph A --depth 3 --direction down"
       Then the output shows A -> B -> C -> D as a tree
       And each node shows its status and phase
 
     @acceptance-criteria @happy-path
     Scenario: Bidirectional traversal with depth limit
       Given a pattern "C" in the middle of a chain
-      When running "process-api graph C --depth 1 --direction both"
+      When running "pattern-graph-cli graph C --depth 1 --direction both"
       Then the output shows direct parents (1 up) and direct children (1 down)
       And deeper relationships are not included
 
@@ -96,14 +96,14 @@ Feature: Data API Relationship Graph - Deep Dependency Analysis
     @acceptance-criteria @happy-path
     Scenario: Impact analysis shows transitive dependents
       Given "EventStore" is used by "Saga" which is used by "Orchestrator"
-      When running "process-api graph impact EventStore"
+      When running "pattern-graph-cli graph impact EventStore"
       Then the output shows "Saga" and "Orchestrator" as affected
       And the output shows the chain of impact
 
     @acceptance-criteria @happy-path
     Scenario: Impact analysis for leaf pattern
       Given a pattern with no usedBy or enables relationships
-      When running "process-api graph impact LeafPattern"
+      When running "pattern-graph-cli graph impact LeafPattern"
       Then the output indicates no downstream impact
 
   # ============================================================================
@@ -126,14 +126,14 @@ Feature: Data API Relationship Graph - Deep Dependency Analysis
     @acceptance-criteria @happy-path
     Scenario: Find path between connected patterns
       Given a chain: EventStore -> Saga -> Orchestrator -> Workflow
-      When running "process-api graph path EventStore Workflow"
+      When running "pattern-graph-cli graph path EventStore Workflow"
       Then the output shows the chain: EventStore -> Saga -> Orchestrator -> Workflow
       And each hop shows the relationship type
 
     @acceptance-criteria @edge-case
     Scenario: No path between disconnected patterns
       Given "PatternA" and "PatternZ" with no connecting relationships
-      When running "process-api graph path PatternA PatternZ"
+      When running "pattern-graph-cli graph path PatternA PatternZ"
       Then the output indicates no path exists between the patterns
 
   # ============================================================================
@@ -156,21 +156,21 @@ Feature: Data API Relationship Graph - Deep Dependency Analysis
     @acceptance-criteria @happy-path
     Scenario: Detect dangling references
       Given a pattern with uses "NonExistentPattern"
-      When running "process-api graph dangling"
+      When running "pattern-graph-cli graph dangling"
       Then the output includes the broken reference
       And the output shows which pattern references it
 
     @acceptance-criteria @happy-path
     Scenario: Detect orphan patterns
       Given a pattern with no uses, usedBy, dependsOn, or enables
-      When running "process-api graph orphans"
+      When running "pattern-graph-cli graph orphans"
       Then the output includes the isolated pattern
       And the output suggests adding relationship tags
 
     @acceptance-criteria @happy-path
     Scenario: Show blocking chains
       Given patterns blocked by incomplete dependencies
-      When running "process-api graph blocking"
+      When running "pattern-graph-cli graph blocking"
       Then the output shows each blocked pattern with its blocker
       And the output shows the chain from blocker to blocked
       And completed dependencies are excluded from the blocked list

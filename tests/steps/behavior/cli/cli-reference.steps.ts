@@ -5,7 +5,7 @@
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import { CLI_SCHEMA, type CLIOptionGroup, type CLISchema } from '../../../../src/cli/cli-schema.js';
-import { createProcessApiReferenceGenerator } from '../../../../src/generators/built-in/process-api-reference-generator.js';
+import { createCliReferenceGenerator } from '../../../../src/generators/built-in/cli-reference-generator.js';
 import type { GeneratorContext } from '../../../../src/generators/types.js';
 
 // ============================================================================
@@ -74,7 +74,7 @@ function schemaFlagsFor(
 // Feature
 // ============================================================================
 
-const feature = await loadFeature('tests/features/behavior/cli/process-api-reference.feature');
+const feature = await loadFeature('tests/features/behavior/cli/cli-reference.feature');
 
 describeFeature(feature, ({ AfterEachScenario, Rule }) => {
   AfterEachScenario(() => {
@@ -92,8 +92,8 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         expect(CLI_SCHEMA).toBeDefined();
       });
 
-      When('the ProcessApiReferenceGenerator produces output', async () => {
-        const generator = createProcessApiReferenceGenerator();
+      When('the CliReferenceGenerator produces output', async () => {
+        const generator = createCliReferenceGenerator();
         const output = await generator.generate([], createMockGeneratorContext());
         state!.generatedContent = output.files[0].content;
       });
@@ -125,8 +125,8 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         state = { generatedContent: null };
       });
 
-      When('the ProcessApiReferenceGenerator produces output', async () => {
-        const generator = createProcessApiReferenceGenerator();
+      When('the CliReferenceGenerator produces output', async () => {
+        const generator = createCliReferenceGenerator();
         const output = await generator.generate([], createMockGeneratorContext());
         state!.generatedContent = output.files[0].content;
       });
@@ -158,8 +158,8 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         state = { generatedContent: null };
       });
 
-      When('the ProcessApiReferenceGenerator produces output', async () => {
-        const generator = createProcessApiReferenceGenerator();
+      When('the CliReferenceGenerator produces output', async () => {
+        const generator = createCliReferenceGenerator();
         const output = await generator.generate([], createMockGeneratorContext());
         state!.generatedContent = output.files[0].content;
       });
@@ -188,8 +188,8 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         state = { generatedContent: null };
       });
 
-      When('the ProcessApiReferenceGenerator produces output', async () => {
-        const generator = createProcessApiReferenceGenerator();
+      When('the CliReferenceGenerator produces output', async () => {
+        const generator = createCliReferenceGenerator();
         const output = await generator.generate([], createMockGeneratorContext());
         state!.generatedContent = output.files[0].content;
       });

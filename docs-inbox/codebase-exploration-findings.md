@@ -200,7 +200,7 @@ generate.ts ──depends-on──> codecs/index.ts (barrel)
               ──depends-on──> schema.ts (RenderableDocument)
               ──depends-on──> codecs/types/base.ts (DocumentCodec, BaseCodecOptions)
 
-Each codec ──depends-on──> validation-schemas/master-dataset.ts (PatternGraph)
+Each codec ──depends-on──> validation-schemas/pattern-graph.ts (PatternGraph)
            ──depends-on──> schema.ts (block builders)
            ──depends-on──> codecs/types/base.ts (BaseCodecOptions, mergeOptions)
            ──depends-on──> codecs/shared-schema.ts (RenderableDocumentOutputSchema)

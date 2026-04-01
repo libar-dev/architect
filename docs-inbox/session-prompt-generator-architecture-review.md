@@ -195,7 +195,7 @@ The formatter:
 
 ### Step 4: Wire `session-prompt` subcommand
 
-Add to `src/cli/process-api.ts` following the established CLI pattern.
+Add to `src/cli/pattern-graph-cli.ts` following the established CLI pattern.
 
 ```bash
 pnpm architect:query -- session-prompt DataAPIDesignSessionSupport --type implement

@@ -14,7 +14,7 @@
  * (`byProductArea`, `byPhase`, `byStatus`, `byCategory`) to generate statistics.
  * Only codecs registered in CodecRegistry receive PatternGraph via the
  * `codec.decode(dataset)` pipeline. A standalone generator (like
- * ProcessApiReferenceGenerator) would need to wire its own PatternGraph access,
+ * CliReferenceGenerator) would need to wire its own PatternGraph access,
  * duplicating what CodecBasedGenerator already provides. The codec approach also
  * gets free integration with `generateDocument('index', dataset)`,
  * `generateAllDocuments()`, and the `CodecOptions` type-safe options pipeline.

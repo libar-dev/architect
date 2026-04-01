@@ -1611,7 +1611,7 @@ _Tests the full design review generation pipeline: sequence annotations are_
 
 #### Process API sequence lookup resolves pattern names case-insensitively
 
-> **Invariant:** The sequence subcommand resolves pattern names with the same case-insensitive matching behavior as other pattern-oriented process-api queries.
+> **Invariant:** The sequence subcommand resolves pattern names with the same case-insensitive matching behavior as other pattern-oriented pattern-graph queries.
 >
 > **Rationale:** Design review consumers should not need exact display-name casing when querying sequence data from the CLI.
 

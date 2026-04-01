@@ -135,7 +135,7 @@ See the **Context Gathering Protocol** section above for mandatory session start
 - `pattern <name>` returns ~66KB for completed patterns — prefer `context --session` for interactive sessions.
 - `query getPattern <name>` shows raw JSON including `extractedShapes` — use for debugging shape extraction.
 - Output modifiers (`--names-only`, `--count`, `--fields`) compose with any list/query command.
-- `pnpm` outputs a banner to stdout. For clean JSON piping, use `npx tsx src/cli/process-api.ts` directly.
+- `pnpm` outputs a banner to stdout. For clean JSON piping, use `npx tsx src/cli/pattern-graph-cli.ts` directly.
 
 ### MCP Server — Native AI Context Tools
 
@@ -283,7 +283,7 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 - **Schema-First**: Zod schemas in `src/validation-schemas/` define types with runtime validation
 - **Registry Pattern**: Tag registry (`src/taxonomy/`) defines categories, status values, and tag formats
 - **Codec-Based Rendering**: Generators in `src/generators/` use codecs to transform data to markdown
-- **Pipeline Factory**: Shared `buildPatternGraph()` in `src/generators/pipeline/build-pipeline.ts` — all consumers (orchestrator, process-api, validate-patterns) call this instead of wiring inline pipelines. Per-consumer behavior via `PipelineOptions`.
+- **Pipeline Factory**: Shared `buildPatternGraph()` in `src/generators/pipeline/build-pipeline.ts` — all consumers (orchestrator, pattern-graph-cli, validate-patterns) call this instead of wiring inline pipelines. Per-consumer behavior via `PipelineOptions`.
 - **Single Read Model** (ADR-006): PatternGraph is the sole read model. No consumer re-derives data from raw scanner/extractor output. Anti-patterns: Parallel Pipeline, Lossy Local Type, Re-derived Relationship.
 
 **Live module inventory:** `pnpm architect:query -- arch context` and `pnpm architect:query -- arch layer`
@@ -315,7 +315,7 @@ Tests use Vitest with BDD/Gherkin integration:
 - **Support**: `tests/support/` - test helpers and setup utilities
 - **Shared state helpers**: `tests/support/helpers/` - reusable state management for split test suites
 
-Large test files are split into focused domain files with shared state extracted to helpers (e.g., `ast-parser-state.ts`, `process-api-state.ts`).
+Large test files are split into focused domain files with shared state extracted to helpers (e.g., `ast-parser-state.ts`, `pattern-graph-cli-state.ts`).
 
 Run a single test file: `pnpm test tests/steps/scanner/file-discovery.steps.ts`
 

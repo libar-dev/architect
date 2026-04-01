@@ -15,7 +15,7 @@ Feature: Orchestrator Pipeline Factory Migration
   `orchestrator.ts` is the last feature consumer that wires the 8-step
   scan-extract-merge-transform pipeline inline (lines 282-427). This is
   the Parallel Pipeline anti-pattern identified in ADR-006. The shared
-  pipeline factory in `build-pipeline.ts` already serves `process-api.ts`
+  pipeline factory in `build-pipeline.ts` already serves `pattern-graph-cli.ts`
   and `validate-patterns.ts`, but the orchestrator — the original pipeline
   host — was deferred (ProcessAPILayeredExtraction DD-3) because it
   collects structured warnings (scan errors with file details, extraction
@@ -72,7 +72,7 @@ Feature: Orchestrator Pipeline Factory Migration
   `GenerationWarning` in a thin adapter — `'gherkin-parse'` maps to
   `'scan'`, and generator-level warning types (`'overwrite-skipped'`,
   `'config'`, `'cleanup'`) are produced by the orchestrator itself, not
-  the pipeline. Existing consumers (process-api, validate-patterns) that
+  the pipeline. Existing consumers (pattern-graph-cli, validate-patterns) that
   ignore warnings or use flat strings are unaffected — they can read
   `.message` only.
 
@@ -86,7 +86,7 @@ Feature: Orchestrator Pipeline Factory Migration
 
   DD-3: Pipeline factory gains an includeValidation option.
   The orchestrator calls `transformToPatternGraph` (no validation),
-  while process-api calls `transformToPatternGraphWithValidation`.
+  while pattern-graph-cli calls `transformToPatternGraphWithValidation`.
   The factory already calls the validation variant. Adding
   `includeValidation?: boolean` (default true) lets the orchestrator
   opt out, since doc generation doesn't need validation summaries.
@@ -114,7 +114,7 @@ Feature: Orchestrator Pipeline Factory Migration
   failures are always fatal. For partial failures (individual files
   with parse errors within an otherwise successful scan), the new
   `failOnScanErrors?: boolean` option controls behavior. When true
-  (default for process-api), partial scan errors produce `Result.err`.
+  (default for pattern-graph-cli), partial scan errors produce `Result.err`.
   When false (orchestrator), partial errors are captured in
   `PipelineResult.warnings` as structured `PipelineWarning` objects
   and the pipeline continues with successfully scanned files.
@@ -130,7 +130,7 @@ Feature: Orchestrator Pipeline Factory Migration
   patterns array for `GenerateResult.patterns` and generator context is
   `dataset.patterns` from the PatternGraph.
 
-  DD-7: validate-patterns.ts and process-api.ts are unaffected.
+  DD-7: validate-patterns.ts and pattern-graph-cli.ts are unaffected.
   They already consume the factory. The only change they see is
   `PipelineResult.warnings` widening from `readonly string[]` to
   `readonly PipelineWarning[]`, which is backward-compatible (they
@@ -164,7 +164,7 @@ Feature: Orchestrator Pipeline Factory Migration
   - Generator dispatch, file writing, PR-changes detection (orchestrator core)
   - Session cleanup, generateFromConfig, groupGenerators (orchestrator utilities)
   - generate-docs CLI (calls generateDocumentation unchanged)
-  - process-api.ts, validate-patterns.ts (already migrated)
+  - pattern-graph-cli.ts, validate-patterns.ts (already migrated)
   - Existing test scenarios for orchestrator (same observable behavior)
 
   Background: Deliverables
@@ -205,7 +205,7 @@ Feature: Orchestrator Pipeline Factory Migration
 
     @acceptance-criteria
     Scenario: Factory is sole pipeline definition
-      Given the three CLI consumers: process-api, validate-patterns, orchestrator
+      Given the three CLI consumers: pattern-graph-cli, validate-patterns, orchestrator
       When each needs a PatternGraph
       Then each calls buildPatternGraph from build-pipeline.ts
       And no consumer wires the 8-step pipeline inline
@@ -246,7 +246,7 @@ Feature: Orchestrator Pipeline Factory Migration
     objects with `type`, `message`, optional `count`, and optional
     `details` (file, line, column, message). Consumers that need
     granular diagnostics (orchestrator) use the full structure. Consumers
-    that need simple messages (process-api) read `.message` only.
+    that need simple messages (pattern-graph-cli) read `.message` only.
 
     **Rationale:** The orchestrator collects scan errors, skipped
     directives, extraction errors, and Gherkin parse errors as structured
@@ -267,7 +267,7 @@ Feature: Orchestrator Pipeline Factory Migration
 
     @acceptance-criteria
     Scenario: Existing consumers unaffected
-      Given process-api.ts and validate-patterns.ts consuming the factory
+      Given pattern-graph-cli.ts and validate-patterns.ts consuming the factory
       When PipelineResult.warnings changes from string[] to PipelineWarning[]
       Then both consumers compile without changes
       And runtime behavior is unchanged
@@ -281,7 +281,7 @@ Feature: Orchestrator Pipeline Factory Migration
 
     **Rationale:** The orchestrator treats scan errors as non-fatal
     warnings — documentation generation should succeed for all scannable
-    files even if some files have syntax errors. The process-api treats
+    files even if some files have syntax errors. The pattern-graph-cli treats
     scan errors as fatal because the query layer requires a complete
     dataset. The factory must support both strategies via configuration.
 

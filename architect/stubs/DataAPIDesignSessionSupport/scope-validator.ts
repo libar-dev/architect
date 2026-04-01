@@ -3,7 +3,7 @@
  * @architect-status roadmap
  * @architect-implements DataAPIDesignSessionSupport
  * @architect-uses PatternGraphAPI, PatternGraph, StubResolver
- * @architect-used-by ProcessAPICLIImpl
+ * @architect-used-by PatternGraphCLIImpl
  * @architect-target src/api/scope-validator.ts
  * @architect-since DS-E
  *

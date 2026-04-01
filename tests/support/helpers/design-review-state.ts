@@ -193,7 +193,7 @@ export function transformWithValidation(state: DesignReviewState): void {
 }
 
 /**
- * Resolve a sequence entry using the same case-insensitive lookup helper as process-api.
+ * Resolve a sequence entry using the same case-insensitive lookup helper as pattern-graph-cli.
  */
 export function resolveSequenceEntry(
   state: DesignReviewState,

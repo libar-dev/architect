@@ -3,7 +3,7 @@
 @architect-implements:DataAPICLIErgonomics
 @architect-status:active
 @architect-product-area:DataAPI
-@cli @process-api @help
+@cli @pattern-graph-cli @help
 Feature: Process API CLI - Per-Subcommand Help
   Per-subcommand help displays usage, flags, and examples for individual subcommands.
 
@@ -21,19 +21,19 @@ Feature: Process API CLI - Per-Subcommand Help
 
     @happy-path
     Scenario: Per-subcommand help for context
-      When running "process-api context --help"
+      When running "pattern-graph-cli context --help"
       Then exit code is 0
       And stdout contains context usage and session flag
       And stdout contains "Usage:"
 
     @happy-path
     Scenario: Global help still works
-      When running "process-api --help"
+      When running "pattern-graph-cli --help"
       Then exit code is 0
       And stdout contains "Usage:"
 
     @validation
     Scenario: Unknown subcommand help
-      When running "process-api foobar --help"
+      When running "pattern-graph-cli foobar --help"
       Then exit code is 0
       And stdout contains "No detailed help"

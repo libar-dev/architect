@@ -114,7 +114,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       When('running status and capturing the first result', async () => {
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' status", {
+        await runCLICommand(state, "pattern-graph-cli -i 'src/**/*.ts' status", {
           timeout: CACHE_QUERY_TIMEOUT_MS,
         });
         getCacheState(state).firstResult = getResult(state);
@@ -123,7 +123,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       And('running status and capturing the second result', async () => {
         // Reset result before the second run
         getCacheState(state).result = null;
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' status", {
+        await runCLICommand(state, "pattern-graph-cli -i 'src/**/*.ts' status", {
           timeout: CACHE_QUERY_TIMEOUT_MS,
         });
         getCacheState(state).secondResult = getResult(state);
@@ -153,7 +153,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       When('running status and capturing the first result', async () => {
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' status", {
+        await runCLICommand(state, "pattern-graph-cli -i 'src/**/*.ts' status", {
           timeout: CACHE_QUERY_TIMEOUT_MS,
         });
         getCacheState(state).firstResult = getResult(state);
@@ -170,7 +170,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
       And('running status and capturing the second result', async () => {
         getCacheState(state).result = null;
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' status", {
+        await runCLICommand(state, "pattern-graph-cli -i 'src/**/*.ts' status", {
           timeout: CACHE_QUERY_TIMEOUT_MS,
         });
         getCacheState(state).secondResult = getResult(state);
@@ -190,7 +190,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       When('running status and capturing the first result', async () => {
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' status", {
+        await runCLICommand(state, "pattern-graph-cli -i 'src/**/*.ts' status", {
           timeout: CACHE_QUERY_TIMEOUT_MS,
         });
         getCacheState(state).firstResult = getResult(state);
@@ -198,7 +198,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
       And('running status with --no-cache and capturing the second result', async () => {
         getCacheState(state).result = null;
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' --no-cache status", {
+        await runCLICommand(state, "pattern-graph-cli -i 'src/**/*.ts' --no-cache status", {
           timeout: CACHE_QUERY_TIMEOUT_MS,
         });
         getCacheState(state).secondResult = getResult(state);

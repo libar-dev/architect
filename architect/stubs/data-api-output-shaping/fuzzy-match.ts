@@ -2,7 +2,7 @@
  * @architect
  * @architect-status roadmap
  * @architect-implements DataAPIOutputShaping
- * @architect-used-by ProcessAPICLIImpl
+ * @architect-used-by PatternGraphCLIImpl
  * @architect-target src/api/fuzzy-match.ts
  * @architect-since DS-A
  *

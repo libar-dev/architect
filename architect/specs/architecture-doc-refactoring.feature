@@ -290,9 +290,9 @@ Feature: Architecture Document Refactoring
   Rule: PatternGraph shapes generate a dedicated ARCHITECTURE-TYPES reference document
 
     **Invariant:** DD-6: A new ReferenceDocConfig produces ARCHITECTURE-TYPES.md using
-    shapeSelectors with group master-dataset to extract PatternGraph schema types,
+    shapeSelectors with group pattern-graph to extract PatternGraph schema types,
     RuntimePatternGraph, RawDataset, PipelineOptions, and PipelineResult. Source files
-    tagged with @architect-shape pattern-graph and @architect-include master-dataset
+    tagged with @architect-shape pattern-graph
     contribute shapes to the reference doc. The Unified Transformation section (L345-478)
     is replaced with a condensed narrative (~15 lines) and pointer to ARCHITECTURE-TYPES.md.
 
@@ -308,7 +308,7 @@ Feature: Architecture Document Refactoring
     @acceptance-criteria @happy-path
     Scenario: PatternGraph shapes extracted via shape selectors
       Given source files tagged with @architect-shape pattern-graph
-      And a ReferenceDocConfig with shapeSelectors targeting master-dataset group
+      And a ReferenceDocConfig with shapeSelectors targeting pattern-graph group
       When the reference codec generates ARCHITECTURE-TYPES.md
       Then PatternGraphSchema, RuntimePatternGraph, and RawDataset types appear
       And each shape includes its TypeScript declaration and JSDoc description
@@ -316,7 +316,7 @@ Feature: Architecture Document Refactoring
     @acceptance-criteria @happy-path
     Scenario: Pipeline types included in ARCHITECTURE-TYPES reference doc
       Given PipelineOptions and PipelineResult tagged with @architect-shape pattern-graph
-      And @architect-include master-dataset on their source files
+      And @architect-shape pattern-graph on their source files
       When the reference codec generates ARCHITECTURE-TYPES.md
       Then PipelineOptions and PipelineResult shapes appear in the API Types section
       And both detailed and compact outputs are produced

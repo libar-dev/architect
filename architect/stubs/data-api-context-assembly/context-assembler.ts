@@ -3,7 +3,7 @@
  * @architect-status roadmap
  * @architect-implements DataAPIContextAssembly
  * @architect-uses PatternGraphAPI, PatternGraph, PatternSummarizer
- * @architect-used-by ProcessAPICLIImpl, ContextFormatter
+ * @architect-used-by PatternGraphCLIImpl, ContextFormatter
  * @architect-target src/api/context-assembler.ts
  * @architect-since DS-C
  *

@@ -911,7 +911,7 @@ _Core CLI infrastructure: help, version, input validation, status, query, patter
 - Integer arguments are coerced for phase queries
 - Double-dash separator is handled gracefully
 
-_process-api-core.feature_
+_pattern-graph-cli-core.feature_
 
 ### Process Api Cli Dry Run
 
@@ -1023,7 +1023,7 @@ _Output modifiers, arch health, and rules subcommand._
 - Rules for non-existent product area returns hint
 - Rules combines product area and only-invariants filters
 
-_process-api-modifiers-rules.feature_
+_pattern-graph-cli-modifiers-rules.feature_
 
 ### Process Api Cli Repl
 
@@ -1140,7 +1140,7 @@ _Discovery subcommands: list, search, context assembly, tags/sources, extended a
 
 - Unannotated finds files missing architect marker
 
-_process-api-subcommands.feature_
+_pattern-graph-cli-subcommands.feature_
 
 ### Process Api Reference Tests
 
@@ -1150,7 +1150,7 @@ _Verifies that the declarative CLI schema drives reference table generation_
 
 #### Generated reference file contains all three table sections
 
-> **Invariant:** PROCESS-API-REFERENCE.md contains Global Options, Output Modifiers, and List Filters tables generated from the CLI schema.
+> **Invariant:** CLI-REFERENCE.md contains Global Options, Output Modifiers, and List Filters tables generated from the CLI schema.
 
 **Verified by:**
 
@@ -1182,7 +1182,7 @@ _Verifies that the declarative CLI schema drives reference table generation_
 
 - Help text includes schema-defined options
 
-_process-api-reference.feature_
+_cli-reference.feature_
 
 ### Scope Validator Tests
 

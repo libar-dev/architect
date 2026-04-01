@@ -32,7 +32,7 @@ Feature: Design Review Diagram Generation
       | BusinessRule errorScenarioNames | complete | src/validation-schemas/extracted-pattern.ts        |
       | DesignReviewCodec               | complete | src/renderable/codecs/design-review.ts             |
       | Design review generator         | complete | src/generators/built-in/design-review-generator.ts |
-      | Process API sequence subcommand | complete | src/cli/process-api.ts                             |
+      | Process API sequence subcommand | complete | src/cli/pattern-graph-cli.ts                             |
       | Config wiring                   | complete | architect.config.ts                         |
 
   Rule: SequenceIndex pre-computes ordered steps from rule-level tags

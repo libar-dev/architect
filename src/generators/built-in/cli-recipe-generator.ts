@@ -9,7 +9,7 @@
  * ## Standalone Generator for CLI Recipes and Command Narratives
  *
  * Generates `PROCESS-API-RECIPES.md` from the declarative CLI schema.
- * Sibling to `ProcessApiReferenceGenerator` — both implement
+ * Sibling to `CliReferenceGenerator` — both implement
  * `DocumentGenerator`, both consume `CLI_SCHEMA` directly, neither depends
  * on PatternGraph (ADR-006 compliant).
  *
@@ -119,7 +119,7 @@ function buildRecipeDocument(preamble: readonly SectionBlock[]): string {
   // 1. Auto-generation notice
   sections.push(
     paragraph(
-      '> Auto-generated from CLI schema. See [CLI Reference](./PROCESS-API-REFERENCE.md) for flag tables.'
+      '> Auto-generated from CLI schema. See [CLI Reference](./CLI-REFERENCE.md) for flag tables.'
     )
   );
 

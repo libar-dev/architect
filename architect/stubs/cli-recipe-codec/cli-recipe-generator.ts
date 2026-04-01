@@ -7,7 +7,7 @@
  * ## CliRecipeGenerator — Standalone Generator for CLI Recipes and Narratives
  *
  * Produces `docs-live/reference/PROCESS-API-RECIPES.md` from the declarative
- * CLI schema. Sibling to `ProcessApiReferenceGenerator` — both implement
+ * CLI schema. Sibling to `CliReferenceGenerator` — both implement
  * `DocumentGenerator`, both consume `CLI_SCHEMA` directly, neither depends
  * on PatternGraph (ADR-006 compliant).
  *
@@ -16,7 +16,7 @@
  * different cadences. Reference tables change when CLI flags are added or
  * removed. Recipes change when workflow recommendations evolve. Coupling
  * them in one generator would force both to change together.
- * `ProcessApiReferenceGenerator` is already completed and tested (Phase 43) —
+ * `CliReferenceGenerator` is already completed and tested (Phase 43) —
  * extending it risks regressions. Two small standalone generators are easier
  * to test and maintain than one large one.
  *
@@ -181,7 +181,7 @@ function buildRecipeDocument(
   //
   // // 1. Auto-generation notice
   // sections.push(paragraph(
-  //   '> Auto-generated from CLI schema. See [CLI Reference](./PROCESS-API-REFERENCE.md) for flag tables.'
+  //   '> Auto-generated from CLI schema. See [CLI Reference](./CLI-REFERENCE.md) for flag tables.'
   // ));
   //
   // // 2. Preamble (editorial prose)
@@ -239,14 +239,14 @@ export interface CliRecipeGeneratorConfig {
 /**
  * Standalone generator producing PROCESS-API-RECIPES.md from CLI schema.
  *
- * Follows the same pattern as ProcessApiReferenceGenerator:
+ * Follows the same pattern as CliReferenceGenerator:
  * - Implements DocumentGenerator interface
  * - Consumes CLI_SCHEMA directly (no PatternGraph dependency)
  * - Returns OutputFile[] via standard orchestrator write path
  * - Registered in architect.config.ts generatorOverrides
  *
- * Key difference from ProcessApiReferenceGenerator:
- * - ProcessApiReferenceGenerator reads CLIOptionGroup → produces flag tables
+ * Key difference from CliReferenceGenerator:
+ * - CliReferenceGenerator reads CLIOptionGroup → produces flag tables
  * - CliRecipeGenerator reads RecipeGroup[] + CommandNarrativeGroup[] → produces recipes
  * - Both read from the same CLI_SCHEMA constant
  */
@@ -296,7 +296,7 @@ export function createCliRecipeGenerator(
 
 /**
  * Registration follows the programmatic pattern from codec-generators.ts.
- * The generator is registered similarly to createProcessApiReferenceGenerator().
+ * The generator is registered similarly to createCliReferenceGenerator().
  *
  * Output directory override is set in architect.config.ts:
  * ```typescript

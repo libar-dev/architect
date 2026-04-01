@@ -3,7 +3,7 @@
 @architect-implements:DataAPICLIErgonomics
 @architect-status:active
 @architect-product-area:DataAPI
-@cli @process-api @dry-run
+@cli @pattern-graph-cli @dry-run
 Feature: Process API CLI - Dry Run
   Dry-run mode shows pipeline scope without processing data.
 
@@ -23,7 +23,7 @@ Feature: Process API CLI - Dry Run
     @happy-path
     Scenario: Dry-run shows file counts
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' --dry-run status"
+      When running "pattern-graph-cli -i 'src/**/*.ts' --dry-run status"
       Then exit code is 0
       And stdout contains dry run marker, file counts, config, and cache status
       And stdout does not contain "success"
@@ -32,7 +32,7 @@ Feature: Process API CLI - Dry Run
     Scenario: Dry-run reports architect.config.js auto-detection
       Given TypeScript files with pattern annotations
       And an architect.config.js with TypeScript sources
-      When running "process-api --dry-run status"
+      When running "pattern-graph-cli --dry-run status"
       Then exit code is 0
       And stdout contains "architect.config.js (auto-detected)"
       And stdout does not contain "success"

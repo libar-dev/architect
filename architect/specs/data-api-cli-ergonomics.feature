@@ -10,19 +10,19 @@
 Feature: Data API CLI Ergonomics - Performance and Interactive Mode
 
   **Problem:**
-  The process-api CLI runs the full pipeline (scan, extract, transform) on every
+  The pattern-graph-cli CLI runs the full pipeline (scan, extract, transform) on every
   invocation, taking 2-5 seconds. During design sessions with 10-20 queries, this
   adds up to 1-2 minutes of waiting. There is no way to keep the pipeline loaded
-  between queries. Per-subcommand help is missing -- `process-api context --help`
+  between queries. Per-subcommand help is missing -- `pattern-graph-cli context --help`
   does not work. FSM-only queries (like `isValidTransition`) run the full pipeline
   even though FSM rules are static.
 
   **Solution:**
   Add performance and ergonomic improvements:
   1. **Pipeline caching** -- Cache PatternGraph to temp file with mtime invalidation
-  2. **REPL mode** -- `process-api repl` keeps pipeline loaded for interactive queries
+  2. **REPL mode** -- `pattern-graph-cli repl` keeps pipeline loaded for interactive queries
   3. **FSM short-circuit** -- FSM queries skip the scan pipeline entirely
-  4. **Per-subcommand help** -- `process-api <subcommand> --help` with examples
+  4. **Per-subcommand help** -- `pattern-graph-cli <subcommand> --help` with examples
   5. **Dry-run mode** -- `--dry-run` shows what would be scanned without running
   6. **Validation summary** -- Include pipeline health in response metadata
 
@@ -38,10 +38,10 @@ Feature: Data API CLI Ergonomics - Performance and Interactive Mode
       | Deliverable | Status | Location | Tests | Test Type |
       | PatternGraph cache with mtime invalidation | complete | src/cli/dataset-cache.ts | Yes | unit |
       | REPL mode handler | complete | src/cli/repl.ts | Yes | integration |
-      | FSM short-circuit for static queries | complete | src/cli/process-api.ts | Yes | unit |
-      | Per-subcommand help system | complete | src/cli/process-api.ts | Yes | integration |
-      | Dry-run mode | complete | src/cli/process-api.ts | Yes | integration |
-      | Validation summary in metadata | complete | src/cli/process-api.ts | Yes | unit |
+      | FSM short-circuit for static queries | complete | src/cli/pattern-graph-cli.ts | Yes | unit |
+      | Per-subcommand help system | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
+      | Dry-run mode | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
+      | Validation summary in metadata | complete | src/cli/pattern-graph-cli.ts | Yes | unit |
 
   # ============================================================================
   # RULE 1: Pipeline Caching
@@ -64,7 +64,7 @@ Feature: Data API CLI Ergonomics - Performance and Interactive Mode
     Scenario: Second query uses cached dataset
       Given a previous query has cached the PatternGraph
       And no source files have been modified since
-      When running "process-api status"
+      When running "pattern-graph-cli status"
       Then the query completes in under 200ms
       And the response metadata indicates cache hit
 
@@ -72,7 +72,7 @@ Feature: Data API CLI Ergonomics - Performance and Interactive Mode
     Scenario: Cache invalidated on source file change
       Given a cached PatternGraph exists
       And a source TypeScript file has been modified
-      When running "process-api status"
+      When running "pattern-graph-cli status"
       Then the pipeline runs fresh (cache miss)
       And the new dataset is cached for subsequent queries
 
@@ -93,7 +93,7 @@ Feature: Data API CLI Ergonomics - Performance and Interactive Mode
 
     @acceptance-criteria @happy-path
     Scenario: REPL accepts multiple queries
-      Given REPL mode is started with "process-api repl"
+      Given REPL mode is started with "pattern-graph-cli repl"
       When entering "status" then "pattern OrderSaga" then "dep-tree OrderSaga"
       Then each query returns results without pipeline re-initialization
       And "quit" exits the REPL
@@ -123,14 +123,14 @@ Feature: Data API CLI Ergonomics - Performance and Interactive Mode
 
     @acceptance-criteria @happy-path
     Scenario: Per-subcommand help output
-      When running "process-api context --help"
+      When running "pattern-graph-cli context --help"
       Then the output shows the context subcommand usage
       And the output lists available flags (--session, --related)
       And the output includes example commands
 
     @acceptance-criteria @happy-path
     Scenario: Dry-run shows pipeline scope
-      When running "process-api --dry-run status"
+      When running "pattern-graph-cli --dry-run status"
       Then the output shows the number of files that would be scanned
       And the output shows the config file being used
       And the output shows input glob patterns
@@ -139,7 +139,7 @@ Feature: Data API CLI Ergonomics - Performance and Interactive Mode
     @acceptance-criteria @happy-path
     Scenario: Validation summary in response metadata
       Given the pipeline detects 2 dangling references
-      When running "process-api status"
+      When running "pattern-graph-cli status"
       Then the response metadata includes pattern count
       And the response metadata includes dangling reference count
       And the response metadata includes any pipeline warnings

@@ -39,9 +39,9 @@ Feature: PatternGraphAPI CLI - Direct Queries for Planning Sessions
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | process:query CLI command | complete | src/cli/process-api.ts | Yes | integration |
-      | CLI argument parser | complete | src/cli/process-api.ts | Yes | integration |
-      | JSON output formatter | complete | src/cli/process-api.ts | Yes | integration |
+      | process:query CLI command | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
+      | CLI argument parser | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
+      | JSON output formatter | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
       | Text output formatter | n/a | N/A | No | N/A |
       | Root package.json script | complete | package.json | No | N/A |
       | CLAUDE.md documentation update | complete | CLAUDE.md | No | N/A |

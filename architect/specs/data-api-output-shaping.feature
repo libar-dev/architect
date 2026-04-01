@@ -39,11 +39,11 @@ Feature: Data API Output Shaping - Compact Output for AI Agents
       | Deliverable | Status | Location | Tests | Test Type |
       | summarizePattern() projection | complete | src/api/summarize.ts | Yes | unit |
       | Output modifier pipeline | complete | src/cli/output-pipeline.ts | Yes | unit |
-      | QueryResult envelope wiring | complete | src/cli/process-api.ts | Yes | unit |
-      | list subcommand | complete | src/cli/process-api.ts | Yes | integration |
-      | search subcommand | complete | src/cli/process-api.ts | Yes | integration |
+      | QueryResult envelope wiring | complete | src/cli/pattern-graph-cli.ts | Yes | unit |
+      | list subcommand | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
+      | search subcommand | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
       | Fuzzy pattern matching | complete | src/api/fuzzy-match.ts | Yes | unit |
-      | Config file default resolution | complete | src/cli/process-api.ts | Yes | unit |
+      | Config file default resolution | complete | src/cli/pattern-graph-cli.ts | Yes | unit |
       | pnpm banner fix | complete | package.json | No | N/A |
 
   # ============================================================================
@@ -74,7 +74,7 @@ Feature: Data API Output Shaping - Compact Output for AI Agents
     @acceptance-criteria @happy-path
     Scenario: List queries return compact summaries
       Given patterns exist in the dataset
-      When running "process-api query getCurrentWork"
+      When running "pattern-graph-cli query getCurrentWork"
       Then each pattern in the output contains only summary fields
       And the output does not contain "directive" or "code" fields
       And total output size is under 1KB for typical results
@@ -82,21 +82,21 @@ Feature: Data API Output Shaping - Compact Output for AI Agents
     @acceptance-criteria @happy-path
     Scenario: Full flag returns complete patterns
       Given patterns exist in the dataset
-      When running "process-api query getCurrentWork --full"
+      When running "pattern-graph-cli query getCurrentWork --full"
       Then each pattern contains all ExtractedPattern fields
       And the output includes "directive" and "code" fields
 
     @acceptance-criteria @happy-path
     Scenario: Single pattern detail is unaffected
       Given a pattern "MyPattern" exists
-      When running "process-api pattern MyPattern"
+      When running "pattern-graph-cli pattern MyPattern"
       Then the output contains full pattern detail
       And the output includes deliverables, dependencies, and relationships
 
     @acceptance-criteria @validation
     Scenario: Full flag combined with names-only is rejected
       Given patterns exist in the dataset
-      When running "process-api query getCurrentWork --full --names-only"
+      When running "pattern-graph-cli query getCurrentWork --full --names-only"
       Then the command fails with an error about conflicting modifiers
       And the error message lists the conflicting flags
 
@@ -124,27 +124,27 @@ Feature: Data API Output Shaping - Compact Output for AI Agents
     @acceptance-criteria @happy-path
     Scenario: Names-only output for list queries
       Given 5 patterns exist with status "roadmap"
-      When running "process-api query getRoadmapItems --names-only"
+      When running "pattern-graph-cli query getRoadmapItems --names-only"
       Then the output is a JSON array of 5 strings
       And each string is a pattern name
 
     @acceptance-criteria @happy-path
     Scenario: Count output for list queries
       Given 3 active patterns and 5 roadmap patterns
-      When running "process-api query getCurrentWork --count"
+      When running "pattern-graph-cli query getCurrentWork --count"
       Then the output is the integer 3
 
     @acceptance-criteria @happy-path
     Scenario: Field selection for list queries
       Given patterns exist in the dataset
-      When running "process-api query getCurrentWork --fields patternName,status,phase"
+      When running "pattern-graph-cli query getCurrentWork --fields patternName,status,phase"
       Then each pattern in the output contains only the requested fields
       And no other fields are present
 
     @acceptance-criteria @validation
     Scenario: Invalid field name in field selection is rejected
       Given patterns exist in the dataset
-      When running "process-api query getCurrentWork --fields patternName,nonExistentField"
+      When running "pattern-graph-cli query getCurrentWork --fields patternName,nonExistentField"
       Then the command fails with an error about invalid field names
       And the error message lists valid field names for the current output mode
 
@@ -174,21 +174,21 @@ Feature: Data API Output Shaping - Compact Output for AI Agents
     @acceptance-criteria @happy-path
     Scenario: Successful query returns typed envelope
       Given patterns exist in the dataset
-      When running "process-api status"
+      When running "pattern-graph-cli status"
       Then the output JSON has "success" set to true
       And the output JSON has a "data" field with the result
       And the output JSON has a "metadata" field with pattern count
 
     @acceptance-criteria @validation
     Scenario: Failed query returns error envelope
-      When running "process-api query nonExistentMethod"
+      When running "pattern-graph-cli query nonExistentMethod"
       Then the output JSON has "success" set to false
       And the output JSON has an "error" field with a message
 
     @acceptance-criteria @happy-path
     Scenario: Compact format strips empty fields
       Given a pattern with empty arrays and null values
-      When running "process-api pattern MyPattern"
+      When running "pattern-graph-cli pattern MyPattern"
       Then the output does not contain empty arrays
       And the output does not contain null values
       And the output does not contain empty strings
@@ -222,34 +222,34 @@ Feature: Data API Output Shaping - Compact Output for AI Agents
     @acceptance-criteria @happy-path
     Scenario: List with single filter
       Given patterns with various statuses and categories
-      When running "process-api list --status active"
+      When running "pattern-graph-cli list --status active"
       Then only active patterns are returned
       And results use the compact summary format
 
     @acceptance-criteria @happy-path
     Scenario: List with composed filters
       Given patterns with various statuses and categories
-      When running "process-api list --status roadmap --category projection"
+      When running "pattern-graph-cli list --status roadmap --category projection"
       Then only roadmap patterns in the projection category are returned
 
     @acceptance-criteria @happy-path
     Scenario: Search with fuzzy matching
       Given a pattern named "AgentCommandInfrastructure"
-      When running "process-api search AgentCommand"
+      When running "pattern-graph-cli search AgentCommand"
       Then the result includes "AgentCommandInfrastructure"
       And results are ranked by match quality
 
     @acceptance-criteria @happy-path
     Scenario: Pagination with limit and offset
       Given 20 roadmap patterns exist
-      When running "process-api list --status roadmap --limit 5 --offset 10"
+      When running "pattern-graph-cli list --status roadmap --limit 5 --offset 10"
       Then exactly 5 patterns are returned
       And they start from the 11th pattern
 
     @acceptance-criteria @validation
     Scenario: Search with no results returns empty with suggestion
       Given patterns exist but none match "zzNonexistent"
-      When running "process-api search zzNonexistent"
+      When running "pattern-graph-cli search zzNonexistent"
       Then the result contains an empty matches array
       And the output includes a hint that no patterns matched
 
@@ -280,20 +280,20 @@ Feature: Data API Output Shaping - Compact Output for AI Agents
     @acceptance-criteria @happy-path
     Scenario: Config file provides default input paths
       Given a architect.config.ts exists with input and features paths
-      When running "process-api status" without --input or --features flags
+      When running "pattern-graph-cli status" without --input or --features flags
       Then the pipeline uses paths from the config file
       And the output shows correct pattern counts
 
     @acceptance-criteria @validation
     Scenario: Fuzzy pattern name suggestion on not-found
       Given a pattern "AgentCommandInfrastructure" exists
-      When running "process-api pattern AgentCommand"
+      When running "pattern-graph-cli pattern AgentCommand"
       Then the error message includes "Did you mean: AgentCommandInfrastructure?"
 
     @acceptance-criteria @validation
     Scenario: Empty result provides contextual hint
       Given no patterns have status "active"
       And 3 patterns have status "roadmap"
-      When running "process-api list --status active"
+      When running "pattern-graph-cli list --status active"
       Then the output includes a hint about roadmap patterns
       And the hint suggests "Try: list --status roadmap"

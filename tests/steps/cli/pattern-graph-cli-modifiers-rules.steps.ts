@@ -1,7 +1,7 @@
 /**
- * process-api CLI Modifiers and Rules Step Definitions
+ * pattern-graph CLI Modifiers and Rules Step Definitions
  *
- * BDD step definitions for testing the process-api CLI
+ * BDD step definitions for testing the pattern-graph CLI
  * output modifiers, arch health, and rules subcommand.
  *
  * @architect
@@ -31,7 +31,7 @@ let state: CLITestState | null = null;
 // Feature Definition
 // =============================================================================
 
-const feature = await loadFeature('tests/features/cli/process-api-modifiers-rules.feature');
+const feature = await loadFeature('tests/features/cli/pattern-graph-cli-modifiers-rules.feature');
 
 describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
@@ -52,7 +52,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   Background(({ Given }) => {
     Given('a temporary working directory', async () => {
       state = initState();
-      state.tempContext = await createTempDir({ prefix: 'cli-process-api-test-' });
+      state.tempContext = await createTempDir({ prefix: 'cli-pattern-graph-test-' });
     });
   });
 

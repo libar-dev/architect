@@ -113,7 +113,7 @@ generated equivalents. Work packages in this gap analysis should map to its phas
 | `publishing-relocation.feature`              | PublishingRelocation            | completed | 40    | Moved PUBLISHING.md to MAINTAINERS.md            |
 | `codec-driven-reference-generation.feature`  | CodecDrivenReferenceGeneration  | completed | 27    | Foundation: config-driven codec factory          |
 | `doc-generation-proof-of-concept.feature`    | DocGenerationProofOfConcept     | completed | 27    | Historical: ADR-021 POC (superseded)             |
-| `process-api-hybrid-generation.feature`      | ProcessApiHybridGeneration      | completed | 43    | CLI schema as single source for reference tables |
+| `cli-reference-generation.feature`           | CliReferenceGeneration          | completed | 43    | CLI schema as single source for reference tables |
 | `claude-module-generation.feature`           | ClaudeModuleGeneration          | completed | 25    | Claude module tags + behavior spec sourcing      |
 | `reference-doc-showcase.feature`             | ReferenceDocShowcase            | completed | 30    | All 9 content block types across 3 detail levels |
 | `validator-read-model-consolidation.feature` | ValidatorReadModelConsolidation | completed | 100   | PatternGraph as single read model (ADR-006)      |
@@ -216,17 +216,17 @@ architect/
 
 ### What `pnpm docs:all` Generates (9 generators)
 
-| Generator               | Output Location           | Files | Content                                          |
-| ----------------------- | ------------------------- | ----- | ------------------------------------------------ |
-| `adrs`                  | docs-live/decisions/      | 8     | ADR index + 7 individual ADRs                    |
-| `business-rules`        | docs-live/business-rules/ | 8     | Overview + 7 area breakdowns (569 rules)         |
-| `taxonomy`              | docs-live/taxonomy/       | 4     | Overview + categories, formats, metadata tags    |
-| `validation-rules`      | docs-live/validation/     | 4     | Overview + error catalog, FSM, protection levels |
-| `reference-docs`        | docs-live/reference/      | 4     | Codecs, types, process-API ref, sample           |
-| `product-area-docs`     | docs-live/product-areas/  | 8     | Overview + 7 area docs with diagrams             |
-| `claude-modules`        | docs-live/\_claude-md/    | 10    | Compact AI context modules                       |
-| `process-api-reference` | docs-live/reference/      | 1     | CLI command reference                            |
-| `cli-recipe`            | docs-live/reference/      | 1     | CLI recipes & workflow guide                     |
+| Generator           | Output Location           | Files | Content                                          |
+| ------------------- | ------------------------- | ----- | ------------------------------------------------ |
+| `adrs`              | docs-live/decisions/      | 8     | ADR index + 7 individual ADRs                    |
+| `business-rules`    | docs-live/business-rules/ | 8     | Overview + 7 area breakdowns (569 rules)         |
+| `taxonomy`          | docs-live/taxonomy/       | 4     | Overview + categories, formats, metadata tags    |
+| `validation-rules`  | docs-live/validation/     | 4     | Overview + error catalog, FSM, protection levels |
+| `reference-docs`    | docs-live/reference/      | 4     | Codecs, types, process-API ref, sample           |
+| `product-area-docs` | docs-live/product-areas/  | 8     | Overview + 7 area docs with diagrams             |
+| `claude-modules`    | docs-live/\_claude-md/    | 10    | Compact AI context modules                       |
+| `cli-reference`     | docs-live/reference/      | 1     | CLI command reference                            |
+| `cli-recipe`        | docs-live/reference/      | 1     | CLI recipes & workflow guide                     |
 
 ### What `pnpm docs:all-preview` Adds (14 more generators)
 
@@ -301,17 +301,17 @@ reference content from `docs-live/` instead of `docs-generated/`.
 
 These `docs-live/` subdirectories exist but have no sync function:
 
-| Directory                       | Files    | Content                                                                                                              |
-| ------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------- |
-| `docs-live/reference/`          | 5 files  | ARCHITECTURE-CODECS.md, ARCHITECTURE-TYPES.md, PROCESS-API-RECIPES.md, PROCESS-API-REFERENCE.md, REFERENCE-SAMPLE.md |
-| `docs-live/taxonomy/`           | 3 files  | categories.md, format-types.md, metadata-tags.md                                                                     |
-| `docs-live/validation/`         | 3 files  | error-catalog.md, fsm-transitions.md, protection-levels.md                                                           |
-| `docs-live/business-rules/`     | 7 files  | Per-area business rule extractions                                                                                   |
-| `docs-live/_claude-md/`         | 10 files | AI context (may not need website publishing)                                                                         |
-| `docs-live/INDEX.md`            | 1 file   | Generated docs master index                                                                                          |
-| `docs-live/TAXONOMY.md`         | 1 file   | Taxonomy overview                                                                                                    |
-| `docs-live/VALIDATION-RULES.md` | 1 file   | Validation rules overview                                                                                            |
-| `docs-live/BUSINESS-RULES.md`   | 1 file   | Business rules overview                                                                                              |
+| Directory                       | Files    | Content                                                                                                      |
+| ------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------ |
+| `docs-live/reference/`          | 5 files  | ARCHITECTURE-CODECS.md, ARCHITECTURE-TYPES.md, PROCESS-API-RECIPES.md, CLI-REFERENCE.md, REFERENCE-SAMPLE.md |
+| `docs-live/taxonomy/`           | 3 files  | categories.md, format-types.md, metadata-tags.md                                                             |
+| `docs-live/validation/`         | 3 files  | error-catalog.md, fsm-transitions.md, protection-levels.md                                                   |
+| `docs-live/business-rules/`     | 7 files  | Per-area business rule extractions                                                                           |
+| `docs-live/_claude-md/`         | 10 files | AI context (may not need website publishing)                                                                 |
+| `docs-live/INDEX.md`            | 1 file   | Generated docs master index                                                                                  |
+| `docs-live/TAXONOMY.md`         | 1 file   | Taxonomy overview                                                                                            |
+| `docs-live/VALIDATION-RULES.md` | 1 file   | Validation rules overview                                                                                    |
+| `docs-live/BUSINESS-RULES.md`   | 1 file   | Business rules overview                                                                                      |
 
 ---
 
@@ -334,7 +334,7 @@ These `docs-live/` subdirectories exist but have no sync function:
 | **ARCHITECTURE.md**     | 1,638 | docs-live/product-areas/GENERATION.md (1,065 lines) + docs-live/reference/ARCHITECTURE-CODECS.md (630 lines) + docs-live/reference/ARCHITECTURE-TYPES.md (429 lines) | Partial      | Generated covers pipeline stages and codec listings well. Missing: executive summary, data flow diagrams, workflow integration section, "Extending the System" guide, programmatic usage examples, quick reference card.                                                                            |
 | **GHERKIN-PATTERNS.md** | 366   | None                                                                                                                                                                 | None         | Authoring style guide: 4 essential patterns, DataTable/DocString usage, tag conventions, feature file rich content rules, step linting reference. Pure editorial guidance -- no annotation source exists.                                                                                           |
 | **ANNOTATION-GUIDE.md** | 270   | docs-live/taxonomy/metadata-tags.md (649 lines)                                                                                                                      | Partial      | Generated has exhaustive tag reference (56 tags). Missing: getting-started guide, shape extraction modes explanation, "Zod schema gotcha" documentation, verification steps, common issues troubleshooting table.                                                                                   |
-| **PROCESS-API.md**      | ~60   | docs-live/reference/PROCESS-API-REFERENCE.md + PROCESS-API-RECIPES.md                                                                                                | **Replaced** | Trimmed to pointer file with operational reference (JSON envelope, exit codes, piping). All prose content now generated by CliRecipeCodec (WP-6 complete).                                                                                                                                          |
+| **PROCESS-API.md**      | ~60   | docs-live/reference/CLI-REFERENCE.md + PROCESS-API-RECIPES.md                                                                                                        | **Replaced** | Trimmed to pointer file with operational reference (JSON envelope, exit codes, piping). All prose content now generated by CliRecipeCodec (WP-6 complete).                                                                                                                                          |
 | **PROCESS-GUARD.md**    | 341   | docs-live/validation/error-catalog.md (79 lines) + docs-live/validation/fsm-transitions.md (49 lines) + docs-live/validation/protection-levels.md                    | Partial      | Generated has error types, FSM matrix, protection levels. Missing: error fix rationale ("why this rule exists"), escape hatch alternatives, pre-commit setup instructions (Husky), programmatic API guide, Decider pattern architecture diagram.                                                    |
 | **VALIDATION.md**       | 418   | docs-live/product-areas/VALIDATION.md (1,115 lines)                                                                                                                  | Partial      | Generated has pattern listings and business rules. Missing: "Which command do I run?" decision tree, 32+ individual lint rule explanations with code examples, anti-pattern detection rationale, CI/CD integration patterns (GitHub Actions YAML), vitest-cucumber two-pattern problem explanation. |
 | **TAXONOMY.md**         | 107   | docs-live/TAXONOMY.md (199 lines) + docs-live/taxonomy/ (3 files)                                                                                                    | Good         | Generated taxonomy reference is actually more comprehensive than manual. Manual adds: architecture explanation (file structure of src/taxonomy/), preset-to-taxonomy mapping, generation commands. Small gap.                                                                                       |
@@ -559,7 +559,7 @@ This replaces the manual PROCESS-GUARD.md "Error Messages and Fixes" section.
 **Type:** Design + Implementation
 **Scope:** architect repo
 **Effort:** Medium (2-3 sessions)
-**Spec alignment:** Extends ProcessApiHybridGeneration (Phase 43, completed). Phase 43
+**Spec alignment:** Extends CliReferenceGeneration (Phase 43, completed). Phase 43
 generated reference tables from CLI schema; this adds recipe/guide content. The manual
 PROCESS-API.md prose was explicitly kept in Phase 43 -- this WP addresses that remainder.
 
@@ -573,7 +573,7 @@ This replaces manual PROCESS-API.md "Common Recipes" and "Session Workflow Comma
 
 **Design questions for session:**
 
-- Extend `ProcessApiReferenceGenerator` or create separate recipe generator?
+- Extend `CliReferenceGenerator` or create separate recipe generator?
 - Where should recipe annotations live? (CLI schema? Feature files? New recipe files?)
 - How to handle "Why Use This" motivational prose? (Preamble?)
 
@@ -736,7 +736,7 @@ ProceduralGuideCodec) have completed design sessions with findings and code stub
   load time by a shared `loadPreambleFromMarkdown()` utility (DD-7/DD-8).
 - **ErrorGuideCodec** extends the existing `ValidationRulesCodec` with a new
   `includeErrorGuide` toggle and convention-tagged annotations on `src/lint/` source.
-- **CliRecipeCodec** creates a sibling `CliRecipeGenerator` to `ProcessApiReferenceGenerator`,
+- **CliRecipeCodec** creates a sibling `CliRecipeGenerator` to `CliReferenceGenerator`,
   both standalone `DocumentGenerator` implementations consuming `CLI_SCHEMA` directly.
 - **EnhancedIndexGeneration** creates a new `IndexCodec` registered in `CodecRegistry`,
   composing PatternGraph-driven statistics with editorial preamble navigation content.
@@ -782,7 +782,7 @@ adr-001 through adr-006, adr-021
 annotation.md, configuration.md, core-types.md, data-api.md, generation.md, process.md, validation.md
 
 **Reference (5 files):**
-ARCHITECTURE-CODECS.md, ARCHITECTURE-TYPES.md, PROCESS-API-RECIPES.md, PROCESS-API-REFERENCE.md, REFERENCE-SAMPLE.md
+ARCHITECTURE-CODECS.md, ARCHITECTURE-TYPES.md, PROCESS-API-RECIPES.md, CLI-REFERENCE.md, REFERENCE-SAMPLE.md
 
 **Taxonomy (3 files):**
 categories.md, format-types.md, metadata-tags.md
@@ -806,6 +806,6 @@ error-catalog.md, fsm-transitions.md, protection-levels.md
 
 ### D. Codec Inventory (22 total)
 
-**In docs:all (9):** adrs, business-rules, taxonomy, validation-rules, reference-docs, product-area-docs, claude-modules, process-api-reference, cli-recipe
+**In docs:all (9):** adrs, business-rules, taxonomy, validation-rules, reference-docs, product-area-docs, claude-modules, cli-reference, cli-recipe
 
 **In docs:all-preview only (14):** patterns, roadmap, milestones, requirements, session, remaining, current, session-plan, session-findings, pr-changes, changelog, traceability, architecture, overview-rdm

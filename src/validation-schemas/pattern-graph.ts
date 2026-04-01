@@ -251,11 +251,11 @@ export const SequenceIndexEntrySchema = z.object({
 export const SequenceIndexSchema = z.record(z.string().trim().min(1), SequenceIndexEntrySchema);
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Master Dataset Schema
+// Pattern Graph Schema
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Master Dataset - Unified view of all extracted patterns
+ * PatternGraph - Unified view of all extracted patterns
  *
  * Contains raw patterns plus pre-computed views and statistics.
  * This is the primary data structure passed to generators and sections.

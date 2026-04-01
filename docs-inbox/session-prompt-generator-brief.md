@@ -199,7 +199,7 @@ CLAUDE.md retains its role as the entry point, but convention sections become **
 | ------------------------------- | ------------------------------------------------- | ----------------- |
 | Session prompt assembler        | `src/api/session-prompt.ts`                       | Yes (unit)        |
 | Session prompt text formatter   | `src/api/session-prompt.ts` (co-located per DD-7) | Yes (unit)        |
-| `session-prompt` CLI subcommand | `src/cli/process-api.ts`                          | Yes (integration) |
+| `session-prompt` CLI subcommand | `src/cli/pattern-graph-cli.ts`                    | Yes (integration) |
 
 ---
 

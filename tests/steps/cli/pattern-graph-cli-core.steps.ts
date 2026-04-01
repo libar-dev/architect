@@ -1,7 +1,7 @@
 /**
- * process-api CLI Core Step Definitions
+ * pattern-graph CLI Core Step Definitions
  *
- * BDD step definitions for testing the process-api CLI
+ * BDD step definitions for testing the pattern-graph CLI
  * core infrastructure: help, version, input validation,
  * status, query, pattern, arch basics, missing args, edge cases.
  *
@@ -32,7 +32,7 @@ let state: CLITestState | null = null;
 // Feature Definition
 // =============================================================================
 
-const feature = await loadFeature('tests/features/cli/process-api-core.feature');
+const feature = await loadFeature('tests/features/cli/pattern-graph-cli-core.feature');
 
 function createJsProjectConfig(): string {
   return `export default {
@@ -62,7 +62,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   Background(({ Given }) => {
     Given('a temporary working directory', async () => {
       state = initState();
-      state.tempContext = await createTempDir({ prefix: 'cli-process-api-test-' });
+      state.tempContext = await createTempDir({ prefix: 'cli-pattern-graph-test-' });
     });
   });
 

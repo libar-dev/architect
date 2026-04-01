@@ -141,7 +141,7 @@ defineConfig(userConfig)
 
 ## Four-Stage Pipeline
 
-The pipeline has two entry points. The orchestrator (`src/generators/orchestrator.ts`) runs all 10 steps end-to-end for documentation generation. The shared pipeline factory `buildPatternGraph()` (`src/generators/pipeline/build-pipeline.ts`) runs steps 1-8 and returns a `Result<PipelineResult, PipelineError>` for CLI consumers like process-api and validate-patterns (see [Pipeline Factory](#pipeline-factory-adr-006)).
+The pipeline has two entry points. The orchestrator (`src/generators/orchestrator.ts`) runs all 10 steps end-to-end for documentation generation. The shared pipeline factory `buildPatternGraph()` (`src/generators/pipeline/build-pipeline.ts`) runs steps 1-8 and returns a `Result<PipelineResult, PipelineError>` for CLI consumers like pattern-graph-cli and validate-patterns (see [Pipeline Factory](#pipeline-factory-adr-006)).
 
 ### Stage 1: Scanner
 
@@ -212,7 +212,7 @@ interface ExtractedPattern {
 
 **Dual-Source Merging:**
 
-After extraction, patterns from both sources are merged with conflict detection. Merge behavior varies by consumer: `'fatal'` mode (used by process-api and orchestrator) returns an error if the same pattern name exists in both TypeScript and Gherkin; `'concatenate'` mode (used by validate-patterns) falls back to concatenation on conflict, since the validator needs both sources for cross-source matching.
+After extraction, patterns from both sources are merged with conflict detection. Merge behavior varies by consumer: `'fatal'` mode (used by pattern-graph-cli and orchestrator) returns an error if the same pattern name exists in both TypeScript and Gherkin; `'concatenate'` mode (used by validate-patterns) falls back to concatenation on conflict, since the validator needs both sources for cross-source matching.
 
 ### Pipeline Factory (ADR-006)
 
@@ -1178,7 +1178,7 @@ buildPatternGraph(options)
          ▼
     Result<PipelineResult, PipelineError>
          │
-         ├── process-api CLI        (mergeConflictStrategy: 'fatal')
+         ├── pattern-graph-cli CLI        (mergeConflictStrategy: 'fatal')
          │     └── query handlers consume dataset
          │
          ├── validate-patterns CLI  (mergeConflictStrategy: 'concatenate')
@@ -1461,7 +1461,7 @@ if (document.additionalFiles) {
 
 ```typescript
 import { z } from 'zod';
-import { PatternGraphSchema, type PatternGraph } from '../validation-schemas/master-dataset';
+import { PatternGraphSchema, type PatternGraph } from '../validation-schemas/pattern-graph';
 import { type RenderableDocument, document, heading, paragraph } from '../renderable/schema';
 import { RenderableDocumentOutputSchema } from '../renderable/codecs/shared-schema';
 

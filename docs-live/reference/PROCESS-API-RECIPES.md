@@ -1,6 +1,6 @@
 # Process API CLI — Recipes & Workflow Guide
 
-> Auto-generated from CLI schema. See [CLI Reference](./PROCESS-API-REFERENCE.md) for flag tables.
+> Auto-generated from CLI schema. See [CLI Reference](./CLI-REFERENCE.md) for flag tables.
 
 ## Why Use This
 
@@ -139,7 +139,7 @@ File: src/api/context-assembler.ts
 
 === CONSUMERS ===
 ContextFormatterImpl (active)
-ProcessAPICLIImpl (active)
+PatternGraphCLIImpl (active)
 
 === ARCHITECTURE (context: api) ===
 PatternGraph (completed, read-model)
@@ -169,7 +169,7 @@ Example output:
 
 ```
 === PRIMARY ===
-src/cli/process-api.ts
+src/cli/pattern-graph-cli.ts
 
 === ARCHITECTURE NEIGHBORS ===
 src/cli/version.ts

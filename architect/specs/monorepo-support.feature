@@ -112,13 +112,13 @@ Feature: Monorepo Cross-Package Support
     @acceptance-criteria @happy-path
     Scenario: Package filter returns only matching patterns
       Given patterns from "platform-core" and "platform-bc" in the dataset
-      When running "process-api list --package platform-core"
+      When running "pattern-graph-cli list --package platform-core"
       Then only patterns with package "platform-core" are returned
 
     @acceptance-criteria @happy-path
     Scenario: Package filter composes with status filter
       Given active and roadmap patterns in both packages
-      When running "process-api list --package platform-core --status active"
+      When running "pattern-graph-cli list --package platform-core --status active"
       Then only active patterns from "platform-core" are returned
 
   Rule: Cross-package dependencies are visible as a package-level graph
@@ -137,13 +137,13 @@ Feature: Monorepo Cross-Package Support
     @acceptance-criteria @happy-path
     Scenario: Cross-package dependency view shows package edges
       Given "OrderHandler" in "platform-bc" uses "EventStore" in "platform-core"
-      When running "process-api cross-package"
+      When running "pattern-graph-cli cross-package"
       Then the output shows platform-bc depends on platform-core
 
     @acceptance-criteria @edge-case
     Scenario: Intra-package dependencies are excluded
       Given "Scanner" uses "ASTParser" and both are in "platform-core"
-      When running "process-api cross-package"
+      When running "pattern-graph-cli cross-package"
       Then no self-referencing edge for platform-core appears
 
   Rule: Coverage analysis reports annotation completeness per package
@@ -161,11 +161,11 @@ Feature: Monorepo Cross-Package Support
     @acceptance-criteria @happy-path
     Scenario: Coverage report includes per-package breakdown
       Given a multi-package config with two packages
-      When running "process-api arch coverage"
+      When running "pattern-graph-cli arch coverage"
       Then the report shows per-package coverage with annotated counts and percentages
 
     @acceptance-criteria @edge-case
     Scenario: Single-package config shows flat coverage report
       Given a config with no packages field
-      When running "process-api arch coverage"
+      When running "pattern-graph-cli arch coverage"
       Then the report shows a single aggregate coverage number

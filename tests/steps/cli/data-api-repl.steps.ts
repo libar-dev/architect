@@ -59,7 +59,7 @@ function getReplResult(state: ReplTestState | null): CLIResult {
 async function runRepl(state: ReplTestState | null, commands: string[]): Promise<void> {
   const s = getReplState(state);
   const stdinData = commands.join('\n') + '\n';
-  s.replResult = await runCLI('process-api', ['-i', "'src/**/*.ts'", 'repl'], {
+  s.replResult = await runCLI('pattern-graph-cli', ['-i', "'src/**/*.ts'", 'repl'], {
     cwd: getTempDir(state),
     timeout: 30000,
     stdin: stdinData,

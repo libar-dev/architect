@@ -21,7 +21,7 @@ The important part, and most important feature in the whole repo was introduced 
 **Process API for AI Coding Agents**
 
 This untracked file is important for context:
-@\_working-docs/01-process-api/03-process-api-data-api-context.md
+@\_working-docs/01-pattern-graph-cli/03-pattern-graph-cli-data-api-context.md
 
 And these specs are scope for the features introduced:
 

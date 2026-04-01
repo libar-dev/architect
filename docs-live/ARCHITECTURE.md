@@ -43,7 +43,7 @@ graph TB
     end
     subgraph cli["Cli BC"]
         ReplMode["ReplMode[service]"]
-        ProcessAPICLIImpl["ProcessAPICLIImpl[service]"]
+        PatternGraphCLIImpl["PatternGraphCLIImpl[service]"]
         OutputPipelineImpl["OutputPipelineImpl[service]"]
         MCPServerBin["MCPServerBin[infrastructure]"]
         DatasetCache["DatasetCache[infrastructure]"]
@@ -69,11 +69,11 @@ graph TB
         ContentDeduplicator["ContentDeduplicator[infrastructure]"]
         CodecBasedGenerator["CodecBasedGenerator[service]"]
         FileCache["FileCache[infrastructure]"]
-        DesignReviewGenerator["DesignReviewGenerator[service]"]
-        DecisionDocGenerator["DecisionDocGenerator[service]"]
         TransformDataset["TransformDataset[service]"]
         SequenceTransformUtils["SequenceTransformUtils[service]"]
         RelationshipResolver["RelationshipResolver[service]"]
+        DesignReviewGenerator["DesignReviewGenerator[service]"]
+        DecisionDocGenerator["DecisionDocGenerator[service]"]
     end
     subgraph lint["Lint BC"]
         LintRules["LintRules[service]"]
@@ -126,19 +126,22 @@ graph TB
     MCPModule --> MCPFileWatcher
     MCPModule --> MCPToolRegistry
     LintEngine --> LintRules
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> GherkinASTParser
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
     GherkinExtractor --> GherkinASTParser
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
     Document_Extractor --> Pattern_Scanner
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> GherkinASTParser
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    ConfigResolver --> ArchitectFactory
+    ArchitectFactory --> RegexBuilders
+    ConfigLoader --> ArchitectFactory
     ReplMode --> PatternGraphAPI
-    ProcessAPICLIImpl --> PatternGraphAPI
-    ProcessAPICLIImpl --> PatternGraph
-    ProcessAPICLIImpl --> PatternSummarizerImpl
-    ProcessAPICLIImpl --> FuzzyMatcherImpl
-    ProcessAPICLIImpl --> OutputPipelineImpl
+    PatternGraphCLIImpl --> PatternGraphAPI
+    PatternGraphCLIImpl --> PatternGraph
+    PatternGraphCLIImpl --> PatternSummarizerImpl
+    PatternGraphCLIImpl --> FuzzyMatcherImpl
+    PatternGraphCLIImpl --> OutputPipelineImpl
     OutputPipelineImpl --> PatternSummarizerImpl
     MCPServerBin --> MCPServerImpl
     PatternSummarizerImpl --> PatternGraphAPI
@@ -158,20 +161,17 @@ graph TB
     ContextAssemblerImpl --> FuzzyMatcherImpl
     ArchQueriesImpl --> PatternGraphAPI
     ArchQueriesImpl --> PatternGraph
-    ConfigResolver --> ArchitectFactory
-    ArchitectFactory --> RegexBuilders
-    ConfigLoader --> ArchitectFactory
     FSMValidator --> FSMTransitions
     FSMValidator --> FSMStates
     DesignReviewCodec --> PatternGraph
     ArchitectureCodec --> PatternGraph
     ProcessGuardDecider --> FSMValidator
+    TransformDataset --> PatternGraph
+    SequenceTransformUtils --> PatternGraph
     DesignReviewGenerator --> DesignReviewCodec
     DesignReviewGenerator --> PatternGraph
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
-    TransformDataset --> PatternGraph
-    SequenceTransformUtils --> PatternGraph
 ```
 
 ---
@@ -213,7 +213,7 @@ All components with architecture annotations:
 | 🚧 Dataset Cache                                                  | cli        | infrastructure | infrastructure | src/cli/dataset-cache.ts                                              |
 | 🚧 MCP Server Bin                                                 | cli        | infrastructure | infrastructure | src/cli/mcp-server.ts                                                 |
 | 🚧 Output Pipeline Impl                                           | cli        | service        | application    | src/cli/output-pipeline.ts                                            |
-| 🚧 Process API CLI Impl                                           | cli        | service        | application    | src/cli/process-api.ts                                                |
+| 🚧 Pattern Graph CLI Impl                                         | cli        | service        | application    | src/cli/pattern-graph-cli.ts                                          |
 | 🚧 Repl Mode                                                      | cli        | service        | application    | src/cli/repl.ts                                                       |
 | ✅ Configuration Defaults                                         | config     | -              | domain         | src/config/defaults.ts                                                |
 | ✅ Configuration Presets                                          | config     | -              | domain         | src/config/presets.ts                                                 |
@@ -231,12 +231,12 @@ All components with architecture annotations:
 | ✅ Dual Source Extractor                                          | extractor  | service        | application    | src/extractor/dual-source-extractor.ts                                |
 | ✅ Gherkin Extractor                                              | extractor  | service        | application    | src/extractor/gherkin-extractor.ts                                    |
 | Cli Recipe Generator                                              | generator  | -              | application    | src/generators/built-in/cli-recipe-generator.ts                       |
+| ✅ Cli Reference Generator                                        | generator  | -              | application    | src/generators/built-in/cli-reference-generator.ts                    |
 | ✅ Context Inference Impl                                         | generator  | -              | application    | src/generators/pipeline/context-inference.ts                          |
 | 🚧 Git Branch Diff                                                | generator  | -              | infrastructure | src/git/branch-diff.ts                                                |
 | 🚧 Git Helpers                                                    | generator  | -              | infrastructure | src/git/helpers.ts                                                    |
 | 🚧 Git Module                                                     | generator  | -              | infrastructure | src/git/index.ts                                                      |
 | 🚧 Git Name Status Parser                                         | generator  | -              | infrastructure | src/git/name-status.ts                                                |
-| ✅ Process Api Reference Generator                                | generator  | -              | application    | src/generators/built-in/process-api-reference-generator.ts            |
 | 🚧 Transform Types                                                | generator  | -              | application    | src/generators/pipeline/transform-types.ts                            |
 | ✅ Content Deduplicator                                           | generator  | infrastructure | infrastructure | src/generators/content-deduplicator.ts                                |
 | 🚧 File Cache                                                     | generator  | infrastructure | infrastructure | src/cache/file-cache.ts                                               |
@@ -321,15 +321,15 @@ All components with architecture annotations:
 | ✅ Normalized Status                                              | -          | -              | -              | src/taxonomy/normalized-status.ts                                     |
 | 🚧 Normalized Status Testing                                      | -          | -              | -              | tests/features/types/normalized-status.feature                        |
 | ✅ Orchestrator Pipeline Factory Migration                        | -          | -              | -              | architect/specs/orchestrator-pipeline-factory-migration.feature       |
+| 🚧 Pattern Graph API Types                                        | -          | -              | -              | src/api/types.ts                                                      |
 | ✅ Pipeline Factory                                               | -          | -              | -              | src/generators/pipeline/build-pipeline.ts                             |
 | ✅ Pipeline Module                                                | -          | -              | -              | src/generators/pipeline/index.ts                                      |
 | ✅ Planning Codecs                                                | -          | -              | -              | src/renderable/codecs/planning.ts                                     |
 | ✅ Pr Changes Codec                                               | -          | -              | -              | src/renderable/codecs/pr-changes.ts                                   |
-| ✅ Process API Layered Extraction                                 | -          | -              | -              | architect/specs/process-api-layered-extraction.feature                |
+| ✅ Process API Layered Extraction                                 | -          | -              | -              | architect/specs/pattern-graph-layered-extraction.feature              |
 | 🚧 Process Guard Module                                           | -          | -              | -              | src/lint/process-guard/index.ts                                       |
 | ✅ Process Guard Testing                                          | -          | -              | -              | tests/features/validation/process-guard.feature                       |
 | 🚧 Process Guard Types                                            | -          | -              | -              | src/lint/process-guard/types.ts                                       |
-| 🚧 Process State Types                                            | -          | -              | -              | src/api/types.ts                                                      |
 | ✅ Reference Codec                                                | -          | -              | -              | src/renderable/codecs/reference-types.ts                              |
 | ✅ Reference Codec                                                | -          | -              | -              | src/renderable/codecs/reference-diagrams.ts                           |
 | ✅ Reference Codec                                                | -          | -              | -              | src/renderable/codecs/reference-builders.ts                           |

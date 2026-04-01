@@ -278,7 +278,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'ARCHITECTURE-TYPES generator produces shapes and convention content',
       ({ Given, When, Then, And }) => {
         Given(
-          'a PatternGraph with pipeline architecture conventions and master dataset shapes',
+          'a PatternGraph with pipeline architecture conventions and pattern graph shapes',
           () => {
             state!.dataset = createTestPatternGraph({
               patterns: [
