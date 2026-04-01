@@ -527,7 +527,6 @@ export function extractPatternTags(tags: readonly string[]): {
   readonly extendsPattern?: string;
   readonly seeAlso?: readonly string[];
   readonly apiRef?: readonly string[];
-  readonly brief?: string;
   readonly categories?: readonly string[];
   readonly quarter?: string;
   readonly completed?: string;

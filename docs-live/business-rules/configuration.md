@@ -114,7 +114,7 @@ _- Raw user config is partial with many optional fields_
 
 #### Output defaults are applied
 
-> **Invariant:** Missing output configuration must resolve to "docs/architecture" with overwrite=false.
+> **Invariant:** Missing output configuration must resolve to "docs-live" with overwrite=false.
 >
 > **Rationale:** Consistent defaults prevent accidental overwrites and establish a predictable output location.
 

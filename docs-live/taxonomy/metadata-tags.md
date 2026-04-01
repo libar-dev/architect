@@ -6,19 +6,17 @@
 
 ## Metadata Tag Definitions
 
-60 metadata tags with full details.
+58 metadata tags with full details.
 
 | Tag                      | Format       | Purpose                                                                    | Required | Repeatable | Values                                                                                                                                                                                                                               | Default  |
 | ------------------------ | ------------ | -------------------------------------------------------------------------- | -------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
 | `pattern`                | value        | Explicit pattern name                                                      | Yes      | No         | -                                                                                                                                                                                                                                    | -        |
 | `status`                 | enum         | Work item lifecycle status (per PDR-005 FSM)                               | No       | No         | roadmap, active, completed, deferred                                                                                                                                                                                                 | roadmap  |
-| `core`                   | flag         | Marks as essential/must-know pattern                                       | No       | No         | -                                                                                                                                                                                                                                    | -        |
 | `usecase`                | quoted-value | Use case association                                                       | No       | Yes        | -                                                                                                                                                                                                                                    | -        |
 | `uses`                   | csv          | Patterns this depends on                                                   | No       | No         | -                                                                                                                                                                                                                                    | -        |
 | `used-by`                | csv          | Patterns that depend on this                                               | No       | No         | -                                                                                                                                                                                                                                    | -        |
 | `phase`                  | number       | Roadmap phase number (unified across monorepo)                             | No       | No         | -                                                                                                                                                                                                                                    | -        |
 | `release`                | value        | Target release version (semver or vNEXT for unreleased work)               | No       | No         | -                                                                                                                                                                                                                                    | -        |
-| `brief`                  | value        | Path to pattern brief markdown                                             | No       | No         | -                                                                                                                                                                                                                                    | -        |
 | `depends-on`             | csv          | Roadmap dependencies (pattern or phase names)                              | No       | No         | -                                                                                                                                                                                                                                    | -        |
 | `enables`                | csv          | Patterns this enables                                                      | No       | No         | -                                                                                                                                                                                                                                    | -        |
 | `implements`             | csv          | Patterns this code file realizes (realization relationship)                | No       | No         | -                                                                                                                                                                                                                                    | -        |
@@ -95,16 +93,6 @@
 | Default      | roadmap                                      |
 | Example      | `@architect-status roadmap`                  |
 
-### `core`
-
-| Property   | Value                                |
-| ---------- | ------------------------------------ |
-| Format     | flag                                 |
-| Purpose    | Marks as essential/must-know pattern |
-| Required   | No                                   |
-| Repeatable | No                                   |
-| Example    | `@architect-core`                    |
-
 ### `usecase`
 
 | Property   | Value                                                 |
@@ -154,16 +142,6 @@
 | Required   | No                                                           |
 | Repeatable | No                                                           |
 | Example    | `@architect-release v0.1.0`                                  |
-
-### `brief`
-
-| Property   | Value                                             |
-| ---------- | ------------------------------------------------- |
-| Format     | value                                             |
-| Purpose    | Path to pattern brief markdown                    |
-| Required   | No                                                |
-| Repeatable | No                                                |
-| Example    | `@architect-brief docs/briefs/decider-pattern.md` |
 
 ### `depends-on`
 

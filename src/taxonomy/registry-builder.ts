@@ -107,7 +107,7 @@ interface AggregationTagDefinitionForRegistry {
  * Used for documentation generation to create organized sections.
  *
  * Groups:
- * - core: Essential pattern identification (pattern, status, core, usecase, brief)
+ * - core: Essential pattern identification (pattern, status, usecase)
  * - relationship: Pattern dependencies and connections
  * - process: Timeline and assignment tracking
  * - prd: Product requirements documentation

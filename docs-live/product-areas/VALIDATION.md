@@ -45,8 +45,8 @@ C4Context
         System(FSMTransitions, "FSMTransitions")
         System(FSMStates, "FSMStates")
     }
-    System_Ext(DoDValidationTypes, "DoDValidationTypes")
     System_Ext(CodecUtils, "CodecUtils")
+    System_Ext(DoDValidationTypes, "DoDValidationTypes")
     System_Ext(DualSourceExtractor, "DualSourceExtractor")
     System_Ext(DetectChanges, "DetectChanges")
     System_Ext(DeriveProcessState, "DeriveProcessState")
@@ -95,8 +95,8 @@ graph LR
         FSMStates[/"FSMStates"/]
     end
     subgraph related["Related"]
-        DoDValidationTypes["DoDValidationTypes"]:::neighbor
         CodecUtils["CodecUtils"]:::neighbor
+        DoDValidationTypes["DoDValidationTypes"]:::neighbor
         DualSourceExtractor["DualSourceExtractor"]:::neighbor
         DetectChanges["DetectChanges"]:::neighbor
         DeriveProcessState["DeriveProcessState"]:::neighbor
@@ -464,6 +464,36 @@ function detectProcessInCode(
 | ------------ | ---- | -------------------------------------------------------------------------- |
 | scannedFiles |      | Array of scanned TypeScript files                                          |
 | registry     |      | Optional tag registry for prefix-aware detection (defaults to @architect-) |
+
+**Returns:** Array of anti-pattern violations
+
+### detectRemovedTags (function)
+
+```typescript
+/**
+ * Detect removed tags in feature files
+ *
+ * Finds tags that were removed from the registry but still appear in source files.
+ * These tags are silently discarded by the scanner, causing data loss without
+ * any diagnostic. This detector makes the failure explicit.
+ *
+ * @param features - Array of scanned feature files
+ * @param registry - Optional tag registry for prefix-aware detection (defaults to @architect-)
+ * @returns Array of anti-pattern violations
+ */
+```
+
+```typescript
+function detectRemovedTags(
+  features: readonly ScannedGherkinFile[],
+  registry?: TagRegistry
+): AntiPatternViolation[];
+```
+
+| Parameter | Type | Description                                                                |
+| --------- | ---- | -------------------------------------------------------------------------- |
+| features  |      | Array of scanned feature files                                             |
+| registry  |      | Optional tag registry for prefix-aware detection (defaults to @architect-) |
 
 **Returns:** Array of anti-pattern violations
 
@@ -891,21 +921,6 @@ const severityOrder: Record<LintSeverity, number>;
 
 ```typescript
 const missingPatternName: LintRule;
-```
-
-### missingStatus (const)
-
-```typescript
-/**
- * Rule: missing-status
- *
- * Patterns should have an explicit status (completed, active, roadmap, deferred).
- * This helps readers understand if the pattern is ready for use.
- */
-```
-
-```typescript
-const missingStatus: LintRule;
 ```
 
 ---

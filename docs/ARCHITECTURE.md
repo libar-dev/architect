@@ -375,7 +375,7 @@ interface MasterDataset {
   byQuarter: Record<string, ExtractedPattern[]>; // e.g., "Q4-2024"
   byCategory: Record<string, ExtractedPattern[]>;
 
-  bySource: {
+  bySourceType: {
     typescript: ExtractedPattern[]; // From .ts files
     gherkin: ExtractedPattern[]; // From .feature files
     roadmap: ExtractedPattern[]; // Has phase metadata
@@ -441,7 +441,7 @@ export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset 
   const byPhaseMap = new Map<number, ExtractedPattern[]>();
   const byQuarter: Record<string, ExtractedPattern[]> = {};
   const byCategoryMap = new Map<string, ExtractedPattern[]>();
-  const bySource: SourceViews = { typescript: [], gherkin: [], roadmap: [], prd: [] };
+  const bySourceType: SourceViews = { typescript: [], gherkin: [], roadmap: [], prd: [] };
 
   // Single pass over all patterns
   for (const pattern of patterns) {
@@ -452,7 +452,7 @@ export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset 
     // Phase grouping (also adds to roadmap)
     if (pattern.phase !== undefined) {
       byPhaseMap.get(pattern.phase)?.push(pattern) ?? byPhaseMap.set(pattern.phase, [pattern]);
-      bySource.roadmap.push(pattern);
+      bySourceType.roadmap.push(pattern);
     }
 
     // Quarter grouping
@@ -474,7 +474,7 @@ export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset 
     .sort(([a], [b]) => a - b)
     .map(([phaseNumber, patterns]) => ({ phaseNumber, patterns, counts: computeCounts(patterns) }));
 
-  return { patterns, tagRegistry, byStatus, byPhase, byQuarter, byCategory, bySource, counts, /* ... */ };
+  return { patterns, tagRegistry, byStatus, byPhase, byQuarter, byCategory, bySourceType, counts, /* ... */ };
 }
 ```
 
@@ -1144,7 +1144,7 @@ Data-driven configuration for pattern categorization:
 │  │ Step 8: Transform to MasterDataset (SINGLE PASS)                           ││
 │  │         transformToMasterDataset({ patterns, tagRegistry, workflow })       ││
 │  │                                                                              ││
-│  │         Computes: byStatus, byPhase, byQuarter, byCategory, bySource,       ││
+│  │         Computes: byStatus, byPhase, byQuarter, byCategory, bySourceType,   ││
 │  │                   counts, phaseCount, categoryCount, relationshipIndex      ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 │                                        │                                         │
@@ -1214,7 +1214,7 @@ buildMasterDataset(options)
           │                 │     counts          │                   │
           ▼                 └─────────────────────┘                   ▼
 ┌─────────────────────┐                               ┌─────────────────────┐
-│     byCategory      │                               │      bySource       │
+│     byCategory      │                               │    bySourceType     │
 │                     │                               │                     │
 │ "core": [...]       │                               │ .typescript[]       │
 │ "scanner": [...]    │                               │ .gherkin[]          │

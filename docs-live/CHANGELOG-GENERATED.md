@@ -24,6 +24,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Git Module**: Shared git utilities used by both generators and lint layers.
 - **Git Helpers**: Low-level helpers for safe git command execution and input sanitization.
 - **Git Branch Diff**: Provides lightweight git diff operations for determining which files changed relative to a base branch.
+- **Repl Mode**: Loads the pipeline once and accepts multiple queries on stdin.
+- **Process API CLI Impl**: Exposes ProcessStateAPI methods as CLI subcommands with JSON output.
+- **Output Pipeline Impl**: Post-processing pipeline that transforms raw API results into shaped CLI output.
+- **MCP Server Bin**: Handles stdout isolation, CLI arg parsing, and process lifecycle.
+- **Lint Process CLI**: Validates git changes against workflow rules.
+- **Dataset Cache**: Caches the full PipelineResult (MasterDataset + ValidationSummary + warnings) to a JSON file.
 - **Config Resolver**: Resolves a raw `ArchitectProjectConfig` into a fully-resolved `ResolvedConfig` with all defaults applied, stubs...
 - **Project Config Types**: Unified project configuration for the Architect package.
 - **Project Config Schema**: Zod validation schema for `ArchitectProjectConfig`.
@@ -41,12 +47,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Context Formatter Impl**: First plain-text formatter in the codebase.
 - **Context Assembler Impl**: Pure function composition over MasterDataset.
 - **Arch Queries Impl**: Pure functions over MasterDataset for deep architecture exploration.
-- **Repl Mode**: Loads the pipeline once and accepts multiple queries on stdin.
-- **Process API CLI Impl**: Exposes ProcessStateAPI methods as CLI subcommands with JSON output.
-- **Output Pipeline Impl**: Post-processing pipeline that transforms raw API results into shaped CLI output.
-- **MCP Server Bin**: Handles stdout isolation, CLI arg parsing, and process lifecycle.
-- **Lint Process CLI**: Validates git changes against workflow rules.
-- **Dataset Cache**: Caches the full PipelineResult (MasterDataset + ValidationSummary + warnings) to a JSON file.
 - **FSM Validator**: :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return...
 - **FSM Transitions**: :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │ ...
 - **FSM States**: :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -...
@@ -54,6 +54,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Reference Document Codec**: :Generation A single codec factory that creates reference document codecs from configuration objects.
 - **Design Review Codec**: :Generation Transforms MasterDataset into a RenderableDocument containing design review artifacts: sequence diagrams,...
 - **Composite Codec**: :Generation Assembles reference documents from multiple codec outputs by concatenating RenderableDocument sections.
+- **Codec Registry Barrel**: Collects all codecMeta exports into a single array.
 - **Claude Module Codec**: :Generation Transforms MasterDataset into RenderableDocuments for CLAUDE.md module generation.
 - **Process Guard Types**: :FSMValidator Defines types for the process guard linter including: - Process state derived from file annotations -...
 - **Process Guard Module**: :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider Enforces workflow rules by validating changes...
@@ -78,23 +79,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Load Preamble Parser**: The parseMarkdownToBlocks function converts raw markdown content into a readonly SectionBlock[] array using a 5-state...
 - **Design Review Generation Tests**: Tests the full design review generation pipeline: sequence annotations are extracted from patterns with business...
 - **Design Review Generator Lifecycle Tests**: The design review generator cleans up stale markdown files when annotated patterns are renamed or removed from the...
+- **Claude Metadata Parity Testing**: The extractor must preserve Claude routing metadata from TypeScript directives and keep the sync and async Gherkin...
 - **Architecture Doc Refactoring Testing**: Validates that ARCHITECTURE.md retains its full reference content and that generated documents in docs-live/ coexist...
 - **Process Api Cli Repl**: Interactive REPL mode keeps the pipeline loaded for multi-query sessions and supports reload.
 - **Process Api Cli Metadata**: Response metadata includes validation summary and pipeline timing for diagnostics.
 - **Process Api Cli Help**: Per-subcommand help displays usage, flags, and examples for individual subcommands.
 - **Process Api Cli Dry Run**: Dry-run mode shows pipeline scope without processing data.
 - **Process Api Cli Cache**: MasterDataset caching between CLI invocations: cache hits, mtime invalidation, and --no-cache bypass.
-- **Uses Tag Testing**: Tests extraction and processing of @architect-uses and @architect-used-by relationship tags from TypeScript files.
-- **Depends On Tag Testing**: Tests extraction of @architect-depends-on and @architect-enables relationship tags from Gherkin files.
 - **Stub Taxonomy Tag Tests**: Stub metadata (target path, design session) was stored as plain text in JSDoc descriptions, invisible to structured...
 - **Stub Resolver Tests**: Design session stubs need structured discovery and resolution to determine which stubs have been implemented and...
+- **Context Formatter Tests**: Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(), and formatOverview() plain text rendering...
+- **Context Assembler Tests**: Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and buildOverview() pure functions that operate...
 - **Pattern Summarize Tests**: Validates that summarizePattern() projects ExtractedPattern (~3.5KB) to PatternSummary (~100 bytes) with the correct...
 - **Pattern Helpers Tests**
 - **Output Pipeline Tests**: Validates the output pipeline transforms: summarization, modifiers, list filters, empty stripping, and format output.
 - **Fuzzy Match Tests**: Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein.
-- **Context Formatter Tests**: Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(), and formatOverview() plain text rendering...
-- **Context Assembler Tests**: Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and buildOverview() pure functions that operate...
 - **Arch Queries Test**
+- **Uses Tag Testing**: Tests extraction and processing of @architect-uses and @architect-used-by relationship tags from TypeScript files.
+- **Depends On Tag Testing**: Tests extraction of @architect-depends-on and @architect-enables relationship tags from Gherkin files.
 
 ---
 
@@ -116,6 +118,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - **Public API**: Main entry point for the @libar-dev/architect package.
+- **MCPToolRegistry — Tool Definitions with Zod Schemas**: Defines 25 MCP tools mapping to ProcessStateAPI methods and CLI subcommands.
+- **MCPServer — Entry Point and Lifecycle Manager**: Main entry point for the Architect MCP server.
+- **PipelineSessionManager — In-Memory MasterDataset Lifecycle**: Manages the persistent MasterDataset that all MCP tool calls read from.
+- **McpFileWatcher — Debounced Source File Watcher**: Watches TypeScript and Gherkin source files for changes, triggering debounced pipeline rebuilds.
+- **Index Preamble Configuration — DD-3, DD-4 Decisions**: Decision DD-3 (Audience paths: preamble vs annotation-derived): Use full preamble for audience reading paths.
+- **IndexCodec Factory — DD-1 Implementation Stub**: Creates the IndexCodec as a Zod codec (MasterDataset -> RenderableDocument).
+- **IndexCodecOptions — DD-1, DD-5 Decisions**: Decision DD-1 (New IndexCodec vs extend existing): Create a new IndexCodec registered in CodecRegistry, NOT a...
 - **Workflow Config Schema**: Zod schemas for validating workflow configuration files that define status models, phase definitions, and artifact...
 - **Tag Registry Configuration**: Defines the structure and validation for tag taxonomy configuration.
 - **Output Schemas**: Zod schemas for JSON output formats used by CLI tools.
@@ -125,20 +134,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Dual Source Schemas**: Zod schemas for dual-source extraction types.
 - **Doc Directive Schema**: Zod schemas for validating parsed @architect-\* directives from JSDoc comments.
 - **Codec Utils**: Provides factory functions for creating type-safe JSON parsing and serialization pipelines using Zod schemas.
-- **DoD Validation Types**: Types and schemas for Definition of Done (DoD) validation and anti-pattern detection.
-- **Validation Module**: Barrel export for validation module providing: - Definition of Done (DoD) validation for completed phases -...
-- **DoD Validator**: Validates that completed phases meet Definition of Done criteria: 1.
-- **Anti Pattern Detector**: Detects violations of the dual-source documentation architecture and process hygiene issues that lead to...
 - **String Utilities**: Provides shared utilities for string manipulation used across the Architect package, including slugification for...
 - **Utils Module**: Common helper functions used across the Architect package.
 - **Pattern Id Generator**: Generates unique, deterministic pattern IDs based on file path and line number.
 - **Collection Utilities**: Provides shared utilities for working with arrays and collections, such as grouping items by a key function.
-- **Result Monad Types**: Explicit error handling via discriminated union.
-- **Error Factory Types**: Structured, discriminated error types with factory functions.
 - **Pattern Scanner**: Discovers TypeScript files matching glob patterns and filters to only those with `@architect` opt-in.
 - **Gherkin Scanner**: Scans .feature files for pattern metadata encoded in Gherkin tags.
 - **Gherkin AST Parser**: Parses Gherkin feature files using @cucumber/gherkin and extracts structured data including feature metadata, tags,...
 - **TypeScript AST Parser**: Parses TypeScript source files using @typescript-eslint/typescript-estree to extract @architect-\* directives with...
+- **DoD Validation Types**: Types and schemas for Definition of Done (DoD) validation and anti-pattern detection.
+- **Validation Module**: Barrel export for validation module providing: - Definition of Done (DoD) validation for completed phases -...
+- **DoD Validator**: Validates that completed phases meet Definition of Done criteria: 1.
+- **Anti Pattern Detector**: Detects violations of the dual-source documentation architecture and process hygiene issues that lead to...
 - **Status Values**: THE single source of truth for FSM state values in the monorepo (per PDR-005 FSM).
 - **Risk Levels**: Three-tier risk classification for roadmap planning.
 - **Tag Registry Builder**: Constructs a complete TagRegistry from TypeScript constants.
@@ -147,6 +154,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Hierarchy Levels**: Three-level hierarchy for organizing work: - epic: Multi-quarter strategic initiatives - phase: Standard work units...
 - **Format Types**: Defines how tag values are parsed and validated.
 - **Category Definitions**: Categories are used to classify patterns and organize documentation.
+- **Result Monad Types**: Explicit error handling via discriminated union.
+- **Error Factory Types**: Structured, discriminated error types with factory functions.
 - **Renderable Utils**: Utility functions for document codecs.
 - **Renderable Document**: Universal intermediate format for all generated documentation.
 - **Universal Renderer**: Converts RenderableDocument to output strings.
@@ -155,6 +164,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Lint Rules**: Defines lint rules that check @architect-\* directives for completeness and quality.
 - **Lint Module**: Provides lint rules and engine for pattern annotation quality checking.
 - **Lint Engine**: Orchestrates lint rule execution against parsed directives.
+- **Shape Extractor**: Extracts TypeScript type definitions (interfaces, type aliases, enums, function signatures) from source files for...
+- **Layer Inference**: Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns.
+- **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation.
+- **Dual Source Extractor**: Extracts pattern metadata from both TypeScript code stubs (@architect-_) and Gherkin feature files (@architect-_),...
+- **Document Extractor**: Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and...
 - **Warning Collector**: Provides a unified system for capturing, categorizing, and reporting non-fatal issues during document generation.
 - **Generator Types**: Minimal interface for pluggable generators that produce documentation from patterns.
 - **Source Mapping Validator**: Performs pre-flight checks on source mapping tables before extraction begins.
@@ -163,11 +177,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Documentation Generation Orchestrator**: Invariant: The orchestrator is the integration boundary for full docs generation: it delegates dataset construction...
 - **Content Deduplicator**: Identifies and merges duplicate sections extracted from multiple sources.
 - **Codec Based Generator**: Adapts the new RenderableDocument Model (RDM) codec system to the existing DocumentGenerator interface.
-- **Shape Extractor**: Extracts TypeScript type definitions (interfaces, type aliases, enums, function signatures) from source files for...
-- **Layer Inference**: Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns.
-- **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation.
-- **Dual Source Extractor**: Extracts pattern metadata from both TypeScript code stubs (@architect-_) and Gherkin feature files (@architect-_),...
-- **Document Extractor**: Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and...
+- **CLI Version Helper**: Reads package version from package.json for CLI --version flag.
+- **Validate Patterns CLI**: Cross-validates TypeScript patterns vs Gherkin feature files.
+- **Lint Patterns CLI**: Validates pattern annotations for quality and completeness.
+- **Documentation Generator CLI**: Replaces multiple specialized CLIs with one unified interface that supports multiple generators in a single run.
+- **CLI Error Handler**: Provides type-safe error handling for all CLI commands using the DocError discriminated union pattern.
+- **CLI Schema**: :DataAPI Declarative schema defining all CLI options for the architect command.
 - **Workflow Loader**: Provides the default 6-phase workflow as an inline constant and loads custom workflow overrides from JSON files via...
 - **Configuration Types**: Type definitions for the Architect configuration system.
 - **Regex Builders**: Type-safe regex factory functions for tag detection and normalization.
@@ -178,19 +193,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Scope Validator Impl**: Pure function composition over ProcessStateAPI and MasterDataset.
 - **Rules Query Module**: Pure query function for business rules extracted from Gherkin Rule: blocks.
 - **Handoff Generator Impl**: Pure function that assembles a handoff document from ProcessStateAPI and MasterDataset.
-- **CLI Version Helper**: Reads package version from package.json for CLI --version flag.
-- **Validate Patterns CLI**: Cross-validates TypeScript patterns vs Gherkin feature files.
-- **Lint Patterns CLI**: Validates pattern annotations for quality and completeness.
-- **Documentation Generator CLI**: Replaces multiple specialized CLIs with one unified interface that supports multiple generators in a single run.
-- **CLI Error Handler**: Provides type-safe error handling for all CLI commands using the DocError discriminated union pattern.
-- **CLI Schema**: :DataAPI Declarative schema defining all CLI options for the architect command.
-- **MCPToolRegistry — Tool Definitions with Zod Schemas**: Defines 25 MCP tools mapping to ProcessStateAPI methods and CLI subcommands.
-- **MCPServer — Entry Point and Lifecycle Manager**: Main entry point for the Architect MCP server.
-- **PipelineSessionManager — In-Memory MasterDataset Lifecycle**: Manages the persistent MasterDataset that all MCP tool calls read from.
-- **McpFileWatcher — Debounced Source File Watcher**: Watches TypeScript and Gherkin source files for changes, triggering debounced pipeline rebuilds.
-- **Index Preamble Configuration — DD-3, DD-4 Decisions**: Decision DD-3 (Audience paths: preamble vs annotation-derived): Use full preamble for audience reading paths.
-- **IndexCodec Factory — DD-1 Implementation Stub**: Creates the IndexCodec as a Zod codec (MasterDataset -> RenderableDocument).
-- **IndexCodecOptions — DD-1, DD-5 Decisions**: Decision DD-1 (New IndexCodec vs extend existing): Create a new IndexCodec registered in CodecRegistry, NOT a...
 - **Validation Rules Codec**: :Generation Transforms MasterDataset into a RenderableDocument for Process Guard validation rules reference.
 - **Timeline Codec**: :Generation Purpose: Development roadmap organized by phase with progress tracking.
 - **Taxonomy Codec**: :Generation Transforms MasterDataset into a RenderableDocument for taxonomy reference output.
@@ -198,6 +200,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Session Codec**: :Generation Purpose: Current session context for AI agents and developers.
 - **Requirements Codec**: :Generation Transforms MasterDataset into RenderableDocument for PRD/requirements output.
 - **Reporting Codecs**: :Generation Purpose: Keep a Changelog format changelog grouped by release version.
+- **Reference Codec**: All type/interface definitions and shared constants used across the ReferenceDocumentCodec module family.
+- **Reference Codec**: All diagram builder functions: collectScopePatterns, collectNeighborPatterns, prepareDiagramContext, and the five...
+- **Reference Codec**: Section builder functions that transform extracted data into SectionBlock arrays.
+- **Reference Codec**: Static data: PRODUCT_AREA_ARCH_CONTEXT_MAP and PRODUCT_AREA_META.
 - **Pr Changes Codec**: :Generation Transforms MasterDataset into RenderableDocument for PR-scoped output.
 - **Planning Codecs**: :Generation Purpose: Pre-planning questions and Definition of Done validation.
 - **Patterns Codec**: :Generation Transforms MasterDataset into a RenderableDocument for pattern registry output.
@@ -218,7 +224,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Built In Generators**: Registers all codec-based generators on import using the RDM (RenderableDocument Model) architecture.
 - **Decision Doc Generator**: Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1.
 - **Codec Generator Registration**: Registers codec-based generators for the RenderableDocument Model (RDM) system.
-- **Codec Base Options**: Shared types, interfaces, and utilities for all document codecs.
+- **Codec Base Options**: :Add-createDecodeOnlyCodec-helper Shared types, interfaces, and utilities for all document codecs.
 - **ADR 006 Single Read Model Architecture**: The Architect package applies event sourcing to itself: git is the event store, annotated source files are...
 - **ADR 005 Codec Based Markdown Rendering**: The documentation generator needs to transform structured pattern data (MasterDataset) into markdown files.
 - **ADR 002 Gherkin Only Testing**: A package that generates documentation from `.feature` files had dual test approaches: 97 legacy `.test.ts` files...
@@ -264,6 +270,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **String Utils**: String utilities provide consistent text transformations across the codebase.
 - **Result Monad**: The Result type provides explicit error handling via a discriminated union.
 - **Error Factories**: Error factories create structured, discriminated error types with consistent message formatting.
+- **Gherkin Ast Parser**: The Gherkin AST parser extracts feature metadata, scenarios, and steps from .feature files for timeline generation...
+- **File Discovery**: The file discovery system uses glob patterns to find TypeScript files for documentation extraction.
+- **Doc String Media Type**: DocString language hints (mediaType) should be preserved through the parsing pipeline from feature files to rendered...
+- **Ast Parser Relationships Edges**: The AST Parser extracts @architect-\* directives from TypeScript source files using the TypeScript compiler API.
+- **Ast Parser Metadata**: The AST Parser extracts @architect-\* directives from TypeScript source files using the TypeScript compiler API.
+- **Ast Parser Exports**: The AST Parser extracts @architect-\* directives from TypeScript source files using the TypeScript compiler API.
 - **Status Transition Detection Testing**: Tests for the detectStatusTransitions function that parses git diff output.
 - **Process Guard Testing**: Pure validation functions for enforcing delivery process rules per PDR-005.
 - **FSM Validator Testing**: Pure validation functions for the 4-state FSM defined in PDR-005.
@@ -271,16 +283,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Detect Changes Testing**: Tests for the detectDeliverableChanges function that parses git diff output.
 - **Config Schema Validation**: Configuration schemas validate scanner and generator inputs with security constraints to prevent path traversal...
 - **Anti Pattern Detector Testing**: Detects violations of the dual-source documentation architecture and process hygiene issues that lead to...
-- **Gherkin Ast Parser**: The Gherkin AST parser extracts feature metadata, scenarios, and steps from .feature files for timeline generation...
-- **File Discovery**: The file discovery system uses glob patterns to find TypeScript files for documentation extraction.
-- **Doc String Media Type**: DocString language hints (mediaType) should be preserved through the parsing pipeline from feature files to rendered...
-- **Ast Parser Relationships Edges**: The AST Parser extracts @architect-\* directives from TypeScript source files using the TypeScript compiler API.
-- **Ast Parser Metadata**: The AST Parser extracts @architect-\* directives from TypeScript source files using the TypeScript compiler API.
-- **Ast Parser Exports**: The AST Parser extracts @architect-\* directives from TypeScript source files using the TypeScript compiler API.
 - **Rule Keyword Po C**: This feature tests whether vitest-cucumber supports the Rule keyword for organizing scenarios under business rules.
-- **Lint Rule Individual Testing**: Individual lint rules that check parsed directives for completeness.
-- **Lint Rule Advanced Testing**: Complex lint rule logic and collection-level behavior.
-- **Lint Engine Testing**: The lint engine orchestrates rule execution, aggregates violations, and formats output for human and machine...
 - **Table Extraction**: Tables in business rule descriptions should appear exactly once in output.
 - **Generator Registry Testing**: Tests the GeneratorRegistry registration, lookup, and listing capabilities.
 - **Prd Implementation Section Testing**: Tests the Implementations section rendering in pattern documents.
@@ -293,7 +296,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Extraction Pipeline Enhancements Testing**: Validates extraction pipeline capabilities for ReferenceDocShowcase: function signature surfacing, full...
 - **Dual Source Extractor Testing**: Extracts and combines pattern metadata from both TypeScript code stubs (@architect-) and Gherkin feature files...
 - **Declaration Level Shape Tagging Testing**: Tests the discoverTaggedShapes function that scans TypeScript source code for declarations annotated with the...
-- **Claude Metadata Parity Testing**: The extractor must preserve Claude routing metadata from TypeScript directives and keep the sync and async Gherkin...
+- **Lint Rule Individual Testing**: Individual lint rules that check parsed directives for completeness.
+- **Lint Rule Advanced Testing**: Complex lint rule logic and collection-level behavior.
+- **Lint Engine Testing**: The lint engine orchestrates rule execution, aggregates violations, and formats output for human and machine...
 - **Warning Collector Testing**: The warning collector provides a unified system for capturing, categorizing, and reporting non-fatal issues during...
 - **Validation Rules Codec Testing**: Validates the Validation Rules Codec that transforms MasterDataset into a RenderableDocument for Process Guard...
 - **Taxonomy Codec Testing**: Validates the Taxonomy Codec that transforms MasterDataset into a RenderableDocument for tag taxonomy reference...
@@ -301,6 +306,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Source Mapper Testing**: The Source Mapper aggregates content from multiple source files based on source mapping tables parsed from decision...
 - **Robustness Integration**: Context: Document generation pipeline needs validation, deduplication, and warning collection to work together...
 - **Poc Integration**: End-to-end integration tests that exercise the full documentation generation pipeline using the actual POC decision...
+- **Index Codec Testing**: Validates the Index Codec that transforms MasterDataset into a RenderableDocument for the main documentation...
 - **Decision Doc Generator Testing**: The Decision Doc Generator orchestrates the full documentation generation pipeline from decision documents (ADR/PDR in .
 - **Decision Doc Codec Testing**: Validates the Decision Doc Codec that parses decision documents (ADR/PDR in .feature format) and extracts content for...
 - **Content Deduplication**: Context: Multiple sources may extract identical content, leading to duplicate sections in generated documentation.
@@ -318,6 +324,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Lint Process Cli**: Command-line interface for validating changes against delivery process rules.
 - **Lint Patterns Cli**: Command-line interface for validating pattern annotation quality.
 - **Generate Docs Cli**: Command-line interface for generating documentation from annotated TypeScript.
+- **Process State API Testing**: Programmatic interface for querying delivery process state.
 - **Transform Dataset Testing**: The transformToMasterDataset function transforms raw extracted patterns into a MasterDataset with all pre-computed...
 - **Session Handoffs**: The delivery process supports mid-phase handoffs between sessions and coordination across multiple developers through...
 - **Session File Lifecycle**: Orphaned session files are automatically cleaned up during generation, maintaining a clean docs-living/sessions/...
@@ -340,7 +347,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Description Header Normalization**: Pattern descriptions should not create duplicate headers when rendered.
 - **Context Inference**: Patterns in standard directories (src/validation/, src/scanner/) should automatically receive architecture context...
 - **Zod Codec Migration**: All JSON parsing and serialization uses type-safe Zod codec pattern, replacing raw JSON.parse/stringify with...
-- **Process State API Testing**: Programmatic interface for querying delivery process state.
+- **Scope Validator Tests**: Starting an implementation or design session without checking prerequisites wastes time when blockers are discovered...
+- **Handoff Generator Tests**: Multi-session work loses critical state between sessions when handoff documentation is manual or forgotten.
 - **Mermaid Relationship Rendering**: Tests for rendering all relationship types in Mermaid dependency graphs with distinct visual styles per relationship...
 - **Linter Validation Testing**: Tests for lint rules that validate relationship integrity, detect conflicts, and ensure bidirectional traceability...
 - **Implements Tag Processing**: Tests for the @architect-implements tag which links implementation files to their corresponding roadmap pattern...
@@ -369,7 +377,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Component Diagram Generation**: As a documentation generator I want to generate component diagrams from architecture metadata So that system...
 - **Arch Tag Extraction**: As a documentation generator I want architecture tags extracted from source code So that I can generate accurate...
 - **Arch Index Dataset**: As a documentation generator I want an archIndex built during dataset transformation So that I can efficiently look...
-- **Scope Validator Tests**: Starting an implementation or design session without checking prerequisites wastes time when blockers are discovered...
-- **Handoff Generator Tests**: Multi-session work loses critical state between sessions when handoff documentation is manual or forgotten.
 
 ---

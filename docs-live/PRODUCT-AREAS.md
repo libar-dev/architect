@@ -11,7 +11,7 @@
 
 The annotation system is the ingestion boundary — it transforms annotated TypeScript and Gherkin files into `ExtractedPattern[]` objects that feed the entire downstream pipeline. Two parallel scanning paths (TypeScript AST + Gherkin parser) converge through dual-source merging. The system is fully data-driven: the `TagRegistry` defines all tags, formats, and categories — adding a new annotation requires only a registry entry, zero parser changes.
 
-**27 patterns** — 24 completed, 2 active, 1 planned
+**27 patterns** — 23 completed, 3 active, 1 planned
 
 **Key patterns:** PatternRelationshipModel, ShapeExtraction, DualSourceExtraction, GherkinRulesSupport, DeclarationLevelShapeTagging, CrossSourceValidation, ExtractionPipelineEnhancementsTesting
 
@@ -31,7 +31,7 @@ Configuration is the entry boundary — it transforms a user-authored `architect
 
 The generation pipeline transforms annotated source code into markdown documents through a four-stage architecture: Scanner discovers files, Extractor produces `ExtractedPattern` objects, Transformer builds MasterDataset with pre-computed views, and Codecs render to markdown via RenderableDocument IR. Nine specialized codecs handle reference docs, planning, session, reporting, timeline, ADRs, business rules, taxonomy, and composite output — each supporting three detail levels (detailed, standard, summary). The Orchestrator runs generators in registration order, producing both detailed `docs-live/` references and compact `_claude-md/` summaries.
 
-**95 patterns** — 81 completed, 6 active, 8 planned
+**96 patterns** — 82 completed, 6 active, 8 planned
 
 **Key patterns:** ADR005CodecBasedMarkdownRendering, CodecDrivenReferenceGeneration, CrossCuttingDocumentInclusion, ArchitectureDiagramGeneration, ScopedArchitecturalView, CompositeCodec, RenderableDocument, ProductAreaOverview
 
@@ -81,14 +81,14 @@ Process defines the USDP-inspired session workflow that governs how work moves t
 
 | Area                                            | Patterns | Completed | Active | Planned |
 | ----------------------------------------------- | -------- | --------- | ------ | ------- |
-| [Annotation](product-areas/ANNOTATION.md)       | 27       | 24        | 2      | 1       |
+| [Annotation](product-areas/ANNOTATION.md)       | 27       | 23        | 3      | 1       |
 | [Configuration](product-areas/CONFIGURATION.md) | 11       | 8         | 0      | 3       |
-| [Generation](product-areas/GENERATION.md)       | 95       | 81        | 6      | 8       |
+| [Generation](product-areas/GENERATION.md)       | 96       | 82        | 6      | 8       |
 | [Validation](product-areas/VALIDATION.md)       | 25       | 16        | 3      | 6       |
 | [DataAPI](product-areas/DATA-API.md)            | 40       | 23        | 15     | 2       |
 | [CoreTypes](product-areas/CORE-TYPES.md)        | 11       | 7         | 4      | 0       |
 | [Process](product-areas/PROCESS.md)             | 11       | 4         | 0      | 7       |
-| **Total**                                       | **220**  | **163**   | **30** | **27**  |
+| **Total**                                       | **221**  | **163**   | **31** | **27**  |
 
 ---
 
@@ -120,9 +120,9 @@ C4Context
     System(DataAPIContextAssembly, "DataAPIContextAssembly")
     System(CrossCuttingDocumentInclusion, "CrossCuttingDocumentInclusion")
     System(CodecDrivenReferenceGeneration, "CodecDrivenReferenceGeneration")
-    System(StringUtils, "StringUtils")
     System(ResultMonad, "ResultMonad")
     System(ErrorFactories, "ErrorFactories")
+    System(StringUtils, "StringUtils")
     System(ExtractionPipelineEnhancementsTesting, "ExtractionPipelineEnhancementsTesting")
     System(KebabCaseSlugs, "KebabCaseSlugs")
     System(ErrorHandlingUnification, "ErrorHandlingUnification")
@@ -199,9 +199,9 @@ graph LR
     DataAPIContextAssembly["DataAPIContextAssembly"]
     CrossCuttingDocumentInclusion["CrossCuttingDocumentInclusion"]
     CodecDrivenReferenceGeneration["CodecDrivenReferenceGeneration"]
-    StringUtils["StringUtils"]
     ResultMonad["ResultMonad"]
     ErrorFactories["ErrorFactories"]
+    StringUtils["StringUtils"]
     ExtractionPipelineEnhancementsTesting["ExtractionPipelineEnhancementsTesting"]
     KebabCaseSlugs["KebabCaseSlugs"]
     ErrorHandlingUnification["ErrorHandlingUnification"]

@@ -1007,7 +1007,7 @@ _- Gherkin tags are flat strings needing semantic interpretation_
 
 #### Single value tags produce scalar metadata fields
 
-> **Invariant:** Each single-value tag (pattern, phase, status, brief) maps to exactly one metadata field with the correct type.
+> **Invariant:** Each single-value tag (pattern, phase, status) maps to exactly one metadata field with the correct type.
 >
 > **Rationale:** Incorrect type coercion (e.g., phase as string instead of number) causes downstream pipeline failures in filtering and sorting.
 
@@ -1019,7 +1019,6 @@ _- Gherkin tags are flat strings needing semantic interpretation_
 - Extract status deferred tag
 - Extract status completed tag
 - Extract status active tag
-- Extract brief path tag
 
 ---
 
