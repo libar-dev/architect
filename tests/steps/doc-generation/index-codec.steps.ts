@@ -60,7 +60,7 @@ function findSectionByHeading(
   level = 2
 ): SectionBlock | undefined {
   for (const block of sections) {
-    if (block.type === 'heading' && block.level === level && block.text.includes(headingText)) {
+    if (block.type === 'heading' && block.level === level && block.text === headingText) {
       return block;
     }
   }
@@ -77,7 +77,7 @@ function getSectionContent(sections: SectionBlock[], headingText: string): Secti
 
   for (const block of sections) {
     if (block.type === 'heading') {
-      if (block.text.includes(headingText)) {
+      if (block.text === headingText) {
         inSection = true;
         sectionLevel = block.level;
         result.push(block);
@@ -112,7 +112,7 @@ function findCodeBlock(sections: SectionBlock[]): SectionBlock | undefined {
  * Get the index of the first heading matching a text within sections
  */
 function headingIndex(sections: SectionBlock[], headingText: string): number {
-  return sections.findIndex((b) => b.type === 'heading' && b.text.includes(headingText));
+  return sections.findIndex((b) => b.type === 'heading' && b.text === headingText);
 }
 
 /**
@@ -510,6 +510,7 @@ describeFeature(feature, ({ Background, Rule }) => {
           // Progress bar uses █ character
           const tableContent = JSON.stringify(tableBlock.rows);
           expect(tableContent).toContain('%');
+          expect(tableContent).toContain('█');
         }
       });
     });
@@ -698,7 +699,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       }
     );
 
-    RuleScenario('Preamble appears after metadata and before inventory', ({ When, Then }) => {
+    RuleScenario('Preamble appears after metadata and before inventory', ({ When, Then, And }) => {
       When(
         'decoding with a preamble section and document entries in topic {string}',
         (_ctx: unknown, topic: string) => {
@@ -735,6 +736,22 @@ describeFeature(feature, ({ Background, Rule }) => {
               secondIdx
             );
           }
+        }
+      );
+
+      And(
+        'the preamble paragraph appears between {string} and {string}',
+        (_ctx: unknown, before: string, after: string) => {
+          expect(state.document).not.toBeNull();
+          const sections = state.document!.sections;
+          const beforeIdx = headingIndex(sections, before);
+          const afterIdx = headingIndex(sections, after);
+          const preambleIdx = sections.findIndex(
+            (b) => b.type === 'paragraph' && b.text.includes('editorial preamble')
+          );
+          expect(preambleIdx, 'Expected to find preamble paragraph').toBeGreaterThan(-1);
+          expect(preambleIdx, `Expected preamble after "${before}"`).toBeGreaterThan(beforeIdx);
+          expect(preambleIdx, `Expected preamble before "${after}"`).toBeLessThan(afterIdx);
         }
       );
     });

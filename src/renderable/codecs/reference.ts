@@ -98,7 +98,13 @@ export type {
   ReferenceCodecOptions,
 } from './reference-types.js';
 export { DIAGRAM_SOURCE_VALUES } from './reference-types.js';
-export { PRODUCT_AREA_ARCH_CONTEXT_MAP, PRODUCT_AREA_META } from './product-area-metadata.js';
+export {
+  PRODUCT_AREA_ARCH_CONTEXT_MAP,
+  PRODUCT_AREA_META,
+  PRODUCT_AREA_KEYS,
+  isProductAreaKey,
+  type ProductAreaKey,
+} from './product-area-metadata.js';
 export {
   buildConventionSections,
   buildBehaviorSectionsFromPatterns,
@@ -115,7 +121,11 @@ export {
 
 // Import types we need internally (after re-exports to avoid conflict)
 import type { DiagramScope, ReferenceDocConfig, ReferenceCodecOptions } from './reference-types.js';
-import { PRODUCT_AREA_ARCH_CONTEXT_MAP, PRODUCT_AREA_META } from './product-area-metadata.js';
+import {
+  PRODUCT_AREA_ARCH_CONTEXT_MAP,
+  PRODUCT_AREA_META,
+  isProductAreaKey,
+} from './product-area-metadata.js';
 import {
   buildConventionSections,
   buildBehaviorSectionsFromPatterns,
@@ -323,7 +333,7 @@ function decodeProductArea(
   opts: Required<ReferenceCodecOptions>
 ): RenderableDocument {
   const area = config.productArea;
-  if (area === undefined) {
+  if (area === undefined || !isProductAreaKey(area)) {
     return document('Error', [paragraph('No product area specified.')], {});
   }
   const sections: SectionBlock[] = [];
@@ -339,7 +349,7 @@ function decodeProductArea(
 
   // Collect TypeScript patterns by explicit archContext tag (for shapes + diagrams)
   // Note: archIndex.byContext includes inferred contexts — use explicit filter to match only tagged patterns
-  const archContexts = PRODUCT_AREA_ARCH_CONTEXT_MAP[area] ?? [];
+  const archContexts = PRODUCT_AREA_ARCH_CONTEXT_MAP[area];
   const contextSet = new Set(archContexts);
   const tsPatterns =
     contextSet.size > 0
@@ -348,19 +358,17 @@ function decodeProductArea(
 
   // 1. Intro section from ADR-001 metadata with key invariants
   const meta = PRODUCT_AREA_META[area];
-  if (meta !== undefined) {
-    sections.push(paragraph(`**${meta.question}** ${meta.intro}`));
+  sections.push(paragraph(`**${meta.question}** ${meta.intro}`));
 
-    if (meta.introSections !== undefined && opts.detailLevel === 'detailed') {
-      sections.push(...meta.introSections);
-    }
-
-    if (meta.keyInvariants.length > 0) {
-      sections.push(heading(2, 'Key Invariants'));
-      sections.push(list([...meta.keyInvariants]));
-    }
-    sections.push(separator());
+  if (meta.introSections !== undefined && opts.detailLevel === 'detailed') {
+    sections.push(...meta.introSections);
   }
+
+  if (meta.keyInvariants.length > 0) {
+    sections.push(heading(2, 'Key Invariants'));
+    sections.push(list([...meta.keyInvariants]));
+  }
+  sections.push(separator());
 
   // 2. Convention/invariant content from area patterns with convention tags
   const conventionPatterns = areaPatterns.filter(
@@ -375,7 +383,7 @@ function decodeProductArea(
 
   // 3. Architecture diagrams — priority: config > meta > auto-generate
   if (opts.detailLevel !== 'summary') {
-    const scopes: readonly DiagramScope[] = config.diagramScopes ?? meta?.diagramScopes ?? [];
+    const scopes: readonly DiagramScope[] = config.diagramScopes ?? meta.diagramScopes ?? [];
 
     if (scopes.length > 0) {
       // Explicit scopes from config or meta — always render
@@ -399,7 +407,7 @@ function decodeProductArea(
     }
   } else {
     // Compact boundary summary for summary-level documents (replaces diagrams)
-    const scopes: readonly DiagramScope[] = config.diagramScopes ?? meta?.diagramScopes ?? [];
+    const scopes: readonly DiagramScope[] = config.diagramScopes ?? meta.diagramScopes ?? [];
     const summary = buildBoundarySummary(dataset, scopes);
     if (summary !== undefined) {
       sections.push(summary);

@@ -13,6 +13,22 @@
 import { heading, table } from '../schema.js';
 import type { ProductAreaMeta, DiagramScope } from './reference-types.js';
 
+export const PRODUCT_AREA_KEYS = [
+  'Annotation',
+  'Configuration',
+  'Generation',
+  'Validation',
+  'DataAPI',
+  'CoreTypes',
+  'Process',
+] as const;
+
+export type ProductAreaKey = (typeof PRODUCT_AREA_KEYS)[number];
+
+export function isProductAreaKey(value: string): value is ProductAreaKey {
+  return (PRODUCT_AREA_KEYS as readonly string[]).includes(value);
+}
+
 // ============================================================================
 // Product Area → archContext Mapping (ADR-001)
 // ============================================================================
@@ -22,7 +38,7 @@ import type { ProductAreaMeta, DiagramScope } from './reference-types.js';
  * Product areas are Gherkin-side tags; archContexts are TypeScript-side tags.
  * This mapping bridges the two tagging domains for diagram scoping.
  */
-export const PRODUCT_AREA_ARCH_CONTEXT_MAP: Readonly<Record<string, readonly string[]>> = {
+export const PRODUCT_AREA_ARCH_CONTEXT_MAP: Readonly<Record<ProductAreaKey, readonly string[]>> = {
   Annotation: ['scanner', 'extractor', 'taxonomy'],
   Configuration: ['config'],
   Generation: ['generator', 'renderer'],
@@ -35,7 +51,7 @@ export const PRODUCT_AREA_ARCH_CONTEXT_MAP: Readonly<Record<string, readonly str
 /**
  * ADR-001 canonical product area metadata for intro sections.
  */
-export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
+export const PRODUCT_AREA_META: Readonly<Record<ProductAreaKey, ProductAreaMeta>> = {
   Annotation: {
     question: 'How do I annotate code?',
     covers: 'Scanning, extraction, tag parsing, dual-source',

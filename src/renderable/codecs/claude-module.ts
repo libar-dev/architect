@@ -86,7 +86,7 @@ export interface ClaudeModuleCodecOptions extends BaseCodecOptions {
  */
 export const DEFAULT_CLAUDE_MODULE_OPTIONS: Required<ClaudeModuleCodecOptions> = {
   ...DEFAULT_BASE_OPTIONS,
-  fullDocsPath: 'docs/',
+  fullDocsPath: 'docs-live/',
   includeRationale: true,
   includeTables: true,
 };

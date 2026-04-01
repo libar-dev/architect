@@ -23,6 +23,7 @@ import { renderToMarkdown, renderToClaudeMdModule } from '../../renderable/rende
 import {
   createReferenceCodec,
   PRODUCT_AREA_META,
+  isProductAreaKey,
   buildScopedDiagram,
   type ReferenceDocConfig,
   type DiagramScope,
@@ -253,9 +254,8 @@ function buildProductAreaIndex(
   // Per-area sections with intro prose and live statistics
   for (const config of configs) {
     const area = config.productArea;
-    if (area === undefined) continue;
+    if (area === undefined || !isProductAreaKey(area)) continue;
     const meta = PRODUCT_AREA_META[area];
-    if (meta === undefined) continue;
 
     sections.push(heading(2, `[${area}](product-areas/${config.docsFilename})`));
     sections.push(paragraph(`> **${meta.question}**`));
@@ -324,11 +324,9 @@ function buildProductAreaIndex(
   const allKeyPatterns: string[] = [];
   for (const config of configs) {
     const area = config.productArea;
-    if (area === undefined) continue;
+    if (area === undefined || !isProductAreaKey(area)) continue;
     const meta = PRODUCT_AREA_META[area];
-    if (meta !== undefined) {
-      allKeyPatterns.push(...meta.keyPatterns);
-    }
+    allKeyPatterns.push(...meta.keyPatterns);
   }
 
   // Diagram 1: C4Context cross-area system overview

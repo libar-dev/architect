@@ -76,6 +76,8 @@ import {
   mergeOptions,
   createDecodeOnlyCodec,
 } from './types/base.js';
+import { renderAcceptanceCriteria, renderBusinessRulesSection } from './helpers.js';
+import { toKebabCase } from '../../utils/index.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Session Codec Options (co-located with codecs)
@@ -205,9 +207,6 @@ export const DEFAULT_UNIFIED_SESSION_OPTIONS: Required<UnifiedSessionCodecOption
   sortBy: 'phase',
   groupPlannedBy: 'none',
 };
-
-import { renderAcceptanceCriteria, renderBusinessRulesSection } from './helpers.js';
-import { toKebabCase } from '../../utils/index.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Unified Session Codec

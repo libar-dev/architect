@@ -214,6 +214,7 @@ Feature: Index Document Codec
         | first            | second                  |
         | Package Metadata | Document Inventory      |
         | Document Inventory | Product Area Statistics |
+      And the preamble paragraph appears between "Package Metadata" and "Document Inventory"
 
     @acceptance-criteria @unit
     Scenario: Separators appear between sections

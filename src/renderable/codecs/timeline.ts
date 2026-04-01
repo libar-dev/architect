@@ -86,6 +86,7 @@ import {
   mergeOptions,
   createDecodeOnlyCodec,
 } from './types/base.js';
+import { renderAcceptanceCriteria, renderBusinessRulesSection } from './helpers.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Timeline Codec Options (co-located with codecs)
@@ -204,7 +205,6 @@ export const DEFAULT_TIMELINE_OPTIONS: Required<TimelineCodecOptions> = {
   filterQuarters: [],
   includeLinks: true,
 };
-import { renderAcceptanceCriteria, renderBusinessRulesSection } from './helpers.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Roadmap Document Codec
