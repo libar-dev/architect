@@ -74,22 +74,22 @@ generated equivalents. Work packages in this gap analysis should map to its phas
 
 **Deliverable Status (from spec Background):**
 
-| Deliverable                                 | Status   | Phase | Maps to WP                                      |
-| ------------------------------------------- | -------- | ----- | ----------------------------------------------- |
-| Preamble capability on ReferenceDocConfig   | complete | --    | N/A (done)                                      |
-| Phase 1 - Taxonomy consolidation            | pending  | 35    | Taxonomy deprecation                            |
-| Phase 2 - Codec listings extraction         | complete | 35    | N/A (done)                                      |
-| Phase 3 - Process Guard consolidation       | pending  | 35    | WP-5                                            |
-| Phase 4 - Architecture decomposition        | complete | 35    | N/A (done)                                      |
-| Phase 5 - Guide trimming                    | pending  | 35    | WP-9                                            |
-| Phase 6 - Index navigation update           | pending  | 35    | WP-2                                            |
-| Phase 37 - docs-live/ consolidation         | complete | 37    | N/A (done, commit 223ace6)                      |
-| Phase 38 - Generated doc quality            | pending  | 38    | WP-9                                            |
-| Phase 39 - Session workflow module gen      | pending  | 39    | Blocked on Phase 25                             |
-| Phase 40 - PUBLISHING.md relocation         | complete | 40    | N/A (done)                                      |
-| Phase 41 - GHERKIN-PATTERNS.md restructure  | pending  | 41    | WP-7                                            |
-| Phase 42 - README.md rationalization        | pending  | 42    | Not in this analysis                            |
-| Phase 43 - PROCESS-API.md hybrid generation | complete | 43    | N/A (done); WP-6 extends with recipe generation |
+| Deliverable                                | Status   | Phase | Maps to WP                                      |
+| ------------------------------------------ | -------- | ----- | ----------------------------------------------- |
+| Preamble capability on ReferenceDocConfig  | complete | --    | N/A (done)                                      |
+| Phase 1 - Taxonomy consolidation           | pending  | 35    | Taxonomy deprecation                            |
+| Phase 2 - Codec listings extraction        | complete | 35    | N/A (done)                                      |
+| Phase 3 - Process Guard consolidation      | pending  | 35    | WP-5                                            |
+| Phase 4 - Architecture decomposition       | complete | 35    | N/A (done)                                      |
+| Phase 5 - Guide trimming                   | pending  | 35    | WP-9                                            |
+| Phase 6 - Index navigation update          | pending  | 35    | WP-2                                            |
+| Phase 37 - docs-live/ consolidation        | complete | 37    | N/A (done, commit 223ace6)                      |
+| Phase 38 - Generated doc quality           | pending  | 38    | WP-9                                            |
+| Phase 39 - Session workflow module gen     | pending  | 39    | Blocked on Phase 25                             |
+| Phase 40 - PUBLISHING.md relocation        | complete | 40    | N/A (done)                                      |
+| Phase 41 - GHERKIN-PATTERNS.md restructure | pending  | 41    | WP-7                                            |
+| Phase 42 - README.md rationalization       | pending  | 42    | Not in this analysis                            |
+| Phase 43 - CLI.md hybrid generation        | complete | 43    | N/A (done); WP-6 extends with recipe generation |
 
 **Key Invariants from Spec:**
 
@@ -334,7 +334,7 @@ These `docs-live/` subdirectories exist but have no sync function:
 | **ARCHITECTURE.md**     | 1,638 | docs-live/product-areas/GENERATION.md (1,065 lines) + docs-live/reference/ARCHITECTURE-CODECS.md (630 lines) + docs-live/reference/ARCHITECTURE-TYPES.md (429 lines) | Partial      | Generated covers pipeline stages and codec listings well. Missing: executive summary, data flow diagrams, workflow integration section, "Extending the System" guide, programmatic usage examples, quick reference card.                                                                            |
 | **GHERKIN-PATTERNS.md** | 366   | None                                                                                                                                                                 | None         | Authoring style guide: 4 essential patterns, DataTable/DocString usage, tag conventions, feature file rich content rules, step linting reference. Pure editorial guidance -- no annotation source exists.                                                                                           |
 | **ANNOTATION-GUIDE.md** | 270   | docs-live/taxonomy/metadata-tags.md (649 lines)                                                                                                                      | Partial      | Generated has exhaustive tag reference (56 tags). Missing: getting-started guide, shape extraction modes explanation, "Zod schema gotcha" documentation, verification steps, common issues troubleshooting table.                                                                                   |
-| **PROCESS-API.md**      | ~60   | docs-live/reference/CLI-REFERENCE.md + CLI-RECIPES.md                                                                                                                | **Replaced** | Trimmed to pointer file with operational reference (JSON envelope, exit codes, piping). All prose content now generated by CliRecipeCodec (WP-6 complete).                                                                                                                                          |
+| **CLI.md**              | ~60   | docs-live/reference/CLI-REFERENCE.md + CLI-RECIPES.md                                                                                                                | **Replaced** | Trimmed to pointer file with operational reference (JSON envelope, exit codes, piping). All prose content now generated by CliRecipeCodec (WP-6 complete).                                                                                                                                          |
 | **PROCESS-GUARD.md**    | 341   | docs-live/validation/error-catalog.md (79 lines) + docs-live/validation/fsm-transitions.md (49 lines) + docs-live/validation/protection-levels.md                    | Partial      | Generated has error types, FSM matrix, protection levels. Missing: error fix rationale ("why this rule exists"), escape hatch alternatives, pre-commit setup instructions (Husky), programmatic API guide, Decider pattern architecture diagram.                                                    |
 | **VALIDATION.md**       | 418   | docs-live/product-areas/VALIDATION.md (1,115 lines)                                                                                                                  | Partial      | Generated has pattern listings and business rules. Missing: "Which command do I run?" decision tree, 32+ individual lint rule explanations with code examples, anti-pattern detection rationale, CI/CD integration patterns (GitHub Actions YAML), vitest-cucumber two-pattern problem explanation. |
 | **TAXONOMY.md**         | 107   | docs-live/TAXONOMY.md (199 lines) + docs-live/taxonomy/ (3 files)                                                                                                    | Good         | Generated taxonomy reference is actually more comprehensive than manual. Manual adds: architecture explanation (file structure of src/taxonomy/), preset-to-taxonomy mapping, generation commands. Small gap.                                                                                       |
@@ -561,7 +561,7 @@ This replaces the manual PROCESS-GUARD.md "Error Messages and Fixes" section.
 **Effort:** Medium (2-3 sessions)
 **Spec alignment:** Extends CliReferenceGeneration (Phase 43, completed). Phase 43
 generated reference tables from CLI schema; this adds recipe/guide content. The manual
-PROCESS-API.md prose was explicitly kept in Phase 43 -- this WP addresses that remainder.
+CLI.md prose was explicitly kept in Phase 43 -- this WP addresses that remainder.
 
 Create a codec that generates CLI recipe guides from:
 
@@ -569,7 +569,7 @@ Create a codec that generates CLI recipe guides from:
 - New `**Recipe:**` annotation in feature files
 - Session type metadata
 
-This replaces manual PROCESS-API.md "Common Recipes" and "Session Workflow Commands".
+This replaces manual CLI.md "Common Recipes" and "Session Workflow Commands".
 
 **Design questions for session:**
 
@@ -692,7 +692,7 @@ All other work packages are complete.
 | TAXONOMY.md         | Now (generated version is better) | WP-1 (sync fix)                         |
 | ARCHITECTURE.md     | WP-3 + WP-9                       | Architecture generator + quality polish |
 | PROCESS-GUARD.md    | WP-5                              | Error guide codec                       |
-| PROCESS-API.md      | Done (WP-6 complete)              | Trimmed to pointer file                 |
+| CLI.md              | Done (WP-6 complete)              | Trimmed to pointer file                 |
 | ANNOTATION-GUIDE.md | WP-7 (partial)                    | Guide codec with getting-started        |
 | VALIDATION.md       | WP-5 + WP-7                       | Error guide + procedural guides         |
 | SESSION-GUIDES.md   | WP-7                              | Procedural guide codec                  |
@@ -761,7 +761,7 @@ pending until generated docs reach quality parity for manual doc archival. Phase
 | CONFIGURATION.md    | 357   | Partial (options auto, rationale manual)    |
 | GHERKIN-PATTERNS.md | 366   | Low (style guide is editorial)              |
 | METHODOLOGY.md      | 238   | None (philosophy)                           |
-| PROCESS-API.md      | ~60   | Complete (pointer file + generated recipes) |
+| CLI.md              | ~60   | Complete (pointer file + generated recipes) |
 | PROCESS-GUARD.md    | 341   | Partial (rules auto, fix guides manual)     |
 | SESSION-GUIDES.md   | 389   | Low (checklists are procedural)             |
 | TAXONOMY.md         | 107   | High (generated version is better)          |

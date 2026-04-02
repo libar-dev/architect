@@ -54,7 +54,7 @@ function buildReferenceDocument(): string {
 
   sections.push(
     paragraph(
-      '> Auto-generated from CLI schema. See [Pattern Graph CLI Guide](../../docs/PROCESS-API.md) for usage examples and recipes.'
+      '> Auto-generated from CLI schema. See [CLI Recipes & Workflow Guide](../../docs-live/reference/CLI-RECIPES.md) for usage examples and recipes.'
     )
   );
 

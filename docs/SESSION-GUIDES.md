@@ -104,7 +104,7 @@ pnpm architect:query -- dep-tree <PatternName>                  # Dependency cha
 pnpm architect:query -- stubs <PatternName>                     # Existing design stubs
 ```
 
-Use these **before** launching explore agents. See [PROCESS-API.md](./PROCESS-API.md).
+Use these **before** launching explore agents. See [CLI.md](./CLI.md).
 
 ### When Required
 
@@ -181,7 +181,7 @@ pnpm architect:query -- files <PatternName> --related
 
 The `scope-validate` command replaces the manual pre-flight checklist — it checks
 dependency completion, deliverable definitions, FSM validity, and design decisions.
-See [PROCESS-API.md](./PROCESS-API.md#scope-validate).
+See [CLI.md](./CLI.md#scope-validate).
 
 ### Execution Checklist
 
@@ -387,5 +387,5 @@ Valid transitions: See [METHODOLOGY.md#fsm-enforced-workflow](./METHODOLOGY.md#f
 | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | DataTables, DocStrings, Rule blocks               |
 | [CONFIGURATION.md](./CONFIGURATION.md)       | Tag prefixes, presets                             |
 | [TAXONOMY.md](./TAXONOMY.md)                 | Tag taxonomy concepts and API                     |
-| [PROCESS-API.md](./PROCESS-API.md)           | Data API CLI commands for all session types       |
+| [CLI.md](./CLI.md)                           | Data API CLI commands for all session types       |
 | [VALIDATION.md](./VALIDATION.md)             | CLI flags for lint-patterns and validate-patterns |

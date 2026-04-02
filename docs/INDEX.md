@@ -29,7 +29,7 @@
 | Write Gherkin specs         | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | 1-515  |
 | Enforce process rules       | [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | 1-341  |
 | Validate annotation quality | [VALIDATION.md](./VALIDATION.md)             | 1-281  |
-| Query process state via CLI | [PROCESS-API.md](./PROCESS-API.md)           | 1-507  |
+| Query pattern graph via CLI | [CLI.md](./CLI.md)                           | 1-507  |
 | Understand the taxonomy     | [TAXONOMY.md](./TAXONOMY.md)                 | 1-105  |
 | Publish to npm              | [MAINTAINERS.md](../MAINTAINERS.md)          | —      |
 | Learn annotation patterns   | [ANNOTATION-GUIDE.md](./ANNOTATION-GUIDE.md) | 1-268  |
@@ -49,7 +49,7 @@
 ### For Developers / AI
 
 4. **[ARCHITECTURE.md](./ARCHITECTURE.md)** — Four-stage pipeline, codecs, PatternGraph
-5. **[PROCESS-API.md](./PROCESS-API.md)** — Data API CLI query interface
+5. **[CLI.md](./CLI.md)** — Data API CLI query interface
 6. **[SESSION-GUIDES.md](./SESSION-GUIDES.md)** — Planning/Design/Implementation workflows
 7. **[GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md)** — Writing effective Gherkin specs
 8. **[ANNOTATION-GUIDE.md](./ANNOTATION-GUIDE.md)** — Annotation mechanics, shape extraction, tag quick reference
@@ -194,7 +194,7 @@
 
 ---
 
-### PROCESS-API.md (Lines 1-507)
+### CLI.md (Lines 1-507)
 
 | Section                   | Lines   | Key Topics                                                  |
 | ------------------------- | ------- | ----------------------------------------------------------- |
@@ -301,7 +301,7 @@ deferred ──→ roadmap
 
 The CLI is the **recommended way** to gather context in any session type.
 It queries annotated sources in real time — not generated snapshots.
-See [PROCESS-API.md](./PROCESS-API.md).
+See [CLI.md](./CLI.md).
 
 ```bash
 pnpm architect:query -- scope-validate MyPattern implement      # ALWAYS run first
@@ -320,7 +320,7 @@ pnpm architect:query -- handoff --pattern MyPattern              # Capture sessi
 | METHODOLOGY.md      | Everyone    | Why — core thesis, principles     |
 | CONFIGURATION.md    | Users       | Setup — presets, tags, config     |
 | ARCHITECTURE.md     | Developers  | How — pipeline, codecs, schemas   |
-| PROCESS-API.md      | AI/Devs     | Data API CLI query interface      |
+| CLI.md              | AI/Devs     | Data API CLI query interface      |
 | SESSION-GUIDES.md   | AI/Devs     | Workflow — day-to-day usage       |
 | GHERKIN-PATTERNS.md | Writers     | Specs — writing effective Gherkin |
 | PROCESS-GUARD.md    | Team Leads  | Governance — enforcement rules    |

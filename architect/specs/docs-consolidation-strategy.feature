@@ -41,7 +41,7 @@ Feature: Documentation Consolidation Strategy
   | METHODOLOGY.md | 238 | Keep: philosophy and core thesis |
   | SESSION-GUIDES.md | 389 | Phase 39: retained as public reference; CLAUDE.md session section generated from annotated behavior specs |
   | GHERKIN-PATTERNS.md | 515 | Phase 41: trim to ~250 lines, Step Linting moves to VALIDATION.md |
-  | PROCESS-API.md | 507 | Phase 43: keep prose, generate 3 reference tables from CLI schema |
+  | CLI.md | 507 | Phase 43: keep prose, generate 3 reference tables from CLI schema |
   | PUBLISHING.md | 144 | Phase 40: relocate to MAINTAINERS.md at repo root |
   | README.md | ~504 | Phase 42: trim to ~150 lines, move pitch content to website |
   | docs-generated/ structure | n/a | Phase 37: consolidate to docs-live/ as single output directory |
@@ -63,7 +63,7 @@ Feature: Documentation Consolidation Strategy
       | Phase 40 - PUBLISHING.md relocation to MAINTAINERS.md | complete | docs/PUBLISHING.md | No | n/a |
       | Phase 41 - GHERKIN-PATTERNS.md restructure | complete | docs/GHERKIN-PATTERNS.md, docs/VALIDATION.md | No | n/a |
       | Phase 42 - README.md rationalization | complete | README.md | No | n/a |
-      | Phase 43 - PROCESS-API.md hybrid generation | complete | docs/PROCESS-API.md, src/cli/ | Yes | integration |
+      | Phase 43 - CLI.md hybrid generation | complete | docs/CLI.md, src/cli/ | Yes | integration |
       | Promote architecture generator from preview to docs:all | complete | package.json, architect.config.ts | No | n/a |
       | Promote changelog generator from preview to docs:all | complete | package.json, architect.config.ts | No | n/a |
 
@@ -142,7 +142,7 @@ Feature: Documentation Consolidation Strategy
     **Invariant:** Documents containing philosophy (METHODOLOGY.md) remain fully manual
     with no generated equivalent (~238 lines). Documents that were originally manual but
     now have generated equivalents or have been restructured (SESSION-GUIDES.md,
-    GHERKIN-PATTERNS.md, PROCESS-API.md) retain their editorial content as preamble
+    GHERKIN-PATTERNS.md, CLI.md) retain their editorial content as preamble
     within generated outputs. PUBLISHING.md was relocated to MAINTAINERS.md at the
     repository root.
 

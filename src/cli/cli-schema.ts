@@ -226,7 +226,7 @@ export const CLI_SCHEMA: CLISchema = {
   },
 
   // ===========================================================================
-  // Command Narratives (from docs/PROCESS-API.md)
+  // Command Narratives (originally transcribed from docs/CLI.md)
   // ===========================================================================
 
   commandNarratives: [
@@ -512,7 +512,7 @@ export const CLI_SCHEMA: CLISchema = {
   ],
 
   // ===========================================================================
-  // Recipes (from docs/PROCESS-API.md "Common Recipes" section)
+  // Recipes (originally transcribed from docs/CLI.md "Common Recipes" section)
   // ===========================================================================
 
   recipes: [

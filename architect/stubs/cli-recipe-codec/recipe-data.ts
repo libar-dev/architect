@@ -6,21 +6,21 @@
  *
  * ## Recipe Data — Example Definitions for CLI_SCHEMA Extension
  *
- * Demonstrates how recipe content from docs/PROCESS-API.md maps to the
+ * Demonstrates how recipe content from docs/CLI.md maps to the
  * structured `RecipeGroup[]` and `CommandNarrativeGroup[]` schema types
  * defined in `recipe-schema.ts`.
  *
  * **Content source:** All recipe and narrative content below is extracted from
- * the manually-maintained `docs/PROCESS-API.md` (509 lines). During
+ * the manually-maintained `docs/CLI.md` (509 lines). During
  * implementation, this content moves into `CLI_SCHEMA` in
- * `src/cli/cli-schema.ts` and the manual prose sections in PROCESS-API.md
+ * `src/cli/cli-schema.ts` and the manual prose sections in CLI.md
  * are replaced with links to the generated file.
  *
  * **Coverage:** This stub shows 2 of 5 recipe groups and 2 of 6 command
  * narratives to validate the schema design. The full implementation will
- * include all content from PROCESS-API.md sections:
+ * include all content from CLI.md sections:
  *
- * | PROCESS-API.md Section | Schema Location | Content Type |
+ * | CLI.md Section | Schema Location | Content Type |
  * |------------------------|-----------------|--------------|
  * | Common Recipes (5 blocks, 42 lines) | `CLI_SCHEMA.recipes` | RecipeGroup[] |
  * | Session Workflow Commands (6 cmds, 125 lines) | `CLI_SCHEMA.commandNarratives[0]` | CommandNarrativeGroup |
@@ -51,7 +51,7 @@ import type {
 /**
  * "Starting a Session" recipe — the recommended 3-command startup sequence.
  *
- * Source: docs/PROCESS-API.md lines 470-476 (Common Recipes section).
+ * Source: docs/CLI.md lines 470-476 (Common Recipes section).
  */
 const startingASessionRecipe: RecipeExample = {
   title: 'Starting a Session',
@@ -75,7 +75,7 @@ const startingASessionRecipe: RecipeExample = {
 /**
  * "Finding What to Work On" recipe — discover available work.
  *
- * Source: docs/PROCESS-API.md lines 478-484.
+ * Source: docs/CLI.md lines 478-484.
  */
 const findingWorkRecipe: RecipeExample = {
   title: 'Finding What to Work On',
@@ -99,7 +99,7 @@ const findingWorkRecipe: RecipeExample = {
 /**
  * Example RecipeGroup composing the two recipe examples above.
  *
- * During implementation, all 5 recipe groups from PROCESS-API.md are defined:
+ * During implementation, all 5 recipe groups from CLI.md are defined:
  * 1. Starting a Session
  * 2. Finding What to Work On
  * 3. Investigating a Pattern
@@ -119,7 +119,7 @@ const COMMON_RECIPES: RecipeGroup = {
 /**
  * Narrative for the `overview` command.
  *
- * Source: docs/PROCESS-API.md lines 86-91.
+ * Source: docs/CLI.md lines 86-91.
  */
 const overviewNarrative: CommandNarrative = {
   command: 'overview',
@@ -146,7 +146,7 @@ const overviewNarrative: CommandNarrative = {
 /**
  * Narrative for the `scope-validate` command.
  *
- * Source: docs/PROCESS-API.md lines 94-117.
+ * Source: docs/CLI.md lines 94-117.
  */
 const scopeValidateNarrative: CommandNarrative = {
   command: 'scope-validate',
@@ -201,7 +201,7 @@ const SESSION_WORKFLOW_NARRATIVES: CommandNarrativeGroup = {
  * 2. Quick Start — 3-command sequence with example `overview` output
  * 3. Session Types — table + decision tree sentence
  *
- * Source: docs/PROCESS-API.md lines 13-77.
+ * Source: docs/CLI.md lines 13-77.
  *
  * Note: The preamble is configured in architect.config.ts, NOT in
  * CLI_SCHEMA. This keeps editorial prose separate from structured command

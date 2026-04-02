@@ -578,7 +578,7 @@ console.log(JSON.stringify(doc.sections, null, 2));
 
 #### Design sessions produce decisions and stubs only
 
-**Invariant:** A design session makes architectural decisions and creates code stubs with interfaces. It must not produce implementation code. Context gathering via the Data API must precede any explore agent usage.
+**Invariant:** A design session makes architectural decisions and creates code stubs with interfaces. It must not produce implementation code. Context gathering via the Process Data API must precede any explore agent usage.
 
 **Rationale:** Design sessions resolve ambiguity before implementation begins. Code stubs in architect/stubs/ live outside src/ to avoid TypeScript compilation and ESLint issues, making them zero-risk artifacts.
 
@@ -623,7 +623,7 @@ console.log(JSON.stringify(doc.sections, null, 2));
 
 #### Handoff captures session-end state for continuity
 
-**Invariant:** Multi-session work requires handoff documentation generated from the Data API. Handoff output always reflects actual annotation state, not manual notes.
+**Invariant:** Multi-session work requires handoff documentation generated from the Process Data API. Handoff output always reflects actual annotation state, not manual notes.
 
 **Rationale:** Manual session notes drift from actual deliverable state. The handoff command derives state from annotations, ensuring the next session starts from ground truth rather than stale notes.
 

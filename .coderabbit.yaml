@@ -17,12 +17,9 @@ reviews:
     - '!pnpm-lock.yaml'
     - '!docs-generated/**'
     - '!catalogue/artefact-sets/**'
-    - 'README.md'
-    - 'CLAUDE.md'
-    - 'docs-sources/**'
+    - '!**/*.md'
     - 'src/**'
     - 'tests/**'
-    - 'docs/**'
     - '.github/**'
     - 'architect/**/*.feature'
 

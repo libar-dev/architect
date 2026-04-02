@@ -156,4 +156,4 @@ Feature: README Rationalization
       When the rationalization is complete
       Then install instructions appear within the first 20 lines of README.md
       And Quick Start steps cover annotate, generate, and enforce
-      And the Documentation section links to CONFIGURATION.md, METHODOLOGY.md, ARCHITECTURE.md, SESSION-GUIDES.md, GHERKIN-PATTERNS.md, PROCESS-GUARD.md, VALIDATION.md, PROCESS-API.md, and TAXONOMY.md
+      And the Documentation section links to CONFIGURATION.md, METHODOLOGY.md, ARCHITECTURE.md, SESSION-GUIDES.md, GHERKIN-PATTERNS.md, PROCESS-GUARD.md, VALIDATION.md, CLI.md, and TAXONOMY.md

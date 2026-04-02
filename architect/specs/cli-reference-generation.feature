@@ -8,10 +8,10 @@
 @architect-depends-on:DocsConsolidationStrategy
 @architect-business-value:keeps-cli-reference-tables-in-sync-with-cli-schema-automatically
 @architect-priority:low
-Feature: PROCESS-API.md Hybrid Generation
+Feature: CLI.md Hybrid Generation
 
   **Problem:**
-  `docs/PROCESS-API.md` (509 lines) contains three reference tables that manually
+  `docs/CLI.md` (509 lines) contains three reference tables that manually
   mirror CLI definitions in source code: Global Options (lines 382-389, 6 rows),
   Output Modifiers (lines 397-403, 5 rows), and List Filters (lines 415-424, 8 rows).
   These ~41 lines are pure data derived from code constants in `src/cli/pattern-graph-cli.ts`
@@ -26,7 +26,7 @@ Feature: PROCESS-API.md Hybrid Generation
   Create a declarative CLI schema (`src/cli/cli-schema.ts`) as the single source of
   truth. A standalone `CliReferenceGenerator` reads this schema and produces
   a complete generated reference file at `docs-live/reference/CLI-REFERENCE.md`.
-  The "Output Reference" section in `docs/PROCESS-API.md` (lines 376-424) is replaced
+  The "Output Reference" section in `docs/CLI.md` (lines 376-424) is replaced
   with a heading and link to the generated file. The `showHelp()` function is refactored
   to consume the same schema, eliminating three-way sync.
 
@@ -46,7 +46,7 @@ Feature: PROCESS-API.md Hybrid Generation
   | showHelp() lines 271-370 is third copy of same data | Three-way sync risk | Schema drives both help text and doc generation |
   | Inter-table prose is only ~10 lines total | Must appear in generated file | Encode as description/postNote fields in schema |
 
-  **Section Audit — docs/PROCESS-API.md (509 lines):**
+  **Section Audit — docs/CLI.md (509 lines):**
   | Section | Lines | Action | Rationale |
   | Intro + Why Use This | 1-30 | KEEP | Editorial context |
   | Quick Start | 31-62 | KEEP | Examples with output |
@@ -71,7 +71,7 @@ Feature: PROCESS-API.md Hybrid Generation
       | Sync test verifying schema entries match parseArgs behavior | complete | tests/features/behavior/cli/ | Yes | integration |
       | CliReferenceGenerator producing complete reference file | complete | src/generators/built-in/cli-reference-generator.ts | Yes | integration |
       | Register generator in orchestrator config | complete | architect.config.ts | Yes | integration |
-      | Trim PROCESS-API.md Output Reference to link to generated file | complete | docs/PROCESS-API.md | Yes | manual |
+      | Trim CLI.md Output Reference to link to generated file | complete | docs/CLI.md | Yes | manual |
       | Refactor showHelp to consume CLI schema | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
       | Behavior spec with scenarios for all 3 generated tables | complete | tests/features/behavior/cli/cli-reference.feature | Yes | integration |
 
@@ -112,7 +112,7 @@ Feature: PROCESS-API.md Hybrid Generation
 
   Rule: Narrative prose sections remain manual
 
-    **Invariant:** PROCESS-API.md sections covering "Why Use This", session type
+    **Invariant:** CLI.md sections covering "Why Use This", session type
     decision tree, workflow recipes, worked examples with expected output, and
     "Common Recipes" are not generated. They require editorial judgment and context
     that cannot be extracted from code annotations. The document's value comes from
@@ -127,11 +127,11 @@ Feature: PROCESS-API.md Hybrid Generation
 
     @acceptance-criteria @validation
     Scenario: Prose sections unchanged after regeneration
-      Given PROCESS-API.md with narrative sections including "Why Use This" and "Common Recipes"
+      Given CLI.md with narrative sections including "Why Use This" and "Common Recipes"
       When the CliReferenceGenerator runs
-      Then PROCESS-API.md is not modified by the generator
+      Then CLI.md is not modified by the generator
       And only CLI-REFERENCE.md is created or updated
-      And PROCESS-API.md contains a link to CLI-REFERENCE.md in the Output Reference section
+      And CLI.md contains a link to CLI-REFERENCE.md in the Output Reference section
 
   Rule: Standalone generator respects ADR-006 single read model
 

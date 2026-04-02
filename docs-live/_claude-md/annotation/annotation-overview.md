@@ -19,8 +19,8 @@
 | MetadataTagDefinitionForRegistry | interface |
 | CategoryDefinition               | interface |
 | CategoryTag                      | type      |
-| isShapeOnlyDirective             | function  |
 | buildRegistry                    | function  |
+| isShapeOnlyDirective             | function  |
 | METADATA_TAGS_BY_GROUP           | const     |
 | CATEGORIES                       | const     |
 | CATEGORY_TAGS                    | const     |
