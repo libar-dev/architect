@@ -421,14 +421,14 @@ graph LR
     end
     TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
     loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
-    ProjectConfigTypes -->|uses| ConfigurationTypes
-    ProjectConfigTypes -->|uses| ConfigurationPresets
-    ConfigurationPresets -->|uses| ConfigurationTypes
+    CLISchema ..->|implements| CliReferenceGeneration
     PatternHelpers ..->|implements| DataAPIOutputShaping
     ArchQueriesImpl -->|uses| PatternGraphAPI
     ArchQueriesImpl -->|uses| PatternGraph
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
-    CLISchema ..->|implements| CliReferenceGeneration
+    ProjectConfigTypes -->|uses| ConfigurationTypes
+    ProjectConfigTypes -->|uses| ConfigurationPresets
+    ConfigurationPresets -->|uses| ConfigurationTypes
     FSMTransitions ..->|implements| PhaseStateMachineValidation
     FSMStates ..->|implements| PhaseStateMachineValidation
     PatternGraphAPI -->|uses| PatternGraph

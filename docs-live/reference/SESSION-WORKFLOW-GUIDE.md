@@ -205,7 +205,7 @@ Three-layer architecture after Phase 39:
 | No CLAUDE.md drift | Session workflow section generated, not hand-authored |
 | Single annotated source | This spec owns all session workflow invariants |
 | Correct audience alignment | Public guide stays in docs/, AI context in \_claude-md/ |
-| Pattern Graph CLI coverage | Session workflow content queryable via `pnpm architect:query -- rules` |
+| Process API coverage | Session workflow content queryable via `pnpm process:query -- rules` |
 | Immediately useful | Rule: blocks are queryable today, generation follows when Phase 25 ships |
 
 **Design Session Findings (2026-03-05):**

@@ -69,11 +69,11 @@ graph TB
         ContentDeduplicator["ContentDeduplicator[infrastructure]"]
         CodecBasedGenerator["CodecBasedGenerator[service]"]
         FileCache["FileCache[infrastructure]"]
+        DesignReviewGenerator["DesignReviewGenerator[service]"]
+        DecisionDocGenerator["DecisionDocGenerator[service]"]
         TransformDataset["TransformDataset[service]"]
         SequenceTransformUtils["SequenceTransformUtils[service]"]
         RelationshipResolver["RelationshipResolver[service]"]
-        DesignReviewGenerator["DesignReviewGenerator[service]"]
-        DecisionDocGenerator["DecisionDocGenerator[service]"]
     end
     subgraph lint["Lint BC"]
         LintRules["LintRules[service]"]
@@ -125,25 +125,17 @@ graph TB
     MCPModule --> MCPPipelineSession
     MCPModule --> MCPFileWatcher
     MCPModule --> MCPToolRegistry
+    LintEngine --> LintRules
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> GherkinASTParser
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
     GherkinExtractor --> GherkinASTParser
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
     Document_Extractor --> Pattern_Scanner
-    LintEngine --> LintRules
-    ReplMode --> PatternGraphAPI
-    PatternGraphCLIImpl --> PatternGraphAPI
-    PatternGraphCLIImpl --> PatternGraph
-    PatternGraphCLIImpl --> PatternSummarizerImpl
-    PatternGraphCLIImpl --> FuzzyMatcherImpl
-    PatternGraphCLIImpl --> OutputPipelineImpl
-    OutputPipelineImpl --> PatternSummarizerImpl
-    MCPServerBin --> MCPServerImpl
     ConfigResolver --> ArchitectFactory
     ArchitectFactory --> RegexBuilders
     ConfigLoader --> ArchitectFactory
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> GherkinASTParser
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
     PatternSummarizerImpl --> PatternGraphAPI
     ScopeValidatorImpl --> PatternGraphAPI
     ScopeValidatorImpl --> PatternGraph
@@ -161,17 +153,25 @@ graph TB
     ContextAssemblerImpl --> FuzzyMatcherImpl
     ArchQueriesImpl --> PatternGraphAPI
     ArchQueriesImpl --> PatternGraph
+    ReplMode --> PatternGraphAPI
+    PatternGraphCLIImpl --> PatternGraphAPI
+    PatternGraphCLIImpl --> PatternGraph
+    PatternGraphCLIImpl --> PatternSummarizerImpl
+    PatternGraphCLIImpl --> FuzzyMatcherImpl
+    PatternGraphCLIImpl --> OutputPipelineImpl
+    OutputPipelineImpl --> PatternSummarizerImpl
+    MCPServerBin --> MCPServerImpl
     FSMValidator --> FSMTransitions
     FSMValidator --> FSMStates
     DesignReviewCodec --> PatternGraph
     ArchitectureCodec --> PatternGraph
     ProcessGuardDecider --> FSMValidator
-    TransformDataset --> PatternGraph
-    SequenceTransformUtils --> PatternGraph
     DesignReviewGenerator --> DesignReviewCodec
     DesignReviewGenerator --> PatternGraph
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
+    TransformDataset --> PatternGraph
+    SequenceTransformUtils --> PatternGraph
 ```
 
 ---
