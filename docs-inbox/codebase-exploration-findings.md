@@ -444,9 +444,9 @@ Both produce `ExtractedPattern` and validate via `ExtractedPatternSchema.safePar
 
 **Shape rendering in wrong layer:** `renderShapesAsMarkdown()` defined in `shape-extractor.ts` (extraction layer), consumed by `codecs/helpers.ts` (renderable layer).
 
-### 4.3 Process Data API (14 files, 4,110 lines)
+### 4.3 Data API (14 files, 4,110 lines)
 
-**`PatternGraphAPI` (process-state.ts line 87):** 25-method interface in 5 groups:
+**`PatternGraphAPI` (pattern-graph-api.ts line 87):** 25-method interface in 5 groups:
 
 - Status queries (5 methods)
 - Phase queries (4 methods)

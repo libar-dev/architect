@@ -2,7 +2,7 @@
 
 > **Deprecated:** The full CLI documentation is now auto-generated. See [CLI Reference Tables](../docs-live/reference/CLI-REFERENCE.md) and [CLI Recipes & Workflow Guide](../docs-live/reference/CLI-RECIPES.md). This file retains only quick-start guidance and operational reference (JSON envelope, exit codes).
 >
-> Query process state directly from annotated source code.
+> Query the pattern graph directly from annotated source code.
 
 > **For AI coding agents:** Start every session with these three commands:
 >

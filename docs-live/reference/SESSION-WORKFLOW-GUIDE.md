@@ -205,7 +205,7 @@ Three-layer architecture after Phase 39:
 | No CLAUDE.md drift | Session workflow section generated, not hand-authored |
 | Single annotated source | This spec owns all session workflow invariants |
 | Correct audience alignment | Public guide stays in docs/, AI context in \_claude-md/ |
-| Process API coverage | Session workflow content queryable via `pnpm process:query -- rules` |
+| Process API coverage | Session workflow content queryable via `pnpm architect:query -- rules` |
 | Immediately useful | Rule: blocks are queryable today, generation follows when Phase 25 ships |
 
 **Design Session Findings (2026-03-05):**
@@ -349,7 +349,7 @@ Three-layer architecture after Phase 39:
 - Handoff output reflects annotation state
 - Handoff output reflects annotation state
 
-  Generate handoff via: pnpm process:query -- handoff --pattern PatternName
+  Generate handoff via: pnpm architect:query -- handoff --pattern PatternName
   Options: --git (include recent commits)
 
 - --session (session identifier)
@@ -370,7 +370,7 @@ Three-layer architecture after Phase 39:
 
 **Invariant:** Phase 39 depends on ClaudeModuleGeneration (Phase 25). Adding `@architect-claude-module` and `@architect-claude-section:workflow` tags to this spec will cause ClaudeModuleGeneration to produce `_claude-md/workflow/` output files. The hand-written `_claude-md/workflow/` files are deleted after successful verified generation.
 
-**Rationale:** The annotation work (Rule blocks in this spec) is immediately useful — queryable via `pnpm process:query -- rules`. Generation deliverables cannot complete until Phase 25 ships the ClaudeModuleCodec. This sequencing is intentional: the annotation investment has standalone value regardless of whether the codec exists yet.
+**Rationale:** The annotation work (Rule blocks in this spec) is immediately useful — queryable via `pnpm architect:query -- rules`. Generation deliverables cannot complete until Phase 25 ships the ClaudeModuleCodec. This sequencing is intentional: the annotation investment has standalone value regardless of whether the codec exists yet.
 
 **Prerequisite:** Phase 25 must add `workflow` to the `claude-section` enum
 values (currently: core, process, testing, infrastructure).

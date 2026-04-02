@@ -1,7 +1,7 @@
 @architect
 @architect-pattern:ConfigBasedWorkflowDefinition
 @architect-status:completed
-@architect-unlock-reason:Add-missing-Invariant-Rationale-annotations
+@architect-unlock-reason:Terminology-alignment-rebrand
 @architect-phase:99
 @architect-effort:2h
 @architect-product-area:Configuration
@@ -12,7 +12,7 @@
 Feature: Config-Based Workflow Definition
 
   **Problem:**
-  Every `pnpm process:query` and `pnpm docs:*` invocation prints:
+  Every `pnpm architect:query` and `pnpm docs:*` invocation prints:
   `Failed to load default workflow (6-phase-standard): Workflow file not found`
 
   The `loadDefaultWorkflow()` function resolves to `catalogue/workflows/`

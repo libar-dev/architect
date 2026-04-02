@@ -32,6 +32,6 @@ Architecture and process decisions are recorded as annotated Gherkin specs in `a
 | ADR-003 | Source-first pattern architecture — code drives docs, not the reverse     |
 | ADR-005 | Codec-based markdown rendering — Zod codecs transform data to markdown    |
 | ADR-006 | Single read model — PatternGraph is the sole read model for all consumers |
-| PDR-001 | Session workflow commands — Process Data API CLI design decisions         |
+| PDR-001 | Session workflow commands — Data API CLI design decisions                 |
 
 Query decisions: `pnpm architect:query -- decisions <pattern>`

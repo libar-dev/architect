@@ -6,7 +6,7 @@ Tests use Vitest with BDD/Gherkin integration:
 - **Support**: `tests/support/` - test helpers and setup utilities
 - **Shared state helpers**: `tests/support/helpers/` - reusable state management for split test suites
 
-Large test files are split into focused domain files with shared state extracted to helpers (e.g., `ast-parser-state.ts`, `pattern-graph-cli-state.ts`).
+Large test files are split into focused domain files with shared state extracted to helpers (e.g., `ast-parser-state.ts`, `pattern-graph-api-state.ts`).
 
 Run a single test file: `pnpm test tests/steps/scanner/file-discovery.steps.ts`
 

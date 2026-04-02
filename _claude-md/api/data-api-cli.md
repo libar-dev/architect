@@ -1,6 +1,6 @@
 ### Data API CLI
 
-Query process state directly from the terminal. **Use this instead of reading generated markdown or launching explore agents** — targeted queries use 5-10x less context.
+Query the pattern graph directly from the terminal. **Use this instead of reading generated markdown or launching explore agents** — targeted queries use 5-10x less context.
 
 **Run `pnpm architect:query -- --help` for the full command reference**, including workflow recipes, session types, architecture queries, output modifiers, and available API methods.
 

@@ -1,6 +1,6 @@
 ### Context Gathering Protocol (MANDATORY)
 
-**Rule: Always query the Process Data API BEFORE using grep, explore agents, or reading files.**
+**Rule: Always query the Data API BEFORE using grep, explore agents, or reading files.**
 
 The API returns structured, current data using 5-10x less context than file reads. Annotations and relationships in source files feed the API — invest in annotations, not manual notes.
 

@@ -45,7 +45,7 @@
         {
           "path": "api/data-api-cli.md",
           "tags": ["core"],
-          "description": "Data API CLI for querying process state"
+          "description": "Data API CLI for querying the pattern graph"
         },
         {
           "path": "api/mcp-server.md",

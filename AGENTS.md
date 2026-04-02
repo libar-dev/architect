@@ -10,17 +10,17 @@ This file helps future Codex sessions ramp up quickly in this repository.
 
 ## Where To Read First
 
-1. Manual docs index: `/Users/darkomijic/dev-projects/architect/docs/INDEX.md`
-2. Config entry point: `/Users/darkomijic/dev-projects/architect/architect.config.ts`
-3. Live generated area index: `/Users/darkomijic/dev-projects/architect/docs-live/PRODUCT-AREAS.md`
+1. Manual docs index: `/Users/darkomijic/dev-projects/delivery-process/docs/INDEX.md`
+2. Config entry point: `/Users/darkomijic/dev-projects/delivery-process/architect.config.ts`
+3. Live generated area index: `/Users/darkomijic/dev-projects/delivery-process/docs-live/PRODUCT-AREAS.md`
 4. Key generated area docs:
-   - `/Users/darkomijic/dev-projects/architect/docs-live/product-areas/ANNOTATION.md`
-   - `/Users/darkomijic/dev-projects/architect/docs-live/product-areas/CONFIGURATION.md`
-   - `/Users/darkomijic/dev-projects/architect/docs-live/product-areas/CORE-TYPES.md`
-   - `/Users/darkomijic/dev-projects/architect/docs-live/product-areas/DATA-API.md`
-   - `/Users/darkomijic/dev-projects/architect/docs-live/product-areas/GENERATION.md`
-   - `/Users/darkomijic/dev-projects/architect/docs-live/product-areas/PROCESS.md`
-   - `/Users/darkomijic/dev-projects/architect/docs-live/product-areas/VALIDATION.md`
+   - `/Users/darkomijic/dev-projects/delivery-process/docs-live/product-areas/ANNOTATION.md`
+   - `/Users/darkomijic/dev-projects/delivery-process/docs-live/product-areas/CONFIGURATION.md`
+   - `/Users/darkomijic/dev-projects/delivery-process/docs-live/product-areas/CORE-TYPES.md`
+   - `/Users/darkomijic/dev-projects/delivery-process/docs-live/product-areas/DATA-API.md`
+   - `/Users/darkomijic/dev-projects/delivery-process/docs-live/product-areas/GENERATION.md`
+   - `/Users/darkomijic/dev-projects/delivery-process/docs-live/product-areas/PROCESS.md`
+   - `/Users/darkomijic/dev-projects/delivery-process/docs-live/product-areas/VALIDATION.md`
 
 ## Onboarding Context (Tutorial WIP)
 
@@ -64,15 +64,15 @@ Use `architect.config.ts` or `.js` as the main integration contract and keep scr
 
 ## Repository Map
 
-- Source code: `/Users/darkomijic/dev-projects/architect/src`
+- Source code: `/Users/darkomijic/dev-projects/delivery-process/src`
 - Feature specs (roadmap/process/decisions/releases):
-  - `/Users/darkomijic/dev-projects/architect/architect/specs`
-  - `/Users/darkomijic/dev-projects/architect/architect/decisions`
-  - `/Users/darkomijic/dev-projects/architect/architect/releases`
-- Design stubs (non-compiled on purpose): `/Users/darkomijic/dev-projects/architect/architect/stubs`
+  - `/Users/darkomijic/dev-projects/delivery-process/architect/specs`
+  - `/Users/darkomijic/dev-projects/delivery-process/architect/decisions`
+  - `/Users/darkomijic/dev-projects/delivery-process/architect/releases`
+- Design stubs (non-compiled on purpose): `/Users/darkomijic/dev-projects/delivery-process/architect/stubs`
 - Tests:
-  - Feature files: `/Users/darkomijic/dev-projects/architect/tests/features`
-  - Step definitions: `/Users/darkomijic/dev-projects/architect/tests/steps`
+  - Feature files: `/Users/darkomijic/dev-projects/delivery-process/tests/features`
+  - Step definitions: `/Users/darkomijic/dev-projects/delivery-process/tests/steps`
 
 ## Session Workflow (Project Convention)
 

@@ -419,16 +419,16 @@ graph LR
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
         CliReferenceGeneration["CliReferenceGeneration"]:::neighbor
     end
-    TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
     loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
-    CLISchema ..->|implements| CliReferenceGeneration
+    TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
+    ProjectConfigTypes -->|uses| ConfigurationTypes
+    ProjectConfigTypes -->|uses| ConfigurationPresets
+    ConfigurationPresets -->|uses| ConfigurationTypes
     PatternHelpers ..->|implements| DataAPIOutputShaping
     ArchQueriesImpl -->|uses| PatternGraphAPI
     ArchQueriesImpl -->|uses| PatternGraph
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
-    ProjectConfigTypes -->|uses| ConfigurationTypes
-    ProjectConfigTypes -->|uses| ConfigurationPresets
-    ConfigurationPresets -->|uses| ConfigurationTypes
+    CLISchema ..->|implements| CliReferenceGeneration
     FSMTransitions ..->|implements| PhaseStateMachineValidation
     FSMStates ..->|implements| PhaseStateMachineValidation
     PatternGraphAPI -->|uses| PatternGraph
@@ -440,6 +440,21 @@ graph LR
 ---
 
 ## API Types
+
+### SectionBlock (type)
+
+```typescript
+type SectionBlock =
+  | HeadingBlock
+  | ParagraphBlock
+  | SeparatorBlock
+  | TableBlock
+  | ListBlock
+  | CodeBlock
+  | MermaidBlock
+  | CollapsibleBlock
+  | LinkOutBlock;
+```
 
 ### normalizeStatus (function)
 
@@ -534,21 +549,6 @@ interface CategoryDefinition {
 | priority    | Display order priority - lower values appear first in sorted output               |
 | description | Brief description of the category's purpose and typical patterns                  |
 | aliases     | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
-
-### SectionBlock (type)
-
-```typescript
-type SectionBlock =
-  | HeadingBlock
-  | ParagraphBlock
-  | SeparatorBlock
-  | TableBlock
-  | ListBlock
-  | CodeBlock
-  | MermaidBlock
-  | CollapsibleBlock
-  | LinkOutBlock;
-```
 
 ---
 
@@ -892,7 +892,7 @@ These are the durable constants of the delivery process.
 [View ConfigBasedWorkflowDefinition source](architect/specs/config-based-workflow-definition.feature)
 
 **Problem:**
-Every `pnpm process:query` and `pnpm docs:*` invocation prints:
+Every `pnpm architect:query` and `pnpm docs:*` invocation prints:
 `Failed to load default workflow (6-phase-standard): Workflow file not found`
 
 The `loadDefaultWorkflow()` function resolves to `catalogue/workflows/`

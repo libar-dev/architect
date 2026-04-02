@@ -623,7 +623,7 @@ METHODOLOGY.md (238 lines) contains philosophy that cannot be extracted from cod
 The master spec already decided to keep it. Design session should confirm and decide:
 
 1. **Keep as-is** (aligned with master spec)
-2. **Encode as invariants** in a feature file for queryability via Process Data API
+2. **Encode as invariants** in a feature file for queryability via Data API
 3. **Merge relevant parts into README.md** as part of Phase 42
 
 **Recommendation:** Option 1, with option 2 as enhancement. The philosophy is

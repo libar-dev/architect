@@ -1,7 +1,7 @@
 @architect
 @architect-pattern:SessionGuidesModuleSource
 @architect-status:completed
-@architect-unlock-reason:Add-include-tag-for-ProceduralGuideCodec
+@architect-unlock-reason:Terminology-alignment-rebrand
 @architect-phase:39
 @architect-effort:0.5d
 @architect-product-area:Generation
@@ -53,7 +53,7 @@ Feature: Session Guides as Annotated Module Source
   | No CLAUDE.md drift | Session workflow section generated, not hand-authored |
   | Single annotated source | This spec owns all session workflow invariants |
   | Correct audience alignment | Public guide stays in docs/, AI context in _claude-md/ |
-  | Process API coverage | Session workflow content queryable via `pnpm process:query -- rules` |
+  | Process API coverage | Session workflow content queryable via `pnpm architect:query -- rules` |
   | Immediately useful | Rule: blocks are queryable today, generation follows when Phase 25 ships |
 
   **Design Session Findings (2026-03-05):**
@@ -283,8 +283,8 @@ Feature: Session Guides as Annotated Module Source
 
     | Situation | Solution | Example |
     | Fix bug in completed spec | Add unlock reason tag | @architect-unlock-reason:Fix-typo |
-    | Modify outside session scope | Use ignore flag | lint-process --staged --ignore-session |
-    | CI treats warnings as errors | Use strict flag | lint-process --all --strict |
+    | Modify outside session scope | Use ignore flag | architect-guard --staged --ignore-session |
+    | CI treats warnings as errors | Use strict flag | architect-guard --all --strict |
 
     @acceptance-criteria @happy-path
     Scenario: All FSM errors have documented recovery paths
@@ -308,7 +308,7 @@ Feature: Session Guides as Annotated Module Source
 
     **Verified by:** Handoff output reflects annotation state
 
-    Generate handoff via: pnpm process:query -- handoff --pattern PatternName
+    Generate handoff via: pnpm architect:query -- handoff --pattern PatternName
     Options: --git (include recent commits), --session (session identifier)
 
     Output includes: deliverable statuses, blockers, modification date, and next
@@ -334,7 +334,7 @@ Feature: Session Guides as Annotated Module Source
     successful verified generation.
 
     **Rationale:** The annotation work (Rule blocks in this spec) is immediately
-    useful — queryable via `pnpm process:query -- rules`. Generation deliverables
+    useful — queryable via `pnpm architect:query -- rules`. Generation deliverables
     cannot complete until Phase 25 ships the ClaudeModuleCodec. This sequencing is
     intentional: the annotation investment has standalone value regardless of
     whether the codec exists yet.

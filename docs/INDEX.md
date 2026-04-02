@@ -231,18 +231,18 @@
 
 ### VALIDATION.md (Lines 1-281)
 
-| Section               | Lines   | Key Topics                                        |
-| --------------------- | ------- | ------------------------------------------------- |
-| Which Command?        | 7-24    | Decision tree for validation commands             |
-| Command Summary       | 26-35   | lint-patterns, lint-steps, lint-process, validate |
-| lint-patterns         | 37-74   | 8 rules table, CLI flags                          |
-| lint-steps            | 76-98   | 12 rules, 3 categories, vitest-cucumber traps     |
-| lint-process          | 100-121 | What it validates, reference links                |
-| validate-patterns     | 123-197 | CLI flags, checks, anti-patterns, DoD             |
-| CI/CD Integration     | 199-238 | Consumer scripts, hooks, GitHub Actions           |
-| Exit Codes            | 240-248 | Per-command exit code table                       |
-| Programmatic API      | 250-272 | Import paths for all validators                   |
-| Related Documentation | 274-281 | Links to GHERKIN-PATTERNS, PROCESS-GUARD, CONFIG  |
+| Section               | Lines   | Key Topics                                           |
+| --------------------- | ------- | ---------------------------------------------------- |
+| Which Command?        | 7-24    | Decision tree for validation commands                |
+| Command Summary       | 26-35   | lint-patterns, lint-steps, architect-guard, validate |
+| lint-patterns         | 37-74   | 8 rules table, CLI flags                             |
+| lint-steps            | 76-98   | 12 rules, 3 categories, vitest-cucumber traps        |
+| architect-guard       | 100-121 | What it validates, reference links                   |
+| validate-patterns     | 123-197 | CLI flags, checks, anti-patterns, DoD                |
+| CI/CD Integration     | 199-238 | Consumer scripts, hooks, GitHub Actions              |
+| Exit Codes            | 240-248 | Per-command exit code table                          |
+| Programmatic API      | 250-272 | Import paths for all validators                      |
+| Related Documentation | 274-281 | Links to GHERKIN-PATTERNS, PROCESS-GUARD, CONFIG     |
 
 ---
 

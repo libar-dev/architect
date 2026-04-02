@@ -49,7 +49,7 @@ Both generated from the SAME annotated sources. Features are planned for **reusa
 
 ### Context Gathering Protocol (MANDATORY)
 
-**Rule: Always query the Process Data API BEFORE using grep, explore agents, or reading files.**
+**Rule: Always query the Data API BEFORE using grep, explore agents, or reading files.**
 
 The API returns structured, current data using 5-10x less context than file reads. Annotations and relationships in source files feed the API — invest in annotations, not manual notes.
 
@@ -124,7 +124,7 @@ pnpm architect:query -- overview                            # Project health sum
 
 ### Data API CLI
 
-Query process state directly from the terminal. **Use this instead of reading generated markdown or launching explore agents** — targeted queries use 5-10x less context.
+Query the pattern graph directly from the terminal. **Use this instead of reading generated markdown or launching explore agents** — targeted queries use 5-10x less context.
 
 **Run `pnpm architect:query -- --help` for the full command reference**, including workflow recipes, session types, architecture queries, output modifiers, and available API methods.
 
@@ -197,7 +197,7 @@ Steps 1-2 can run in parallel (no dependencies between them).
 
 | Tool                | Description                                            |
 | ------------------- | ------------------------------------------------------ |
-| `architect_rebuild` | Force dataset rebuild from current source files        |
+| `architect_rebuild` | Force PatternGraph rebuild from current source files   |
 | `architect_config`  | Show source globs, base dir, build time, pattern count |
 | `architect_help`    | List all available tools with descriptions             |
 
@@ -299,7 +299,7 @@ Architecture and process decisions are recorded as annotated Gherkin specs in `a
 | ADR-003 | Source-first pattern architecture — code drives docs, not the reverse     |
 | ADR-005 | Codec-based markdown rendering — Zod codecs transform data to markdown    |
 | ADR-006 | Single read model — PatternGraph is the sole read model for all consumers |
-| PDR-001 | Session workflow commands — Process Data API CLI design decisions         |
+| PDR-001 | Session workflow commands — Data API CLI design decisions                 |
 
 Query decisions: `pnpm architect:query -- decisions <pattern>`
 
@@ -315,7 +315,7 @@ Tests use Vitest with BDD/Gherkin integration:
 - **Support**: `tests/support/` - test helpers and setup utilities
 - **Shared state helpers**: `tests/support/helpers/` - reusable state management for split test suites
 
-Large test files are split into focused domain files with shared state extracted to helpers (e.g., `ast-parser-state.ts`, `pattern-graph-cli-state.ts`).
+Large test files are split into focused domain files with shared state extracted to helpers (e.g., `ast-parser-state.ts`, `pattern-graph-api-state.ts`).
 
 Run a single test file: `pnpm test tests/steps/scanner/file-discovery.steps.ts`
 
@@ -495,13 +495,13 @@ The parser sees:
 
 Issues discovered during step definition implementation:
 
-| Issue                             | Description                                                  | Fix                                                                                               |
-| --------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| Pattern not in `bySource.gherkin` | TraceabilityCodec shows "No Timeline Patterns"               | Set `filePath: '...feature'` in `createTestPattern()` - source categorization uses file extension |
-| Business value not found          | REMAINING-WORK.md business value is in `additionalFiles`     | Check detail files via `doc.additionalFiles` not main document sections                           |
-| Codec output mismatch             | Spec says "Next Actionable table" but codec uses list format | Debug actual output with `console.log(JSON.stringify(doc.sections))` then align test expectations |
-| `behaviorFileVerified` undefined  | Patterns created without explicit verification status        | Add `behaviorFileVerified: true/false` to `createTestPattern()` when testing traceability         |
-| Discovery tags missing            | SessionFindingsCodec shows "No Findings"                     | Pass `discoveredGaps`, `discoveredImprovements`, `discoveredLearnings` to factory                 |
+| Issue                                 | Description                                                  | Fix                                                                                               |
+| ------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| Pattern not in `bySourceType.gherkin` | TraceabilityCodec shows "No Timeline Patterns"               | Set `filePath: '...feature'` in `createTestPattern()` - source categorization uses file extension |
+| Business value not found              | REMAINING-WORK.md business value is in `additionalFiles`     | Check detail files via `doc.additionalFiles` not main document sections                           |
+| Codec output mismatch                 | Spec says "Next Actionable table" but codec uses list format | Debug actual output with `console.log(JSON.stringify(doc.sections))` then align test expectations |
+| `behaviorFileVerified` undefined      | Patterns created without explicit verification status        | Add `behaviorFileVerified: true/false` to `createTestPattern()` when testing traceability         |
+| Discovery tags missing                | SessionFindingsCodec shows "No Findings"                     | Pass `discoveredGaps`, `discoveredImprovements`, `discoveredLearnings` to factory                 |
 
 ### Coding & Linting Standards
 
@@ -578,7 +578,7 @@ console.log(JSON.stringify(doc.sections, null, 2));
 
 #### Design sessions produce decisions and stubs only
 
-**Invariant:** A design session makes architectural decisions and creates code stubs with interfaces. It must not produce implementation code. Context gathering via the Process Data API must precede any explore agent usage.
+**Invariant:** A design session makes architectural decisions and creates code stubs with interfaces. It must not produce implementation code. Context gathering via the Data API must precede any explore agent usage.
 
 **Rationale:** Design sessions resolve ambiguity before implementation begins. Code stubs in architect/stubs/ live outside src/ to avoid TypeScript compilation and ESLint issues, making them zero-risk artifacts.
 
@@ -615,15 +615,15 @@ console.log(JSON.stringify(doc.sections, null, 2));
 | session-scope (warning)   | Modified file outside session scope            | Add to scope OR use --ignore-session        |
 | session-excluded          | Modified excluded pattern during session       | Remove from exclusion OR override           |
 
-| Situation                    | Solution              | Example                                |
-| ---------------------------- | --------------------- | -------------------------------------- |
-| Fix bug in completed spec    | Add unlock reason tag | @architect-unlock-reason:Fix-typo      |
-| Modify outside session scope | Use ignore flag       | lint-process --staged --ignore-session |
-| CI treats warnings as errors | Use strict flag       | lint-process --all --strict            |
+| Situation                    | Solution              | Example                                   |
+| ---------------------------- | --------------------- | ----------------------------------------- |
+| Fix bug in completed spec    | Add unlock reason tag | @architect-unlock-reason:Fix-typo         |
+| Modify outside session scope | Use ignore flag       | architect-guard --staged --ignore-session |
+| CI treats warnings as errors | Use strict flag       | architect-guard --all --strict            |
 
 #### Handoff captures session-end state for continuity
 
-**Invariant:** Multi-session work requires handoff documentation generated from the Process Data API. Handoff output always reflects actual annotation state, not manual notes.
+**Invariant:** Multi-session work requires handoff documentation generated from the Data API. Handoff output always reflects actual annotation state, not manual notes.
 
 **Rationale:** Manual session notes drift from actual deliverable state. The handoff command derives state from annotations, ensuring the next session starts from ground truth rather than stale notes.
 
@@ -631,7 +631,7 @@ console.log(JSON.stringify(doc.sections, null, 2));
 
 **Invariant:** Phase 39 depends on ClaudeModuleGeneration (Phase 25). Adding `@architect-claude-module` and `@architect-claude-section:workflow` tags to this spec will cause ClaudeModuleGeneration to produce `_claude-md/workflow/` output files. The hand-written `_claude-md/workflow/` files are deleted after successful verified generation.
 
-**Rationale:** The annotation work (Rule blocks in this spec) is immediately useful — queryable via `pnpm process:query -- rules`. Generation deliverables cannot complete until Phase 25 ships the ClaudeModuleCodec. This sequencing is intentional: the annotation investment has standalone value regardless of whether the codec exists yet.
+**Rationale:** The annotation work (Rule blocks in this spec) is immediately useful — queryable via `pnpm architect:query -- rules`. Generation deliverables cannot complete until Phase 25 ships the ClaudeModuleCodec. This sequencing is intentional: the annotation investment has standalone value regardless of whether the codec exists yet.
 
 ---
 

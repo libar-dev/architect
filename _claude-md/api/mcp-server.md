@@ -58,7 +58,7 @@ Steps 1-2 can run in parallel (no dependencies between them).
 
 | Tool                | Description                                            |
 | ------------------- | ------------------------------------------------------ |
-| `architect_rebuild` | Force dataset rebuild from current source files        |
+| `architect_rebuild` | Force PatternGraph rebuild from current source files   |
 | `architect_config`  | Show source globs, base dir, build time, pattern count |
 | `architect_help`    | List all available tools with descriptions             |
 

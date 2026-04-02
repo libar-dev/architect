@@ -187,7 +187,7 @@ Feature: Interactive Setup Command
     Scenario: Injected scripts use bin command names
       Given a package.json with no Architect scripts
       When the init command injects scripts
-      Then package.json contains process:query using "pattern-graph-cli"
+      Then package.json contains architect:query using "pattern-graph-cli"
       And contains docs:all using "generate-docs"
       And preserves the existing "type" field
 

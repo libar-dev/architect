@@ -16,7 +16,7 @@ Need to check vitest-cucumber compatibility?
 ├─ Yes → lint-steps
 │
 Need FSM workflow validation?
-├─ Yes → lint-process
+├─ Yes → architect-guard
 │
 Need cross-source or DoD validation?
 ├─ Yes → validate-patterns
@@ -234,7 +234,7 @@ Step files:     tests/steps/**/*.steps.ts
 
 ---
 
-## lint-process
+## architect-guard
 
 FSM validation for delivery workflow (PDR-005). Enforces status transitions and protection levels.
 

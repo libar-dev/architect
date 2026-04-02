@@ -1,7 +1,7 @@
 @architect
 @architect-pattern:PatternGraphLayeredExtraction
 @architect-status:completed
-@architect-unlock-reason:PR28-review-structural-fixes
+@architect-unlock-reason:Terminology-alignment-rebrand
 @architect-phase:100
 @architect-effort:2d
 @architect-product-area:DataAPI
@@ -142,11 +142,11 @@ Feature: Pattern Graph Layered Extraction
   | Step | What | Verification |
   | 1 | Create src/generators/pipeline/build-pipeline.ts with PipelineOptions and factory | pnpm typecheck |
   | 2 | Export from src/generators/pipeline/index.ts barrel | pnpm typecheck |
-  | 3 | Migrate pattern-graph-cli.ts buildPipeline to factory call | pnpm typecheck, pnpm process:query -- overview |
+  | 3 | Migrate pattern-graph-cli.ts buildPipeline to factory call | pnpm typecheck, pnpm architect:query -- overview |
   | 4 | Remove unused scanner/extractor imports from pattern-graph-cli.ts | pnpm lint |
   | 5 | Migrate validate-patterns.ts PatternGraph pipeline to factory call | pnpm validate:patterns (0 errors, 0 warnings) |
   | 6 | Create src/api/rules-query.ts with queryBusinessRules | pnpm typecheck |
-  | 7 | Slim handleRules in pattern-graph-cli.ts to thin delegation | pnpm process:query -- rules |
+  | 7 | Slim handleRules in pattern-graph-cli.ts to thin delegation | pnpm architect:query -- rules |
   | 8 | Export from src/api/index.ts barrel | pnpm typecheck |
   | 9 | Full verification | pnpm build, pnpm test, pnpm lint, pnpm validate:patterns |
 
@@ -319,6 +319,6 @@ Feature: Pattern Graph Layered Extraction
       Given the complete refactored codebase
       When running pnpm build, pnpm test, pnpm lint, and pnpm validate:patterns
       Then all pass with zero errors
-      And pnpm process:query -- overview produces the same output as before
-      And pnpm process:query -- rules produces the same output as before
-      And pnpm process:query -- rules --product-area DataAPI produces the same output as before
+      And pnpm architect:query -- overview produces the same output as before
+      And pnpm architect:query -- rules produces the same output as before
+      And pnpm architect:query -- rules --product-area DataAPI produces the same output as before

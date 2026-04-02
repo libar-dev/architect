@@ -136,6 +136,14 @@ graph TB
     ConfigResolver --> ArchitectFactory
     ArchitectFactory --> RegexBuilders
     ConfigLoader --> ArchitectFactory
+    ReplMode --> PatternGraphAPI
+    PatternGraphCLIImpl --> PatternGraphAPI
+    PatternGraphCLIImpl --> PatternGraph
+    PatternGraphCLIImpl --> PatternSummarizerImpl
+    PatternGraphCLIImpl --> FuzzyMatcherImpl
+    PatternGraphCLIImpl --> OutputPipelineImpl
+    OutputPipelineImpl --> PatternSummarizerImpl
+    MCPServerBin --> MCPServerImpl
     PatternSummarizerImpl --> PatternGraphAPI
     ScopeValidatorImpl --> PatternGraphAPI
     ScopeValidatorImpl --> PatternGraph
@@ -153,14 +161,6 @@ graph TB
     ContextAssemblerImpl --> FuzzyMatcherImpl
     ArchQueriesImpl --> PatternGraphAPI
     ArchQueriesImpl --> PatternGraph
-    ReplMode --> PatternGraphAPI
-    PatternGraphCLIImpl --> PatternGraphAPI
-    PatternGraphCLIImpl --> PatternGraph
-    PatternGraphCLIImpl --> PatternSummarizerImpl
-    PatternGraphCLIImpl --> FuzzyMatcherImpl
-    PatternGraphCLIImpl --> OutputPipelineImpl
-    OutputPipelineImpl --> PatternSummarizerImpl
-    MCPServerBin --> MCPServerImpl
     FSMValidator --> FSMTransitions
     FSMValidator --> FSMStates
     DesignReviewCodec --> PatternGraph
