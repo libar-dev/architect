@@ -2,7 +2,7 @@
 @architect-pattern:RendererBlockTypes
 @architect-implements:UniversalMarkdownRenderer
 @architect-status:completed
-@architect-unlock-reason:'Split-from-original'
+@architect-unlock-reason:Split-from-original
 @architect-product-area:Generation
 @behavior @render
 Feature: Universal Markdown Renderer - Block Types

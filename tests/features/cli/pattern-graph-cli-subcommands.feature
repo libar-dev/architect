@@ -2,7 +2,7 @@
 @architect-pattern:PatternGraphCliSubcommands
 @architect-implements:PatternGraphAPICLI
 @architect-status:completed
-@architect-unlock-reason:'Split-from-original'
+@architect-unlock-reason:Split-from-original
 @architect-product-area:DataAPI
 @cli @pattern-graph-cli
 Feature: Pattern Graph CLI - Discovery Subcommands

@@ -13,7 +13,7 @@ Feature: Validator Read Model Consolidation — validate-patterns CLI
   `validate-patterns.ts` was the only feature consumer that bypassed the
   PatternGraph. It wired its own mini-pipeline (scan + extract + ad-hoc
   matching), created a lossy local type (`GherkinPatternInfo`) that discarded
-  relationship data, and failed to resolve `@architect-implements` links.
+  relationship data, and failed to resolve architect-implements links.
 
   **Solution:**
   Refactored `validate-patterns.ts` to consume the PatternGraph as its

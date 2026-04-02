@@ -9,7 +9,7 @@ Feature: Declaration-Level Shape Tagging - Extraction
 
   **Problem:**
   The current shape extraction system operates at file granularity. The
-  the `architect-extract-shapes` tag on a pattern block extracts named declarations
+  `architect-extract-shapes` tag on a pattern block extracts named declarations
   from the entire file, and the reference doc config shapeSelectors field selects
   shapes by source selector only. There is no way for a reference document to request
   "only RiskLevel and RISK_LEVELS from risk-levels.ts" -- it gets every shape

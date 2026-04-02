@@ -23,13 +23,6 @@ Feature: Architecture Queries - Neighborhood, Comparison, Tags, Sources
   5. `sources` shows file inventory by type
   6. `unannotated [--path glob]` finds files without the opt-in marker
 
-  Background: Deliverables
-    Given the following deliverables:
-      | Deliverable | Status | Location | Tests | Test Type |
-      | arch neighborhood unit tests | pending | tests/steps/api/architecture-queries/ | Yes | unit |
-      | arch compare unit tests | pending | tests/steps/api/architecture-queries/ | Yes | unit |
-      | tags and sources unit tests | pending | tests/steps/api/architecture-queries/ | Yes | unit |
-
   Rule: Neighborhood and comparison views
 
     **Invariant:** The architecture query API must provide pattern neighborhood views (direct connections) and cross-context comparison views (shared/unique dependencies), returning undefined for nonexistent patterns.

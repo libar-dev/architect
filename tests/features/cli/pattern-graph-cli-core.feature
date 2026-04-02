@@ -1,7 +1,7 @@
 @architect
 @architect-pattern:PatternGraphAPICLI
 @architect-status:completed
-@architect-unlock-reason:'Split-from-original'
+@architect-unlock-reason:Split-from-original
 @architect-phase:24
 @architect-product-area:DataAPI
 @cli @pattern-graph-cli

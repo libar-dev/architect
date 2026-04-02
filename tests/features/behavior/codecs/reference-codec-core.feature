@@ -2,7 +2,7 @@
 @behavior @reference-codec
 @architect-pattern:ReferenceDocShowcase
 @architect-status:completed
-@architect-unlock-reason:'Split-from-original'
+@architect-unlock-reason:Split-from-original
 @architect-phase:30
 @architect-depends-on:CodecDrivenReferenceGeneration,ScopedArchitecturalView,ShapeExtraction
 @architect-product-area:Generation
