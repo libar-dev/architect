@@ -1,8 +1,10 @@
 @architect
-@architect-pattern:ConfigLoaderTesting
+@architect-pattern:ConfigBasedWorkflowDefinition
 @architect-implements:ConfigLoader
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-phase:99
+@architect-depends-on:MvpWorkflowImplementation
 @architect-product-area:Configuration
 @behavior @config
 Feature: Config Loader - TypeScript Configuration Discovery
@@ -11,14 +13,22 @@ Feature: Config Loader - TypeScript Configuration Discovery
   taxonomy customization.
 
   **Problem:**
-  - Different directories need different taxonomies
-  - Package-level config should override repo-level
-  - CLI tools need automatic config discovery
+  Every `pnpm architect:query` and `pnpm docs:*` invocation prints:
+  `Failed to load default workflow (6-phase-standard): Workflow file not found`
+
+  The `loadDefaultWorkflow()` function resolves to `catalogue/workflows/`
+  which does not exist. The directory was deleted during monorepo extraction.
+  The system already degrades gracefully (workflow = undefined), but the
+  warning is noise for both human CLI use and future hook consumers (HUD).
 
   **Solution:**
-  - Walk up directories looking for `architect.config.ts`
-  - Stop at repo root (.git marker)
-  - Fall back to libar-generic preset (3 categories) if no config found
+  Inline the default workflow as a constant in `workflow-loader.ts`, built
+  from canonical taxonomy values. Make `loadDefaultWorkflow()` synchronous.
+  Preserve `loadWorkflowFromPath()` for custom `--workflow <file>` overrides.
+
+  Config discovery walks up directories looking for `architect.config.ts`,
+  stops at repo root (.git marker), and falls back to libar-generic preset
+  (3 categories) if no config found.
 
   Background:
     Given a config loader test context with temp directory

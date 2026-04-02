@@ -2,7 +2,6 @@
  * @architect
  * @architect-pattern CLISchema
  * @architect-status completed
- * @architect-unlock-reason:Add-recipe-and-narrative-fields-for-CliRecipeCodec
  * @architect-implements CliReferenceGeneration
  * @architect-arch-context cli
  * @architect-arch-layer domain

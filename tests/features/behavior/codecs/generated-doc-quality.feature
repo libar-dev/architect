@@ -1,15 +1,29 @@
 @architect
 @behavior @reference-codec
-@architect-pattern:GeneratedDocQualityTests
+@architect-pattern:GeneratedDocQuality
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
-@architect-implements:GeneratedDocQuality
+@architect-phase:38
 @architect-product-area:Generation
 Feature: Generated Documentation Quality Improvements
 
-  Tests for the four quality fixes in GeneratedDocQuality (Phase 38):
-  duplicate table removal, Generation compact enrichment, types-first
-  ordering, and product area TOC generation.
+  **Problem:**
+  Four quality issues reduce the usefulness of generated docs for both Claude agents
+  and human developers: (1) REFERENCE-SAMPLE.md re-renders canonical value tables
+  twice — 500+ duplicate lines with zero information gain; (2) the Generation product
+  area compact file is 1.4 KB for a 233 KB area — critically undersized; (3)
+  ARCHITECTURE-TYPES.md opens with orchestrator prose instead of type definitions,
+  burying the content Claude most needs; (4) product area docs (GENERATION.md 233 KB,
+  DATA-API.md 102 KB) have no navigation TOC, making browser traversal impractical.
+
+  **Solution:**
+  Fix the reference codec's behavior-specs renderer to stop duplicating convention
+  tables. Enrich the Generation product area compact template. Reorder
+  ARCHITECTURE-TYPES.md to lead with type definitions. Add a generated TOC block
+  to product area doc headers.
+
+  Tests for the four quality fixes: duplicate table removal, Generation compact
+  enrichment, types-first ordering, and product area TOC generation.
 
   Background:
     Given a reference codec test context

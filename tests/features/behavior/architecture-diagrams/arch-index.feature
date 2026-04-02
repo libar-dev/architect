@@ -2,7 +2,7 @@
 @architect-pattern:ArchIndexDataset
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
-@architect-implements:ArchitectureDiagramGeneration
+@architect-implements:ArchitectureDiagramAdvanced
 @architect-product-area:Generation
 @architecture
 Feature: Architecture Index in PatternGraph

@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:NormalizedStatusTesting
 @architect-status:active
+@architect-implements:TypeScriptTaxonomyImplementation
 @architect-product-area:CoreTypes
 @architect-include:core-types
 @taxonomy @status

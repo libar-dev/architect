@@ -1,10 +1,20 @@
 @architect
-@architect-pattern:CompositeCodecTesting
+@architect-pattern:CrossCuttingDocumentInclusion
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-implements:ReferenceDocShowcase
+@architect-phase:32
+@architect-depends-on:DeclarationLevelShapeTagging,ReferenceDocShowcase
 @architect-product-area:Generation
 Feature: Composite Codec
+
+  Content-to-document is a many-to-many relationship. A type definition
+  may be relevant to an architecture overview, a configuration guide, and
+  an AI context section. The `architect-include` tag enables cross-cutting
+  document inclusion by routing content to named documents at the source,
+  next to the code, without requiring document configs to enumerate every
+  item by name. The include tag is purely additive -- it never removes
+  content that would be selected by existing filters.
 
   Assembles reference documents from multiple codec outputs by
   concatenating RenderableDocument sections. Enables building

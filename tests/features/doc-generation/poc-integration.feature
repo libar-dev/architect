@@ -1,9 +1,15 @@
 @architect
-@architect-pattern:PocIntegration
+@architect-pattern:DocGenerationProofOfConcept
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-phase:27
+@architect-depends-on:ShapeExtraction
 @architect-product-area:Generation
 Feature: Documentation Generation POC Integration
+
+  This decision establishes the pattern for generating technical documentation
+  from annotated source files. It serves as both the DECISION (why/how) and
+  the PROOF OF CONCEPT (demonstrating the pattern works).
 
   End-to-end integration tests that exercise the full documentation generation
   pipeline using the actual POC decision document and real source files.
@@ -26,7 +32,7 @@ Feature: Documentation Generation POC Integration
 
     @acceptance-criteria @integration
     Scenario: Load actual POC decision document
-      Given the POC decision document at "architect/specs/doc-generation-proof-of-concept.feature"
+      Given the POC decision document at "tests/fixtures/doc-generation/poc-decision-document.feature"
       When parsing the decision document
       Then parsed content should have correct structure
 
@@ -111,7 +117,7 @@ Feature: Documentation Generation POC Integration
     @acceptance-criteria @integration
     Scenario: Extract Scenario Outline Examples from process-guard-linter.feature
       Given the source mapper with base directory at project root
-      When extracting from "architect/specs/process-guard-linter.feature" with method "Scenario Outline Examples"
+      When extracting from "tests/features/validation/process-guard.feature" with method "Scenario Outline Examples"
       Then extracted content should contain protection level table
 
   # ============================================================================

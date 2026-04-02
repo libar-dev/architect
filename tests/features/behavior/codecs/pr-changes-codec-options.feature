@@ -2,7 +2,7 @@
 @architect-pattern:PrChangesCodecOptionsTesting
 @architect-implements:PrChangesCodec
 @architect-status:completed
-@architect-unlock-reason:'Split-from-original'
+@architect-unlock-reason:Split-from-original
 @architect-product-area:Generation
 @behavior @pr-changes-codec
 Feature: PR Changes Codec - Options and Filters

@@ -1,15 +1,27 @@
 @architect
-@architect-pattern:ArchQueriesTest
-@architect-status:active
+@architect-pattern:DataAPIArchitectureQueries
+@architect-status:completed
+@architect-unlock-reason:Value-transfer-from-spec
+@architect-phase:25b
+@architect-depends-on:DataAPIOutputShaping
 @architect-product-area:DataAPI
 Feature: Architecture Queries - Neighborhood, Comparison, Tags, Sources
 
-  Background: Deliverables
-    Given the following deliverables:
-      | Deliverable | Status | Location | Tests | Test Type |
-      | arch neighborhood unit tests | pending | tests/steps/api/architecture-queries/ | Yes | unit |
-      | arch compare unit tests | pending | tests/steps/api/architecture-queries/ | Yes | unit |
-      | tags and sources unit tests | pending | tests/steps/api/architecture-queries/ | Yes | unit |
+  **Problem:**
+  The current `arch` subcommand provides basic queries (roles, context, layer, graph)
+  but lacks deeper analysis needed for design sessions: pattern neighborhoods (what's
+  directly connected), cross-context comparison, annotation coverage gaps, and
+  taxonomy discovery. Agents exploring architecture must make multiple queries and
+  mentally assemble the picture, wasting context tokens.
+
+  **Solution:**
+  Extend the `arch` subcommand and add new discovery commands:
+  1. `arch neighborhood <pattern>` shows 1-hop relationships (direct uses/usedBy)
+  2. `arch compare <ctx1> <ctx2>` shows shared deps and integration points
+  3. `arch coverage` reports annotation completeness with gaps
+  4. `tags` lists all tags in use with counts
+  5. `sources` shows file inventory by type
+  6. `unannotated [--path glob]` finds files without the opt-in marker
 
   Rule: Neighborhood and comparison views
 

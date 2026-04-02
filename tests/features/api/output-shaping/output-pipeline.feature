@@ -1,6 +1,8 @@
 @architect
-@architect-pattern:OutputPipelineTests
-@architect-status:active
+@architect-pattern:DataAPIOutputShaping
+@architect-status:completed
+@architect-unlock-reason:Value-transfer-from-spec
+@architect-phase:25a
 @architect-product-area:DataAPI
 Feature: Output Modifier Pipeline
 

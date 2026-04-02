@@ -1,10 +1,11 @@
 @architect
 @behavior @extraction
-@architect-pattern:DualSourceExtractorTesting
-@architect-implements:DualSourceExtractor
+@architect-pattern:PatternGraphLayeredExtraction
 @architect-status:completed
-@architect-unlock-reason:Retroactive-completion-during-rebrand
-@architect-product-area:Annotation
+@architect-unlock-reason:Terminology-alignment-rebrand
+@architect-phase:100
+@architect-depends-on:ValidatorReadModelConsolidation
+@architect-product-area:DataAPI
 Feature: Dual-Source Extraction
   Extracts and combines pattern metadata from both TypeScript code stubs
   (@architect-*) and Gherkin feature files (@libar-process-*), validates

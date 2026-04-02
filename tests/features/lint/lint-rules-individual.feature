@@ -2,7 +2,7 @@
 @lint @architect-pattern:LintRuleIndividualTesting
 @architect-implements:LintRules
 @architect-status:completed
-@architect-unlock-reason:'Split-from-original'
+@architect-unlock-reason:Split-from-original
 @architect-product-area:Validation
 Feature: Pattern Annotation Lint Rules - Individual Rule Validation
   Individual lint rules that check parsed directives for completeness.

@@ -1,11 +1,24 @@
 @architect
-@architect-pattern:PatternGraphCliCore
-@architect-implements:PatternGraphAPICLI
+@architect-pattern:PatternGraphAPICLI
 @architect-status:completed
-@architect-unlock-reason:'Split-from-original'
+@architect-unlock-reason:Split-from-original
+@architect-phase:24
 @architect-product-area:DataAPI
 @cli @pattern-graph-cli
 Feature: Pattern Graph CLI - Core Infrastructure
+
+  **Problem:**
+  The PatternGraphAPI provides 27 typed query methods for efficient state queries, but
+  Claude Code sessions cannot use it directly:
+  - Import paths require built packages with correct ESM resolution
+  - No CLI command exposes the API for shell invocation
+  - Current workaround requires regenerating markdown docs and reading them
+  - Documentation claims API is "directly usable" but practical usage is blocked
+
+  **Solution:**
+  Add a CLI command `pnpm architect:query` that exposes key PatternGraphAPI methods
+  with JSON and text output formats, enabling direct programmatic access from AI sessions.
+
   Core CLI infrastructure: help, version, input validation, status, query, pattern, arch basics, missing args, edge cases.
 
   Background:

@@ -1,7 +1,28 @@
+@architect
+@architect-pattern:StepLintExtendedRules
+@architect-status:completed
+@architect-unlock-reason:Retroactive-completion
+@architect-phase:51
+@architect-depends-on:StepLintVitestCucumber
+@architect-product-area:Validation
 Feature: Step Lint Extended Rules - Additional vitest-cucumber Traps
 
-  Tests for the 4 extended lint-steps rules that catch additional
-  vitest-cucumber compatibility issues statically.
+  **Problem:**
+  The initial lint-steps CLI catches 8 vitest-cucumber traps, but 4 documented
+  traps from _claude-md/testing/vitest-cucumber.md remain uncovered:
+  - Hash in step text (mid-line) truncates the step at runtime
+  - Feature descriptions starting with Given/When/Then break the parser
+  - Scenario Outline steps using quoted values (the feature-file side of the
+    Two-Pattern Problem -- the step-file side is already caught)
+  - Repeated identical step patterns in the same scenario overwrite registrations
+
+  These cause cryptic runtime failures that are statically detectable.
+
+  **Solution:**
+  Extend lint-steps with 4 new rules using the same pure-function architecture.
+  Two are feature-only checks, one is a step-only check, and one is a
+  cross-file check. All reuse the existing LintViolation/LintSummary types
+  and integrate into the existing runner pipeline.
 
   Background:
     Given a step lint context

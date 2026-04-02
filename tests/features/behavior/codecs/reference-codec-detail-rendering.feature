@@ -2,7 +2,7 @@
 @behavior @reference-codec
 @architect-pattern:ReferenceCodecDetailRendering
 @architect-status:completed
-@architect-unlock-reason:'Split-from-original'
+@architect-unlock-reason:Split-from-original
 @architect-implements:ReferenceDocShowcase
 @architect-product-area:Generation
 Feature: Reference Codec - Detail Level Rendering

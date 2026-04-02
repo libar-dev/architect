@@ -1,10 +1,23 @@
 @architect
-@behavior @status-transitions @architect-pattern:StatusTransitionDetectionTesting
+@behavior @status-transitions @architect-pattern:MvpWorkflowImplementation
 @architect-implements:DetectChanges
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
-@architect-product-area:Validation
+@architect-phase:99
+@architect-product-area:Process
 Feature: Status Transition Detection from Git Diff
+
+  **Problem:**
+  PDR-005 defines a 4-state workflow FSM (`roadmap, active, completed, deferred`)
+  but the Architect package validation schemas and generators may still
+  reference legacy status values. Need to ensure alignment.
+
+  **Solution:**
+  Implement PDR-005 status values via taxonomy module refactor:
+  1. Create taxonomy module as single source of truth (src/taxonomy/status-values.ts)
+  2. Update validation schemas to import from taxonomy module
+  3. Update generators to use normalizeStatus() for display bucket mapping
+
   Tests for the detectStatusTransitions function that parses git diff output.
   Verifies that status tags inside docstrings are ignored and only file-level
   tags are used for FSM transition validation.

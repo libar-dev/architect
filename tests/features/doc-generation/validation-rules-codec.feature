@@ -1,10 +1,25 @@
 @architect
-@architect-pattern:ValidationRulesCodecTesting
+@architect-pattern:ErrorGuideCodec
 @architect-implements:ValidationRulesCodec
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-phase:35
 @architect-product-area:Generation
 Feature: Validation Rules Document Codec
+
+  **Problem:**
+  `docs/PROCESS-GUARD.md` (341 lines) is manually maintained with per-error-code
+  diagnosis guides, escape hatch documentation, pre-commit setup instructions, and
+  programmatic API examples. When validation rules change in `src/lint/`, the manual
+  doc drifts. The existing `ValidationRulesCodec` generates `docs-live/validation/`
+  files (error-catalog.md, fsm-transitions.md, protection-levels.md) covering ~35%
+  of PROCESS-GUARD.md content, but these lack fix rationale, alternative approaches,
+  integration recipes, and the programmatic API.
+
+  **Solution:**
+  Enhance the `ValidationRulesCodec` to generate error diagnosis guide content by
+  extending its options, annotating error-handling source files with convention tags,
+  and composing preamble content for Husky/CI setup that cannot come from annotations.
 
   Validates the Validation Rules Codec that transforms PatternGraph into a
   RenderableDocument for Process Guard validation rules reference (VALIDATION-RULES.md).

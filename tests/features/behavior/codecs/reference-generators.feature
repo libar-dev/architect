@@ -1,11 +1,25 @@
 @architect
 @behavior @reference-generators
-@architect-pattern:ReferenceGeneratorTesting
+@architect-pattern:CodecDrivenReferenceGeneration
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-implements:ReferenceDocShowcase
+@architect-phase:27
+@architect-depends-on:DocGenerationProofOfConcept,ScopedArchitecturalView
 @architect-product-area:Generation
 Feature: Reference Document Generator Registration
+
+  **Problem:**
+  Each reference document (Process Guard, Taxonomy, Validation, etc.) required a
+  hand-coded recipe feature that duplicated codec setup, rendering, and file output
+  logic. Adding a new reference document meant creating a new feature file, a new
+  codec wrapper, and a new generator class -- all following the same pattern.
+
+  **Solution:**
+  A single `createReferenceCodec` factory driven by `ReferenceDocConfig` objects.
+  Each config declares four content sources -- convention tags, diagram scopes,
+  shape source globs, and behavior categories -- that compose automatically in
+  AD-5 order.
 
   Registers reference document generators from project config. Configs with
   `productArea` set are routed to a "product-area-docs" meta-generator;

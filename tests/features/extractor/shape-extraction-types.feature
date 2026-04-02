@@ -1,9 +1,11 @@
 @architect
-@architect-pattern:ShapeExtractionTypesTesting
+@architect-pattern:ShapeExtraction
 @architect-implements:ReferenceDocShowcase
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-phase:26
 @architect-product-area:Annotation
+@architect-enables:DocGenerationProofOfConcept
 Feature: TypeScript Shape Extraction - Type Extraction
 
   Validates the shape extraction system that extracts TypeScript type

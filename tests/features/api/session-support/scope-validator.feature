@@ -1,15 +1,23 @@
 @architect
-@architect-pattern:ScopeValidatorTests
+@architect-pattern:DataAPIDesignSessionSupport
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-phase:25c
 @architect-product-area:DataAPI
+@architect-depends-on:DataAPIContextAssembly,DataAPIStubIntegration
 Feature: Scope Validator - Pre-flight Session Readiness Checks
 
   **Problem:**
-  Starting an implementation or design session without checking prerequisites
-  wastes time when blockers are discovered mid-session.
+  Starting a design or implementation session requires manually compiling
+  elaborate context prompts. This manual compilation takes 10-15 minutes per
+  session start and is error-prone (missing dependencies, stale context).
+  Starting without checking prerequisites wastes time when blockers are
+  discovered mid-session.
 
   **Solution:**
+  Session workflow commands automate two critical session moments:
+  1. **Pre-flight check:** `scope-validate <pattern>` verifies implementation readiness
+  2. **Session end:** `handoff [--pattern X]` generates handoff documentation
   ScopeValidator runs composable checks and aggregates results into a verdict
   (ready, blocked, or warnings) before a session starts.
 

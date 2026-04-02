@@ -1,8 +1,8 @@
 @architect
-@architect-implements:PhaseStateMachineValidation
 @behavior @fsm-validation
-@architect-pattern:FSMValidatorTesting
+@architect-pattern:PhaseStateMachineValidation
 @architect-status:completed
+@architect-phase:100
 @architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Validation
 @architect-depends-on:FSMTransitions,FSMStates

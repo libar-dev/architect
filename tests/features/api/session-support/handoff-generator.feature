@@ -1,5 +1,6 @@
 @architect
 @architect-pattern:HandoffGeneratorTests
+@architect-implements:DataAPIDesignSessionSupport
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:DataAPI

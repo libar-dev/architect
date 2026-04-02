@@ -1,5 +1,6 @@
 @architect
 @architect-pattern:WorkflowConfigSchemasValidation
+@architect-implements:ConfigBasedWorkflowDefinition
 @architect-status:active
 @architect-product-area:Validation
 @validation @workflow

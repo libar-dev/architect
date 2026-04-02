@@ -2,7 +2,7 @@
 @architect-pattern:AstParserMetadata
 @architect-implements:AstParser
 @architect-status:completed
-@architect-unlock-reason:'Split-from-original'
+@architect-unlock-reason:Split-from-original
 @architect-product-area:Annotation
 Feature: TypeScript AST Parser - Metadata Extraction
   The AST Parser extracts @architect-* directives from TypeScript source files

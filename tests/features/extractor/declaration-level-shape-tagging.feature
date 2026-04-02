@@ -1,10 +1,33 @@
 @architect
-@architect-pattern:DeclarationLevelShapeTaggingTesting
+@architect-pattern:DeclarationLevelShapeTagging
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
-@architect-implements:DeclarationLevelShapeTagging
+@architect-phase:31
+@architect-depends-on:ShapeExtraction,ReferenceDocShowcase
 @architect-product-area:Annotation
 Feature: Declaration-Level Shape Tagging - Extraction
+
+  **Problem:**
+  The current shape extraction system operates at file granularity. The
+  `architect-extract-shapes` tag on a pattern block extracts named declarations
+  from the entire file, and the reference doc config shapeSelectors field selects
+  shapes by source selector only. There is no way for a reference document to request
+  "only RiskLevel and RISK_LEVELS from risk-levels.ts" -- it gets every shape
+  the file exports. This produces noisy reference documents that include
+  irrelevant types alongside the focused content the document is trying to
+  present.
+
+  The reference doc system is designed for composing focused documents from
+  cherry-picked content: conventionTags filters by tag, behaviorCategories
+  filters by category, diagramScopes filters by arch metadata. But source
+  selectors provide the coarse file-level axis with content-level filtering.
+
+  **Solution:**
+  Introduce a lightweight architect-shape annotation tag on individual
+  TypeScript declarations. Each tagged declaration self-identifies as a
+  documentable shape, optionally belonging to a named group. On the consumer
+  side, add shapeSelectors to ReferenceDocConfig for fine-grained selection
+  by name or group.
 
   Tests the discoverTaggedShapes function that scans TypeScript source
   code for declarations annotated with the architect-shape JSDoc tag.

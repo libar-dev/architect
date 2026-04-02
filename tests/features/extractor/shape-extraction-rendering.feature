@@ -1,8 +1,8 @@
 @architect
 @architect-pattern:ShapeExtractionRenderingTesting
-@architect-implements:ReferenceDocShowcase
+@architect-implements:ReferenceDocShowcase,ShapeExtraction
 @architect-status:completed
-@architect-unlock-reason:'Split-from-original'
+@architect-unlock-reason:Split-from-original
 @architect-product-area:Annotation
 Feature: TypeScript Shape Extraction - Rendering and Validation
 

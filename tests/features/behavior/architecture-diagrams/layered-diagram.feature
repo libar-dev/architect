@@ -1,11 +1,22 @@
 @architect
-@architect-pattern:LayeredDiagramGeneration
+@architect-pattern:ArchitectureDiagramAdvanced
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
-@architect-implements:ArchitectureDiagramGeneration
+@architect-phase:23
 @architect-product-area:Generation
 @architecture
 Feature: Layered Architecture Diagram Generation
+
+  **Problem:** Core diagram generation (see ArchitectureDiagramCore) produces
+  component-level diagrams from `arch-*` tags. However, large codebases need
+  additional visualization modes: layered views grouping patterns by architectural
+  layer, CLI-integrated generation via the generator registry, and sequence
+  diagrams showing runtime interaction flows between components.
+
+  **Solution:** Extend the architecture diagram system with advanced capabilities:
+  - Layered diagrams that group patterns by `@architect-arch-layer` (domain, application, infrastructure)
+  - Generator registry integration for CLI-driven generation via `pnpm docs:architecture`
+  - Sequence diagram support for modeling runtime interactions between components
 
   As a documentation generator
   I want to generate layered architecture diagrams from metadata

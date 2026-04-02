@@ -1,11 +1,26 @@
 @architect
-@architect-pattern:ValidatePatternsCli
+@architect-pattern:ValidatorReadModelConsolidation
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
-@architect-product-area:DataAPI
+@architect-phase:100
+@architect-product-area:Validation
+@architect-depends-on:ADR006SingleReadModelArchitecture
 @architect-implements:CliBehaviorTesting
 @cli @validate-patterns
-Feature: validate-patterns CLI
+Feature: Validator Read Model Consolidation — validate-patterns CLI
+
+  **Problem:**
+  `validate-patterns.ts` was the only feature consumer that bypassed the
+  PatternGraph. It wired its own mini-pipeline (scan + extract + ad-hoc
+  matching), created a lossy local type (`GherkinPatternInfo`) that discarded
+  relationship data, and failed to resolve architect-implements links.
+
+  **Solution:**
+  Refactored `validate-patterns.ts` to consume the PatternGraph as its
+  data source for cross-source validation. The validator became a feature
+  consumer like codecs and the PatternGraphAPI — querying pre-computed
+  views and the relationship index instead of building its own maps.
+
   Command-line interface for cross-validating TypeScript patterns vs Gherkin feature files.
 
   Background:

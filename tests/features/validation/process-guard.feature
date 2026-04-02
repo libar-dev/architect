@@ -1,7 +1,8 @@
 @architect
-@architect-implements:ProcessGuardLinter
-@behavior @process-guard @architect-pattern:ProcessGuardTesting
+@architect-pattern:ProcessGuardLinter
+@behavior @process-guard
 @architect-status:completed
+@architect-phase:99
 @architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Validation
 @architect-depends-on:PhaseStateMachineValidation,AntiPatternDetector

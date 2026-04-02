@@ -69,12 +69,7 @@ function buildDataset(): void {
 // Feature
 // =============================================================================
 
-describeFeature(feature, ({ Background, Rule }) => {
-  Background(({ Given }) => {
-    Given('the following deliverables:', () => {
-      // Deliverables table is metadata only — no runtime behavior
-    });
-  });
+describeFeature(feature, ({ Rule }) => {
   // ===========================================================================
   // Rule 1: Neighborhood and comparison views
   // ===========================================================================

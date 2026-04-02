@@ -1,10 +1,16 @@
 @architect
-@architect-pattern:TagRegistryBuilderTesting
-@architect-status:active
+@architect-pattern:TypeScriptTaxonomyImplementation
+@architect-status:completed
+@architect-unlock-reason:Value-transfer-from-spec
+@architect-phase:99
 @architect-product-area:CoreTypes
 @architect-include:core-types
 @taxonomy @registry
 Feature: Tag Registry Builder
+  As an Architect developer
+  I want taxonomy defined in TypeScript with Zod integration
+  So that I get compile-time safety and runtime validation
+
   The tag registry builder constructs a complete TagRegistry from TypeScript
   constants. It is the single source of truth for the Architect
   annotation taxonomy, providing tag definitions, categories, and format

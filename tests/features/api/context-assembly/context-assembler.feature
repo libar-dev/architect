@@ -1,8 +1,30 @@
 @architect
-@architect-pattern:ContextAssemblerTests
-@architect-status:active
+@architect-pattern:DataAPIContextAssembly
+@architect-status:completed
+@architect-unlock-reason:Value-transfer-from-spec
+@architect-phase:25b
+@architect-depends-on:DataAPIOutputShaping,DataAPIStubIntegration
 @architect-product-area:DataAPI
 Feature: Context Assembler - Session-Oriented Context Bundle Builder
+
+  **Problem:**
+  Starting a Claude Code design or implementation session requires assembling
+  30-100KB of curated, multi-source context from hundreds of annotated files.
+  Today this requires either manual context compilation by the user or 5-10
+  explore agents burning context and time. The Architect pipeline already
+  has rich data (PatternGraph with archIndex, relationshipIndex, byPhase,
+  byStatus views) but no command combines data from multiple indexes around
+  a focal pattern into a compact, session-oriented context bundle.
+
+  **Solution:**
+  Add context assembly subcommands that answer "what should I read next?"
+  rather than "what data exists?":
+  1. `context <pattern>` assembles metadata + spec path + stub paths +
+     dependency chain + related patterns into ~1.5KB of file paths
+  2. `files <pattern>` returns only file paths organized by relevance
+  3. `dep-tree <pattern>` walks dependency chains recursively with status
+  4. `overview` gives executive project summary
+  5. Session type tailoring via `--session planning|design|implement`
 
   Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and
   buildOverview() pure functions that operate on PatternGraph.
