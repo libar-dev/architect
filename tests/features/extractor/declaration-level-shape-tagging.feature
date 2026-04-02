@@ -23,7 +23,7 @@ Feature: Declaration-Level Shape Tagging - Extraction
   selectors provide the coarse file-level axis with content-level filtering.
 
   **Solution:**
-  Introduce a lightweight @architect-shape annotation tag on individual
+  Introduce a lightweight architect-shape annotation tag on individual
   TypeScript declarations. Each tagged declaration self-identifies as a
   documentable shape, optionally belonging to a named group. On the consumer
   side, add shapeSelectors to ReferenceDocConfig for fine-grained selection
