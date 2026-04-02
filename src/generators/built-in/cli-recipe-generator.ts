@@ -8,10 +8,10 @@
  *
  * ## Standalone Generator for CLI Recipes and Command Narratives
  *
- * Generates `PROCESS-API-RECIPES.md` from the declarative CLI schema.
- * Sibling to `ProcessApiReferenceGenerator` — both implement
+ * Generates `CLI-RECIPES.md` from the declarative CLI schema.
+ * Sibling to `CliReferenceGenerator` — both implement
  * `DocumentGenerator`, both consume `CLI_SCHEMA` directly, neither depends
- * on MasterDataset (ADR-006 compliant).
+ * on PatternGraph (ADR-006 compliant).
  *
  * ### When to Use
  *
@@ -119,7 +119,7 @@ function buildRecipeDocument(preamble: readonly SectionBlock[]): string {
   // 1. Auto-generation notice
   sections.push(
     paragraph(
-      '> Auto-generated from CLI schema. See [CLI Reference](./PROCESS-API-REFERENCE.md) for flag tables.'
+      '> Auto-generated from CLI schema. See [CLI Reference](./CLI-REFERENCE.md) for flag tables.'
     )
   );
 
@@ -145,7 +145,7 @@ function buildRecipeDocument(preamble: readonly SectionBlock[]): string {
     }
   }
 
-  const doc = document('Process API CLI \u2014 Recipes & Workflow Guide', sections);
+  const doc = document('Pattern Graph CLI Recipes & Workflow Guide', sections);
   return renderToMarkdown(doc);
 }
 
@@ -169,7 +169,7 @@ class CliRecipeGeneratorImpl implements DocumentGenerator {
     return Promise.resolve({
       files: [
         {
-          path: 'reference/PROCESS-API-RECIPES.md',
+          path: 'reference/CLI-RECIPES.md',
           content,
         },
       ],

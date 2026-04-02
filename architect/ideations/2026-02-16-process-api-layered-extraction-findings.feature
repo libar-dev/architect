@@ -1,16 +1,16 @@
 @ideation
 @ideation-status:active
-@ideation-scope:process-api,pipeline-factory,process-guard,adr-006-enforcement
-@relates-to:ProcessAPILayeredExtraction,ADR006SingleReadModelArchitecture,ProcessGuardLinter,ValidatorReadModelConsolidation
-Feature: Process API Layered Extraction — Investigation Findings
+@ideation-scope:pattern-graph-cli,pipeline-factory,process-guard,adr-006-enforcement
+@relates-to:PatternGraphLayeredExtraction,ADR006SingleReadModelArchitecture,ProcessGuardLinter,ValidatorReadModelConsolidation
+Feature: Pattern Graph Layered Extraction — Investigation Findings
 
   Trigger: ADR-006 architectural investigation revealed concrete violations
-  in process-api.ts (1,703 lines, three responsibilities), pipeline duplication
+  in pattern-graph-cli.ts (1,703 lines, three responsibilities), pipeline duplication
   across four consumers, and a previously undocumented fifth consumer in the
   Process Guard. These findings inform the design session for
-  ProcessAPILayeredExtraction.
+  PatternGraphLayeredExtraction.
 
-  Rule: Three responsibilities confirmed in process-api.ts
+  Rule: Three responsibilities confirmed in pattern-graph-cli.ts
 
     Investigation verified the spec claim. The file contains:
 
@@ -24,7 +24,7 @@ Feature: Process API Layered Extraction — Investigation Findings
     **Domain Logic** (~500+ lines): handleRules (183 lines), handleStubs
     (42 lines), handleDecisions (39 lines), handlePdr (65 lines), plus
     supporting types and helpers. These are feature consumers of the
-    MasterDataset that belong in src/api/ modules.
+    PatternGraph that belong in src/api/ modules.
 
     | Handler | Lines | Complexity | API Counterpart Exists? |
     | handleRules | 1096-1279 | High: nested Map hierarchies, parseBusinessRuleAnnotations | No — needs src/api/rules-query.ts |
@@ -41,18 +41,18 @@ Feature: Process API Layered Extraction — Investigation Findings
 
   Rule: Pipeline duplication is four consumers, not three
 
-    The spec identifies orchestrator.ts, process-api.ts, and
+    The spec identifies orchestrator.ts, pattern-graph-cli.ts, and
     validate-patterns.ts. Investigation found a fourth:
 
     | Consumer | File | What It Imports |
     | Orchestrator | src/generators/orchestrator.ts:51-55 | scanPatterns, extractPatterns, scanGherkinFiles, extractPatternsFromGherkin |
-    | Process API CLI | src/cli/process-api.ts:45-47 | scanPatterns, extractPatterns, scanGherkinFiles |
+    | Pattern Graph CLI | src/cli/pattern-graph-cli.ts:45-47 | scanPatterns, extractPatterns, scanGherkinFiles |
     | Validate Patterns CLI | src/cli/validate-patterns.ts:32-35 | scanPatterns, scanGherkinFiles, extractPatterns, extractProcessMetadata |
     | Process Guard | src/lint/process-guard/derive-state.ts:33 | scanGherkinFiles, extractDeliverables |
 
     The Process Guard (derive-state.ts) is a partial consumer. It only
     scans Gherkin files and extracts deliverables for FSM state derivation.
-    It does NOT need a full MasterDataset — its use case is lightweight
+    It does NOT need a full PatternGraph — its use case is lightweight
     state derivation from annotations, not feature consumption.
 
     **Design question for the pipeline factory:** Should derive-state.ts
@@ -82,7 +82,7 @@ Feature: Process API Layered Extraction — Investigation Findings
     should be:
 
     | Input | Type | Source |
-    | dataset | RuntimeMasterDataset | Pipeline output |
+    | dataset | RuntimePatternGraph | Pipeline output |
     | filters | RulesFilters | Parsed from subArgs |
     | modifiers | OutputModifiers | --count, --names-only |
 
@@ -90,30 +90,30 @@ Feature: Process API Layered Extraction — Investigation Findings
     move with the domain logic. parseBusinessRuleAnnotations() is already
     in src/api/ or should be extracted there.
 
-  Rule: Orchestrator pipeline differs from process-api pipeline
+  Rule: Orchestrator pipeline differs from pattern-graph-cli pipeline
 
     The orchestrator (src/generators/orchestrator.ts) has a richer pipeline
-    than process-api.ts. Key differences:
+    than pattern-graph-cli.ts. Key differences:
 
-    | Step | orchestrator.ts | process-api.ts |
+    | Step | orchestrator.ts | pattern-graph-cli.ts |
     | Gherkin extraction | extractPatternsFromGherkin (full) | extractProcessMetadata + extractDeliverables (partial) |
     | Pattern merging | mergePatterns() | mergePatterns() |
     | Hierarchy | computeHierarchyChildren() | computeHierarchyChildren() |
     | Workflow | loadDefaultWorkflow() | loadDefaultWorkflow() or loadWorkflowFromPath() |
-    | Transform | transformToMasterDataset() | transformToMasterDatasetWithValidation() |
+    | Transform | transformToPatternGraph() | transformToPatternGraphWithValidation() |
 
     The pipeline factory must accommodate both: orchestrator needs the
-    basic MasterDataset, process-api needs the validation summary too.
-    transformToMasterDatasetWithValidation returns both — the factory
+    basic PatternGraph, pattern-graph-cli needs the validation summary too.
+    transformToPatternGraphWithValidation returns both — the factory
     should return TransformResult and let callers destructure what they need.
 
   Rule: Suggestions for deeper analysis in a dedicated design session
 
     The following topics require focused investigation before writing the
-    ProcessAPILayeredExtraction design spec:
+    PatternGraphLayeredExtraction design spec:
 
     **1. Output pipeline integration**
-    process-api.ts has an output pipeline (src/cli/output-pipeline.ts) for
+    pattern-graph-cli.ts has an output pipeline (src/cli/output-pipeline.ts) for
     formatting, field selection, and output modifiers. The CLI shell needs
     to apply this after getting results from API modules. The interface
     between API module return values and the output pipeline is a design
@@ -126,7 +126,7 @@ Feature: Process API Layered Extraction — Investigation Findings
     monad pattern.
 
     **3. RouteContext type**
-    process-api.ts defines RouteContext (line 1285) as the parameter type
+    pattern-graph-cli.ts defines RouteContext (line 1285) as the parameter type
     for handlers. When domain logic moves to src/api/, the context type
     either moves too or is replaced by explicit parameters. The cleaner
     option is explicit parameters (dataset, filters, modifiers) — RouteContext
@@ -142,7 +142,7 @@ Feature: Process API Layered Extraction — Investigation Findings
 
     **5. Test strategy**
     The extracted API modules (rules-query.ts, etc.) become independently
-    testable with mock MasterDataset inputs. This is a major testability
+    testable with mock PatternGraph inputs. This is a major testability
     improvement. The design session should define the test approach:
     Gherkin feature files (consistent with project policy) using factory
-    helpers to build test MasterDataset instances.
+    helpers to build test PatternGraph instances.

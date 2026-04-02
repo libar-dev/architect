@@ -8,14 +8,14 @@
  * All diagram builder functions: collectScopePatterns, collectNeighborPatterns,
  * prepareDiagramContext, and the five diagram type builders (flowchart, sequence,
  * state, C4, class). Also contains the three hardcoded domain diagrams
- * (fsm-lifecycle, generation-pipeline, master-dataset-views) and the
+ * (fsm-lifecycle, generation-pipeline, pattern-graph-views) and the
  * public buildScopedDiagram dispatcher.
  */
 
 import { type SectionBlock, heading, paragraph, separator, mermaid } from '../schema.js';
 import type { DiagramScope } from './reference-types.js';
 import type { ExtractedPattern } from '../../validation-schemas/extracted-pattern.js';
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import {
   sanitizeNodeId,
   EDGE_STYLES,
@@ -36,7 +36,7 @@ import type { ProcessStatusValue } from '../../taxonomy/index.js';
  * Collect patterns matching a DiagramScope filter.
  */
 export function collectScopePatterns(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   scope: DiagramScope
 ): ExtractedPattern[] {
   const nameSet = new Set(scope.patterns ?? []);
@@ -62,7 +62,7 @@ export function collectScopePatterns(
  * the scope depends on, not what depends on it.
  */
 export function collectNeighborPatterns(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   scopeNames: ReadonlySet<string>
 ): ExtractedPattern[] {
   const neighborNames = new Set<string>();
@@ -118,7 +118,7 @@ interface DiagramContext {
 
 /** Extract shared setup from scope + dataset into a reusable context */
 function prepareDiagramContext(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   scope: DiagramScope
 ): DiagramContext | undefined {
   const scopePatterns = collectScopePatterns(dataset, scope);
@@ -478,8 +478,8 @@ function buildGenerationPipelineSequenceDiagram(): string[] {
     '    Orchestrator ->> Extractor: extractFromGherkin(docs)',
     '    Extractor -->> Orchestrator: ExtractedPattern[]',
     '    Orchestrator ->> Orchestrator: mergePatterns(ts, gherkin)',
-    '    Orchestrator ->> Transformer: transformToMasterDataset(patterns)',
-    '    Transformer -->> Orchestrator: MasterDataset',
+    '    Orchestrator ->> Transformer: transformToPatternGraph(patterns)',
+    '    Transformer -->> Orchestrator: PatternGraph',
     '    Orchestrator ->> Codec: codec.decode(dataset)',
     '    Codec -->> Orchestrator: RenderableDocument',
     '    Orchestrator ->> Renderer: render(document)',
@@ -487,11 +487,11 @@ function buildGenerationPipelineSequenceDiagram(): string[] {
   ];
 }
 
-/** Build MasterDataset fan-out diagram from hardcoded domain knowledge */
-function buildMasterDatasetViewsDiagram(): string[] {
+/** Build PatternGraph fan-out diagram from hardcoded domain knowledge */
+function buildPatternGraphViewsDiagram(): string[] {
   return [
     'graph TB',
-    '    MD[MasterDataset]',
+    '    MD[PatternGraph]',
     '    MD --> byStatus["byStatus<br/>(completed / active / planned)"]',
     '    MD --> byPhase["byPhase<br/>(sorted, with counts)"]',
     '    MD --> byQuarter["byQuarter<br/>(keyed by Q-YYYY)"]',
@@ -664,7 +664,7 @@ function buildClassDiagram(ctx: DiagramContext): string[] {
  * Scope patterns are grouped by archContext in subgraphs (flowchart) or
  * rendered as participants/states (sequence/state diagrams).
  */
-export function buildScopedDiagram(dataset: MasterDataset, scope: DiagramScope): SectionBlock[] {
+export function buildScopedDiagram(dataset: PatternGraph, scope: DiagramScope): SectionBlock[] {
   const title = scope.title ?? 'Component Overview';
 
   // Content source override: render hardcoded domain diagrams
@@ -684,11 +684,11 @@ export function buildScopedDiagram(dataset: MasterDataset, scope: DiagramScope):
       separator(),
     ];
   }
-  if (scope.source === 'master-dataset-views') {
+  if (scope.source === 'pattern-graph-views') {
     return [
       heading(2, title),
-      paragraph('Pre-computed view fan-out from MasterDataset (single-pass transform):'),
-      mermaid(buildMasterDatasetViewsDiagram().join('\n')),
+      paragraph('Pre-computed view fan-out from PatternGraph (single-pass transform):'),
+      mermaid(buildPatternGraphViewsDiagram().join('\n')),
       separator(),
     ];
   }

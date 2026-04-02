@@ -3,12 +3,12 @@
  * @architect-core
  * @architect-pattern CodecGeneratorRegistration
  * @architect-status completed
- * @architect-uses DesignReviewGenerator, DecisionDocGenerator, ProcessApiReferenceGenerator, CliRecipeGenerator
+ * @architect-uses DesignReviewGenerator, DecisionDocGenerator, CliReferenceGenerator, CliRecipeGenerator
  *
  * ## Codec-Based Generator Registration
  *
  * Registers codec-based generators for the RenderableDocument Model (RDM) system.
- * These generators use Zod 4 codecs to transform MasterDataset into RenderableDocuments,
+ * These generators use Zod 4 codecs to transform PatternGraph into RenderableDocuments,
  * which are then rendered to markdown via the universal renderer.
  *
  * ### When to Use
@@ -30,7 +30,7 @@ import { generatorRegistry } from '../registry.js';
 import { createCodecGenerator } from '../codec-based.js';
 import { createDecisionDocGenerator } from './decision-doc-generator.js';
 import { createDesignReviewGenerator } from './design-review-generator.js';
-import { createProcessApiReferenceGenerator } from './process-api-reference-generator.js';
+import { createCliReferenceGenerator } from './cli-reference-generator.js';
 import { createCliRecipeGenerator } from './cli-recipe-generator.js';
 import { loadPreambleFromMarkdown } from '../../renderable/load-preamble.js';
 import type { SectionBlock } from '../../renderable/schema.js';
@@ -162,7 +162,7 @@ generatorRegistry.register(createCodecGenerator('claude-modules', 'claude-module
 
 /**
  * Index Generator
- * Generates INDEX.md navigation hub with editorial preamble + MasterDataset statistics
+ * Generates INDEX.md navigation hub with editorial preamble + PatternGraph statistics
  */
 generatorRegistry.register(createCodecGenerator('index', 'index'));
 
@@ -189,15 +189,15 @@ generatorRegistry.register(createDecisionDocGenerator());
 generatorRegistry.register(createDesignReviewGenerator());
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Process API Reference Generator (Schema-Based, not Codec-Based)
+// CLI Reference Generator (Schema-Based, not Codec-Based)
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Process API CLI Reference Generator
- * Generates PROCESS-API-REFERENCE.md from declarative CLI schema.
- * Standalone: does not consume MasterDataset (ADR-006).
+ * Pattern Graph CLI Reference Generator
+ * Generates CLI-REFERENCE.md from declarative CLI schema.
+ * Standalone: does not consume PatternGraph (ADR-006).
  */
-generatorRegistry.register(createProcessApiReferenceGenerator());
+generatorRegistry.register(createCliReferenceGenerator());
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CLI Recipe Generator (Schema-Based, not Codec-Based)
@@ -205,12 +205,12 @@ generatorRegistry.register(createProcessApiReferenceGenerator());
 
 /**
  * CLI Recipe & Workflow Guide Generator
- * Generates PROCESS-API-RECIPES.md from declarative CLI schema.
- * Standalone: does not consume MasterDataset (ADR-006).
+ * Generates CLI-RECIPES.md from declarative CLI schema.
+ * Standalone: does not consume PatternGraph (ADR-006).
  */
 let cliRecipePreamble: readonly SectionBlock[] = [];
 try {
-  cliRecipePreamble = loadPreambleFromMarkdown('docs-sources/process-api-recipes.md');
+  cliRecipePreamble = loadPreambleFromMarkdown('docs-sources/cli-recipes.md');
 } catch {
   // Preamble file may not exist in test environments (e.g., CLI integration tests
   // that run generate-docs in a temp directory). Fall back to empty preamble.

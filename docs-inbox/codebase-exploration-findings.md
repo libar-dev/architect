@@ -51,7 +51,7 @@
 - `NormalizedStatusFilter` (line 38): alias for `NormalizedStatus` from taxonomy
 - `CodecLimits` (lines 43-50): `recentItems`, `maxDetailFiles`, `collapseThreshold`
 - `BaseCodecOptions` (lines 55-64): `generateDetailFiles`, `detailLevel`, `limits`
-- `DocumentCodec` (lines 127-130): `z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema>`
+- `DocumentCodec` (lines 127-130): `z.ZodCodec<typeof PatternGraphSchema, typeof RenderableDocumentOutputSchema>`
 
 **Key functions:**
 
@@ -181,7 +181,7 @@ export const DEFAULT_XXX_OPTIONS: Required<XxxCodecOptions> = { ... };
 // 3. Factory function
 export function createXxxCodec(options?: XxxCodecOptions): DocumentCodec {
   const opts = mergeOptions(DEFAULT_XXX_OPTIONS, options);
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
+  return z.codec(PatternGraphSchema, RenderableDocumentOutputSchema, {
     decode: (dataset) => buildXxxDocument(dataset, opts),
     encode: () => { throw new Error('Codec is decode-only.'); },
   });
@@ -200,7 +200,7 @@ generate.ts ──depends-on──> codecs/index.ts (barrel)
               ──depends-on──> schema.ts (RenderableDocument)
               ──depends-on──> codecs/types/base.ts (DocumentCodec, BaseCodecOptions)
 
-Each codec ──depends-on──> validation-schemas/master-dataset.ts (MasterDataset)
+Each codec ──depends-on──> validation-schemas/pattern-graph.ts (PatternGraph)
            ──depends-on──> schema.ts (block builders)
            ──depends-on──> codecs/types/base.ts (BaseCodecOptions, mergeOptions)
            ──depends-on──> codecs/shared-schema.ts (RenderableDocumentOutputSchema)
@@ -301,9 +301,9 @@ Preserves type safety: `FormatType` constrains keys, `Partial` allows omissions.
 
 ---
 
-## 3. MasterDataset & Configuration (~3,500 lines)
+## 3. PatternGraph & Configuration (~3,500 lines)
 
-### 3.1 MasterDataset Schema (352 lines)
+### 3.1 PatternGraph Schema (352 lines)
 
 Four layers:
 
@@ -318,19 +318,19 @@ Four layers:
 
 **`bySource` (lines 113-125):** Contains `typescript`, `gherkin`, `roadmap`, `prd`. The latter two are NOT source types — naming mismatch.
 
-**No workflow in Zod schema:** `LoadedWorkflow` contains Maps (not JSON-serializable), excluded from schema. Handled by `RuntimeMasterDataset`.
+**No workflow in Zod schema:** `LoadedWorkflow` contains Maps (not JSON-serializable), excluded from schema. Handled by `RuntimePatternGraph`.
 
-### 3.2 RuntimeMasterDataset vs MasterDataset
+### 3.2 RuntimePatternGraph vs PatternGraph
 
 `transform-types.ts:88`:
 
 ```typescript
-export interface RuntimeMasterDataset extends MasterDataset {
+export interface RuntimePatternGraph extends PatternGraph {
   readonly workflow?: LoadedWorkflow;
 }
 ```
 
-Creates a type split: codecs receive `MasterDataset` (no workflow), `GeneratorContext` carries `RuntimeMasterDataset` (with workflow), `ProcessStateAPI` wraps `RuntimeMasterDataset`.
+Creates a type split: codecs receive `PatternGraph` (no workflow), `GeneratorContext` carries `RuntimePatternGraph` (with workflow), `PatternGraphAPI` wraps `RuntimePatternGraph`.
 
 ### 3.3 Configuration System
 
@@ -362,9 +362,9 @@ Two presets:
 5. Merge patterns
 6. Compute hierarchy children
 7. Load workflow
-8. Transform to MasterDataset
+8. Transform to PatternGraph
 
-**5 consumers:** Orchestrator, Process API CLI, validate-patterns CLI, REPL, MCP server.
+**5 consumers:** Orchestrator, Pattern Graph CLI, validate-patterns CLI, REPL, MCP server.
 
 **`PipelineOptions` does NOT carry config:** It has raw glob arrays, not `ResolvedConfig`. The pipeline internally calls `loadConfig()` to get the registry, causing the double-load when orchestrator already loaded config.
 
@@ -379,19 +379,19 @@ Two presets:
 
 **Codec options merge (lines 328-366):** Simple spread: `{ ...config.project.codecOptions, ...options?.codecOptions }`. **Shallow merge** — nested options clobbered, not deep-merged.
 
-**`GeneratorContext.masterDataset` typed as optional** (types.ts:77): `RuntimeMasterDataset | undefined`. Always populated in practice.
+**`GeneratorContext.patternGraph` typed as optional** (types.ts:77): `RuntimePatternGraph | undefined`. Always populated in practice.
 
 ### 3.7 Result Monad (`result.ts` — 107 lines)
 
 Discriminated union with: `ok()`, `err()`, `isOk()`, `isErr()`, `unwrap()`, `unwrapOr()`, `map()`, `mapErr()`.
 
-Used consistently in: pipeline factory, scanner, config loader, orchestrator, document generation. **Not used in:** `transformToMasterDataset()` (returns plain values with `ValidationSummary`).
+Used consistently in: pipeline factory, scanner, config loader, orchestrator, document generation. **Not used in:** `transformToPatternGraph()` (returns plain values with `ValidationSummary`).
 
 Missing: `flatMap`/`andThen`, `tap`. Manual unwrapping needed for chaining.
 
 ### 3.8 Renderable Utils (`utils.ts` — 419 lines)
 
-**Vestigial functions:** `groupByCategory()`, `groupByPhase()`, `groupByQuarter()` (lines 326-354) duplicate MasterDataset pre-computed views.
+**Vestigial functions:** `groupByCategory()`, `groupByPhase()`, `groupByQuarter()` (lines 326-354) duplicate PatternGraph pre-computed views.
 
 **Duplication:** `completionPercentage()` and `isFullyCompleted()` exist in both `utils.ts` (lines 289-299) and `transform-dataset.ts` (lines 410-419).
 
@@ -444,9 +444,9 @@ Both produce `ExtractedPattern` and validate via `ExtractedPatternSchema.safePar
 
 **Shape rendering in wrong layer:** `renderShapesAsMarkdown()` defined in `shape-extractor.ts` (extraction layer), consumed by `codecs/helpers.ts` (renderable layer).
 
-### 4.3 Process Data API (14 files, 4,110 lines)
+### 4.3 Data API (14 files, 4,110 lines)
 
-**`ProcessStateAPI` (process-state.ts line 87):** 25-method interface in 5 groups:
+**`PatternGraphAPI` (pattern-graph-api.ts line 87):** 25-method interface in 5 groups:
 
 - Status queries (5 methods)
 - Phase queries (4 methods)
@@ -454,11 +454,11 @@ Both produce `ExtractedPattern` and validate via `ExtractedPatternSchema.safePar
 - Pattern queries (7 methods)
 - Timeline queries (5 methods)
 
-Plus `getMasterDataset()`.
+Plus `getPatternGraph()`.
 
 **Implementation:** Thin facade — most methods are 1-5 line delegations to pre-computed dataset views.
 
-**Linear scan issue:** `getPatternsByStatus()` (line 311) filters `dataset.patterns` linearly. MasterDataset pre-computes normalized groups but not exact FSM status. A `byExactStatus` index would be O(1).
+**Linear scan issue:** `getPatternsByStatus()` (line 311) filters `dataset.patterns` linearly. PatternGraph pre-computes normalized groups but not exact FSM status. A `byExactStatus` index would be O(1).
 
 **Context assembler** (726 lines): The largest API file. Handles 3 session types with different inclusion rules. Candidate for strategy pattern refactoring.
 
@@ -473,7 +473,7 @@ Plus `getMasterDataset()`.
 - 6 architecture (JSON output)
 - 3 management
 
-**Tool-to-API mapping:** Every tool wraps either a `ProcessStateAPI` method, a standalone query function, or a composed operation.
+**Tool-to-API mapping:** Every tool wraps either a `PatternGraphAPI` method, a standalone query function, or a composed operation.
 
 **`--watch` implementation:** `chokidar`-based file watching with 500ms debounce. Failed rebuilds log error and keep previous dataset.
 
@@ -523,7 +523,7 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC/API/LINT
 | ----------------------- | ------------- | ----------------------------------------- |
 | Scanner → Extractor     | Good          | Clean type contract                       |
 | Extractor → Transformer | Good          | Unified `ExtractedPattern` type           |
-| Transformer → API       | Excellent     | MasterDataset is the single read model    |
+| Transformer → API       | Excellent     | PatternGraph is the single read model     |
 | API → MCP               | Good          | Thin wrapper, 1:1 mapping                 |
 | Scanner → Lint          | Clean         | Lint reuses scanner infrastructure        |
 | Extractor → Renderable  | **Violation** | `renderShapesAsMarkdown` wrong layer      |
@@ -541,7 +541,7 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC/API/LINT
 2. **Pure codecs:** All codecs are pure functions (dataset in, document out). No I/O, no side effects.
 3. **Type-safe taxonomy:** Multi-layer enforcement (const arrays → union types → Zod schemas → runtime Sets).
 4. **Result monad:** Consistent error handling in pipeline, scanner, config loader.
-5. **Pre-computed views:** O(1) access in MasterDataset for status, phase, quarter, category.
+5. **Pre-computed views:** O(1) access in PatternGraph for status, phase, quarter, category.
 6. **Decider pattern:** Process Guard is pure — no I/O, no side effects, easy to test.
 
 ### 5.2 Systematic Issues
@@ -551,15 +551,15 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC/API/LINT
 3. **Double file reads:** Scanner reads, extractor re-reads for shapes.
 4. **Double config load:** Orchestrator loads config, pipeline loads again.
 5. **Layer violations:** Shape rendering in extractor, tag extraction across scanner/extractor boundary.
-6. **Vestigial code:** Grouping functions that duplicate MasterDataset views.
+6. **Vestigial code:** Grouping functions that duplicate PatternGraph views.
 7. **Inconsistent patterns:** Two different pattern-building styles between TS and Gherkin extractors.
 8. **Ghost annotations:** `@architect-core` with dual behavior by source type.
 
 ### 5.3 `ValidationRulesCodec` Note
 
-This codec ignores `MasterDataset` entirely (confirmed: `_dataset` parameter unused). It builds from hardcoded `RULE_DEFINITIONS`. Two options:
+This codec ignores `PatternGraph` entirely (confirmed: `_dataset` parameter unused). It builds from hardcoded `RULE_DEFINITIONS`. Two options:
 
-1. Make it read rules from MasterDataset (which HAS business rules from Gherkin extraction) — architecturally cleaner
+1. Make it read rules from PatternGraph (which HAS business rules from Gherkin extraction) — architecturally cleaner
 2. Document it as a "static content codec" — honest about what it is
 
 Option 1 is more useful but requires decider rules to be extractable as data.

@@ -3,7 +3,7 @@
  * @architect-pattern CLISchema
  * @architect-status completed
  * @architect-unlock-reason:Add-recipe-and-narrative-fields-for-CliRecipeCodec
- * @architect-implements ProcessApiHybridGeneration
+ * @architect-implements CliReferenceGeneration
  * @architect-arch-context cli
  * @architect-arch-layer domain
  * @architect-product-area:DataAPI
@@ -12,8 +12,8 @@
  *
  * Declarative schema defining all CLI options for the architect command.
  * Consumed by:
- * - `showHelp()` in process-api.ts (terminal help text)
- * - `ProcessApiReferenceGenerator` (generated markdown reference)
+ * - `showHelp()` in pattern-graph-cli.ts (terminal help text)
+ * - `CliReferenceGenerator` (generated markdown reference)
  *
  * This eliminates three-way sync between parser code, help text, and docs.
  */
@@ -226,7 +226,7 @@ export const CLI_SCHEMA: CLISchema = {
   },
 
   // ===========================================================================
-  // Command Narratives (from docs/PROCESS-API.md)
+  // Command Narratives (originally transcribed from docs/CLI.md)
   // ===========================================================================
 
   commandNarratives: [
@@ -246,7 +246,7 @@ export const CLI_SCHEMA: CLISchema = {
             '318 patterns (224 completed, 47 active, 47 planned) = 70%',
             '',
             '=== ACTIVE PHASES ===',
-            'Phase 24: ProcessStateAPIRelationshipQueries (1 active)',
+            'Phase 24: PatternGraphAPIRelationshipQueries (1 active)',
             'Phase 25: DataAPIStubIntegration (1 active)',
             '',
             '=== BLOCKING ===',
@@ -286,20 +286,20 @@ export const CLI_SCHEMA: CLISchema = {
             'Status: active | Category: pattern',
             '## ContextAssembler \u2014 Session-Oriented Context Bundle Builder',
             '',
-            'Pure function composition over MasterDataset.',
+            'Pure function composition over PatternGraph.',
             'File: src/api/context-assembler.ts',
             '',
             '=== DEPENDENCIES ===',
-            '[active] ProcessStateAPI (implementation) src/api/process-state.ts',
-            '[completed] MasterDataset (implementation) src/validation-schemas/master-dataset.ts',
+            '[active] PatternGraphAPI (implementation) src/api/pattern-graph-api.ts',
+            '[completed] PatternGraph (implementation) src/validation-schemas/pattern-graph.ts',
             '',
             '=== CONSUMERS ===',
             'ContextFormatterImpl (active)',
-            'ProcessAPICLIImpl (active)',
+            'PatternGraphCLIImpl (active)',
             '',
             '=== ARCHITECTURE (context: api) ===',
-            'MasterDataset (completed, read-model)',
-            'ProcessStateAPI (active, service)',
+            'PatternGraph (completed, read-model)',
+            'PatternGraphAPI (active, service)',
             '...',
           ].join('\n'),
         },
@@ -318,7 +318,7 @@ export const CLI_SCHEMA: CLISchema = {
           usageExample: 'pnpm architect:query -- files MyPattern --related',
           expectedOutput: [
             '=== PRIMARY ===',
-            'src/cli/process-api.ts',
+            'src/cli/pattern-graph-cli.ts',
             '',
             '=== ARCHITECTURE NEIGHBORS ===',
             'src/cli/version.ts',
@@ -512,7 +512,7 @@ export const CLI_SCHEMA: CLISchema = {
   ],
 
   // ===========================================================================
-  // Recipes (from docs/PROCESS-API.md "Common Recipes" section)
+  // Recipes (originally transcribed from docs/CLI.md "Common Recipes" section)
   // ===========================================================================
 
   recipes: [

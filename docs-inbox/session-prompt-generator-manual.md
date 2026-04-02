@@ -54,7 +54,7 @@ After the API commands, read these for implementation patterns:
 | `architect/specs/data-api-session-support.feature`                       | Spec with deliverables and scenarios                       |
 | `src/api/context-assembler.ts`                                           | Reusable helpers: `requirePattern()`, `resolveFsm()`       |
 | `src/api/context-formatter.ts`                                           | `=== MARKERS ===` text formatting conventions              |
-| `src/cli/process-api.ts`                                                 | CLI subcommand wiring pattern (how to add new subcommands) |
+| `src/cli/pattern-graph-cli.ts`                                           | CLI subcommand wiring pattern (how to add new subcommands) |
 | `src/validation/dod-validator.ts`                                        | `isDeliverableComplete()` for handoff completion logic     |
 
 ### Execution order (CRITICAL)

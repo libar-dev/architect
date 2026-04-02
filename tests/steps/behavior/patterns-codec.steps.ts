@@ -11,12 +11,12 @@ import {
   PatternsDocumentCodec,
 } from '../../../src/renderable/codecs/patterns.js';
 import type { RenderableDocument, TableBlock } from '../../../src/renderable/schema.js';
-import type { MasterDataset } from '../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../src/validation-schemas/pattern-graph.js';
 import {
-  createTestMasterDataset,
-  createMasterDatasetWithStatus,
-  createMasterDatasetWithCategories,
-  createMasterDatasetWithRelationships,
+  createTestPatternGraph,
+  createPatternGraphWithStatus,
+  createPatternGraphWithCategories,
+  createPatternGraphWithRelationships,
   createTestPattern,
   resetPatternCounter,
 } from '../../fixtures/dataset-factories.js';
@@ -36,7 +36,7 @@ import type { DataTableRow } from '../../support/world.js';
 // =============================================================================
 
 interface PatternsCodecState {
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   document: RenderableDocument | null;
   markdown: string;
 }
@@ -153,8 +153,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     'Document structure includes progress tracking and category navigation',
     ({ RuleScenario }) => {
       RuleScenario('Decode empty dataset', ({ Given, When, Then, And }) => {
-        Given('an empty MasterDataset', () => {
-          state!.dataset = createTestMasterDataset();
+        Given('an empty PatternGraph', () => {
+          state!.dataset = createTestPatternGraph();
         });
 
         When('decoding with PatternsDocumentCodec', () => {
@@ -184,10 +184,10 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         'Decode dataset with patterns - document structure',
         ({ Given, When, Then, And }) => {
           Given(
-            'a MasterDataset with {int} patterns across {int} categories',
+            'a PatternGraph with {int} patterns across {int} categories',
             (_ctx: unknown, patternCount: number, categoryCount: number) => {
               const categories = ['core', 'ddd', 'saga'].slice(0, categoryCount);
-              state!.dataset = createMasterDatasetWithCategories(
+              state!.dataset = createPatternGraphWithCategories(
                 categories,
                 Math.ceil(patternCount / categoryCount)
               );
@@ -219,13 +219,13 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
 
       RuleScenario('Progress summary shows correct counts', ({ Given, When, Then, And }) => {
         Given(
-          'a MasterDataset with status distribution:',
+          'a PatternGraph with status distribution:',
           (_ctx: unknown, dataTable: DataTableRow[]) => {
             const counts: Record<string, number> = {};
             for (const row of dataTable) {
               counts[row.status] = parseInt(row.count);
             }
-            state!.dataset = createMasterDatasetWithStatus(counts);
+            state!.dataset = createPatternGraphWithStatus(counts);
           }
         );
 
@@ -260,8 +260,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
 
   Rule('Pattern table presents all patterns sorted by status then name', ({ RuleScenario }) => {
     RuleScenario('Pattern table includes all patterns', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with {int} patterns', (_ctx: unknown, count: number) => {
-        state!.dataset = createTestMasterDataset({ patternCount: count });
+      Given('a PatternGraph with {int} patterns', (_ctx: unknown, count: number) => {
+        state!.dataset = createTestPatternGraph({ patternCount: count });
       });
 
       When('decoding with PatternsDocumentCodec', () => {
@@ -285,7 +285,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     });
 
     RuleScenario('Pattern table is sorted by status then name', ({ Given, When, Then }) => {
-      Given('a MasterDataset with patterns:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+      Given('a PatternGraph with patterns:', (_ctx: unknown, dataTable: DataTableRow[]) => {
         const patterns = dataTable.map((row) => {
           // Status values now match directly (roadmap, active, completed, deferred)
           return createTestPattern({
@@ -293,7 +293,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             status: (row.status ?? 'completed') as 'roadmap' | 'active' | 'completed' | 'deferred',
           });
         });
-        state!.dataset = createTestMasterDataset({ patterns });
+        state!.dataset = createTestPatternGraph({ patterns });
       });
 
       When('decoding with PatternsDocumentCodec', () => {
@@ -320,7 +320,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
   Rule('Category sections group patterns by domain', ({ RuleScenario }) => {
     RuleScenario('Category sections with pattern lists', ({ Given, When, Then }) => {
       Given(
-        'a MasterDataset with patterns in categories:',
+        'a PatternGraph with patterns in categories:',
         (_ctx: unknown, dataTable: DataTableRow[]) => {
           const patterns = [];
           for (const row of dataTable) {
@@ -329,7 +329,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
               patterns.push(createTestPattern({ category: row.category }));
             }
           }
-          state!.dataset = createTestMasterDataset({ patterns });
+          state!.dataset = createTestPatternGraph({ patterns });
         }
       );
 
@@ -354,7 +354,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
 
     RuleScenario('Filter to specific categories', ({ Given, When, Then, And }) => {
       Given(
-        'a MasterDataset with patterns in categories:',
+        'a PatternGraph with patterns in categories:',
         (_ctx: unknown, dataTable: DataTableRow[]) => {
           const patterns = [];
           for (const row of dataTable) {
@@ -363,7 +363,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
               patterns.push(createTestPattern({ category: row.category }));
             }
           }
-          state!.dataset = createTestMasterDataset({ patterns });
+          state!.dataset = createTestPatternGraph({ patterns });
         }
       );
 
@@ -402,8 +402,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
 
   Rule('Dependency graph visualizes pattern relationships', ({ RuleScenario }) => {
     RuleScenario('Dependency graph included when relationships exist', ({ Given, When, Then }) => {
-      Given('a MasterDataset with pattern relationships', () => {
-        state!.dataset = createMasterDatasetWithRelationships();
+      Given('a PatternGraph with pattern relationships', () => {
+        state!.dataset = createPatternGraphWithRelationships();
       });
 
       When('decoding with default options', () => {
@@ -417,8 +417,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     });
 
     RuleScenario('No dependency graph when no relationships', ({ Given, When, Then }) => {
-      Given('a MasterDataset without relationships', () => {
-        state!.dataset = createTestMasterDataset({ patternCount: 3 });
+      Given('a PatternGraph without relationships', () => {
+        state!.dataset = createTestPatternGraph({ patternCount: 3 });
       });
 
       When('decoding with default options', () => {
@@ -432,8 +432,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     });
 
     RuleScenario('Dependency graph disabled by option', ({ Given, When, Then }) => {
-      Given('a MasterDataset with pattern relationships', () => {
-        state!.dataset = createMasterDatasetWithRelationships();
+      Given('a PatternGraph with pattern relationships', () => {
+        state!.dataset = createPatternGraphWithRelationships();
       });
 
       When('decoding with includeDependencyGraph disabled', () => {
@@ -454,7 +454,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
 
   Rule('Detail file generation creates per-pattern pages', ({ RuleScenario }) => {
     RuleScenario('Generate individual pattern files when enabled', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with named patterns:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+      Given('a PatternGraph with named patterns:', (_ctx: unknown, dataTable: DataTableRow[]) => {
         const patterns = [];
         for (const row of dataTable) {
           patterns.push(
@@ -465,7 +465,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             })
           );
         }
-        state!.dataset = createTestMasterDataset({ patterns });
+        state!.dataset = createTestPatternGraph({ patterns });
       });
 
       When('decoding with generateDetailFiles enabled', () => {
@@ -534,9 +534,9 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     });
 
     RuleScenario('No detail files when disabled', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with patterns in {int} categories', (_ctx: unknown, count: number) => {
+      Given('a PatternGraph with patterns in {int} categories', (_ctx: unknown, count: number) => {
         const categories = ['core', 'ddd', 'saga'].slice(0, count);
-        state!.dataset = createMasterDatasetWithCategories(categories, 2);
+        state!.dataset = createPatternGraphWithCategories(categories, 2);
       });
 
       When('decoding with generateDetailFiles disabled', () => {
@@ -574,7 +574,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
 
     RuleScenario('Individual pattern file contains full details', ({ Given, When, Then, And }) => {
       Given(
-        'a MasterDataset with a pattern named {string} in category {string}',
+        'a PatternGraph with a pattern named {string} in category {string}',
         (_ctx: unknown, name: string, category: string) => {
           const patterns = [
             createTestPattern({
@@ -584,7 +584,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
               description: `Description for ${name}`,
             }),
           ];
-          state!.dataset = createTestMasterDataset({ patterns });
+          state!.dataset = createTestPatternGraph({ patterns });
         }
       );
 

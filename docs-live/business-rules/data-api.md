@@ -664,48 +664,97 @@ _Validates the output pipeline transforms: summarization, modifiers,_
 
 _output-pipeline.feature_
 
-### Pattern Summarize Tests
+### Pattern Graph API
 
-_Validates that summarizePattern() projects ExtractedPattern (~3.5KB) to_
+_- Markdown generation is not ideal for programmatic access_
 
 ---
 
-#### summarizePattern projects to compact summary
+#### Status queries return correct patterns
 
-> **Invariant:** summarizePattern must project a full pattern object to a compact summary containing exactly 6 fields, using the patternName tag over the name field when available and omitting undefined optional fields.
+> **Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
 >
-> **Rationale:** Compact summaries reduce token usage by 80-90% compared to full patterns — they provide enough context for navigation without overwhelming AI context windows.
+> **Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
 
 **Verified by:**
 
-- Summary includes all 6 fields for a TypeScript pattern
-- Summary includes all 6 fields for a Gherkin pattern
-- Summary uses patternName tag over name field
-- Summary omits undefined optional fields
+- Get patterns by normalized status
+- Get patterns by FSM status
+- Get current work returns active patterns
+- Get roadmap items returns roadmap and deferred
+- Get status counts
+- Get completion percentage
 
 ---
 
-#### summarizePatterns batch processes arrays
+#### Phase queries return correct phase data
 
-> **Invariant:** summarizePatterns must batch-process an array of patterns, returning a correctly-sized array of compact summaries.
+> **Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
 >
-> **Rationale:** Batch processing avoids N individual function calls — the API frequently needs to summarize all patterns matching a query in a single operation.
+> **Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
 
 **Verified by:**
 
-- Batch summarization returns correct count
-
-_summarize.feature_
-
-### Process Api Cli Cache
-
-_MasterDataset caching between CLI invocations: cache hits, mtime invalidation, and --no-cache bypass._
+- Get patterns by phase
+- Get phase progress
+- Get nonexistent phase returns undefined
+- Get active phases
 
 ---
 
-#### MasterDataset is cached between invocations
+#### FSM queries expose transition validation
 
-> **Invariant:** When source files have not changed between CLI invocations, the second invocation must use the cached MasterDataset and report cache.hit as true alongside pipeline timing metadata.
+> **Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
+>
+> **Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
+
+**Verified by:**
+
+- Check valid transition
+- Check invalid transition
+- Get valid transitions from status
+- Get protection info
+
+---
+
+#### Pattern queries find and retrieve pattern data
+
+> **Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
+>
+> **Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
+
+**Verified by:**
+
+- Find pattern by name (case insensitive)
+- Find nonexistent pattern returns undefined
+- Get patterns by category
+- Get all categories with counts
+
+---
+
+#### Timeline queries group patterns by time
+
+> **Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
+>
+> **Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
+
+**Verified by:**
+
+- Get patterns by quarter
+- Get all quarters
+- Get recently completed sorted by date
+
+_pattern-graph-api.feature_
+
+### Pattern Graph Cli Cache
+
+_PatternGraph caching between CLI invocations: cache hits, mtime invalidation, and --no-cache bypass._
+
+---
+
+#### PatternGraph is cached between invocations
+
+> **Invariant:** When source files have not changed between CLI invocations, the second invocation must use the cached PatternGraph and report cache.hit as true alongside pipeline timing metadata.
 >
 > **Rationale:** The pipeline rebuild costs 2-5 seconds per invocation. Caching eliminates this cost for repeated queries against unchanged sources, which is the common case during interactive AI sessions.
 
@@ -717,7 +766,7 @@ _MasterDataset caching between CLI invocations: cache hits, mtime invalidation, 
 
 _data-api-cache.feature_
 
-### Process Api Cli Core
+### Pattern Graph Cli Core
 
 _Core CLI infrastructure: help, version, input validation, status, query, pattern, arch basics, missing args, edge cases._
 
@@ -753,7 +802,7 @@ _Core CLI infrastructure: help, version, input validation, status, query, patter
 
 #### CLI status subcommand shows delivery state
 
-> **Invariant:** The status subcommand must return structured JSON containing delivery progress derived from the MasterDataset.
+> **Invariant:** The status subcommand must return structured JSON containing delivery progress derived from the PatternGraph.
 >
 > **Rationale:** Consumers depend on machine-readable status output for scripting and CI integration; unstructured output breaks downstream automation.
 
@@ -792,7 +841,7 @@ _Core CLI infrastructure: help, version, input validation, status, query, patter
 
 #### CLI arch subcommand queries architecture
 
-> **Invariant:** The arch subcommand must expose role, bounded context, and layer queries over the MasterDataset's architecture metadata.
+> **Invariant:** The arch subcommand must expose role, bounded context, and layer queries over the PatternGraph's architecture metadata.
 >
 > **Rationale:** Architecture queries replace manual exploration of annotated sources; missing or incorrect results lead to wrong structural assumptions during design sessions.
 
@@ -829,9 +878,9 @@ _Core CLI infrastructure: help, version, input validation, status, query, patter
 - Integer arguments are coerced for phase queries
 - Double-dash separator is handled gracefully
 
-_process-api-core.feature_
+_pattern-graph-cli-core.feature_
 
-### Process Api Cli Dry Run
+### Pattern Graph Cli Dry Run
 
 _Dry-run mode shows pipeline scope without processing data._
 
@@ -850,7 +899,7 @@ _Dry-run mode shows pipeline scope without processing data._
 
 _data-api-dryrun.feature_
 
-### Process Api Cli Help
+### Pattern Graph Cli Help
 
 _Per-subcommand help displays usage, flags, and examples for individual subcommands._
 
@@ -870,7 +919,7 @@ _Per-subcommand help displays usage, flags, and examples for individual subcomma
 
 _data-api-help.feature_
 
-### Process Api Cli Metadata
+### Pattern Graph Cli Metadata
 
 _Response metadata includes validation summary and pipeline timing for diagnostics._
 
@@ -889,7 +938,7 @@ _Response metadata includes validation summary and pipeline timing for diagnosti
 
 _data-api-metadata.feature_
 
-### Process Api Cli Modifiers And Rules
+### Pattern Graph Cli Modifiers And Rules
 
 _Output modifiers, arch health, and rules subcommand._
 
@@ -941,9 +990,51 @@ _Output modifiers, arch health, and rules subcommand._
 - Rules for non-existent product area returns hint
 - Rules combines product area and only-invariants filters
 
-_process-api-modifiers-rules.feature_
+_pattern-graph-cli-modifiers-rules.feature_
 
-### Process Api Cli Repl
+### Pattern Graph Cli Reference Tests
+
+_Verifies that the declarative CLI schema drives reference table generation_
+
+---
+
+#### Generated reference file contains all three table sections
+
+> **Invariant:** CLI-REFERENCE.md contains Global Options, Output Modifiers, and List Filters tables generated from the CLI schema.
+
+**Verified by:**
+
+- Generated file contains Global Options table
+- Generated file contains Output Modifiers table
+- Generated file contains List Filters table
+- Generated file includes inter-table prose
+
+---
+
+#### CLI schema stays in sync with parser
+
+> **Invariant:** Every flag recognized by parseArgs() has a corresponding entry in the CLI schema. A missing schema entry means the sync test fails.
+
+**Verified by:**
+
+- Schema covers all global option flags
+- Schema covers all output modifier flags
+- Schema covers all list filter flags
+- Schema covers session option
+
+---
+
+#### showHelp output reflects CLI schema
+
+> **Invariant:** The help text rendered by showHelp() includes all options from the CLI schema, formatted for terminal display.
+
+**Verified by:**
+
+- Help text includes schema-defined options
+
+_cli-reference.feature_
+
+### Pattern Graph Cli Repl
 
 _Interactive REPL mode keeps the pipeline loaded for multi-query sessions and supports reload._
 
@@ -974,7 +1065,7 @@ _Interactive REPL mode keeps the pipeline loaded for multi-query sessions and su
 
 _data-api-repl.feature_
 
-### Process Api Cli Subcommands
+### Pattern Graph Cli Subcommands
 
 _Discovery subcommands: list, search, context assembly, tags/sources, extended arch, unannotated._
 
@@ -1058,131 +1149,40 @@ _Discovery subcommands: list, search, context assembly, tags/sources, extended a
 
 - Unannotated finds files missing architect marker
 
-_process-api-subcommands.feature_
+_pattern-graph-cli-subcommands.feature_
 
-### Process Api Reference Tests
+### Pattern Summarize Tests
 
-_Verifies that the declarative CLI schema drives reference table generation_
-
----
-
-#### Generated reference file contains all three table sections
-
-> **Invariant:** PROCESS-API-REFERENCE.md contains Global Options, Output Modifiers, and List Filters tables generated from the CLI schema.
-
-**Verified by:**
-
-- Generated file contains Global Options table
-- Generated file contains Output Modifiers table
-- Generated file contains List Filters table
-- Generated file includes inter-table prose
+_Validates that summarizePattern() projects ExtractedPattern (~3.5KB) to_
 
 ---
 
-#### CLI schema stays in sync with parser
+#### summarizePattern projects to compact summary
 
-> **Invariant:** Every flag recognized by parseArgs() has a corresponding entry in the CLI schema. A missing schema entry means the sync test fails.
-
-**Verified by:**
-
-- Schema covers all global option flags
-- Schema covers all output modifier flags
-- Schema covers all list filter flags
-- Schema covers session option
-
----
-
-#### showHelp output reflects CLI schema
-
-> **Invariant:** The help text rendered by showHelp() includes all options from the CLI schema, formatted for terminal display.
-
-**Verified by:**
-
-- Help text includes schema-defined options
-
-_process-api-reference.feature_
-
-### Process State API
-
-_- Markdown generation is not ideal for programmatic access_
-
----
-
-#### Status queries return correct patterns
-
-> **Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
+> **Invariant:** summarizePattern must project a full pattern object to a compact summary containing exactly 6 fields, using the patternName tag over the name field when available and omitting undefined optional fields.
 >
-> **Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
+> **Rationale:** Compact summaries reduce token usage by 80-90% compared to full patterns — they provide enough context for navigation without overwhelming AI context windows.
 
 **Verified by:**
 
-- Get patterns by normalized status
-- Get patterns by FSM status
-- Get current work returns active patterns
-- Get roadmap items returns roadmap and deferred
-- Get status counts
-- Get completion percentage
+- Summary includes all 6 fields for a TypeScript pattern
+- Summary includes all 6 fields for a Gherkin pattern
+- Summary uses patternName tag over name field
+- Summary omits undefined optional fields
 
 ---
 
-#### Phase queries return correct phase data
+#### summarizePatterns batch processes arrays
 
-> **Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
+> **Invariant:** summarizePatterns must batch-process an array of patterns, returning a correctly-sized array of compact summaries.
 >
-> **Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
+> **Rationale:** Batch processing avoids N individual function calls — the API frequently needs to summarize all patterns matching a query in a single operation.
 
 **Verified by:**
 
-- Get patterns by phase
-- Get phase progress
-- Get nonexistent phase returns undefined
-- Get active phases
+- Batch summarization returns correct count
 
----
-
-#### FSM queries expose transition validation
-
-> **Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
->
-> **Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
-
-**Verified by:**
-
-- Check valid transition
-- Check invalid transition
-- Get valid transitions from status
-- Get protection info
-
----
-
-#### Pattern queries find and retrieve pattern data
-
-> **Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
->
-> **Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
-
-**Verified by:**
-
-- Find pattern by name (case insensitive)
-- Find nonexistent pattern returns undefined
-- Get patterns by category
-- Get all categories with counts
-
----
-
-#### Timeline queries group patterns by time
-
-> **Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
->
-> **Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
-
-**Verified by:**
-
-- Get patterns by quarter
-- Get all quarters
-- Get recently completed sorted by date
-
-_process-state-api.feature_
+_summarize.feature_
 
 ### Scope Validator Tests
 

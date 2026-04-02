@@ -1,17 +1,17 @@
 @architect
-@architect-pattern:ProcessStateAPIRelationshipQueries
+@architect-pattern:PatternGraphAPIRelationshipQueries
 @architect-status:completed
 @architect-unlock-reason:Relationships-available-via-getPatternRelationships-superseded-by-DataAPIRelationshipGraph
 @architect-phase:24
 @architect-product-area:DataAPI
 @architect-effort:3d
-Feature: ProcessStateAPI Relationship Queries
+Feature: PatternGraphAPI Relationship Queries
 
-  **Problem:** ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`,
+  **Problem:** PatternGraphAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`,
   `enables`) but lacks implementation relationship queries. Claude Code cannot ask "what code
   implements this pattern?" or "what pattern does this file implement?"
 
-  **Solution:** Extend ProcessStateAPI with relationship query methods that leverage the new
+  **Solution:** Extend PatternGraphAPI with relationship query methods that leverage the new
   `implements`/`extends` tags from PatternRelationshipModel:
   - Bidirectional traceability: spec → code and code → spec
   - Inheritance hierarchy navigation: base → specializations
@@ -26,9 +26,9 @@ Feature: ProcessStateAPI Relationship Queries
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Implementation relationship queries | superseded | src/api/process-state.ts | No | N/A |
-      | Inheritance hierarchy queries | superseded | src/api/process-state.ts | No | N/A |
-      | ProcessStateAPI type extensions | complete | src/api/types.ts | Yes | unit |
+      | Implementation relationship queries | superseded | src/api/pattern-graph-api.ts | No | N/A |
+      | Inheritance hierarchy queries | superseded | src/api/pattern-graph-api.ts | No | N/A |
+      | PatternGraphAPI type extensions | complete | src/api/types.ts | Yes | unit |
       | Relationship query step definitions | superseded | N/A | No | N/A |
 
   # ═══════════════════════════════════════════════════════════════════════════════
@@ -128,7 +128,7 @@ Feature: ProcessStateAPI Relationship Queries
     **Rationale:** Claude Code often needs the complete picture: dependencies AND implementations
     AND inheritance. A single call reduces round-trips and context switching.
 
-    **API:** See `@libar-dev/architect/src/api/process-state.ts`
+    **API:** See `@libar-dev/architect/src/api/pattern-graph-api.ts`
 
     **Verified by:** Get all relationships, Filter by relationship type
 

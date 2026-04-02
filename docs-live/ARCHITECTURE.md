@@ -25,7 +25,7 @@ Component architecture with bounded context isolation:
 ```mermaid
 graph TB
     subgraph api["Api BC"]
-        MasterDataset["MasterDataset[read-model]"]
+        PatternGraph["PatternGraph[read-model]"]
         MCPToolRegistry["MCPToolRegistry[service]"]
         MCPServerImpl["MCPServerImpl[service]"]
         MCPPipelineSession["MCPPipelineSession[service]"]
@@ -33,7 +33,7 @@ graph TB
         MCPFileWatcher["MCPFileWatcher[infrastructure]"]
         PatternSummarizerImpl["PatternSummarizerImpl[service]"]
         ScopeValidatorImpl["ScopeValidatorImpl[service]"]
-        ProcessStateAPI["ProcessStateAPI[service]"]
+        PatternGraphAPI["PatternGraphAPI[service]"]
         HandoffGeneratorImpl["HandoffGeneratorImpl[service]"]
         FuzzyMatcherImpl["FuzzyMatcherImpl[service]"]
         CoverageAnalyzerImpl["CoverageAnalyzerImpl[service]"]
@@ -43,7 +43,7 @@ graph TB
     end
     subgraph cli["Cli BC"]
         ReplMode["ReplMode[service]"]
-        ProcessAPICLIImpl["ProcessAPICLIImpl[service]"]
+        PatternGraphCLIImpl["PatternGraphCLIImpl[service]"]
         OutputPipelineImpl["OutputPipelineImpl[service]"]
         MCPServerBin["MCPServerBin[infrastructure]"]
         DatasetCache["DatasetCache[infrastructure]"]
@@ -114,62 +114,62 @@ graph TB
     end
     DoDValidator --> DualSourceExtractor
     GherkinScanner --> GherkinASTParser
-    MCPToolRegistry --> ProcessStateAPI
+    MCPToolRegistry --> PatternGraphAPI
     MCPToolRegistry --> MCPPipelineSession
     MCPServerImpl --> MCPPipelineSession
     MCPServerImpl --> MCPToolRegistry
     MCPServerImpl --> MCPFileWatcher
-    MCPPipelineSession --> ProcessStateAPI
+    MCPPipelineSession --> PatternGraphAPI
     MCPPipelineSession --> ConfigLoader
     MCPModule --> MCPServerImpl
     MCPModule --> MCPPipelineSession
     MCPModule --> MCPFileWatcher
     MCPModule --> MCPToolRegistry
     LintEngine --> LintRules
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> GherkinASTParser
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
     GherkinExtractor --> GherkinASTParser
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
     Document_Extractor --> Pattern_Scanner
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> GherkinASTParser
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    ReplMode --> ProcessStateAPI
-    ProcessAPICLIImpl --> ProcessStateAPI
-    ProcessAPICLIImpl --> MasterDataset
-    ProcessAPICLIImpl --> PatternSummarizerImpl
-    ProcessAPICLIImpl --> FuzzyMatcherImpl
-    ProcessAPICLIImpl --> OutputPipelineImpl
+    ReplMode --> PatternGraphAPI
+    PatternGraphCLIImpl --> PatternGraphAPI
+    PatternGraphCLIImpl --> PatternGraph
+    PatternGraphCLIImpl --> PatternSummarizerImpl
+    PatternGraphCLIImpl --> FuzzyMatcherImpl
+    PatternGraphCLIImpl --> OutputPipelineImpl
     OutputPipelineImpl --> PatternSummarizerImpl
     MCPServerBin --> MCPServerImpl
     ConfigResolver --> ArchitectFactory
     ArchitectFactory --> RegexBuilders
     ConfigLoader --> ArchitectFactory
-    PatternSummarizerImpl --> ProcessStateAPI
-    ScopeValidatorImpl --> ProcessStateAPI
-    ScopeValidatorImpl --> MasterDataset
-    ProcessStateAPI --> MasterDataset
-    ProcessStateAPI --> FSMValidator
-    HandoffGeneratorImpl --> ProcessStateAPI
-    HandoffGeneratorImpl --> MasterDataset
+    PatternSummarizerImpl --> PatternGraphAPI
+    ScopeValidatorImpl --> PatternGraphAPI
+    ScopeValidatorImpl --> PatternGraph
+    PatternGraphAPI --> PatternGraph
+    PatternGraphAPI --> FSMValidator
+    HandoffGeneratorImpl --> PatternGraphAPI
+    HandoffGeneratorImpl --> PatternGraph
     HandoffGeneratorImpl --> ContextFormatterImpl
     CoverageAnalyzerImpl --> Pattern_Scanner
-    CoverageAnalyzerImpl --> MasterDataset
+    CoverageAnalyzerImpl --> PatternGraph
     ContextFormatterImpl --> ContextAssemblerImpl
-    ContextAssemblerImpl --> ProcessStateAPI
-    ContextAssemblerImpl --> MasterDataset
+    ContextAssemblerImpl --> PatternGraphAPI
+    ContextAssemblerImpl --> PatternGraph
     ContextAssemblerImpl --> PatternSummarizerImpl
     ContextAssemblerImpl --> FuzzyMatcherImpl
-    ArchQueriesImpl --> ProcessStateAPI
-    ArchQueriesImpl --> MasterDataset
+    ArchQueriesImpl --> PatternGraphAPI
+    ArchQueriesImpl --> PatternGraph
     FSMValidator --> FSMTransitions
     FSMValidator --> FSMStates
-    DesignReviewCodec --> MasterDataset
-    ArchitectureCodec --> MasterDataset
+    DesignReviewCodec --> PatternGraph
+    ArchitectureCodec --> PatternGraph
     ProcessGuardDecider --> FSMValidator
-    TransformDataset --> MasterDataset
-    SequenceTransformUtils --> MasterDataset
+    TransformDataset --> PatternGraph
+    SequenceTransformUtils --> PatternGraph
     DesignReviewGenerator --> DesignReviewCodec
-    DesignReviewGenerator --> MasterDataset
+    DesignReviewGenerator --> PatternGraph
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
 ```
@@ -196,7 +196,7 @@ All components with architecture annotations:
 | 🚧 Pattern Helpers                                                | api        | -              | domain         | src/api/pattern-helpers.ts                                            |
 | 🚧 MCP File Watcher                                               | api        | infrastructure | infrastructure | src/mcp/file-watcher.ts                                               |
 | 🚧 MCP Module                                                     | api        | infrastructure | application    | src/mcp/index.ts                                                      |
-| ✅ Master Dataset                                                 | api        | read-model     | domain         | src/validation-schemas/master-dataset.ts                              |
+| ✅ Pattern Graph                                                  | api        | read-model     | domain         | src/validation-schemas/pattern-graph.ts                               |
 | 🚧 Arch Queries Impl                                              | api        | service        | domain         | src/api/arch-queries.ts                                               |
 | 🚧 Context Assembler Impl                                         | api        | service        | application    | src/api/context-assembler.ts                                          |
 | 🚧 Context Formatter Impl                                         | api        | service        | application    | src/api/context-formatter.ts                                          |
@@ -206,14 +206,14 @@ All components with architecture annotations:
 | 🚧 MCP Pipeline Session                                           | api        | service        | application    | src/mcp/pipeline-session.ts                                           |
 | 🚧 MCP Server Impl                                                | api        | service        | application    | src/mcp/server.ts                                                     |
 | 🚧 MCP Tool Registry                                              | api        | service        | application    | src/mcp/tool-registry.ts                                              |
+| 🚧 Pattern Graph API                                              | api        | service        | application    | src/api/pattern-graph-api.ts                                          |
 | 🚧 Pattern Summarizer Impl                                        | api        | service        | application    | src/api/summarize.ts                                                  |
-| 🚧 Process State API                                              | api        | service        | application    | src/api/process-state.ts                                              |
 | ✅ Scope Validator Impl                                           | api        | service        | application    | src/api/scope-validator.ts                                            |
 | ✅ CLI Schema                                                     | cli        | -              | domain         | src/cli/cli-schema.ts                                                 |
 | 🚧 Dataset Cache                                                  | cli        | infrastructure | infrastructure | src/cli/dataset-cache.ts                                              |
 | 🚧 MCP Server Bin                                                 | cli        | infrastructure | infrastructure | src/cli/mcp-server.ts                                                 |
 | 🚧 Output Pipeline Impl                                           | cli        | service        | application    | src/cli/output-pipeline.ts                                            |
-| 🚧 Process API CLI Impl                                           | cli        | service        | application    | src/cli/process-api.ts                                                |
+| 🚧 Pattern Graph CLI Impl                                         | cli        | service        | application    | src/cli/pattern-graph-cli.ts                                          |
 | 🚧 Repl Mode                                                      | cli        | service        | application    | src/cli/repl.ts                                                       |
 | ✅ Configuration Defaults                                         | config     | -              | domain         | src/config/defaults.ts                                                |
 | ✅ Configuration Presets                                          | config     | -              | domain         | src/config/presets.ts                                                 |
@@ -231,12 +231,12 @@ All components with architecture annotations:
 | ✅ Dual Source Extractor                                          | extractor  | service        | application    | src/extractor/dual-source-extractor.ts                                |
 | ✅ Gherkin Extractor                                              | extractor  | service        | application    | src/extractor/gherkin-extractor.ts                                    |
 | Cli Recipe Generator                                              | generator  | -              | application    | src/generators/built-in/cli-recipe-generator.ts                       |
+| ✅ Cli Reference Generator                                        | generator  | -              | application    | src/generators/built-in/cli-reference-generator.ts                    |
 | ✅ Context Inference Impl                                         | generator  | -              | application    | src/generators/pipeline/context-inference.ts                          |
 | 🚧 Git Branch Diff                                                | generator  | -              | infrastructure | src/git/branch-diff.ts                                                |
 | 🚧 Git Helpers                                                    | generator  | -              | infrastructure | src/git/helpers.ts                                                    |
 | 🚧 Git Module                                                     | generator  | -              | infrastructure | src/git/index.ts                                                      |
 | 🚧 Git Name Status Parser                                         | generator  | -              | infrastructure | src/git/name-status.ts                                                |
-| ✅ Process Api Reference Generator                                | generator  | -              | application    | src/generators/built-in/process-api-reference-generator.ts            |
 | 🚧 Transform Types                                                | generator  | -              | application    | src/generators/pipeline/transform-types.ts                            |
 | ✅ Content Deduplicator                                           | generator  | infrastructure | infrastructure | src/generators/content-deduplicator.ts                                |
 | 🚧 File Cache                                                     | generator  | infrastructure | infrastructure | src/cache/file-cache.ts                                               |
@@ -321,15 +321,15 @@ All components with architecture annotations:
 | ✅ Normalized Status                                              | -          | -              | -              | src/taxonomy/normalized-status.ts                                     |
 | 🚧 Normalized Status Testing                                      | -          | -              | -              | tests/features/types/normalized-status.feature                        |
 | ✅ Orchestrator Pipeline Factory Migration                        | -          | -              | -              | architect/specs/orchestrator-pipeline-factory-migration.feature       |
+| 🚧 Pattern Graph API Types                                        | -          | -              | -              | src/api/types.ts                                                      |
+| ✅ Pattern Graph Layered Extraction                               | -          | -              | -              | architect/specs/pattern-graph-layered-extraction.feature              |
 | ✅ Pipeline Factory                                               | -          | -              | -              | src/generators/pipeline/build-pipeline.ts                             |
 | ✅ Pipeline Module                                                | -          | -              | -              | src/generators/pipeline/index.ts                                      |
 | ✅ Planning Codecs                                                | -          | -              | -              | src/renderable/codecs/planning.ts                                     |
 | ✅ Pr Changes Codec                                               | -          | -              | -              | src/renderable/codecs/pr-changes.ts                                   |
-| ✅ Process API Layered Extraction                                 | -          | -              | -              | architect/specs/process-api-layered-extraction.feature                |
 | 🚧 Process Guard Module                                           | -          | -              | -              | src/lint/process-guard/index.ts                                       |
 | ✅ Process Guard Testing                                          | -          | -              | -              | tests/features/validation/process-guard.feature                       |
 | 🚧 Process Guard Types                                            | -          | -              | -              | src/lint/process-guard/types.ts                                       |
-| 🚧 Process State Types                                            | -          | -              | -              | src/api/types.ts                                                      |
 | ✅ Reference Codec                                                | -          | -              | -              | src/renderable/codecs/reference-types.ts                              |
 | ✅ Reference Codec                                                | -          | -              | -              | src/renderable/codecs/reference-diagrams.ts                           |
 | ✅ Reference Codec                                                | -          | -              | -              | src/renderable/codecs/reference-builders.ts                           |

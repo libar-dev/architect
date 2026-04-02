@@ -1,15 +1,15 @@
 /**
  * @architect
  * @architect-core
- * @architect-pattern ProcessStateAPI
+ * @architect-pattern PatternGraphAPI
  * @architect-status active
  * @architect-implements PhaseStateMachineValidation
  * @architect-arch-role service
  * @architect-arch-context api
  * @architect-arch-layer application
- * @architect-uses MasterDataset, FSMValidator
+ * @architect-uses PatternGraph, FSMValidator
  *
- * ## Process State API - Programmatic Query Interface
+ * ## Pattern Graph API - Programmatic Query Interface
  *
  * TypeScript interface for querying project state.
  * Designed for Claude Code integration and programmatic access.
@@ -32,9 +32,9 @@
  * ### Usage
  *
  * ```typescript
- * import { createProcessStateAPI } from "@libar-dev/architect";
+ * import { createPatternGraphAPI } from "@libar-dev/architect";
  *
- * const api = createProcessStateAPI(masterDataset);
+ * const api = createPatternGraphAPI(patternGraph);
  *
  * // Get current work
  * const active = api.getCurrentWork();
@@ -47,9 +47,9 @@
  */
 
 import type {
-  MasterDataset,
+  PatternGraph,
   ExtractedPattern,
-  PhaseGroup as MasterPhaseGroup,
+  PhaseGroup as SchemaPhaseGroup,
 } from '../validation-schemas/index.js';
 import type { ProcessStatusValue } from '../taxonomy/index.js';
 import {
@@ -78,13 +78,13 @@ import type {
 } from './types.js';
 
 // =============================================================================
-// Process State API Interface
+// Pattern Graph API Interface
 // =============================================================================
 
 /**
  * Programmatic API for querying project state
  */
-export interface ProcessStateAPI {
+export interface PatternGraphAPI {
   // ─────────────────────────────────────────────────────────────────────────
   // Status Queries
   // ─────────────────────────────────────────────────────────────────────────
@@ -205,7 +205,7 @@ export interface ProcessStateAPI {
   /**
    * Get complete pattern relationships (all relationship types)
    *
-   * Returns the full relationship data from the MasterDataset's relationshipIndex,
+   * Returns the full relationship data from the PatternGraph's relationshipIndex,
    * including UML-inspired relationships (implements, extends) and cross-references
    * (see-also, api-ref).
    *
@@ -290,29 +290,29 @@ export interface ProcessStateAPI {
   // ─────────────────────────────────────────────────────────────────────────
 
   /**
-   * Get the underlying MasterDataset
+   * Get the underlying PatternGraph
    */
-  getMasterDataset(): MasterDataset;
+  getPatternGraph(): PatternGraph;
 }
 
 // =============================================================================
-// Process State API Implementation
+// Pattern Graph API Implementation
 // =============================================================================
 
 /**
- * Create a ProcessStateAPI instance from a MasterDataset
+ * Create a PatternGraphAPI instance from a PatternGraph
  *
- * @param dataset - The MasterDataset to wrap
- * @returns ProcessStateAPI instance
+ * @param dataset - The PatternGraph to wrap
+ * @returns PatternGraphAPI instance
  */
-export function createProcessStateAPI(dataset: MasterDataset): ProcessStateAPI {
+export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
   // Helper to find patterns by exact FSM status
   function filterByExactStatus(status: ProcessStatusValue): ExtractedPattern[] {
     return dataset.patterns.filter((p) => p.status === status);
   }
 
-  // Helper to convert MasterPhaseGroup to PhaseGroup
-  function convertPhaseGroup(mpg: MasterPhaseGroup): PhaseGroup {
+  // Helper to convert SchemaPhaseGroup to PhaseGroup
+  function convertPhaseGroup(mpg: SchemaPhaseGroup): PhaseGroup {
     return {
       phaseNumber: mpg.phaseNumber,
       phaseName: mpg.phaseName,
@@ -585,7 +585,7 @@ export function createProcessStateAPI(dataset: MasterDataset): ProcessStateAPI {
     // Raw Access
     // ─────────────────────────────────────────────────────────────────────
 
-    getMasterDataset() {
+    getPatternGraph() {
       return dataset;
     },
   };

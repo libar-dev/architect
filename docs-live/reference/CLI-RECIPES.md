@@ -1,6 +1,6 @@
-# Process API CLI — Recipes & Workflow Guide
+# Pattern Graph CLI Recipes & Workflow Guide
 
-> Auto-generated from CLI schema. See [CLI Reference](./PROCESS-API-REFERENCE.md) for flag tables.
+> Auto-generated from CLI schema. See [CLI Reference](./CLI-REFERENCE.md) for flag tables.
 
 ## Why Use This
 
@@ -35,7 +35,7 @@ Example `overview` output:
 318 patterns (224 completed, 47 active, 47 planned) = 70%
 
 === ACTIVE PHASES ===
-Phase 24: ProcessStateAPIRelationshipQueries (1 active)
+Phase 24: PatternGraphAPIRelationshipQueries (1 active)
 Phase 25: DataAPIStubIntegration (1 active)
 
 === BLOCKING ===
@@ -79,7 +79,7 @@ Example output:
 318 patterns (224 completed, 47 active, 47 planned) = 70%
 
 === ACTIVE PHASES ===
-Phase 24: ProcessStateAPIRelationshipQueries (1 active)
+Phase 24: PatternGraphAPIRelationshipQueries (1 active)
 Phase 25: DataAPIStubIntegration (1 active)
 
 === BLOCKING ===
@@ -130,20 +130,20 @@ Example output:
 Status: active | Category: pattern
 ## ContextAssembler — Session-Oriented Context Bundle Builder
 
-Pure function composition over MasterDataset.
+Pure function composition over PatternGraph.
 File: src/api/context-assembler.ts
 
 === DEPENDENCIES ===
-[active] ProcessStateAPI (implementation) src/api/process-state.ts
-[completed] MasterDataset (implementation) src/validation-schemas/master-dataset.ts
+[active] PatternGraphAPI (implementation) src/api/pattern-graph-api.ts
+[completed] PatternGraph (implementation) src/validation-schemas/pattern-graph.ts
 
 === CONSUMERS ===
 ContextFormatterImpl (active)
-ProcessAPICLIImpl (active)
+PatternGraphCLIImpl (active)
 
 === ARCHITECTURE (context: api) ===
-MasterDataset (completed, read-model)
-ProcessStateAPI (active, service)
+PatternGraph (completed, read-model)
+PatternGraphAPI (active, service)
 ...
 ```
 
@@ -169,7 +169,7 @@ Example output:
 
 ```
 === PRIMARY ===
-src/cli/process-api.ts
+src/cli/pattern-graph-cli.ts
 
 === ARCHITECTURE NEIGHBORS ===
 src/cli/version.ts

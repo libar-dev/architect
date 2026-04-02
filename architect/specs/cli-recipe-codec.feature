@@ -6,15 +6,15 @@
 @architect-effort:2w
 @architect-product-area:Generation
 @architect-depends-on:DocsConsolidationStrategy
-@architect-depends-on:ProcessApiHybridGeneration
-@architect-business-value:replaces-460-lines-of-manual-PROCESS-API-md-prose-with-generated-recipe-and-narrative-content
+@architect-depends-on:CliReferenceGeneration
+@architect-business-value:replaces-460-lines-of-manual-CLI-md-prose-with-generated-recipe-and-narrative-content
 @architect-priority:medium
 Feature: CLI Recipe Codec
 
   **Problem:**
-  `docs/PROCESS-API.md` (~509 lines) retains ~460 lines of editorial prose after
-  Phase 43 (ProcessApiHybridGeneration) extracted 3 reference tables to
-  `docs-live/reference/PROCESS-API-REFERENCE.md`. The remaining content includes:
+  `docs/CLI.md` (~509 lines) retains ~460 lines of editorial prose after
+  Phase 43 (CliReferenceGeneration) extracted 3 reference tables to
+  `docs-live/reference/CLI-REFERENCE.md`. The remaining content includes:
   "Why Use This" motivation (30 lines), Quick Start with example output (32 lines),
   Session Types decision tree (12 lines), Session Workflow Commands with 6 narrative
   command descriptions and output examples (125 lines), Pattern Discovery with 8
@@ -25,11 +25,11 @@ Feature: CLI Recipe Codec
 
   **Solution:**
   Create a standalone `CliRecipeGenerator` that extends CLI_SCHEMA with recipe
-  definitions and narrative metadata, producing `docs-live/reference/PROCESS-API-RECIPES.md`.
-  The generator is a sibling to `ProcessApiReferenceGenerator` -- both are standalone
+  definitions and narrative metadata, producing `docs-live/reference/CLI-RECIPES.md`.
+  The generator is a sibling to `CliReferenceGenerator` -- both are standalone
   (ADR-006 compliant) and consume CLI_SCHEMA directly. Editorial content that cannot
   be derived from schema (motivation prose, session decision tree) uses the preamble
-  mechanism. `docs/PROCESS-API.md` retains a slim editorial introduction and links
+  mechanism. `docs/CLI.md` retains a slim editorial introduction and links
   to both generated files (reference tables + recipes).
 
   **Why It Matters:**
@@ -51,13 +51,13 @@ Feature: CLI Recipe Codec
   **Design Session Findings (2026-03-06):**
   | Finding | Impact | Resolution |
   | DD-1: Recipes need separate RecipeGroup[] field, not inline per-option | Recipes span multiple option groups (e.g., "Starting a Session" uses overview + scope-validate + context) | Added RecipeGroup[] and CommandNarrativeGroup[] as optional fields on CLISchema -- existing consumers unchanged |
-  | DD-2: CLI_SCHEMA extension is additive with two new optional fields | ProcessApiReferenceGenerator and showHelp ignore unknown fields | recipes and commandNarratives fields added to CLISchema interface, not a separate extended type |
+  | DD-2: CLI_SCHEMA extension is additive with two new optional fields | CliReferenceGenerator and showHelp ignore unknown fields | recipes and commandNarratives fields added to CLISchema interface, not a separate extended type |
   | DD-3: Preamble mechanism proven by ReferenceDocConfig and ErrorGuideCodec stubs | Why Use This (30 lines), Quick Start (32 lines), Session Types (12 lines) are editorial judgment | Generator accepts preamble SectionBlock[] via CliRecipeGeneratorConfig, configured in architect.config.ts |
   | DD-4: CommandNarrative type needed, not just CLIOptionGroup.description extension | Session Workflow has 6 commands each needing description + usage example + expected output | New CommandNarrative interface with command, description, usageExample, details, expectedOutput fields |
-  | DD-5: Recipes grouped by task intent, not session type or command | Matches existing Common Recipes structure in PROCESS-API.md | 5 groups: Starting a Session, Finding Work, Investigating, Design Prep, Ending a Session |
+  | DD-5: Recipes grouped by task intent, not session type or command | Matches existing Common Recipes structure in CLI.md | 5 groups: Starting a Session, Finding Work, Investigating, Design Prep, Ending a Session |
   | Content audit: ~460 lines map to 3 schema locations + preamble | Zero information loss from manual to generated | recipes (42 lines), commandNarratives (287 lines), preamble (74 lines), kept in manual (70 lines) |
-  | ProcessApiReferenceGenerator is 113 lines and proven stable | Extending it risks regressions on Phase 43 deliverables | CliRecipeGenerator is a separate sibling class, same DocumentGenerator interface |
-  | Generator registration follows process-api-reference pattern | generatorOverrides already has process-api-reference entry | Add cli-recipe entry with same outputDirectory: docs-live |
+  | CliReferenceGenerator is 113 lines and proven stable | Extending it risks regressions on Phase 43 deliverables | CliRecipeGenerator is a separate sibling class, same DocumentGenerator interface |
+  | Generator registration follows cli-reference pattern | generatorOverrides already has cli-reference entry | Add cli-recipe entry with same outputDirectory: docs-live |
 
   **Design Stubs:**
   | Stub | Location | Key Decisions |
@@ -69,26 +69,26 @@ Feature: CLI Recipe Codec
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
       | Extend CLI_SCHEMA with recipe definitions per command group | complete | src/cli/cli-schema.ts | Yes | unit |
-      | Create CliRecipeGenerator producing PROCESS-API-RECIPES.md | complete | src/generators/built-in/cli-recipe-generator.ts | Yes | integration |
+      | Create CliRecipeGenerator producing CLI-RECIPES.md | complete | src/generators/built-in/cli-recipe-generator.ts | Yes | integration |
       | Register generator in orchestrator config | complete | architect.config.ts | Yes | integration |
       | Preamble content for Why Use This and session decision tree | complete | architect.config.ts | No | n/a |
-      | Replace PROCESS-API.md prose sections with pointers to generated files | complete | docs/PROCESS-API.md | No | n/a |
+      | Replace CLI.md prose sections with pointers to generated files | complete | docs/CLI.md | No | n/a |
       | Behavior spec with scenarios for recipe generation | n/a | tests/features/behavior/cli/cli-recipe-generation.feature | Yes | acceptance |
 
   Rule: CLI recipes are a separate generator from reference tables
 
     **Invariant:** The `CliRecipeGenerator` is a standalone sibling to
-    `ProcessApiReferenceGenerator`, not an extension of it. Both implement
+    `CliReferenceGenerator`, not an extension of it. Both implement
     `DocumentGenerator`, both consume `CLI_SCHEMA` directly, and both produce
     independent `OutputFile[]` via the standard orchestrator write path. The recipe
-    generator produces `docs-live/reference/PROCESS-API-RECIPES.md` while the
-    reference generator produces `docs-live/reference/PROCESS-API-REFERENCE.md`.
+    generator produces `docs-live/reference/CLI-RECIPES.md` while the
+    reference generator produces `docs-live/reference/CLI-REFERENCE.md`.
 
     **Rationale:** Reference tables and recipe guides serve different audiences and
     change at different cadences. Reference tables change when CLI flags are added
     or removed. Recipes change when workflow recommendations evolve. Coupling them
     in one generator would force both to change together and make the generator
-    responsible for two distinct content types. ProcessApiReferenceGenerator is
+    responsible for two distinct content types. CliReferenceGenerator is
     already completed and tested (Phase 43) -- extending it risks regressions. Two
     small standalone generators are easier to test and maintain than one large one.
 
@@ -98,17 +98,17 @@ Feature: CLI Recipe Codec
     @acceptance-criteria @happy-path
     Scenario: CliRecipeGenerator produces recipe file independently
       Given the CliRecipeGenerator is registered in the orchestrator
-      And the ProcessApiReferenceGenerator is also registered
+      And the CliReferenceGenerator is also registered
       When docs:all runs
-      Then docs-live/reference/PROCESS-API-RECIPES.md is created
-      And docs-live/reference/PROCESS-API-REFERENCE.md is also created
+      Then docs-live/reference/CLI-RECIPES.md is created
+      And docs-live/reference/CLI-REFERENCE.md is also created
       And neither generator imports nor depends on the other
 
     @acceptance-criteria @validation
-    Scenario: Recipe generator has no MasterDataset dependency
+    Scenario: Recipe generator has no PatternGraph dependency
       Given the CliRecipeGenerator source file
       When inspecting its import statements
-      Then it does not import MasterDataset or any pipeline module
+      Then it does not import PatternGraph or any pipeline module
       And it imports only from src/cli/cli-schema.ts and generator infrastructure
 
   Rule: Recipe content uses a structured schema extension
@@ -177,7 +177,7 @@ Feature: CLI Recipe Codec
     Scenario: Generated file starts with preamble editorial content
       Given a CliRecipeGenerator with preamble containing Why Use This prose
       And the preamble includes a comparison table and Quick Start example
-      When the generator produces PROCESS-API-RECIPES.md
+      When the generator produces CLI-RECIPES.md
       Then the file begins with the Why Use This section
       And the Quick Start section follows with command examples and output
       And generated recipe sections appear after the preamble content
@@ -189,13 +189,13 @@ Feature: CLI Recipe Codec
       Then the file begins directly with the first recipe group heading
       And no empty sections or separators appear at the top
 
-  Rule: Generated recipe file complements manual PROCESS-API.md
+  Rule: Generated recipe file complements manual CLI.md
 
-    **Invariant:** After this pattern completes, `docs/PROCESS-API.md` is trimmed to
+    **Invariant:** After this pattern completes, `docs/CLI.md` is trimmed to
     a slim editorial introduction (~30 lines) containing the document title, a
     one-paragraph purpose statement, and links to both generated files:
-    `docs-live/reference/PROCESS-API-REFERENCE.md` (option tables from Phase 43) and
-    `docs-live/reference/PROCESS-API-RECIPES.md` (recipes and narratives from this
+    `docs-live/reference/CLI-REFERENCE.md` (option tables from Phase 43) and
+    `docs-live/reference/CLI-RECIPES.md` (recipes and narratives from this
     pattern). The manual file retains the JSON Envelope, Exit Codes, and JSON Piping
     sections (~40 lines) which are operational reference unlikely to drift.
     All other prose sections are replaced by the generated recipe file.
@@ -213,21 +213,21 @@ Feature: CLI Recipe Codec
     Recipe sections no longer duplicated in manual file
 
     @acceptance-criteria @happy-path
-    Scenario: PROCESS-API.md links to both generated files
-      Given PROCESS-API.md has been trimmed after CliRecipeCodec completion
+    Scenario: CLI.md links to both generated files
+      Given CLI.md has been trimmed after CliRecipeCodec completion
       When reading the manual file
-      Then it contains a link to docs-live/reference/PROCESS-API-REFERENCE.md
-      And it contains a link to docs-live/reference/PROCESS-API-RECIPES.md
+      Then it contains a link to docs-live/reference/CLI-REFERENCE.md
+      And it contains a link to docs-live/reference/CLI-RECIPES.md
       And the total line count is under 100 lines
 
     @acceptance-criteria @validation
     Scenario: No recipe content duplicated between manual and generated files
-      Given PROCESS-API.md and PROCESS-API-RECIPES.md both exist
+      Given CLI.md and CLI-RECIPES.md both exist
       When comparing their content
-      Then the Common Recipes section does not appear in PROCESS-API.md
-      And Session Workflow Commands section does not appear in PROCESS-API.md
-      And Pattern Discovery section does not appear in PROCESS-API.md
-      And these sections appear in PROCESS-API-RECIPES.md
+      Then the Common Recipes section does not appear in CLI.md
+      And Session Workflow Commands section does not appear in CLI.md
+      And Pattern Discovery section does not appear in CLI.md
+      And these sections appear in CLI-RECIPES.md
 
   Rule: Command narrative descriptions are sourced from schema metadata
 
@@ -239,7 +239,7 @@ Feature: CLI Recipe Codec
     and Inventory), new `CommandGroup` entries are added to the schema with title,
     description, and per-command narrative metadata.
 
-    **Rationale:** The manual PROCESS-API.md contains narrative descriptions for each
+    **Rationale:** The manual CLI.md contains narrative descriptions for each
     command ("Highest-impact command. Pre-flight readiness check that prevents wasted
     sessions.") that are valuable developer context. Hardcoding these in the generator
     would create a second maintenance location. Placing them in CLI_SCHEMA co-locates

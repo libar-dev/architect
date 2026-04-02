@@ -9,7 +9,7 @@ import {
   initState,
   createReferenceCodec,
   createTestPattern,
-  createTestMasterDataset,
+  createTestPatternGraph,
   findHeadings,
   findTables,
   findLists,
@@ -74,7 +74,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
               '**Rationale:** Prevents drift.\n\n' +
               '| Value | Meaning |\n| --- | --- |\n| alpha | First |\n| beta | Second |\n\n' +
               '**Verified by:** Table validation';
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'ConventionWithTable',
@@ -153,7 +153,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
               '**Rationale:** Prevents drift.\n\n' +
               '| Value | Meaning |\n| --- | --- |\n| alpha | First |\n| beta | Second |\n\n' +
               '**Verified by:** Table validation';
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'ConventionWithTable',
@@ -220,7 +220,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         });
 
         And('a dataset with both convention content and shape content', () => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'ConventionPattern',
@@ -299,7 +299,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         });
 
         And('a dataset with multiple patterns in the Generation area', () => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'GenPattern1',
@@ -401,7 +401,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       });
 
       And('a dataset with Generation area patterns', () => {
-        state!.dataset = createTestMasterDataset({
+        state!.dataset = createTestPatternGraph({
           patterns: [
             createTestPattern({
               name: 'GenerationCodec',

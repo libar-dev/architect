@@ -46,7 +46,7 @@
  * - When checking which patterns are currently being worked on
  */
 
-import type { MasterDataset, PhaseGroup } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph, PhaseGroup } from '../../validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -281,7 +281,7 @@ export function createRoadmapCodec(options?: RoadmapCodecOptions): DocumentCodec
 /**
  * Default Roadmap Document Codec
  *
- * Transforms MasterDataset → RenderableDocument for roadmap view.
+ * Transforms PatternGraph → RenderableDocument for roadmap view.
  * Shows phases with progress, patterns grouped by phase.
  */
 export const RoadmapDocumentCodec = createRoadmapCodec();
@@ -305,7 +305,7 @@ export function createMilestonesCodec(options?: CompletedMilestonesCodecOptions)
 /**
  * Default Completed Milestones Document Codec
  *
- * Transforms MasterDataset → RenderableDocument for completed milestones.
+ * Transforms PatternGraph → RenderableDocument for completed milestones.
  * Shows historical completed phases and patterns.
  */
 export const CompletedMilestonesCodec = createMilestonesCodec();
@@ -332,7 +332,7 @@ export function createCurrentWorkCodec(options?: CurrentWorkCodecOptions): Docum
 /**
  * Default Current Work Document Codec
  *
- * Transforms MasterDataset → RenderableDocument for current work.
+ * Transforms PatternGraph → RenderableDocument for current work.
  * Shows active phases with deliverables and progress tracking.
  */
 export const CurrentWorkCodec = createCurrentWorkCodec();
@@ -369,7 +369,7 @@ export const codecMetas = [
  * Build roadmap document
  */
 function buildRoadmapDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<RoadmapCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
@@ -414,7 +414,7 @@ function buildRoadmapDocument(
 /**
  * Build overall progress section
  */
-function buildOverallProgress(dataset: MasterDataset): SectionBlock[] {
+function buildOverallProgress(dataset: PatternGraph): SectionBlock[] {
   const { counts, phaseCount } = dataset;
   const progress = completionPercentage(counts);
   const progressBar = renderProgressBar(counts.completed, counts.total, 20);
@@ -444,7 +444,7 @@ function buildOverallProgress(dataset: MasterDataset): SectionBlock[] {
 /**
  * Build phase breakdown section
  */
-function buildPhaseBreakdown(dataset: MasterDataset): SectionBlock[] {
+function buildPhaseBreakdown(dataset: PatternGraph): SectionBlock[] {
   const sections: SectionBlock[] = [];
 
   sections.push(heading(2, 'Phases'));
@@ -494,7 +494,7 @@ function buildPhaseSection(phase: PhaseGroup): SectionBlock[] {
 /**
  * Build quarterly timeline section
  */
-function buildQuarterlyTimeline(dataset: MasterDataset): SectionBlock[] {
+function buildQuarterlyTimeline(dataset: PatternGraph): SectionBlock[] {
   const sections: SectionBlock[] = [];
   const quarters = Object.keys(dataset.byQuarter).sort();
 
@@ -530,7 +530,7 @@ function buildQuarterlyTimeline(dataset: MasterDataset): SectionBlock[] {
  * Build phase navigation table with links to detail files
  */
 function buildPhaseNavigationTable(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<RoadmapCodecOptions>
 ): SectionBlock[] {
   const sections: SectionBlock[] = [];
@@ -587,7 +587,7 @@ export function getPhaseSlug(phaseNumber: number, phaseName: string | undefined)
  * Build phase detail files (progressive disclosure)
  */
 function buildPhaseDetailFiles(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<RoadmapCodecOptions>
 ): Record<string, RenderableDocument> {
   const files: Record<string, RenderableDocument> = {};
@@ -739,7 +739,7 @@ function buildPatternDetailList(patterns: ExtractedPattern[]): SectionBlock[] {
  * Build completed milestones document
  */
 function buildCompletedMilestonesDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<CompletedMilestonesCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
@@ -805,7 +805,7 @@ function buildCompletedMilestonesDocument(
  * Build completed summary section
  */
 function buildCompletedSummary(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   completedPatterns: ExtractedPattern[]
 ): SectionBlock[] {
   const completedPhases = dataset.byPhase.filter(
@@ -829,7 +829,7 @@ function buildCompletedSummary(
 /**
  * Build completed phases section
  */
-function buildCompletedPhases(dataset: MasterDataset): SectionBlock[] {
+function buildCompletedPhases(dataset: PatternGraph): SectionBlock[] {
   const sections: SectionBlock[] = [];
 
   // Filter to fully completed phases
@@ -873,7 +873,7 @@ function buildCompletedPhases(dataset: MasterDataset): SectionBlock[] {
  * Build quarterly navigation table with links to detail files
  */
 function buildQuarterlyNavigationTable(
-  _dataset: MasterDataset,
+  _dataset: PatternGraph,
   completedPatterns: ExtractedPattern[],
   options: Required<CompletedMilestonesCodecOptions>
 ): SectionBlock[] {
@@ -948,7 +948,7 @@ function buildRecentCompletions(patterns: ExtractedPattern[], limit = 10): Secti
  * Build quarterly milestone detail files (progressive disclosure)
  */
 function buildQuarterlyMilestoneFiles(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   completedPatterns: ExtractedPattern[],
   _options: Required<CompletedMilestonesCodecOptions>
 ): Record<string, RenderableDocument> {
@@ -975,7 +975,7 @@ function buildQuarterlyMilestoneFiles(
 function buildQuarterDetailDocument(
   quarter: string,
   patterns: ExtractedPattern[],
-  dataset: MasterDataset
+  dataset: PatternGraph
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
 
@@ -1054,7 +1054,7 @@ function buildQuarterDetailDocument(
  * - Deliverables (if configured)
  */
 function buildCurrentWorkDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<CurrentWorkCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
@@ -1109,7 +1109,7 @@ function buildCurrentWorkDocument(
  * Build current work summary section
  */
 function buildCurrentWorkSummary(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   _activePatterns: ExtractedPattern[]
 ): SectionBlock[] {
   // Count phases with active work
@@ -1141,7 +1141,7 @@ function buildCurrentWorkSummary(
  * Build active phases section
  */
 function buildActivePhases(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<CurrentWorkCodecOptions>
 ): SectionBlock[] {
   const sections: SectionBlock[] = [];
@@ -1234,7 +1234,7 @@ function buildActivePatternsList(
  * Build current work detail files (progressive disclosure)
  */
 function buildCurrentWorkDetailFiles(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<CurrentWorkCodecOptions>
 ): Record<string, RenderableDocument> {
   const files: Record<string, RenderableDocument> = {};
@@ -1257,7 +1257,7 @@ function buildCurrentWorkDetailFiles(
  */
 function buildCurrentPhaseDetailDocument(
   phase: PhaseGroup,
-  _dataset: MasterDataset,
+  _dataset: PatternGraph,
   options: Required<CurrentWorkCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];

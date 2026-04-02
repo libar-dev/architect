@@ -2,20 +2,20 @@
 /**
  * @architect
  * @architect-core @architect-cli
- * @architect-pattern ProcessAPICLIImpl
+ * @architect-pattern PatternGraphCLIImpl
  * @architect-status active
- * @architect-implements ProcessStateAPICLI
+ * @architect-implements PatternGraphAPICLI
  * @architect-arch-role service
  * @architect-arch-context cli
  * @architect-arch-layer application
- * @architect-uses ProcessStateAPI, MasterDataset, PipelineFactory, RulesQueryModule, PatternSummarizerImpl, FuzzyMatcherImpl, OutputPipelineImpl
+ * @architect-uses PatternGraphAPI, PatternGraph, PipelineFactory, RulesQueryModule, PatternSummarizerImpl, FuzzyMatcherImpl, OutputPipelineImpl
  * @architect-used-by npm scripts, Claude Code sessions
  * @architect-usecase "When querying project state from CLI"
  * @architect-usecase "When Claude Code needs real-time delivery state queries"
  *
- * ## architect - CLI Query Interface to ProcessStateAPI
+ * ## architect - CLI Query Interface to PatternGraphAPI
  *
- * Exposes ProcessStateAPI methods as CLI subcommands with JSON output.
+ * Exposes PatternGraphAPI methods as CLI subcommands with JSON output.
  * Runs pipeline steps 1-8 (config -> scan -> extract -> transform),
  * then routes subcommands to API methods.
  *
@@ -27,7 +27,7 @@
  *
  * ### Key Concepts
  *
- * - **Subcommand Routing**: CLI subcommands map to ProcessStateAPI methods
+ * - **Subcommand Routing**: CLI subcommands map to PatternGraphAPI methods
  * - **JSON Output**: All output is JSON to stdout, errors to stderr
  * - **Pipeline Reuse**: Steps 1-8 match architect-generate exactly
  * - **QueryResult Envelope**: All output wrapped in success/error discriminated union
@@ -43,13 +43,13 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { applyProjectSourceDefaults, findConfigFile } from '../config/config-loader.js';
 import {
-  buildMasterDataset,
+  buildPatternGraph,
   type PipelineResult,
   type ValidationSummary,
-  type RuntimeMasterDataset,
+  type RuntimePatternGraph,
 } from '../generators/pipeline/index.js';
-import { createProcessStateAPI } from '../api/process-state.js';
-import type { ProcessStateAPI } from '../api/process-state.js';
+import { createPatternGraphAPI } from '../api/pattern-graph-api.js';
+import type { PatternGraphAPI } from '../api/pattern-graph-api.js';
 import type { ExtractedPattern } from '../validation-schemas/index.js';
 import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 import {
@@ -143,7 +143,7 @@ import type { RulesFilters } from '../api/rules-query.js';
 // CLI Config
 // =============================================================================
 
-interface ProcessAPICLIConfig {
+interface PatternGraphCLIConfig {
   input: string[];
   features: string[];
   baseDir: string;
@@ -166,7 +166,7 @@ interface ProcessAPICLIConfig {
 
 /** Mutable state accumulated during argument parsing. */
 interface ParseState {
-  readonly config: ProcessAPICLIConfig;
+  readonly config: PatternGraphCLIConfig;
   namesOnly: boolean;
   count: boolean;
   fields: string[] | null;
@@ -305,7 +305,7 @@ function handlePositionalArg(state: ParseState, arg: string): void {
   }
 }
 
-function parseArgs(argv: string[] = process.argv.slice(2)): ProcessAPICLIConfig {
+function parseArgs(argv: string[] = process.argv.slice(2)): PatternGraphCLIConfig {
   const state: ParseState = {
     config: {
       input: [],
@@ -521,7 +521,7 @@ Available API Methods (for 'query'):
             getPatternsByCategory, getCategories
   Timeline: getPatternsByQuarter, getQuarters, getCurrentWork, getRoadmapItems,
             getRecentlyCompleted
-  Raw:      getMasterDataset
+  Raw:      getPatternGraph
 `);
 }
 
@@ -596,7 +596,7 @@ function getSubcommandOptionGroups(subcommand: string): readonly string[] {
 /**
  * Execute dry-run: show pipeline scope (files, config, cache) without processing.
  */
-async function executeDryRun(opts: ProcessAPICLIConfig): Promise<void> {
+async function executeDryRun(opts: PatternGraphCLIConfig): Promise<void> {
   const baseDir = path.resolve(opts.baseDir);
 
   // Resolve globs to file lists
@@ -640,7 +640,7 @@ async function executeDryRun(opts: ProcessAPICLIConfig): Promise<void> {
  * Prefers loadProjectConfig() for repos with a project config file,
  * falls back to filesystem auto-detection for repos without one.
  */
-async function applyConfigDefaults(config: ProcessAPICLIConfig): Promise<void> {
+async function applyConfigDefaults(config: PatternGraphCLIConfig): Promise<void> {
   const applied = await applyProjectSourceDefaults(config);
   if (applied) {
     return;
@@ -654,7 +654,7 @@ async function applyConfigDefaults(config: ProcessAPICLIConfig): Promise<void> {
  * Filesystem-based auto-detection fallback for repos without a config file.
  * Checks for conventional directory structures and applies defaults.
  */
-async function applyConfigDefaultsFallback(config: ProcessAPICLIConfig): Promise<void> {
+async function applyConfigDefaultsFallback(config: PatternGraphCLIConfig): Promise<void> {
   const baseDir = path.resolve(config.baseDir);
 
   if (config.input.length === 0) {
@@ -692,8 +692,8 @@ function formatConfigStatus(configPath: string | null): string {
 // Pipeline
 // =============================================================================
 
-async function buildPipeline(config: ProcessAPICLIConfig): Promise<PipelineResult> {
-  const result = await buildMasterDataset({
+async function buildPipeline(config: PatternGraphCLIConfig): Promise<PipelineResult> {
+  const result = await buildPatternGraph({
     input: config.input,
     features: config.features,
     baseDir: config.baseDir,
@@ -825,7 +825,7 @@ function tryFsmShortCircuit(subcommand: string, subArgs: readonly string[]): unk
 // Subcommand Handlers
 // =============================================================================
 
-function handleStatus(api: ProcessStateAPI): unknown {
+function handleStatus(api: PatternGraphAPI): unknown {
   return {
     counts: api.getStatusCounts(),
     completionPercentage: api.getCompletionPercentage(),
@@ -909,8 +909,8 @@ const API_METHODS = [
   'getCurrentWork',
   'getRoadmapItems',
   'getRecentlyCompleted',
-  'getMasterDataset',
-] as const satisfies ReadonlyArray<keyof ProcessStateAPI>;
+  'getPatternGraph',
+] as const satisfies ReadonlyArray<keyof PatternGraphAPI>;
 
 type ApiMethodName = (typeof API_METHODS)[number];
 
@@ -921,7 +921,7 @@ type ApiMethodName = (typeof API_METHODS)[number];
  */
 const API_DISPATCH: Record<
   ApiMethodName,
-  (api: ProcessStateAPI, args: ReadonlyArray<string | number>) => unknown
+  (api: PatternGraphAPI, args: ReadonlyArray<string | number>) => unknown
 > = {
   // Status queries
   getPatternsByNormalizedStatus: (api, args) =>
@@ -991,11 +991,11 @@ const API_DISPATCH: Record<
   },
 
   // Raw access
-  getMasterDataset: (api) => api.getMasterDataset(),
+  getPatternGraph: (api) => api.getPatternGraph(),
 };
 
 function handleQuery(
-  api: ProcessStateAPI,
+  api: PatternGraphAPI,
   args: string[]
 ): { methodName: string; result: unknown } {
   const methodName = args[0];
@@ -1018,7 +1018,7 @@ function handleQuery(
   return { methodName, result: dispatch(api, coercedArgs) };
 }
 
-function handlePattern(api: ProcessStateAPI, args: string[]): unknown {
+function handlePattern(api: PatternGraphAPI, args: string[]): unknown {
   const name = args[0];
   if (!name) {
     throw new QueryApiError('INVALID_ARGUMENT', 'Usage: architect pattern <name>');
@@ -1026,7 +1026,7 @@ function handlePattern(api: ProcessStateAPI, args: string[]): unknown {
 
   const pattern = api.getPattern(name);
   if (!pattern) {
-    const hint = suggestPattern(name, allPatternNames(api.getMasterDataset()));
+    const hint = suggestPattern(name, allPatternNames(api.getPatternGraph()));
     throw new QueryApiError('PATTERN_NOT_FOUND', `Pattern not found: "${name}".${hint}`);
   }
 
@@ -1130,10 +1130,7 @@ function parseListFilters(subArgs: string[]): ListFilters {
 /**
  * Generate contextual hint for empty list results.
  */
-function generateEmptyHint(
-  dataset: RuntimeMasterDataset,
-  filters: ListFilters
-): string | undefined {
+function generateEmptyHint(dataset: RuntimePatternGraph, filters: ListFilters): string | undefined {
   if (filters.status !== null) {
     const counts = dataset.counts;
     const alternatives: string[] = [];
@@ -1162,7 +1159,7 @@ function generateEmptyHint(
 }
 
 function handleList(
-  dataset: RuntimeMasterDataset,
+  dataset: RuntimePatternGraph,
   subArgs: string[],
   modifiers: OutputModifiers
 ): unknown {
@@ -1178,13 +1175,13 @@ function handleList(
   return applyOutputPipeline(input, modifiers);
 }
 
-function handleSearch(api: ProcessStateAPI, subArgs: string[]): unknown {
+function handleSearch(api: PatternGraphAPI, subArgs: string[]): unknown {
   const query = subArgs[0];
   if (!query) {
     throw new QueryApiError('INVALID_ARGUMENT', 'Usage: architect search <query>');
   }
 
-  const names = allPatternNames(api.getMasterDataset());
+  const names = allPatternNames(api.getPatternGraph());
   const matches = fuzzyMatchPatterns(query, names);
 
   if (matches.length === 0) {
@@ -1316,7 +1313,7 @@ async function handleArch(ctx: RouteContext): Promise<unknown> {
 // =============================================================================
 
 function handleSequence(
-  dataset: RuntimeMasterDataset,
+  dataset: RuntimePatternGraph,
   subArgs: string[],
   modifiers: OutputModifiers
 ): unknown {
@@ -1349,7 +1346,7 @@ function handleSequence(
 
 // =============================================================================
 
-function handleStubs(dataset: RuntimeMasterDataset, subArgs: string[], baseDir: string): unknown {
+function handleStubs(dataset: RuntimePatternGraph, subArgs: string[], baseDir: string): unknown {
   const stubs = findStubPatterns(dataset);
   const resolutions = resolveStubs(stubs, baseDir);
 
@@ -1393,7 +1390,7 @@ function handleStubs(dataset: RuntimeMasterDataset, subArgs: string[], baseDir: 
   return groupStubsByPattern(filtered);
 }
 
-function handleDecisions(dataset: RuntimeMasterDataset, subArgs: string[]): unknown {
+function handleDecisions(dataset: RuntimePatternGraph, subArgs: string[]): unknown {
   const patternName = subArgs[0];
   if (patternName === undefined) {
     throw new QueryApiError('INVALID_ARGUMENT', 'Usage: decisions <pattern>');
@@ -1433,7 +1430,7 @@ function handleDecisions(dataset: RuntimeMasterDataset, subArgs: string[]): unkn
   };
 }
 
-function handlePdr(dataset: RuntimeMasterDataset, subArgs: string[]): unknown {
+function handlePdr(dataset: RuntimePatternGraph, subArgs: string[]): unknown {
   const pdrNumber = subArgs[0];
   if (pdrNumber === undefined) {
     throw new QueryApiError('INVALID_ARGUMENT', 'Usage: pdr <number> (e.g., pdr 012)');
@@ -1521,8 +1518,8 @@ function handleRules(ctx: RouteContext): unknown {
 // =============================================================================
 
 interface RouteContext {
-  api: ProcessStateAPI;
-  dataset: RuntimeMasterDataset;
+  api: PatternGraphAPI;
+  dataset: RuntimePatternGraph;
   validation: ValidationSummary;
   subcommand: string;
   subArgs: string[];
@@ -1986,18 +1983,18 @@ async function main(): Promise<void> {
   }
 
   const pipelineMs = Math.round(performance.now() - startMs);
-  const { dataset: masterDataset, validation } = pipelineResult;
+  const { dataset: patternGraph, validation } = pipelineResult;
 
   // Build extended metadata for JSON responses
   const extra = buildQueryMetadataExtra(validation, cacheHit, cacheAgeMs, pipelineMs);
 
-  // Create ProcessStateAPI
-  const api = createProcessStateAPI(masterDataset);
+  // Create PatternGraphAPI
+  const api = createPatternGraphAPI(patternGraph);
 
   // Route and execute subcommand
   const result = await routeSubcommand({
     api,
-    dataset: masterDataset,
+    dataset: patternGraph,
     validation,
     subcommand: opts.subcommand,
     subArgs: opts.subArgs,
@@ -2005,7 +2002,7 @@ async function main(): Promise<void> {
     sessionType: opts.sessionType,
     baseDir: path.resolve(opts.baseDir),
     cliConfig: { input: opts.input, features: opts.features, baseDir: opts.baseDir },
-    registry: masterDataset.tagRegistry,
+    registry: patternGraph.tagRegistry,
   });
 
   // Dual output path (ADR-008):
@@ -2014,7 +2011,7 @@ async function main(): Promise<void> {
   if (typeof result === 'string') {
     console.log(result);
   } else {
-    const envelope = createSuccess(result, masterDataset.counts.total, extra);
+    const envelope = createSuccess(result, patternGraph.counts.total, extra);
     const output = formatOutput(envelope, opts.format);
     console.log(output);
   }

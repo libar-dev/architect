@@ -11,7 +11,7 @@ import {
   getRenderedMarkdown,
   createReferenceCodec,
   createTestPattern,
-  createTestMasterDataset,
+  createTestPatternGraph,
   findHeadings,
   findTables,
   findBlocksByType,
@@ -57,8 +57,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('an empty MasterDataset', () => {
-          state!.dataset = createTestMasterDataset({ patterns: [] });
+        And('an empty PatternGraph', () => {
+          state!.dataset = createTestPatternGraph({ patterns: [] });
         });
 
         When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
@@ -96,10 +96,10 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with a convention-tagged pattern:',
+          'a PatternGraph with a convention-tagged pattern:',
           (_ctx: unknown, dataTable: Array<Record<string, string>>) => {
             const row = dataTable[0]!;
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'ConventionPattern',
@@ -146,8 +146,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         }
       );
 
-      And('a MasterDataset with a convention pattern with a table', () => {
-        state!.dataset = createTestMasterDataset({
+      And('a PatternGraph with a convention pattern with a table', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: [
             createTestPattern({
               name: 'TablePattern',
@@ -197,8 +197,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         }
       );
 
-      And('a MasterDataset with a convention pattern with narrative and rationale', () => {
-        state!.dataset = createTestMasterDataset({
+      And('a PatternGraph with a convention pattern with narrative and rationale', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: [
             createTestPattern({
               name: 'DetailPattern',
@@ -250,8 +250,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with a convention pattern with narrative and rationale', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with a convention pattern with narrative and rationale', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'DetailPatternFull',
@@ -306,9 +306,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with a behavior pattern in category {string}',
+          'a PatternGraph with a behavior pattern in category {string}',
           (_ctx: unknown, category: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'ProcessGuardSpec',
@@ -360,9 +360,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with a pattern at {string} with extracted shapes',
+          'a PatternGraph with a pattern at {string} with extracted shapes',
           (_ctx: unknown, filePath: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'ShapePattern',
@@ -432,9 +432,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       );
 
       And(
-        'a MasterDataset with a pattern at {string} with extracted shapes',
+        'a PatternGraph with a pattern at {string} with extracted shapes',
         (_ctx: unknown, filePath: string) => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'ShapePattern',
@@ -490,9 +490,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       );
 
       And(
-        'a MasterDataset with a pattern at {string} with extracted shapes',
+        'a PatternGraph with a pattern at {string} with extracted shapes',
         (_ctx: unknown, filePath: string) => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'ShapePattern',
@@ -545,8 +545,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with both convention and behavior data', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with both convention and behavior data', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'ConventionADR',
@@ -613,8 +613,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
             };
           });
 
-          And('a MasterDataset with convention, shape, and behavior data', () => {
-            state!.dataset = createTestMasterDataset({
+          And('a PatternGraph with convention, shape, and behavior data', () => {
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'ConventionADR',
@@ -700,8 +700,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with a convention pattern with a mermaid diagram', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with a convention pattern with a mermaid diagram', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'MermaidConvention',
@@ -750,8 +750,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         }
       );
 
-      And('a MasterDataset with a convention pattern with a mermaid diagram', () => {
-        state!.dataset = createTestMasterDataset({
+      And('a PatternGraph with a convention pattern with a mermaid diagram', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: [
             createTestPattern({
               name: 'MermaidConventionSummary',

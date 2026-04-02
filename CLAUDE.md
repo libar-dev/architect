@@ -15,7 +15,7 @@ Context engineering platform with extraction pipeline and typed codecs. Extracts
 **Key Capabilities:**
 
 - Pattern extraction from TypeScript JSDoc and Gherkin tags
-- MasterDataset transformation with pre-computed views (O(1) access)
+- PatternGraph transformation with pre-computed views (O(1) access)
 - Codec-based markdown generation with progressive disclosure
 - FSM-enforced delivery workflow validation via pre-commit hooks
 
@@ -49,7 +49,7 @@ Both generated from the SAME annotated sources. Features are planned for **reusa
 
 ### Context Gathering Protocol (MANDATORY)
 
-**Rule: Always query the Process Data API BEFORE using grep, explore agents, or reading files.**
+**Rule: Always query the Data API BEFORE using grep, explore agents, or reading files.**
 
 The API returns structured, current data using 5-10x less context than file reads. Annotations and relationships in source files feed the API — invest in annotations, not manual notes.
 
@@ -124,7 +124,7 @@ pnpm architect:query -- overview                            # Project health sum
 
 ### Data API CLI
 
-Query process state directly from the terminal. **Use this instead of reading generated markdown or launching explore agents** — targeted queries use 5-10x less context.
+Query the pattern graph directly from the terminal. **Use this instead of reading generated markdown or launching explore agents** — targeted queries use 5-10x less context.
 
 **Run `pnpm architect:query -- --help` for the full command reference**, including workflow recipes, session types, architecture queries, output modifiers, and available API methods.
 
@@ -135,11 +135,11 @@ See the **Context Gathering Protocol** section above for mandatory session start
 - `pattern <name>` returns ~66KB for completed patterns — prefer `context --session` for interactive sessions.
 - `query getPattern <name>` shows raw JSON including `extractedShapes` — use for debugging shape extraction.
 - Output modifiers (`--names-only`, `--count`, `--fields`) compose with any list/query command.
-- `pnpm` outputs a banner to stdout. For clean JSON piping, use `npx tsx src/cli/process-api.ts` directly.
+- `pnpm` outputs a banner to stdout. For clean JSON piping, use `npx tsx src/cli/pattern-graph-cli.ts` directly.
 
 ### MCP Server — Native AI Context Tools
 
-When the MCP server is running, **use `architect_*` tools instead of CLI commands** (`pnpm architect:query --`). The MCP server keeps the MasterDataset in memory — tool calls dispatch in sub-milliseconds vs 2-5 seconds for CLI subprocess invocations. All 25 tools wrap the same ProcessStateAPI methods available via CLI.
+When the MCP server is running, **use `architect_*` tools instead of CLI commands** (`pnpm architect:query --`). The MCP server keeps the PatternGraph in memory — tool calls dispatch in sub-milliseconds vs 2-5 seconds for CLI subprocess invocations. All 25 tools wrap the same PatternGraphAPI methods available via CLI.
 
 #### Session Start (MCP Protocol)
 
@@ -197,7 +197,7 @@ Steps 1-2 can run in parallel (no dependencies between them).
 
 | Tool                | Description                                            |
 | ------------------- | ------------------------------------------------------ |
-| `architect_rebuild` | Force dataset rebuild from current source files        |
+| `architect_rebuild` | Force PatternGraph rebuild from current source files   |
 | `architect_config`  | Show source globs, base dir, build time, pattern count |
 | `architect_help`    | List all available tools with descriptions             |
 
@@ -269,13 +269,13 @@ The `--watch` flag enables auto-rebuild when `.ts` or `.feature` files change (5
 
 ```
 CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
-         (files)   (patterns)   (MasterDataset)  (Markdown)
+         (files)   (patterns)   (PatternGraph)  (Markdown)
 ```
 
 1. **Scanner** (`src/scanner/`): File discovery, AST parsing, opt-in detection via `@architect` marker
 2. **Extractor** (`src/extractor/`): Pattern extraction from TypeScript JSDoc and Gherkin tags
-3. **Transformer** (`src/generators/pipeline/`): Builds MasterDataset with pre-computed views
-4. **Codec** (`src/renderable/`): Zod 4 codecs transform MasterDataset → RenderableDocument → Markdown
+3. **Transformer** (`src/generators/pipeline/`): Builds PatternGraph with pre-computed views
+4. **Codec** (`src/renderable/`): Zod 4 codecs transform PatternGraph → RenderableDocument → Markdown
 
 ### Key Design Patterns
 
@@ -283,8 +283,8 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 - **Schema-First**: Zod schemas in `src/validation-schemas/` define types with runtime validation
 - **Registry Pattern**: Tag registry (`src/taxonomy/`) defines categories, status values, and tag formats
 - **Codec-Based Rendering**: Generators in `src/generators/` use codecs to transform data to markdown
-- **Pipeline Factory**: Shared `buildMasterDataset()` in `src/generators/pipeline/build-pipeline.ts` — all consumers (orchestrator, process-api, validate-patterns) call this instead of wiring inline pipelines. Per-consumer behavior via `PipelineOptions`.
-- **Single Read Model** (ADR-006): MasterDataset is the sole read model. No consumer re-derives data from raw scanner/extractor output. Anti-patterns: Parallel Pipeline, Lossy Local Type, Re-derived Relationship.
+- **Pipeline Factory**: Shared `buildPatternGraph()` in `src/generators/pipeline/build-pipeline.ts` — all consumers (orchestrator, pattern-graph-cli, validate-patterns) call this instead of wiring inline pipelines. Per-consumer behavior via `PipelineOptions`.
+- **Single Read Model** (ADR-006): PatternGraph is the sole read model. No consumer re-derives data from raw scanner/extractor output. Anti-patterns: Parallel Pipeline, Lossy Local Type, Re-derived Relationship.
 
 **Live module inventory:** `pnpm architect:query -- arch context` and `pnpm architect:query -- arch layer`
 
@@ -292,14 +292,14 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 
 Architecture and process decisions are recorded as annotated Gherkin specs in `architect/decisions/`:
 
-| Spec    | Key Decision                                                               |
-| ------- | -------------------------------------------------------------------------- |
-| ADR-001 | Taxonomy canonical values — tag registry is the single source of truth     |
-| ADR-002 | Gherkin-only testing — no `.test.ts` files, all tests are `.feature`       |
-| ADR-003 | Source-first pattern architecture — code drives docs, not the reverse      |
-| ADR-005 | Codec-based markdown rendering — Zod codecs transform data to markdown     |
-| ADR-006 | Single read model — MasterDataset is the sole read model for all consumers |
-| PDR-001 | Session workflow commands — Process Data API CLI design decisions          |
+| Spec    | Key Decision                                                              |
+| ------- | ------------------------------------------------------------------------- |
+| ADR-001 | Taxonomy canonical values — tag registry is the single source of truth    |
+| ADR-002 | Gherkin-only testing — no `.test.ts` files, all tests are `.feature`      |
+| ADR-003 | Source-first pattern architecture — code drives docs, not the reverse     |
+| ADR-005 | Codec-based markdown rendering — Zod codecs transform data to markdown    |
+| ADR-006 | Single read model — PatternGraph is the sole read model for all consumers |
+| PDR-001 | Session workflow commands — Data API CLI design decisions                 |
 
 Query decisions: `pnpm architect:query -- decisions <pattern>`
 
@@ -315,7 +315,7 @@ Tests use Vitest with BDD/Gherkin integration:
 - **Support**: `tests/support/` - test helpers and setup utilities
 - **Shared state helpers**: `tests/support/helpers/` - reusable state management for split test suites
 
-Large test files are split into focused domain files with shared state extracted to helpers (e.g., `ast-parser-state.ts`, `process-api-state.ts`).
+Large test files are split into focused domain files with shared state extracted to helpers (e.g., `ast-parser-state.ts`, `pattern-graph-api-state.ts`).
 
 Run a single test file: `pnpm test tests/steps/scanner/file-discovery.steps.ts`
 
@@ -495,13 +495,13 @@ The parser sees:
 
 Issues discovered during step definition implementation:
 
-| Issue                             | Description                                                  | Fix                                                                                               |
-| --------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| Pattern not in `bySource.gherkin` | TraceabilityCodec shows "No Timeline Patterns"               | Set `filePath: '...feature'` in `createTestPattern()` - source categorization uses file extension |
-| Business value not found          | REMAINING-WORK.md business value is in `additionalFiles`     | Check detail files via `doc.additionalFiles` not main document sections                           |
-| Codec output mismatch             | Spec says "Next Actionable table" but codec uses list format | Debug actual output with `console.log(JSON.stringify(doc.sections))` then align test expectations |
-| `behaviorFileVerified` undefined  | Patterns created without explicit verification status        | Add `behaviorFileVerified: true/false` to `createTestPattern()` when testing traceability         |
-| Discovery tags missing            | SessionFindingsCodec shows "No Findings"                     | Pass `discoveredGaps`, `discoveredImprovements`, `discoveredLearnings` to factory                 |
+| Issue                                 | Description                                                  | Fix                                                                                               |
+| ------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| Pattern not in `bySourceType.gherkin` | TraceabilityCodec shows "No Timeline Patterns"               | Set `filePath: '...feature'` in `createTestPattern()` - source categorization uses file extension |
+| Business value not found              | REMAINING-WORK.md business value is in `additionalFiles`     | Check detail files via `doc.additionalFiles` not main document sections                           |
+| Codec output mismatch                 | Spec says "Next Actionable table" but codec uses list format | Debug actual output with `console.log(JSON.stringify(doc.sections))` then align test expectations |
+| `behaviorFileVerified` undefined      | Patterns created without explicit verification status        | Add `behaviorFileVerified: true/false` to `createTestPattern()` when testing traceability         |
+| Discovery tags missing                | SessionFindingsCodec shows "No Findings"                     | Pass `discoveredGaps`, `discoveredImprovements`, `discoveredLearnings` to factory                 |
 
 ### Coding & Linting Standards
 
@@ -522,9 +522,9 @@ The project has strict linting rules. Save time by coding defensively.
 ```typescript
 // debug-codec.ts
 import { RemainingWorkCodec } from './src/renderable/codecs/session.js';
-import { createTestMasterDataset } from './tests/fixtures/dataset-factories.js';
+import { createTestPatternGraph } from './tests/fixtures/dataset-factories.js';
 
-const dataset = createTestMasterDataset({ ... });
+const dataset = createTestPatternGraph({ ... });
 const doc = RemainingWorkCodec.decode(dataset);
 console.log(JSON.stringify(doc.sections, null, 2));
 ```
@@ -615,11 +615,11 @@ console.log(JSON.stringify(doc.sections, null, 2));
 | session-scope (warning)   | Modified file outside session scope            | Add to scope OR use --ignore-session        |
 | session-excluded          | Modified excluded pattern during session       | Remove from exclusion OR override           |
 
-| Situation                    | Solution              | Example                                |
-| ---------------------------- | --------------------- | -------------------------------------- |
-| Fix bug in completed spec    | Add unlock reason tag | @architect-unlock-reason:Fix-typo      |
-| Modify outside session scope | Use ignore flag       | lint-process --staged --ignore-session |
-| CI treats warnings as errors | Use strict flag       | lint-process --all --strict            |
+| Situation                    | Solution              | Example                                   |
+| ---------------------------- | --------------------- | ----------------------------------------- |
+| Fix bug in completed spec    | Add unlock reason tag | @architect-unlock-reason:Fix-typo         |
+| Modify outside session scope | Use ignore flag       | architect-guard --staged --ignore-session |
+| CI treats warnings as errors | Use strict flag       | architect-guard --all --strict            |
 
 #### Handoff captures session-end state for continuity
 
@@ -631,7 +631,7 @@ console.log(JSON.stringify(doc.sections, null, 2));
 
 **Invariant:** Phase 39 depends on ClaudeModuleGeneration (Phase 25). Adding `@architect-claude-module` and `@architect-claude-section:workflow` tags to this spec will cause ClaudeModuleGeneration to produce `_claude-md/workflow/` output files. The hand-written `_claude-md/workflow/` files are deleted after successful verified generation.
 
-**Rationale:** The annotation work (Rule blocks in this spec) is immediately useful — queryable via `pnpm process:query -- rules`. Generation deliverables cannot complete until Phase 25 ships the ClaudeModuleCodec. This sequencing is intentional: the annotation investment has standalone value regardless of whether the codec exists yet.
+**Rationale:** The annotation work (Rule blocks in this spec) is immediately useful — queryable via `pnpm architect:query -- rules`. Generation deliverables cannot complete until Phase 25 ships the ClaudeModuleCodec. This sequencing is intentional: the annotation investment has standalone value regardless of whether the codec exists yet.
 
 ---
 

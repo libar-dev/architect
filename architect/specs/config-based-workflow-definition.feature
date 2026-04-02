@@ -1,7 +1,7 @@
 @architect
 @architect-pattern:ConfigBasedWorkflowDefinition
 @architect-status:completed
-@architect-unlock-reason:Add-missing-Invariant-Rationale-annotations
+@architect-unlock-reason:Terminology-alignment-rebrand
 @architect-phase:99
 @architect-effort:2h
 @architect-product-area:Configuration
@@ -12,7 +12,7 @@
 Feature: Config-Based Workflow Definition
 
   **Problem:**
-  Every `pnpm process:query` and `pnpm docs:*` invocation prints:
+  Every `pnpm architect:query` and `pnpm docs:*` invocation prints:
   `Failed to load default workflow (6-phase-standard): Workflow file not found`
 
   The `loadDefaultWorkflow()` function resolves to `catalogue/workflows/`
@@ -55,7 +55,7 @@ Feature: Config-Based Workflow Definition
       | Remove dead code paths | complete | src/config/workflow-loader.ts |
       | Update public API exports | complete | src/config/index.ts |
       | Remove async and try-catch in orchestrator | complete | src/generators/orchestrator.ts |
-      | Remove async and try-catch in process-api | complete | src/cli/process-api.ts |
+      | Remove async and try-catch in pattern-graph-cli | complete | src/cli/pattern-graph-cli.ts |
       | Delete orphaned JSON file | n/a | architect/6-phase-standard.json |
       | Amend ADR-001 with phase definitions rule | complete | architect/decisions/adr-001-taxonomy-canonical-values.feature |
 
@@ -71,7 +71,7 @@ Feature: Config-Based Workflow Definition
 
     **Rationale:** The file-based loading path (`catalogue/workflows/`) has
     been dead code since monorepo extraction. Both callers (orchestrator,
-    process-api) already handle the failure gracefully, proving the system
+    pattern-graph-cli) already handle the failure gracefully, proving the system
     works without it. Making the function synchronous and infallible removes
     the try-catch ceremony and the warning noise.
 
@@ -86,12 +86,12 @@ Feature: Config-Based Workflow Definition
     | Remove dead code paths | Delete getCatalogueWorkflowsPath, loadWorkflowConfig, DEFAULT_WORKFLOW_NAME, dead imports | workflow-loader.ts cleanup |
     | Remove loadWorkflowConfig from public API | Update src/config/index.ts exports | Breaking change (safe: function always threw) |
     | Update orchestrator call site | Remove await and try-catch (lines 410-418) | orchestrator.ts |
-    | Update process-api call site | Remove await and try-catch (lines 549-555) | process-api.ts |
+    | Update pattern-graph-cli call site | Remove await and try-catch (lines 549-555) | pattern-graph-cli.ts |
 
     @acceptance-criteria @happy-path
     Scenario: Default workflow loads without warning
       Given the Architect package with no workflow JSON file
-      When the process-api runs an overview command
+      When the pattern-graph-cli runs an overview command
       Then no workflow warning appears in output
       And the overview displays progress, active phases, and blocking info
 

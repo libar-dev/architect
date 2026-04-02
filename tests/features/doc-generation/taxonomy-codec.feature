@@ -6,7 +6,7 @@
 @architect-product-area:Generation
 Feature: Taxonomy Document Codec
 
-  Validates the Taxonomy Codec that transforms MasterDataset into a
+  Validates the Taxonomy Codec that transforms PatternGraph into a
   RenderableDocument for tag taxonomy reference documentation (TAXONOMY.md).
 
   Background: Codec setup

@@ -10,7 +10,7 @@
 Feature: Data API Platform Integration - MCP Server and Monorepo Support
 
   **Problem:**
-  The process-api CLI requires subprocess invocation for every query, adding
+  The pattern-graph-cli CLI requires subprocess invocation for every query, adding
   shell overhead and preventing stateful interaction. Claude Code's native tool
   integration mechanism is Model Context Protocol (MCP), which the process API
   does not support. Additionally, in the monorepo context, queries must specify
@@ -19,7 +19,7 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
 
   **Solution:**
   Two integration capabilities:
-  1. **MCP Server Mode** -- Expose ProcessStateAPI as an MCP server that Claude
+  1. **MCP Server Mode** -- Expose PatternGraphAPI as an MCP server that Claude
      Code connects to directly. Eliminates CLI overhead and enables stateful
      queries (pipeline loaded once, multiple queries without re-scanning).
   2. **Monorepo Support** -- Cross-package dependency views, package-scoped
@@ -46,7 +46,7 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
       | MCP session state management | superseded | src/mcp/session.ts | Yes | unit |
       | CLAUDE.md context layer generator | superseded | src/generators/claude-md-generator.ts | Yes | unit |
       | Cross-package dependency analyzer | superseded | src/api/cross-package.ts | Yes | unit |
-      | Package-scoped filter flag | superseded | src/cli/process-api.ts | Yes | integration |
+      | Package-scoped filter flag | superseded | src/cli/pattern-graph-cli.ts | Yes | integration |
       | Multi-package config support | superseded | src/config/multi-package.ts | Yes | unit |
       | Per-package coverage report | superseded | src/api/coverage-analyzer.ts | Yes | unit |
 
@@ -54,9 +54,9 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
   # RULE 1: MCP Server Mode
   # ============================================================================
 
-  Rule: ProcessStateAPI is accessible as an MCP server for Claude Code
+  Rule: PatternGraphAPI is accessible as an MCP server for Claude Code
 
-    **Invariant:** The MCP server exposes all ProcessStateAPI methods as MCP tools
+    **Invariant:** The MCP server exposes all PatternGraphAPI methods as MCP tools
     with typed input/output schemas. The pipeline is loaded once on server start
     and refreshed on source file changes.
 
@@ -81,10 +81,10 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
     **Verified by:** MCP server starts, MCP tool invocation, Auto-refresh on change
 
     @acceptance-criteria @happy-path
-    Scenario: MCP server exposes ProcessStateAPI tools
+    Scenario: MCP server exposes PatternGraphAPI tools
       Given the MCP server is started with input globs
       When Claude Code requests tool listing
-      Then all ProcessStateAPI methods appear as MCP tools
+      Then all PatternGraphAPI methods appear as MCP tools
       And each tool has typed input and output schemas
 
     @acceptance-criteria @happy-path
@@ -121,7 +121,7 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
     @acceptance-criteria @happy-path
     Scenario: Generate CLAUDE.md context layer for bounded context
       Given annotated patterns in the "orders" bounded context
-      When running "process-api generate-context-layer --context orders"
+      When running "pattern-graph-cli generate-context-layer --context orders"
       Then a CLAUDE.md section is generated with pattern metadata
       And the section includes relationship summaries
       And the section includes a file reading list
@@ -136,7 +136,7 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
     @acceptance-criteria @edge-case
     Scenario: Context layer for bounded context with no annotations
       Given a bounded context directory with no @architect annotations
-      When running "process-api generate-context-layer --context empty-context"
+      When running "pattern-graph-cli generate-context-layer --context empty-context"
       Then the output indicates no patterns found in the context
       And the CLAUDE.md section contains a placeholder with discovery guidance
 
@@ -160,21 +160,21 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
     @acceptance-criteria @happy-path
     Scenario: Cross-package dependency view
       Given patterns across "platform-core" and "platform-bc" packages
-      When running "process-api cross-package"
+      When running "pattern-graph-cli cross-package"
       Then the output shows which packages depend on which patterns
       And completed vs roadmap dependencies are distinguished
 
     @acceptance-criteria @happy-path
     Scenario: Package-scoped query filtering
       Given patterns from multiple packages in the dataset
-      When running "process-api list --package platform-core --status active"
+      When running "pattern-graph-cli list --package platform-core --status active"
       Then only patterns from "platform-core" are returned
       And the package filter composes with other filters
 
     @acceptance-criteria @edge-case
     Scenario: Query for non-existent package returns empty result
       Given patterns from "platform-core" and "platform-bc" packages
-      When running "process-api list --package non-existent-package"
+      When running "pattern-graph-cli list --package non-existent-package"
       Then the output is an empty result set
       And no error is raised
 
@@ -203,7 +203,7 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
 
     @acceptance-criteria @happy-path
     Scenario: Watch mode re-generates on file change
-      Given watch mode is running with "process-api watch --generate architecture"
+      Given watch mode is running with "pattern-graph-cli watch --generate architecture"
       When a source file is modified
       Then the architecture docs are regenerated automatically
       And only affected doc sections are updated

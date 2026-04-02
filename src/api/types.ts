@@ -1,24 +1,24 @@
 /**
  * @architect
  * @architect-core
- * @architect-pattern ProcessStateTypes
+ * @architect-pattern PatternGraphAPITypes
  * @architect-status active
- * @architect-depends-on:MasterDataset
+ * @architect-depends-on:PatternGraph
  *
- * ## Process State API Types
+ * ## Pattern Graph API Types
  *
- * Type definitions for the ProcessStateAPI query interface.
+ * Type definitions for the PatternGraphAPI query interface.
  * Designed for programmatic access by Claude Code and other tools.
  *
  * ### When to Use
  *
- * - Import types when working with ProcessStateAPI responses
+ * - Import types when working with PatternGraphAPI responses
  * - Use QueryResult<T> for typed response handling
  */
 
 import type { DeliverableStatus, ProcessStatusValue } from '../taxonomy/index.js';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
-import type { ImplementationRef } from '../validation-schemas/master-dataset.js';
+import type { ImplementationRef } from '../validation-schemas/pattern-graph.js';
 
 // =============================================================================
 // Query Response Types
@@ -159,8 +159,8 @@ export interface PatternDependencies {
 /**
  * Complete pattern relationships (includes all relationship types)
  *
- * Used by ProcessStateAPI.getPatternRelationships() to expose the full
- * relationship graph from the MasterDataset's relationshipIndex.
+ * Used by PatternGraphAPI.getPatternRelationships() to expose the full
+ * relationship graph from the PatternGraph's relationshipIndex.
  */
 export interface PatternRelationships {
   /** Patterns this pattern depends on (from @architect-depends-on) */

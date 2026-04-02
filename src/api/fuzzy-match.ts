@@ -4,7 +4,7 @@
  * @architect-pattern FuzzyMatcherImpl
  * @architect-status active
  * @architect-implements DataAPIOutputShaping
- * @architect-used-by ProcessAPICLIImpl
+ * @architect-used-by PatternGraphCLIImpl
  * @architect-arch-role service
  * @architect-arch-context api
  * @architect-arch-layer application

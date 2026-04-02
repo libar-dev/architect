@@ -21,9 +21,9 @@ import {
   SessionFindingsCodec,
 } from '../../../../src/renderable/codecs/planning.js';
 import type { RenderableDocument, TableBlock } from '../../../../src/renderable/schema.js';
-import type { MasterDataset } from '../../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../../src/validation-schemas/pattern-graph.js';
 import {
-  createTestMasterDataset,
+  createTestPatternGraph,
   createTestPattern,
   resetPatternCounter,
 } from '../../../fixtures/dataset-factories.js';
@@ -42,7 +42,7 @@ import type { DataTableRow } from '../../../support/world.js';
 // =============================================================================
 
 interface PlanningCodecState {
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   document: RenderableDocument | null;
 }
 
@@ -136,7 +136,7 @@ function findSectionList(doc: RenderableDocument, sectionName: string): string[]
 // Dataset Factories
 // =============================================================================
 
-function createDatasetWithNoActionablePhases(): MasterDataset {
+function createDatasetWithNoActionablePhases(): PatternGraph {
   const patterns = [
     createTestPattern({
       name: 'Completed Pattern',
@@ -144,10 +144,10 @@ function createDatasetWithNoActionablePhases(): MasterDataset {
       phase: 1,
     }),
   ];
-  return createTestMasterDataset({ patterns });
+  return createTestPatternGraph({ patterns });
 }
 
-function createDatasetWithPlanningPatterns(): MasterDataset {
+function createDatasetWithPlanningPatterns(): PatternGraph {
   const patterns = [
     createTestPattern({
       name: 'Foundation Pattern',
@@ -165,10 +165,10 @@ function createDatasetWithPlanningPatterns(): MasterDataset {
       phase: 3,
     }),
   ];
-  return createTestMasterDataset({ patterns });
+  return createTestPatternGraph({ patterns });
 }
 
-function createDatasetWithDeliverables(): MasterDataset {
+function createDatasetWithDeliverables(): PatternGraph {
   const patterns = [
     createTestPattern({
       name: 'Pattern With Deliverables',
@@ -180,10 +180,10 @@ function createDatasetWithDeliverables(): MasterDataset {
       ],
     }),
   ];
-  return createTestMasterDataset({ patterns });
+  return createTestPatternGraph({ patterns });
 }
 
-function createDatasetWithScenarios(): MasterDataset {
+function createDatasetWithScenarios(): PatternGraph {
   const pattern = createTestPattern({
     name: 'Pattern With Scenarios',
     status: 'active',
@@ -219,10 +219,10 @@ function createDatasetWithScenarios(): MasterDataset {
       steps: [{ keyword: 'Given', text: 'a logged in user' }],
     },
   ];
-  return createTestMasterDataset({ patterns: [pattern] });
+  return createTestPatternGraph({ patterns: [pattern] });
 }
 
-function createDatasetWithDependencies(): MasterDataset {
+function createDatasetWithDependencies(): PatternGraph {
   const patterns = [
     createTestPattern({
       name: 'Completed Dependency',
@@ -241,10 +241,10 @@ function createDatasetWithDependencies(): MasterDataset {
       phase: 2,
     }),
   ];
-  return createTestMasterDataset({ patterns });
+  return createTestPatternGraph({ patterns });
 }
 
-function createDatasetWithActiveAndPlanned(): MasterDataset {
+function createDatasetWithActiveAndPlanned(): PatternGraph {
   const patterns = [
     createTestPattern({
       name: 'Completed Base',
@@ -267,10 +267,10 @@ function createDatasetWithActiveAndPlanned(): MasterDataset {
       phase: 3,
     }),
   ];
-  return createTestMasterDataset({ patterns });
+  return createTestPatternGraph({ patterns });
 }
 
-function createDatasetWithOnlyCompleted(): MasterDataset {
+function createDatasetWithOnlyCompleted(): PatternGraph {
   const patterns = [
     createTestPattern({
       name: 'Completed Pattern 1',
@@ -283,10 +283,10 @@ function createDatasetWithOnlyCompleted(): MasterDataset {
       phase: 1,
     }),
   ];
-  return createTestMasterDataset({ patterns });
+  return createTestPatternGraph({ patterns });
 }
 
-function createDatasetWithUseCases(): MasterDataset {
+function createDatasetWithUseCases(): PatternGraph {
   const patterns = [
     createTestPattern({
       name: 'Pattern With Use Cases',
@@ -299,10 +299,10 @@ function createDatasetWithUseCases(): MasterDataset {
       ],
     }),
   ];
-  return createTestMasterDataset({ patterns });
+  return createTestPatternGraph({ patterns });
 }
 
-function createDatasetWithRules(): MasterDataset {
+function createDatasetWithRules(): PatternGraph {
   const pattern = createTestPattern({
     name: 'Pattern With Rules',
     status: 'active',
@@ -329,10 +329,10 @@ function createDatasetWithRules(): MasterDataset {
       scenarioNames: ['Valid order', 'Empty order', 'Invalid quantity'],
     },
   ];
-  return createTestMasterDataset({ patterns: [pattern] });
+  return createTestPatternGraph({ patterns: [pattern] });
 }
 
-function createDatasetWithoutFindings(): MasterDataset {
+function createDatasetWithoutFindings(): PatternGraph {
   const patterns = [
     createTestPattern({
       name: 'Completed Pattern',
@@ -340,10 +340,10 @@ function createDatasetWithoutFindings(): MasterDataset {
       phase: 1,
     }),
   ];
-  return createTestMasterDataset({ patterns });
+  return createTestPatternGraph({ patterns });
 }
 
-function createDatasetWithFindings(): MasterDataset {
+function createDatasetWithFindings(): PatternGraph {
   const pattern1 = createTestPattern({
     name: 'Pattern With Findings',
     status: 'completed',
@@ -366,10 +366,10 @@ function createDatasetWithFindings(): MasterDataset {
   ];
   patternWithFindings.risk = 'Scaling concerns';
 
-  return createTestMasterDataset({ patterns: [pattern1] });
+  return createTestPatternGraph({ patterns: [pattern1] });
 }
 
-function createDatasetWithDiscoveredGaps(): MasterDataset {
+function createDatasetWithDiscoveredGaps(): PatternGraph {
   const pattern = createTestPattern({
     name: 'Pattern With Gaps',
     status: 'completed',
@@ -379,10 +379,10 @@ function createDatasetWithDiscoveredGaps(): MasterDataset {
     'Gap 1: Missing validation',
     'Gap 2: No error messages',
   ];
-  return createTestMasterDataset({ patterns: [pattern] });
+  return createTestPatternGraph({ patterns: [pattern] });
 }
 
-function createDatasetWithDiscoveredImprovements(): MasterDataset {
+function createDatasetWithDiscoveredImprovements(): PatternGraph {
   const pattern = createTestPattern({
     name: 'Pattern With Improvements',
     status: 'completed',
@@ -392,10 +392,10 @@ function createDatasetWithDiscoveredImprovements(): MasterDataset {
     'Improvement 1: Add caching',
     'Improvement 2: Optimize queries',
   ];
-  return createTestMasterDataset({ patterns: [pattern] });
+  return createTestPatternGraph({ patterns: [pattern] });
 }
 
-function createDatasetWithDiscoveredRisks(): MasterDataset {
+function createDatasetWithDiscoveredRisks(): PatternGraph {
   const pattern = createTestPattern({
     name: 'Pattern With Risks',
     status: 'completed',
@@ -407,10 +407,10 @@ function createDatasetWithDiscoveredRisks(): MasterDataset {
   };
   patternWithRisks.discoveredRisks = ['Risk 1: Security vulnerability'];
   patternWithRisks.risk = 'Risk 2: Performance issue';
-  return createTestMasterDataset({ patterns: [pattern] });
+  return createTestPatternGraph({ patterns: [pattern] });
 }
 
-function createDatasetWithDiscoveredLearnings(): MasterDataset {
+function createDatasetWithDiscoveredLearnings(): PatternGraph {
   const pattern = createTestPattern({
     name: 'Pattern With Learnings',
     status: 'completed',
@@ -420,10 +420,10 @@ function createDatasetWithDiscoveredLearnings(): MasterDataset {
     'Learning 1: Use composition',
     'Learning 2: Prefer immutability',
   ];
-  return createTestMasterDataset({ patterns: [pattern] });
+  return createTestPatternGraph({ patterns: [pattern] });
 }
 
-function createDatasetWithFindingsAcrossPhases(): MasterDataset {
+function createDatasetWithFindingsAcrossPhases(): PatternGraph {
   const pattern1 = createTestPattern({
     name: 'Phase 1 Pattern',
     status: 'completed',
@@ -438,7 +438,7 @@ function createDatasetWithFindingsAcrossPhases(): MasterDataset {
   });
   (pattern2 as unknown as { discoveredGaps: string[] }).discoveredGaps = ['Phase 2 gap'];
 
-  return createTestMasterDataset({ patterns: [pattern1, pattern2] });
+  return createTestPatternGraph({ patterns: [pattern1, pattern2] });
 }
 
 // =============================================================================
@@ -464,7 +464,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('PlanningChecklistCodec prepares for implementation sessions', ({ RuleScenario }) => {
     RuleScenario('No actionable phases produces empty message', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with no actionable phases', () => {
+      Given('a PatternGraph with no actionable phases', () => {
         state!.dataset = createDatasetWithNoActionablePhases();
       });
 
@@ -483,7 +483,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Summary shows phases to plan count', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with planning patterns', () => {
+      Given('a PatternGraph with planning patterns', () => {
         state!.dataset = createDatasetWithPlanningPatterns();
       });
 
@@ -510,7 +510,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Pre-planning questions section', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with planning patterns', () => {
+      Given('a PatternGraph with planning patterns', () => {
         state!.dataset = createDatasetWithPlanningPatterns();
       });
 
@@ -538,7 +538,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Definition of Done with deliverables', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with patterns with deliverables', () => {
+      Given('a PatternGraph with patterns with deliverables', () => {
         state!.dataset = createDatasetWithDeliverables();
       });
 
@@ -560,7 +560,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Acceptance criteria from scenarios', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with patterns with scenarios', () => {
+      Given('a PatternGraph with patterns with scenarios', () => {
         state!.dataset = createDatasetWithScenarios();
       });
 
@@ -582,7 +582,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Risk assessment section', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with planning patterns', () => {
+      Given('a PatternGraph with planning patterns', () => {
         state!.dataset = createDatasetWithPlanningPatterns();
       });
 
@@ -611,7 +611,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Dependency status shows met vs unmet', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with patterns with dependencies', () => {
+      Given('a PatternGraph with patterns with dependencies', () => {
         state!.dataset = createDatasetWithDependencies();
       });
 
@@ -638,7 +638,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('forActivePhases option', ({ Given, When, Then }) => {
-      Given('a MasterDataset with active and planned patterns', () => {
+      Given('a PatternGraph with active and planned patterns', () => {
         state!.dataset = createDatasetWithActiveAndPlanned();
       });
 
@@ -658,7 +658,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('forNextActionable option', ({ Given, When, Then }) => {
-      Given('a MasterDataset with active and planned patterns', () => {
+      Given('a PatternGraph with active and planned patterns', () => {
         state!.dataset = createDatasetWithActiveAndPlanned();
       });
 
@@ -684,7 +684,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('SessionPlanCodec generates implementation plans', ({ RuleScenario }) => {
     RuleScenario('No phases to plan produces empty message', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with only completed patterns', () => {
+      Given('a PatternGraph with only completed patterns', () => {
         state!.dataset = createDatasetWithOnlyCompleted();
       });
 
@@ -703,7 +703,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Summary shows status counts', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with planning patterns', () => {
+      Given('a PatternGraph with planning patterns', () => {
         state!.dataset = createDatasetWithPlanningPatterns();
       });
 
@@ -730,7 +730,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Implementation approach from useCases', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with patterns with useCases', () => {
+      Given('a PatternGraph with patterns with useCases', () => {
         state!.dataset = createDatasetWithUseCases();
       });
 
@@ -752,7 +752,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Deliverables rendering', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with patterns with deliverables', () => {
+      Given('a PatternGraph with patterns with deliverables', () => {
         state!.dataset = createDatasetWithDeliverables();
       });
 
@@ -782,7 +782,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Acceptance criteria with steps', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with patterns with scenarios', () => {
+      Given('a PatternGraph with patterns with scenarios', () => {
         state!.dataset = createDatasetWithScenarios();
       });
 
@@ -804,7 +804,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Business rules section', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with patterns with rules', () => {
+      Given('a PatternGraph with patterns with rules', () => {
         state!.dataset = createDatasetWithRules();
       });
 
@@ -826,7 +826,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('statusFilter option for active only', ({ Given, When, Then }) => {
-      Given('a MasterDataset with planning patterns', () => {
+      Given('a PatternGraph with planning patterns', () => {
         state!.dataset = createDatasetWithPlanningPatterns();
       });
 
@@ -843,7 +843,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('statusFilter option for planned only', ({ Given, When, Then }) => {
-      Given('a MasterDataset with planning patterns', () => {
+      Given('a PatternGraph with planning patterns', () => {
         state!.dataset = createDatasetWithPlanningPatterns();
       });
 
@@ -866,7 +866,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('SessionFindingsCodec captures retrospective discoveries', ({ RuleScenario }) => {
     RuleScenario('No findings produces empty message', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with patterns without findings', () => {
+      Given('a PatternGraph with patterns without findings', () => {
         state!.dataset = createDatasetWithoutFindings();
       });
 
@@ -885,7 +885,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Summary shows finding type counts', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with patterns with findings', () => {
+      Given('a PatternGraph with patterns with findings', () => {
         state!.dataset = createDatasetWithFindings();
       });
 
@@ -912,7 +912,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Gaps section', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with patterns with discovered gaps', () => {
+      Given('a PatternGraph with patterns with discovered gaps', () => {
         state!.dataset = createDatasetWithDiscoveredGaps();
       });
 
@@ -934,7 +934,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Improvements section', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with patterns with discovered improvements', () => {
+      Given('a PatternGraph with patterns with discovered improvements', () => {
         state!.dataset = createDatasetWithDiscoveredImprovements();
       });
 
@@ -956,7 +956,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Risks section includes risk field', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with patterns with discovered risks', () => {
+      Given('a PatternGraph with patterns with discovered risks', () => {
         state!.dataset = createDatasetWithDiscoveredRisks();
       });
 
@@ -980,7 +980,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Learnings section', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with patterns with discovered learnings', () => {
+      Given('a PatternGraph with patterns with discovered learnings', () => {
         state!.dataset = createDatasetWithDiscoveredLearnings();
       });
 
@@ -1002,7 +1002,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('groupBy category option', ({ Given, When, Then }) => {
-      Given('a MasterDataset with patterns with findings', () => {
+      Given('a PatternGraph with patterns with findings', () => {
         state!.dataset = createDatasetWithFindings();
       });
 
@@ -1021,7 +1021,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('groupBy phase option', ({ Given, When, Then }) => {
-      Given('a MasterDataset with patterns with findings', () => {
+      Given('a PatternGraph with patterns with findings', () => {
         state!.dataset = createDatasetWithFindingsAcrossPhases();
       });
 
@@ -1039,7 +1039,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('groupBy type option', ({ Given, When, Then }) => {
-      Given('a MasterDataset with patterns with findings', () => {
+      Given('a PatternGraph with patterns with findings', () => {
         state!.dataset = createDatasetWithFindings();
       });
 
@@ -1059,7 +1059,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('showSourcePhase option enabled', ({ Given, When, Then }) => {
-      Given('a MasterDataset with patterns with findings', () => {
+      Given('a PatternGraph with patterns with findings', () => {
         state!.dataset = createDatasetWithFindingsAcrossPhases();
       });
 
@@ -1076,7 +1076,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('showSourcePhase option disabled', ({ Given, When, Then }) => {
-      Given('a MasterDataset with patterns with findings', () => {
+      Given('a PatternGraph with patterns with findings', () => {
         state!.dataset = createDatasetWithFindingsAcrossPhases();
       });
 

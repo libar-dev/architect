@@ -1,7 +1,7 @@
 /**
  * Data API CLI Cache Step Definitions
  *
- * BDD step definitions for testing MasterDataset caching
+ * BDD step definitions for testing PatternGraph caching
  * between CLI invocations: cache hits, mtime invalidation,
  * and --no-cache bypass.
  *
@@ -22,7 +22,7 @@ import {
   getResult,
   writePatternFiles,
   createTempDir,
-} from '../../support/helpers/process-api-state.js';
+} from '../../support/helpers/pattern-graph-api-state.js';
 
 // =============================================================================
 // Extended State for Cache Tests
@@ -104,17 +104,17 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   });
 
   // ---------------------------------------------------------------------------
-  // Rule: MasterDataset is cached between invocations
+  // Rule: PatternGraph is cached between invocations
   // ---------------------------------------------------------------------------
 
-  Rule('MasterDataset is cached between invocations', ({ RuleScenario }) => {
+  Rule('PatternGraph is cached between invocations', ({ RuleScenario }) => {
     RuleScenario('Second query uses cached dataset', ({ Given, When, Then, And }) => {
       Given('TypeScript files with pattern annotations', async () => {
         await writePatternFiles(state);
       });
 
       When('running status and capturing the first result', async () => {
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' status", {
+        await runCLICommand(state, "pattern-graph-cli -i 'src/**/*.ts' status", {
           timeout: CACHE_QUERY_TIMEOUT_MS,
         });
         getCacheState(state).firstResult = getResult(state);
@@ -123,7 +123,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       And('running status and capturing the second result', async () => {
         // Reset result before the second run
         getCacheState(state).result = null;
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' status", {
+        await runCLICommand(state, "pattern-graph-cli -i 'src/**/*.ts' status", {
           timeout: CACHE_QUERY_TIMEOUT_MS,
         });
         getCacheState(state).secondResult = getResult(state);
@@ -153,7 +153,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       When('running status and capturing the first result', async () => {
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' status", {
+        await runCLICommand(state, "pattern-graph-cli -i 'src/**/*.ts' status", {
           timeout: CACHE_QUERY_TIMEOUT_MS,
         });
         getCacheState(state).firstResult = getResult(state);
@@ -170,7 +170,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
       And('running status and capturing the second result', async () => {
         getCacheState(state).result = null;
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' status", {
+        await runCLICommand(state, "pattern-graph-cli -i 'src/**/*.ts' status", {
           timeout: CACHE_QUERY_TIMEOUT_MS,
         });
         getCacheState(state).secondResult = getResult(state);
@@ -190,7 +190,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       When('running status and capturing the first result', async () => {
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' status", {
+        await runCLICommand(state, "pattern-graph-cli -i 'src/**/*.ts' status", {
           timeout: CACHE_QUERY_TIMEOUT_MS,
         });
         getCacheState(state).firstResult = getResult(state);
@@ -198,7 +198,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
       And('running status with --no-cache and capturing the second result', async () => {
         getCacheState(state).result = null;
-        await runCLICommand(state, "process-api -i 'src/**/*.ts' --no-cache status", {
+        await runCLICommand(state, "pattern-graph-cli -i 'src/**/*.ts' --no-cache status", {
           timeout: CACHE_QUERY_TIMEOUT_MS,
         });
         getCacheState(state).secondResult = getResult(state);

@@ -21,11 +21,11 @@ import {
   findUnusedTaxonomy,
   type UnusedTaxonomyReport,
 } from '../../../../src/api/coverage-analyzer.js';
-import type { RuntimeMasterDataset } from '../../../../src/generators/pipeline/transform-types.js';
+import type { RuntimePatternGraph } from '../../../../src/generators/pipeline/transform-types.js';
 import type { ExtractedPattern } from '../../../../src/validation-schemas/index.js';
 import {
   createTestPattern,
-  createTestMasterDataset,
+  createTestPatternGraph,
   resetPatternCounter,
 } from '../../../fixtures/dataset-factories.js';
 
@@ -36,7 +36,7 @@ const feature = await loadFeature('tests/features/api/architecture-queries/arch-
 // =============================================================================
 
 interface TestState {
-  dataset: RuntimeMasterDataset | null;
+  dataset: RuntimePatternGraph | null;
   patterns: ExtractedPattern[];
   neighborhood: NeighborhoodResult | undefined;
   comparison: ContextComparison | undefined;
@@ -62,7 +62,7 @@ function initState(): TestState {
 
 function buildDataset(): void {
   if (state === null) return;
-  state.dataset = createTestMasterDataset({ patterns: state.patterns });
+  state.dataset = createTestPatternGraph({ patterns: state.patterns });
 }
 
 // =============================================================================
@@ -514,7 +514,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         );
 
         And('{string} enables {string} via reverse computation', () => {
-          // Reverse computation happens in createTestMasterDataset -> transformToMasterDataset
+          // Reverse computation happens in createTestPatternGraph -> transformToPatternGraph
           buildDataset();
         });
 

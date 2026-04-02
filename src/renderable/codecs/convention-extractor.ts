@@ -1,7 +1,7 @@
 /**
  * Convention Extractor
  *
- * Filters MasterDataset for patterns tagged with `@architect-convention`
+ * Filters PatternGraph for patterns tagged with `@architect-convention`
  * and extracts convention content as structured data for reference codec
  * composition. Supports two sources:
  *
@@ -16,7 +16,7 @@
  * @see ReferenceDocShowcase spec
  */
 
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import type { BusinessRule, ExtractedPattern } from '../../validation-schemas/extracted-pattern.js';
 import type { SectionBlock } from '../schema.js';
 import { table } from '../schema.js';
@@ -311,14 +311,14 @@ function extractConventionRulesFromDescription(
 // ============================================================================
 
 /**
- * Extracts convention content from MasterDataset.
+ * Extracts convention content from PatternGraph.
  *
  * Filters patterns tagged with `@architect-convention` matching the
  * requested tag values. For Gherkin-sourced patterns, extracts from
  * Rule: blocks. For TypeScript-sourced patterns (no rules array),
  * decomposes the JSDoc description by ## headings.
  *
- * @param dataset - The MasterDataset containing all extracted patterns
+ * @param dataset - The PatternGraph containing all extracted patterns
  * @param conventionTags - Convention tag values to filter by
  * @returns Array of ConventionBundles, one per requested tag value
  *
@@ -331,7 +331,7 @@ function extractConventionRulesFromDescription(
  * ```
  */
 export function extractConventions(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   conventionTags: readonly string[]
 ): ConventionBundle[] {
   if (conventionTags.length === 0) return [];

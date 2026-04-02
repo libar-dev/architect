@@ -12,18 +12,18 @@ import { expect } from 'vitest';
 import type { GeneratorOutput } from '../../../src/generators/types.js';
 import { createDesignReviewGenerator } from '../../../src/generators/built-in/design-review-generator.js';
 import { createDefaultTagRegistry } from '../../../src/validation-schemas/tag-registry.js';
-import type { RuntimeMasterDataset } from '../../../src/generators/pipeline/transform-types.js';
+import type { RuntimePatternGraph } from '../../../src/generators/pipeline/transform-types.js';
 import {
   createTempDir,
   writeTempFile,
   type TempDirContext,
 } from '../../support/helpers/file-system.js';
-import { createTestMasterDataset, createTestPattern } from '../../fixtures/dataset-factories.js';
+import { createTestPatternGraph, createTestPattern } from '../../fixtures/dataset-factories.js';
 import { createSequenceRule } from '../../support/helpers/design-review-state.js';
 
 interface DesignReviewGeneratorState {
   tempContext: TempDirContext | null;
-  dataset: RuntimeMasterDataset | null;
+  dataset: RuntimePatternGraph | null;
   output: GeneratorOutput | null;
 }
 
@@ -88,7 +88,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
               ],
             });
 
-            requireState().dataset = createTestMasterDataset({ patterns: [pattern] });
+            requireState().dataset = createTestPatternGraph({ patterns: [pattern] });
           }
         );
 
@@ -102,7 +102,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
             baseDir: current.tempContext!.tempDir,
             outputDir: '.',
             registry: createDefaultTagRegistry(),
-            masterDataset: current.dataset,
+            patternGraph: current.dataset,
           });
         });
 

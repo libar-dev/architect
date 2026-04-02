@@ -1,11 +1,11 @@
 @architect
-@architect-pattern:ProcessApiCliCore
-@architect-implements:ProcessApiCli
+@architect-pattern:PatternGraphCliCore
+@architect-implements:PatternGraphAPICLI
 @architect-status:completed
 @architect-unlock-reason:'Split-from-original'
 @architect-product-area:DataAPI
-@cli @process-api
-Feature: Process API CLI - Core Infrastructure
+@cli @pattern-graph-cli
+Feature: Pattern Graph CLI - Core Infrastructure
   Core CLI infrastructure: help, version, input validation, status, query, pattern, arch basics, missing args, edge cases.
 
   Background:
@@ -22,18 +22,18 @@ Feature: Process API CLI - Core Infrastructure
 
     @happy-path
     Scenario: Display help with --help flag
-      When running "process-api --help"
+      When running "pattern-graph-cli --help"
       Then exit code is 0
       And stdout contains "Usage:"
 
     @happy-path
     Scenario: Display version with -v flag
-      When running "process-api -v"
+      When running "pattern-graph-cli -v"
       Then exit code is 0
 
     @validation
     Scenario: No subcommand shows help
-      When running "process-api -i 'src/**/*.ts'"
+      When running "pattern-graph-cli -i 'src/**/*.ts'"
       Then exit code is 1
       And output contains "Usage:"
 
@@ -48,7 +48,7 @@ Feature: Process API CLI - Core Infrastructure
 
     @validation
     Scenario: Fail without --input flag when running status
-      When running "process-api status"
+      When running "pattern-graph-cli status"
       Then exit code is 1
       And output contains "--input"
 
@@ -56,13 +56,13 @@ Feature: Process API CLI - Core Infrastructure
     Scenario: Use architect.config.js sources when --input is omitted
       Given TypeScript files with pattern annotations
       And an architect.config.js with TypeScript sources
-      When running "process-api status"
+      When running "pattern-graph-cli status"
       Then exit code is 0
       And stdout is valid JSON with key "success"
 
     @validation
     Scenario: Reject unknown options
-      When running "process-api --unknown-flag"
+      When running "pattern-graph-cli --unknown-flag"
       Then exit code is 1
       And output contains "Unknown option"
 
@@ -72,13 +72,13 @@ Feature: Process API CLI - Core Infrastructure
 
   Rule: CLI status subcommand shows delivery state
 
-    **Invariant:** The status subcommand must return structured JSON containing delivery progress derived from the MasterDataset.
+    **Invariant:** The status subcommand must return structured JSON containing delivery progress derived from the PatternGraph.
     **Rationale:** Consumers depend on machine-readable status output for scripting and CI integration; unstructured output breaks downstream automation.
 
     @happy-path
     Scenario: Status shows counts and completion percentage
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' status"
+      When running "pattern-graph-cli -i 'src/**/*.ts' status"
       Then exit code is 0
       And stdout is valid JSON with key "success"
 
@@ -94,21 +94,21 @@ Feature: Process API CLI - Core Infrastructure
     @happy-path
     Scenario: Query getStatusCounts returns count object
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' query getStatusCounts"
+      When running "pattern-graph-cli -i 'src/**/*.ts' query getStatusCounts"
       Then exit code is 0
       And stdout is valid JSON
 
     @happy-path
     Scenario: Query isValidTransition with arguments
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' query isValidTransition roadmap active"
+      When running "pattern-graph-cli -i 'src/**/*.ts' query isValidTransition roadmap active"
       Then exit code is 0
       And stdout is valid JSON
 
     @validation
     Scenario: Unknown API method shows error
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' query nonExistentMethod"
+      When running "pattern-graph-cli -i 'src/**/*.ts' query nonExistentMethod"
       Then exit code is 1
       And output contains "Unknown"
 
@@ -124,7 +124,7 @@ Feature: Process API CLI - Core Infrastructure
     @happy-path
     Scenario: Pattern lookup returns full detail
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' pattern CompletedPattern"
+      When running "pattern-graph-cli -i 'src/**/*.ts' pattern CompletedPattern"
       Then exit code is 0
       And stdout is valid JSON
       And stdout contains "CompletedPattern"
@@ -132,7 +132,7 @@ Feature: Process API CLI - Core Infrastructure
     @validation
     Scenario: Pattern not found shows error
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' pattern NonExistent"
+      When running "pattern-graph-cli -i 'src/**/*.ts' pattern NonExistent"
       Then exit code is 1
       And output contains "not found"
 
@@ -142,27 +142,27 @@ Feature: Process API CLI - Core Infrastructure
 
   Rule: CLI arch subcommand queries architecture
 
-    **Invariant:** The arch subcommand must expose role, bounded context, and layer queries over the MasterDataset's architecture metadata.
+    **Invariant:** The arch subcommand must expose role, bounded context, and layer queries over the PatternGraph's architecture metadata.
     **Rationale:** Architecture queries replace manual exploration of annotated sources; missing or incorrect results lead to wrong structural assumptions during design sessions.
 
     @happy-path
     Scenario: Arch roles lists roles with counts
       Given TypeScript files with architecture annotations
-      When running "process-api -i 'src/**/*.ts' arch roles"
+      When running "pattern-graph-cli -i 'src/**/*.ts' arch roles"
       Then exit code is 0
       And stdout is valid JSON
 
     @happy-path
     Scenario: Arch context filters to bounded context
       Given TypeScript files with architecture annotations
-      When running "process-api -i 'src/**/*.ts' arch context testctx"
+      When running "pattern-graph-cli -i 'src/**/*.ts' arch context testctx"
       Then exit code is 0
       And stdout is valid JSON
 
     @happy-path
     Scenario: Arch layer lists layers with counts
       Given TypeScript files with architecture annotations
-      When running "process-api -i 'src/**/*.ts' arch layer"
+      When running "pattern-graph-cli -i 'src/**/*.ts' arch layer"
       Then exit code is 0
       And stdout is valid JSON
 
@@ -178,21 +178,21 @@ Feature: Process API CLI - Core Infrastructure
     @validation
     Scenario: Query without method name shows error
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' query"
+      When running "pattern-graph-cli -i 'src/**/*.ts' query"
       Then exit code is 1
       And output contains "Usage:"
 
     @validation
     Scenario: Pattern without name shows error
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' pattern"
+      When running "pattern-graph-cli -i 'src/**/*.ts' pattern"
       Then exit code is 1
       And output contains "Usage:"
 
     @validation
     Scenario: Unknown subcommand shows error
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' foobar"
+      When running "pattern-graph-cli -i 'src/**/*.ts' foobar"
       Then exit code is 1
       And output contains "Unknown subcommand"
 
@@ -208,10 +208,10 @@ Feature: Process API CLI - Core Infrastructure
     @edge-case
     Scenario: Integer arguments are coerced for phase queries
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' query getPatternsByPhase 1"
+      When running "pattern-graph-cli -i 'src/**/*.ts' query getPatternsByPhase 1"
       Then exit code is 0
 
     @edge-case
     Scenario: Double-dash separator is handled gracefully
-      When running "process-api -- --help"
+      When running "pattern-graph-cli -- --help"
       Then exit code is 0

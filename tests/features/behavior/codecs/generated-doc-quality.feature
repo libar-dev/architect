@@ -77,5 +77,5 @@ Feature: Generated Documentation Quality Improvements
         | Term |
         | Scanner |
         | Codec |
-        | MasterDataset |
+        | PatternGraph |
         | RenderableDocument |

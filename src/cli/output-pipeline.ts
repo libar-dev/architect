@@ -5,7 +5,7 @@
  * @architect-status active
  * @architect-implements DataAPIOutputShaping
  * @architect-uses PatternSummarizerImpl
- * @architect-used-by ProcessAPICLIImpl
+ * @architect-used-by PatternGraphCLIImpl
  * @architect-arch-role service
  * @architect-arch-context cli
  * @architect-arch-layer application
@@ -24,7 +24,7 @@
  */
 
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
-import type { MasterDataset } from '../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../validation-schemas/pattern-graph.js';
 import { QueryApiError } from '../api/types.js';
 import type { QueryResult } from '../api/types.js';
 import { summarizePatterns, SUMMARY_FIELDS, deriveSource } from '../api/summarize.js';
@@ -104,7 +104,7 @@ export type PipelineInput =
   | { readonly kind: 'scalar'; readonly data: unknown };
 
 /**
- * Set of ProcessStateAPI method names that return ExtractedPattern[].
+ * Set of PatternGraphAPI method names that return ExtractedPattern[].
  *
  * Used by the router to tag results with `kind: 'patterns'` for the pipeline.
  */
@@ -223,7 +223,7 @@ export function applyOutputPipeline(input: PipelineInput, modifiers: OutputModif
  * Pagination (offset/limit) applies after all filters.
  */
 export function applyListFilters(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   filters: ListFilters
 ): readonly ExtractedPattern[] {
   let candidates: readonly ExtractedPattern[] = dataset.patterns;

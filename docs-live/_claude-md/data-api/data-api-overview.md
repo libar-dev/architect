@@ -18,7 +18,7 @@
 
 #### Shared Pipeline Factory Responsibilities
 
-**Invariant:** `buildMasterDataset()` is the shared factory for Steps 1-8 of the architecture pipeline and returns `Result<PipelineResult, PipelineError>` without process-level side effects.
+**Invariant:** `buildPatternGraph()` is the shared factory for Steps 1-8 of the architecture pipeline and returns `Result<PipelineResult, PipelineError>` without process-level side effects.
 
 #### 8-Step Dataset Build Flow
 
@@ -30,7 +30,7 @@
 | ----------------------- | --------- |
 | PipelineOptions         | interface |
 | PipelineResult          | interface |
-| MasterDatasetSchema     | const     |
+| PatternGraphSchema      | const     |
 | StatusGroupsSchema      | const     |
 | StatusCountsSchema      | const     |
 | PhaseGroupSchema        | const     |

@@ -36,4 +36,4 @@ When pattern exists in both TypeScript AND feature file:
 
 **Warning:** If TypeScript file is missing `@architect-status`, the pattern data is **ignored** and not merged with feature file.
 
-**Implementation:** `mergePatterns()` in `src/generators/pipeline/merge-patterns.ts`. Conflict strategy is per-consumer: `fatal` (orchestrator/process-api) or `concatenate` (validator).
+**Implementation:** `mergePatterns()` in `src/generators/pipeline/merge-patterns.ts`. Conflict strategy is per-consumer: `fatal` (orchestrator/pattern-graph-cli) or `concatenate` (validator).

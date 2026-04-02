@@ -6,7 +6,7 @@
 @architect-product-area:Generation
 @behavior @patterns-codec
 Feature: Patterns Document Codec
-  The PatternsDocumentCodec transforms MasterDataset into a RenderableDocument
+  The PatternsDocumentCodec transforms PatternGraph into a RenderableDocument
   for generating PATTERNS.md and category detail files.
 
   **Problem:**
@@ -14,7 +14,7 @@ Feature: Patterns Document Codec
   - Output should include progress tracking, navigation, and categorization
 
   **Solution:**
-  - Codec transforms MasterDataset → RenderableDocument in a single decode call
+  - Codec transforms PatternGraph → RenderableDocument in a single decode call
   - Generates main document with optional category detail files
 
   Background:
@@ -28,7 +28,7 @@ Feature: Patterns Document Codec
 
     @happy-path @edge-case
     Scenario: Decode empty dataset
-      Given an empty MasterDataset
+      Given an empty PatternGraph
       When decoding with PatternsDocumentCodec
       Then the document title is "Pattern Registry"
       And the document has a purpose
@@ -36,7 +36,7 @@ Feature: Patterns Document Codec
 
     @happy-path
     Scenario: Decode dataset with patterns - document structure
-      Given a MasterDataset with 5 patterns across 2 categories
+      Given a PatternGraph with 5 patterns across 2 categories
       When decoding with PatternsDocumentCodec
       Then the document title is "Pattern Registry"
       And the document contains sections:
@@ -47,7 +47,7 @@ Feature: Patterns Document Codec
 
     @happy-path
     Scenario: Progress summary shows correct counts
-      Given a MasterDataset with status distribution:
+      Given a PatternGraph with status distribution:
         | status    | count |
         | completed | 3     |
         | active    | 2     |
@@ -69,7 +69,7 @@ Feature: Patterns Document Codec
 
     @happy-path
     Scenario: Pattern table includes all patterns
-      Given a MasterDataset with 4 patterns
+      Given a PatternGraph with 4 patterns
       When decoding with PatternsDocumentCodec
       Then the pattern table has 4 rows
       And the pattern table has columns:
@@ -80,7 +80,7 @@ Feature: Patterns Document Codec
         | Description |
 
     Scenario: Pattern table is sorted by status then name
-      Given a MasterDataset with patterns:
+      Given a PatternGraph with patterns:
         | name      | status    |
         | Zebra     | completed |
         | Alpha     | roadmap   |
@@ -102,7 +102,7 @@ Feature: Patterns Document Codec
 
     @happy-path
     Scenario: Category sections with pattern lists
-      Given a MasterDataset with patterns in categories:
+      Given a PatternGraph with patterns in categories:
         | category | count |
         | core     | 3     |
         | ddd      | 2     |
@@ -113,7 +113,7 @@ Feature: Patterns Document Codec
         | ddd      | 2            |
 
     Scenario: Filter to specific categories
-      Given a MasterDataset with patterns in categories:
+      Given a PatternGraph with patterns in categories:
         | category | count |
         | core     | 3     |
         | ddd      | 2     |
@@ -132,17 +132,17 @@ Feature: Patterns Document Codec
     **Verified by:** Dependency graph included when relationships exist, No dependency graph when no relationships, Dependency graph disabled by option
 
     Scenario: Dependency graph included when relationships exist
-      Given a MasterDataset with pattern relationships
+      Given a PatternGraph with pattern relationships
       When decoding with default options
       Then the document contains a mermaid dependency graph
 
     Scenario: No dependency graph when no relationships
-      Given a MasterDataset without relationships
+      Given a PatternGraph without relationships
       When decoding with default options
       Then the document does not contain a mermaid block
 
     Scenario: Dependency graph disabled by option
-      Given a MasterDataset with pattern relationships
+      Given a PatternGraph with pattern relationships
       When decoding with includeDependencyGraph disabled
       Then the document does not contain a mermaid block
 
@@ -154,7 +154,7 @@ Feature: Patterns Document Codec
 
     @happy-path
     Scenario: Generate individual pattern files when enabled
-      Given a MasterDataset with named patterns:
+      Given a PatternGraph with named patterns:
         | name            | category |
         | Core Pattern    | core     |
         | Another Core    | core     |
@@ -169,13 +169,13 @@ Feature: Patterns Document Codec
       And pattern links point to individual files
 
     Scenario: No detail files when disabled
-      Given a MasterDataset with patterns in 2 categories
+      Given a PatternGraph with patterns in 2 categories
       When decoding with generateDetailFiles disabled
       Then the document has no additional files
       And category links are anchor links
 
     Scenario: Individual pattern file contains full details
-      Given a MasterDataset with a pattern named "Test Pattern" in category "core"
+      Given a PatternGraph with a pattern named "Test Pattern" in category "core"
       When decoding with generateDetailFiles enabled
       Then the "patterns/test-pattern.md" additional file exists
       And the pattern file has title containing "Test Pattern"

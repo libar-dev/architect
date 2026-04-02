@@ -225,7 +225,7 @@ Feature: Reference Document Showcase
     **Rationale:** The sample document is the integration test for the reference
     codec. If any block type is missing, there is no automated verification that
     the codec can produce it. Coverage of all 9 types validates the full
-    rendering pipeline from MasterDataset through codec through renderer.
+    rendering pipeline from PatternGraph through codec through renderer.
 
     **Verified by:** All 9 block types present in detailed output,
     Summary output uses compact block subset

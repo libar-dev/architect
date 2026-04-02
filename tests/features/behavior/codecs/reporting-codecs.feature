@@ -7,7 +7,7 @@
 @behavior @reporting-codecs
 Feature: Reporting Document Codecs
   The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
-  transform MasterDataset into RenderableDocuments for reporting outputs.
+  transform PatternGraph into RenderableDocuments for reporting outputs.
 
   **Problem:**
   - Need to generate changelog, traceability, and overview documents
@@ -34,14 +34,14 @@ Feature: Reporting Document Codecs
 
     @happy-path @edge-case
     Scenario: Decode empty dataset produces changelog header only
-      Given an empty MasterDataset for changelog
+      Given an empty PatternGraph for changelog
       When decoding with ChangelogCodec
       Then the document title is "Changelog"
       And the document contains Keep a Changelog header
 
     @happy-path
     Scenario: Unreleased section shows active and vNEXT patterns
-      Given a MasterDataset with unreleased patterns
+      Given a PatternGraph with unreleased patterns
       When decoding with ChangelogCodec
       Then the document contains "[Unreleased]" heading
       And the unreleased section contains active patterns
@@ -49,7 +49,7 @@ Feature: Reporting Document Codecs
 
     @happy-path
     Scenario: Release sections sorted by semver descending
-      Given a MasterDataset with multiple releases:
+      Given a PatternGraph with multiple releases:
         | release  | count |
         | v0.1.0   | 2     |
         | v0.2.0   | 3     |
@@ -63,19 +63,19 @@ Feature: Reporting Document Codecs
 
     @happy-path
     Scenario: Quarter fallback for patterns without release
-      Given a MasterDataset with completed patterns without release tag
+      Given a PatternGraph with completed patterns without release tag
       When decoding with ChangelogCodec
       Then the document contains quarterly sections
       And the quarterly sections contain patterns
 
     Scenario: Earlier section for undated patterns
-      Given a MasterDataset with undated completed patterns
+      Given a PatternGraph with undated completed patterns
       When decoding with ChangelogCodec
       Then the document contains "[Earlier]" heading
       And the earlier section contains undated patterns
 
     Scenario: Category mapping to change types
-      Given a MasterDataset with category-mapped patterns:
+      Given a PatternGraph with category-mapped patterns:
         | category   | expectedType |
         | fix        | Fixed        |
         | bugfix     | Fixed        |
@@ -86,12 +86,12 @@ Feature: Reporting Document Codecs
       Then each category maps to correct change type
 
     Scenario: Exclude unreleased when option disabled
-      Given a MasterDataset with unreleased patterns
+      Given a PatternGraph with unreleased patterns
       When decoding with includeUnreleased disabled
       Then the document does not contain "[Unreleased]" heading
 
     Scenario: Change type sections follow standard order
-      Given a MasterDataset with mixed change types
+      Given a PatternGraph with mixed change types
       When decoding with ChangelogCodec
       Then change type sections follow order:
         | type       |
@@ -114,14 +114,14 @@ Feature: Reporting Document Codecs
 
     @happy-path @edge-case
     Scenario: No timeline patterns produces empty message
-      Given a MasterDataset with no timeline patterns
+      Given a PatternGraph with no timeline patterns
       When decoding with TraceabilityCodec
       Then the document title is "Timeline → Behavior Traceability"
       And the document contains "No Timeline Patterns" heading
 
     @happy-path
     Scenario: Coverage statistics show totals and percentage
-      Given a MasterDataset with traceability patterns:
+      Given a PatternGraph with traceability patterns:
         | name       | phase | hasBehaviorFile |
         | Pattern A  | 1     | true            |
         | Pattern B  | 1     | true            |
@@ -136,37 +136,37 @@ Feature: Reporting Document Codecs
 
     @happy-path
     Scenario: Coverage gaps table shows missing coverage
-      Given a MasterDataset with coverage gaps
+      Given a PatternGraph with coverage gaps
       When decoding with TraceabilityCodec
       Then the document contains "Coverage Gaps" heading
       And the gaps table shows patterns without behavior files
 
     @happy-path
     Scenario: Covered phases in collapsible section
-      Given a MasterDataset with covered patterns
+      Given a PatternGraph with covered patterns
       When decoding with TraceabilityCodec
       Then the document contains covered phases collapsible
       And the covered phases table shows behavior file paths
 
     Scenario: Exclude gaps when option disabled
-      Given a MasterDataset with coverage gaps
+      Given a PatternGraph with coverage gaps
       When decoding with includeGaps disabled
       Then the document does not contain "Coverage Gaps" heading
 
     Scenario: Exclude stats when option disabled
-      Given a MasterDataset with traceability patterns:
+      Given a PatternGraph with traceability patterns:
         | name       | phase | hasBehaviorFile |
         | Pattern A  | 1     | true            |
       When decoding with includeStats disabled
       Then the document does not contain "Coverage Statistics" heading
 
     Scenario: Exclude covered when option disabled
-      Given a MasterDataset with covered patterns
+      Given a PatternGraph with covered patterns
       When decoding with includeCovered disabled
       Then the document does not contain covered phases collapsible
 
     Scenario: Verified behavior files indicated in output
-      Given a MasterDataset with verified behavior files
+      Given a PatternGraph with verified behavior files
       When decoding with TraceabilityCodec
       Then the covered patterns show verification status
 
@@ -182,21 +182,21 @@ Feature: Reporting Document Codecs
 
     @happy-path @edge-case
     Scenario: Decode empty dataset produces minimal overview
-      Given an empty MasterDataset for overview
+      Given an empty PatternGraph for overview
       When decoding with OverviewCodec
       Then the document title is "Architecture Overview"
       And the document has a purpose
 
     @happy-path
     Scenario: Architecture section from overview-tagged patterns
-      Given a MasterDataset with overview patterns
+      Given a PatternGraph with overview patterns
       When decoding with OverviewCodec
       Then the document contains "Architecture" heading
       And the architecture section contains overview pattern descriptions
 
     @happy-path
     Scenario: Patterns summary with progress bar
-      Given a MasterDataset with status distribution for overview:
+      Given a PatternGraph with status distribution for overview:
         | status    | count |
         | completed | 6     |
         | active    | 2     |
@@ -208,7 +208,7 @@ Feature: Reporting Document Codecs
 
     @happy-path
     Scenario: Timeline summary with phase counts
-      Given a MasterDataset with phased patterns
+      Given a PatternGraph with phased patterns
       When decoding with OverviewCodec
       Then the document contains "Timeline Summary" heading
       And the timeline summary table shows:
@@ -219,24 +219,24 @@ Feature: Reporting Document Codecs
         | Patterns        |
 
     Scenario: Exclude architecture when option disabled
-      Given a MasterDataset with overview patterns
+      Given a PatternGraph with overview patterns
       When decoding with includeArchitecture disabled
       Then the document does not contain "Architecture" heading
 
     Scenario: Exclude patterns summary when option disabled
-      Given a MasterDataset with status distribution for overview:
+      Given a PatternGraph with status distribution for overview:
         | status    | count |
         | completed | 5     |
       When decoding with includePatternsSummary disabled
       Then the document does not contain "Patterns Summary" heading
 
     Scenario: Exclude timeline summary when option disabled
-      Given a MasterDataset with phased patterns
+      Given a PatternGraph with phased patterns
       When decoding with includeTimelineSummary disabled
       Then the document does not contain "Timeline Summary" heading
 
     Scenario: Multiple overview patterns create multiple architecture subsections
-      Given a MasterDataset with multiple overview patterns:
+      Given a PatternGraph with multiple overview patterns:
         | name                | description              |
         | Event Store         | Core event persistence   |
         | Projection Engine   | Read model generation    |

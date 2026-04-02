@@ -1,7 +1,7 @@
 /**
  * Step definitions for Taxonomy Codec behavior tests
  *
- * Tests the Taxonomy Codec that transforms MasterDataset into a
+ * Tests the Taxonomy Codec that transforms PatternGraph into a
  * RenderableDocument for tag taxonomy reference documentation (TAXONOMY.md).
  */
 
@@ -12,8 +12,8 @@ import {
   type TaxonomyCodecOptions,
 } from '../../../src/renderable/codecs/taxonomy.js';
 import type { RenderableDocument, SectionBlock } from '../../../src/renderable/schema.js';
-import { createTestMasterDataset } from '../../fixtures/dataset-factories.js';
-import type { MasterDataset } from '../../../src/validation-schemas/master-dataset.js';
+import { createTestPatternGraph } from '../../fixtures/dataset-factories.js';
+import type { PatternGraph } from '../../../src/validation-schemas/pattern-graph.js';
 import {
   createDefaultTagRegistry,
   type MetadataTagDefinition,
@@ -28,7 +28,7 @@ const feature = await loadFeature('tests/features/doc-generation/taxonomy-codec.
 interface TestState {
   // Input
   options: Partial<TaxonomyCodecOptions>;
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   customMetadataTags: MetadataTagDefinition[];
 
   // Output
@@ -187,7 +187,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('Document metadata is correctly set', ({ RuleScenario }) => {
     RuleScenario('Document title is Taxonomy Reference', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createTaxonomyCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -200,7 +200,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Document purpose describes tag taxonomy', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createTaxonomyCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -213,7 +213,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Detail level reflects generateDetailFiles option', ({ When, Then }) => {
       When('decoding with generateDetailFiles disabled', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createTaxonomyCodec({ generateDetailFiles: false });
         state.document = codec.decode(state.dataset);
       });
@@ -232,7 +232,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('Categories section is generated from TagRegistry', ({ RuleScenario }) => {
     RuleScenario('Categories section is included in output', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createTaxonomyCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -246,7 +246,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Category table has correct columns', ({ When, Then, And }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createTaxonomyCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -276,7 +276,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('LinkOut to detail file when generateDetailFiles enabled', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createTaxonomyCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -297,7 +297,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       'With groupByDomain enabled tags are grouped into subsections',
       ({ When, Then }) => {
         When('decoding with groupByDomain enabled', () => {
-          state.dataset = createTestMasterDataset();
+          state.dataset = createTestPatternGraph();
           const codec = createTaxonomyCodec({ groupByDomain: true });
           state.document = codec.decode(state.dataset);
         });
@@ -319,7 +319,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('With groupByDomain disabled single table rendered', ({ When, Then, And }) => {
       When('decoding with groupByDomain disabled', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createTaxonomyCodec({ groupByDomain: false });
         state.document = codec.decode(state.dataset);
       });
@@ -367,7 +367,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         const customRegistry = createTagRegistryWithMetadataTags(
           state.customMetadataTags.map((t) => t.tag)
         );
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         // Override the tag registry in the dataset
         (state.dataset as { tagRegistry: typeof customRegistry }).tagRegistry = customRegistry;
         const codec = createTaxonomyCodec({ groupByDomain: true });
@@ -401,7 +401,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         const customRegistry = createTagRegistryWithMetadataTags(
           state.customMetadataTags.map((t) => t.tag)
         );
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         (state.dataset as { tagRegistry: typeof customRegistry }).tagRegistry = customRegistry;
         const codec = createTaxonomyCodec({ groupByDomain: true });
         state.document = codec.decode(state.dataset);
@@ -434,7 +434,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         const customRegistry = createTagRegistryWithMetadataTags(
           state.customMetadataTags.map((t) => t.tag)
         );
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         (state.dataset as { tagRegistry: typeof customRegistry }).tagRegistry = customRegistry;
         const codec = createTaxonomyCodec({ groupByDomain: true });
         state.document = codec.decode(state.dataset);
@@ -467,7 +467,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         const customRegistry = createTagRegistryWithMetadataTags(
           state.customMetadataTags.map((t) => t.tag)
         );
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         (state.dataset as { tagRegistry: typeof customRegistry }).tagRegistry = customRegistry;
         const codec = createTaxonomyCodec({ groupByDomain: true });
         state.document = codec.decode(state.dataset);
@@ -500,7 +500,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         const customRegistry = createTagRegistryWithMetadataTags(
           state.customMetadataTags.map((t) => t.tag)
         );
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         (state.dataset as { tagRegistry: typeof customRegistry }).tagRegistry = customRegistry;
         const codec = createTaxonomyCodec({ groupByDomain: true });
         state.document = codec.decode(state.dataset);
@@ -524,7 +524,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('Optional sections can be disabled via codec options', ({ RuleScenario }) => {
     RuleScenario('includeFormatTypes disabled excludes Format Types section', ({ When, Then }) => {
       When('decoding with includeFormatTypes disabled', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createTaxonomyCodec({ includeFormatTypes: false });
         state.document = codec.decode(state.dataset);
       });
@@ -541,7 +541,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('includePresets disabled excludes Presets section', ({ When, Then }) => {
       When('decoding with includePresets disabled', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createTaxonomyCodec({ includePresets: false });
         state.document = codec.decode(state.dataset);
       });
@@ -558,7 +558,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('includeArchDiagram disabled excludes Architecture section', ({ When, Then }) => {
       When('decoding with includeArchDiagram disabled', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createTaxonomyCodec({ includeArchDiagram: false });
         state.document = codec.decode(state.dataset);
       });
@@ -581,7 +581,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('Detail files are generated for progressive disclosure', ({ RuleScenario }) => {
     RuleScenario('generateDetailFiles creates 3 additional files', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createTaxonomyCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -595,7 +595,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Detail files have correct paths', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createTaxonomyCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -611,7 +611,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('generateDetailFiles disabled creates no additional files', ({ When, Then }) => {
       When('decoding with generateDetailFiles disabled', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createTaxonomyCodec({ generateDetailFiles: false });
         state.document = codec.decode(state.dataset);
       });
@@ -631,7 +631,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('Format types are documented with descriptions and examples', ({ RuleScenario }) => {
     RuleScenario('All 6 format types are documented', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createTaxonomyCodec();
         state.document = codec.decode(state.dataset);
       });

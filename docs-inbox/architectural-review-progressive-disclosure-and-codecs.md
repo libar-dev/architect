@@ -35,14 +35,14 @@ Four parallel deep-dives covered the entire pipeline:
 | -------------------------- | ---------- | -------------- | --------------------------------------------------------------------- |
 | Codec pipeline             | 28 files   | ~16,900        | `src/renderable/` (codecs, render, schema, generate)                  |
 | Taxonomy & tag registry    | 13+ files  | ~4,000         | `src/taxonomy/`, scanner parsers, validation schemas                  |
-| MasterDataset & config     | 12 files   | ~3,500         | `src/validation-schemas/`, `src/config/`, `src/generators/pipeline/`  |
+| PatternGraph & config      | 12 files   | ~3,500         | `src/validation-schemas/`, `src/config/`, `src/generators/pipeline/`  |
 | Scanner/extractor/API/lint | 52 files   | ~16,900        | `src/scanner/`, `src/extractor/`, `src/api/`, `src/mcp/`, `src/lint/` |
 
 ---
 
 ## Part 1: Spec Direction Assessment
 
-**The direction is sound.** The four specs address real problems with well-reasoned solutions. The three-layer progressive disclosure model, ProjectMetadata flow through MasterDataset, codec consolidation via view discriminants, and config simplification are all architecturally correct choices.
+**The direction is sound.** The four specs address real problems with well-reasoned solutions. The three-layer progressive disclosure model, ProjectMetadata flow through PatternGraph, codec consolidation via view discriminants, and config simplification are all architecturally correct choices.
 
 However, the specs optimize locally in several places where a structural intervention would yield more. The window for breaking changes is closing — this review focuses on what to break _now_ for compounding returns.
 
@@ -54,41 +54,41 @@ However, the specs optimize locally in several places where a structural interve
 
 The most significant architectural issue is not in the codec layer (where the specs focus) but in the **pipeline data flow**. There are two parallel type systems that don't unify.
 
-#### RuntimeMasterDataset vs MasterDataset
+#### RuntimePatternGraph vs PatternGraph
 
 `src/generators/pipeline/transform-types.ts:88` defines:
 
 ```typescript
-export interface RuntimeMasterDataset extends MasterDataset {
+export interface RuntimePatternGraph extends PatternGraph {
   readonly workflow?: LoadedWorkflow;
 }
 ```
 
 This creates a type split that propagates everywhere:
 
-| Consumer                         | Receives                     | Can Access Workflow? |
-| -------------------------------- | ---------------------------- | -------------------- |
-| `GeneratorContext.masterDataset` | `RuntimeMasterDataset`       | Yes                  |
-| `z.codec.decode(dataset)`        | `MasterDataset` (Zod schema) | **No**               |
-| `ProcessStateAPI`                | `RuntimeMasterDataset`       | Yes (via factory)    |
-| `PipelineResult.dataset`         | `RuntimeMasterDataset`       | Yes                  |
+| Consumer                        | Receives                    | Can Access Workflow? |
+| ------------------------------- | --------------------------- | -------------------- |
+| `GeneratorContext.patternGraph` | `RuntimePatternGraph`       | Yes                  |
+| `z.codec.decode(dataset)`       | `PatternGraph` (Zod schema) | **No**               |
+| `PatternGraphAPI`               | `RuntimePatternGraph`       | Yes (via factory)    |
+| `PipelineResult.dataset`        | `RuntimePatternGraph`       | Yes                  |
 
-**Codecs — the primary consumers of MasterDataset — cannot access workflow data.** The Zod codec type signature enforces `MasterDataset` (the serializable subset), but `LoadedWorkflow` contains `Map` instances that can't be represented in Zod.
+**Codecs — the primary consumers of PatternGraph — cannot access workflow data.** The Zod codec type signature enforces `PatternGraph` (the serializable subset), but `LoadedWorkflow` contains `Map` instances that can't be represented in Zod.
 
-**Why this matters for the specs:** The proposed `ProjectMetadata` flows through `MasterDataset` (Spec 1 Rule 5). This is correct. But it means `MasterDataset` is accumulating fields that are really "runtime context for codecs" — not data extracted from source files. `ProjectMetadata`, `tagExampleOverrides`, and `workflow` are all config/runtime context, not extraction products.
+**Why this matters for the specs:** The proposed `ProjectMetadata` flows through `PatternGraph` (Spec 1 Rule 5). This is correct. But it means `PatternGraph` is accumulating fields that are really "runtime context for codecs" — not data extracted from source files. `ProjectMetadata`, `tagExampleOverrides`, and `workflow` are all config/runtime context, not extraction products.
 
 **Structural intervention — `CodecContext`:**
 
 ```typescript
 interface CodecContext {
-  readonly dataset: MasterDataset; // extraction products only
+  readonly dataset: PatternGraph; // extraction products only
   readonly projectMetadata?: ProjectMetadata; // config identity
   readonly workflow?: LoadedWorkflow; // FSM definitions
   readonly tagExampleOverrides?: Partial<Record<FormatType, { example: string }>>;
 }
 ```
 
-This separates concerns cleanly: `MasterDataset` stays as a pure extraction read model (ADR-006), while `CodecContext` carries everything a codec needs. The `DocumentCodec` type would become `z.ZodCodec<CodecContextSchema, RenderableDocumentOutputSchema>`.
+This separates concerns cleanly: `PatternGraph` stays as a pure extraction read model (ADR-006), while `CodecContext` carries everything a codec needs. The `DocumentCodec` type would become `z.ZodCodec<CodecContextSchema, RenderableDocumentOutputSchema>`.
 
 **Breaking change:** Yes — every codec's `decode` signature changes. But since `createDecodeOnlyCodec()` is planned anyway (Spec 4 Rule 3), this is the right time. The helper absorbs the change:
 
@@ -233,7 +233,7 @@ Spec 2 includes regression scenarios (Rule 1), but they're mixed with new-featur
 Every codec repeats the identical ceremony:
 
 ```typescript
-return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
+return z.codec(PatternGraphSchema, RenderableDocumentOutputSchema, {
   decode: (dataset) => buildDocument(dataset, opts),
   encode: () => {
     throw new Error('Codec is decode-only. See zod-codecs.md');
@@ -329,15 +329,15 @@ The `z.any()` on `sections` means **codec output is never schema-validated at ru
 When `generateFromConfig()` is used (the high-level orchestrator path), config is loaded twice:
 
 1. **Externally** by `loadProjectConfig()` → `ResolvedConfig`
-2. **Inside** `buildMasterDataset()` at `build-pipeline.ts:172` which calls `loadConfig(baseDir)` again
+2. **Inside** `buildPatternGraph()` at `build-pipeline.ts:172` which calls `loadConfig(baseDir)` again
 
-The second load exists because `buildMasterDataset()` is designed as a standalone entry point (used by 5 consumers: orchestrator, process-api CLI, validate-patterns CLI, REPL, MCP server).
+The second load exists because `buildPatternGraph()` is designed as a standalone entry point (used by 5 consumers: orchestrator, pattern-graph-cli CLI, validate-patterns CLI, REPL, MCP server).
 
 **Fix:** `PipelineOptions` should accept an optional pre-loaded `TagRegistry`. When provided, skip the internal `loadConfig()`. The 4 non-orchestrator consumers continue to omit it. The orchestrator passes its already-loaded config. Zero behavioral change, one fewer disk read + config resolution.
 
 ### SI-2: `bySource` Naming Mismatch
 
-`MasterDataset.bySource` contains four arrays:
+`PatternGraph.bySource` contains four arrays:
 
 | Key          | What it actually is                  | Problem                                      |
 | ------------ | ------------------------------------ | -------------------------------------------- |
@@ -352,11 +352,11 @@ The second load exists because `buildMasterDataset()` is designed as a standalon
 
 ### SI-3: Vestigial Grouping Functions in `utils.ts`
 
-`src/renderable/utils.ts` ~lines 326-354 define `groupByCategory()`, `groupByPhase()`, `groupByQuarter()`. These duplicate the pre-computed views already in `MasterDataset.byCategory`, `byPhase`, `byQuarter`.
+`src/renderable/utils.ts` ~lines 326-354 define `groupByCategory()`, `groupByPhase()`, `groupByQuarter()`. These duplicate the pre-computed views already in `PatternGraph.byCategory`, `byPhase`, `byQuarter`.
 
-Post-ADR-006, all consumers should have a `MasterDataset`. These functions exist for a pre-ADR-006 world.
+Post-ADR-006, all consumers should have a `PatternGraph`. These functions exist for a pre-ADR-006 world.
 
-**Fix:** Remove and update callers to use MasterDataset views directly.
+**Fix:** Remove and update callers to use PatternGraph views directly.
 
 ### SI-4: `completionPercentage()` Duplication
 
@@ -377,9 +377,9 @@ The shape extractor also does **double file reads**: the scanner reads file cont
 
 `gherkin-extractor.ts` imports `extractPatternTags` from `scanner/gherkin-ast-parser.ts`. This is a scanner function consumed by the extractor. The function is purely transformational and belongs in a shared utility or in the extractor itself.
 
-### SI-7: `GeneratorContext.masterDataset` Is Optional When Always Populated
+### SI-7: `GeneratorContext.patternGraph` Is Optional When Always Populated
 
-`src/generators/types.ts:77` types `masterDataset` as `RuntimeMasterDataset | undefined`, but every real invocation populates it. Generators must defensively null-check for a condition that can't happen.
+`src/generators/types.ts:77` types `patternGraph` as `RuntimePatternGraph | undefined`, but every real invocation populates it. Generators must defensively null-check for a condition that can't happen.
 
 **Fix:** Make it required.
 
@@ -414,7 +414,7 @@ The orchestrator merges codec options with simple spread: `{ ...config.project.c
 
 2. **Rule 4 (output directory):** Also change the preset default to `docs-live` (CI-5). Eliminates the need for most consumers to set `output.directory` at all.
 
-3. **Rule 5 (`MasterDataset.projectMetadata`):** Consider using `CodecContext` (CI-1) instead of adding `projectMetadata` directly to `MasterDataset`. This keeps MasterDataset as a pure extraction read model.
+3. **Rule 5 (`PatternGraph.projectMetadata`):** Consider using `CodecContext` (CI-1) instead of adding `projectMetadata` directly to `PatternGraph`. This keeps PatternGraph as a pure extraction read model.
 
 4. **`tagExampleOverrides` validation scenario (line 259-266):** Ensure the Zod schema uses `z.enum(FORMAT_TYPES)` for keys, not a generic `z.record(z.string(), ...)`.
 
@@ -454,7 +454,7 @@ The orchestrator merges codec options with simple spread: `{ ...config.project.c
 
 2. **`reference.ts` decomposition should be 5 files, not 3** (CI-6). Independent PR, not coupled with the consolidation.
 
-3. **`createDecodeOnlyCodec()` should accept `CodecContext`** (CI-1), not raw `MasterDataset`.
+3. **`createDecodeOnlyCodec()` should accept `CodecContext`** (CI-1), not raw `PatternGraph`.
 
 ---
 
@@ -462,7 +462,7 @@ The orchestrator merges codec options with simple spread: `{ ...config.project.c
 
 ### BC-1: Introduce `CodecContext` Wrapper (CI-1)
 
-Replace `MasterDataset` as the codec input with `CodecContext` that separates extraction products from runtime context. All codecs change signature via `createDecodeOnlyCodec()`.
+Replace `PatternGraph` as the codec input with `CodecContext` that separates extraction products from runtime context. All codecs change signature via `createDecodeOnlyCodec()`.
 
 ### BC-2: Make `docs-live` the Preset Default (CI-5)
 
@@ -480,7 +480,7 @@ Clean up all instances. In Gherkin files where category intent is real, replace 
 
 Update to `@architect-sequence-error`.
 
-### BC-6: Make `GeneratorContext.masterDataset` Required
+### BC-6: Make `GeneratorContext.patternGraph` Required
 
 Remove the `undefined` from the type. Eliminate ~21 unnecessary null checks.
 
@@ -497,7 +497,7 @@ The initial review session produced findings CI-1 through CI-6 and BC-1 through 
 | Previous Finding                                     | Disposition                                                                | Notes |
 | ---------------------------------------------------- | -------------------------------------------------------------------------- | ----- |
 | CI-1: Self-describing codecs                         | **Validated and extended** — also derive `CodecOptions` type automatically |
-| CI-2: `createDecodeOnlyCodec()` design               | **Validated** — should accept `CodecContext`, not `MasterDataset`          |
+| CI-2: `createDecodeOnlyCodec()` design               | **Validated** — should accept `CodecContext`, not `PatternGraph`           |
 | CI-3: Progressive disclosure as renderer concern     | **Validated** — `detailLevel` enforcement also belongs in renderer         |
 | CI-4: `output.directory` preset default              | **Validated** — change at preset level for `docs-live`                     |
 | CI-5: `reference.ts` decomposition timing            | **Extended** — 5 files, not 3; diagrams alone are 690 lines                |
@@ -505,7 +505,7 @@ The initial review session produced findings CI-1 through CI-6 and BC-1 through 
 | BC-1: Remove `DOCUMENT_TYPE_RENDERERS`               | **Validated** — inline on `codecMeta`                                      |
 | BC-2: `docs-live` preset default                     | **Validated**                                                              |
 | BC-3: Optional `behaviorCategories`/`conventionTags` | **Validated** — schema-level `.default([])`                                |
-| BC-4: Remove `isCore` from MasterDataset views       | **Superseded** — the `@architect-core` ghost tag is the real issue         |
+| BC-4: Remove `isCore` from PatternGraph views        | **Superseded** — the `@architect-core` ghost tag is the real issue         |
 | BC-5: Fix flag example in TaxonomyCodec              | **Validated** — `@architect-core` → `@architect-sequence-error`            |
 | BC-6: Remove flag format entirely                    | **Overturned** — flag format costs nearly nothing, semantic value is real  |
 
@@ -540,17 +540,17 @@ The previous review suggested removing the `flag` format type since only `sequen
 
 ## Part 9: One-Line Verdicts
 
-| Area                                                             | Verdict                                                                  |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| Overall spec direction                                           | **Sound** — addresses real problems, minor structural adjustments needed |
-| Pipeline split-brain (`RuntimeMasterDataset` vs `MasterDataset`) | **Address now** — introduce `CodecContext`                               |
-| Type safety gaps (25 `as` casts, index signatures)               | **Acceptable as-is** — Zod validation downstream catches errors          |
-| `@architect-core` ghost tag                                      | **Clean up immediately** — dual behavior in TS vs Gherkin is a live bug  |
-| Flag format removal                                              | **Don't remove** — architectural cost is trivial, semantic value is real |
-| Self-describing codecs                                           | **Missing from specs, needed before consolidation**                      |
-| `reference.ts` decomposition                                     | **5 files, not 3** — diagrams alone are 690 lines                        |
-| Progressive disclosure ownership                                 | **Render layer** — not codec options                                     |
-| `detailLevel` enforcement                                        | **Renderer default + codec override** — covers all 21 codecs, not just 3 |
-| `bySource` naming                                                | **Rename to `bySourceType`** — `roadmap`/`prd` are not source types      |
-| Double config load                                               | **Fix via optional `TagRegistry` on `PipelineOptions`**                  |
-| `autoDiscoverDocuments`                                          | **Defer** — adds coupling for unclear benefit                            |
+| Area                                                           | Verdict                                                                  |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Overall spec direction                                         | **Sound** — addresses real problems, minor structural adjustments needed |
+| Pipeline split-brain (`RuntimePatternGraph` vs `PatternGraph`) | **Address now** — introduce `CodecContext`                               |
+| Type safety gaps (25 `as` casts, index signatures)             | **Acceptable as-is** — Zod validation downstream catches errors          |
+| `@architect-core` ghost tag                                    | **Clean up immediately** — dual behavior in TS vs Gherkin is a live bug  |
+| Flag format removal                                            | **Don't remove** — architectural cost is trivial, semantic value is real |
+| Self-describing codecs                                         | **Missing from specs, needed before consolidation**                      |
+| `reference.ts` decomposition                                   | **5 files, not 3** — diagrams alone are 690 lines                        |
+| Progressive disclosure ownership                               | **Render layer** — not codec options                                     |
+| `detailLevel` enforcement                                      | **Renderer default + codec override** — covers all 21 codecs, not just 3 |
+| `bySource` naming                                              | **Rename to `bySourceType`** — `roadmap`/`prd` are not source types      |
+| Double config load                                             | **Fix via optional `TagRegistry` on `PipelineOptions`**                  |
+| `autoDiscoverDocuments`                                        | **Defer** — adds coupling for unclear benefit                            |

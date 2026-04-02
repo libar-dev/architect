@@ -9,13 +9,13 @@
  * @architect-arch-role service
  * @architect-arch-context api
  * @architect-arch-layer application
- * @architect-uses ProcessStateAPI, MCPPipelineSession
+ * @architect-uses PatternGraphAPI, MCPPipelineSession
  * @architect-implements MCPServerIntegration
  *
  * ## MCP Tool Registry
  *
  * Defines all MCP tools with Zod input schemas and handler functions.
- * Each tool wraps a ProcessStateAPI method or CLI subcommand.
+ * Each tool wraps a PatternGraphAPI method or CLI subcommand.
  * Tool names use "architect_" prefix to avoid collisions with other MCP servers.
  *
  * ### When to Use
@@ -654,7 +654,7 @@ export function registerAllTools(server: McpServer, sessionManager: PipelineSess
     {
       title: 'Rebuild Dataset',
       description:
-        'Force rebuild of the in-memory MasterDataset from current source files. Use after making changes to annotated sources.',
+        'Force rebuild of the in-memory PatternGraph from current source files. Use after making changes to annotated sources.',
       inputSchema: z.object({}),
     },
     safeHandler(async () => {

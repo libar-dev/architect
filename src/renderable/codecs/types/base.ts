@@ -20,8 +20,8 @@
 import { z } from 'zod';
 import type { NormalizedStatus, FormatType } from '../../../taxonomy/index.js';
 import type { ProjectMetadata } from '../../../config/project-config.js';
-import { MasterDatasetSchema } from '../../../validation-schemas/master-dataset.js';
-import type { MasterDataset } from '../../../validation-schemas/master-dataset.js';
+import { PatternGraphSchema } from '../../../validation-schemas/pattern-graph.js';
+import type { PatternGraph } from '../../../validation-schemas/pattern-graph.js';
 import { RenderableDocumentOutputSchema } from '../shared-schema.js';
 import type { RenderableDocument } from '../../schema.js';
 
@@ -121,7 +121,7 @@ export function mergeOptions<T extends BaseCodecOptions>(
 /**
  * Type alias for decode-only document codecs.
  *
- * These codecs transform MasterDataset → RenderableDocument.
+ * These codecs transform PatternGraph → RenderableDocument.
  * The reverse direction (encode) is not supported and throws at runtime,
  * matching Zod's behavior for unidirectional transforms.
  *
@@ -129,7 +129,7 @@ export function mergeOptions<T extends BaseCodecOptions>(
  * @see https://zod.dev/codecs
  */
 export type DocumentCodec = z.ZodCodec<
-  typeof MasterDatasetSchema,
+  typeof PatternGraphSchema,
   typeof RenderableDocumentOutputSchema
 >;
 
@@ -168,7 +168,7 @@ export interface CodecMeta {
  * Context provided to all codec decode functions.
  *
  * Separates extraction products (dataset) from runtime context
- * (project metadata, workflow, tag overrides). This keeps MasterDataset
+ * (project metadata, workflow, tag overrides). This keeps PatternGraph
  * as a pure read model (ADR-006) while giving codecs access to
  * config-derived runtime data.
  *
@@ -177,7 +177,7 @@ export interface CodecMeta {
  */
 export interface CodecContext {
   /** The extraction read model — patterns, views, indexes */
-  readonly dataset: MasterDataset;
+  readonly dataset: PatternGraph;
   /** Project identity metadata (package name, purpose, license, regeneration commands) */
   readonly projectMetadata?: ProjectMetadata;
   /** Format type example overrides for TaxonomyCodec */
@@ -242,8 +242,8 @@ export function getCodecContextEnrichment(): CodecContextEnrichment {
  * across ~24 codec factories.
  *
  * The public-facing `decode` parameter receives a `CodecContext` wrapper,
- * while the internal Zod boundary still operates on `MasterDataset` directly.
- * This keeps MasterDataset as a pure read model (ADR-006) and allows the
+ * while the internal Zod boundary still operates on `PatternGraph` directly.
+ * This keeps PatternGraph as a pure read model (ADR-006) and allows the
  * context to be extended with runtime fields (e.g. projectMetadata) without
  * touching every Zod schema.
  *
@@ -253,8 +253,8 @@ export function getCodecContextEnrichment(): CodecContextEnrichment {
 export function createDecodeOnlyCodec(
   decode: (context: CodecContext) => RenderableDocument
 ): DocumentCodec {
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset) => decode({ dataset, ..._contextEnrichment }),
+  return z.codec(PatternGraphSchema, RenderableDocumentOutputSchema, {
+    decode: (dataset: PatternGraph) => decode({ dataset, ..._contextEnrichment }),
     encode: (): never => {
       throw new Error('Codec is decode-only. See zod-codecs.md');
     },

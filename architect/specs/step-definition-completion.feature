@@ -68,7 +68,7 @@ Feature: Step Definition Completion
 
     **Implementation Notes:**
     - Use createExtractedPattern() from tests/fixtures/pattern-factories.ts
-    - Use createMasterDataset() from tests/fixtures/dataset-factories.ts
+    - Use createPatternGraph() from tests/fixtures/dataset-factories.ts
     - Import codecs from src/renderable/codecs/
     - Assert on RenderableDocument structure, not markdown output
 

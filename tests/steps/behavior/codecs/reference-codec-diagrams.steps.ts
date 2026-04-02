@@ -10,7 +10,7 @@ import {
   makeConfig,
   createReferenceCodec,
   createTestPattern,
-  createTestMasterDataset,
+  createTestPatternGraph,
   findHeadings,
   findBlocksByType,
   type DetailLevel,
@@ -67,9 +67,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with arch-annotated patterns in context {string}',
+          'a PatternGraph with arch-annotated patterns in context {string}',
           (_ctx: unknown, context: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'LintRules',
@@ -125,8 +125,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with arch patterns where lint uses validation', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with arch patterns where lint uses validation', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'LintRules',
@@ -198,9 +198,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with patterns in include {string}',
+          'a PatternGraph with patterns in include {string}',
           (_ctx: unknown, viewName: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'PatternScanner',
@@ -259,8 +259,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with self-contained lint patterns', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with self-contained lint patterns', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'LintRules',
@@ -314,9 +314,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       });
 
       And(
-        'a MasterDataset where one pattern matches archContext and another matches include',
+        'a PatternGraph where one pattern matches archContext and another matches include',
         () => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'LintRules',
@@ -377,8 +377,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with multiple arch-annotated patterns', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with multiple arch-annotated patterns', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'LintRules',
@@ -433,9 +433,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with arch-annotated patterns in context {string}',
+          'a PatternGraph with arch-annotated patterns in context {string}',
           (_ctx: unknown, context: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'ConventionADR',
@@ -492,8 +492,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with patterns in domain and infrastructure layers', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with patterns in domain and infrastructure layers', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'DomainPattern',
@@ -556,8 +556,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         }
       );
 
-      And('a MasterDataset with a domain-layer pattern and a shared-context pattern', () => {
-        state!.dataset = createTestMasterDataset({
+      And('a PatternGraph with a domain-layer pattern and a shared-context pattern', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: [
             createTestPattern({
               name: 'DomainPattern',
@@ -617,9 +617,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       );
 
       And(
-        'a MasterDataset with arch-annotated patterns in context {string}',
+        'a PatternGraph with arch-annotated patterns in context {string}',
         (_ctx: unknown, context: string) => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'LintRules',
@@ -651,7 +651,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('Hardcoded diagram sources render deterministic output', ({ RuleScenario }) => {
     RuleScenario(
-      'master-dataset-views source produces MasterDataset fan-out diagram',
+      'pattern-graph-views source produces PatternGraph fan-out diagram',
       ({ Given, And, When, Then }) => {
         Given(
           'a reference config with diagramScopes source {string}',
@@ -661,7 +661,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
               conventionTags: [],
               shapeSelectors: [],
               behaviorCategories: [],
-              diagramScopes: [{ source: source as 'master-dataset-views' }],
+              diagramScopes: [{ source: source as 'pattern-graph-views' }],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',
@@ -670,9 +670,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with arch-annotated patterns in context {string}',
+          'a PatternGraph with arch-annotated patterns in context {string}',
           (_ctx: unknown, context: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'LintRules',
@@ -747,8 +747,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           };
         });
 
-        And('a MasterDataset with patterns in two different include groups', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with patterns in two different include groups', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'SessionCodec',
@@ -810,9 +810,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         });
 
         And(
-          'a MasterDataset with patterns in include {string}',
+          'a PatternGraph with patterns in include {string}',
           (_ctx: unknown, viewName: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'PatternScanner',

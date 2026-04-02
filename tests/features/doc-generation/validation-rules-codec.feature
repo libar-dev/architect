@@ -6,7 +6,7 @@
 @architect-product-area:Generation
 Feature: Validation Rules Document Codec
 
-  Validates the Validation Rules Codec that transforms MasterDataset into a
+  Validates the Validation Rules Codec that transforms PatternGraph into a
   RenderableDocument for Process Guard validation rules reference (VALIDATION-RULES.md).
 
   Background: Codec setup

@@ -29,9 +29,9 @@ The project has strict linting rules. Save time by coding defensively.
 ```typescript
 // debug-codec.ts
 import { RemainingWorkCodec } from './src/renderable/codecs/session.js';
-import { createTestMasterDataset } from './tests/fixtures/dataset-factories.js';
+import { createTestPatternGraph } from './tests/fixtures/dataset-factories.js';
 
-const dataset = createTestMasterDataset({ ... });
+const dataset = createTestPatternGraph({ ... });
 const doc = RemainingWorkCodec.decode(dataset);
 console.log(JSON.stringify(doc.sections, null, 2));
 ```

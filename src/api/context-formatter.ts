@@ -4,7 +4,7 @@
  * @architect-status active
  * @architect-implements DataAPIContextAssembly
  * @architect-uses ContextAssemblerImpl
- * @architect-used-by ProcessAPICLIImpl
+ * @architect-used-by PatternGraphCLIImpl
  * @architect-arch-role service
  * @architect-arch-context api
  * @architect-arch-layer application

@@ -3,8 +3,8 @@
  * @architect-pattern HandoffGeneratorImpl
  * @architect-status completed
  * @architect-implements DataAPIDesignSessionSupport
- * @architect-uses ProcessStateAPI, MasterDataset, ContextFormatterImpl
- * @architect-used-by ProcessAPICLIImpl
+ * @architect-uses PatternGraphAPI, PatternGraph, ContextFormatterImpl
+ * @architect-used-by PatternGraphCLIImpl
  * @architect-target src/api/handoff-generator.ts
  * @architect-arch-role service
  * @architect-arch-context api
@@ -12,16 +12,16 @@
  *
  * ## HandoffGenerator — Session-End State Summary
  *
- * Pure function that assembles a handoff document from ProcessStateAPI
- * and MasterDataset. Captures everything the next session needs to
+ * Pure function that assembles a handoff document from PatternGraphAPI
+ * and PatternGraph. Captures everything the next session needs to
  * continue work without context loss.
  *
  * **When to Use:** When ending a work session and capturing state for the next session via the `handoff` CLI subcommand.
  */
 
 import type { SessionType } from './context-assembler.js';
-import type { ProcessStateAPI } from './process-state.js';
-import type { MasterDataset } from '../validation-schemas/master-dataset.js';
+import type { PatternGraphAPI } from './pattern-graph-api.js';
+import type { PatternGraph } from '../validation-schemas/pattern-graph.js';
 import { QueryApiError } from './types.js';
 import { getPatternName } from './pattern-helpers.js';
 import {
@@ -78,8 +78,8 @@ function inferSessionType(status: string | undefined): HandoffSessionType {
 // ---------------------------------------------------------------------------
 
 export function generateHandoff(
-  api: ProcessStateAPI,
-  _dataset: MasterDataset, // _dataset reserved for future use per design stub
+  api: PatternGraphAPI,
+  _dataset: PatternGraph, // _dataset reserved for future use per design stub
   options: HandoffOptions
 ): HandoffDocument {
   const { patternName, modifiedFiles } = options;

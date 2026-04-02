@@ -226,8 +226,8 @@ sequenceDiagram
     Orchestrator ->> Extractor: extractFromGherkin(docs)
     Extractor -->> Orchestrator: ExtractedPattern[]
     Orchestrator ->> Orchestrator: mergePatterns(ts, gherkin)
-    Orchestrator ->> Transformer: transformToMasterDataset(patterns)
-    Transformer -->> Orchestrator: MasterDataset
+    Orchestrator ->> Transformer: transformToPatternGraph(patterns)
+    Transformer -->> Orchestrator: PatternGraph
     Orchestrator ->> Codec: codec.decode(dataset)
     Codec -->> Orchestrator: RenderableDocument
     Orchestrator ->> Renderer: render(document)
@@ -255,16 +255,6 @@ classDiagram
     class Documentation_Generation_Orchestrator {
         <<service>>
     }
-    class ProcessApiReferenceGenerator {
-    }
-    class DesignReviewGenerator {
-        <<service>>
-    }
-    class DecisionDocGenerator {
-        <<service>>
-    }
-    class CliRecipeGenerator {
-    }
     class TransformTypes {
     }
     class TransformDataset {
@@ -279,16 +269,26 @@ classDiagram
     class ContextInferenceImpl {
         +ContextInferenceRule interface
     }
-    class MasterDataset
+    class DesignReviewGenerator {
+        <<service>>
+    }
+    class DecisionDocGenerator {
+        <<service>>
+    }
+    class CliReferenceGenerator {
+    }
+    class CliRecipeGenerator {
+    }
+    class PatternGraph
     class Pattern_Scanner
     class GherkinASTParser
     class ShapeExtractor
     class PatternHelpers
     class DesignReviewCodec
     class DecisionDocCodec
-    class ProcessApiHybridGeneration
     class PatternRelationshipModel
     class DesignReviewGeneration
+    class CliReferenceGeneration
     class CliRecipeCodec
     class ContextInference
     GitModule ..> GitBranchDiff : uses
@@ -297,23 +297,23 @@ classDiagram
     SourceMapper ..> ShapeExtractor : depends on
     SourceMapper ..> GherkinASTParser : depends on
     Documentation_Generation_Orchestrator ..> Pattern_Scanner : uses
-    ProcessApiReferenceGenerator ..|> ProcessApiHybridGeneration : implements
-    DesignReviewGenerator ..> DesignReviewCodec : uses
-    DesignReviewGenerator ..> MasterDataset : uses
-    DesignReviewGenerator ..|> DesignReviewGeneration : implements
-    DecisionDocGenerator ..> DecisionDocCodec : depends on
-    DecisionDocGenerator ..> SourceMapper : depends on
-    CliRecipeGenerator ..|> CliRecipeCodec : implements
-    TransformTypes ..> MasterDataset : uses
-    TransformDataset ..> MasterDataset : uses
+    TransformTypes ..> PatternGraph : uses
+    TransformDataset ..> PatternGraph : uses
     TransformDataset ..|> PatternRelationshipModel : implements
-    SequenceTransformUtils ..> MasterDataset : uses
+    SequenceTransformUtils ..> PatternGraph : uses
     SequenceTransformUtils ..|> DesignReviewGeneration : implements
     RelationshipResolver ..> PatternHelpers : uses
     ContextInferenceImpl ..|> ContextInference : implements
-    DesignReviewCodec ..> MasterDataset : uses
+    DesignReviewGenerator ..> DesignReviewCodec : uses
+    DesignReviewGenerator ..> PatternGraph : uses
+    DesignReviewGenerator ..|> DesignReviewGeneration : implements
+    DecisionDocGenerator ..> DecisionDocCodec : depends on
+    DecisionDocGenerator ..> SourceMapper : depends on
+    CliReferenceGenerator ..|> CliReferenceGeneration : implements
+    CliRecipeGenerator ..|> CliRecipeCodec : implements
+    DesignReviewCodec ..> PatternGraph : uses
     DesignReviewCodec ..|> DesignReviewGeneration : implements
-    CliRecipeCodec ..> ProcessApiHybridGeneration : depends on
+    CliRecipeCodec ..> CliReferenceGeneration : depends on
 ```
 
 ---
@@ -388,7 +388,7 @@ Scoped architecture diagram showing component relationships:
 ```mermaid
 graph LR
     subgraph api["Api"]
-        MasterDataset[/"MasterDataset"/]
+        PatternGraph[/"PatternGraph"/]
         PatternHelpers["PatternHelpers"]
         ArchQueriesImpl("ArchQueriesImpl")
     end
@@ -411,28 +411,28 @@ graph LR
         FSMStates[/"FSMStates"/]
     end
     subgraph related["Related"]
-        ProcessStateAPI["ProcessStateAPI"]:::neighbor
+        PatternGraphAPI["PatternGraphAPI"]:::neighbor
         TypeScriptTaxonomyImplementation["TypeScriptTaxonomyImplementation"]:::neighbor
-        ProcessApiHybridGeneration["ProcessApiHybridGeneration"]:::neighbor
         ProceduralGuideCodec["ProceduralGuideCodec"]:::neighbor
         PhaseStateMachineValidation["PhaseStateMachineValidation"]:::neighbor
         DataAPIOutputShaping["DataAPIOutputShaping"]:::neighbor
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
+        CliReferenceGeneration["CliReferenceGeneration"]:::neighbor
     end
-    TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
     loadPreambleFromMarkdown___Shared_Markdown_to_SectionBlock_Parser ..->|implements| ProceduralGuideCodec
     ProjectConfigTypes -->|uses| ConfigurationTypes
     ProjectConfigTypes -->|uses| ConfigurationPresets
     ConfigurationPresets -->|uses| ConfigurationTypes
+    CLISchema ..->|implements| CliReferenceGeneration
     PatternHelpers ..->|implements| DataAPIOutputShaping
-    ArchQueriesImpl -->|uses| ProcessStateAPI
-    ArchQueriesImpl -->|uses| MasterDataset
+    ArchQueriesImpl -->|uses| PatternGraphAPI
+    ArchQueriesImpl -->|uses| PatternGraph
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
-    CLISchema ..->|implements| ProcessApiHybridGeneration
+    TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
     FSMTransitions ..->|implements| PhaseStateMachineValidation
     FSMStates ..->|implements| PhaseStateMachineValidation
-    ProcessStateAPI -->|uses| MasterDataset
-    ProcessStateAPI ..->|implements| PhaseStateMachineValidation
+    PatternGraphAPI -->|uses| PatternGraph
+    PatternGraphAPI ..->|implements| PhaseStateMachineValidation
     DataAPIArchitectureQueries -.->|depends on| DataAPIOutputShaping
     classDef neighbor stroke-dasharray: 5 5
 ```
@@ -440,6 +440,21 @@ graph LR
 ---
 
 ## API Types
+
+### SectionBlock (type)
+
+```typescript
+type SectionBlock =
+  | HeadingBlock
+  | ParagraphBlock
+  | SeparatorBlock
+  | TableBlock
+  | ListBlock
+  | CodeBlock
+  | MermaidBlock
+  | CollapsibleBlock
+  | LinkOutBlock;
+```
 
 ### normalizeStatus (function)
 
@@ -535,21 +550,6 @@ interface CategoryDefinition {
 | description | Brief description of the category's purpose and typical patterns                  |
 | aliases     | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
 
-### SectionBlock (type)
-
-```typescript
-type SectionBlock =
-  | HeadingBlock
-  | ParagraphBlock
-  | SeparatorBlock
-  | TableBlock
-  | ListBlock
-  | CodeBlock
-  | MermaidBlock
-  | CollapsibleBlock
-  | LinkOutBlock;
-```
-
 ---
 
 ## Behavior Specifications
@@ -585,13 +585,129 @@ Validation happens later at load time via Zod schema in `loadProjectConfig()`.
 
 - In `architect.config.ts` at project root to get type-safe configuration with autocompletion.
 
+### ConfigBasedWorkflowDefinition
+
+[View ConfigBasedWorkflowDefinition source](architect/specs/config-based-workflow-definition.feature)
+
+**Problem:**
+Every `pnpm architect:query` and `pnpm docs:*` invocation prints:
+`Failed to load default workflow (6-phase-standard): Workflow file not found`
+
+The `loadDefaultWorkflow()` function resolves to `catalogue/workflows/`
+which does not exist. The directory was deleted during monorepo extraction.
+The system already degrades gracefully (workflow = undefined), but the
+warning is noise for both human CLI use and future hook consumers (HUD).
+
+The old `6-phase-standard.json` conflated three concerns:
+
+- Taxonomy vocabulary (status names) — already in `src/taxonomy/`
+- FSM behavior (transitions) — already in `src/validation/fsm/`
+- Workflow structure (phases) — orphaned, no proper home
+
+**Solution:**
+Inline the default workflow as a constant in `workflow-loader.ts`, built
+from canonical taxonomy values. Make `loadDefaultWorkflow()` synchronous.
+Preserve `loadWorkflowFromPath()` for custom `--workflow <file>` overrides.
+
+The workflow definition uses only the 4 canonical statuses from ADR-001
+(roadmap, active, completed, deferred) — not the stale 5-status set from
+the deleted JSON (which included non-canonical `implemented` and `partial`).
+
+Phase definitions (Inception, Elaboration, Session, Construction,
+Validation, Retrospective) move from a missing JSON file to an inline
+constant, making the default workflow always available without file I/O.
+
+Design Decisions (DS-1, 2026-02-15):
+
+| ID | Decision | Rationale |
+| DD-1 | Inline constant in workflow-loader.ts, not preset integration | Minimal correct fix, zero type regression risk. Preset integration deferred. |
+| DD-2 | Constant satisfies existing WorkflowConfig type | Reuse createLoadedWorkflow() from workflow-config.ts. No new types needed. |
+| DD-3 | Remove dead code: getCatalogueWorkflowsPath, loadWorkflowConfig, DEFAULT_WORKFLOW_NAME | Dead since monorepo extraction. Public API break is safe (function always threw). |
+| DD-4 | loadDefaultWorkflow() returns LoadedWorkflow synchronously | Infallible constant needs no async or error handling. |
+| DD-5 | Amend ADR-001 with canonical phase definitions | Phase names are canonical values; fits existing governance in ADR-001. |
+
+<details>
+<summary>Default workflow is built from an inline constant (2 scenarios)</summary>
+
+#### Default workflow is built from an inline constant
+
+**Invariant:** `loadDefaultWorkflow()` returns a `LoadedWorkflow` without file system access. It cannot fail. The default workflow constant uses only canonical status values from `src/taxonomy/status-values.ts`.
+
+**Rationale:** The file-based loading path (`catalogue/workflows/`) has been dead code since monorepo extraction. Both callers (orchestrator, pattern-graph-cli) already handle the failure gracefully, proving the system works without it. Making the function synchronous and infallible removes the try-catch ceremony and the warning noise.
+
+**Verified by:**
+
+- Default workflow loads without warning
+- Workflow constant uses canonical statuses only
+- Workflow constant uses canonical statuses only
+
+  Implementation approach:
+
+</details>
+
+<details>
+<summary>Custom workflow files still work via --workflow flag (1 scenarios)</summary>
+
+#### Custom workflow files still work via --workflow flag
+
+**Invariant:** `loadWorkflowFromPath()` remains available for projects that need custom workflow definitions. The `--workflow <file>` CLI flag and `workflowPath` config field continue to work.
+
+**Rationale:** The inline default replaces file-based _default_ loading, not file-based _custom_ loading. Projects may define custom phases or additional statuses via JSON files.
+
+**Verified by:**
+
+- Custom workflow file overrides default
+
+</details>
+
+<details>
+<summary>FSM validation and Process Guard are not affected</summary>
+
+#### FSM validation and Process Guard are not affected
+
+**Invariant:** The FSM transition matrix, protection levels, and Process Guard rules remain hardcoded in `src/validation/fsm/` and `src/lint/process-guard/`. They do not read from `LoadedWorkflow`.
+
+**Rationale:** FSM and workflow are separate concerns. FSM enforces status transitions (4-state model from PDR-005). Workflow defines phase structure (6-phase USDP). The workflow JSON declared `transitionsTo` on its statuses, but no code ever read those values — the FSM uses its own `VALID_TRANSITIONS` constant. This separation is correct and intentional. Blast radius analysis confirmed zero workflow imports in: - src/validation/fsm/ (4 files) - src/lint/process-guard/ (5 files) - src/taxonomy/ (all files)
+
+</details>
+
+<details>
+<summary>Workflow as a configurable preset field is deferred</summary>
+
+#### Workflow as a configurable preset field is deferred
+
+**Invariant:** The inline default workflow constant is the only workflow source until preset integration is implemented. No preset or project config field exposes workflow customization.
+
+**Rationale:** Coupling workflow into the preset/config system before the inline fix ships would widen the blast radius and risk type regressions across all config consumers.
+
+**Verified by:**
+
+- N/A - deferred until preset integration
+
+  Adding `workflow` as a field on `ArchitectConfig` (presets) and
+  `ArchitectProjectConfig` (project config) is a natural next step
+  but NOT required for the MVP fix.
+
+  The inline constant in `workflow-loader.ts` resolves the warning. Moving
+  workflow into the preset/config system enables:
+  - Different presets with different default phases (e.g.
+
+- 3-phase libar-generic)
+  - Per-project phase customization in architect.config.ts
+  - Phase definitions appearing in generated documentation
+
+  See ideation artifact for design options:
+  architect/ideations/2026-02-15-workflow-config-and-fsm-extensibility.feature
+
+</details>
+
 ### ADR005CodecBasedMarkdownRendering
 
 [View ADR005CodecBasedMarkdownRendering source](architect/decisions/adr-005-codec-based-markdown-rendering.feature)
 
 **Context:**
 The documentation generator needs to transform structured pattern data
-(MasterDataset) into markdown files. The initial approach used direct
+(PatternGraph) into markdown files. The initial approach used direct
 string concatenation in generator functions, mixing data selection,
 formatting logic, and output assembly in a single pass. This made
 generators hard to test, difficult to compose, and impossible to
@@ -600,7 +716,7 @@ AI context).
 
 **Decision:**
 Adopt a codec architecture inspired by serialization codecs (encode/decode).
-Each document type has a codec that decodes a MasterDataset into a
+Each document type has a codec that decodes a PatternGraph into a
 RenderableDocument — an intermediate representation of sections, headings,
 tables, paragraphs, and code blocks. A separate renderer transforms the
 RenderableDocument into markdown. This separates data selection (what to
@@ -627,15 +743,15 @@ include) from formatting (how it looks) from serialization (markdown syntax).
 
 #### Codecs implement a decode-only contract
 
-**Invariant:** Every codec is a pure function that accepts a MasterDataset and returns a RenderableDocument. Codecs do not perform side effects, do not write files, and do not access the filesystem. The codec contract is decode-only because the transformation is one-directional: structured data becomes a document, never the reverse.
+**Invariant:** Every codec is a pure function that accepts a PatternGraph and returns a RenderableDocument. Codecs do not perform side effects, do not write files, and do not access the filesystem. The codec contract is decode-only because the transformation is one-directional: structured data becomes a document, never the reverse.
 
-**Rationale:** Pure functions are deterministic and trivially testable. For the same MasterDataset, a codec always produces the same RenderableDocument. This makes snapshot testing reliable and enables codec output comparison across versions.
+**Rationale:** Pure functions are deterministic and trivially testable. For the same PatternGraph, a codec always produces the same RenderableDocument. This makes snapshot testing reliable and enables codec output comparison across versions.
 
 **Codec call signature:**
 
 ```typescript
 interface DocumentCodec {
-  decode(dataset: MasterDataset): RenderableDocument;
+  decode(dataset: PatternGraph): RenderableDocument;
 }
 ```
 
@@ -884,122 +1000,6 @@ These are the durable constants of the delivery process.
 **Verified by:**
 
 - Canonical values are enforced
-
-</details>
-
-### ConfigBasedWorkflowDefinition
-
-[View ConfigBasedWorkflowDefinition source](architect/specs/config-based-workflow-definition.feature)
-
-**Problem:**
-Every `pnpm process:query` and `pnpm docs:*` invocation prints:
-`Failed to load default workflow (6-phase-standard): Workflow file not found`
-
-The `loadDefaultWorkflow()` function resolves to `catalogue/workflows/`
-which does not exist. The directory was deleted during monorepo extraction.
-The system already degrades gracefully (workflow = undefined), but the
-warning is noise for both human CLI use and future hook consumers (HUD).
-
-The old `6-phase-standard.json` conflated three concerns:
-
-- Taxonomy vocabulary (status names) — already in `src/taxonomy/`
-- FSM behavior (transitions) — already in `src/validation/fsm/`
-- Workflow structure (phases) — orphaned, no proper home
-
-**Solution:**
-Inline the default workflow as a constant in `workflow-loader.ts`, built
-from canonical taxonomy values. Make `loadDefaultWorkflow()` synchronous.
-Preserve `loadWorkflowFromPath()` for custom `--workflow <file>` overrides.
-
-The workflow definition uses only the 4 canonical statuses from ADR-001
-(roadmap, active, completed, deferred) — not the stale 5-status set from
-the deleted JSON (which included non-canonical `implemented` and `partial`).
-
-Phase definitions (Inception, Elaboration, Session, Construction,
-Validation, Retrospective) move from a missing JSON file to an inline
-constant, making the default workflow always available without file I/O.
-
-Design Decisions (DS-1, 2026-02-15):
-
-| ID | Decision | Rationale |
-| DD-1 | Inline constant in workflow-loader.ts, not preset integration | Minimal correct fix, zero type regression risk. Preset integration deferred. |
-| DD-2 | Constant satisfies existing WorkflowConfig type | Reuse createLoadedWorkflow() from workflow-config.ts. No new types needed. |
-| DD-3 | Remove dead code: getCatalogueWorkflowsPath, loadWorkflowConfig, DEFAULT_WORKFLOW_NAME | Dead since monorepo extraction. Public API break is safe (function always threw). |
-| DD-4 | loadDefaultWorkflow() returns LoadedWorkflow synchronously | Infallible constant needs no async or error handling. |
-| DD-5 | Amend ADR-001 with canonical phase definitions | Phase names are canonical values; fits existing governance in ADR-001. |
-
-<details>
-<summary>Default workflow is built from an inline constant (2 scenarios)</summary>
-
-#### Default workflow is built from an inline constant
-
-**Invariant:** `loadDefaultWorkflow()` returns a `LoadedWorkflow` without file system access. It cannot fail. The default workflow constant uses only canonical status values from `src/taxonomy/status-values.ts`.
-
-**Rationale:** The file-based loading path (`catalogue/workflows/`) has been dead code since monorepo extraction. Both callers (orchestrator, process-api) already handle the failure gracefully, proving the system works without it. Making the function synchronous and infallible removes the try-catch ceremony and the warning noise.
-
-**Verified by:**
-
-- Default workflow loads without warning
-- Workflow constant uses canonical statuses only
-- Workflow constant uses canonical statuses only
-
-  Implementation approach:
-
-</details>
-
-<details>
-<summary>Custom workflow files still work via --workflow flag (1 scenarios)</summary>
-
-#### Custom workflow files still work via --workflow flag
-
-**Invariant:** `loadWorkflowFromPath()` remains available for projects that need custom workflow definitions. The `--workflow <file>` CLI flag and `workflowPath` config field continue to work.
-
-**Rationale:** The inline default replaces file-based _default_ loading, not file-based _custom_ loading. Projects may define custom phases or additional statuses via JSON files.
-
-**Verified by:**
-
-- Custom workflow file overrides default
-
-</details>
-
-<details>
-<summary>FSM validation and Process Guard are not affected</summary>
-
-#### FSM validation and Process Guard are not affected
-
-**Invariant:** The FSM transition matrix, protection levels, and Process Guard rules remain hardcoded in `src/validation/fsm/` and `src/lint/process-guard/`. They do not read from `LoadedWorkflow`.
-
-**Rationale:** FSM and workflow are separate concerns. FSM enforces status transitions (4-state model from PDR-005). Workflow defines phase structure (6-phase USDP). The workflow JSON declared `transitionsTo` on its statuses, but no code ever read those values — the FSM uses its own `VALID_TRANSITIONS` constant. This separation is correct and intentional. Blast radius analysis confirmed zero workflow imports in: - src/validation/fsm/ (4 files) - src/lint/process-guard/ (5 files) - src/taxonomy/ (all files)
-
-</details>
-
-<details>
-<summary>Workflow as a configurable preset field is deferred</summary>
-
-#### Workflow as a configurable preset field is deferred
-
-**Invariant:** The inline default workflow constant is the only workflow source until preset integration is implemented. No preset or project config field exposes workflow customization.
-
-**Rationale:** Coupling workflow into the preset/config system before the inline fix ships would widen the blast radius and risk type regressions across all config consumers.
-
-**Verified by:**
-
-- N/A - deferred until preset integration
-
-  Adding `workflow` as a field on `ArchitectConfig` (presets) and
-  `ArchitectProjectConfig` (project config) is a natural next step
-  but NOT required for the MVP fix.
-
-  The inline constant in `workflow-loader.ts` resolves the warning. Moving
-  workflow into the preset/config system enables:
-  - Different presets with different default phases (e.g.
-
-- 3-phase libar-generic)
-  - Per-project phase customization in architect.config.ts
-  - Phase definitions appearing in generated documentation
-
-  See ideation artifact for design options:
-  architect/ideations/2026-02-15-workflow-config-and-fsm-extensibility.feature
 
 </details>
 

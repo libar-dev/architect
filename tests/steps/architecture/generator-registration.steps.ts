@@ -11,7 +11,7 @@ import { expect } from 'vitest';
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 
 import { generatorRegistry } from '../../../src/generators/registry.js';
-import { transformToMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
+import { transformToPatternGraph } from '../../../src/generators/pipeline/transform-dataset.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
 import type { GeneratorContext, GeneratorOutput } from '../../../src/generators/types.js';
 import { createDefaultTagRegistry, createTestPattern } from '../../fixtures/dataset-factories.js';
@@ -92,7 +92,7 @@ async function runArchitectureGenerator(): Promise<void> {
 
   // Build dataset with patterns
   const tagRegistry = createDefaultTagRegistry();
-  const masterDataset = transformToMasterDataset({
+  const patternGraph = transformToPatternGraph({
     patterns: state.patterns,
     tagRegistry,
     workflow: undefined,
@@ -103,7 +103,7 @@ async function runArchitectureGenerator(): Promise<void> {
     baseDir: '/test',
     outputDir: '/test/output',
     registry: tagRegistry,
-    masterDataset,
+    patternGraph,
     codecOptions: state.codecOptions,
   };
 

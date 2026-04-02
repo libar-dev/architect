@@ -2,8 +2,7 @@
 
 Workflow for adding live Mermaid diagrams, enriched intros, and API Types sections to product area documents in `docs-live/product-areas/`.
 
-**Completed:** Annotation, Configuration, CoreTypes
-**Remaining:** Generation, Validation, DataAPI, Process
+**All 7 product areas complete:** Annotation, Configuration, CoreTypes, DataAPI, Generation, Process, Validation
 
 #### Pre-Flight (Run First)
 
@@ -28,7 +27,7 @@ pnpm architect:query -- list --product-area <AreaName> --names-only
 | 3    | Add `@architect-depends-on` to feature files                           | Creates relationship edges in diagrams       |
 | 4    | Add `@architect-shape` + `@architect-include` to key type declarations | Populates API Types section                  |
 | 5    | Add `@architect-product-area:<Area>` to TS file annotations            | Routes TS patterns to product area           |
-| 6    | Update `PRODUCT_AREA_META` in `reference.ts` (~line 237)               | Enriched intro, invariants, `diagramScopes`  |
+| 6    | Update `PRODUCT_AREA_META` in `product-area-metadata.ts`               | Enriched intro, invariants, `diagramScopes`  |
 | 7    | `pnpm build && pnpm test && pnpm docs:product-areas`                   | Verify end-to-end                            |
 
 #### PRODUCT_AREA_META Entry Structure

@@ -29,8 +29,8 @@ import {
 import {
   RelationshipEntrySchema,
   type RelationshipEntry,
-} from '../../../../src/validation-schemas/master-dataset.js';
-import { transformToMasterDataset } from '../../../../src/generators/pipeline/transform-dataset.js';
+} from '../../../../src/validation-schemas/pattern-graph.js';
+import { transformToPatternGraph } from '../../../../src/generators/pipeline/transform-dataset.js';
 import { createDefaultTagRegistry } from '../../../../src/validation-schemas/index.js';
 import type { ExtractedPattern } from '../../../../src/types/index.js';
 import { asPatternId, asCategoryName, asSourceFilePath } from '../../../../src/types/branded.js';
@@ -260,7 +260,7 @@ describeFeature(feature, ({ Rule }) => {
 
       When('the relationship index is built', () => {
         const tagRegistry = createDefaultTagRegistry();
-        const dataset = transformToMasterDataset({
+        const dataset = transformToPatternGraph({
           patterns: state!.patterns,
           tagRegistry,
         });
@@ -295,7 +295,7 @@ describeFeature(feature, ({ Rule }) => {
 
       When('the relationship index is built', () => {
         const tagRegistry = createDefaultTagRegistry();
-        const dataset = transformToMasterDataset({
+        const dataset = transformToPatternGraph({
           patterns: state!.patterns,
           tagRegistry,
         });

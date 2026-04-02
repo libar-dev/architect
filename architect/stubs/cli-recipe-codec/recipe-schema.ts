@@ -54,7 +54,7 @@
  * Pattern", "Design Session Prep", "Ending a Session". Each `RecipeExample`
  * has a title, purpose string, array of `RecipeStep` (command + comment),
  * and optional expected output. This mirrors the existing Common Recipes
- * section structure in PROCESS-API.md, ensuring zero information loss.
+ * section structure in CLI.md, ensuring zero information loss.
  *
  * ### Integration with CLISchema
  *
@@ -66,7 +66,7 @@
  * | `commandNarratives` | `CommandNarrativeGroup[]` | Per-command narrative descriptions |
  *
  * Both are optional to preserve backward compatibility with existing consumers
- * (ProcessApiReferenceGenerator, showHelp).
+ * (CliReferenceGenerator, showHelp).
  */
 
 // =============================================================================
@@ -157,7 +157,7 @@ export interface RecipeGroup {
  *
  * Carries the rich description and usage example that appears in the
  * generated recipe file alongside the command. This replaces the manually
- * maintained prose in docs/PROCESS-API.md sections like "Session Workflow
+ * maintained prose in docs/CLI.md sections like "Session Workflow
  * Commands" and "Pattern Discovery".
  *
  * @example
@@ -191,7 +191,7 @@ export interface CommandNarrative {
  * A group of related command narratives under a shared section heading.
  *
  * Maps to sections like "Session Workflow Commands" (6 text commands)
- * and "Pattern Discovery" (8 JSON commands) in docs/PROCESS-API.md.
+ * and "Pattern Discovery" (8 JSON commands) in docs/CLI.md.
  */
 export interface CommandNarrativeGroup {
   /** Section heading (e.g., 'Session Workflow Commands') */

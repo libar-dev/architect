@@ -3,7 +3,7 @@
  *
  * BDD step definitions for testing the CodecBasedGenerator class.
  * Tests codec delegation and codec options pass-through.
- * MasterDataset is required by type — no runtime null guard needed.
+ * PatternGraph is required by type — no runtime null guard needed.
  *
  * Uses Rule() + RuleScenario() pattern as feature file uses Rule: blocks.
  */
@@ -14,7 +14,7 @@ import type { GeneratorContext, GeneratorOutput } from '../../../src/generators/
 import type { GenerationError } from '../../../src/generators/orchestrator.js';
 import type { DocumentType } from '../../../src/renderable/generate.js';
 import {
-  createTestMasterDataset,
+  createTestPatternGraph,
   createDefaultTagRegistry,
   createTestPattern,
 } from '../../fixtures/dataset-factories.js';
@@ -87,8 +87,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       );
 
-      And('a context with MasterDataset containing patterns', () => {
-        const dataset = createTestMasterDataset({
+      And('a context with PatternGraph containing patterns', () => {
+        const dataset = createTestPatternGraph({
           patterns: [
             createTestPattern({
               id: 'pattern-00000001',
@@ -103,7 +103,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           baseDir: '/test',
           outputDir: '/test/output',
           registry: createDefaultTagRegistry(),
-          masterDataset: dataset,
+          patternGraph: dataset,
         };
       });
 
@@ -143,9 +143,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       );
 
-      And('a context with MasterDataset', () => {
+      And('a context with PatternGraph', () => {
         // Create patterns with file paths matching the filter
-        const dataset = createTestMasterDataset({
+        const dataset = createTestPatternGraph({
           patterns: [
             createTestPattern({
               id: 'pattern-00000001',
@@ -175,7 +175,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           baseDir: '/test',
           outputDir: '/test/output',
           registry: createDefaultTagRegistry(),
-          masterDataset: dataset,
+          patternGraph: dataset,
         };
       });
 

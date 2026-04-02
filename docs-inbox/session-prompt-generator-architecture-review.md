@@ -26,10 +26,10 @@ The insight that **CLAUDE.md sections should be generated from decision records*
 
 The codebase has **two deliberate rendering paths** established by ADR-008:
 
-| Path           | Pipeline                                                                  | Audience                  | Format                               |
-| -------------- | ------------------------------------------------------------------------- | ------------------------- | ------------------------------------ |
-| **Codec path** | MasterDataset → Codec → RenderableDocument → UniversalRenderer → Markdown | Human docs / AI reference | Markdown with headers, tables, lists |
-| **Text path**  | MasterDataset → Assembler → Formatter → Plain text                        | AI session context        | `=== SECTION ===` markers, compact   |
+| Path           | Pipeline                                                                 | Audience                  | Format                               |
+| -------------- | ------------------------------------------------------------------------ | ------------------------- | ------------------------------------ |
+| **Codec path** | PatternGraph → Codec → RenderableDocument → UniversalRenderer → Markdown | Human docs / AI reference | Markdown with headers, tables, lists |
+| **Text path**  | PatternGraph → Assembler → Formatter → Plain text                        | AI session context        | `=== SECTION ===` markers, compact   |
 
 Session prompts are **AI session context** — they tell an agent what to do. Per the codebase's own architectural decisions, they belong on the text path.
 
@@ -122,7 +122,7 @@ More importantly, prompt sections should be assembled **programmatically** from 
 Instead of recipe→template→markdown, I recommend **extending the existing context assembly pipeline**:
 
 ```
-MasterDataset ──→ assembleContext()      ──→ ContextBundle          ──→ formatContextBundle() ──→ text
+PatternGraph ──→ assembleContext()      ──→ ContextBundle          ──→ formatContextBundle() ──→ text
                   (existing, + conventions)   (extended with conventions)  (extended sections)
 ```
 
@@ -131,7 +131,7 @@ MasterDataset ──→ assembleContext()      ──→ ContextBundle          
 ```
 Decision Records (tagged @convention) ─┐
                                        ├──→ assembleSessionPrompt() ──→ SessionPromptBundle ──→ formatSessionPrompt()
-ProcessStateAPI queries ───────────────┘                                                           ↓
+PatternGraphAPI queries ───────────────┘                                                           ↓
                                                                                               Structured text
 ```
 
@@ -140,7 +140,7 @@ ProcessStateAPI queries ───────────────┘        
 1. **ADR-008 aligned** — text output for AI, not markdown
 2. **No new engine** — extends existing assembler + formatter pattern (same as scope-validator, handoff-generator)
 3. **Parameterized by design** — pattern name is already a parameter
-4. **Convention injection is pure data** — filter decision records from MasterDataset by `@convention` tag, extract Rule block content
+4. **Convention injection is pure data** — filter decision records from PatternGraph by `@convention` tag, extract Rule block content
 5. **Co-located formatter** — per PDR-002 DD-7, formatters live with their data assemblers (see `scope-validator.ts:134`, `handoff-generator.ts:180`)
 
 ### What the prompt assembler does
@@ -195,7 +195,7 @@ The formatter:
 
 ### Step 4: Wire `session-prompt` subcommand
 
-Add to `src/cli/process-api.ts` following the established CLI pattern.
+Add to `src/cli/pattern-graph-cli.ts` following the established CLI pattern.
 
 ```bash
 pnpm architect:query -- session-prompt DataAPIDesignSessionSupport --type implement

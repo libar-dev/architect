@@ -1,12 +1,12 @@
 /**
- * process-api CLI Subcommands Step Definitions
+ * pattern-graph CLI Subcommands Step Definitions
  *
- * BDD step definitions for testing the process-api CLI
+ * BDD step definitions for testing the pattern-graph CLI
  * discovery subcommands: list, search, context assembly,
  * tags/sources, extended arch, unannotated.
  *
  * @architect
- * @architect-implements ProcessStateAPICLI
+ * @architect-implements PatternGraphAPICLI
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
@@ -22,7 +22,7 @@ import {
   writeTwoContextFiles,
   writeMixedAnnotationFiles,
   createTempDir,
-} from '../../support/helpers/process-api-state.js';
+} from '../../support/helpers/pattern-graph-api-state.js';
 
 // =============================================================================
 // Module-level state (reset per scenario)
@@ -34,7 +34,7 @@ let state: CLITestState | null = null;
 // Feature Definition
 // =============================================================================
 
-const feature = await loadFeature('tests/features/cli/process-api-subcommands.feature');
+const feature = await loadFeature('tests/features/cli/pattern-graph-cli-subcommands.feature');
 
 describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
@@ -55,7 +55,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   Background(({ Given }) => {
     Given('a temporary working directory', async () => {
       state = initState();
-      state.tempContext = await createTempDir({ prefix: 'cli-process-api-test-' });
+      state.tempContext = await createTempDir({ prefix: 'cli-pattern-graph-test-' });
     });
   });
 

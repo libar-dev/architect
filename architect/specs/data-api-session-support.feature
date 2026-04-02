@@ -42,9 +42,9 @@ Feature: Data API Design Session Support - Automated Session Workflows
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
       | Scope validation logic | complete | src/api/scope-validator.ts | Yes | unit |
-      | scope-validate subcommand | complete | src/cli/process-api.ts | Yes | integration |
+      | scope-validate subcommand | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
       | Handoff document generator | complete | src/api/handoff-generator.ts | Yes | unit |
-      | handoff subcommand | complete | src/cli/process-api.ts | Yes | integration |
+      | handoff subcommand | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
 
   # ============================================================================
   # RULE 1: Scope Validation
@@ -75,14 +75,14 @@ Feature: Data API Design Session Support - Automated Session Workflows
     @acceptance-criteria @happy-path
     Scenario: All scope validation checks pass
       Given a pattern with all prerequisites met
-      When running "process-api scope-validate MyPattern --type implement"
+      When running "pattern-graph-cli scope-validate MyPattern --type implement"
       Then all checklist items show green/passing
       And the output indicates "Ready for implementation session"
 
     @acceptance-criteria @validation
     Scenario: Dependency blocker detected
       Given a pattern "X" depending on "Y" with status "roadmap"
-      When running "process-api scope-validate X --type implement"
+      When running "pattern-graph-cli scope-validate X --type implement"
       Then the dependencies check shows "BLOCKED"
       And the output identifies "Y (roadmap)" as the blocker
       And the output suggests "Complete Y first or change session type to design"
@@ -90,7 +90,7 @@ Feature: Data API Design Session Support - Automated Session Workflows
     @acceptance-criteria @validation
     Scenario: FSM transition blocker detected
       Given a pattern with status "completed"
-      When running "process-api scope-validate CompletedPattern --type implement"
+      When running "pattern-graph-cli scope-validate CompletedPattern --type implement"
       Then the FSM check shows "BLOCKED"
       And the output indicates transition to active is not valid from completed
 
@@ -124,7 +124,7 @@ Feature: Data API Design Session Support - Automated Session Workflows
     @acceptance-criteria @happy-path
     Scenario: Generate handoff for in-progress pattern
       Given an active pattern with 3 completed and 2 remaining deliverables
-      When running "process-api handoff --pattern MyPattern"
+      When running "pattern-graph-cli handoff --pattern MyPattern"
       Then the output shows the session summary
       And the output lists 3 completed deliverables
       And the output lists 2 remaining deliverables as next priorities
@@ -133,7 +133,7 @@ Feature: Data API Design Session Support - Automated Session Workflows
     @acceptance-criteria @happy-path
     Scenario: Handoff captures discovered items
       Given a pattern with discovery tags in feature file comments
-      When running "process-api handoff --pattern MyPattern"
+      When running "pattern-graph-cli handoff --pattern MyPattern"
       Then the output includes discovered gaps
       And the output includes discovered improvements
       And the output includes discovered learnings

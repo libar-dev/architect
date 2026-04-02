@@ -9,9 +9,9 @@
  * @architect-arch-layer infrastructure
  * @architect-uses PipelineFactory, WorkflowConfigSchema
  *
- * ## Dataset Cache - MasterDataset Persistence with mtime Invalidation
+ * ## Dataset Cache - PatternGraph Persistence with mtime Invalidation
  *
- * Caches the full PipelineResult (MasterDataset + ValidationSummary + warnings)
+ * Caches the full PipelineResult (PatternGraph + ValidationSummary + warnings)
  * to a JSON file. Subsequent CLI invocations skip the 2-5s pipeline rebuild
  * when no source files have changed.
  *
@@ -29,7 +29,7 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import { glob } from 'glob';
 import type { PipelineResult, PipelineOptions } from '../generators/pipeline/index.js';
-import type { RuntimeMasterDataset } from '../generators/pipeline/index.js';
+import type { RuntimePatternGraph } from '../generators/pipeline/index.js';
 import type { WorkflowConfig } from '../validation-schemas/workflow-config.js';
 import { createLoadedWorkflow } from '../validation-schemas/workflow-config.js';
 
@@ -141,8 +141,8 @@ export async function tryLoadCache(
     if (cached.metadata.version !== CACHE_VERSION) return undefined;
     if (cached.metadata.key !== cacheKey) return undefined;
 
-    // Reconstruct RuntimeMasterDataset from plain MasterDataset + WorkflowConfig
-    const dataset = cached.dataset as RuntimeMasterDataset;
+    // Reconstruct RuntimePatternGraph from plain PatternGraph + WorkflowConfig
+    const dataset = cached.dataset as RuntimePatternGraph;
     if (cached.workflowConfig !== null) {
       const workflow = createLoadedWorkflow(cached.workflowConfig);
       // Assign workflow back onto the deserialized dataset (Maps are not JSON-serializable)

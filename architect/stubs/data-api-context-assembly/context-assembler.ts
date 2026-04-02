@@ -2,14 +2,14 @@
  * @architect
  * @architect-status roadmap
  * @architect-implements DataAPIContextAssembly
- * @architect-uses ProcessStateAPI, MasterDataset, PatternSummarizer
- * @architect-used-by ProcessAPICLIImpl, ContextFormatter
+ * @architect-uses PatternGraphAPI, PatternGraph, PatternSummarizer
+ * @architect-used-by PatternGraphCLIImpl, ContextFormatter
  * @architect-target src/api/context-assembler.ts
  * @architect-since DS-C
  *
  * ## ContextAssembler — Session-Oriented Context Bundle Builder
  *
- * Pure function composition over MasterDataset. Reads from 5 pre-computed
+ * Pure function composition over PatternGraph. Reads from 5 pre-computed
  * views (patterns, relationshipIndex, archIndex, deliverables, FSM) and
  * assembles them into a ContextBundle tailored to the session type.
  *
@@ -39,7 +39,7 @@
  *
  * See: DataAPIContextAssembly spec, Rules 1-5
  *
- * **When to Use:** When building a session context bundle for a pattern — use this instead of manually querying MasterDataset views.
+ * **When to Use:** When building a session context bundle for a pattern — use this instead of manually querying PatternGraph views.
  */
 
 // ---------------------------------------------------------------------------
@@ -312,7 +312,7 @@ export interface OverviewSummary {
 /**
  * Assemble a curated context bundle for one or more focal patterns.
  *
- * Pure function: takes MasterDataset + options, returns ContextBundle.
+ * Pure function: takes PatternGraph + options, returns ContextBundle.
  *
  * Algorithm:
  * 1. Resolve each focal pattern via dataset.patterns lookup
@@ -320,7 +320,7 @@ export interface OverviewSummary {
  * 3. For multi-pattern: union deps, tag shared (appearing in 2+ sets)
  * 4. Populate/omit sections based on sessionType
  *
- * @param dataset - MasterDataset with patterns, relationshipIndex, archIndex
+ * @param dataset - PatternGraph with patterns, relationshipIndex, archIndex
  * @param options - Context assembly options
  * @returns Assembled context bundle
  */
@@ -337,7 +337,7 @@ export function assembleContext(
  * Uses iterative BFS with visited-set cycle detection (DS-C-2).
  * Walks dependsOn/enables (planning) and optionally uses/usedBy (implementation).
  *
- * @param dataset - MasterDataset with patterns and relationshipIndex
+ * @param dataset - PatternGraph with patterns and relationshipIndex
  * @param options - Dep-tree options (pattern, maxDepth, includeImplementationDeps)
  * @returns Root node of the dependency tree
  */
@@ -354,7 +354,7 @@ export function buildDepTree(
  * Returns file paths grouped by: primary (spec + stubs), completed deps,
  * roadmap deps, architecture neighbors.
  *
- * @param dataset - MasterDataset with patterns and relationshipIndex
+ * @param dataset - PatternGraph with patterns and relationshipIndex
  * @param pattern - Focal pattern name
  * @param includeRelated - Whether to include deps and neighbors (default: false)
  * @returns File reading list with paths organized by relevance
@@ -373,7 +373,7 @@ export function buildFileReadingList(
  * Aggregates: progress counts, active phases, blocking relationships.
  * A pattern is "blocked" if any of its dependsOn targets has status !== completed.
  *
- * @param dataset - MasterDataset with patterns, byStatus, byPhase, relationshipIndex
+ * @param dataset - PatternGraph with patterns, byStatus, byPhase, relationshipIndex
  * @returns Project overview summary
  */
 export function buildOverview(

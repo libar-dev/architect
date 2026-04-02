@@ -20,7 +20,7 @@ Feature: Codec Behavior Testing
 
   **Solution:**
   Create behavior specs for each untested codec covering:
-  - Input transformation (MasterDataset to RenderableDocument)
+  - Input transformation (PatternGraph to RenderableDocument)
   - Output structure (correct sections, headings, content)
   - Edge cases (empty data, missing fields)
 
@@ -65,28 +65,28 @@ Feature: Codec Behavior Testing
 
     @acceptance-criteria @happy-path
     Scenario: RoadmapDocumentCodec groups by phase
-      Given MasterDataset with patterns in phases 15, 16, 17
+      Given PatternGraph with patterns in phases 15, 16, 17
       When RoadmapDocumentCodec transforms dataset
       Then document has sections for each phase
       And patterns are grouped under their phase headings
 
     @acceptance-criteria @happy-path
     Scenario: CompletedMilestonesCodec shows only completed
-      Given MasterDataset with completed and roadmap patterns
+      Given PatternGraph with completed and roadmap patterns
       When CompletedMilestonesCodec transforms dataset
       Then document only includes completed patterns
       And completion dates are shown
 
     @acceptance-criteria @happy-path
     Scenario: CurrentWorkCodec shows only active
-      Given MasterDataset with active, roadmap, and completed patterns
+      Given PatternGraph with active, roadmap, and completed patterns
       When CurrentWorkCodec transforms dataset
       Then document only includes active patterns
       And current progress is highlighted
 
     @acceptance-criteria @validation
     Scenario: Empty dataset produces minimal output
-      Given MasterDataset with no patterns
+      Given PatternGraph with no patterns
       When RoadmapDocumentCodec transforms dataset
       Then document has title and purpose
       And content section indicates no planned work
@@ -108,7 +108,7 @@ Feature: Codec Behavior Testing
 
     @acceptance-criteria @happy-path
     Scenario: SessionContextCodec includes active pattern details
-      Given MasterDataset with active pattern "FeatureX"
+      Given PatternGraph with active pattern "FeatureX"
       And pattern has 3 deliverables (2 complete, 1 pending)
       When SessionContextCodec transforms dataset
       Then document includes FeatureX with deliverable status
@@ -116,7 +116,7 @@ Feature: Codec Behavior Testing
 
     @acceptance-criteria @happy-path
     Scenario: RemainingWorkCodec aggregates by phase
-      Given MasterDataset with incomplete patterns in phases 15, 16
+      Given PatternGraph with incomplete patterns in phases 15, 16
       When RemainingWorkCodec transforms dataset
       Then document groups remaining work by phase
       And total effort remaining is calculated
@@ -138,14 +138,14 @@ Feature: Codec Behavior Testing
 
     @acceptance-criteria @happy-path
     Scenario: RequirementsDocumentCodec includes full feature descriptions
-      Given MasterDataset with pattern having Problem/Solution description
+      Given PatternGraph with pattern having Problem/Solution description
       When RequirementsDocumentCodec transforms dataset
       Then document includes Problem and Solution sections
       And business value table is rendered
 
     @acceptance-criteria @happy-path
     Scenario: Acceptance criteria have bold keywords
-      Given MasterDataset with pattern having acceptance scenarios
+      Given PatternGraph with pattern having acceptance scenarios
       When RequirementsDocumentCodec transforms dataset
       Then scenario steps have bold Given/When/Then keywords
 
@@ -166,14 +166,14 @@ Feature: Codec Behavior Testing
 
     @acceptance-criteria @happy-path
     Scenario: ChangelogCodec follows Keep a Changelog format
-      Given MasterDataset with patterns tagged to releases v0.1.0, v0.2.0
+      Given PatternGraph with patterns tagged to releases v0.1.0, v0.2.0
       When ChangelogCodec transforms dataset
       Then document has sections for each release version
       And Unreleased section shows untagged changes
 
     @acceptance-criteria @happy-path
     Scenario: TraceabilityCodec maps rules to scenarios
-      Given MasterDataset with patterns having Rules and Verified by annotations
+      Given PatternGraph with patterns having Rules and Verified by annotations
       When TraceabilityCodec transforms dataset
       Then document includes Rule-to-Scenario matrix
       And unverified rules are listed separately
@@ -195,14 +195,14 @@ Feature: Codec Behavior Testing
 
     @acceptance-criteria @happy-path
     Scenario: PlanningChecklistCodec includes deliverables
-      Given MasterDataset with active pattern having 5 deliverables
+      Given PatternGraph with active pattern having 5 deliverables
       When PlanningChecklistCodec transforms dataset
       Then document includes checklist with all deliverables
       And status checkboxes reflect completion state
 
     @acceptance-criteria @happy-path
     Scenario: SessionFindingsCodec captures discoveries
-      Given MasterDataset with pattern having @discovered-gap annotations
+      Given PatternGraph with pattern having @discovered-gap annotations
       When SessionFindingsCodec transforms dataset
       Then document includes Discoveries section
       And gaps, improvements, and risks are categorized

@@ -51,7 +51,7 @@
  * - `pattern.discoveredLearnings` -- Learned insights
  */
 
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -277,7 +277,7 @@ export const codecMetas = [
 // ═══════════════════════════════════════════════════════════════════════════
 
 function buildPlanningChecklistDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<PlanningChecklistCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
@@ -418,7 +418,7 @@ function buildPhaseChecklist(
 // ═══════════════════════════════════════════════════════════════════════════
 
 function buildSessionPlanDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<SessionPlanCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
@@ -521,7 +521,7 @@ function buildPhasePlan(
 // ═══════════════════════════════════════════════════════════════════════════
 
 function buildSessionFindingsDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<SessionFindingsCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];

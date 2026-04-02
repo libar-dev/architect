@@ -31,7 +31,7 @@ import type { ExtractedPattern } from '../../validation-schemas/extracted-patter
 import type { ExtractedShape } from '../../validation-schemas/extracted-shape.js';
 import { camelCaseToTitleCase, slugify } from '../../utils/string-utils.js';
 import { getPatternName } from '../../api/pattern-helpers.js';
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import { collectScopePatterns } from './reference-diagrams.js';
 
 // ============================================================================
@@ -380,7 +380,7 @@ export function buildShapeSections(
  * Returns undefined if no patterns found.
  */
 export function buildBoundarySummary(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   scopes: readonly DiagramScope[]
 ): SectionBlock | undefined {
   const allPatterns: ExtractedPattern[] = [];

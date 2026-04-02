@@ -14,12 +14,12 @@ import {
   suggestPattern,
 } from '../../../../src/api/pattern-helpers.js';
 import { createTestPattern } from '../../../fixtures/pattern-factories.js';
-import { createTestMasterDataset } from '../../../fixtures/dataset-factories.js';
+import { createTestPatternGraph } from '../../../fixtures/dataset-factories.js';
 import type { ExtractedPattern } from '../../../../src/validation-schemas/extracted-pattern.js';
 import type {
-  MasterDataset,
+  PatternGraph,
   RelationshipEntry,
-} from '../../../../src/validation-schemas/master-dataset.js';
+} from '../../../../src/validation-schemas/pattern-graph.js';
 
 const feature = await loadFeature('tests/features/api/output-shaping/pattern-helpers.feature');
 
@@ -34,7 +34,7 @@ interface TestState {
   foundPattern: ExtractedPattern | undefined;
   relationships: RelationshipEntry | undefined;
   suggestion: string;
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   candidates: readonly string[];
 }
 
@@ -170,7 +170,7 @@ describeFeature(feature, ({ Rule }) => {
           createTestPattern({ name, filePath: 'src/order.ts', uses: ['EventStore'] }),
           createTestPattern({ name: 'EventStore', filePath: 'src/event.ts' }),
         ];
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
       });
 
       When('I get relationships for {string}', (_ctx: unknown, name: string) => {
@@ -189,7 +189,7 @@ describeFeature(feature, ({ Rule }) => {
           createTestPattern({ name, filePath: 'src/order.ts', uses: ['EventStore'] }),
           createTestPattern({ name: 'EventStore', filePath: 'src/event.ts' }),
         ];
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
       });
 
       When('I get relationships for {string}', (_ctx: unknown, name: string) => {
@@ -205,7 +205,7 @@ describeFeature(feature, ({ Rule }) => {
       Given('a dataset without relationship index', () => {
         state = initState();
         // Empty dataset has no relationship index
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
       });
 
       When('I get relationships for {string}', (_ctx: unknown, name: string) => {

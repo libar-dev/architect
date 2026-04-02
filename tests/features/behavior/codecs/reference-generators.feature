@@ -70,7 +70,7 @@ Feature: Reference Document Generator Registration
 
     @happy-path
     Scenario: Product area generator with matching data produces non-empty output
-      Given a MasterDataset with a pattern in product area "Annotation"
+      Given a PatternGraph with a pattern in product area "Annotation"
       When running the "annotation-overview-reference" generator
       Then the output has 1 file
       And the output file path starts with "product-areas/"
@@ -78,15 +78,15 @@ Feature: Reference Document Generator Registration
 
     @happy-path
     Scenario: Product area generator with no patterns still produces intro
-      Given an empty MasterDataset
+      Given an empty PatternGraph
       When running the "annotation-overview-reference" generator
       Then the output has 1 file
       And the output file content contains "How do I annotate code?"
 
     @integration
     Scenario: ARCHITECTURE-TYPES generator produces shapes and convention content
-      Given a MasterDataset with pipeline architecture conventions and master dataset shapes
+      Given a PatternGraph with pipeline architecture conventions and pattern graph shapes
       When running the "architecture-types-reference" generator
       Then the output has 1 file
       And the output file path starts with "reference/"
-      And the output file content contains all of "MasterDatasetSchema", "PipelineOptions", "Orchestrator Pipeline Responsibilities", and "graph TB"
+      And the output file content contains all of "PatternGraphSchema", "PipelineOptions", "Orchestrator Pipeline Responsibilities", and "graph TB"

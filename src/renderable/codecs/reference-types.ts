@@ -21,7 +21,7 @@ import type { ShapeSelector } from './shape-matcher.js';
 export const DIAGRAM_SOURCE_VALUES = [
   'fsm-lifecycle',
   'generation-pipeline',
-  'master-dataset-views',
+  'pattern-graph-views',
 ] as const;
 
 /** Discriminated source type for DiagramScope.source */
@@ -71,7 +71,7 @@ export interface DiagramScope {
    * instead of computing from pattern relationships.
    * - 'fsm-lifecycle': FSM state transitions with protection levels
    * - 'generation-pipeline': 4-stage generation pipeline temporal flow
-   * - 'master-dataset-views': MasterDataset pre-computed view fan-out
+   * - 'pattern-graph-views': PatternGraph pre-computed view fan-out
    */
   readonly source?: DiagramSource;
 }
@@ -89,7 +89,7 @@ export interface ReferenceDocConfig {
   /** Convention tag values to extract from decision records */
   readonly conventionTags?: readonly string[];
 
-  /** Categories to filter behavior patterns from MasterDataset */
+  /** Categories to filter behavior patterns from PatternGraph */
   readonly behaviorCategories?: readonly string[];
 
   /** Multiple scoped diagrams. */

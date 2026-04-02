@@ -1,6 +1,6 @@
 # MCP Server Setup
 
-> Architect MCP server exposes ProcessStateAPI as native Claude Code tools with sub-millisecond dispatch.
+> Architect MCP server exposes PatternGraphAPI as native Claude Code tools with sub-millisecond dispatch.
 
 ## Quick Start
 
@@ -78,8 +78,8 @@ Override config auto-detection for monorepo setups:
 The MCP server:
 
 1. **Loads the pipeline once** — config detection, scanning, extraction, transformation (~1-2s)
-2. **Keeps MasterDataset in memory** — all subsequent queries are O(1) lookups
-3. **Exposes 25 tools** — each wrapping a ProcessStateAPI method or CLI subcommand
+2. **Keeps PatternGraph in memory** — all subsequent queries are O(1) lookups
+3. **Exposes 25 tools** — each wrapping a PatternGraphAPI method or CLI subcommand
 4. **Optionally watches files** — auto-rebuilds on source changes (500ms debounce)
 
 ## Available Tools

@@ -15,7 +15,7 @@ import {
   createArchitectureCodec,
   type ArchitectureCodecOptions,
 } from '../../../src/renderable/codecs/architecture.js';
-import { transformToMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
+import { transformToPatternGraph } from '../../../src/generators/pipeline/transform-dataset.js';
 import { renderToMarkdown } from '../../../src/renderable/render.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
 import { createDefaultTagRegistry, createTestPattern } from '../../fixtures/dataset-factories.js';
@@ -89,7 +89,7 @@ function generateDiagram(): void {
   if (!state) throw new Error('State not initialized');
 
   // Build dataset with patterns
-  const dataset = transformToMasterDataset({
+  const dataset = transformToPatternGraph({
     patterns: state.patterns,
     tagRegistry: createDefaultTagRegistry(),
     workflow: undefined,

@@ -11,7 +11,7 @@
  * - Component diagram module grouping
  * - Type hexagon rendering with fields
  * - Design questions auto-computed metrics
- * - Case-insensitive process-api sequence lookup
+ * - Case-insensitive pattern-graph CLI sequence lookup
  * - Mermaid-safe escaping across rendered label positions
  *
  * @architect

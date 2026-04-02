@@ -5,7 +5,7 @@
  * @architect-cli
  * @architect-pattern ValidatePatternsCLI
  * @architect-status completed
- * @architect-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, MasterDataset, CodecUtils
+ * @architect-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, PatternGraph, CodecUtils
  * @architect-extract-shapes ValidateCLIConfig, ValidationIssue, ValidationSummary
  *
  * ## ValidatePatternsCLI - Cross-Source Pattern Validator
@@ -41,7 +41,7 @@ import {
   applyProjectSourceDefaults,
   formatConfigError,
 } from '../config/config-loader.js';
-import { buildMasterDataset } from '../generators/pipeline/index.js';
+import { buildPatternGraph } from '../generators/pipeline/index.js';
 import {
   ScannerConfigSchema,
   createJsonOutputCodec,
@@ -49,7 +49,7 @@ import {
 } from '../validation-schemas/index.js';
 import type { ExtractedPattern } from '../validation-schemas/index.js';
 import { normalizeStatus, isPatternComplete } from '../taxonomy/index.js';
-import type { RuntimeMasterDataset } from '../generators/pipeline/index.js';
+import type { RuntimePatternGraph } from '../generators/pipeline/index.js';
 import {
   validateDoD,
   formatDoDSummary,
@@ -336,7 +336,7 @@ function hasImplementsMatch(
   tsPattern: ExtractedPattern,
   tsName: string,
   gherkinByName: ReadonlyMap<string, ExtractedPattern>,
-  dataset: RuntimeMasterDataset
+  dataset: RuntimePatternGraph
 ): boolean {
   // Check if a Gherkin pattern implements this TS pattern
   if ((dataset.relationshipIndex?.[tsName]?.implementedBy.length ?? 0) > 0) {
@@ -364,7 +364,7 @@ function hasImplementsMatch(
 function hasGherkinImplementsMatch(
   gherkinPattern: ExtractedPattern,
   tsByName: ReadonlyMap<string, ExtractedPattern>,
-  dataset: RuntimeMasterDataset
+  dataset: RuntimePatternGraph
 ): boolean {
   const name = getPatternName(gherkinPattern);
 
@@ -389,7 +389,7 @@ function hasGherkinImplementsMatch(
 }
 
 /**
- * Validate cross-source consistency using the MasterDataset read model.
+ * Validate cross-source consistency using the PatternGraph read model.
  *
  * Compares TypeScript patterns against Gherkin patterns to find:
  * - Missing patterns in either source (with implements-aware resolution)
@@ -398,13 +398,13 @@ function hasGherkinImplementsMatch(
  * - Missing deliverables for completed phases
  * - Invalid dependencies
  *
- * DD-2: Consumes RuntimeMasterDataset instead of raw scanner/extractor output.
+ * DD-2: Consumes RuntimePatternGraph instead of raw scanner/extractor output.
  * DD-3: Two-phase matching — name-based first, then relationshipIndex fallback.
  *
- * @param dataset - The pre-computed MasterDataset read model
+ * @param dataset - The pre-computed PatternGraph read model
  * @returns Validation summary with issues and statistics
  */
-export function validatePatterns(dataset: RuntimeMasterDataset): ValidationSummary {
+export function validatePatterns(dataset: RuntimePatternGraph): ValidationSummary {
   const issues: ValidationIssue[] = [];
   const tsPatterns = dataset.bySourceType.typescript;
   const gherkinPatterns = dataset.bySourceType.gherkin;
@@ -726,8 +726,8 @@ async function main(): Promise<void> {
       console.log('');
     }
 
-    // Build MasterDataset via shared pipeline factory (DD-7)
-    const pipelineResult = await buildMasterDataset({
+    // Build PatternGraph via shared pipeline factory (DD-7)
+    const pipelineResult = await buildPatternGraph({
       input: config.input,
       features: config.features,
       baseDir: config.baseDir,
@@ -747,7 +747,7 @@ async function main(): Promise<void> {
     }
 
     // Raw scans for stage-1 consumers (DoD validation, anti-pattern detection)
-    // These correctly use scanned file data, not the MasterDataset — see DD-7
+    // These correctly use scanned file data, not the PatternGraph — see DD-7
     const scannerConfig = ScannerConfigSchema.parse({
       patterns: config.input,
       exclude: config.exclude.length > 0 ? config.exclude : undefined,

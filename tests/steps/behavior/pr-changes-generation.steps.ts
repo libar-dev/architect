@@ -21,10 +21,10 @@ import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import { generateDocument } from '../../../src/renderable/generate.js';
 import type { PrChangesCodecOptions } from '../../../src/renderable/codecs/pr-changes.js';
-import type { MasterDataset } from '../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../src/validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
 import {
-  createTestMasterDataset,
+  createTestPatternGraph,
   createTestPattern,
   resetPatternCounter,
   type TestDeliverable,
@@ -37,7 +37,7 @@ import type { DataTableRow } from '../../support/world.js';
 
 interface PrChangesGenerationState {
   patterns: ExtractedPattern[];
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   output: string;
   options: PrChangesCodecOptions;
 }
@@ -66,7 +66,7 @@ function initState(): PrChangesGenerationState {
  * Generate PR changes markdown from dataset with options
  */
 function generatePrChangesMarkdown(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: PrChangesCodecOptions = {}
 ): string {
   const files = generateDocument('pr-changes', dataset, { 'pr-changes': options });
@@ -76,8 +76,8 @@ function generatePrChangesMarkdown(
 /**
  * Build dataset from accumulated patterns
  */
-function buildDataset(): MasterDataset {
-  return createTestMasterDataset({ patterns: state!.patterns });
+function buildDataset(): PatternGraph {
+  return createTestPatternGraph({ patterns: state!.patterns });
 }
 
 /**

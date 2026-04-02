@@ -22,7 +22,7 @@ Feature: Reference Codec - Detail Level Rendering
     @happy-path
     Scenario: Standard level includes narrative but omits rationale
       Given a reference config with convention tags "fsm-rules" and behavior tags ""
-      And a MasterDataset with a convention pattern with narrative and rationale
+      And a PatternGraph with a convention pattern with narrative and rationale
       When decoding at detail level "standard"
       Then the document contains narrative text
       And the document does not contain text "Rationale"
@@ -35,7 +35,7 @@ Feature: Reference Codec - Detail Level Rendering
     @happy-path
     Scenario: Detailed level renders structured behavior rules
       Given a reference config with convention tags "" and behavior tags "process-guard"
-      And a MasterDataset with a behavior pattern with structured rules
+      And a PatternGraph with a behavior pattern with structured rules
       When decoding at detail level "detailed"
       Then the document has a heading "Invariant Rule"
       And the document contains text "Must follow FSM transitions"
@@ -45,7 +45,7 @@ Feature: Reference Codec - Detail Level Rendering
     @happy-path
     Scenario: Standard level renders behavior rules without rationale
       Given a reference config with convention tags "" and behavior tags "process-guard"
-      And a MasterDataset with a behavior pattern with structured rules
+      And a PatternGraph with a behavior pattern with structured rules
       When decoding at detail level "standard"
       Then the document has a heading "Invariant Rule"
       And the document contains text "Must follow FSM transitions"
@@ -54,7 +54,7 @@ Feature: Reference Codec - Detail Level Rendering
     @happy-path
     Scenario: Summary level shows behavior rules as truncated table
       Given a reference config with convention tags "" and behavior tags "process-guard"
-      And a MasterDataset with a behavior pattern with structured rules
+      And a PatternGraph with a behavior pattern with structured rules
       When decoding at detail level "summary"
       Then the document has at least 1 table
       And the document does not have a heading "Invariant Rule"
@@ -62,7 +62,7 @@ Feature: Reference Codec - Detail Level Rendering
     @edge-case
     Scenario: Scenario names and verifiedBy merge as deduplicated list
       Given a reference config with convention tags "" and behavior tags "process-guard"
-      And a MasterDataset with a behavior pattern with overlapping scenarioNames and verifiedBy
+      And a PatternGraph with a behavior pattern with overlapping scenarioNames and verifiedBy
       When decoding at detail level "detailed"
       Then the document contains a verified-by list with 3 unique entries
 
@@ -74,14 +74,14 @@ Feature: Reference Codec - Detail Level Rendering
     @happy-path
     Scenario: Standard level includes JSDoc in code blocks
       Given a reference config with source selector "src/lint/*.ts"
-      And a MasterDataset with a shape pattern with JSDoc
+      And a PatternGraph with a shape pattern with JSDoc
       When decoding at detail level "standard"
       Then the document contains text "Input to the process guard decider function"
 
     @happy-path
     Scenario: Detailed level includes JSDoc in code block and property table
       Given a reference config with source selector "src/lint/*.ts"
-      And a MasterDataset with a shape pattern with JSDoc and property docs
+      And a PatternGraph with a shape pattern with JSDoc and property docs
       When decoding at detail level "detailed"
       Then the document contains text "Input to the process guard decider function"
       And the document has at least 1 table
@@ -89,7 +89,7 @@ Feature: Reference Codec - Detail Level Rendering
     @edge-case
     Scenario: Shapes without JSDoc render code blocks only
       Given a reference config with source selector "src/lint/*.ts"
-      And a MasterDataset with a shape pattern without JSDoc
+      And a PatternGraph with a shape pattern without JSDoc
       When decoding at detail level "standard"
       Then the document does not contain text "Input to the process guard"
       And the document contains a code block with "typescript"
@@ -102,7 +102,7 @@ Feature: Reference Codec - Detail Level Rendering
     @happy-path
     Scenario: Detailed level renders param table for function shapes
       Given a reference config with source selector "src/lint/*.ts"
-      And a MasterDataset with a function shape with param docs
+      And a PatternGraph with a function shape with param docs
       When decoding at detail level "detailed"
       Then the document has a table with columns "Parameter" and "Type" and "Description"
       And the table contains param "orderId" with description "The unique order identifier"
@@ -110,7 +110,7 @@ Feature: Reference Codec - Detail Level Rendering
     @happy-path
     Scenario: Detailed level renders returns and throws documentation
       Given a reference config with source selector "src/lint/*.ts"
-      And a MasterDataset with a function shape with returns and throws docs
+      And a PatternGraph with a function shape with returns and throws docs
       When decoding at detail level "detailed"
       Then the rendered output contains returns paragraph with type and description
       And the document has a table with columns "Exception" and "Description"
@@ -118,7 +118,7 @@ Feature: Reference Codec - Detail Level Rendering
     @happy-path
     Scenario: Standard level renders param table without throws
       Given a reference config with source selector "src/lint/*.ts"
-      And a MasterDataset with a function shape with param and throws docs
+      And a PatternGraph with a function shape with param and throws docs
       When decoding at detail level "standard"
       Then the document has a table with columns "Parameter" and "Type" and "Description"
       And the document does not have a table with column "Exception"
@@ -126,7 +126,7 @@ Feature: Reference Codec - Detail Level Rendering
     @edge-case
     Scenario: Shapes without param docs skip param table
       Given a reference config with source selector "src/lint/*.ts"
-      And a MasterDataset with a shape pattern with JSDoc
+      And a PatternGraph with a shape pattern with JSDoc
       When decoding at detail level "detailed"
       Then the document does not have a table with column "Parameter"
 
@@ -148,7 +148,7 @@ Feature: Reference Codec - Detail Level Rendering
     @acceptance-criteria @happy-path
     Scenario: Behavior pattern with many rules uses collapsible blocks at detailed level
       Given a reference config with convention tags "" and behavior tags "process-guard"
-      And a MasterDataset with a behavior pattern with 3 structured rules
+      And a PatternGraph with a behavior pattern with 3 structured rules
       When decoding at detail level "detailed"
       Then the document contains at least 1 collapsible block
       And each collapsible block summary includes a rule name
@@ -156,14 +156,14 @@ Feature: Reference Codec - Detail Level Rendering
     @acceptance-criteria @happy-path
     Scenario: Behavior pattern with few rules does not use collapsible blocks
       Given a reference config with convention tags "" and behavior tags "process-guard"
-      And a MasterDataset with a behavior pattern with 2 structured rules
+      And a PatternGraph with a behavior pattern with 2 structured rules
       When decoding at detail level "detailed"
       Then the document does not contain collapsible blocks
 
     @acceptance-criteria @happy-path
     Scenario: Summary level never produces collapsible blocks
       Given a reference config with convention tags "" and behavior tags "process-guard"
-      And a MasterDataset with a behavior pattern with 3 structured rules
+      And a PatternGraph with a behavior pattern with 3 structured rules
       When decoding at detail level "summary"
       Then the document does not contain collapsible blocks
 
@@ -184,7 +184,7 @@ Feature: Reference Codec - Detail Level Rendering
     @acceptance-criteria @happy-path
     Scenario: Behavior pattern includes source file link-out at detailed level
       Given a reference config with convention tags "" and behavior tags "process-guard"
-      And a MasterDataset with a behavior pattern in category "process-guard"
+      And a PatternGraph with a behavior pattern in category "process-guard"
       When decoding at detail level "detailed"
       Then the document contains at least 1 link-out block
       And the link-out path references a source file
@@ -192,14 +192,14 @@ Feature: Reference Codec - Detail Level Rendering
     @acceptance-criteria @happy-path
     Scenario: Standard level includes source file link-out
       Given a reference config with convention tags "" and behavior tags "process-guard"
-      And a MasterDataset with a behavior pattern in category "process-guard"
+      And a PatternGraph with a behavior pattern in category "process-guard"
       When decoding at detail level "standard"
       Then the document contains at least 1 link-out block
 
     @acceptance-criteria @happy-path
     Scenario: Summary level omits link-out blocks
       Given a reference config with convention tags "" and behavior tags "process-guard"
-      And a MasterDataset with a behavior pattern in category "process-guard"
+      And a PatternGraph with a behavior pattern in category "process-guard"
       When decoding at detail level "summary"
       Then the document does not contain link-out blocks
 
@@ -217,7 +217,7 @@ Feature: Reference Codec - Detail Level Rendering
     @acceptance-criteria @happy-path
     Scenario: Include-tagged pattern appears in behavior section
       Given a reference config with includeTags "reference-sample"
-      And a MasterDataset with a pattern that has include "reference-sample"
+      And a PatternGraph with a pattern that has include "reference-sample"
       When decoding at detail level "standard"
       Then the document has a heading "Behavior Specifications"
       And the document contains text "IncludedPattern"
@@ -225,7 +225,7 @@ Feature: Reference Codec - Detail Level Rendering
     @acceptance-criteria @happy-path
     Scenario: Include-tagged pattern is additive with category-selected patterns
       Given a reference config with behavior tags "lint" and includeTags "reference-sample"
-      And a MasterDataset with a category pattern and an include-tagged pattern
+      And a PatternGraph with a category pattern and an include-tagged pattern
       When decoding at detail level "standard"
       Then the document contains text "LintPattern"
       And the document contains text "IncludedPattern"
@@ -233,6 +233,6 @@ Feature: Reference Codec - Detail Level Rendering
     @acceptance-criteria @edge-case
     Scenario: Pattern without matching include tag is excluded
       Given a reference config with includeTags "reference-sample"
-      And a MasterDataset with a pattern that has include "other-doc"
+      And a PatternGraph with a pattern that has include "other-doc"
       When decoding at detail level "standard"
       Then the document does not have a heading "Behavior Specifications"

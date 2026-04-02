@@ -7,7 +7,7 @@
 @architect-product-area:Generation
 Feature: Convention Extractor
 
-  Extracts convention content from MasterDataset decision records
+  Extracts convention content from PatternGraph decision records
   tagged with @architect-convention. Produces structured ConventionBundles
   with rule content, tables, and invariant/rationale metadata.
 
@@ -21,13 +21,13 @@ Feature: Convention Extractor
 
     @happy-path @edge-case
     Scenario: Empty convention tags returns empty array
-      Given an empty MasterDataset
+      Given an empty PatternGraph
       When extracting conventions for no tags
       Then the convention result is empty
 
     @edge-case
     Scenario: No matching patterns returns empty array
-      Given a MasterDataset with patterns but no convention tags
+      Given a PatternGraph with patterns but no convention tags
       When extracting conventions for tag "fsm-rules"
       Then the convention result is empty
 

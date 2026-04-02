@@ -14,7 +14,7 @@
  * ## MCP File Watcher
  *
  * Watches source file globs and triggers debounced pipeline rebuilds.
- * When a TypeScript or Gherkin file changes, the MasterDataset is rebuilt
+ * When a TypeScript or Gherkin file changes, the PatternGraph is rebuilt
  * so subsequent tool calls reflect the updated annotations.
  *
  * ### When to Use

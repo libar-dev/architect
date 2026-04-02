@@ -19,9 +19,9 @@ import {
   type PdrReference,
 } from '../../../../src/api/stub-resolver.js';
 import { createTestPattern } from '../../../fixtures/pattern-factories.js';
-import { createTestMasterDataset } from '../../../fixtures/dataset-factories.js';
+import { createTestPatternGraph } from '../../../fixtures/dataset-factories.js';
 import type { ExtractedPattern } from '../../../../src/validation-schemas/index.js';
-import type { MasterDataset } from '../../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../../src/validation-schemas/pattern-graph.js';
 
 const feature = await loadFeature('tests/features/api/stub-integration/stub-resolver.feature');
 
@@ -30,7 +30,7 @@ const feature = await loadFeature('tests/features/api/stub-integration/stub-reso
 // =============================================================================
 
 interface StubResolverTestState {
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   patterns: ExtractedPattern[];
   stubPatterns: readonly ExtractedPattern[];
   resolutions: readonly StubResolution[];
@@ -75,7 +75,7 @@ describeFeature(feature, ({ Rule }) => {
           status: 'active',
         });
         state.patterns = [stubPattern, normalPattern];
-        state.dataset = createTestMasterDataset({ patterns: state.patterns });
+        state.dataset = createTestPatternGraph({ patterns: state.patterns });
       });
 
       When('finding stub patterns from the dataset', () => {
@@ -103,7 +103,7 @@ describeFeature(feature, ({ Rule }) => {
           status: 'active',
         });
         state.patterns = [withTarget, withoutTarget];
-        state.dataset = createTestMasterDataset({ patterns: state.patterns });
+        state.dataset = createTestPatternGraph({ patterns: state.patterns });
       });
 
       When('finding stub patterns from the dataset', () => {

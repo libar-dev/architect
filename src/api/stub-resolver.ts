@@ -3,12 +3,12 @@
  * @architect-pattern StubResolverImpl
  * @architect-status active
  * @architect-implements DataAPIStubIntegration
- * @architect-uses ProcessStateAPI
- * @architect-used-by ProcessAPICLIImpl
+ * @architect-uses PatternGraphAPI
+ * @architect-used-by PatternGraphCLIImpl
  *
  * ## StubResolver — Design Stub Discovery and Resolution
  *
- * Identifies design session stubs in the MasterDataset and resolves them
+ * Identifies design session stubs in the PatternGraph and resolves them
  * against the filesystem to determine implementation status.
  *
  * Stub identification heuristic:
@@ -25,7 +25,7 @@
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
-import type { MasterDataset } from '../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../validation-schemas/pattern-graph.js';
 import { getPatternName, firstImplements } from './pattern-helpers.js';
 
 // ---------------------------------------------------------------------------
@@ -93,13 +93,13 @@ export interface PdrReference {
 // ---------------------------------------------------------------------------
 
 /**
- * Identify stub patterns from the MasterDataset.
+ * Identify stub patterns from the PatternGraph.
  *
  * A pattern is a stub if:
  * 1. Its source file path contains '/stubs/' (lives in stubs directory), OR
  * 2. It has a `targetPath` field (from @architect-target tag)
  */
-export function findStubPatterns(dataset: MasterDataset): readonly ExtractedPattern[] {
+export function findStubPatterns(dataset: PatternGraph): readonly ExtractedPattern[] {
   return dataset.patterns.filter(
     (p) => p.source.file.includes('/stubs/') || p.targetPath !== undefined
   );

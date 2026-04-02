@@ -10,7 +10,7 @@
  * Registers all codec-based generators on import using the RDM
  * (RenderableDocument Model) architecture.
  *
- * All generators use Zod 4 codecs to transform MasterDataset
+ * All generators use Zod 4 codecs to transform PatternGraph
  * into RenderableDocuments, which are then rendered to markdown.
  *
  * ### When to Use

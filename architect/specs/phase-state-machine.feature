@@ -28,7 +28,7 @@ Feature: Phase State Machine Validation
       | FSM transition matrix and validator | complete | 123 | @libar-dev/architect/src/validation/fsm/transitions.ts |
       | Pure validation functions | complete | 123 | @libar-dev/architect/src/validation/fsm/validator.ts |
       | Status validation lint rule | complete | 2190 | @libar-dev/architect/src/lint/rules.ts |
-      | ProcessStateAPI for programmatic queries | complete | 95 | @libar-dev/architect/src/api/process-state.ts |
+      | PatternGraphAPI for programmatic queries | complete | 95 | @libar-dev/architect/src/api/pattern-graph-api.ts |
 
   Rule: Valid status values are enforced
 

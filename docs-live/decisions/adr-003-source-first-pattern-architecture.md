@@ -112,7 +112,7 @@ artifacts are annotated source code, executable specs, and decision specs.
 
 **Invariant:** `@architect-pattern:X` may appear in exactly one file across the entire codebase. The `mergePatterns()` conflict check in `orchestrator.ts` correctly enforces this.
 
-**Rationale:** Duplicate pattern definitions cause merge conflicts in the MasterDataset and produce ambiguous ownership in generated documentation.
+**Rationale:** Duplicate pattern definitions cause merge conflicts in the PatternGraph and produce ambiguous ownership in generated documentation.
 
 | Current State                   | Resolution                                      |
 | ------------------------------- | ----------------------------------------------- |

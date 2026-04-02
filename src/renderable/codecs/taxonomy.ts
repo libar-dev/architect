@@ -9,7 +9,7 @@
  *
  * ## TaxonomyDocumentCodec
  *
- * Transforms MasterDataset into a RenderableDocument for taxonomy reference output.
+ * Transforms PatternGraph into a RenderableDocument for taxonomy reference output.
  * Generates TAXONOMY.md and detail files (taxonomy/*.md).
  *
  * **Purpose:** Taxonomy reference documentation with tag definitions, preset comparison, and format type reference.
@@ -127,12 +127,12 @@ export function createTaxonomyCodec(options?: TaxonomyCodecOptions): DocumentCod
 /**
  * Default Taxonomy Document Codec
  *
- * Transforms MasterDataset → RenderableDocument for taxonomy reference.
+ * Transforms PatternGraph → RenderableDocument for taxonomy reference.
  * Uses default options with all features enabled.
  *
  * @example
  * ```typescript
- * const doc = TaxonomyDocumentCodec.decode(masterDataset);
+ * const doc = TaxonomyDocumentCodec.decode(patternGraph);
  * const markdown = renderToMarkdown(doc);
  * ```
  */

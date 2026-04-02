@@ -19,13 +19,13 @@ import {
   type SessionType,
 } from '../../../../src/api/context-assembler.js';
 import { QueryApiError } from '../../../../src/api/types.js';
-import { createProcessStateAPI } from '../../../../src/api/process-state.js';
-import type { ProcessStateAPI } from '../../../../src/api/process-state.js';
-import type { RuntimeMasterDataset } from '../../../../src/generators/pipeline/transform-types.js';
+import { createPatternGraphAPI } from '../../../../src/api/pattern-graph-api.js';
+import type { PatternGraphAPI } from '../../../../src/api/pattern-graph-api.js';
+import type { RuntimePatternGraph } from '../../../../src/generators/pipeline/transform-types.js';
 import type { ExtractedPattern } from '../../../../src/validation-schemas/index.js';
 import {
   createTestPattern,
-  createTestMasterDataset,
+  createTestPatternGraph,
   resetPatternCounter,
 } from '../../../fixtures/dataset-factories.js';
 
@@ -36,8 +36,8 @@ const feature = await loadFeature('tests/features/api/context-assembly/context-a
 // =============================================================================
 
 interface TestState {
-  dataset: RuntimeMasterDataset | null;
-  api: ProcessStateAPI | null;
+  dataset: RuntimePatternGraph | null;
+  api: PatternGraphAPI | null;
   bundle: ContextBundle | null;
   tree: DepTreeNode | null;
   fileList: FileReadingList | null;
@@ -64,8 +64,8 @@ function initState(): TestState {
 
 function buildDatasetAndApi(patterns: ExtractedPattern[]): void {
   if (state === null) return;
-  state.dataset = createTestMasterDataset({ patterns });
-  state.api = createProcessStateAPI(state.dataset);
+  state.dataset = createTestPatternGraph({ patterns });
+  state.api = createPatternGraphAPI(state.dataset);
 }
 
 // =============================================================================
@@ -751,10 +751,10 @@ describeFeature(feature, ({ Rule }) => {
             status: 'roadmap',
             phase: 12,
           });
-          state.dataset = createTestMasterDataset({
+          state.dataset = createTestPatternGraph({
             patterns: [completedDep, activePattern, incompleteDep, planned],
           });
-          state.api = createProcessStateAPI(state.dataset);
+          state.api = createPatternGraphAPI(state.dataset);
         });
 
         When('I build the overview', () => {
@@ -788,8 +788,8 @@ describeFeature(feature, ({ Rule }) => {
     RuleScenario('Empty dataset returns zero-state overview', ({ Given, When, Then, And }) => {
       Given('an empty dataset with {int} patterns', (_ctx: unknown, _count: number) => {
         state = initState();
-        state.dataset = createTestMasterDataset();
-        state.api = createProcessStateAPI(state.dataset);
+        state.dataset = createTestPatternGraph();
+        state.api = createPatternGraphAPI(state.dataset);
       });
 
       When('I build the overview', () => {

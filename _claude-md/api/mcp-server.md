@@ -1,6 +1,6 @@
 ### MCP Server — Native AI Context Tools
 
-When the MCP server is running, **use `architect_*` tools instead of CLI commands** (`pnpm architect:query --`). The MCP server keeps the MasterDataset in memory — tool calls dispatch in sub-milliseconds vs 2-5 seconds for CLI subprocess invocations. All 25 tools wrap the same ProcessStateAPI methods available via CLI.
+When the MCP server is running, **use `architect_*` tools instead of CLI commands** (`pnpm architect:query --`). The MCP server keeps the PatternGraph in memory — tool calls dispatch in sub-milliseconds vs 2-5 seconds for CLI subprocess invocations. All 25 tools wrap the same PatternGraphAPI methods available via CLI.
 
 #### Session Start (MCP Protocol)
 
@@ -58,7 +58,7 @@ Steps 1-2 can run in parallel (no dependencies between them).
 
 | Tool                | Description                                            |
 | ------------------- | ------------------------------------------------------ |
-| `architect_rebuild` | Force dataset rebuild from current source files        |
+| `architect_rebuild` | Force PatternGraph rebuild from current source files   |
 | `architect_config`  | Show source globs, base dir, build time, pattern count |
 | `architect_help`    | List all available tools with descriptions             |
 

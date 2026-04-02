@@ -27,13 +27,13 @@
 | Understand the tag taxonomy    | [TAXONOMY.md](TAXONOMY.md)                                      |
 | Check validation rules         | [VALIDATION-RULES.md](VALIDATION-RULES.md)                      |
 | Browse the changelog           | [CHANGELOG-GENERATED.md](CHANGELOG-GENERATED.md)                |
-| Query process state via CLI    | [Process API Reference](reference/PROCESS-API-REFERENCE.md)     |
-| Find CLI workflow recipes      | [Process API Recipes](reference/PROCESS-API-RECIPES.md)         |
+| Query process state via CLI    | [CLI Reference](reference/CLI-REFERENCE.md)                     |
+| Find CLI workflow recipes      | [CLI Recipes](reference/CLI-RECIPES.md)                         |
 | Run AI coding sessions         | [Session Workflow Guide](reference/SESSION-WORKFLOW-GUIDE.md)   |
 | Enforce delivery process rules | [Process Guard Reference](reference/PROCESS-GUARD-REFERENCE.md) |
 | Learn annotation mechanics     | [Annotation Reference](reference/ANNOTATION-REFERENCE.md)       |
 | See codec patterns and options | [Architecture Codecs](reference/ARCHITECTURE-CODECS.md)         |
-| Understand MasterDataset types | [Architecture Types](reference/ARCHITECTURE-TYPES.md)           |
+| Understand PatternGraph types  | [Architecture Types](reference/ARCHITECTURE-TYPES.md)           |
 
 ---
 
@@ -55,7 +55,7 @@
 
 1. **[Annotation Reference](reference/ANNOTATION-REFERENCE.md)** -- Annotation mechanics and tag reference
 2. **[Session Workflow Guide](reference/SESSION-WORKFLOW-GUIDE.md)** -- Planning, Design, Implementation workflows
-3. **[Process API Reference](reference/PROCESS-API-REFERENCE.md)** -- CLI command reference with flags and examples
+3. **[CLI Reference](reference/CLI-REFERENCE.md)** -- Pattern Graph CLI command reference with flags and examples
 4. **[Process Guard Reference](reference/PROCESS-GUARD-REFERENCE.md)** -- Pre-commit hooks, error codes, programmatic API
 
 ---
@@ -73,11 +73,11 @@
 | CHANGELOG-GENERATED.md  | Everyone   | Project changelog from release specs             |
 | Annotation Reference    | Developers | Annotation mechanics, shape extraction           |
 | Session Workflow Guide  | AI/Devs    | Session decision trees and workflow checklists   |
-| Process API Reference   | AI/Devs    | CLI command reference with flags and examples    |
-| Process API Recipes     | AI/Devs    | CLI workflow recipes and session guides          |
+| CLI Reference           | AI/Devs    | CLI command reference with flags and examples    |
+| CLI Recipes             | AI/Devs    | CLI workflow recipes and session guides          |
 | Process Guard Reference | Team Leads | Pre-commit hooks, error codes, programmatic API  |
 | Architecture Codecs     | Developers | All codecs with factory patterns and options     |
-| Architecture Types      | Developers | MasterDataset interface and type shapes          |
+| Architecture Types      | Developers | PatternGraph interface and type shapes           |
 
 ---
 
@@ -85,11 +85,11 @@
 
 **Delivery Process** -- A code-first documentation and workflow toolkit. Extracts patterns from annotated TypeScript and Gherkin sources, generates markdown documentation, and validates delivery workflow via pre-commit hooks.
 
-**Pattern** -- An annotated unit of work tracked by the delivery process. Each pattern has a status (roadmap, active, completed, deferred), belongs to a product area, and has deliverables. Patterns are the atomic unit of the MasterDataset.
+**Pattern** -- An annotated unit of work tracked by the delivery process. Each pattern has a status (roadmap, active, completed, deferred), belongs to a product area, and has deliverables. Patterns are the atomic unit of the PatternGraph.
 
-**MasterDataset** -- The single read model (ADR-006) containing all extracted patterns with pre-computed views (byProductArea, byPhase, byStatus, byCategory). All codecs and the Data API consume this dataset.
+**PatternGraph** -- The single read model (ADR-006) containing all extracted patterns with pre-computed views (byProductArea, byPhase, byStatus, byCategory). All codecs and the Data API consume this dataset.
 
-**Codec** -- A Zod-based transformer that decodes MasterDataset into a RenderableDocument. Each codec produces a specific document type. Codecs are pure functions with no I/O.
+**Codec** -- A Zod-based transformer that decodes PatternGraph into a RenderableDocument. Each codec produces a specific document type. Codecs are pure functions with no I/O.
 
 **Dual-Source Architecture** -- Feature files own planning metadata (status, phase, dependencies). TypeScript files own implementation metadata (uses, used-by, category). This split prevents ownership conflicts.
 
@@ -122,11 +122,11 @@
 | --------------------------------------------------------------- | -------------------------------------------------------------------- | ---------- |
 | [Annotation Reference](reference/ANNOTATION-REFERENCE.md)       | Annotation mechanics, shape extraction, tag reference                | Developers |
 | [Session Workflow Guide](reference/SESSION-WORKFLOW-GUIDE.md)   | Planning, Design, Implementation session workflows                   | AI/Devs    |
-| [Process API Reference](reference/PROCESS-API-REFERENCE.md)     | CLI command reference with flags and examples                        | AI/Devs    |
-| [Process API Recipes](reference/PROCESS-API-RECIPES.md)         | CLI workflow recipes and session guides                              | AI/Devs    |
+| [CLI Reference](reference/CLI-REFERENCE.md)                     | Pattern Graph CLI command reference with flags and examples          | AI/Devs    |
+| [CLI Recipes](reference/CLI-RECIPES.md)                         | Pattern Graph CLI workflow recipes and session guides                | AI/Devs    |
 | [Process Guard Reference](reference/PROCESS-GUARD-REFERENCE.md) | Pre-commit hooks, error codes, programmatic API                      | Team Leads |
 | [Architecture Codecs](reference/ARCHITECTURE-CODECS.md)         | All codecs with factory patterns and options                         | Developers |
-| [Architecture Types](reference/ARCHITECTURE-TYPES.md)           | MasterDataset interface and type shapes                              | Developers |
+| [Architecture Types](reference/ARCHITECTURE-TYPES.md)           | PatternGraph interface and type shapes                               | Developers |
 | [Configuration Guide](reference/CONFIGURATION-GUIDE.md)         | Presets, config files, sources, output, and monorepo setup           | Users      |
 | [Validation Tools Guide](reference/VALIDATION-TOOLS-GUIDE.md)   | lint-patterns, lint-steps, lint-process, validate-patterns reference | CI/CD      |
 | [Gherkin Authoring Guide](reference/GHERKIN-AUTHORING-GUIDE.md) | Roadmap specs, Rule blocks, DataTables, tag conventions              | Developers |
@@ -226,6 +226,6 @@ pnpm docs:business-rules        # Business rules
 pnpm docs:taxonomy              # Taxonomy reference
 pnpm docs:validation            # Validation rules
 pnpm docs:claude-modules        # Claude context modules
-pnpm docs:process-api-reference # Process API CLI reference
+pnpm docs:cli-reference         # Pattern Graph CLI reference
 pnpm docs:cli-recipe            # CLI recipes & workflow guide
 ```

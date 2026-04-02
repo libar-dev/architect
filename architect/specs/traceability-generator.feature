@@ -18,7 +18,7 @@ Feature: Traceability Generator - Rule-to-Scenario Coverage via Codec
   Rule-to-Scenario traceability. The `parseBusinessRuleAnnotations()` helper in
   `src/renderable/codecs/helpers.ts` already extracts `verifiedBy` strings from Rule
   descriptions. The remaining work is:
-  1. Cross-reference those strings against actual scenario names in MasterDataset
+  1. Cross-reference those strings against actual scenario names in PatternGraph
   2. Build a traceability matrix section showing Rule-to-Scenario mappings
   3. Detect coverage gaps (unverified rules, orphan scenarios, dangling references)
   4. Wire the codec output into `docs:all` via config and npm script
@@ -48,7 +48,7 @@ Feature: Traceability Generator - Rule-to-Scenario Coverage via Codec
   Rule: Cross-references Verified by annotations against actual scenarios
 
     **Invariant:** Every `verifiedBy` string extracted from a Rule description is
-    matched against scenario names in the MasterDataset. The traceability matrix
+    matched against scenario names in the PatternGraph. The traceability matrix
     shows each Rule with its verification status: verified (all references resolve),
     partially verified (some resolve), or unverified (none resolve or no annotation).
 
@@ -67,7 +67,7 @@ Feature: Traceability Generator - Rule-to-Scenario Coverage via Codec
         Rule: Reservations prevent race conditions
           **Verified by:** Concurrent reservations, Expired reservation cleanup
         """
-      And the MasterDataset contains scenarios:
+      And the PatternGraph contains scenarios:
         | Scenario Name |
         | Concurrent reservations |
         | Expired reservation cleanup |
@@ -77,7 +77,7 @@ Feature: Traceability Generator - Rule-to-Scenario Coverage via Codec
     @acceptance-criteria @validation
     Scenario: Reports dangling references
       Given a Rule references scenario "Non-existent test" in Verified by
-      And no scenario with that name exists in the MasterDataset
+      And no scenario with that name exists in the PatternGraph
       When the TraceabilityCodec decodes the dataset
       Then a "Dangling References" section should list "Non-existent test"
       And the Rule should show status "partially verified" or "unverified"

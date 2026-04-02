@@ -22,11 +22,11 @@
  * execution (orchestrator-owned) keeps Data API and validation consumers aligned on one
  * read-model path while preserving generator-specific output handling.
  *
- * ## Steps 1-8 via buildMasterDataset()
+ * ## Steps 1-8 via buildPatternGraph()
  *
  * Steps 1-8 (config load, TypeScript/Gherkin scan + extraction, merge, hierarchy
- * derivation, workflow load, and `transformToMasterDataset`) are delegated to
- * `buildMasterDataset()`.
+ * derivation, workflow load, and `transformToPatternGraph`) are delegated to
+ * `buildPatternGraph()`.
  *
  * ## Steps 9-10: Codec Execution and File Writing
  *
@@ -62,7 +62,7 @@ import { generatorRegistry } from './registry.js';
 import type { GeneratorContext } from './types.js';
 import type { Result } from '../types/index.js';
 import { Result as R } from '../types/index.js';
-import { buildMasterDataset } from './pipeline/index.js';
+import { buildPatternGraph } from './pipeline/index.js';
 import { getChangedFilesList } from '../git/index.js';
 import type { CodecOptions } from '../renderable/generate.js';
 import { registerReferenceGenerators } from './built-in/reference-generators.js';
@@ -170,7 +170,7 @@ export interface GenerateOptions {
 
   /**
    * Pre-loaded tag registry. When provided, skips internal config load inside
-   * buildMasterDataset (avoids loading config twice when caller already has it).
+   * buildPatternGraph (avoids loading config twice when caller already has it).
    */
   tagRegistry?: TagRegistry;
 
@@ -313,7 +313,7 @@ export async function generateDocumentation(
     : undefined; // let factory use defaults
 
   // DD-6: Delegate 8-step pipeline to shared factory
-  const pipelineResult = await buildMasterDataset({
+  const pipelineResult = await buildPatternGraph({
     input: options.input,
     features,
     baseDir,
@@ -333,10 +333,10 @@ export async function generateDocumentation(
   }
 
   // DD-6: Extract values from pipeline result
-  const { dataset: masterDataset } = pipelineResult.value;
-  const allPatterns = masterDataset.patterns;
-  const registry = masterDataset.tagRegistry;
-  const workflow = masterDataset.workflow;
+  const { dataset: patternGraph } = pipelineResult.value;
+  const allPatterns = patternGraph.patterns;
+  const registry = patternGraph.tagRegistry;
+  const workflow = patternGraph.workflow;
 
   // DD-1: Map PipelineWarning[] → GenerationWarning[]
   for (const pw of pipelineResult.value.warnings) {
@@ -405,12 +405,12 @@ export async function generateDocumentation(
       continue; // Skip this generator, try others
     }
 
-    // Build generator context with pre-computed masterDataset and codec options
+    // Build generator context with pre-computed patternGraph and codec options
     const context: GeneratorContext = {
       baseDir,
       outputDir: options.outputDir,
       registry,
-      masterDataset,
+      patternGraph,
       ...(workflow !== undefined ? { workflow } : {}),
       ...(codecOptions !== undefined ? { codecOptions } : {}),
       ...(options.projectMetadata !== undefined

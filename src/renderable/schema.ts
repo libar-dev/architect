@@ -11,7 +11,7 @@
  * ## RenderableDocument Schema
  *
  * Universal intermediate format for all generated documentation.
- * Document codecs transform MasterDataset into this format,
+ * Document codecs transform PatternGraph into this format,
  * then the universal renderer converts it to markdown.
  *
  * ### When to Use

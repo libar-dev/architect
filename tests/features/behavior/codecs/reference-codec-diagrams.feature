@@ -21,7 +21,7 @@ Feature: Reference Codec - Diagram Scoping
     @happy-path
     Scenario: Config with diagramScopes produces mermaid block at detailed level
       Given a reference config with diagramScopes archContext "lint"
-      And a MasterDataset with arch-annotated patterns in context "lint"
+      And a PatternGraph with arch-annotated patterns in context "lint"
       When decoding at detail level "detailed"
       Then the document contains a mermaid block
       And the document has a heading "Component Overview"
@@ -29,7 +29,7 @@ Feature: Reference Codec - Diagram Scoping
     @happy-path
     Scenario: Neighbor patterns appear in diagram with distinct style
       Given a reference config with diagramScopes archContext "lint"
-      And a MasterDataset with arch patterns where lint uses validation
+      And a PatternGraph with arch patterns where lint uses validation
       When decoding at detail level "detailed"
       Then the document contains a mermaid block
       And the mermaid content contains "neighbor"
@@ -39,7 +39,7 @@ Feature: Reference Codec - Diagram Scoping
     @happy-path
     Scenario: include filter selects patterns by include tag membership
       Given a reference config with diagramScopes include "pipeline-stages"
-      And a MasterDataset with patterns in include "pipeline-stages"
+      And a PatternGraph with patterns in include "pipeline-stages"
       When decoding at detail level "detailed"
       Then the document contains a mermaid block
       And the mermaid content contains "PatternScanner"
@@ -47,7 +47,7 @@ Feature: Reference Codec - Diagram Scoping
     @edge-case
     Scenario: Self-contained scope produces no Related subgraph
       Given a reference config with diagramScopes archContext "lint"
-      And a MasterDataset with self-contained lint patterns
+      And a PatternGraph with self-contained lint patterns
       When decoding at detail level "detailed"
       Then the document contains a mermaid block
       And the mermaid content does not contain "Related"
@@ -55,7 +55,7 @@ Feature: Reference Codec - Diagram Scoping
     @edge-case
     Scenario: Multiple filter dimensions OR together
       Given a reference config with diagramScopes combining archContext and include
-      And a MasterDataset where one pattern matches archContext and another matches include
+      And a PatternGraph where one pattern matches archContext and another matches include
       When decoding at detail level "detailed"
       Then the document contains a mermaid block
       And the mermaid content contains both "LintRules" and "DocExtractor"
@@ -63,7 +63,7 @@ Feature: Reference Codec - Diagram Scoping
     @happy-path
     Scenario: Explicit pattern names filter selects named patterns
       Given a reference config with diagramScopes patterns "LintRules"
-      And a MasterDataset with multiple arch-annotated patterns
+      And a PatternGraph with multiple arch-annotated patterns
       When decoding at detail level "detailed"
       Then the document contains a mermaid block
       And the mermaid content contains "LintRules"
@@ -72,14 +72,14 @@ Feature: Reference Codec - Diagram Scoping
     @edge-case
     Scenario: Config without diagramScopes produces no diagram section
       Given a reference config with convention tags "fsm-rules" and behavior tags ""
-      And a MasterDataset with arch-annotated patterns in context "lint"
+      And a PatternGraph with arch-annotated patterns in context "lint"
       When decoding at detail level "detailed"
       Then the document does not have a heading "Component Overview"
 
     @happy-path
     Scenario: archLayer filter selects patterns by architectural layer
       Given a reference config with diagramScopes archLayer "domain"
-      And a MasterDataset with patterns in domain and infrastructure layers
+      And a PatternGraph with patterns in domain and infrastructure layers
       When decoding at detail level "detailed"
       Then the document contains a mermaid block
       And the mermaid content contains "DomainPattern"
@@ -88,7 +88,7 @@ Feature: Reference Codec - Diagram Scoping
     @happy-path
     Scenario: archLayer and archContext compose via OR
       Given a reference config with diagramScopes archLayer "domain" and archContext "shared"
-      And a MasterDataset with a domain-layer pattern and a shared-context pattern
+      And a PatternGraph with a domain-layer pattern and a shared-context pattern
       When decoding at detail level "detailed"
       Then the document contains a mermaid block
       And the mermaid content contains both "DomainPattern" and "SharedPattern"
@@ -96,24 +96,24 @@ Feature: Reference Codec - Diagram Scoping
     @happy-path
     Scenario: Summary level omits scoped diagram
       Given a reference config with diagramScopes archContext "lint"
-      And a MasterDataset with arch-annotated patterns in context "lint"
+      And a PatternGraph with arch-annotated patterns in context "lint"
       When decoding at detail level "summary"
       Then the document does not contain a mermaid block
 
   Rule: Hardcoded diagram sources render deterministic output
 
     **Invariant:** Hardcoded diagram sources render without relationship-scoping input and emit stable, source-specific Mermaid content.
-    **Rationale:** Domain diagrams such as pipeline and MasterDataset fan-out encode canonical architecture views that should not depend on ad-hoc test dataset shape.
-    **Verified by:** master-dataset-views source renders expected fan-out nodes
+    **Rationale:** Domain diagrams such as pipeline and PatternGraph fan-out encode canonical architecture views that should not depend on ad-hoc test dataset shape.
+    **Verified by:** pattern-graph-views source renders expected fan-out nodes
 
     @happy-path
-    Scenario: master-dataset-views source produces MasterDataset fan-out diagram
-      Given a reference config with diagramScopes source "master-dataset-views"
-      And a MasterDataset with arch-annotated patterns in context "lint"
+    Scenario: pattern-graph-views source produces PatternGraph fan-out diagram
+      Given a reference config with diagramScopes source "pattern-graph-views"
+      And a PatternGraph with arch-annotated patterns in context "lint"
       When decoding at detail level "detailed"
       Then the document contains a mermaid block
       And the mermaid content contains "graph TB"
-      And the mermaid content contains all of "MasterDataset", "byStatus", "byPhase", and "relationshipIndex"
+      And the mermaid content contains all of "PatternGraph", "byStatus", "byPhase", and "relationshipIndex"
 
   Rule: Multiple diagram scopes produce multiple mermaid blocks
 
@@ -123,7 +123,7 @@ Feature: Reference Codec - Diagram Scoping
     @happy-path
     Scenario: Config with diagramScopes array produces multiple diagrams
       Given a reference config with two diagramScopes
-      And a MasterDataset with patterns in two different include groups
+      And a PatternGraph with patterns in two different include groups
       When decoding at detail level "detailed"
       Then the document contains 2 mermaid blocks
       And the document has headings "Codec Transformation" and "Pipeline Data Flow"
@@ -131,7 +131,7 @@ Feature: Reference Codec - Diagram Scoping
     @happy-path
     Scenario: Diagram direction is reflected in mermaid output
       Given a reference config with LR direction diagramScopes
-      And a MasterDataset with patterns in include "pipeline-stages"
+      And a PatternGraph with patterns in include "pipeline-stages"
       When decoding at detail level "detailed"
       Then the document contains a mermaid block
       And the mermaid content contains "graph LR"

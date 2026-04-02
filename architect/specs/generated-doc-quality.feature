@@ -29,7 +29,7 @@ Feature: Generated Documentation Quality Improvements
   | Benefit | Audience |
   | Removes ~200 wasted token-lines per REFERENCE-SAMPLE.md read | Claude |
   | Generation compact usable as standalone context (1.4 KB → 4+ KB) | Claude |
-  | ARCHITECTURE-TYPES.md answers "what is MasterDataset?" immediately | Claude |
+  | ARCHITECTURE-TYPES.md answers "what is PatternGraph?" immediately | Claude |
   | 233 KB product area docs become navigable in a browser | Human devs |
 
   Background: Deliverables
@@ -101,9 +101,9 @@ Feature: Generated Documentation Quality Improvements
 
   Rule: ARCHITECTURE-TYPES.md leads with type definitions, not convention content
 
-    **Invariant:** ARCHITECTURE-TYPES.md opens with the MasterDataset type definitions
+    **Invariant:** ARCHITECTURE-TYPES.md opens with the PatternGraph type definitions
     section before any pipeline-architecture convention content. An agent querying
-    "what is MasterDataset" finds the type definition within the first 30 lines.
+    "what is PatternGraph" finds the type definition within the first 30 lines.
     The pipeline-architecture convention prose (orchestrator responsibilities, pipeline
     steps) follows the type definitions section.
 
@@ -117,8 +117,8 @@ Feature: Generated Documentation Quality Improvements
     Pipeline convention content follows types section
 
     @acceptance-criteria @happy-path
-    Scenario: MasterDataset type definition appears before orchestrator prose
+    Scenario: PatternGraph type definition appears before orchestrator prose
       Given ARCHITECTURE-TYPES.md generated with shapes section ordered before conventions
       When the first 30 lines are read
-      Then MasterDataset or a related type definition appears
+      Then PatternGraph or a related type definition appears
       And no orchestrator responsibility prose appears before the first type definition

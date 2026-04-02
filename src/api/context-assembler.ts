@@ -3,26 +3,26 @@
  * @architect-pattern ContextAssemblerImpl
  * @architect-status active
  * @architect-implements DataAPIContextAssembly
- * @architect-uses ProcessStateAPI, MasterDataset, PatternSummarizerImpl, FuzzyMatcherImpl, StubResolverImpl
- * @architect-used-by ProcessAPICLIImpl, ContextFormatterImpl
+ * @architect-uses PatternGraphAPI, PatternGraph, PatternSummarizerImpl, FuzzyMatcherImpl, StubResolverImpl
+ * @architect-used-by PatternGraphCLIImpl, ContextFormatterImpl
  * @architect-arch-role service
  * @architect-arch-context api
  * @architect-arch-layer application
  *
  * ## ContextAssembler — Session-Oriented Context Bundle Builder
  *
- * Pure function composition over MasterDataset. Reads from 5 pre-computed
+ * Pure function composition over PatternGraph. Reads from 5 pre-computed
  * views (patterns, relationshipIndex, archIndex, deliverables, FSM) and
  * assembles them into a ContextBundle tailored to the session type.
  *
  * The assembler does NOT format output. It produces structured data that
  * the ContextFormatter renders as plain text (see ADR-008).
  *
- * **When to Use:** When building a session context bundle for a pattern — use this instead of manually querying MasterDataset views.
+ * **When to Use:** When building a session context bundle for a pattern — use this instead of manually querying PatternGraph views.
  */
 
-import type { ProcessStateAPI } from './process-state.js';
-import type { MasterDataset } from '../validation-schemas/master-dataset.js';
+import type { PatternGraphAPI } from './pattern-graph-api.js';
+import type { PatternGraph } from '../validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import {
   VALID_PROCESS_STATUS_SET,
@@ -187,7 +187,7 @@ export interface OverviewSummary {
 /**
  * Find a pattern by name or throw QueryApiError with a fuzzy suggestion.
  */
-function requirePattern(dataset: MasterDataset, name: string): ExtractedPattern {
+function requirePattern(dataset: PatternGraph, name: string): ExtractedPattern {
   const pattern = findPatternByNameFromList(dataset.patterns, name);
   if (pattern !== undefined) return pattern;
   const allNames = allPatternNames(dataset);
@@ -197,7 +197,7 @@ function requirePattern(dataset: MasterDataset, name: string): ExtractedPattern 
 }
 
 function resolveDepEntry(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   depName: string,
   kind: 'planning' | 'implementation'
 ): DepEntry {
@@ -221,7 +221,7 @@ function buildMetadata(pattern: ExtractedPattern): PatternContextMeta {
   };
 }
 
-function resolveStubRefs(dataset: MasterDataset, patternName: string): readonly StubRef[] {
+function resolveStubRefs(dataset: PatternGraph, patternName: string): readonly StubRef[] {
   const rels = getRelationships(dataset, patternName);
   if (rels === undefined) return [];
 
@@ -235,7 +235,7 @@ function resolveStubRefs(dataset: MasterDataset, patternName: string): readonly 
 }
 
 function resolveArchNeighbors(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   pattern: ExtractedPattern,
   focalNames: ReadonlySet<string>
 ): readonly NeighborEntry[] {
@@ -257,7 +257,7 @@ function resolveArchNeighbors(
 }
 
 function resolveDeliverables(
-  api: ProcessStateAPI,
+  api: PatternGraphAPI,
   patternName: string
 ): readonly DeliverableEntry[] {
   const deliverables = api.getPatternDeliverables(patternName);
@@ -268,7 +268,7 @@ function resolveDeliverables(
   }));
 }
 
-function resolveFsm(api: ProcessStateAPI, status: string | undefined): FsmContext | undefined {
+function resolveFsm(api: PatternGraphAPI, status: string | undefined): FsmContext | undefined {
   if (status === undefined) return undefined;
   if (!VALID_STATUSES.has(status)) return undefined;
   const validStatus = status as ProcessStatusValue;
@@ -290,8 +290,8 @@ function resolveTestFiles(pattern: ExtractedPattern): readonly string[] {
 // ---------------------------------------------------------------------------
 
 export function assembleContext(
-  dataset: MasterDataset,
-  api: ProcessStateAPI,
+  dataset: PatternGraph,
+  api: PatternGraphAPI,
   options: ContextOptions
 ): ContextBundle {
   const { patterns: patternNames, sessionType } = options;
@@ -438,7 +438,7 @@ export function assembleContext(
 // buildDepTree
 // ---------------------------------------------------------------------------
 
-export function buildDepTree(dataset: MasterDataset, options: DepTreeOptions): DepTreeNode {
+export function buildDepTree(dataset: PatternGraph, options: DepTreeOptions): DepTreeNode {
   const { pattern: focalName, maxDepth, includeImplementationDeps } = options;
 
   requirePattern(dataset, focalName);
@@ -459,7 +459,7 @@ export function buildDepTree(dataset: MasterDataset, options: DepTreeOptions): D
 }
 
 function findDepTreeRoot(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   focalName: string,
   includeImplementationDeps: boolean
 ): string {
@@ -488,7 +488,7 @@ function findDepTreeRoot(
 }
 
 function buildTreeNode(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   name: string,
   focalName: string,
   depth: number,
@@ -572,7 +572,7 @@ function buildTreeNode(
 // ---------------------------------------------------------------------------
 
 export function buildFileReadingList(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   patternName: string,
   includeRelated: boolean
 ): FileReadingList {
@@ -649,7 +649,7 @@ export function buildFileReadingList(
 // buildOverview
 // ---------------------------------------------------------------------------
 
-export function buildOverview(dataset: MasterDataset): OverviewSummary {
+export function buildOverview(dataset: PatternGraph): OverviewSummary {
   const { counts } = dataset;
   const total = counts.total;
   const percentage = total > 0 ? Math.round((counts.completed / total) * 100) : 0;

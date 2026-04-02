@@ -5,7 +5,7 @@
 @architect-implements:ArchitectureDiagramGeneration
 @architect-product-area:Generation
 @architecture
-Feature: Architecture Index in MasterDataset
+Feature: Architecture Index in PatternGraph
 
   As a documentation generator
   I want an archIndex built during dataset transformation
@@ -34,7 +34,7 @@ Feature: Architecture Index in MasterDataset
         | Handler1 | command-handler | orders      | application |
         | Handler2 | command-handler | inventory   | application |
         | Proj1    | projection      | orders      | application |
-      When transformToMasterDataset runs
+      When transformToPatternGraph runs
       Then archIndex byRole for "command-handler" should contain 2 patterns
       And archIndex byRole for "projection" should contain 1 pattern
 
@@ -54,7 +54,7 @@ Feature: Architecture Index in MasterDataset
         | OrderHandler  | command-handler | orders      | application |
         | OrderProj     | projection      | orders      | application |
         | InvHandler    | command-handler | inventory   | application |
-      When transformToMasterDataset runs
+      When transformToPatternGraph runs
       Then archIndex byContext for "orders" should contain 2 patterns
       And archIndex byContext for "inventory" should contain 1 pattern
 
@@ -74,7 +74,7 @@ Feature: Architecture Index in MasterDataset
         | Decider1 | decider         | orders      | domain         |
         | Handler1 | command-handler | orders      | application    |
         | Infra1   | infrastructure  | -           | infrastructure |
-      When transformToMasterDataset runs
+      When transformToPatternGraph runs
       Then archIndex byLayer should have counts:
         | layer          | count |
         | domain         | 1     |
@@ -101,7 +101,7 @@ Feature: Architecture Index in MasterDataset
       And a pattern without arch annotations:
         | name       |
         | NoArchTags |
-      When transformToMasterDataset runs
+      When transformToPatternGraph runs
       Then archIndex all should contain 3 patterns
       And archIndex all should not contain pattern "NoArchTags"
 
@@ -123,7 +123,7 @@ Feature: Architecture Index in MasterDataset
         | name          |
         | NotAnnotated1 |
         | NotAnnotated2 |
-      When transformToMasterDataset runs
+      When transformToPatternGraph runs
       Then archIndex all should contain 1 pattern
       And archIndex all should contain pattern "Annotated"
 

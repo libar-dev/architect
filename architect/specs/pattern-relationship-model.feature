@@ -41,7 +41,7 @@ Feature: Pattern Relationship Model
       | Extends tag in taxonomy registry | complete | src/taxonomy/registry-builder.ts | Yes | unit |
       | DocDirective schema update | complete | src/validation-schemas/doc-directive.ts | Yes | unit |
       | ExtractedPattern schema update | complete | src/validation-schemas/extracted-pattern.ts | Yes | unit |
-      | RelationshipEntry schema update | complete | src/validation-schemas/master-dataset.ts | Yes | unit |
+      | RelationshipEntry schema update | complete | src/validation-schemas/pattern-graph.ts | Yes | unit |
       | Relationship index enhancement | complete | src/generators/pipeline/transform-dataset.ts | Yes | unit |
       | Mermaid graph enhancement | complete | src/renderable/codecs/patterns.ts | Yes | unit |
       | Pattern detail implementations section | complete | src/renderable/codecs/patterns.ts | Yes | unit |

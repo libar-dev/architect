@@ -1,10 +1,10 @@
 @architect
-@architect-pattern:ProcessApiCliMetadata
+@architect-pattern:PatternGraphCliMetadata
 @architect-implements:DataAPICLIErgonomics
 @architect-status:active
 @architect-product-area:DataAPI
-@cli @process-api @metadata
-Feature: Process API CLI - Response Metadata
+@cli @pattern-graph-cli @metadata
+Feature: Pattern Graph CLI - Response Metadata
   Response metadata includes validation summary and pipeline timing for diagnostics.
 
   Background:
@@ -22,7 +22,7 @@ Feature: Process API CLI - Response Metadata
     @acceptance-criteria @happy-path
     Scenario: Validation summary in response metadata
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' status"
+      When running "pattern-graph-cli -i 'src/**/*.ts' status"
       Then exit code is 0
       And stdout is valid JSON with key "metadata"
       And metadata has a validation object with count fields
@@ -31,6 +31,6 @@ Feature: Process API CLI - Response Metadata
     @happy-path
     Scenario: Pipeline timing in metadata
       Given TypeScript files with pattern annotations
-      When running "process-api -i 'src/**/*.ts' status"
+      When running "pattern-graph-cli -i 'src/**/*.ts' status"
       Then exit code is 0
       And metadata has a numeric pipelineMs field

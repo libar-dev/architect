@@ -4,13 +4,13 @@
  * Shared state and mock infrastructure for MCP server tests.
  *
  * @architect
- * @architect-uses MCPPipelineSession, ProcessStateAPI, TagRegistry
+ * @architect-uses MCPPipelineSession, PatternGraphAPI, TagRegistry
  */
 
 import type { PipelineSession, ParsedOptions } from '../../../src/mcp/index.js';
-import { createTestMasterDataset } from '../../fixtures/dataset-factories.js';
+import { createTestPatternGraph } from '../../fixtures/dataset-factories.js';
 import { createTestPattern } from '../../fixtures/pattern-factories.js';
-import { createProcessStateAPI } from '../../../src/api/process-state.js';
+import { createPatternGraphAPI } from '../../../src/api/pattern-graph-api.js';
 import { createDefaultTagRegistry } from '../../../src/validation-schemas/tag-registry.js';
 
 // =============================================================================
@@ -64,13 +64,13 @@ export class MockMcpServer {
 
 /**
  * Creates a PipelineSession from test factories.
- * Avoids real file I/O by using in-memory MasterDataset.
+ * Avoids real file I/O by using in-memory PatternGraph.
  */
 export function createTestPipelineSession(): PipelineSession {
-  const dataset = createTestMasterDataset({
+  const dataset = createTestPatternGraph({
     statusDistribution: { completed: 3, active: 2, planned: 1 },
   });
-  const api = createProcessStateAPI(dataset);
+  const api = createPatternGraphAPI(dataset);
   const registry = createDefaultTagRegistry();
 
   return {
@@ -94,8 +94,8 @@ export function createFilterTestSession(): PipelineSession {
     createTestPattern({ name: 'CompletedP46', status: 'completed', phase: 46 }),
     createTestPattern({ name: 'RoadmapP5', status: 'roadmap', phase: 5 }),
   ];
-  const dataset = createTestMasterDataset({ patterns });
-  const api = createProcessStateAPI(dataset);
+  const dataset = createTestPatternGraph({ patterns });
+  const api = createPatternGraphAPI(dataset);
   const registry = createDefaultTagRegistry();
 
   return {
@@ -146,8 +146,8 @@ export function createRichPatternSession(): PipelineSession {
       },
     ],
   });
-  const dataset = createTestMasterDataset({ patterns: [focal, dep] });
-  const api = createProcessStateAPI(dataset);
+  const dataset = createTestPatternGraph({ patterns: [focal, dep] });
+  const api = createPatternGraphAPI(dataset);
   const registry = createDefaultTagRegistry();
 
   return {

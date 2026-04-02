@@ -40,14 +40,14 @@ The tag prefix is configurable via presets or custom configuration (see [Configu
 
 ### Key Design Principles
 
-| Principle                      | Description                                                                                      |
-| ------------------------------ | ------------------------------------------------------------------------------------------------ |
-| **Single Source of Truth**     | Code + .feature files are authoritative; docs are generated projections                          |
-| **Single-Pass Transformation** | All derived views computed in O(n) time, not redundant O(n) per section                          |
-| **Codec-Based Rendering**      | Zod 4 codecs transform MasterDataset → RenderableDocument → Markdown                             |
-| **Schema-First Validation**    | Zod schemas define types; runtime validation at all boundaries                                   |
-| **Single Read Model**          | MasterDataset is the sole read model for all consumers — codecs, validators, query API (ADR-006) |
-| **Result Monad**               | Explicit error handling via `Result<T, E>` instead of exceptions                                 |
+| Principle                      | Description                                                                                     |
+| ------------------------------ | ----------------------------------------------------------------------------------------------- |
+| **Single Source of Truth**     | Code + .feature files are authoritative; docs are generated projections                         |
+| **Single-Pass Transformation** | All derived views computed in O(n) time, not redundant O(n) per section                         |
+| **Codec-Based Rendering**      | Zod 4 codecs transform PatternGraph → RenderableDocument → Markdown                             |
+| **Schema-First Validation**    | Zod schemas define types; runtime validation at all boundaries                                  |
+| **Single Read Model**          | PatternGraph is the sole read model for all consumers — codecs, validators, query API (ADR-006) |
+| **Result Monad**               | Explicit error handling via `Result<T, E>` instead of exceptions                                |
 
 ### Architecture Overview
 
@@ -57,7 +57,7 @@ The tag prefix is configurable via presets or custom configuration (see [Configu
   ┌─────────────┐   ┌─────────────┐   ┌─────────────────┐   ┌─────────────┐
   │   SCANNER   │ → │  EXTRACTOR  │ → │  TRANSFORMER    │ → │   CODEC     │
   │             │   │             │   │                 │   │             │
-  │ TypeScript  │   │ ExtractedP- │   │ MasterDataset   │   │ Renderable  │
+  │ TypeScript  │   │ ExtractedP- │   │ PatternGraph   │   │ Renderable  │
   │ Gherkin     │   │ attern[]    │   │ (pre-computed   │   │ Document    │
   │ Files       │   │             │   │  views)         │   │ → Markdown  │
   └─────────────┘   └─────────────┘   └─────────────────┘   └─────────────┘
@@ -94,7 +94,7 @@ export default defineConfig({
 | **Scanner**     | `regexBuilders.hasFileOptIn()`   | Detects files with configured opt-in marker |
 | **Scanner**     | `regexBuilders.directivePattern` | Matches tags with configured prefix         |
 | **Extractor**   | `registry.categories`            | Maps tags to category names                 |
-| **Transformer** | `registry`                       | Builds MasterDataset with category indexes  |
+| **Transformer** | `registry`                       | Builds PatternGraph with category indexes   |
 
 ### Configuration Resolution
 
@@ -141,7 +141,7 @@ defineConfig(userConfig)
 
 ## Four-Stage Pipeline
 
-The pipeline has two entry points. The orchestrator (`src/generators/orchestrator.ts`) runs all 10 steps end-to-end for documentation generation. The shared pipeline factory `buildMasterDataset()` (`src/generators/pipeline/build-pipeline.ts`) runs steps 1-8 and returns a `Result<PipelineResult, PipelineError>` for CLI consumers like process-api and validate-patterns (see [Pipeline Factory](#pipeline-factory-adr-006)).
+The pipeline has two entry points. The orchestrator (`src/generators/orchestrator.ts`) runs all 10 steps end-to-end for documentation generation. The shared pipeline factory `buildPatternGraph()` (`src/generators/pipeline/build-pipeline.ts`) runs steps 1-8 and returns a `Result<PipelineResult, PipelineError>` for CLI consumers like pattern-graph-cli and validate-patterns (see [Pipeline Factory](#pipeline-factory-adr-006)).
 
 ### Stage 1: Scanner
 
@@ -212,18 +212,18 @@ interface ExtractedPattern {
 
 **Dual-Source Merging:**
 
-After extraction, patterns from both sources are merged with conflict detection. Merge behavior varies by consumer: `'fatal'` mode (used by process-api and orchestrator) returns an error if the same pattern name exists in both TypeScript and Gherkin; `'concatenate'` mode (used by validate-patterns) falls back to concatenation on conflict, since the validator needs both sources for cross-source matching.
+After extraction, patterns from both sources are merged with conflict detection. Merge behavior varies by consumer: `'fatal'` mode (used by pattern-graph-cli and orchestrator) returns an error if the same pattern name exists in both TypeScript and Gherkin; `'concatenate'` mode (used by validate-patterns) falls back to concatenation on conflict, since the validator needs both sources for cross-source matching.
 
 ### Pipeline Factory (ADR-006)
 
-ADR-006 established the **Single Read Model Architecture**: the MasterDataset is the sole read model for all consumers. The shared pipeline factory extracts the 8-step scan-extract-merge-transform pipeline into a reusable function.
+ADR-006 established the **Single Read Model Architecture**: the PatternGraph is the sole read model for all consumers. The shared pipeline factory extracts the 8-step scan-extract-merge-transform pipeline into a reusable function.
 
 **Key File:** `src/generators/pipeline/build-pipeline.ts`
 
 **Signature:**
 
 ```typescript
-function buildMasterDataset(
+function buildPatternGraph(
   options: PipelineOptions
 ): Promise<Result<PipelineResult, PipelineError>>;
 ```
@@ -246,7 +246,7 @@ function buildMasterDataset(
 
 | Field          | Type                         | Description                                |
 | -------------- | ---------------------------- | ------------------------------------------ |
-| `dataset`      | `RuntimeMasterDataset`       | The fully-computed read model              |
+| `dataset`      | `RuntimePatternGraph`        | The fully-computed read model              |
 | `validation`   | `ValidationSummary`          | Schema validation results for all patterns |
 | `warnings`     | `readonly PipelineWarning[]` | Structured non-fatal warnings              |
 | `scanMetadata` | `ScanMetadata`               | Aggregate scan counts for reporting        |
@@ -289,7 +289,7 @@ function buildMasterDataset(
 | Layer                  | May Import                            | Examples                                              |
 | ---------------------- | ------------------------------------- | ----------------------------------------------------- |
 | Pipeline Orchestration | `scanner/`, `extractor/`, `pipeline/` | `orchestrator.ts`, pipeline setup in CLI entry points |
-| Feature Consumption    | `MasterDataset`, `relationshipIndex`  | codecs, ProcessStateAPI, validators, query handlers   |
+| Feature Consumption    | `PatternGraph`, `relationshipIndex`   | codecs, PatternGraphAPI, validators, query handlers   |
 
 **Named Anti-Patterns (ADR-006):**
 
@@ -303,7 +303,7 @@ function buildMasterDataset(
 
 **Purpose:** Compute all derived views in a single O(n) pass.
 
-**Key File:** `src/generators/pipeline/transform-dataset.ts:transformToMasterDataset()`
+**Key File:** `src/generators/pipeline/transform-dataset.ts:transformToPatternGraph()`
 
 This is the **key innovation** of the unified pipeline. Instead of each section calling `.filter()` repeatedly:
 
@@ -318,16 +318,16 @@ The transformer computes ALL views upfront:
 
 ```typescript
 // NEW: Single-pass transformation - O(n) total
-const masterDataset = transformToMasterDataset({ patterns, tagRegistry, workflow });
+const patternGraph = transformToPatternGraph({ patterns, tagRegistry, workflow });
 
 // Sections access pre-computed views - O(1)
-const completed = masterDataset.byStatus.completed;
-const phase3 = masterDataset.byPhase.find((p) => p.phaseNumber === 3);
+const completed = patternGraph.byStatus.completed;
+const phase3 = patternGraph.byPhase.find((p) => p.phaseNumber === 3);
 ```
 
 ### Stage 4: Codec
 
-**Purpose:** Transform MasterDataset into RenderableDocument, then render to markdown.
+**Purpose:** Transform PatternGraph into RenderableDocument, then render to markdown.
 
 **Key Files:**
 
@@ -336,7 +336,7 @@ const phase3 = masterDataset.byPhase.find((p) => p.phaseNumber === 3);
 
 ```typescript
 // Codec transforms to universal intermediate format
-const doc = PatternsDocumentCodec.decode(masterDataset);
+const doc = PatternsDocumentCodec.decode(patternGraph);
 
 // Renderer produces markdown files
 const files = renderDocumentWithFiles(doc, 'PATTERNS.md');
@@ -346,14 +346,14 @@ const files = renderDocumentWithFiles(doc, 'PATTERNS.md');
 
 ## Unified Transformation Architecture
 
-### MasterDataset Schema
+### PatternGraph Schema
 
-**Key File:** `src/validation-schemas/master-dataset.ts`
+**Key File:** `src/validation-schemas/pattern-graph.ts`
 
-The `MasterDataset` is the central data structure containing all pre-computed views:
+The `PatternGraph` is the central data structure containing all pre-computed views:
 
 ```typescript
-interface MasterDataset {
+interface PatternGraph {
   // ─── Raw Data ───────────────────────────────────────────────────────────
   patterns: ExtractedPattern[];
   tagRegistry: TagRegistry;
@@ -418,24 +418,24 @@ interface MasterDataset {
 }
 ```
 
-### RuntimeMasterDataset
+### RuntimePatternGraph
 
-The runtime type extends `MasterDataset` with non-serializable workflow:
+The runtime type extends `PatternGraph` with non-serializable workflow:
 
 ```typescript
 // transform-dataset.ts:50-53
-interface RuntimeMasterDataset extends MasterDataset {
+interface RuntimePatternGraph extends PatternGraph {
   readonly workflow?: LoadedWorkflow; // Contains Maps - not JSON-serializable
 }
 ```
 
 ### Single-Pass Transformation
 
-The `transformToMasterDataset()` function iterates over patterns exactly once, accumulating all views:
+The `transformToPatternGraph()` function iterates over patterns exactly once, accumulating all views:
 
 ```typescript
 // transform-dataset.ts:98-235 (simplified)
-export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset {
+export function transformToPatternGraph(raw: RawDataset): RuntimePatternGraph {
   // Initialize accumulators
   const byStatus: StatusGroups = { completed: [], active: [], planned: [] };
   const byPhaseMap = new Map<number, ExtractedPattern[]>();
@@ -487,14 +487,14 @@ export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset 
 The Architect package uses a codec-based architecture for document generation:
 
 ```
-MasterDataset → Codec.decode() → RenderableDocument ─┬→ renderToMarkdown       → Markdown Files
+PatternGraph → Codec.decode() → RenderableDocument ─┬→ renderToMarkdown       → Markdown Files
                                                       └→ renderToClaudeMdModule → Modular Claude.md
 ```
 
 | Component                  | Description                                                                       |
 | -------------------------- | --------------------------------------------------------------------------------- |
-| **MasterDataset**          | Aggregated view of all extracted patterns with indexes by category, phase, status |
-| **Codec**                  | Zod 4 codec that transforms MasterDataset into RenderableDocument                 |
+| **PatternGraph**           | Aggregated view of all extracted patterns with indexes by category, phase, status |
+| **Codec**                  | Zod 4 codec that transforms PatternGraph into RenderableDocument                  |
 | **RenderableDocument**     | Universal intermediate format with typed section blocks                           |
 | **renderToMarkdown**       | Domain-agnostic markdown renderer for human documentation                         |
 | **renderToClaudeMdModule** | Modular-claude-md renderer (H3-rooted headings, omits Mermaid/link-outs)          |
@@ -853,7 +853,7 @@ const doc = codec.decode(dataset);
 
 **Key Exports:**
 
-- `createCompositeCodec(codecs, options)` — Factory that decodes each child codec against the same MasterDataset and composes their outputs
+- `createCompositeCodec(codecs, options)` — Factory that decodes each child codec against the same PatternGraph and composes their outputs
 - `composeDocuments(documents, options)` — Pure document-level composition (concatenates sections, merges `additionalFiles` with last-wins semantics)
 
 **Options (CompositeCodecOptions):**
@@ -1141,8 +1141,8 @@ Data-driven configuration for pattern categorization:
 │                                        │                                         │
 │                                        ▼                                         │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
-│  │ Step 8: Transform to MasterDataset (SINGLE PASS)                           ││
-│  │         transformToMasterDataset({ patterns, tagRegistry, workflow })       ││
+│  │ Step 8: Transform to PatternGraph (SINGLE PASS)                           ││
+│  │         transformToPatternGraph({ patterns, tagRegistry, workflow })       ││
 │  │                                                                              ││
 │  │         Computes: byStatus, byPhase, byQuarter, byCategory, bySourceType,   ││
 │  │                   counts, phaseCount, categoryCount, relationshipIndex      ││
@@ -1152,7 +1152,7 @@ Data-driven configuration for pattern categorization:
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
 │  │ Step 9: Run Codecs                                                          ││
 │  │         for each generator:                                                 ││
-│  │           doc = Codec.decode(masterDataset)                                 ││
+│  │           doc = Codec.decode(patternGraph)                                 ││
 │  │           files = renderDocumentWithFiles(doc, outputPath)                  ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 │                                        │                                         │
@@ -1167,10 +1167,10 @@ Data-driven configuration for pattern categorization:
 
 ### Pipeline Factory Entry Point (ADR-006)
 
-Steps 1-8 are also available via `buildMasterDataset()` from `src/generators/pipeline/build-pipeline.ts`. The orchestrator adds Steps 9-10 (codec execution and file writing).
+Steps 1-8 are also available via `buildPatternGraph()` from `src/generators/pipeline/build-pipeline.ts`. The orchestrator adds Steps 9-10 (codec execution and file writing).
 
 ```
-buildMasterDataset(options)
+buildPatternGraph(options)
          │
          ▼
     Steps 1-8 (scan → extract → merge → transform)
@@ -1178,7 +1178,7 @@ buildMasterDataset(options)
          ▼
     Result<PipelineResult, PipelineError>
          │
-         ├── process-api CLI        (mergeConflictStrategy: 'fatal')
+         ├── pattern-graph-cli CLI        (mergeConflictStrategy: 'fatal')
          │     └── query handlers consume dataset
          │
          ├── validate-patterns CLI  (mergeConflictStrategy: 'concatenate')
@@ -1189,11 +1189,11 @@ buildMasterDataset(options)
                └── Step 10: File writing → OutputFile[]
 ```
 
-### MasterDataset Views
+### PatternGraph Views
 
 ```
                         ┌─────────────────────────────────────┐
-                        │         MasterDataset               │
+                        │         PatternGraph               │
                         │                                     │
                         │  patterns: ExtractedPattern[]       │
                         │  tagRegistry: TagRegistry           │
@@ -1242,7 +1242,7 @@ buildMasterDataset(options)
 
 ````
                     ┌─────────────────────────────┐
-                    │       MasterDataset         │
+                    │       PatternGraph         │
                     └──────────────┬──────────────┘
                                    │
         ┌──────────────────────────┼──────────────────────────┐
@@ -1403,7 +1403,7 @@ const currentCodec = createCurrentWorkCodec({
 ### Direct Codec Usage
 
 ```typescript
-import { createPatternsCodec, type MasterDataset } from '@libar-dev/architect';
+import { createPatternsCodec, type PatternGraph } from '@libar-dev/architect';
 import { renderToMarkdown } from '@libar-dev/architect/renderable';
 
 // Create custom codec
@@ -1413,7 +1413,7 @@ const codec = createPatternsCodec({
 });
 
 // Transform dataset
-const document = codec.decode(masterDataset);
+const document = codec.decode(patternGraph);
 
 // Render to markdown
 const markdown = renderToMarkdown(document);
@@ -1425,7 +1425,7 @@ const markdown = renderToMarkdown(document);
 import { generateDocument, type DocumentType } from '@libar-dev/architect/renderable';
 
 // Generate with default options
-const files = generateDocument('patterns', masterDataset);
+const files = generateDocument('patterns', patternGraph);
 
 // files is OutputFile[]
 for (const file of files) {
@@ -1461,7 +1461,7 @@ if (document.additionalFiles) {
 
 ```typescript
 import { z } from 'zod';
-import { MasterDatasetSchema, type MasterDataset } from '../validation-schemas/master-dataset';
+import { PatternGraphSchema, type PatternGraph } from '../validation-schemas/pattern-graph';
 import { type RenderableDocument, document, heading, paragraph } from '../renderable/schema';
 import { RenderableDocumentOutputSchema } from '../renderable/codecs/shared-schema';
 
@@ -1474,8 +1474,8 @@ interface MyCodecOptions {
 export function createMyCodec(options?: MyCodecOptions) {
   const opts = { includeCustomSection: true, ...options };
 
-  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
-    decode: (dataset: MasterDataset): RenderableDocument => {
+  return z.codec(PatternGraphSchema, RenderableDocumentOutputSchema, {
+    decode: (dataset: PatternGraph): RenderableDocument => {
       const sections = [
         heading(2, 'Summary'),
         paragraph(`Total patterns: ${dataset.counts.total}`),
@@ -1513,7 +1513,7 @@ class MyCustomGenerator implements DocumentGenerator {
 
   generate(patterns, context) {
     const codec = createMyCodec();
-    const doc = codec.decode(context.masterDataset);
+    const doc = codec.decode(context.patternGraph);
     const files = renderDocumentWithFiles(doc, 'MY-CUSTOM.md');
     return Promise.resolve({ files });
   }
@@ -1612,25 +1612,25 @@ filterQuarters: []; // All (default)
 
 ## Code References
 
-| Component                | File                                                | Purpose                                        |
-| ------------------------ | --------------------------------------------------- | ---------------------------------------------- |
-| MasterDataset Schema     | `src/validation-schemas/master-dataset.ts`          | Central data structure                         |
-| transformToMasterDataset | `src/generators/pipeline/transform-dataset.ts`      | Single-pass transformation                     |
-| Document Codecs          | `src/renderable/codecs/*.ts`                        | Zod 4 codec implementations                    |
-| Reference Codec          | `src/renderable/codecs/reference.ts`                | Scoped reference documents                     |
-| Composite Codec          | `src/renderable/codecs/composite.ts`                | Multi-codec assembly                           |
-| Convention Extractor     | `src/renderable/codecs/convention-extractor.ts`     | Convention content extraction                  |
-| Shape Matcher            | `src/renderable/codecs/shape-matcher.ts`            | Declaration-level filtering                    |
-| Markdown Renderer        | `src/renderable/render.ts`                          | Block → Markdown                               |
-| Claude Context Renderer  | `src/renderable/render.ts`                          | LLM-optimized rendering                        |
-| Orchestrator             | `src/generators/orchestrator.ts`                    | Pipeline coordination                          |
-| TypeScript Scanner       | `src/scanner/pattern-scanner.ts`                    | TS AST parsing                                 |
-| Gherkin Scanner          | `src/scanner/gherkin-scanner.ts`                    | Feature file parsing                           |
-| Pipeline Factory         | `src/generators/pipeline/build-pipeline.ts`         | Shared 8-step pipeline for CLI consumers       |
-| Business Rules Query     | `src/api/rules-query.ts`                            | Rules domain query (from Gherkin Rule: blocks) |
-| Business Rules Codec     | `src/renderable/codecs/business-rules.ts`           | Business rules from Gherkin Rule: blocks       |
-| Architecture Codec       | `src/renderable/codecs/architecture.ts`             | Architecture diagrams from annotations         |
-| Taxonomy Codec           | `src/renderable/codecs/taxonomy.ts`                 | Taxonomy reference documentation               |
-| Validation Rules Codec   | `src/renderable/codecs/validation-rules.ts`         | Process Guard validation rules reference       |
-| Decision Doc Generator   | `src/generators/built-in/decision-doc-generator.ts` | ADR/PDR decision documents                     |
-| Shape Extractor          | `src/extractor/shape-extractor.ts`                  | Shape extraction from TS                       |
+| Component               | File                                                | Purpose                                        |
+| ----------------------- | --------------------------------------------------- | ---------------------------------------------- |
+| PatternGraph Schema     | `src/validation-schemas/pattern-graph.ts`           | Central data structure                         |
+| transformToPatternGraph | `src/generators/pipeline/transform-dataset.ts`      | Single-pass transformation                     |
+| Document Codecs         | `src/renderable/codecs/*.ts`                        | Zod 4 codec implementations                    |
+| Reference Codec         | `src/renderable/codecs/reference.ts`                | Scoped reference documents                     |
+| Composite Codec         | `src/renderable/codecs/composite.ts`                | Multi-codec assembly                           |
+| Convention Extractor    | `src/renderable/codecs/convention-extractor.ts`     | Convention content extraction                  |
+| Shape Matcher           | `src/renderable/codecs/shape-matcher.ts`            | Declaration-level filtering                    |
+| Markdown Renderer       | `src/renderable/render.ts`                          | Block → Markdown                               |
+| Claude Context Renderer | `src/renderable/render.ts`                          | LLM-optimized rendering                        |
+| Orchestrator            | `src/generators/orchestrator.ts`                    | Pipeline coordination                          |
+| TypeScript Scanner      | `src/scanner/pattern-scanner.ts`                    | TS AST parsing                                 |
+| Gherkin Scanner         | `src/scanner/gherkin-scanner.ts`                    | Feature file parsing                           |
+| Pipeline Factory        | `src/generators/pipeline/build-pipeline.ts`         | Shared 8-step pipeline for CLI consumers       |
+| Business Rules Query    | `src/api/rules-query.ts`                            | Rules domain query (from Gherkin Rule: blocks) |
+| Business Rules Codec    | `src/renderable/codecs/business-rules.ts`           | Business rules from Gherkin Rule: blocks       |
+| Architecture Codec      | `src/renderable/codecs/architecture.ts`             | Architecture diagrams from annotations         |
+| Taxonomy Codec          | `src/renderable/codecs/taxonomy.ts`                 | Taxonomy reference documentation               |
+| Validation Rules Codec  | `src/renderable/codecs/validation-rules.ts`         | Process Guard validation rules reference       |
+| Decision Doc Generator  | `src/generators/built-in/decision-doc-generator.ts` | ADR/PDR decision documents                     |
+| Shape Extractor         | `src/extractor/shape-extractor.ts`                  | Shape extraction from TS                       |

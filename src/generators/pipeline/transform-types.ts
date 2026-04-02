@@ -6,16 +6,16 @@
  * @architect-arch-context generator
  * @architect-arch-layer application
  * @architect-used-by TransformDataset, Orchestrator
- * @architect-uses MasterDataset, LoadedWorkflow, ExtractedPattern, TagRegistry, ContextInferenceRule
+ * @architect-uses PatternGraph, LoadedWorkflow, ExtractedPattern, TagRegistry, ContextInferenceRule
  *
- * ## TransformTypes - MasterDataset Transformation Types
+ * ## TransformTypes - PatternGraph Transformation Types
  *
  * Type definitions for the dataset transformation pipeline.
  * Separated from transform-dataset.ts to allow importing types
  * without pulling in the transformation logic.
  */
 
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import type { LoadedWorkflow } from '../../config/workflow-loader.js';
 import type { ExtractedPattern, TagRegistry } from '../../validation-schemas/index.js';
 import type { ContextInferenceRule } from './context-inference.js';
@@ -66,26 +66,26 @@ export interface ValidationSummary {
 }
 
 /**
- * Result of transformToMasterDataset including both dataset and validation info.
+ * Result of transformToPatternGraph including both dataset and validation info.
  */
 export interface TransformResult {
-  /** The transformed MasterDataset */
-  dataset: RuntimeMasterDataset;
+  /** The transformed PatternGraph */
+  dataset: RuntimePatternGraph;
 
   /** Validation summary with any issues found during transformation */
   validation: ValidationSummary;
 }
 
 /**
- * Runtime MasterDataset with optional workflow
+ * Runtime PatternGraph with optional workflow
  *
- * Extends the Zod-compatible MasterDataset with workflow reference.
+ * Extends the Zod-compatible PatternGraph with workflow reference.
  * LoadedWorkflow contains Maps which aren't JSON-serializable,
  * so it's kept separate from the Zod schema.
  *
- * @architect-shape master-dataset
+ * @architect-shape pattern-graph
  */
-export interface RuntimeMasterDataset extends MasterDataset {
+export interface RuntimePatternGraph extends PatternGraph {
   /** Optional workflow configuration (not serializable) */
   readonly workflow?: LoadedWorkflow;
 }
@@ -93,7 +93,7 @@ export interface RuntimeMasterDataset extends MasterDataset {
 /**
  * Raw input data for transformation
  *
- * @architect-shape master-dataset
+ * @architect-shape pattern-graph
  */
 export interface RawDataset {
   /** Extracted patterns from TypeScript and/or Gherkin sources */

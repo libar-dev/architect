@@ -9,13 +9,13 @@ import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import { filterShapesBySelectors } from '../../../../src/renderable/codecs/shape-matcher.js';
 import type { ShapeSelector } from '../../../../src/renderable/codecs/shape-matcher.js';
-import type { MasterDataset } from '../../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../../src/validation-schemas/pattern-graph.js';
 import type {
   ExtractedShape,
   ShapeKind,
 } from '../../../../src/validation-schemas/extracted-shape.js';
 import { createTestPattern, resetPatternCounter } from '../../../fixtures/pattern-factories.js';
-import { createTestMasterDataset } from '../../../fixtures/dataset-factories.js';
+import { createTestPatternGraph } from '../../../fixtures/dataset-factories.js';
 
 // ============================================================================
 // Helpers
@@ -39,7 +39,7 @@ interface ShapeRow {
   Kind: string;
 }
 
-function buildDatasetFromRows(rows: readonly ShapeRow[]): MasterDataset {
+function buildDatasetFromRows(rows: readonly ShapeRow[]): PatternGraph {
   resetPatternCounter();
   // Group rows by pattern source
   const bySource = new Map<string, ShapeRow[]>();
@@ -62,7 +62,7 @@ function buildDatasetFromRows(rows: readonly ShapeRow[]): MasterDataset {
     });
   });
 
-  return createTestMasterDataset({ patterns });
+  return createTestPatternGraph({ patterns });
 }
 
 // ============================================================================
@@ -70,7 +70,7 @@ function buildDatasetFromRows(rows: readonly ShapeRow[]): MasterDataset {
 // ============================================================================
 
 interface SelectorTestState {
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   resultShapes: readonly ExtractedShape[];
 }
 
@@ -105,7 +105,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Select specific shapes by source and names', ({ Given, When, Then, And }) => {
       Given(
-        'a MasterDataset with patterns containing these extracted shapes:',
+        'a PatternGraph with patterns containing these extracted shapes:',
         (_ctx: unknown, table: readonly ShapeRow[]) => {
           state!.dataset = buildDatasetFromRows(table);
         }
@@ -140,7 +140,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Select all shapes in a group', ({ Given, When, Then, And }) => {
       Given(
-        'a MasterDataset with patterns containing these extracted shapes:',
+        'a PatternGraph with patterns containing these extracted shapes:',
         (_ctx: unknown, table: readonly ShapeRow[]) => {
           state!.dataset = buildDatasetFromRows(table);
         }
@@ -172,7 +172,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Select all tagged shapes from a source file', ({ Given, When, Then, And }) => {
       Given(
-        'a MasterDataset with patterns containing these extracted shapes:',
+        'a PatternGraph with patterns containing these extracted shapes:',
         (_ctx: unknown, table: readonly ShapeRow[]) => {
           state!.dataset = buildDatasetFromRows(table);
         }
@@ -194,7 +194,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Source-only selector returns all matching shapes', ({ Given, When, Then }) => {
       Given(
-        'a MasterDataset with patterns containing these extracted shapes:',
+        'a PatternGraph with patterns containing these extracted shapes:',
         (_ctx: unknown, table: readonly ShapeRow[]) => {
           state!.dataset = buildDatasetFromRows(table);
         }

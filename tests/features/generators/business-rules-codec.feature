@@ -6,7 +6,7 @@
 @architect-implements:BusinessRulesGenerator
 Feature: Business Rules Document Codec
 
-  Tests the BusinessRulesCodec transformation from MasterDataset to RenderableDocument.
+  Tests the BusinessRulesCodec transformation from PatternGraph to RenderableDocument.
   Verifies rule extraction, organization by domain/phase, and progressive disclosure.
 
   Background: Business rules codec test context

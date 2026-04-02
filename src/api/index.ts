@@ -4,10 +4,10 @@
  * @architect-pattern APIModule
  * @architect-status active
  *
- * ## API Module - Programmatic Process State Interface
+ * ## API Module - Programmatic Pattern Graph Interface
  *
- * Central export for the Process State API, providing a TypeScript
- * interface for querying project state.
+ * Central export for the PatternGraphAPI, providing a TypeScript
+ * interface for querying the pattern graph and delivery state.
  *
  * ### When to Use
  *
@@ -19,12 +19,12 @@
  *
  * ```typescript
  * import {
- *   createProcessStateAPI,
- *   type ProcessStateAPI,
+ *   createPatternGraphAPI,
+ *   type PatternGraphAPI,
  *   type QueryResult,
  * } from "@libar-dev/architect/api";
  *
- * const api = createProcessStateAPI(masterDataset);
+ * const api = createPatternGraphAPI(patternGraph);
  *
  * // Query current work
  * const activeWork = api.getCurrentWork();
@@ -58,9 +58,9 @@ export type {
 export { createSuccess, createError, QueryApiError } from './types.js';
 export type { NeighborEntry } from './types.js';
 
-// Process State API
-export type { ProcessStateAPI } from './process-state.js';
-export { createProcessStateAPI } from './process-state.js';
+// Pattern Graph API
+export type { PatternGraphAPI } from './pattern-graph-api.js';
+export { createPatternGraphAPI } from './pattern-graph-api.js';
 
 // Pattern Summarization
 export type { PatternSummary } from './summarize.js';

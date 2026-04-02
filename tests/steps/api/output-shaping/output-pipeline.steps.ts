@@ -16,9 +16,9 @@ import {
   type PipelineInput,
 } from '../../../../src/cli/output-pipeline.js';
 import { createTestPattern } from '../../../fixtures/pattern-factories.js';
-import { createTestMasterDataset } from '../../../fixtures/dataset-factories.js';
+import { createTestPatternGraph } from '../../../fixtures/dataset-factories.js';
 import type { ExtractedPattern } from '../../../../src/validation-schemas/index.js';
-import type { MasterDataset } from '../../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../../src/validation-schemas/pattern-graph.js';
 
 const feature = await loadFeature('tests/features/api/output-shaping/output-pipeline.feature');
 
@@ -28,7 +28,7 @@ const feature = await loadFeature('tests/features/api/output-shaping/output-pipe
 
 interface PipelineTestState {
   patterns: ExtractedPattern[];
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   output: unknown;
   error: Error | null;
   scalarInput: unknown;
@@ -328,7 +328,7 @@ describeFeature(feature, ({ Rule }) => {
               })
             ),
           ];
-          state.dataset = createTestMasterDataset({ patterns });
+          state.dataset = createTestPatternGraph({ patterns });
         }
       );
 
@@ -369,7 +369,7 @@ describeFeature(feature, ({ Rule }) => {
               filePath: 'src/api1.ts',
             }),
           ];
-          state.dataset = createTestMasterDataset({ patterns });
+          state.dataset = createTestPatternGraph({ patterns });
         }
       );
 
@@ -403,7 +403,7 @@ describeFeature(feature, ({ Rule }) => {
             filePath: `src/r${i}.ts`,
           })
         );
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
       });
 
       When(
@@ -440,7 +440,7 @@ describeFeature(feature, ({ Rule }) => {
             filePath: `src/r${i}.ts`,
           })
         );
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
       });
 
       When(

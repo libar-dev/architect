@@ -31,7 +31,7 @@ Feature: Context Auto-Inference from File Paths
     Scenario Outline: Recursive wildcard matches nested paths
       Given a pattern rule "<pattern>" for context "test-context"
       And a pattern at file path "<filePath>" with archLayer "application"
-      When transforming to master dataset with rules
+      When transforming to pattern graph with rules
       Then the pattern archContext should be "<expectedContext>"
 
       Examples:
@@ -56,7 +56,7 @@ Feature: Context Auto-Inference from File Paths
     Scenario Outline: Single-level wildcard matches direct children only
       Given a pattern rule "<pattern>" for context "test-context"
       And a pattern at file path "<filePath>" with archLayer "application"
-      When transforming to master dataset with rules
+      When transforming to pattern graph with rules
       Then the pattern archContext should be "<expectedContext>"
 
       Examples:
@@ -79,7 +79,7 @@ Feature: Context Auto-Inference from File Paths
     Scenario Outline: Prefix matching behavior
       Given a pattern rule "<pattern>" for context "test-context"
       And a pattern at file path "<filePath>" with archLayer "application"
-      When transforming to master dataset with rules
+      When transforming to pattern graph with rules
       Then the pattern archContext should be "<expectedContext>"
 
       Examples:
@@ -101,7 +101,7 @@ Feature: Context Auto-Inference from File Paths
     Scenario: Empty rules array returns undefined
       Given no context inference rules
       And a pattern at file path "src/unknown/file.ts" with archLayer "application"
-      When transforming to master dataset with rules
+      When transforming to pattern graph with rules
       Then the pattern has no inferred archContext
       And the pattern is not in archIndex byContext
 
@@ -109,7 +109,7 @@ Feature: Context Auto-Inference from File Paths
     Scenario: File path does not match any rule
       Given default context inference rules
       And a pattern at file path "unknown/path/file.ts" with archLayer "application"
-      When transforming to master dataset with rules
+      When transforming to pattern graph with rules
       Then the pattern has no inferred archContext
       And the pattern is not in archIndex byContext
 
@@ -127,7 +127,7 @@ Feature: Context Auto-Inference from File Paths
     Scenario: Single matching rule infers context
       Given default context inference rules
       And a pattern at file path "src/validation/rules.ts" with archLayer "application"
-      When transforming to master dataset with rules
+      When transforming to pattern graph with rules
       Then the pattern archContext should be "validation"
       And the pattern appears in archIndex byContext under "validation"
 
@@ -138,7 +138,7 @@ Feature: Context Auto-Inference from File Paths
         | src/validation/** | validation |
         | src/**            | general    |
       And a pattern at file path "src/validation/rules.ts" with archLayer "application"
-      When transforming to master dataset with rules
+      When transforming to pattern graph with rules
       Then the pattern archContext should be "validation"
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -155,7 +155,7 @@ Feature: Context Auto-Inference from File Paths
     Scenario: Explicit context takes precedence over inference
       Given default context inference rules
       And a pattern at file path "src/validation/rules.ts" with archLayer "application" and archContext "custom"
-      When transforming to master dataset with rules
+      When transforming to pattern graph with rules
       Then the pattern archContext should be "custom"
       And the pattern appears in archIndex byContext under "custom"
 
@@ -173,7 +173,7 @@ Feature: Context Auto-Inference from File Paths
     Scenario: Pattern without archLayer is still added to byContext if context is inferred
       Given default context inference rules
       And a pattern at file path "src/validation/rules.ts" without archLayer
-      When transforming to master dataset with rules
+      When transforming to pattern graph with rules
       Then the pattern is in archIndex all
       And the pattern appears in archIndex byContext under "validation"
 
@@ -191,7 +191,7 @@ Feature: Context Auto-Inference from File Paths
     Scenario Outline: Default directory mappings
       Given default context inference rules
       And a pattern at file path "<filePath>" with archLayer "application"
-      When transforming to master dataset with rules
+      When transforming to pattern graph with rules
       Then the pattern archContext should be "<expectedContext>"
 
       Examples:

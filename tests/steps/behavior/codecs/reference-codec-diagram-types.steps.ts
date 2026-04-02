@@ -9,7 +9,7 @@ import {
   initState,
   createReferenceCodec,
   createTestPattern,
-  createTestMasterDataset,
+  createTestPatternGraph,
   findBlocksByType,
   type DetailLevel,
   type RenderableDocument,
@@ -63,9 +63,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       );
 
       And(
-        'a MasterDataset with arch-annotated patterns in context {string}',
+        'a PatternGraph with arch-annotated patterns in context {string}',
         (_ctx: unknown, context: string) => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'OrderHandler',
@@ -126,9 +126,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with patterns in context {string} with uses relationships',
+          'a PatternGraph with patterns in context {string} with uses relationships',
           (_ctx: unknown, context: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'OrderService',
@@ -203,9 +203,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       );
 
       And(
-        'a MasterDataset with patterns in context {string} with dependsOn relationships',
+        'a PatternGraph with patterns in context {string} with dependsOn relationships',
         (_ctx: unknown, context: string) => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'ValidationStep',
@@ -272,8 +272,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with an orders pattern that uses an external pattern', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with an orders pattern that uses an external pattern', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'OrderService',
@@ -332,8 +332,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         }
       );
 
-      And('a MasterDataset with a linear dependsOn chain of workflow patterns', () => {
-        state!.dataset = createTestMasterDataset({
+      And('a PatternGraph with a linear dependsOn chain of workflow patterns', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: [
             createTestPattern({
               name: 'StepC',
@@ -398,9 +398,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       );
 
       And(
-        'a MasterDataset with patterns in context {string} with uses relationships',
+        'a PatternGraph with patterns in context {string} with uses relationships',
         (_ctx: unknown, context: string) => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'OrderService',
@@ -476,8 +476,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with an orders pattern that uses an external pattern', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with an orders pattern that uses an external pattern', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'OrderService',
@@ -534,9 +534,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with patterns in context {string} with uses relationships',
+          'a PatternGraph with patterns in context {string} with uses relationships',
           (_ctx: unknown, context: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'OrderService',
@@ -605,9 +605,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       );
 
       And(
-        'a MasterDataset with a service pattern and a projection pattern in context {string}',
+        'a PatternGraph with a service pattern and a projection pattern in context {string}',
         (_ctx: unknown, context: string) => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'OrderHandler',
@@ -668,9 +668,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with patterns in context {string} with uses relationships',
+          'a PatternGraph with patterns in context {string} with uses relationships',
           (_ctx: unknown, context: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'ServiceA',
@@ -726,9 +726,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with patterns in context {string} with uses relationships',
+          'a PatternGraph with patterns in context {string} with uses relationships',
           (_ctx: unknown, context: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'CompactA',
@@ -782,9 +782,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       );
 
       And(
-        'a MasterDataset with a service pattern and a projection pattern in context {string}',
+        'a PatternGraph with a service pattern and a projection pattern in context {string}',
         (_ctx: unknown, context: string) => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'OrderService',
@@ -844,9 +844,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with a pattern without archRole in context {string}',
+          'a PatternGraph with a pattern without archRole in context {string}',
           (_ctx: unknown, context: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'PlainPattern',

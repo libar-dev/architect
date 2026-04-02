@@ -8,7 +8,7 @@
  *
  * ## ValidationRulesCodec
  *
- * Transforms MasterDataset into a RenderableDocument for Process Guard validation
+ * Transforms PatternGraph into a RenderableDocument for Process Guard validation
  * rules reference. Generates VALIDATION-RULES.md and detail files (validation/*.md).
  *
  * **Purpose:** Process Guard validation rules reference with FSM diagrams and protection level matrix.
@@ -238,12 +238,12 @@ export function createValidationRulesCodec(options?: ValidationRulesCodecOptions
 /**
  * Default ValidationRules Document Codec
  *
- * Transforms MasterDataset -> RenderableDocument for validation rules reference.
+ * Transforms PatternGraph -> RenderableDocument for validation rules reference.
  * Uses default options with all features enabled.
  *
  * @example
  * ```typescript
- * const doc = ValidationRulesCodec.decode(masterDataset);
+ * const doc = ValidationRulesCodec.decode(patternGraph);
  * const markdown = renderToMarkdown(doc);
  * ```
  */

@@ -57,7 +57,7 @@ List specific declaration names in the file-level JSDoc:
 ```typescript
 /**
  * @architect
- * @architect-extract-shapes MasterDatasetSchema, StatusGroupsSchema
+ * @architect-extract-shapes PatternGraphSchema, StatusGroupsSchema
  */
 ```
 
@@ -96,7 +96,7 @@ For Zod files, extract the **schema constant** (with `Schema` suffix), not the i
 
 | Wrong (type alias)                       | Correct (schema constant)                 |
 | ---------------------------------------- | ----------------------------------------- |
-| `@extract-shapes MasterDataset`          | `@extract-shapes MasterDatasetSchema`     |
+| `@extract-shapes PatternGraph`           | `@extract-shapes PatternGraphSchema`      |
 | Shows: `z.infer<typeof ...>` (unhelpful) | Shows: `z.object({...})` (full structure) |
 
 ---
@@ -108,9 +108,9 @@ For Zod files, extract the **schema constant** (with `Schema` suffix), not the i
 ```typescript
 /**
  * @architect
- * @architect-pattern MasterDataset
+ * @architect-pattern PatternGraph
  * @architect-status completed
- * @architect-extract-shapes MasterDatasetSchema, StatusGroupsSchema, PhaseGroupSchema
+ * @architect-extract-shapes PatternGraphSchema, StatusGroupsSchema, PhaseGroupSchema
  */
 ```
 
@@ -134,7 +134,7 @@ For Zod files, extract the **schema constant** (with `Schema` suffix), not the i
  * @architect-status completed
  * @architect-arch-context generator
  * @architect-arch-layer application
- * @architect-extract-shapes transformToMasterDataset, RuntimeMasterDataset
+ * @architect-extract-shapes transformToPatternGraph, RuntimePatternGraph
  */
 ```
 

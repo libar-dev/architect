@@ -1,7 +1,7 @@
 /**
  * Step definitions for Validation Rules Codec behavior tests
  *
- * Tests the Validation Rules Codec that transforms MasterDataset into a
+ * Tests the Validation Rules Codec that transforms PatternGraph into a
  * RenderableDocument for Process Guard validation rules reference (VALIDATION-RULES.md).
  */
 
@@ -12,8 +12,8 @@ import {
   type ValidationRulesCodecOptions,
 } from '../../../src/renderable/codecs/validation-rules.js';
 import type { RenderableDocument, SectionBlock } from '../../../src/renderable/schema.js';
-import { createTestMasterDataset } from '../../fixtures/dataset-factories.js';
-import type { MasterDataset } from '../../../src/validation-schemas/master-dataset.js';
+import { createTestPatternGraph } from '../../fixtures/dataset-factories.js';
+import type { PatternGraph } from '../../../src/validation-schemas/pattern-graph.js';
 
 const feature = await loadFeature('tests/features/doc-generation/validation-rules-codec.feature');
 
@@ -24,7 +24,7 @@ const feature = await loadFeature('tests/features/doc-generation/validation-rule
 interface TestState {
   // Input
   options: Partial<ValidationRulesCodecOptions>;
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
 
   // Output
   document: RenderableDocument | null;
@@ -214,7 +214,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('Document metadata is correctly set', ({ RuleScenario }) => {
     RuleScenario('Document title is Validation Rules', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createValidationRulesCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -227,7 +227,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Document purpose describes Process Guard', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createValidationRulesCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -240,7 +240,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Detail level reflects generateDetailFiles option', ({ When, Then }) => {
       When('decoding with generateDetailFiles disabled', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createValidationRulesCodec({ generateDetailFiles: false });
         state.document = codec.decode(state.dataset);
       });
@@ -259,7 +259,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('All validation rules are documented in a table', ({ RuleScenario }) => {
     RuleScenario('All 6 rules appear in table', ({ When, Then, And }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createValidationRulesCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -289,7 +289,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Rules have correct severity levels', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createValidationRulesCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -317,7 +317,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('FSM state diagram is generated from transitions', ({ RuleScenario }) => {
     RuleScenario('Mermaid diagram generated when includeFSMDiagram enabled', ({ When, Then }) => {
       When('decoding with includeFSMDiagram enabled', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createValidationRulesCodec({ includeFSMDiagram: true });
         state.document = codec.decode(state.dataset);
       });
@@ -331,7 +331,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Diagram includes all 4 states', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createValidationRulesCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -348,7 +348,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('FSM diagram excluded when includeFSMDiagram disabled', ({ When, Then }) => {
       When('decoding with includeFSMDiagram disabled', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createValidationRulesCodec({ includeFSMDiagram: false });
         state.document = codec.decode(state.dataset);
       });
@@ -368,7 +368,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('Protection level matrix shows status protections', ({ RuleScenario }) => {
     RuleScenario('Matrix shows all 4 statuses with protection levels', ({ When, Then, And }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createValidationRulesCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -393,7 +393,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       'Protection matrix excluded when includeProtectionMatrix disabled',
       ({ When, Then }) => {
         When('decoding with includeProtectionMatrix disabled', () => {
-          state.dataset = createTestMasterDataset();
+          state.dataset = createTestPatternGraph();
           const codec = createValidationRulesCodec({ includeProtectionMatrix: false });
           state.document = codec.decode(state.dataset);
         });
@@ -417,7 +417,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('CLI usage is documented with options and exit codes', ({ RuleScenario }) => {
     RuleScenario('CLI example code block included', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createValidationRulesCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -431,7 +431,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('All 6 CLI options documented', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createValidationRulesCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -454,7 +454,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('Exit codes documented', ({ When, Then }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createValidationRulesCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -468,7 +468,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
     RuleScenario('CLI section excluded when includeCLIUsage disabled', ({ When, Then }) => {
       When('decoding with includeCLIUsage disabled', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createValidationRulesCodec({ includeCLIUsage: false });
         state.document = codec.decode(state.dataset);
       });
@@ -491,7 +491,7 @@ describeFeature(feature, ({ Background, Rule }) => {
   Rule('Escape hatches are documented for special cases', ({ RuleScenario }) => {
     RuleScenario('All 3 escape hatches documented', ({ When, Then, And }) => {
       When('decoding with default options', () => {
-        state.dataset = createTestMasterDataset();
+        state.dataset = createTestPatternGraph();
         const codec = createValidationRulesCodec();
         state.document = codec.decode(state.dataset);
       });
@@ -514,7 +514,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       'Escape hatches section excluded when includeEscapeHatches disabled',
       ({ When, Then }) => {
         When('decoding with includeEscapeHatches disabled', () => {
-          state.dataset = createTestMasterDataset();
+          state.dataset = createTestPatternGraph();
           const codec = createValidationRulesCodec({ includeEscapeHatches: false });
           state.document = codec.decode(state.dataset);
         });

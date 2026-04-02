@@ -2,8 +2,8 @@
  * @architect
  * @architect-status roadmap
  * @architect-implements DataAPIArchitectureQueries
- * @architect-uses ProcessStateAPI, MasterDataset, Pattern Scanner
- * @architect-used-by ProcessAPICLIImpl
+ * @architect-uses PatternGraphAPI, PatternGraph, Pattern Scanner
+ * @architect-used-by PatternGraphCLIImpl
  * @architect-target src/api/arch-queries.ts
  * @architect-since DS-D
  *
@@ -47,7 +47,7 @@
  * See ADR-008 for rationale.
  */
 export interface SubcommandContext {
-  /** ProcessStateAPI instance for pattern queries. */
+  /** PatternGraphAPI instance for pattern queries. */
   readonly api: unknown;
   /** CLI config with input globs, features, baseDir. */
   readonly cliConfig: {
@@ -82,7 +82,7 @@ export interface NeighborEntry {
  * 1-hop neighborhood result for a focal pattern.
  *
  * Resolves: uses, usedBy, same-context siblings, implements/implementedBy.
- * All from pre-computed MasterDataset views (no additional scanning).
+ * All from pre-computed PatternGraph views (no additional scanning).
  */
 export interface NeighborhoodResult {
   /** Focal pattern name. */
@@ -245,7 +245,7 @@ export interface SourceInventory {
  * 5. Resolve NeighborEntry metadata for each neighbor
  *
  * @param name - Pattern name to get neighborhood for
- * @param dataset - MasterDataset with archIndex and relationshipIndex
+ * @param dataset - PatternGraph with archIndex and relationshipIndex
  * @returns Neighborhood result, or undefined if pattern not found
  */
 export function computeNeighborhood(
@@ -266,7 +266,7 @@ export function computeNeighborhood(
  *
  * @param ctx1 - First context name
  * @param ctx2 - Second context name
- * @param dataset - MasterDataset with archIndex and relationshipIndex
+ * @param dataset - PatternGraph with archIndex and relationshipIndex
  * @returns Comparison result, or undefined if either context not found
  */
 export function compareContexts(
@@ -288,7 +288,7 @@ export function compareContexts(
  * 5. Cross-reference with tagRegistry.metadataTags for tag names
  * 6. Sort by count descending
  *
- * @param dataset - MasterDataset with patterns and tagRegistry
+ * @param dataset - PatternGraph with patterns and tagRegistry
  * @returns Tag usage report sorted by count
  */
 export function aggregateTagUsage(
@@ -306,9 +306,9 @@ export function aggregateTagUsage(
  * - .feature extension → Gherkin
  * - .ts extension → TypeScript
  *
- * No re-scan needed — all data from MasterDataset.patterns[].source.file.
+ * No re-scan needed — all data from PatternGraph.patterns[].source.file.
  *
- * @param dataset - MasterDataset with patterns
+ * @param dataset - PatternGraph with patterns
  * @returns Source inventory grouped by type
  */
 export function buildSourceInventory(

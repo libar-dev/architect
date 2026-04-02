@@ -10,8 +10,8 @@ Feature: Handoff Generator - Session-End State Summary
   documentation is manual or forgotten.
 
   **Solution:**
-  HandoffGenerator assembles a structured handoff document from ProcessStateAPI
-  and MasterDataset, capturing completed work, remaining items, discovered
+  HandoffGenerator assembles a structured handoff document from PatternGraphAPI
+  and PatternGraph, capturing completed work, remaining items, discovered
   issues, and next-session priorities.
 
   Rule: Handoff generates compact session state summary

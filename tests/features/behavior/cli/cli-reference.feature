@@ -1,24 +1,24 @@
 @architect
-@architect-pattern:ProcessApiReferenceTests
-@architect-implements:ProcessApiHybridGeneration
+@architect-pattern:PatternGraphCliReferenceTests
+@architect-implements:CliReferenceGeneration
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:DataAPI
-@behavior @cli @process-api-reference
-Feature: Process API CLI Reference Generation
+@behavior @cli @cli-reference
+Feature: Pattern Graph CLI Reference Generation
 
   Verifies that the declarative CLI schema drives reference table generation
   and stays in sync with the parser implementation.
 
   Rule: Generated reference file contains all three table sections
 
-    **Invariant:** PROCESS-API-REFERENCE.md contains Global Options, Output Modifiers,
+    **Invariant:** CLI-REFERENCE.md contains Global Options, Output Modifiers,
     and List Filters tables generated from the CLI schema.
 
     @acceptance-criteria @happy-path
     Scenario: Generated file contains Global Options table
       Given the CLI schema is loaded
-      When the ProcessApiReferenceGenerator produces output
+      When the CliReferenceGenerator produces output
       Then the output contains a "Global Options" heading
       And the output contains a table with columns "Flag", "Short", "Description", "Default"
       And the table has 6 rows for global options
@@ -26,7 +26,7 @@ Feature: Process API CLI Reference Generation
     @acceptance-criteria @happy-path
     Scenario: Generated file contains Output Modifiers table
       Given the CLI schema is loaded
-      When the ProcessApiReferenceGenerator produces output
+      When the CliReferenceGenerator produces output
       Then the output contains an "Output Modifiers" heading
       And the output contains a table with columns "Output Modifier", "Description"
       And the table has 5 rows for output modifiers
@@ -34,7 +34,7 @@ Feature: Process API CLI Reference Generation
     @acceptance-criteria @happy-path
     Scenario: Generated file contains List Filters table
       Given the CLI schema is loaded
-      When the ProcessApiReferenceGenerator produces output
+      When the CliReferenceGenerator produces output
       Then the output contains a "List Filters" heading
       And the output contains a table with columns "List Filter", "Description"
       And the table has 8 rows for list filters
@@ -42,7 +42,7 @@ Feature: Process API CLI Reference Generation
     @acceptance-criteria @happy-path
     Scenario: Generated file includes inter-table prose
       Given the CLI schema is loaded
-      When the ProcessApiReferenceGenerator produces output
+      When the CliReferenceGenerator produces output
       Then the output contains the following prose fragments:
         | fragment             |
         | Config auto-detection |

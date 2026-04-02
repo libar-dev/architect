@@ -1,21 +1,21 @@
 /**
  * Transform Dataset Step Definitions
  *
- * BDD step definitions for testing the transformToMasterDataset function
+ * BDD step definitions for testing the transformToPatternGraph function
  * and related utility functions (completionPercentage, isFullyCompleted).
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import type {
-  RuntimeMasterDataset,
+  RuntimePatternGraph,
   RawDataset,
 } from '../../../src/generators/pipeline/transform-types.js';
 import {
-  transformToMasterDataset,
+  transformToPatternGraph,
   completionPercentage,
   isFullyCompleted,
 } from '../../../src/generators/pipeline/transform-dataset.js';
-import type { StatusCounts } from '../../../src/validation-schemas/master-dataset.js';
+import type { StatusCounts } from '../../../src/validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
 import type { LoadedWorkflow } from '../../../src/config/workflow-loader.js';
 import {
@@ -35,7 +35,7 @@ interface TransformDatasetState {
   workflow: LoadedWorkflow | undefined;
 
   // Results
-  dataset: RuntimeMasterDataset | null;
+  dataset: RuntimePatternGraph | null;
 
   // For utility function tests
   statusCounts: StatusCounts | null;
@@ -104,8 +104,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         // state.patterns is already empty
       });
 
-      When('transforming to MasterDataset', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+      When('transforming to PatternGraph', () => {
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then('the dataset has {int} patterns', (_ctx: unknown, count: number) => {
@@ -149,8 +149,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         }
       );
 
-      When('transforming to MasterDataset', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+      When('transforming to PatternGraph', () => {
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then('byStatus.completed has {int} patterns', (_ctx: unknown, count: number) => {
@@ -185,8 +185,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         }
       });
 
-      When('transforming to MasterDataset', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+      When('transforming to PatternGraph', () => {
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then('each pattern is grouped in the expected status bucket', () => {
@@ -213,8 +213,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         }
       });
 
-      When('transforming to MasterDataset', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+      When('transforming to PatternGraph', () => {
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then(
@@ -239,8 +239,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         addPattern({ phase: 2, name: 'Phase 2 Pattern' });
       });
 
-      When('transforming to MasterDataset', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+      When('transforming to PatternGraph', () => {
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then('byPhase is sorted as [1, 2, 3]', () => {
@@ -256,8 +256,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         addPattern({ phase: 1, status: 'active' });
       });
 
-      When('transforming to MasterDataset', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+      When('transforming to PatternGraph', () => {
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then('phase 1 counts are:', (_ctx: unknown, dataTable: DataTableRow[]) => {
@@ -285,8 +285,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         }
       });
 
-      When('transforming to MasterDataset', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+      When('transforming to PatternGraph', () => {
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then('byPhase has {int} phase group', (_ctx: unknown, count: number) => {
@@ -314,8 +314,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         }
       });
 
-      When('transforming to MasterDataset', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+      When('transforming to PatternGraph', () => {
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then(
@@ -345,8 +345,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         }
       });
 
-      When('transforming to MasterDataset', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+      When('transforming to PatternGraph', () => {
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then('byQuarter has {int} quarter', (_ctx: unknown, count: number) => {
@@ -364,8 +364,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         }
       });
 
-      When('transforming to MasterDataset', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+      When('transforming to PatternGraph', () => {
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then(
@@ -403,8 +403,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         }
       });
 
-      When('transforming to MasterDataset', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+      When('transforming to PatternGraph', () => {
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then('bySourceType.typescript has {int} patterns', (_ctx: unknown, count: number) => {
@@ -429,8 +429,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         }
       });
 
-      When('transforming to MasterDataset', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+      When('transforming to PatternGraph', () => {
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then('bySourceType.roadmap has {int} patterns', (_ctx: unknown, count: number) => {
@@ -459,8 +459,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         }
       );
 
-      When('transforming to MasterDataset', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+      When('transforming to PatternGraph', () => {
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then(
@@ -510,8 +510,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           }
         );
 
-        When('transforming to MasterDataset', () => {
-          state!.dataset = transformToMasterDataset(createRawDataset());
+        When('transforming to PatternGraph', () => {
+          state!.dataset = transformToPatternGraph(createRawDataset());
         });
 
         Then(
@@ -541,8 +541,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         }
       );
 
-      When('transforming to MasterDataset', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+      When('transforming to PatternGraph', () => {
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then(
@@ -565,8 +565,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         }
       );
 
-      When('transforming to MasterDataset', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+      When('transforming to PatternGraph', () => {
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then(
@@ -594,8 +594,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           }
         );
 
-        When('transforming to MasterDataset', () => {
-          state!.dataset = transformToMasterDataset(createRawDataset());
+        When('transforming to PatternGraph', () => {
+          state!.dataset = transformToPatternGraph(createRawDataset());
         });
 
         Then(
@@ -713,7 +713,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
       });
 
       When('transforming with the workflow', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then(
@@ -736,8 +736,8 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         addPattern({ name: 'Pattern 2' });
       });
 
-      When('transforming to MasterDataset', () => {
-        state!.dataset = transformToMasterDataset(createRawDataset());
+      When('transforming to PatternGraph', () => {
+        state!.dataset = transformToPatternGraph(createRawDataset());
       });
 
       Then('the result does not include workflow', () => {

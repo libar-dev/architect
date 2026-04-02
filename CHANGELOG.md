@@ -36,7 +36,7 @@ First npm-published pre-release for monorepo validation.
 - FSM-enforced workflow validation via pre-commit hooks
 - Codec-based document generation (patterns, roadmap, decisions, product areas, etc.)
 - Cross-source validation (TypeScript + Gherkin dual-source merging)
-- MasterDataset single read model (ADR-006)
+- PatternGraph single read model (ADR-006)
 
 ### Changed
 

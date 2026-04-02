@@ -27,7 +27,7 @@ Event sourcing teaches us: **derive state, don't store it**. Apply this to docum
 
 - **Events** = Git commits (changes to annotated code)
 - **Projections** = Generated docs (PATTERNS.md, ROADMAP.md)
-- **Read Model** = MasterDataset (consumed by codecs, validators, and Data API CLI)
+- **Read Model** = PatternGraph (consumed by codecs, validators, and Data API CLI)
 
 When you run `architect-generate`, you're rebuilding read models from the event stream. The source annotations are always authoritative.
 

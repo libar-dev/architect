@@ -6,14 +6,14 @@
  *
  * ## IndexCodec Factory — DD-1 Implementation Stub
  *
- * Creates the IndexCodec as a Zod codec (MasterDataset -> RenderableDocument).
+ * Creates the IndexCodec as a Zod codec (PatternGraph -> RenderableDocument).
  * Follows the same factory pattern as all other codecs in the system:
  * `createIndexCodec(options?) -> DocumentCodec`.
  *
  * ### Codec Decode Pipeline
  *
  * ```
- * MasterDataset
+ * PatternGraph
  *   |
  *   +--> [Package Metadata Header]        (optional, from options)
  *   |
@@ -60,7 +60,7 @@
  *    `generateDetailFiles` defaults to false.
  */
 
-import type { MasterDataset } from '../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../src/validation-schemas/pattern-graph.js';
 import type { RenderableDocument, SectionBlock } from '../../src/renderable/schema.js';
 import type { IndexCodecOptions, DocumentEntry } from './index-codec-options.js';
 import type { StatusCounts } from '../../src/api/types.js';
@@ -72,7 +72,7 @@ import type { StatusCounts } from '../../src/api/types.js';
 /**
  * Create an IndexCodec with custom options.
  *
- * The returned codec transforms MasterDataset into a RenderableDocument
+ * The returned codec transforms PatternGraph into a RenderableDocument
  * containing the enhanced index. Register in CodecRegistry as:
  *
  * ```typescript
@@ -81,13 +81,13 @@ import type { StatusCounts } from '../../src/api/types.js';
  * ```
  *
  * @param options - IndexCodecOptions with preamble and visibility toggles
- * @returns A Zod codec (MasterDataset -> RenderableDocument)
+ * @returns A Zod codec (PatternGraph -> RenderableDocument)
  */
 export function createIndexCodec(
   _options?: IndexCodecOptions
 ): unknown {
   // DD-1: Registered in CodecRegistry as document type 'index'
-  // Uses z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, { decode, encode })
+  // Uses z.codec(PatternGraphSchema, RenderableDocumentOutputSchema, { decode, encode })
   // pattern identical to OverviewCodec, BusinessRulesCodec, etc.
   throw new Error('EnhancedIndexGeneration not yet implemented - roadmap pattern');
 }
@@ -101,7 +101,7 @@ export function createIndexCodec(
 // ---------------------------------------------------------------------------
 
 /**
- * Builds the enhanced index RenderableDocument from MasterDataset.
+ * Builds the enhanced index RenderableDocument from PatternGraph.
  *
  * Section ordering:
  * 1. Package metadata header (if enabled)
@@ -111,12 +111,12 @@ export function createIndexCodec(
  * 5. Phase progress summary (from byStatus view)
  * 6. Regeneration commands footer
  *
- * @param dataset - MasterDataset with pre-computed views
+ * @param dataset - PatternGraph with pre-computed views
  * @param options - Resolved IndexCodecOptions
  * @returns RenderableDocument for the enhanced index
  */
 function buildIndexDocument(
-  _dataset: MasterDataset,
+  _dataset: PatternGraph,
   _options: IndexCodecOptions
 ): RenderableDocument {
   throw new Error('EnhancedIndexGeneration not yet implemented - roadmap pattern');
@@ -153,11 +153,11 @@ function buildDocumentInventory(
  * a table identical in structure to buildProductAreaIndex() in
  * reference-generators.ts, but scoped to the index context.
  *
- * @param dataset - MasterDataset with byProductArea view
+ * @param dataset - PatternGraph with byProductArea view
  * @returns SectionBlock[] for the product area statistics
  */
 function buildProductAreaStats(
-  _dataset: MasterDataset
+  _dataset: PatternGraph
 ): SectionBlock[] {
   // Reuses computeStatusCounts() from src/renderable/utils.ts
   // Produces table: | Area | Patterns | Completed | Active | Planned |
@@ -171,11 +171,11 @@ function buildProductAreaStats(
  * Uses dataset.byStatus view to show status distribution and
  * completion percentage via completionPercentage() utility.
  *
- * @param dataset - MasterDataset with byStatus view
+ * @param dataset - PatternGraph with byStatus view
  * @returns SectionBlock[] for the phase progress summary
  */
 function buildPhaseProgress(
-  _dataset: MasterDataset
+  _dataset: PatternGraph
 ): SectionBlock[] {
   // Uses dataset.byStatus (StatusGroupsSchema: { roadmap, active, completed, deferred })
   // Renders: "X patterns total: Y completed (Z%), A active, B planned"
@@ -204,7 +204,7 @@ void buildPhaseProgress;
 void buildRegenerationFooter;
 
 // Suppress unused import warnings
-void (undefined as unknown as MasterDataset);
+void (undefined as unknown as PatternGraph);
 void (undefined as unknown as SectionBlock);
 void (undefined as unknown as DocumentEntry);
 void (undefined as unknown as StatusCounts);

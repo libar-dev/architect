@@ -102,7 +102,7 @@ Feature: Cross-Cutting Document Inclusion
   | reference.ts | Rename DiagramScope.archView to include, add includeTags to ReferenceDocConfig, add inclusion pass | ~35 lines |
   | project-config-schema.ts | Rename archView to include, add includeTags | ~5 lines |
   | transform-dataset.ts | Rename archView references to include in dataset views | ~10 lines |
-  | master-dataset.ts | Rename byArchView to byInclude in dataset schema | ~5 lines |
+  | pattern-graph.ts | Rename byArchView to byInclude in dataset schema | ~5 lines |
   | reference-generators.ts | Update built-in configs from archView to include | ~5 lines |
   | pattern-scanner.ts | Rename arch-view extraction to include | ~3 lines |
   | architect.config.ts | Update showcase config: rename archView, add includeTags | ~5 lines |

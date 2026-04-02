@@ -15,7 +15,7 @@ Feature: Data API Context Assembly - One-Command Session Context
   30-100KB of curated, multi-source context from hundreds of annotated files.
   Today this requires either manual context compilation by the user or 5-10
   explore agents burning context and time. The Architect pipeline already
-  has rich data (MasterDataset with archIndex, relationshipIndex, byPhase,
+  has rich data (PatternGraph with archIndex, relationshipIndex, byPhase,
   byStatus views) but no command combines data from multiple indexes around
   a focal pattern into a compact, session-oriented context bundle.
 
@@ -43,10 +43,10 @@ Feature: Data API Context Assembly - One-Command Session Context
       | Deliverable | Status | Location | Tests | Test Type |
       | ContextBundle type | complete | src/api/context-assembler.ts | Yes | unit |
       | Context assembler | complete | src/api/context-assembler.ts | Yes | unit |
-      | context subcommand | complete | src/cli/process-api.ts | Yes | integration |
-      | files subcommand | complete | src/cli/process-api.ts | Yes | integration |
-      | dep-tree subcommand | complete | src/cli/process-api.ts | Yes | integration |
-      | overview subcommand | complete | src/cli/process-api.ts | Yes | integration |
+      | context subcommand | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
+      | files subcommand | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
+      | dep-tree subcommand | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
+      | overview subcommand | complete | src/cli/pattern-graph-cli.ts | Yes | integration |
       | Context text renderer | complete | src/api/context-formatter.ts | Yes | unit |
 
   # ============================================================================
@@ -60,12 +60,12 @@ Feature: Data API Context Assembly - One-Command Session Context
     and architecture position -- in ~1.5KB of structured text.
 
     **Rationale:** This is the core value proposition. The command crosses five
-    gaps simultaneously: it assembles data from multiple MasterDataset indexes,
+    gaps simultaneously: it assembles data from multiple PatternGraph indexes,
     shapes it compactly, resolves file paths from pattern names, discovers stubs
     by convention, and tailors output by session type.
 
     **Assembly steps:**
-    1. Find pattern in MasterDataset via `getPattern()`
+    1. Find pattern in PatternGraph via `getPattern()`
     2. Resolve spec file from `pattern.filePath`
     3. Find stubs via `implementedBy` in relationshipIndex
     4. Walk `dependsOn` chain with status for each dependency
@@ -85,7 +85,7 @@ Feature: Data API Context Assembly - One-Command Session Context
     @acceptance-criteria @happy-path
     Scenario: Assemble design session context
       Given a pattern "AgentLLMIntegration" with dependencies and stubs
-      When running "process-api context AgentLLMIntegration --session design"
+      When running "pattern-graph-cli context AgentLLMIntegration --session design"
       Then the output contains the pattern metadata section
       And the output contains the spec file path
       And the output contains dependency stubs with target paths
@@ -96,7 +96,7 @@ Feature: Data API Context Assembly - One-Command Session Context
     @acceptance-criteria @happy-path
     Scenario: Assemble planning session context
       Given a pattern "AgentLLMIntegration" with dependencies
-      When running "process-api context AgentLLMIntegration --session planning"
+      When running "pattern-graph-cli context AgentLLMIntegration --session planning"
       Then the output contains pattern metadata and status
       And the output contains the dependency chain with status
       And the output does NOT contain stubs or architecture details
@@ -105,7 +105,7 @@ Feature: Data API Context Assembly - One-Command Session Context
     @acceptance-criteria @happy-path
     Scenario: Assemble implementation session context
       Given a pattern "ProcessGuardLinter" with completed deliverables
-      When running "process-api context ProcessGuardLinter --session implement"
+      When running "pattern-graph-cli context ProcessGuardLinter --session implement"
       Then the output contains the spec file path
       And the output contains the deliverables checklist with status
       And the output contains FSM state and valid transitions
@@ -114,7 +114,7 @@ Feature: Data API Context Assembly - One-Command Session Context
     @acceptance-criteria @validation
     Scenario: Context for nonexistent pattern returns error with suggestion
       Given a pattern "AgentLLMIntegration" exists
-      When running "process-api context NonExistentPattern --session design"
+      When running "pattern-graph-cli context NonExistentPattern --session design"
       Then the command fails with a pattern-not-found error
       And the error message suggests similar pattern names
 
@@ -145,7 +145,7 @@ Feature: Data API Context Assembly - One-Command Session Context
     @acceptance-criteria @happy-path
     Scenario: File reading list with related patterns
       Given a pattern "OrderSaga" with uses and usedBy relationships
-      When running "process-api files OrderSaga --related"
+      When running "pattern-graph-cli files OrderSaga --related"
       Then the output lists primary files first
       And the output lists completed dependency files
       And the output lists architecture neighbor files
@@ -154,14 +154,14 @@ Feature: Data API Context Assembly - One-Command Session Context
     @acceptance-criteria @happy-path
     Scenario: File reading list without related patterns
       Given a pattern "OrderSaga" exists
-      When running "process-api files OrderSaga"
+      When running "pattern-graph-cli files OrderSaga"
       Then the output lists only the primary spec and stub files
       And no dependency or neighbor files are included
 
     @acceptance-criteria @validation
     Scenario: Files for pattern with no resolvable paths returns minimal output
       Given a pattern "MinimalPattern" with no stubs or dependencies
-      When running "process-api files MinimalPattern --related"
+      When running "pattern-graph-cli files MinimalPattern --related"
       Then the output lists only the primary spec file
       And the completed, roadmap, and neighbor sections are empty
 
@@ -193,7 +193,7 @@ Feature: Data API Context Assembly - One-Command Session Context
     @acceptance-criteria @happy-path
     Scenario: Dependency tree with status markers
       Given a dependency chain: A (completed) -> B (completed) -> C (roadmap)
-      When running "process-api dep-tree C --status"
+      When running "pattern-graph-cli dep-tree C --status"
       Then the output shows the tree with completion markers
       And completed dependencies are marked as such
       And the focal pattern is highlighted
@@ -201,14 +201,14 @@ Feature: Data API Context Assembly - One-Command Session Context
     @acceptance-criteria @happy-path
     Scenario: Dependency tree with depth limit
       Given a deep dependency chain with 5 levels
-      When running "process-api dep-tree C --depth 2"
+      When running "pattern-graph-cli dep-tree C --depth 2"
       Then the output shows at most 2 levels of dependencies
       And truncated branches are indicated
 
     @acceptance-criteria @validation
     Scenario: Dependency tree handles circular dependencies safely
       Given patterns A depends on B and B depends on A
-      When running "process-api dep-tree A"
+      When running "pattern-graph-cli dep-tree A"
       Then the output shows the cycle without infinite recursion
       And the visited node is marked to indicate a cycle
 
@@ -231,7 +231,7 @@ Feature: Data API Context Assembly - One-Command Session Context
     @acceptance-criteria @happy-path
     Scenario: Multi-pattern context merges dependencies
       Given patterns "AgentLLM" and "AgentCommand" sharing dependency "AgentBC"
-      When running "process-api context AgentLLM AgentCommand --session design"
+      When running "pattern-graph-cli context AgentLLM AgentCommand --session design"
       Then shared dependencies appear once with a "shared" marker
       And unique dependencies are listed per pattern
       And the combined context is smaller than two separate calls
@@ -239,7 +239,7 @@ Feature: Data API Context Assembly - One-Command Session Context
     @acceptance-criteria @validation
     Scenario: Multi-pattern context with one invalid name reports error
       Given a pattern "AgentLLM" exists but "InvalidName" does not
-      When running "process-api context AgentLLM InvalidName --session design"
+      When running "pattern-graph-cli context AgentLLM InvalidName --session design"
       Then the command fails with a pattern-not-found error for "InvalidName"
       And no partial context is returned
 
@@ -267,7 +267,7 @@ Feature: Data API Context Assembly - One-Command Session Context
     @acceptance-criteria @happy-path
     Scenario: Executive overview
       Given 36 completed, 3 active, and 30 planned patterns
-      When running "process-api overview"
+      When running "pattern-graph-cli overview"
       Then the output shows "69 patterns (36 completed, 3 active, 30 planned) = 52%"
       And the output lists active phases with counts
       And the output shows blocking relationships
@@ -275,7 +275,7 @@ Feature: Data API Context Assembly - One-Command Session Context
     @acceptance-criteria @validation
     Scenario: Overview with empty pipeline returns zero-state summary
       Given the pipeline has 0 patterns
-      When running "process-api overview"
+      When running "pattern-graph-cli overview"
       Then the output shows "0 patterns (0 completed, 0 active, 0 planned) = 0%"
       And the active phases section is empty
       And the blocking section is empty

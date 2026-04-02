@@ -24,7 +24,7 @@
  *
  * DD-3: File type filtering - only .ts and .feature file changes trigger
  * rebuilds. Changes to .md, .json, or other files are silently ignored
- * since they don't affect the MasterDataset.
+ * since they don't affect the PatternGraph.
  *
  * DD-4: Rebuild failure isolation - if a rebuild fails (e.g., parse error
  * in modified file), the watcher logs the error and keeps the previous

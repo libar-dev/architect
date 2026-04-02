@@ -14,14 +14,14 @@
  *
  * ### When to Use
  *
- * - When generating specific document types from MasterDataset
+ * - When generating specific document types from PatternGraph
  * - When needing high-level generation API without direct codec usage
  * - When building custom documentation workflows
  *
- * Flow: MasterDataset → Codec → RenderableDocument → Renderer → Markdown
+ * Flow: PatternGraph → Codec → RenderableDocument → Renderer → Markdown
  */
 
-import type { MasterDataset } from '../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../validation-schemas/pattern-graph.js';
 import type { RenderableDocument } from './schema.js';
 import { renderDocumentWithFiles, type OutputFile } from './render.js';
 import { Result } from '../types/result.js';
@@ -152,7 +152,7 @@ export const DOCUMENT_TYPES = {
   },
   index: {
     outputPath: 'INDEX.md',
-    description: 'Navigation hub with editorial preamble and MasterDataset statistics',
+    description: 'Navigation hub with editorial preamble and PatternGraph statistics',
   },
 } as const;
 
@@ -388,13 +388,13 @@ function resolveCodec(type: DocumentType, options?: CodecOptions): DocumentCodec
  * explicit error handling without try/catch at the call site.
  *
  * @param type - Document type to generate
- * @param dataset - MasterDataset with pattern data
+ * @param dataset - PatternGraph with pattern data
  * @param options - Optional codec-specific options
  * @returns Result containing OutputFile[] on success, or GenerationError on failure
  *
  * @example
  * ```typescript
- * const result = generateDocumentSafe("patterns", masterDataset);
+ * const result = generateDocumentSafe("patterns", patternGraph);
  * if (Result.isOk(result)) {
  *   for (const file of result.value) {
  *     fs.writeFileSync(file.path, file.content);
@@ -406,7 +406,7 @@ function resolveCodec(type: DocumentType, options?: CodecOptions): DocumentCodec
  */
 export function generateDocumentSafe(
   type: DocumentType,
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options?: CodecOptions,
   contextEnrichment?: CodecContextEnrichment
 ): Result<OutputFile[], GenerationError> {
@@ -427,7 +427,7 @@ export function generateDocumentSafe(
   }
 
   try {
-    // Decode: MasterDataset → RenderableDocument (with error handling)
+    // Decode: PatternGraph → RenderableDocument (with error handling)
     let doc: RenderableDocument;
     try {
       doc = codec.decode(dataset) as RenderableDocument;
@@ -464,7 +464,7 @@ export function generateDocumentSafe(
  * Generate a single document type
  *
  * @param type - Document type to generate
- * @param dataset - MasterDataset with pattern data
+ * @param dataset - PatternGraph with pattern data
  * @param options - Optional codec-specific options (e.g., changedFiles for PR changes)
  * @returns Array of output files (main + additional for progressive disclosure)
  *
@@ -479,17 +479,17 @@ export function generateDocumentSafe(
  * @example
  * ```typescript
  * // Without options (uses default codec)
- * const files = generateDocument("patterns", masterDataset);
+ * const files = generateDocument("patterns", patternGraph);
  *
  * // With options (uses factory function)
- * const files = generateDocument("pr-changes", masterDataset, {
+ * const files = generateDocument("pr-changes", patternGraph, {
  *   "pr-changes": { changedFiles: ["src/foo.ts"], releaseFilter: "v0.2.0" }
  * });
  * ```
  */
 export function generateDocument(
   type: DocumentType,
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options?: CodecOptions,
   contextEnrichment?: CodecContextEnrichment
 ): OutputFile[] {
@@ -506,7 +506,7 @@ export function generateDocument(
   }
 
   try {
-    // Decode: MasterDataset → RenderableDocument
+    // Decode: PatternGraph → RenderableDocument
     const doc = codec.decode(dataset) as RenderableDocument;
 
     // Render: RenderableDocument → OutputFile[]
@@ -523,14 +523,14 @@ export function generateDocument(
  * Generate multiple document types
  *
  * @param types - Document types to generate
- * @param dataset - MasterDataset with pattern data
+ * @param dataset - PatternGraph with pattern data
  * @param options - Optional codec-specific options
  * @param contextEnrichment - Optional runtime context (projectMetadata, tagExampleOverrides)
  * @returns Array of all output files
  */
 export function generateDocuments(
   types: DocumentType[],
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options?: CodecOptions,
   contextEnrichment?: CodecContextEnrichment
 ): OutputFile[] {
@@ -547,13 +547,13 @@ export function generateDocuments(
 /**
  * Generate all document types
  *
- * @param dataset - MasterDataset with pattern data
+ * @param dataset - PatternGraph with pattern data
  * @param options - Optional codec-specific options
  * @param contextEnrichment - Optional runtime context (projectMetadata, tagExampleOverrides)
  * @returns Array of all output files
  */
 export function generateAllDocuments(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options?: CodecOptions,
   contextEnrichment?: CodecContextEnrichment
 ): OutputFile[] {

@@ -3,7 +3,7 @@
  * @architect-core
  * @architect-pattern RulesQueryModule
  * @architect-status completed
- * @architect-implements ProcessAPILayeredExtraction
+ * @architect-implements PatternGraphLayeredExtraction
  * @architect-product-area DataAPI
  * @architect-uses BusinessRulesCodec, CodecHelpers
  *
@@ -13,7 +13,7 @@
  * Groups rules by product area, phase, and feature pattern.
  *
  * Target: src/api/rules-query.ts
- * See: DD-4 (ProcessAPILayeredExtraction)
+ * See: DD-4 (PatternGraphLayeredExtraction)
  *
  * **When to Use:** When querying business rules and invariants from Gherkin specs via the `rules` CLI subcommand.
  */
@@ -22,7 +22,7 @@ import { parseBusinessRuleAnnotations } from '../renderable/codecs/helpers.js';
 import type { BusinessRuleAnnotations } from '../renderable/codecs/helpers.js';
 import { deduplicateScenarioNames } from '../renderable/codecs/business-rules.js';
 import { QueryApiError } from './types.js';
-import type { RuntimeMasterDataset } from '../generators/pipeline/index.js';
+import type { RuntimePatternGraph } from '../generators/pipeline/index.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Types
@@ -67,14 +67,14 @@ export interface RulesQueryResult {
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Query business rules from the MasterDataset, grouped by product area,
+ * Query business rules from the PatternGraph, grouped by product area,
  * phase, and feature pattern.
  *
- * DD-4: Pure function taking RuntimeMasterDataset and RulesFilters.
+ * DD-4: Pure function taking RuntimePatternGraph and RulesFilters.
  * All Map/Set construction lives here, not in the CLI handler.
  */
 export function queryBusinessRules(
-  dataset: RuntimeMasterDataset,
+  dataset: RuntimePatternGraph,
   filters: RulesFilters
 ): RulesQueryResult {
   // Collect patterns with rules, applying filters

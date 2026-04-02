@@ -6,7 +6,7 @@
 @architect-product-area:Generation
 @behavior @pr-changes-codec
 Feature: PR Changes Codec - Core Rendering
-  The PrChangesCodec transforms MasterDataset into RenderableDocument for
+  The PrChangesCodec transforms PatternGraph into RenderableDocument for
   PR-scoped documentation. It filters patterns by changed files and/or
   release version tags, groups by phase or priority, and generates
   review-focused output.
@@ -36,7 +36,7 @@ Feature: PR Changes Codec - Core Rendering
 
     @happy-path @edge-case
     Scenario: No changes when no patterns match changedFiles filter
-      Given a MasterDataset with active patterns
+      Given a PatternGraph with active patterns
       When decoding with changedFiles filter for non-matching paths
       Then the document title is "Pull Request Changes"
       And the document contains "No Changes" section
@@ -44,14 +44,14 @@ Feature: PR Changes Codec - Core Rendering
 
     @happy-path @edge-case
     Scenario: No changes when no patterns match releaseFilter
-      Given a MasterDataset with active patterns
+      Given a PatternGraph with active patterns
       When decoding with releaseFilter "v9.9.9"
       Then the document contains "No Changes" section
       And the no changes message mentions the release filter
 
     @happy-path @edge-case
     Scenario: No changes with combined filters when nothing matches
-      Given a MasterDataset with active patterns
+      Given a PatternGraph with active patterns
       When decoding with changedFiles and releaseFilter that match nothing
       Then the document contains "No Changes" section
       And the no changes message mentions both filters
@@ -68,7 +68,7 @@ Feature: PR Changes Codec - Core Rendering
 
     @happy-path
     Scenario: Summary section shows pattern counts
-      Given a MasterDataset with PR-relevant patterns
+      Given a PatternGraph with PR-relevant patterns
       When decoding with PrChangesCodec
       Then the document title is "Pull Request Changes"
       And the document contains a "Summary" section
@@ -80,13 +80,13 @@ Feature: PR Changes Codec - Core Rendering
 
     @happy-path
     Scenario: Summary shows release tag when releaseFilter is set
-      Given a MasterDataset with PR-relevant patterns with deliverables
+      Given a PatternGraph with PR-relevant patterns with deliverables
       When decoding with releaseFilter "v0.2.0"
       Then the summary table includes release tag row
 
     @happy-path
     Scenario: Summary shows files filter count when changedFiles is set
-      Given a MasterDataset with PR-relevant patterns
+      Given a PatternGraph with PR-relevant patterns
       When decoding with changedFiles filter for matching paths
       Then the summary table includes files filter row
 
@@ -102,7 +102,7 @@ Feature: PR Changes Codec - Core Rendering
 
     @happy-path
     Scenario: Changes grouped by phase with default sortBy
-      Given a MasterDataset with patterns in multiple phases
+      Given a PatternGraph with patterns in multiple phases
       When decoding with PrChangesCodec
       Then the document contains a "Changes by Phase" section
       And the document contains phase headings:
@@ -111,7 +111,7 @@ Feature: PR Changes Codec - Core Rendering
         | Phase 2  |
 
     Scenario: Pattern details shown within phase groups
-      Given a MasterDataset with patterns in multiple phases
+      Given a PatternGraph with patterns in multiple phases
       When decoding with PrChangesCodec
       Then phase groups contain pattern headings with status emoji
 
@@ -127,7 +127,7 @@ Feature: PR Changes Codec - Core Rendering
 
     @happy-path
     Scenario: Changes grouped by priority
-      Given a MasterDataset with patterns with different priorities
+      Given a PatternGraph with patterns with different priorities
       When decoding with sortBy "priority"
       Then the document contains a "Changes by Priority" section
       And the document contains priority headings:
@@ -137,7 +137,7 @@ Feature: PR Changes Codec - Core Rendering
         | Low Priority     |
 
     Scenario: Priority groups show correct patterns
-      Given a MasterDataset with patterns with different priorities
+      Given a PatternGraph with patterns with different priorities
       When decoding with sortBy "priority"
       Then high priority section contains high priority patterns
       And low priority section contains low priority patterns
@@ -154,7 +154,7 @@ Feature: PR Changes Codec - Core Rendering
 
     @happy-path
     Scenario: Flat changes list with workflow sort
-      Given a MasterDataset with PR-relevant patterns
+      Given a PatternGraph with PR-relevant patterns
       When decoding with sortBy "workflow"
       Then the document contains a "Changes" section
       And the changes section contains pattern entries
@@ -171,7 +171,7 @@ Feature: PR Changes Codec - Core Rendering
 
     @happy-path
     Scenario: Pattern detail shows metadata table
-      Given a MasterDataset with a detailed pattern
+      Given a PatternGraph with a detailed pattern
       When decoding with PrChangesCodec
       Then pattern details include metadata table with:
         | property      |
@@ -179,14 +179,14 @@ Feature: PR Changes Codec - Core Rendering
         | Phase         |
 
     Scenario: Pattern detail shows business value when available
-      Given a MasterDataset with a pattern with business value
+      Given a PatternGraph with a pattern with business value
       When decoding with PrChangesCodec
       Then pattern details include metadata table with:
         | property       |
         | Business Value |
 
     Scenario: Pattern detail shows description
-      Given a MasterDataset with a detailed pattern
+      Given a PatternGraph with a detailed pattern
       When decoding with PrChangesCodec
       Then pattern details include description text
 
@@ -202,17 +202,17 @@ Feature: PR Changes Codec - Core Rendering
 
     @happy-path
     Scenario: Deliverables shown when patterns have deliverables
-      Given a MasterDataset with patterns with deliverables
+      Given a PatternGraph with patterns with deliverables
       When decoding with includeDeliverables enabled
       Then the document contains deliverables lists
 
     Scenario: Deliverables filtered by release when releaseFilter is set
-      Given a MasterDataset with patterns with mixed release deliverables
+      Given a PatternGraph with patterns with mixed release deliverables
       When decoding with releaseFilter "v0.2.0" and includeDeliverables
       Then only deliverables for "v0.2.0" are shown
 
     Scenario: No deliverables section when includeDeliverables is disabled
-      Given a MasterDataset with patterns with deliverables
+      Given a PatternGraph with patterns with deliverables
       When decoding with includeDeliverables disabled
       Then the document does not contain deliverables lists
 
@@ -228,12 +228,12 @@ Feature: PR Changes Codec - Core Rendering
 
     @happy-path
     Scenario: Acceptance criteria rendered when patterns have scenarios
-      Given a MasterDataset with patterns with scenarios
+      Given a PatternGraph with patterns with scenarios
       When decoding with PrChangesCodec
       Then the document contains "Acceptance Criteria" sections
 
     Scenario: Acceptance criteria shows scenario steps
-      Given a MasterDataset with patterns with scenarios and steps
+      Given a PatternGraph with patterns with scenarios and steps
       When decoding with PrChangesCodec
       Then acceptance criteria sections contain step lists
 
@@ -245,12 +245,12 @@ Feature: PR Changes Codec - Core Rendering
 
     @happy-path
     Scenario: Business rules rendered when patterns have rules
-      Given a MasterDataset with patterns with business rules
+      Given a PatternGraph with patterns with business rules
       When decoding with PrChangesCodec
       Then the document contains "Business Rules" sections
 
     Scenario: Business rules show rule names and verification info
-      Given a MasterDataset with patterns with business rules
+      Given a PatternGraph with patterns with business rules
       When decoding with PrChangesCodec
       Then business rules sections contain rule names
       And business rules sections contain verification info

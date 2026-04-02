@@ -2,7 +2,7 @@
  * Architecture Index Step Definitions
  *
  * BDD step definitions for testing the archIndex built during
- * transformToMasterDataset. The archIndex groups patterns by role,
+ * transformToPatternGraph. The archIndex groups patterns by role,
  * context, and layer for efficient architecture diagram generation.
  *
  * @architect
@@ -11,8 +11,8 @@
 import { expect } from 'vitest';
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 
-import type { RuntimeMasterDataset } from '../../../src/generators/pipeline/transform-types.js';
-import { transformToMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
+import type { RuntimePatternGraph } from '../../../src/generators/pipeline/transform-types.js';
+import { transformToPatternGraph } from '../../../src/generators/pipeline/transform-dataset.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
 import { createDefaultTagRegistry, createTestPattern } from '../../fixtures/dataset-factories.js';
 import type { DataTableRow } from '../../support/world.js';
@@ -23,7 +23,7 @@ import type { DataTableRow } from '../../support/world.js';
 
 interface ArchIndexState {
   patterns: ExtractedPattern[];
-  dataset: RuntimeMasterDataset | null;
+  dataset: RuntimePatternGraph | null;
 }
 
 // =============================================================================
@@ -126,9 +126,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       });
 
-      When('transformToMasterDataset runs', () => {
+      When('transformToPatternGraph runs', () => {
         if (!state) throw new Error('State not initialized');
-        state.dataset = transformToMasterDataset({
+        state.dataset = transformToPatternGraph({
           patterns: state.patterns,
           tagRegistry: createDefaultTagRegistry(),
           workflow: undefined,
@@ -173,9 +173,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       });
 
-      When('transformToMasterDataset runs', () => {
+      When('transformToPatternGraph runs', () => {
         if (!state) throw new Error('State not initialized');
-        state.dataset = transformToMasterDataset({
+        state.dataset = transformToPatternGraph({
           patterns: state.patterns,
           tagRegistry: createDefaultTagRegistry(),
           workflow: undefined,
@@ -220,9 +220,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       });
 
-      When('transformToMasterDataset runs', () => {
+      When('transformToPatternGraph runs', () => {
         if (!state) throw new Error('State not initialized');
-        state.dataset = transformToMasterDataset({
+        state.dataset = transformToPatternGraph({
           patterns: state.patterns,
           tagRegistry: createDefaultTagRegistry(),
           workflow: undefined,
@@ -275,9 +275,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       });
 
-      When('transformToMasterDataset runs', () => {
+      When('transformToPatternGraph runs', () => {
         if (!state) throw new Error('State not initialized');
-        state.dataset = transformToMasterDataset({
+        state.dataset = transformToPatternGraph({
           patterns: state.patterns,
           tagRegistry: createDefaultTagRegistry(),
           workflow: undefined,
@@ -327,9 +327,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       });
 
-      When('transformToMasterDataset runs', () => {
+      When('transformToPatternGraph runs', () => {
         if (!state) throw new Error('State not initialized');
-        state.dataset = transformToMasterDataset({
+        state.dataset = transformToPatternGraph({
           patterns: state.patterns,
           tagRegistry: createDefaultTagRegistry(),
           workflow: undefined,

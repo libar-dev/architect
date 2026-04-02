@@ -3,14 +3,14 @@
  * @architect-generator @architect-infra
  * @architect-pattern PipelineFactory
  * @architect-status completed
- * @architect-implements ProcessAPILayeredExtraction
+ * @architect-implements PatternGraphLayeredExtraction
  * @architect-product-area DataAPI
- * @architect-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, MasterDataset
+ * @architect-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, PatternGraph
  * @architect-convention pipeline-architecture
  *
  * ## Shared Pipeline Factory Responsibilities
  *
- * **Invariant:** `buildMasterDataset()` is the shared factory for Steps 1-8 of the
+ * **Invariant:** `buildPatternGraph()` is the shared factory for Steps 1-8 of the
  * architecture pipeline and returns `Result<PipelineResult, PipelineError>` without
  * process-level side effects.
  *
@@ -21,18 +21,18 @@
  *
  * The factory owns: configuration load, TypeScript scan + extraction, Gherkin scan +
  * extraction, merge conflict handling, hierarchy child derivation, workflow load,
- * and `transformToMasterDataset` with validation summary.
+ * and `transformToPatternGraph` with validation summary.
  *
  * ## Consumer Architecture and PipelineOptions Differentiation
  *
- * Three consumers share this factory: `process-api`, `validate-patterns`, and the
+ * Three consumers share this factory: `pattern-graph-cli`, `validate-patterns`, and the
  * generation orchestrator. `PipelineOptions` differentiates behavior by
  * `mergeConflictStrategy` (`fatal` vs `concatenate`), `includeValidation` toggles,
  * and `failOnScanErrors` policy without forking pipeline logic.
  *
  * ### When to Use
  *
- * - Any consumer needs a MasterDataset without rewriting scan/extract/merge flow
+ * - Any consumer needs a PatternGraph without rewriting scan/extract/merge flow
  * - CLI consumers require differentiated conflict strategy and validation behavior
  * - Orchestrator needs a shared steps 1-8 implementation before codec/file execution
  */
@@ -52,13 +52,13 @@ import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../../config/defaults.js';
 import { loadDefaultWorkflow, loadWorkflowFromPath } from '../../config/workflow-loader.js';
 import type { LoadedWorkflow } from '../../config/workflow-loader.js';
 import {
-  transformToMasterDataset,
-  transformToMasterDatasetWithValidation,
+  transformToPatternGraph,
+  transformToPatternGraphWithValidation,
 } from './transform-dataset.js';
 import { Result } from '../../types/result.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
-import type { RuntimeMasterDataset, ValidationSummary } from './transform-types.js';
+import type { RuntimePatternGraph, ValidationSummary } from './transform-types.js';
 import type { ContextInferenceRule } from './context-inference.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -66,14 +66,14 @@ import type { ContextInferenceRule } from './context-inference.js';
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Options for building a MasterDataset via the shared pipeline.
+ * Options for building a PatternGraph via the shared pipeline.
  *
  * DD-1: Factory lives at src/generators/pipeline/build-pipeline.ts.
  * DD-2: mergeConflictStrategy controls per-consumer conflict handling.
  * DD-3: exclude, contextInferenceRules support future orchestrator
  *        migration without breaking changes.
  *
- * @architect-shape master-dataset
+ * @architect-shape pattern-graph
  */
 export interface PipelineOptions {
   readonly input: readonly string[];
@@ -135,10 +135,10 @@ export interface ScanMetadata {
 /**
  * Successful pipeline result containing the dataset and validation summary.
  *
- * @architect-shape master-dataset
+ * @architect-shape pattern-graph
  */
 export interface PipelineResult {
-  readonly dataset: RuntimeMasterDataset;
+  readonly dataset: RuntimePatternGraph;
   readonly validation: ValidationSummary;
   readonly warnings: readonly PipelineWarning[];
   readonly scanMetadata: ScanMetadata;
@@ -149,7 +149,7 @@ export interface PipelineResult {
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Build a MasterDataset by executing the 8-step extraction pipeline.
+ * Build a PatternGraph by executing the 8-step extraction pipeline.
  *
  * Returns Result<PipelineResult, PipelineError> so each consumer maps errors
  * to its own strategy (process.exit, throw, etc.). Does not call process.exit
@@ -163,9 +163,9 @@ export interface PipelineResult {
  * 5. Merge patterns (conflict handling per mergeConflictStrategy)
  * 6. Compute hierarchy children
  * 7. Load workflow configuration
- * 8. Transform to MasterDataset with validation
+ * 8. Transform to PatternGraph with validation
  */
-export async function buildMasterDataset(
+export async function buildPatternGraph(
   options: PipelineOptions
 ): Promise<Result<PipelineResult, PipelineError>> {
   const baseDir = path.resolve(options.baseDir);
@@ -340,7 +340,7 @@ export async function buildMasterDataset(
     gherkinErrorCount,
   };
 
-  // Step 8: Transform to MasterDataset
+  // Step 8: Transform to PatternGraph
   // DD-3: includeValidation controls which transform path to use
   const contextInferenceRules = options.contextInferenceRules ?? DEFAULT_CONTEXT_INFERENCE_RULES;
   const rawDataset = {
@@ -351,7 +351,7 @@ export async function buildMasterDataset(
   };
 
   if (options.includeValidation === false) {
-    const dataset = transformToMasterDataset(rawDataset);
+    const dataset = transformToPatternGraph(rawDataset);
     return Result.ok({
       dataset,
       validation: {
@@ -366,6 +366,6 @@ export async function buildMasterDataset(
     });
   }
 
-  const { dataset, validation } = transformToMasterDatasetWithValidation(rawDataset);
+  const { dataset, validation } = transformToPatternGraphWithValidation(rawDataset);
   return Result.ok({ dataset, validation, warnings, scanMetadata });
 }

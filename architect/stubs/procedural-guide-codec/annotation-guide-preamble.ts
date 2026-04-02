@@ -108,7 +108,7 @@
  *
  * | Wrong (type alias) | Correct (schema constant) |
  * |--------------------|---------------------------|
- * | `@extract-shapes MasterDataset` | `@extract-shapes MasterDatasetSchema` |
+ * | `@extract-shapes PatternGraph` | `@extract-shapes PatternGraphSchema` |
  *
  * ---
  *

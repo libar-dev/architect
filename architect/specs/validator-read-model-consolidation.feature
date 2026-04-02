@@ -13,7 +13,7 @@ Feature: Validator Read Model Consolidation
 
   **Problem:**
   `validate-patterns.ts` is the only feature consumer that bypasses the
-  MasterDataset. It wires its own mini-pipeline (scan + extract + ad-hoc
+  PatternGraph. It wires its own mini-pipeline (scan + extract + ad-hoc
   matching), creates a lossy local type (`GherkinPatternInfo`) that discards
   relationship data, and then fails to resolve `@architect-implements`
   links — producing 7 false-positive warnings.
@@ -21,7 +21,7 @@ Feature: Validator Read Model Consolidation
   This is the Parallel Pipeline anti-pattern identified in ADR-006. The
   validator re-derives pattern identity and cross-source matching from raw
   scanner/extractor output, ignoring the relationship index that the
-  MasterDataset already computes with full forward and reverse edges.
+  PatternGraph already computes with full forward and reverse edges.
 
   **Current violations in validate-patterns.ts (lines refer to pre-refactor):**
 
@@ -42,9 +42,9 @@ Feature: Validator Read Model Consolidation
   | SourceMapper | Utility with @architect-phase 27 but no Gherkin spec | Spurious phase tag |
 
   **Solution:**
-  Refactor `validate-patterns.ts` to consume the MasterDataset as its
+  Refactor `validate-patterns.ts` to consume the PatternGraph as its
   data source for cross-source validation. The validator becomes a feature
-  consumer like codecs and the ProcessStateAPI — querying pre-computed
+  consumer like codecs and the PatternGraphAPI — querying pre-computed
   views and the relationship index instead of building its own maps from
   raw data.
 
@@ -60,14 +60,14 @@ Feature: Validator Read Model Consolidation
 
   **Design Decisions:**
 
-  DD-1: Reuse the same pipeline as process-api.ts — not a shared factory yet.
+  DD-1: Reuse the same pipeline as pattern-graph-cli.ts — not a shared factory yet.
   The validator will wire scan-extract-merge-transform inline, mirroring
-  how process-api.ts does it today (lines 490-558). Extracting a shared
-  pipeline factory is scoped to ProcessAPILayeredExtraction, not this spec.
+  how pattern-graph-cli.ts does it today (lines 490-558). Extracting a shared
+  pipeline factory is scoped to PatternGraphLayeredExtraction, not this spec.
   This keeps the refactoring focused on data-access only.
 
   DD-2: The validatePatterns() function signature changes from
-  (tsPatterns, gherkinPatterns) to (dataset: RuntimeMasterDataset).
+  (tsPatterns, gherkinPatterns) to (dataset: RuntimePatternGraph).
   All cross-source matching uses dataset.patterns + dataset.relationshipIndex.
   The function remains exported for testability.
 
@@ -77,9 +77,9 @@ Feature: Validator Read Model Consolidation
   in any relationshipIndex entry's implementedBy array. This resolves
   the ShapeExtractor and DecisionDocGenerator false positives.
 
-  DD-4: The validator will import transformToMasterDatasetWithValidation
+  DD-4: The validator will import transformToPatternGraphWithValidation
   from generators/pipeline/index.js, plus the merge and hierarchy helpers
-  already used by process-api.ts. This is a temporary parallel pipeline
+  already used by pattern-graph-cli.ts. This is a temporary parallel pipeline
   (acknowledged) that will be replaced when the pipeline factory exists.
 
   DD-5: Phase tag removal from utility patterns is a separate atomic step
@@ -90,8 +90,8 @@ Feature: Validator Read Model Consolidation
 
   | Step | What | Verification |
   | 1 | Remove @architect-phase from 5 utility files | pnpm build, warnings drop from 7 to 2 |
-  | 2 | Wire MasterDataset pipeline in main() | pnpm typecheck |
-  | 3 | Rewrite validatePatterns() to consume RuntimeMasterDataset | pnpm typecheck |
+  | 2 | Wire PatternGraph pipeline in main() | pnpm typecheck |
+  | 3 | Rewrite validatePatterns() to consume RuntimePatternGraph | pnpm typecheck |
   | 4 | Delete GherkinPatternInfo, extractGherkinPatternInfo | pnpm typecheck, pnpm test |
   | 5 | Remove unused scanner/extractor imports | pnpm lint |
   | 6 | Run pnpm validate:patterns — verify 0 errors, 0 warnings | Full verification |
@@ -118,8 +118,8 @@ Feature: Validator Read Model Consolidation
     Given the following deliverables:
       | Deliverable | Status | Location |
       | Remove phase tags from 5 utility patterns | complete | 5 TS files (see Files Modified) |
-      | Wire MasterDataset pipeline in main() | complete | src/cli/validate-patterns.ts |
-      | Rewrite validatePatterns() to consume RuntimeMasterDataset | complete | src/cli/validate-patterns.ts |
+      | Wire PatternGraph pipeline in main() | complete | src/cli/validate-patterns.ts |
+      | Rewrite validatePatterns() to consume RuntimePatternGraph | complete | src/cli/validate-patterns.ts |
       | Delete GherkinPatternInfo and extractGherkinPatternInfo | complete | src/cli/validate-patterns.ts |
       | Remove unused scanner/extractor imports | complete | src/cli/validate-patterns.ts |
       | Zero warnings on pnpm validate:patterns | complete | CLI output |
@@ -127,10 +127,10 @@ Feature: Validator Read Model Consolidation
   Rule: Validator queries the read model for cross-source matching
 
     **Invariant:** Pattern identity resolution — including implements
-    relationships in both directions — uses `MasterDataset.relationshipIndex`
+    relationships in both directions — uses `PatternGraph.relationshipIndex`
     rather than ad-hoc name-equality maps built from raw scanner output.
 
-    **Rationale:** The MasterDataset computes implementedBy reverse lookups
+    **Rationale:** The PatternGraph computes implementedBy reverse lookups
     in transform-dataset.ts (second pass, lines 488-546). The validator's
     current name-equality Map cannot resolve ShapeExtractor -> ShapeExtraction
     or DecisionDocGeneratorTesting -> DecisionDocGenerator because these are
@@ -144,7 +144,7 @@ Feature: Validator Read Model Consolidation
       And a Gherkin feature "DecisionDocGeneratorTesting" with @architect-implements:DecisionDocGenerator
       When running cross-source validation
       Then no warning is produced for "DecisionDocGenerator"
-      And the relationship is resolved via MasterDataset.relationshipIndex
+      And the relationship is resolved via PatternGraph.relationshipIndex
 
     @acceptance-criteria
     Scenario: TS pattern implementing a Gherkin spec resolves
@@ -156,7 +156,7 @@ Feature: Validator Read Model Consolidation
   Rule: No lossy local types in the validator
 
     **Invariant:** The validator operates on `ExtractedPattern` from the
-    MasterDataset, not a consumer-local DTO that discards fields.
+    PatternGraph, not a consumer-local DTO that discards fields.
 
     **Rationale:** GherkinPatternInfo keeps only name, phase, status, file,
     and deliverables — discarding uses, dependsOn, implementsPatterns,
@@ -171,7 +171,7 @@ Feature: Validator Read Model Consolidation
       When inspecting the module
       Then no GherkinPatternInfo interface exists
       And no extractGherkinPatternInfo function exists
-      And pattern data comes from MasterDataset.patterns
+      And pattern data comes from PatternGraph.patterns
 
   Rule: Utility patterns without specs are not false positives
 

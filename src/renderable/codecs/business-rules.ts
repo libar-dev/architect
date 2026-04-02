@@ -9,7 +9,7 @@
  *
  * ## BusinessRulesCodec
  *
- * Transforms MasterDataset into a RenderableDocument for business rules output.
+ * Transforms PatternGraph into a RenderableDocument for business rules output.
  * Generates BUSINESS-RULES.md organized by product area, phase, and feature.
  *
  * **Purpose:** Business rules documentation organized by product area, phase, and feature. Extracts domain constraints from Gherkin Rule: blocks.
@@ -60,7 +60,7 @@
  * ```
  */
 
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
 import {
@@ -219,12 +219,12 @@ export function createBusinessRulesCodec(options?: BusinessRulesCodecOptions): D
 /**
  * Default Business Rules Document Codec
  *
- * Transforms MasterDataset → RenderableDocument for business rules.
+ * Transforms PatternGraph → RenderableDocument for business rules.
  * Uses default options with standard detail level.
  *
  * @example
  * ```typescript
- * const doc = BusinessRulesCodec.decode(masterDataset);
+ * const doc = BusinessRulesCodec.decode(patternGraph);
  * const markdown = renderToMarkdown(doc);
  * ```
  */
@@ -246,7 +246,7 @@ export const codecMeta = {
  * Build the business rules document from dataset
  */
 function buildBusinessRulesDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<BusinessRulesCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
@@ -314,7 +314,7 @@ function buildBusinessRulesDocument(
  * Collect rules organized by Product Area → Phase → Feature
  */
 function collectRulesByProductArea(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<BusinessRulesCodecOptions>
 ): Map<string, ProductAreaGroup> {
   const groups = new Map<string, ProductAreaGroup>();

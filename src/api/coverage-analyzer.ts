@@ -3,8 +3,8 @@
  * @architect-pattern CoverageAnalyzerImpl
  * @architect-status active
  * @architect-implements DataAPIArchitectureQueries
- * @architect-uses Pattern Scanner, MasterDataset
- * @architect-used-by ProcessAPICLIImpl
+ * @architect-uses Pattern Scanner, PatternGraph
+ * @architect-used-by PatternGraphCLIImpl
  * @architect-arch-role service
  * @architect-arch-context api
  * @architect-arch-layer application
@@ -12,7 +12,7 @@
  * ## CoverageAnalyzer — Annotation Coverage and Taxonomy Gap Detection
  *
  * Reports annotation completeness by comparing scannable files (from glob)
- * against annotated patterns in MasterDataset. Uses independent glob via
+ * against annotated patterns in PatternGraph. Uses independent glob via
  * findFilesToScan() — cheap (~1ms) and avoids changing buildPipeline().
  *
  * **When to Use:** When checking annotation completeness or finding unannotated files via `arch coverage` or `unannotated` CLI subcommands.
@@ -21,7 +21,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { findFilesToScan, hasFileOptIn } from '../scanner/pattern-scanner.js';
-import type { MasterDataset } from '../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../validation-schemas/pattern-graph.js';
 import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 
 // ---------------------------------------------------------------------------
@@ -48,7 +48,7 @@ export interface CoverageReport {
 // ---------------------------------------------------------------------------
 
 export function findUnusedTaxonomy(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   registry: TagRegistry
 ): UnusedTaxonomyReport {
   // Collect used values from patterns
@@ -122,7 +122,7 @@ export async function findUnannotatedFiles(
 // ---------------------------------------------------------------------------
 
 export async function analyzeCoverage(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   inputGlobs: readonly string[],
   baseDir: string,
   registry: TagRegistry

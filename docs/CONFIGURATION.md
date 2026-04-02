@@ -135,10 +135,10 @@ Full taxonomy for domain-driven architectures with 21 categories.
  * @architect-pattern TransformDataset
  * @architect-status completed
  * @architect-core
- * @architect-uses MasterDataset, ExtractedPattern
+ * @architect-uses PatternGraph, ExtractedPattern
  * @architect-used-by Orchestrator
  */
-export function transformToMasterDataset(input: TransformInput): MasterDataset { ... }
+export function transformToPatternGraph(input: TransformInput): PatternGraph { ... }
 ```
 
 > **Category Reference:** Run `pnpm docs:taxonomy` for the complete list. See [TAXONOMY.md](./TAXONOMY.md) for concepts.

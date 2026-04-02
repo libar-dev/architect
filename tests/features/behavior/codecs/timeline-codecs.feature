@@ -7,7 +7,7 @@
 @behavior @timeline-codecs
 Feature: Timeline Document Codecs
   The timeline codecs (RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWorkCodec)
-  transform MasterDataset into RenderableDocuments for different timeline views.
+  transform PatternGraph into RenderableDocuments for different timeline views.
 
   **Problem:**
   - Need to generate roadmap, milestones, and current work documents from patterns
@@ -32,7 +32,7 @@ Feature: Timeline Document Codecs
 
     @happy-path @edge-case
     Scenario: Decode empty dataset produces minimal roadmap
-      Given an empty MasterDataset
+      Given an empty PatternGraph
       When decoding with RoadmapDocumentCodec
       Then the document title is "Development Roadmap"
       And the document has a purpose
@@ -40,7 +40,7 @@ Feature: Timeline Document Codecs
 
     @happy-path
     Scenario: Decode dataset with multiple phases
-      Given a MasterDataset with timeline patterns
+      Given a PatternGraph with timeline patterns
       When decoding with RoadmapDocumentCodec
       Then the document title is "Development Roadmap"
       And the document contains sections:
@@ -51,7 +51,7 @@ Feature: Timeline Document Codecs
 
     @happy-path
     Scenario: Progress section shows correct status counts
-      Given a MasterDataset with status distribution:
+      Given a PatternGraph with status distribution:
         | status    | count |
         | completed | 5     |
         | active    | 3     |
@@ -67,7 +67,7 @@ Feature: Timeline Document Codecs
 
     @happy-path
     Scenario: Phase navigation table with progress
-      Given a MasterDataset with timeline patterns
+      Given a PatternGraph with timeline patterns
       When decoding with RoadmapDocumentCodec
       Then the phase navigation table has columns:
         | column   |
@@ -77,13 +77,13 @@ Feature: Timeline Document Codecs
       And the phase navigation has 4 rows
 
     Scenario: Phase sections show pattern tables
-      Given a MasterDataset with timeline patterns
+      Given a PatternGraph with timeline patterns
       When decoding with RoadmapDocumentCodec
       Then phase 1 section shows "100% complete"
       And phase 3 section shows active patterns
 
     Scenario: Generate phase detail files when enabled
-      Given a MasterDataset with timeline patterns
+      Given a PatternGraph with timeline patterns
       When decoding with generateDetailFiles enabled for roadmap
       Then the document has phase detail files:
         | path                                     |
@@ -93,12 +93,12 @@ Feature: Timeline Document Codecs
         | phases/phase-04-advanced-projections.md  |
 
     Scenario: No detail files when disabled
-      Given a MasterDataset with timeline patterns
+      Given a PatternGraph with timeline patterns
       When decoding with generateDetailFiles disabled for roadmap
       Then the document has no additional files
 
     Scenario: Quarterly timeline shown when quarters exist
-      Given a MasterDataset with timeline patterns
+      Given a PatternGraph with timeline patterns
       When decoding with RoadmapDocumentCodec
       Then the document contains a "Quarterly Timeline" section
       And the quarterly timeline table has quarters:
@@ -119,14 +119,14 @@ Feature: Timeline Document Codecs
 
     @happy-path @edge-case
     Scenario: No completed patterns produces empty message
-      Given a MasterDataset with only planned patterns
+      Given a PatternGraph with only planned patterns
       When decoding with CompletedMilestonesCodec
       Then the document title is "Completed Milestones"
       And the document contains "No Completed Milestones"
 
     @happy-path
     Scenario: Summary shows completed counts
-      Given a MasterDataset with timeline patterns
+      Given a PatternGraph with timeline patterns
       When decoding with CompletedMilestonesCodec
       Then the document title is "Completed Milestones"
       And the summary table shows:
@@ -135,25 +135,25 @@ Feature: Timeline Document Codecs
 
     @happy-path
     Scenario: Quarterly navigation with completed patterns
-      Given a MasterDataset with timeline patterns
+      Given a PatternGraph with timeline patterns
       When decoding with CompletedMilestonesCodec
       Then the document contains a "Quarterly Navigation" section
       And the quarterly navigation shows quarters with completed counts
 
     Scenario: Completed phases shown in collapsible sections
-      Given a MasterDataset with timeline patterns
+      Given a PatternGraph with timeline patterns
       When decoding with CompletedMilestonesCodec
       Then the document contains a "Completed Phases" section
       And the completed phases are collapsible
 
     Scenario: Recent completions section with limit
-      Given a MasterDataset with timeline patterns
+      Given a PatternGraph with timeline patterns
       When decoding with CompletedMilestonesCodec
       Then the document contains a "Recent Completions" section
       And recent completions shows at most 10 patterns
 
     Scenario: Generate quarterly detail files when enabled
-      Given a MasterDataset with timeline patterns
+      Given a PatternGraph with timeline patterns
       When decoding with generateDetailFiles enabled for milestones
       Then the document has quarterly milestone files:
         | path                    |
@@ -172,14 +172,14 @@ Feature: Timeline Document Codecs
 
     @happy-path @edge-case
     Scenario: No active work produces empty message
-      Given a MasterDataset with only completed patterns
+      Given a PatternGraph with only completed patterns
       When decoding with CurrentWorkCodec
       Then the document title is "Current Work"
       And the document contains "No Active Work"
 
     @happy-path
     Scenario: Summary shows overall progress
-      Given a MasterDataset with timeline patterns
+      Given a PatternGraph with timeline patterns
       When decoding with CurrentWorkCodec
       Then the document title is "Current Work"
       And the summary shows overall progress percentage
@@ -187,18 +187,18 @@ Feature: Timeline Document Codecs
 
     @happy-path
     Scenario: Active phases with progress bars
-      Given a MasterDataset with timeline patterns
+      Given a PatternGraph with timeline patterns
       When decoding with CurrentWorkCodec
       Then the document contains an "Active Phases" section
       And active phase 3 shows progress and status breakdown
 
     Scenario: Deliverables rendered when configured
-      Given a MasterDataset with patterns with deliverables
+      Given a PatternGraph with patterns with deliverables
       When decoding with includeDeliverables enabled for current work
       Then the active patterns show their deliverables
 
     Scenario: All active patterns table
-      Given a MasterDataset with timeline patterns
+      Given a PatternGraph with timeline patterns
       When decoding with CurrentWorkCodec
       Then the document contains an "All Active Patterns" section
       And the active patterns table has columns:
@@ -209,7 +209,7 @@ Feature: Timeline Document Codecs
         | Description |
 
     Scenario: Generate current work detail files when enabled
-      Given a MasterDataset with timeline patterns
+      Given a PatternGraph with timeline patterns
       When decoding with generateDetailFiles enabled for current work
       Then the document has current work detail files:
         | path                                           |

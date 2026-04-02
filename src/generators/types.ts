@@ -4,7 +4,7 @@
 
 import type { ExtractedPattern, TagRegistry } from '../validation-schemas';
 import type { LoadedWorkflow } from '../validation-schemas/workflow-config.js';
-import type { RuntimeMasterDataset } from './pipeline/index.js';
+import type { RuntimePatternGraph } from './pipeline/index.js';
 import type { CodecOptions } from '../renderable/generate.js';
 import type { ProjectMetadata } from '../config/project-config.js';
 import type { FormatType } from '../taxonomy/index.js';
@@ -76,7 +76,7 @@ export interface GeneratorContext {
    * computed in a single pass. Sections should use these pre-computed views
    * instead of filtering the raw patterns array.
    */
-  readonly masterDataset: RuntimeMasterDataset;
+  readonly patternGraph: RuntimePatternGraph;
 
   /**
    * Optional codec-specific options for document generation.

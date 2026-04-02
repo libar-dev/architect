@@ -10,7 +10,7 @@
  *
  * ## IndexCodec
  *
- * **Purpose:** Navigation hub composing editorial preamble with MasterDataset statistics.
+ * **Purpose:** Navigation hub composing editorial preamble with PatternGraph statistics.
  *
  * **Output Files:** `INDEX.md` (single page, no detail files)
  *
@@ -32,7 +32,7 @@
  * - DD-5: Standalone codec, not routed through reference codec pipeline
  */
 
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import {
   type RenderableDocument,
   type SectionBlock,
@@ -132,7 +132,7 @@ export const IndexCodec = createIndexCodec();
 export const codecMeta = {
   type: 'index',
   outputPath: 'INDEX.md',
-  description: 'Navigation hub with editorial preamble and MasterDataset statistics',
+  description: 'Navigation hub with editorial preamble and PatternGraph statistics',
   factory: createIndexCodec,
   defaultInstance: IndexCodec,
 } as const;
@@ -259,7 +259,7 @@ function buildDocumentInventory(entries: readonly DocumentEntry[]): SectionBlock
   return sections;
 }
 
-function buildProductAreaStats(dataset: MasterDataset): SectionBlock[] {
+function buildProductAreaStats(dataset: PatternGraph): SectionBlock[] {
   const sections: SectionBlock[] = [heading(2, 'Product Area Statistics')];
 
   const rows: string[][] = [];
@@ -303,7 +303,7 @@ function buildProductAreaStats(dataset: MasterDataset): SectionBlock[] {
   return sections;
 }
 
-function buildPhaseProgress(dataset: MasterDataset): SectionBlock[] {
+function buildPhaseProgress(dataset: PatternGraph): SectionBlock[] {
   const sections: SectionBlock[] = [heading(2, 'Phase Progress')];
 
   const counts = computeStatusCounts(dataset.patterns);
@@ -400,7 +400,7 @@ function buildRegenerationFooter(context: CodecContext): SectionBlock[] {
         'pnpm docs:taxonomy              # Taxonomy reference',
         'pnpm docs:validation            # Validation rules',
         'pnpm docs:claude-modules        # Claude context modules',
-        'pnpm docs:process-api-reference # Process API CLI reference',
+        'pnpm docs:cli-reference         # Pattern Graph CLI reference',
         'pnpm docs:cli-recipe            # CLI recipes & workflow guide',
       ].join('\n'),
       'bash'

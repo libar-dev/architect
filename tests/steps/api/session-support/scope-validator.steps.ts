@@ -13,11 +13,11 @@ import {
 } from '../../../../src/api/scope-validator.js';
 import { QueryApiError } from '../../../../src/api/types.js';
 import { createTestPattern } from '../../../fixtures/pattern-factories.js';
-import { createTestMasterDataset } from '../../../fixtures/dataset-factories.js';
-import { createProcessStateAPI } from '../../../../src/api/process-state.js';
-import type { ProcessStateAPI } from '../../../../src/api/process-state.js';
+import { createTestPatternGraph } from '../../../fixtures/dataset-factories.js';
+import { createPatternGraphAPI } from '../../../../src/api/pattern-graph-api.js';
+import type { PatternGraphAPI } from '../../../../src/api/pattern-graph-api.js';
 import type { ExtractedPattern } from '../../../../src/validation-schemas/index.js';
-import type { MasterDataset } from '../../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../../src/validation-schemas/pattern-graph.js';
 
 const feature = await loadFeature('tests/features/api/session-support/scope-validator.feature');
 
@@ -26,8 +26,8 @@ const feature = await loadFeature('tests/features/api/session-support/scope-vali
 // =============================================================================
 
 interface ScopeValidatorTestState {
-  api: ProcessStateAPI | null;
-  dataset: MasterDataset | null;
+  api: PatternGraphAPI | null;
+  dataset: PatternGraph | null;
   result: ScopeValidationResult | null;
   formattedOutput: string;
   thrownError: unknown;
@@ -46,11 +46,11 @@ function initState(): ScopeValidatorTestState {
 }
 
 function buildApiAndDataset(patterns: ExtractedPattern[]): {
-  api: ProcessStateAPI;
-  dataset: MasterDataset;
+  api: PatternGraphAPI;
+  dataset: PatternGraph;
 } {
-  const dataset = createTestMasterDataset({ patterns });
-  const api = createProcessStateAPI(dataset);
+  const dataset = createTestPatternGraph({ patterns });
+  const api = createPatternGraphAPI(dataset);
   return { api, dataset };
 }
 

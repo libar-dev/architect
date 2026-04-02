@@ -11,7 +11,7 @@ import {
   getRenderedMarkdown,
   createReferenceCodec,
   createTestPattern,
-  createTestMasterDataset,
+  createTestPatternGraph,
   findHeadings,
   findLists,
   findParagraphs,
@@ -63,8 +63,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with a convention pattern with narrative and rationale', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with a convention pattern with narrative and rationale', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'DetailPatternStandard',
@@ -123,8 +123,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with a behavior pattern with structured rules', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with a behavior pattern with structured rules', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'BehaviorSpec',
@@ -197,8 +197,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with a behavior pattern with structured rules', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with a behavior pattern with structured rules', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'BehaviorSpecStd',
@@ -258,8 +258,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with a behavior pattern with structured rules', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with a behavior pattern with structured rules', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'BehaviorSpecSum',
@@ -316,9 +316,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with a behavior pattern with overlapping scenarioNames and verifiedBy',
+          'a PatternGraph with a behavior pattern with overlapping scenarioNames and verifiedBy',
           () => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'BehaviorSpecDedup',
@@ -386,8 +386,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         }
       );
 
-      And('a MasterDataset with a shape pattern with JSDoc', () => {
-        state!.dataset = createTestMasterDataset({
+      And('a PatternGraph with a shape pattern with JSDoc', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: [
             createTestPattern({
               name: 'ShapeWithDoc',
@@ -438,8 +438,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with a shape pattern with JSDoc and property docs', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with a shape pattern with JSDoc and property docs', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'ShapeWithDocAndProps',
@@ -499,8 +499,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         }
       );
 
-      And('a MasterDataset with a shape pattern without JSDoc', () => {
-        state!.dataset = createTestMasterDataset({
+      And('a PatternGraph with a shape pattern without JSDoc', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: [
             createTestPattern({
               name: 'ShapeNoDoc',
@@ -562,8 +562,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with a function shape with param docs', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with a function shape with param docs', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'FuncWithParams',
@@ -647,8 +647,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with a function shape with returns and throws docs', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with a function shape with returns and throws docs', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'FuncWithReturnsThrows',
@@ -715,8 +715,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with a function shape with param and throws docs', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with a function shape with param and throws docs', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'FuncWithParamThrows',
@@ -784,8 +784,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         }
       );
 
-      And('a MasterDataset with a shape pattern with JSDoc', () => {
-        state!.dataset = createTestMasterDataset({
+      And('a PatternGraph with a shape pattern with JSDoc', () => {
+        state!.dataset = createTestPatternGraph({
           patterns: [
             createTestPattern({
               name: 'ShapeNoParams',
@@ -839,7 +839,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with a behavior pattern with {int} structured rules',
+          'a PatternGraph with a behavior pattern with {int} structured rules',
           (_ctx: unknown, ruleCount: number) => {
             const rules = [];
             for (let i = 1; i <= ruleCount; i++) {
@@ -850,7 +850,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
                 scenarioNames: [`Scenario ${i}A`, `Scenario ${i}B`],
               });
             }
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'MultiRuleBehavior',
@@ -898,7 +898,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with a behavior pattern with {int} structured rules',
+          'a PatternGraph with a behavior pattern with {int} structured rules',
           (_ctx: unknown, ruleCount: number) => {
             const rules = [];
             for (let i = 1; i <= ruleCount; i++) {
@@ -909,7 +909,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
                 scenarioNames: [`Scenario ${i}A`, `Scenario ${i}B`],
               });
             }
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'FewRuleBehavior',
@@ -947,7 +947,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with a behavior pattern with {int} structured rules',
+          'a PatternGraph with a behavior pattern with {int} structured rules',
           (_ctx: unknown, ruleCount: number) => {
             const rules = [];
             for (let i = 1; i <= ruleCount; i++) {
@@ -958,7 +958,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
                 scenarioNames: [],
               });
             }
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'SummaryBehavior',
@@ -1002,9 +1002,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with a behavior pattern in category {string}',
+          'a PatternGraph with a behavior pattern in category {string}',
           (_ctx: unknown, category: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'LinkOutBehavior',
@@ -1051,9 +1051,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       );
 
       And(
-        'a MasterDataset with a behavior pattern in category {string}',
+        'a PatternGraph with a behavior pattern in category {string}',
         (_ctx: unknown, category: string) => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'LinkOutStandard',
@@ -1090,9 +1090,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       );
 
       And(
-        'a MasterDataset with a behavior pattern in category {string}',
+        'a PatternGraph with a behavior pattern in category {string}',
         (_ctx: unknown, category: string) => {
-          state!.dataset = createTestMasterDataset({
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'LinkOutSummary',
@@ -1141,9 +1141,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         });
 
         And(
-          'a MasterDataset with a pattern that has include {string}',
+          'a PatternGraph with a pattern that has include {string}',
           (_ctx: unknown, includeTag: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'IncludedPattern',
@@ -1199,8 +1199,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           }
         );
 
-        And('a MasterDataset with a category pattern and an include-tagged pattern', () => {
-          state!.dataset = createTestMasterDataset({
+        And('a PatternGraph with a category pattern and an include-tagged pattern', () => {
+          state!.dataset = createTestPatternGraph({
             patterns: [
               createTestPattern({
                 name: 'LintPattern',
@@ -1260,9 +1260,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         });
 
         And(
-          'a MasterDataset with a pattern that has include {string}',
+          'a PatternGraph with a pattern that has include {string}',
           (_ctx: unknown, includeTag: string) => {
-            state!.dataset = createTestMasterDataset({
+            state!.dataset = createTestPatternGraph({
               patterns: [
                 createTestPattern({
                   name: 'NonMatchingPattern',

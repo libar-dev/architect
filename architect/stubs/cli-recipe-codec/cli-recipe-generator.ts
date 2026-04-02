@@ -6,17 +6,17 @@
  *
  * ## CliRecipeGenerator — Standalone Generator for CLI Recipes and Narratives
  *
- * Produces `docs-live/reference/PROCESS-API-RECIPES.md` from the declarative
- * CLI schema. Sibling to `ProcessApiReferenceGenerator` — both implement
+ * Produces `docs-live/reference/CLI-RECIPES.md` from the declarative
+ * CLI schema. Sibling to `CliReferenceGenerator` — both implement
  * `DocumentGenerator`, both consume `CLI_SCHEMA` directly, neither depends
- * on MasterDataset (ADR-006 compliant).
+ * on PatternGraph (ADR-006 compliant).
  *
  * **Design Decision DD-1 (Separate generator, not extension):**
  * Reference tables and recipe guides serve different audiences and change at
  * different cadences. Reference tables change when CLI flags are added or
  * removed. Recipes change when workflow recommendations evolve. Coupling
  * them in one generator would force both to change together.
- * `ProcessApiReferenceGenerator` is already completed and tested (Phase 43) —
+ * `CliReferenceGenerator` is already completed and tested (Phase 43) —
  * extending it risks regressions. Two small standalone generators are easier
  * to test and maintain than one large one.
  *
@@ -35,17 +35,17 @@
  * `architect.config.ts`, not in the generator source.
  *
  * **Design Decision DD-5 (No claude-md output):**
- * The generator produces only `docs-live/reference/PROCESS-API-RECIPES.md`.
+ * The generator produces only `docs-live/reference/CLI-RECIPES.md`.
  * It does NOT produce `_claude-md/` output because CLAUDE.md already has
  * a manually-authored "Data API CLI" section that serves the AI context use
  * case. Adding generated claude-md modules would create duplicate content.
  *
  * ### Output File Structure
  *
- * The generated `PROCESS-API-RECIPES.md` has this structure:
+ * The generated `CLI-RECIPES.md` has this structure:
  *
  * ```
- * # Process API CLI — Recipes & Workflow Guide
+ * # Pattern Graph CLI Recipes & Workflow Guide
  * > Auto-generated from CLI schema.
  *
  * [Preamble: Why Use This, Quick Start, Session Types]
@@ -181,7 +181,7 @@ function buildRecipeDocument(
   //
   // // 1. Auto-generation notice
   // sections.push(paragraph(
-  //   '> Auto-generated from CLI schema. See [CLI Reference](./PROCESS-API-REFERENCE.md) for flag tables.'
+  //   '> Auto-generated from CLI schema. See [CLI Reference](./CLI-REFERENCE.md) for flag tables.'
   // ));
   //
   // // 2. Preamble (editorial prose)
@@ -206,7 +206,7 @@ function buildRecipeDocument(
   //   }
   // }
   //
-  // const doc = document('Process API CLI - Recipes & Workflow Guide', sections);
+  // const doc = document('Pattern Graph CLI Recipes & Workflow Guide', sections);
   // return renderToMarkdown(doc);
 
   throw new Error('CliRecipeCodec not yet implemented - roadmap pattern');
@@ -237,16 +237,16 @@ export interface CliRecipeGeneratorConfig {
 // =============================================================================
 
 /**
- * Standalone generator producing PROCESS-API-RECIPES.md from CLI schema.
+ * Standalone generator producing CLI-RECIPES.md from CLI schema.
  *
- * Follows the same pattern as ProcessApiReferenceGenerator:
+ * Follows the same pattern as CliReferenceGenerator:
  * - Implements DocumentGenerator interface
- * - Consumes CLI_SCHEMA directly (no MasterDataset dependency)
+ * - Consumes CLI_SCHEMA directly (no PatternGraph dependency)
  * - Returns OutputFile[] via standard orchestrator write path
  * - Registered in architect.config.ts generatorOverrides
  *
- * Key difference from ProcessApiReferenceGenerator:
- * - ProcessApiReferenceGenerator reads CLIOptionGroup → produces flag tables
+ * Key difference from CliReferenceGenerator:
+ * - CliReferenceGenerator reads CLIOptionGroup → produces flag tables
  * - CliRecipeGenerator reads RecipeGroup[] + CommandNarrativeGroup[] → produces recipes
  * - Both read from the same CLI_SCHEMA constant
  */
@@ -269,7 +269,7 @@ class CliRecipeGeneratorImpl {
     return Promise.resolve({
       files: [
         {
-          path: 'reference/PROCESS-API-RECIPES.md',
+          path: 'reference/CLI-RECIPES.md',
           content,
         },
       ],
@@ -296,7 +296,7 @@ export function createCliRecipeGenerator(
 
 /**
  * Registration follows the programmatic pattern from codec-generators.ts.
- * The generator is registered similarly to createProcessApiReferenceGenerator().
+ * The generator is registered similarly to createCliReferenceGenerator().
  *
  * Output directory override is set in architect.config.ts:
  * ```typescript

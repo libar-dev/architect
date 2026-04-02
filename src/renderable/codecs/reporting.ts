@@ -44,7 +44,7 @@
  * - When combining completion stats with architecture context
  */
 
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -222,7 +222,7 @@ export const codecMetas = [
 // ═══════════════════════════════════════════════════════════════════════════
 
 function buildChangelogDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<ChangelogCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
@@ -375,7 +375,7 @@ function buildChangelogSection(
 // ═══════════════════════════════════════════════════════════════════════════
 
 function buildTraceabilityDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<TraceabilityCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
@@ -471,7 +471,7 @@ function buildTraceabilityDocument(
 // ═══════════════════════════════════════════════════════════════════════════
 
 function buildOverviewDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<OverviewCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];

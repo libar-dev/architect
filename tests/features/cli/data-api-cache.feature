@@ -1,11 +1,11 @@
 @architect
-@architect-pattern:ProcessApiCliCache
+@architect-pattern:PatternGraphCliCache
 @architect-implements:DataAPICLIErgonomics
 @architect-status:active
 @architect-product-area:DataAPI
-@cli @process-api @cache
-Feature: Process API CLI - Dataset Cache
-  MasterDataset caching between CLI invocations: cache hits, mtime invalidation, and --no-cache bypass.
+@cli @pattern-graph-cli @cache
+Feature: Pattern Graph CLI - Dataset Cache
+  PatternGraph caching between CLI invocations: cache hits, mtime invalidation, and --no-cache bypass.
 
   Background:
     Given a temporary working directory
@@ -14,9 +14,9 @@ Feature: Process API CLI - Dataset Cache
   # RULE 1: Cache Hit on Unchanged Sources
   # ============================================================================
 
-  Rule: MasterDataset is cached between invocations
+  Rule: PatternGraph is cached between invocations
 
-    **Invariant:** When source files have not changed between CLI invocations, the second invocation must use the cached MasterDataset and report cache.hit as true alongside pipeline timing metadata.
+    **Invariant:** When source files have not changed between CLI invocations, the second invocation must use the cached PatternGraph and report cache.hit as true alongside pipeline timing metadata.
     **Rationale:** The pipeline rebuild costs 2-5 seconds per invocation. Caching eliminates this cost for repeated queries against unchanged sources, which is the common case during interactive AI sessions.
 
     @happy-path

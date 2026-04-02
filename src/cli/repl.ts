@@ -7,7 +7,7 @@
  * @architect-arch-role service
  * @architect-arch-context cli
  * @architect-arch-layer application
- * @architect-uses PipelineFactory, ProcessStateAPI
+ * @architect-uses PipelineFactory, PatternGraphAPI
  *
  * ## REPL Mode - Interactive Multi-Query Pipeline Session
  *
@@ -30,13 +30,13 @@
 import * as readline from 'node:readline/promises';
 import * as path from 'path';
 import {
-  buildMasterDataset,
+  buildPatternGraph,
   type PipelineResult,
-  type RuntimeMasterDataset,
+  type RuntimePatternGraph,
   type ValidationSummary,
 } from '../generators/pipeline/index.js';
-import { createProcessStateAPI } from '../api/process-state.js';
-import type { ProcessStateAPI } from '../api/process-state.js';
+import { createPatternGraphAPI } from '../api/pattern-graph-api.js';
+import type { PatternGraphAPI } from '../api/pattern-graph-api.js';
 import { QueryApiError, createSuccess, createError } from '../api/types.js';
 import { formatOutput } from './output-pipeline.js';
 import {
@@ -60,8 +60,8 @@ export interface ReplOptions {
 }
 
 interface ReplState {
-  api: ProcessStateAPI;
-  dataset: RuntimeMasterDataset;
+  api: PatternGraphAPI;
+  dataset: RuntimePatternGraph;
   validation: ValidationSummary;
 }
 
@@ -70,7 +70,7 @@ interface ReplState {
 // =============================================================================
 
 async function loadPipeline(opts: ReplOptions): Promise<PipelineResult> {
-  const result = await buildMasterDataset({
+  const result = await buildPatternGraph({
     input: opts.input,
     features: opts.features,
     baseDir: opts.baseDir,
@@ -192,7 +192,7 @@ export async function startRepl(opts: ReplOptions): Promise<void> {
   console.error('Loading pipeline...');
   const pipeline = await loadPipeline(opts);
   const state: ReplState = {
-    api: createProcessStateAPI(pipeline.dataset),
+    api: createPatternGraphAPI(pipeline.dataset),
     dataset: pipeline.dataset,
     validation: pipeline.validation,
   };
@@ -263,7 +263,7 @@ async function processLine(trimmed: string, state: ReplState, opts: ReplOptions)
     console.error('Reloading pipeline...');
     try {
       const fresh = await loadPipeline(opts);
-      state.api = createProcessStateAPI(fresh.dataset);
+      state.api = createPatternGraphAPI(fresh.dataset);
       state.dataset = fresh.dataset;
       state.validation = fresh.validation;
       console.error(`Reloaded: ${state.dataset.counts.total} patterns`);

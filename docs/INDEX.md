@@ -29,7 +29,7 @@
 | Write Gherkin specs         | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | 1-515  |
 | Enforce process rules       | [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | 1-341  |
 | Validate annotation quality | [VALIDATION.md](./VALIDATION.md)             | 1-281  |
-| Query process state via CLI | [PROCESS-API.md](./PROCESS-API.md)           | 1-507  |
+| Query pattern graph via CLI | [CLI.md](./CLI.md)                           | 1-507  |
 | Understand the taxonomy     | [TAXONOMY.md](./TAXONOMY.md)                 | 1-105  |
 | Publish to npm              | [MAINTAINERS.md](../MAINTAINERS.md)          | —      |
 | Learn annotation patterns   | [ANNOTATION-GUIDE.md](./ANNOTATION-GUIDE.md) | 1-268  |
@@ -48,8 +48,8 @@
 
 ### For Developers / AI
 
-4. **[ARCHITECTURE.md](./ARCHITECTURE.md)** — Four-stage pipeline, codecs, MasterDataset
-5. **[PROCESS-API.md](./PROCESS-API.md)** — Data API CLI query interface
+4. **[ARCHITECTURE.md](./ARCHITECTURE.md)** — Four-stage pipeline, codecs, PatternGraph
+5. **[CLI.md](./CLI.md)** — Data API CLI query interface
 6. **[SESSION-GUIDES.md](./SESSION-GUIDES.md)** — Planning/Design/Implementation workflows
 7. **[GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md)** — Writing effective Gherkin specs
 8. **[ANNOTATION-GUIDE.md](./ANNOTATION-GUIDE.md)** — Annotation mechanics, shape extraction, tag quick reference
@@ -117,22 +117,22 @@
 
 ### ARCHITECTURE.md (Lines 1-1638)
 
-| Section                    | Lines     | Key Topics                                                        |
-| -------------------------- | --------- | ----------------------------------------------------------------- |
-| Executive Summary          | 28-69     | What it does, key principles (incl. Single Read Model), overview  |
-| Configuration Architecture | 70-139    | Entry point, pipeline effects, resolution                         |
-| Four-Stage Pipeline        | 140-343   | Scanner → Extractor → Pipeline Factory → Transformer → Codec      |
-| Unified Transformation     | 345-478   | MasterDataset schema (relationshipIndex + archIndex), single-pass |
-| Codec Architecture         | 481-527   | Concepts, block vocabulary, factory, 3 renderers                  |
-| Available Codecs           | 529-870   | All 20 codecs with options tables                                 |
-| Progressive Disclosure     | 871-917   | Split logic, detail levels                                        |
-| Source Systems             | 919-1024  | TypeScript scanner, Gherkin scanner                               |
-| Key Design Patterns        | 1026-1105 | Result monad, schema-first, tag registry                          |
-| Data Flow Diagrams         | 1107-1290 | Pipeline flow, factory entry point, MasterDataset views, codecs   |
-| Workflow Integration       | 1292-1401 | Planning, implementing, release workflows                         |
-| Programmatic Usage         | 1403-1458 | Direct codec usage, generateDocument                              |
-| Extending the System       | 1460-1527 | Custom codec, custom generator                                    |
-| Quick Reference            | 1529-1604 | Codec-to-generator mapping, CLI, filters                          |
+| Section                    | Lines     | Key Topics                                                       |
+| -------------------------- | --------- | ---------------------------------------------------------------- |
+| Executive Summary          | 28-69     | What it does, key principles (incl. Single Read Model), overview |
+| Configuration Architecture | 70-139    | Entry point, pipeline effects, resolution                        |
+| Four-Stage Pipeline        | 140-343   | Scanner → Extractor → Pipeline Factory → Transformer → Codec     |
+| Unified Transformation     | 345-478   | PatternGraph schema (relationshipIndex + archIndex), single-pass |
+| Codec Architecture         | 481-527   | Concepts, block vocabulary, factory, 3 renderers                 |
+| Available Codecs           | 529-870   | All 20 codecs with options tables                                |
+| Progressive Disclosure     | 871-917   | Split logic, detail levels                                       |
+| Source Systems             | 919-1024  | TypeScript scanner, Gherkin scanner                              |
+| Key Design Patterns        | 1026-1105 | Result monad, schema-first, tag registry                         |
+| Data Flow Diagrams         | 1107-1290 | Pipeline flow, factory entry point, PatternGraph views, codecs   |
+| Workflow Integration       | 1292-1401 | Planning, implementing, release workflows                        |
+| Programmatic Usage         | 1403-1458 | Direct codec usage, generateDocument                             |
+| Extending the System       | 1460-1527 | Custom codec, custom generator                                   |
+| Quick Reference            | 1529-1604 | Codec-to-generator mapping, CLI, filters                         |
 
 #### Available Codecs Reference
 
@@ -194,7 +194,7 @@
 
 ---
 
-### PROCESS-API.md (Lines 1-507)
+### CLI.md (Lines 1-507)
 
 | Section                   | Lines   | Key Topics                                                  |
 | ------------------------- | ------- | ----------------------------------------------------------- |
@@ -231,18 +231,18 @@
 
 ### VALIDATION.md (Lines 1-281)
 
-| Section               | Lines   | Key Topics                                        |
-| --------------------- | ------- | ------------------------------------------------- |
-| Which Command?        | 7-24    | Decision tree for validation commands             |
-| Command Summary       | 26-35   | lint-patterns, lint-steps, lint-process, validate |
-| lint-patterns         | 37-74   | 8 rules table, CLI flags                          |
-| lint-steps            | 76-98   | 12 rules, 3 categories, vitest-cucumber traps     |
-| lint-process          | 100-121 | What it validates, reference links                |
-| validate-patterns     | 123-197 | CLI flags, checks, anti-patterns, DoD             |
-| CI/CD Integration     | 199-238 | Consumer scripts, hooks, GitHub Actions           |
-| Exit Codes            | 240-248 | Per-command exit code table                       |
-| Programmatic API      | 250-272 | Import paths for all validators                   |
-| Related Documentation | 274-281 | Links to GHERKIN-PATTERNS, PROCESS-GUARD, CONFIG  |
+| Section               | Lines   | Key Topics                                           |
+| --------------------- | ------- | ---------------------------------------------------- |
+| Which Command?        | 7-24    | Decision tree for validation commands                |
+| Command Summary       | 26-35   | lint-patterns, lint-steps, architect-guard, validate |
+| lint-patterns         | 37-74   | 8 rules table, CLI flags                             |
+| lint-steps            | 76-98   | 12 rules, 3 categories, vitest-cucumber traps        |
+| architect-guard       | 100-121 | What it validates, reference links                   |
+| validate-patterns     | 123-197 | CLI flags, checks, anti-patterns, DoD                |
+| CI/CD Integration     | 199-238 | Consumer scripts, hooks, GitHub Actions              |
+| Exit Codes            | 240-248 | Per-command exit code table                          |
+| Programmatic API      | 250-272 | Import paths for all validators                      |
+| Related Documentation | 274-281 | Links to GHERKIN-PATTERNS, PROCESS-GUARD, CONFIG     |
 
 ---
 
@@ -301,7 +301,7 @@ deferred ──→ roadmap
 
 The CLI is the **recommended way** to gather context in any session type.
 It queries annotated sources in real time — not generated snapshots.
-See [PROCESS-API.md](./PROCESS-API.md).
+See [CLI.md](./CLI.md).
 
 ```bash
 pnpm architect:query -- scope-validate MyPattern implement      # ALWAYS run first
@@ -320,7 +320,7 @@ pnpm architect:query -- handoff --pattern MyPattern              # Capture sessi
 | METHODOLOGY.md      | Everyone    | Why — core thesis, principles     |
 | CONFIGURATION.md    | Users       | Setup — presets, tags, config     |
 | ARCHITECTURE.md     | Developers  | How — pipeline, codecs, schemas   |
-| PROCESS-API.md      | AI/Devs     | Data API CLI query interface      |
+| CLI.md              | AI/Devs     | Data API CLI query interface      |
 | SESSION-GUIDES.md   | AI/Devs     | Workflow — day-to-day usage       |
 | GHERKIN-PATTERNS.md | Writers     | Specs — writing effective Gherkin |
 | PROCESS-GUARD.md    | Team Leads  | Governance — enforcement rules    |

@@ -115,7 +115,7 @@ Phases are ordered by: (1) safety prerequisites, (2) structural foundations that
 **Scope:**
 
 - Add `createDecodeOnlyCodec(decode)` function to `src/renderable/codecs/types/base.ts`
-- Initially accepts `(dataset: MasterDataset) => RenderableDocument` (Phase 1B changes the signature)
+- Initially accepts `(dataset: PatternGraph) => RenderableDocument` (Phase 1B changes the signature)
 - Returns `DocumentCodec` with standard encode-throws behavior
 - Migrate all 21 registered codecs + unregistered reference codecs to use it
 - Remove all inline `z.codec()` + `encode: () => throw` patterns
@@ -138,7 +138,7 @@ Phases are ordered by: (1) safety prerequisites, (2) structural foundations that
 
 ### 1B: `CodecContext` Wrapper (Decision Point)
 
-**Why:** Separates extraction products from runtime context. Makes `MasterDataset` a pure read model (ADR-006 alignment).
+**Why:** Separates extraction products from runtime context. Makes `PatternGraph` a pure read model (ADR-006 alignment).
 
 **Decision required:** This is the highest-leverage structural change but also the highest-risk. Two options:
 
@@ -146,7 +146,7 @@ Phases are ordered by: (1) safety prerequisites, (2) structural foundations that
 
 ```typescript
 interface CodecContext {
-  readonly dataset: MasterDataset;
+  readonly dataset: PatternGraph;
   readonly projectMetadata?: ProjectMetadata;
   readonly workflow?: LoadedWorkflow;
   readonly tagExampleOverrides?: Partial<Record<FormatType, { example: string }>>;
@@ -155,8 +155,8 @@ interface CodecContext {
 
 All codecs change from `decode(dataset)` to `decode(context)`. The `createDecodeOnlyCodec()` helper absorbs the change — codec authors update one function signature per codec.
 
-**Option B — `projectMetadata` on MasterDataset (non-breaking, incremental):**
-Add `projectMetadata?: ProjectMetadata` to `MasterDatasetSchema` as the specs propose. Simpler, but MasterDataset accumulates non-extraction fields.
+**Option B — `projectMetadata` on PatternGraph (non-breaking, incremental):**
+Add `projectMetadata?: ProjectMetadata` to `PatternGraphSchema` as the specs propose. Simpler, but PatternGraph accumulates non-extraction fields.
 
 **Recommendation:** Option A if this is the refactoring window. Option B if shipping speed matters more.
 
@@ -169,8 +169,8 @@ Add `projectMetadata?: ProjectMetadata` to `MasterDatasetSchema` as the specs pr
 
 **Acceptance criteria:**
 
-- [ ] No codec directly receives `MasterDataset` — all go through `CodecContext`
-- [ ] `MasterDataset` has no `projectMetadata` field (it's on `CodecContext`)
+- [ ] No codec directly receives `PatternGraph` — all go through `CodecContext`
+- [ ] `PatternGraph` has no `projectMetadata` field (it's on `CodecContext`)
 - [ ] All codecs access dataset via `context.dataset`
 - [ ] `pnpm build && pnpm test` passes
 
@@ -294,13 +294,13 @@ readonly tagExampleOverrides?: Record<string, string>;
 - `src/config/presets.ts` — add `output.directory: 'docs-live'` to libar-generic preset
 - `src/renderable/codecs/reference.ts` — `ReferenceDocConfig` optional fields, `preambleFile`
 
-### 2C: MasterDataset / CodecContext Integration
+### 2C: PatternGraph / CodecContext Integration
 
 **Scope:** (Spec 1 Rule 5)
 
 **If CodecContext (1B Option A):** Add `projectMetadata` to `CodecContext`, populated in orchestrator from resolved config.
 
-**If MasterDataset (1B Option B):** Add `projectMetadata?: ProjectMetadata` to `MasterDatasetSchema`, populated in `buildMasterDataset()`.
+**If PatternGraph (1B Option B):** Add `projectMetadata?: ProjectMetadata` to `PatternGraphSchema`, populated in `buildPatternGraph()`.
 
 ### 2D: Codec Consumption
 
@@ -533,7 +533,7 @@ These are real improvements but not blocking any spec work:
 ### 7A: Pipeline Efficiency
 
 - `PipelineOptions` accepts optional pre-loaded `TagRegistry` (eliminates double config load)
-- Make `GeneratorContext.masterDataset` required (eliminate unnecessary optionality)
+- Make `GeneratorContext.patternGraph` required (eliminate unnecessary optionality)
 
 ### 7B: Layer Boundary Fixes
 

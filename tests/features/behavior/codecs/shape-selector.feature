@@ -24,7 +24,7 @@ Feature: Shape Selector Filtering
 
     @acceptance-criteria @happy-path
     Scenario: Select specific shapes by source and names
-      Given a MasterDataset with patterns containing these extracted shapes:
+      Given a PatternGraph with patterns containing these extracted shapes:
         | Pattern Source | Shape Name | Group | Kind |
         | src/taxonomy/risk-levels.ts | RiskLevel | api-types | type |
         | src/taxonomy/risk-levels.ts | RISK_LEVELS | api-types | const |
@@ -35,7 +35,7 @@ Feature: Shape Selector Filtering
 
     @acceptance-criteria @happy-path
     Scenario: Select all shapes in a group
-      Given a MasterDataset with patterns containing these extracted shapes:
+      Given a PatternGraph with patterns containing these extracted shapes:
         | Pattern Source | Shape Name | Group | Kind |
         | src/taxonomy/risk-levels.ts | RiskLevel | api-types | type |
         | src/taxonomy/status-values.ts | ProcessStatus | api-types | type |
@@ -46,7 +46,7 @@ Feature: Shape Selector Filtering
 
     @acceptance-criteria @happy-path
     Scenario: Select all tagged shapes from a source file
-      Given a MasterDataset with patterns containing these extracted shapes:
+      Given a PatternGraph with patterns containing these extracted shapes:
         | Pattern Source | Shape Name | Group | Kind |
         | src/taxonomy/risk-levels.ts | RiskLevel | api-types | type |
         | src/taxonomy/risk-levels.ts | RISK_LEVELS | api-types | const |
@@ -58,7 +58,7 @@ Feature: Shape Selector Filtering
 
     @acceptance-criteria @happy-path
     Scenario: Source-only selector returns all matching shapes
-      Given a MasterDataset with patterns containing these extracted shapes:
+      Given a PatternGraph with patterns containing these extracted shapes:
         | Pattern Source | Shape Name | Group | Kind |
         | src/taxonomy/risk-levels.ts | RiskLevel | api-types | type |
         | src/taxonomy/risk-levels.ts | RISK_LEVELS | | const |

@@ -20,13 +20,13 @@ Feature: Codec-Based Generator
   Rule: CodecBasedGenerator adapts codecs to generator interface
 
     **Invariant:** CodecBasedGenerator delegates document generation to the underlying codec and surfaces codec errors through the generator interface.
-    **Rationale:** The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side. MasterDataset is required in context — enforced by the TypeScript type system, not at runtime.
+    **Rationale:** The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side. PatternGraph is required in context — enforced by the TypeScript type system, not at runtime.
     **Verified by:** Generator delegates to codec, Codec options are passed through
 
     @acceptance-criteria @happy-path
     Scenario: Generator delegates to codec
       Given a CodecBasedGenerator wrapping "patterns" document type
-      And a context with MasterDataset containing patterns
+      And a context with PatternGraph containing patterns
       When the generator generate method is called
       Then the output should contain a file with path "PATTERNS.md"
       And the output should have no errors
@@ -34,7 +34,7 @@ Feature: Codec-Based Generator
     @acceptance-criteria @happy-path
     Scenario: Codec options are passed through
       Given a CodecBasedGenerator for "pr-changes" document type
-      And a context with MasterDataset
+      And a context with PatternGraph
       And codecOptions with changedFiles filter:
         | file              |
         | src/core/types.ts |

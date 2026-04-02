@@ -16,7 +16,7 @@
  *
  * Architecture:
  * ```
- * MasterDataset → Document Codecs → RenderableDocument → Universal Renderer → Markdown
+ * PatternGraph → Document Codecs → RenderableDocument → Universal Renderer → Markdown
  * ```
  *
  * Key Exports:

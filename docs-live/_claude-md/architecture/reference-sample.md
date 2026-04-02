@@ -106,10 +106,10 @@
 
 | Type                      | Kind      |
 | ------------------------- | --------- |
+| SectionBlock              | type      |
 | normalizeStatus           | function  |
 | DELIVERABLE_STATUS_VALUES | const     |
 | CategoryDefinition        | interface |
-| SectionBlock              | type      |
 
 #### Behavior Specifications
 
@@ -117,11 +117,20 @@
 
 ##### DefineConfig
 
+##### ConfigBasedWorkflowDefinition
+
+| Rule                                                 | Description                                                                                                              |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Default workflow is built from an inline constant    | **Invariant:** `loadDefaultWorkflow()` returns a `LoadedWorkflow` without<br> file system access. It cannot fail. The... |
+| Custom workflow files still work via --workflow flag | **Invariant:** `loadWorkflowFromPath()` remains available for projects<br> that need custom workflow definitions. The... |
+| FSM validation and Process Guard are not affected    | **Invariant:** The FSM transition matrix, protection levels, and Process<br> Guard rules remain hardcoded in...          |
+| Workflow as a configurable preset field is deferred  | **Invariant:** The inline default workflow constant is the only workflow source until preset integration is...           |
+
 ##### ADR005CodecBasedMarkdownRendering
 
 | Rule                                                              | Description                                                                                                           |
 | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Codecs implement a decode-only contract                           | **Invariant:** Every codec is a pure function that accepts a MasterDataset<br> and returns a RenderableDocument....   |
+| Codecs implement a decode-only contract                           | **Invariant:** Every codec is a pure function that accepts a PatternGraph<br> and returns a RenderableDocument....    |
 | RenderableDocument is a typed intermediate representation         | **Invariant:** RenderableDocument contains a title, an ordered array of<br> SectionBlock elements, and an optional... |
 | CompositeCodec assembles documents from child codecs              | **Invariant:** CompositeCodec accepts an array of child codecs and<br> produces a single RenderableDocument by...     |
 | ADR content comes from both Feature description and Rule prefixes | **Invariant:** ADR structured content (Context, Decision, Consequences)<br> can appear in two locations within a...   |
@@ -140,15 +149,6 @@
 | Quarter format convention                           | **Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`).<br> ISO-year-first sorting works...              |
 | Canonical phase definitions (6-phase USDP standard) | **Invariant:** The default workflow defines exactly 6 phases in fixed<br> order. These are the canonical phase names...  |
 | Deliverable status canonical values                 | **Invariant:** Deliverable status (distinct from pattern FSM status)<br> uses exactly 6 values, enforced by Zod...       |
-
-##### ConfigBasedWorkflowDefinition
-
-| Rule                                                 | Description                                                                                                              |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Default workflow is built from an inline constant    | **Invariant:** `loadDefaultWorkflow()` returns a `LoadedWorkflow` without<br> file system access. It cannot fail. The... |
-| Custom workflow files still work via --workflow flag | **Invariant:** `loadWorkflowFromPath()` remains available for projects<br> that need custom workflow definitions. The... |
-| FSM validation and Process Guard are not affected    | **Invariant:** The FSM transition matrix, protection levels, and Process<br> Guard rules remain hardcoded in...          |
-| Workflow as a configurable preset field is deferred  | **Invariant:** The inline default workflow constant is the only workflow source until preset integration is...           |
 
 ##### ProcessGuardTesting
 

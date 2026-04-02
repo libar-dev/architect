@@ -84,7 +84,7 @@ Feature: Shape Source Pattern Matching
 
     @happy-path
     Scenario: Shapes are selected from matching source glob patterns
-      Given a MasterDataset with patterns:
+      Given a PatternGraph with patterns:
         | filePath             | shapeName    | shapeKind  |
         | src/lint/rules.ts    | LintRule     | interface  |
         | src/lint/config.ts   | LintConfig   | type       |
@@ -94,7 +94,7 @@ Feature: Shape Source Pattern Matching
 
     @happy-path
     Scenario: Duplicate shape names are deduplicated
-      Given a MasterDataset with patterns:
+      Given a PatternGraph with patterns:
         | filePath             | shapeName    | shapeKind  |
         | src/lint/rules.ts    | LintRule     | interface  |
         | src/lint/config.ts   | LintRule     | type       |
@@ -103,7 +103,7 @@ Feature: Shape Source Pattern Matching
 
     @edge-case
     Scenario: No shapes returned when glob does not match
-      Given a MasterDataset with patterns:
+      Given a PatternGraph with patterns:
         | filePath                | shapeName    | shapeKind  |
         | src/other/unrelated.ts  | Unrelated    | interface  |
       When selecting shapes with source selector "src/lint/*.ts"

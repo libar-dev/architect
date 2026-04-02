@@ -54,7 +54,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   });
 
   Background(({ Given }) => {
-    Given('a test MasterDataset is initialized for MCP', () => {
+    Given('a test PatternGraph is initialized for MCP', () => {
       state = initMcpState();
     });
   });
@@ -80,7 +80,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         // Session already retrieved during initialization
       });
 
-      Then('the session contains a MasterDataset with patterns', () => {
+      Then('the session contains a PatternGraph with patterns', () => {
         expect(state!.session).not.toBeNull();
         expect(state!.session!.dataset.patterns.length).toBeGreaterThan(0);
       });

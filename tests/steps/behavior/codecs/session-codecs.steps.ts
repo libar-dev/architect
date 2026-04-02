@@ -22,11 +22,11 @@ import type {
   TableBlock,
   CollapsibleBlock,
 } from '../../../../src/renderable/schema.js';
-import type { MasterDataset } from '../../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../../src/validation-schemas/pattern-graph.js';
 import {
-  createTestMasterDataset,
-  createMasterDatasetWithStatus,
-  createMasterDatasetWithTimeline,
+  createTestPatternGraph,
+  createPatternGraphWithStatus,
+  createPatternGraphWithTimeline,
   createTestPattern,
   resetPatternCounter,
 } from '../../../fixtures/dataset-factories.js';
@@ -46,7 +46,7 @@ import type { DataTableRow } from '../../../support/world.js';
 // =============================================================================
 
 interface SessionCodecState {
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   document: RenderableDocument | null;
 }
 
@@ -166,7 +166,7 @@ function findCollapsibleWithSummary(
   return collapsibles.find((c) => c.summary.includes(summaryText)) ?? null;
 }
 
-function createDatasetWithOnlyCompleted(): MasterDataset {
+function createDatasetWithOnlyCompleted(): PatternGraph {
   const patterns = [
     createTestPattern({
       name: 'Completed Feature 1',
@@ -181,10 +181,10 @@ function createDatasetWithOnlyCompleted(): MasterDataset {
       quarter: 'Q4-2025',
     }),
   ];
-  return createTestMasterDataset({ patterns });
+  return createTestPatternGraph({ patterns });
 }
 
-function createDatasetWithBlockedPatterns(): MasterDataset {
+function createDatasetWithBlockedPatterns(): PatternGraph {
   const patterns = [
     createTestPattern({
       name: 'Foundation Pattern',
@@ -208,10 +208,10 @@ function createDatasetWithBlockedPatterns(): MasterDataset {
       phase: 3,
     }),
   ];
-  return createTestMasterDataset({ patterns });
+  return createTestPatternGraph({ patterns });
 }
 
-function createDatasetWithManyPlannedPatterns(): MasterDataset {
+function createDatasetWithManyPlannedPatterns(): PatternGraph {
   const patterns = [
     createTestPattern({
       name: 'Completed Base',
@@ -231,10 +231,10 @@ function createDatasetWithManyPlannedPatterns(): MasterDataset {
     );
   }
 
-  return createTestMasterDataset({ patterns });
+  return createTestPatternGraph({ patterns });
 }
 
-function createDatasetWithPrioritizedPatterns(): MasterDataset {
+function createDatasetWithPrioritizedPatterns(): PatternGraph {
   const patterns = [
     createTestPattern({
       name: 'Critical Feature',
@@ -261,10 +261,10 @@ function createDatasetWithPrioritizedPatterns(): MasterDataset {
       priority: 'low',
     }),
   ];
-  return createTestMasterDataset({ patterns });
+  return createTestPatternGraph({ patterns });
 }
 
-function createDatasetWithActionablePatterns(): MasterDataset {
+function createDatasetWithActionablePatterns(): PatternGraph {
   // Create a dataset where some planned patterns are actionable (not blocked)
   const patterns = [
     createTestPattern({
@@ -297,7 +297,7 @@ function createDatasetWithActionablePatterns(): MasterDataset {
       dependsOn: ['Active Work'],
     }),
   ];
-  return createTestMasterDataset({ patterns });
+  return createTestPatternGraph({ patterns });
 }
 
 // =============================================================================
@@ -325,8 +325,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     RuleScenario(
       'Decode empty dataset produces minimal session context',
       ({ Given, When, Then, And }) => {
-        Given('an empty MasterDataset', () => {
-          state!.dataset = createTestMasterDataset();
+        Given('an empty PatternGraph', () => {
+          state!.dataset = createTestPatternGraph();
         });
 
         When('decoding with SessionContextCodec', () => {
@@ -353,8 +353,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     );
 
     RuleScenario('Decode dataset with timeline patterns', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with timeline patterns', () => {
-        state!.dataset = createMasterDatasetWithTimeline();
+      Given('a PatternGraph with timeline patterns', () => {
+        state!.dataset = createPatternGraphWithTimeline();
       });
 
       When('decoding with SessionContextCodec', () => {
@@ -381,13 +381,13 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Session status shows current focus', ({ Given, When, Then, And }) => {
       Given(
-        'a MasterDataset with status distribution:',
+        'a PatternGraph with status distribution:',
         (_ctx: unknown, dataTable: DataTableRow[]) => {
           const counts: Record<string, number> = {};
           for (const row of dataTable) {
             counts[row.status] = parseInt(row.count);
           }
-          state!.dataset = createMasterDatasetWithStatus(counts);
+          state!.dataset = createPatternGraphWithStatus(counts);
         }
       );
 
@@ -415,8 +415,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Phase navigation for incomplete phases', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with timeline patterns', () => {
-        state!.dataset = createMasterDatasetWithTimeline();
+      Given('a PatternGraph with timeline patterns', () => {
+        state!.dataset = createPatternGraphWithTimeline();
       });
 
       When('decoding with SessionContextCodec', () => {
@@ -448,8 +448,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Active work grouped by phase', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with timeline patterns', () => {
-        state!.dataset = createMasterDatasetWithTimeline();
+      Given('a PatternGraph with timeline patterns', () => {
+        state!.dataset = createPatternGraphWithTimeline();
       });
 
       When('decoding with SessionContextCodec', () => {
@@ -471,7 +471,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Blocked items section with dependencies', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with blocked patterns', () => {
+      Given('a PatternGraph with blocked patterns', () => {
         state!.dataset = createDatasetWithBlockedPatterns();
       });
 
@@ -495,7 +495,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('No blocked items section when disabled', ({ Given, When, Then }) => {
-      Given('a MasterDataset with blocked patterns', () => {
+      Given('a PatternGraph with blocked patterns', () => {
         state!.dataset = createDatasetWithBlockedPatterns();
       });
 
@@ -512,8 +512,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Recent completions collapsible', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with timeline patterns', () => {
-        state!.dataset = createMasterDatasetWithTimeline();
+      Given('a PatternGraph with timeline patterns', () => {
+        state!.dataset = createPatternGraphWithTimeline();
       });
 
       When('decoding with SessionContextCodec', () => {
@@ -535,8 +535,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Generate session phase detail files when enabled', ({ Given, When, Then }) => {
-      Given('a MasterDataset with timeline patterns', () => {
-        state!.dataset = createMasterDatasetWithTimeline();
+      Given('a PatternGraph with timeline patterns', () => {
+        state!.dataset = createPatternGraphWithTimeline();
       });
 
       When('decoding with generateDetailFiles enabled for session', () => {
@@ -555,8 +555,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('No detail files when disabled', ({ Given, When, Then }) => {
-      Given('a MasterDataset with timeline patterns', () => {
-        state!.dataset = createMasterDatasetWithTimeline();
+      Given('a PatternGraph with timeline patterns', () => {
+        state!.dataset = createPatternGraphWithTimeline();
       });
 
       When('decoding with generateDetailFiles disabled for session', () => {
@@ -579,7 +579,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('RemainingWorkCodec aggregates incomplete work by phase', ({ RuleScenario }) => {
     RuleScenario('All work complete produces celebration message', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with only completed patterns', () => {
+      Given('a PatternGraph with only completed patterns', () => {
         state!.dataset = createDatasetWithOnlyCompleted();
       });
 
@@ -600,13 +600,13 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
     RuleScenario('Summary shows remaining counts', ({ Given, When, Then, And }) => {
       Given(
-        'a MasterDataset with status distribution:',
+        'a PatternGraph with status distribution:',
         (_ctx: unknown, dataTable: DataTableRow[]) => {
           const counts: Record<string, number> = {};
           for (const row of dataTable) {
             counts[row.status] = parseInt(row.count);
           }
-          state!.dataset = createMasterDatasetWithStatus(counts);
+          state!.dataset = createPatternGraphWithStatus(counts);
         }
       );
 
@@ -633,8 +633,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Phase navigation with remaining count', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with timeline patterns', () => {
-        state!.dataset = createMasterDatasetWithTimeline();
+      Given('a PatternGraph with timeline patterns', () => {
+        state!.dataset = createPatternGraphWithTimeline();
       });
 
       When('decoding with RemainingWorkCodec', () => {
@@ -658,7 +658,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('By priority shows ready vs blocked', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with blocked patterns', () => {
+      Given('a PatternGraph with blocked patterns', () => {
         state!.dataset = createDatasetWithBlockedPatterns();
       });
 
@@ -685,7 +685,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Next actionable items section', ({ Given, When, Then, And }) => {
-      Given('a MasterDataset with actionable patterns', () => {
+      Given('a PatternGraph with actionable patterns', () => {
         state!.dataset = createDatasetWithActionablePatterns();
       });
 
@@ -738,7 +738,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Next actionable respects maxNextActionable limit', ({ Given, When, Then }) => {
-      Given('a MasterDataset with many planned patterns', () => {
+      Given('a PatternGraph with many planned patterns', () => {
         state!.dataset = createDatasetWithManyPlannedPatterns();
       });
 
@@ -771,8 +771,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Sort by phase option', ({ Given, When, Then }) => {
-      Given('a MasterDataset with timeline patterns', () => {
-        state!.dataset = createMasterDatasetWithTimeline();
+      Given('a PatternGraph with timeline patterns', () => {
+        state!.dataset = createPatternGraphWithTimeline();
       });
 
       When('decoding with sortBy set to {string}', (_ctx: unknown, sortBy: string) => {
@@ -804,7 +804,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Sort by priority option', ({ Given, When, Then }) => {
-      Given('a MasterDataset with prioritized patterns', () => {
+      Given('a PatternGraph with prioritized patterns', () => {
         state!.dataset = createDatasetWithPrioritizedPatterns();
       });
 
@@ -824,8 +824,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('Generate remaining work detail files when enabled', ({ Given, When, Then }) => {
-      Given('a MasterDataset with timeline patterns', () => {
-        state!.dataset = createMasterDatasetWithTimeline();
+      Given('a PatternGraph with timeline patterns', () => {
+        state!.dataset = createPatternGraphWithTimeline();
       });
 
       When('decoding with generateDetailFiles enabled for remaining', () => {
@@ -847,8 +847,8 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario('No detail files when disabled for remaining', ({ Given, When, Then }) => {
-      Given('a MasterDataset with timeline patterns', () => {
-        state!.dataset = createMasterDatasetWithTimeline();
+      Given('a PatternGraph with timeline patterns', () => {
+        state!.dataset = createPatternGraphWithTimeline();
       });
 
       When('decoding with generateDetailFiles disabled for remaining', () => {

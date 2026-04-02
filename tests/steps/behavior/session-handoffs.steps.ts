@@ -16,9 +16,9 @@ import { join } from 'path';
 import { createSessionContextCodec } from '../../../src/renderable/codecs/session.js';
 import { createSessionFindingsCodec } from '../../../src/renderable/codecs/planning.js';
 import type { RenderableDocument } from '../../../src/renderable/schema.js';
-import type { MasterDataset } from '../../../src/validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../../src/validation-schemas/pattern-graph.js';
 import {
-  createTestMasterDataset,
+  createTestPatternGraph,
   createTestPattern,
   resetPatternCounter,
 } from '../../fixtures/dataset-factories.js';
@@ -30,7 +30,7 @@ import type { DataTableRow } from '../../support/world.js';
 // =============================================================================
 
 interface SessionHandoffsState {
-  dataset: MasterDataset | null;
+  dataset: PatternGraph | null;
   document: RenderableDocument | null;
   findingsDocument: RenderableDocument | null;
   includeHandoffContext: boolean;
@@ -129,7 +129,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
             phase: 1,
             status: 'active',
           });
-          state.dataset = createTestMasterDataset({ patterns: [pattern] });
+          state.dataset = createTestPatternGraph({ patterns: [pattern] });
         });
 
         When('generating SESSION-CONTEXT.md with includeHandoffContext enabled', () => {
@@ -187,7 +187,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
             discoveredImprovements: improvements.length > 0 ? improvements : undefined,
             discoveredLearnings: learnings.length > 0 ? learnings : undefined,
           });
-          state.dataset = createTestMasterDataset({ patterns: [pattern] });
+          state.dataset = createTestPatternGraph({ patterns: [pattern] });
         });
 
         When('generating SESSION-CONTEXT.md with includeHandoffContext enabled', () => {
@@ -255,7 +255,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
           status: 'active',
           discoveredLearnings: [pauseIndicator],
         });
-        state!.dataset = createTestMasterDataset({ patterns: [pattern] });
+        state!.dataset = createTestPatternGraph({ patterns: [pattern] });
       });
 
       When('generating SESSION-CONTEXT.md with includeHandoffContext enabled', () => {
@@ -504,7 +504,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
           phase: 1,
           status: 'active',
         });
-        state.dataset = createTestMasterDataset({ patterns: [pattern] });
+        state.dataset = createTestPatternGraph({ patterns: [pattern] });
       });
 
       When('generating SESSION-CONTEXT.md with includeHandoffContext enabled', () => {
@@ -543,7 +543,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
           status: 'active',
           discoveredGaps: ['Some gap'],
         });
-        state.dataset = createTestMasterDataset({ patterns: [pattern] });
+        state.dataset = createTestPatternGraph({ patterns: [pattern] });
       });
 
       When('generating SESSION-CONTEXT.md with includeHandoffContext disabled', () => {
@@ -587,7 +587,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
             status: 'roadmap',
           }),
         ];
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
       });
 
       When('a session ends before phase completion', () => {
@@ -627,7 +627,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
             status: 'roadmap',
           }),
         ];
-        state.dataset = createTestMasterDataset({ patterns });
+        state.dataset = createTestPatternGraph({ patterns });
       });
 
       When('following the coordination pattern documented in PROCESS_SETUP.md', () => {
@@ -664,7 +664,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
           discoveredImprovements: ['Could optimize with caching'],
           discoveredLearnings: ['Parser requires strict formatting'],
         });
-        state.dataset = createTestMasterDataset({ patterns: [pattern] });
+        state.dataset = createTestPatternGraph({ patterns: [pattern] });
       });
 
       When('following the retrospective checklist', () => {

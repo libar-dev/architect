@@ -39,7 +39,7 @@
  * | groupPlannedBy | "quarter" \| "priority" \| "level" \| "none" | "none" | Group planned items |
  */
 
-import type { MasterDataset, PhaseGroup } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph, PhaseGroup } from '../../validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
@@ -270,7 +270,7 @@ export function createSessionContextCodec(options?: SessionCodecOptions): Docume
 /**
  * Default Session Context Document Codec
  *
- * Transforms MasterDataset → RenderableDocument for session context.
+ * Transforms PatternGraph → RenderableDocument for session context.
  * Shows current phase focus, active work, and planning context.
  */
 export const SessionContextCodec = createSessionContextCodec();
@@ -297,7 +297,7 @@ export function createRemainingWorkCodec(options?: RemainingWorkCodecOptions): D
 /**
  * Default Remaining Work Document Codec
  *
- * Transforms MasterDataset → RenderableDocument for remaining work.
+ * Transforms PatternGraph → RenderableDocument for remaining work.
  * Aggregates all incomplete work across phases.
  */
 export const RemainingWorkCodec = createRemainingWorkCodec();
@@ -327,7 +327,7 @@ export const codecMetas = [
  * Build session context document
  */
 function buildSessionContextDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<SessionCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
@@ -378,7 +378,7 @@ function buildSessionContextDocument(
 /**
  * Build session status section
  */
-function buildSessionStatus(dataset: MasterDataset): SectionBlock[] {
+function buildSessionStatus(dataset: PatternGraph): SectionBlock[] {
   const { counts } = dataset;
   const progress = completionPercentage(counts);
   const progressBar = renderProgressBar(counts.completed, counts.total, 20);
@@ -412,7 +412,7 @@ function buildSessionStatus(dataset: MasterDataset): SectionBlock[] {
  * Build active work section
  */
 function buildActiveWork(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   _options: Required<SessionCodecOptions>
 ): SectionBlock[] {
   const sections: SectionBlock[] = [];
@@ -467,7 +467,7 @@ function buildActiveWork(
  * Build current phase context summary (links to detail file)
  */
 function buildCurrentPhaseContextSummary(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<SessionCodecOptions>
 ): SectionBlock[] {
   const sections: SectionBlock[] = [];
@@ -506,7 +506,7 @@ function buildCurrentPhaseContextSummary(
  * Build recent completions section
  */
 function buildSessionRecentCompletions(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<SessionCodecOptions>
 ): SectionBlock[] {
   const sections: SectionBlock[] = [];
@@ -541,7 +541,7 @@ function buildSessionRecentCompletions(
 /**
  * Build blocked items section
  */
-function buildBlockedItems(dataset: MasterDataset): SectionBlock[] {
+function buildBlockedItems(dataset: PatternGraph): SectionBlock[] {
   const sections: SectionBlock[] = [];
 
   // Find patterns that are blocked (have unmet dependencies)
@@ -598,7 +598,7 @@ function getSessionPhaseSlug(phaseNumber: number, phaseName: string | undefined)
  * Build session phase navigation table
  */
 function buildSessionPhaseNavigation(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<SessionCodecOptions>
 ): SectionBlock[] {
   const sections: SectionBlock[] = [];
@@ -641,7 +641,7 @@ function buildSessionPhaseNavigation(
  * Build session phase detail files (progressive disclosure)
  */
 function buildSessionPhaseFiles(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<SessionCodecOptions>
 ): Record<string, RenderableDocument> {
   const files: Record<string, RenderableDocument> = {};
@@ -664,7 +664,7 @@ function buildSessionPhaseFiles(
  */
 function buildSessionPhaseDetailDocument(
   phase: PhaseGroup,
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<SessionCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
@@ -831,7 +831,7 @@ function buildBlockedPatternList(patterns: ExtractedPattern[]): SectionBlock[] {
  * Build remaining work document
  */
 function buildRemainingWorkDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<RemainingWorkCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
@@ -900,7 +900,7 @@ function buildRemainingWorkDocument(
  * Build next actionable items section
  */
 function buildNextActionableItems(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   incomplete: ExtractedPattern[],
   options: Required<RemainingWorkCodecOptions>
 ): SectionBlock[] {
@@ -957,7 +957,7 @@ function buildNextActionableItems(
  * Build remaining work summary
  */
 function buildRemainingWorkSummary(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   incomplete: ExtractedPattern[]
 ): SectionBlock[] {
   const active = incomplete.filter((p) => isPatternActive(p.status));
@@ -998,7 +998,7 @@ function getRemainingPhaseSlug(phaseNumber: number, phaseName: string | undefine
  * Build remaining work phase navigation table
  */
 function buildRemainingPhaseNavigation(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<RemainingWorkCodecOptions>
 ): SectionBlock[] {
   const sections: SectionBlock[] = [];
@@ -1061,7 +1061,7 @@ function buildRemainingPhaseNavigation(
  * Build remaining work by priority (summary only for index)
  */
 function buildRemainingByPrioritySummary(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   incomplete: ExtractedPattern[],
   options: Required<RemainingWorkCodecOptions>
 ): SectionBlock[] {
@@ -1134,7 +1134,7 @@ function buildRemainingByPrioritySummary(
  * Build remaining work phase detail files (progressive disclosure)
  */
 function buildRemainingPhaseFiles(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<RemainingWorkCodecOptions>
 ): Record<string, RenderableDocument> {
   const files: Record<string, RenderableDocument> = {};
@@ -1157,7 +1157,7 @@ function buildRemainingPhaseFiles(
  */
 function buildRemainingPhaseDetailDocument(
   phase: PhaseGroup,
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   _options: Required<RemainingWorkCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];

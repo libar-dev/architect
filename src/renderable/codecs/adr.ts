@@ -9,7 +9,7 @@
  *
  * ## AdrDocumentCodec
  *
- * Transforms MasterDataset into RenderableDocument for Architecture Decision Records.
+ * Transforms PatternGraph into RenderableDocument for Architecture Decision Records.
  * Extracts ADRs from patterns with `@architect-adr` tags.
  *
  * **Purpose:** Architecture Decision Records extracted from patterns with @architect-adr tags.
@@ -43,7 +43,7 @@
  * - **Consequences**: Positive and negative outcomes
  */
 
-import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { PatternGraph } from '../../validation-schemas/pattern-graph.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   partitionRulesByPrefix,
@@ -137,7 +137,7 @@ export function createAdrCodec(options?: AdrCodecOptions): DocumentCodec {
 /**
  * Default ADR Document Codec
  *
- * Transforms MasterDataset → RenderableDocument for architecture decisions.
+ * Transforms PatternGraph → RenderableDocument for architecture decisions.
  * Groups ADRs by category with progressive disclosure.
  */
 export const AdrDocumentCodec = createAdrCodec();
@@ -158,7 +158,7 @@ export const codecMeta = {
  * Build ADR document
  */
 function buildAdrDocument(
-  dataset: MasterDataset,
+  dataset: PatternGraph,
   options: Required<AdrCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];

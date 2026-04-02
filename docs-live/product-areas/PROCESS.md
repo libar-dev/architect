@@ -236,7 +236,7 @@ graph LR
     ValidatorReadModelConsolidation["ValidatorReadModelConsolidation"]
     StepDefinitionCompletion["StepDefinitionCompletion"]
     SessionFileCleanup["SessionFileCleanup"]
-    ProcessAPILayeredExtraction["ProcessAPILayeredExtraction"]
+    PatternGraphLayeredExtraction["PatternGraphLayeredExtraction"]
     OrchestratorPipelineFactoryMigration["OrchestratorPipelineFactoryMigration"]
     MvpWorkflowImplementation["MvpWorkflowImplementation"]
     LivingRoadmapCLI["LivingRoadmapCLI"]
@@ -252,8 +252,8 @@ graph LR
     ValidatorReadModelConsolidation -.->|depends on| ADR006SingleReadModelArchitecture
     StepDefinitionCompletion -.->|depends on| ADR002GherkinOnlyTesting
     SessionFileCleanup -.->|depends on| SessionFileLifecycle
-    ProcessAPILayeredExtraction -.->|depends on| ValidatorReadModelConsolidation
-    OrchestratorPipelineFactoryMigration -.->|depends on| ProcessAPILayeredExtraction
+    PatternGraphLayeredExtraction -.->|depends on| ValidatorReadModelConsolidation
+    OrchestratorPipelineFactoryMigration -.->|depends on| PatternGraphLayeredExtraction
     LivingRoadmapCLI -.->|depends on| MvpWorkflowImplementation
     EffortVarianceTracking -.->|depends on| MvpWorkflowImplementation
     ConfigBasedWorkflowDefinition -.->|depends on| MvpWorkflowImplementation
@@ -295,7 +295,7 @@ graph LR
 | Tier 1 specs are ephemeral working documents | Tier 1 roadmap specs serve planning and delivery tracking. They are not the source of truth for pattern identity, invariants, or acceptance criteria. After completion, they may be archived. | Treating tier 1 specs as durable creates a maintenance burden — at scale only 39% maintain traceability, and duplicated Rules/Scenarios average 200-400 stale lines.           |
 | Three durable artifact types                 | The delivery process produces three artifact types with long-term value. All other artifacts are projections or ephemeral.                                                                    | Without a clear boundary between durable and ephemeral artifacts, teams maintain redundant documents that inevitably drift from the source of truth.                           |
 | Implements is UML Realization (many-to-one)  | `@architect-implements` declares a realization relationship. Multiple files can implement the same pattern. One file can implement multiple patterns (CSV format).                            | Without many-to-one realization, cross-cutting patterns that span multiple files cannot be traced back to a single canonical definition.                                       |
-| Single-definition constraint                 | `@architect-pattern:X` may appear in exactly one file across the entire codebase. The `mergePatterns()` conflict check in `orchestrator.ts` correctly enforces this.                          | Duplicate pattern definitions cause merge conflicts in the MasterDataset and produce ambiguous ownership in generated documentation.                                           |
+| Single-definition constraint                 | `@architect-pattern:X` may appear in exactly one file across the entire codebase. The `mergePatterns()` conflict check in `orchestrator.ts` correctly enforces this.                          | Duplicate pattern definitions cause merge conflicts in the PatternGraph and produce ambiguous ownership in generated documentation.                                            |
 | Reverse links preferred over forward links   | `@architect-implements` (reverse: "I verify this pattern") is the primary traceability mechanism. `@architect-executable-specs` (forward: "my tests live here") is retained but not required. | Forward links in tier 1 specs go stale when specs are archived, while reverse links in test files are self-maintaining because the test cannot run without the implementation. |
 
 ### Cli Behavior Testing

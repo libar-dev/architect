@@ -112,7 +112,7 @@ Feature: Architecture Doc Refactoring Coverage
     @acceptance-criteria @happy-path
     Scenario: Unified Transformation Architecture section retained and ARCHITECTURE-TYPES exists
       When reading the "Unified Transformation Architecture" section
-      Then the section contains "MasterDataset"
+      Then the section contains "PatternGraph"
       And file "docs-live/reference/ARCHITECTURE-TYPES.md" exists
 
     @happy-path
@@ -127,21 +127,21 @@ Feature: Architecture Doc Refactoring Coverage
       Then the section has content
       And file "docs-live/reference/ARCHITECTURE-CODECS.md" exists
 
-  Rule: MasterDataset shapes appear in ARCHITECTURE-TYPES reference
+  Rule: PatternGraph shapes appear in ARCHITECTURE-TYPES reference
 
-    **Invariant:** The ARCHITECTURE-TYPES.md reference document contains core MasterDataset types (MasterDataset, RuntimeMasterDataset, RawDataset) and pipeline types (PipelineOptions, PipelineResult) extracted from shape annotations.
+    **Invariant:** The ARCHITECTURE-TYPES.md reference document contains core PatternGraph types (PatternGraph, RuntimePatternGraph, RawDataset) and pipeline types (PipelineOptions, PipelineResult) extracted from shape annotations.
 
     **Rationale:** Type shapes are the structural backbone of the pipeline. Generating their documentation from annotations ensures the reference always matches the actual TypeScript interfaces, eliminating manual drift.
 
-    **Verified by:** Core MasterDataset types appear in ARCHITECTURE-TYPES, Pipeline types appear in ARCHITECTURE-TYPES reference, Unified Transformation section has full MasterDataset content
+    **Verified by:** Core PatternGraph types appear in ARCHITECTURE-TYPES, Pipeline types appear in ARCHITECTURE-TYPES reference, Unified Transformation section has full PatternGraph content
 
     @acceptance-criteria @happy-path
-    Scenario: Core MasterDataset types appear in ARCHITECTURE-TYPES
+    Scenario: Core PatternGraph types appear in ARCHITECTURE-TYPES
       When reading file "docs-live/reference/ARCHITECTURE-TYPES.md"
       Then the file contains each of the following:
         """
-        MasterDataset
-        RuntimeMasterDataset
+        PatternGraph
+        RuntimePatternGraph
         RawDataset
         """
 
@@ -152,10 +152,10 @@ Feature: Architecture Doc Refactoring Coverage
       And the file also contains "PipelineResult"
 
     @happy-path
-    Scenario: Unified Transformation section has full MasterDataset content
+    Scenario: Unified Transformation section has full PatternGraph content
       When reading the "Unified Transformation Architecture" section
-      Then the section contains "MasterDataset"
-      And the section also contains "RuntimeMasterDataset"
+      Then the section contains "PatternGraph"
+      And the section also contains "RuntimePatternGraph"
 
   Rule: Pipeline architecture convention appears in generated reference
 

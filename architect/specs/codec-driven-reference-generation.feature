@@ -62,14 +62,14 @@ Feature: Codec-Driven Reference Generation
     @acceptance-criteria @happy-path
     Scenario: Config with matching data produces a complete document
       Given a ReferenceDocConfig with convention tags and shape sources
-      And a MasterDataset with patterns matching those tags and sources
+      And a PatternGraph with patterns matching those tags and sources
       When the reference codec renders the document
       Then the output contains convention sections, shape sections, and metadata
 
     @acceptance-criteria @edge-case
     Scenario: Config with no matching data produces fallback content
       Given a ReferenceDocConfig with tags that match no patterns
-      And an empty MasterDataset
+      And an empty PatternGraph
       When the reference codec renders the document
       Then the output contains "No content found" fallback message
 
@@ -98,7 +98,7 @@ Feature: Codec-Driven Reference Generation
     @acceptance-criteria @happy-path
     Scenario: Empty sources are omitted gracefully
       Given a config with only convention tags (no shapes, no behaviors, no diagrams)
-      And a MasterDataset with matching conventions
+      And a PatternGraph with matching conventions
       When the reference codec renders the document
       Then only convention sections appear
       And no empty placeholder sections exist

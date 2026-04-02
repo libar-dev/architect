@@ -145,5 +145,5 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
   @acceptance-criteria @happy-path
   Scenario: Active pattern infers implement session
     Given a pattern with status "active"
-    When running "process-api handoff --pattern MyPattern"
+    When running "pattern-graph-cli handoff --pattern MyPattern"
     Then the session summary shows session type "implement"

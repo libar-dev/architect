@@ -2,8 +2,8 @@
  * @architect
  * @architect-status roadmap
  * @architect-implements DataAPIOutputShaping
- * @architect-uses ProcessStateAPI
- * @architect-used-by OutputPipeline, ProcessAPICLIImpl
+ * @architect-uses PatternGraphAPI
+ * @architect-used-by OutputPipeline, PatternGraphCLIImpl
  * @architect-target src/api/summarize.ts
  * @architect-since DS-A
  *
