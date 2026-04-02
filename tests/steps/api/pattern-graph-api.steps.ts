@@ -1,5 +1,5 @@
 /**
- * Process State API Step Definitions
+ * Pattern Graph API Step Definitions
  *
  * BDD step definitions for testing the PatternGraphAPI query interface.
  *

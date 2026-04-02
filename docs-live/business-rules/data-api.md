@@ -746,40 +746,7 @@ _- Markdown generation is not ideal for programmatic access_
 
 _pattern-graph-api.feature_
 
-### Pattern Summarize Tests
-
-_Validates that summarizePattern() projects ExtractedPattern (~3.5KB) to_
-
----
-
-#### summarizePattern projects to compact summary
-
-> **Invariant:** summarizePattern must project a full pattern object to a compact summary containing exactly 6 fields, using the patternName tag over the name field when available and omitting undefined optional fields.
->
-> **Rationale:** Compact summaries reduce token usage by 80-90% compared to full patterns — they provide enough context for navigation without overwhelming AI context windows.
-
-**Verified by:**
-
-- Summary includes all 6 fields for a TypeScript pattern
-- Summary includes all 6 fields for a Gherkin pattern
-- Summary uses patternName tag over name field
-- Summary omits undefined optional fields
-
----
-
-#### summarizePatterns batch processes arrays
-
-> **Invariant:** summarizePatterns must batch-process an array of patterns, returning a correctly-sized array of compact summaries.
->
-> **Rationale:** Batch processing avoids N individual function calls — the API frequently needs to summarize all patterns matching a query in a single operation.
-
-**Verified by:**
-
-- Batch summarization returns correct count
-
-_summarize.feature_
-
-### Process Api Cli Cache
+### Pattern Graph Cli Cache
 
 _PatternGraph caching between CLI invocations: cache hits, mtime invalidation, and --no-cache bypass._
 
@@ -799,7 +766,7 @@ _PatternGraph caching between CLI invocations: cache hits, mtime invalidation, a
 
 _data-api-cache.feature_
 
-### Process Api Cli Core
+### Pattern Graph Cli Core
 
 _Core CLI infrastructure: help, version, input validation, status, query, pattern, arch basics, missing args, edge cases._
 
@@ -913,7 +880,7 @@ _Core CLI infrastructure: help, version, input validation, status, query, patter
 
 _pattern-graph-cli-core.feature_
 
-### Process Api Cli Dry Run
+### Pattern Graph Cli Dry Run
 
 _Dry-run mode shows pipeline scope without processing data._
 
@@ -932,7 +899,7 @@ _Dry-run mode shows pipeline scope without processing data._
 
 _data-api-dryrun.feature_
 
-### Process Api Cli Help
+### Pattern Graph Cli Help
 
 _Per-subcommand help displays usage, flags, and examples for individual subcommands._
 
@@ -952,7 +919,7 @@ _Per-subcommand help displays usage, flags, and examples for individual subcomma
 
 _data-api-help.feature_
 
-### Process Api Cli Metadata
+### Pattern Graph Cli Metadata
 
 _Response metadata includes validation summary and pipeline timing for diagnostics._
 
@@ -971,7 +938,7 @@ _Response metadata includes validation summary and pipeline timing for diagnosti
 
 _data-api-metadata.feature_
 
-### Process Api Cli Modifiers And Rules
+### Pattern Graph Cli Modifiers And Rules
 
 _Output modifiers, arch health, and rules subcommand._
 
@@ -1025,7 +992,49 @@ _Output modifiers, arch health, and rules subcommand._
 
 _pattern-graph-cli-modifiers-rules.feature_
 
-### Process Api Cli Repl
+### Pattern Graph Cli Reference Tests
+
+_Verifies that the declarative CLI schema drives reference table generation_
+
+---
+
+#### Generated reference file contains all three table sections
+
+> **Invariant:** CLI-REFERENCE.md contains Global Options, Output Modifiers, and List Filters tables generated from the CLI schema.
+
+**Verified by:**
+
+- Generated file contains Global Options table
+- Generated file contains Output Modifiers table
+- Generated file contains List Filters table
+- Generated file includes inter-table prose
+
+---
+
+#### CLI schema stays in sync with parser
+
+> **Invariant:** Every flag recognized by parseArgs() has a corresponding entry in the CLI schema. A missing schema entry means the sync test fails.
+
+**Verified by:**
+
+- Schema covers all global option flags
+- Schema covers all output modifier flags
+- Schema covers all list filter flags
+- Schema covers session option
+
+---
+
+#### showHelp output reflects CLI schema
+
+> **Invariant:** The help text rendered by showHelp() includes all options from the CLI schema, formatted for terminal display.
+
+**Verified by:**
+
+- Help text includes schema-defined options
+
+_cli-reference.feature_
+
+### Pattern Graph Cli Repl
 
 _Interactive REPL mode keeps the pipeline loaded for multi-query sessions and supports reload._
 
@@ -1056,7 +1065,7 @@ _Interactive REPL mode keeps the pipeline loaded for multi-query sessions and su
 
 _data-api-repl.feature_
 
-### Process Api Cli Subcommands
+### Pattern Graph Cli Subcommands
 
 _Discovery subcommands: list, search, context assembly, tags/sources, extended arch, unannotated._
 
@@ -1142,47 +1151,38 @@ _Discovery subcommands: list, search, context assembly, tags/sources, extended a
 
 _pattern-graph-cli-subcommands.feature_
 
-### Process Api Reference Tests
+### Pattern Summarize Tests
 
-_Verifies that the declarative CLI schema drives reference table generation_
-
----
-
-#### Generated reference file contains all three table sections
-
-> **Invariant:** CLI-REFERENCE.md contains Global Options, Output Modifiers, and List Filters tables generated from the CLI schema.
-
-**Verified by:**
-
-- Generated file contains Global Options table
-- Generated file contains Output Modifiers table
-- Generated file contains List Filters table
-- Generated file includes inter-table prose
+_Validates that summarizePattern() projects ExtractedPattern (~3.5KB) to_
 
 ---
 
-#### CLI schema stays in sync with parser
+#### summarizePattern projects to compact summary
 
-> **Invariant:** Every flag recognized by parseArgs() has a corresponding entry in the CLI schema. A missing schema entry means the sync test fails.
+> **Invariant:** summarizePattern must project a full pattern object to a compact summary containing exactly 6 fields, using the patternName tag over the name field when available and omitting undefined optional fields.
+>
+> **Rationale:** Compact summaries reduce token usage by 80-90% compared to full patterns — they provide enough context for navigation without overwhelming AI context windows.
 
 **Verified by:**
 
-- Schema covers all global option flags
-- Schema covers all output modifier flags
-- Schema covers all list filter flags
-- Schema covers session option
+- Summary includes all 6 fields for a TypeScript pattern
+- Summary includes all 6 fields for a Gherkin pattern
+- Summary uses patternName tag over name field
+- Summary omits undefined optional fields
 
 ---
 
-#### showHelp output reflects CLI schema
+#### summarizePatterns batch processes arrays
 
-> **Invariant:** The help text rendered by showHelp() includes all options from the CLI schema, formatted for terminal display.
+> **Invariant:** summarizePatterns must batch-process an array of patterns, returning a correctly-sized array of compact summaries.
+>
+> **Rationale:** Batch processing avoids N individual function calls — the API frequently needs to summarize all patterns matching a query in a single operation.
 
 **Verified by:**
 
-- Help text includes schema-defined options
+- Batch summarization returns correct count
 
-_cli-reference.feature_
+_summarize.feature_
 
 ### Scope Validator Tests
 

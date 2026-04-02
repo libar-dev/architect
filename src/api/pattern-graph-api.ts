@@ -9,7 +9,7 @@
  * @architect-arch-layer application
  * @architect-uses PatternGraph, FSMValidator
  *
- * ## Process State API - Programmatic Query Interface
+ * ## Pattern Graph API - Programmatic Query Interface
  *
  * TypeScript interface for querying project state.
  * Designed for Claude Code integration and programmatic access.
@@ -49,7 +49,7 @@
 import type {
   PatternGraph,
   ExtractedPattern,
-  PhaseGroup as MasterPhaseGroup,
+  PhaseGroup as SchemaPhaseGroup,
 } from '../validation-schemas/index.js';
 import type { ProcessStatusValue } from '../taxonomy/index.js';
 import {
@@ -78,7 +78,7 @@ import type {
 } from './types.js';
 
 // =============================================================================
-// Process State API Interface
+// Pattern Graph API Interface
 // =============================================================================
 
 /**
@@ -296,7 +296,7 @@ export interface PatternGraphAPI {
 }
 
 // =============================================================================
-// Process State API Implementation
+// Pattern Graph API Implementation
 // =============================================================================
 
 /**
@@ -311,8 +311,8 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
     return dataset.patterns.filter((p) => p.status === status);
   }
 
-  // Helper to convert MasterPhaseGroup to PhaseGroup
-  function convertPhaseGroup(mpg: MasterPhaseGroup): PhaseGroup {
+  // Helper to convert SchemaPhaseGroup to PhaseGroup
+  function convertPhaseGroup(mpg: SchemaPhaseGroup): PhaseGroup {
     return {
       phaseNumber: mpg.phaseNumber,
       phaseName: mpg.phaseName,

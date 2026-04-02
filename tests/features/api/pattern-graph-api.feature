@@ -5,8 +5,8 @@
 @behavior @pattern-graph-api
 @architect-pattern:PatternGraphAPITesting
 @architect-product-area:DataAPI
-Feature: Process State API
-  Programmatic interface for querying delivery process state.
+Feature: Pattern Graph API
+  Programmatic interface for querying the pattern graph and delivery process state.
   Designed for Claude Code integration and tool automation.
 
   **Problem:**

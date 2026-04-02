@@ -6,7 +6,7 @@
 @architect-effort:2d
 @architect-product-area:Generation
 @architect-include:process-workflow,codec-transformation
-@architect-depends-on:ProcessAPILayeredExtraction
+@architect-depends-on:PatternGraphLayeredExtraction
 @architect-business-value:eliminate-last-parallel-pipeline-and-unify-pipeline-definition
 @architect-priority:high
 Feature: Orchestrator Pipeline Factory Migration
@@ -17,7 +17,7 @@ Feature: Orchestrator Pipeline Factory Migration
   the Parallel Pipeline anti-pattern identified in ADR-006. The shared
   pipeline factory in `build-pipeline.ts` already serves `pattern-graph-cli.ts`
   and `validate-patterns.ts`, but the orchestrator — the original pipeline
-  host — was deferred (ProcessAPILayeredExtraction DD-3) because it
+  host — was deferred (PatternGraphLayeredExtraction DD-3) because it
   collects structured warnings (scan errors with file details, extraction
   error counts, Gherkin parse errors with line/column) that the factory's
   flat `readonly string[]` warnings cannot represent.
@@ -90,7 +90,7 @@ Feature: Orchestrator Pipeline Factory Migration
   The factory already calls the validation variant. Adding
   `includeValidation?: boolean` (default true) lets the orchestrator
   opt out, since doc generation doesn't need validation summaries.
-  This was foreshadowed in ProcessAPILayeredExtraction DD-3.
+  This was foreshadowed in PatternGraphLayeredExtraction DD-3.
 
   DD-4: Scan result counts flow through PipelineResult.
   The orchestrator needs scan result counts for constructing its warning

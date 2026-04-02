@@ -364,7 +364,7 @@ Two presets:
 7. Load workflow
 8. Transform to PatternGraph
 
-**5 consumers:** Orchestrator, Process API CLI, validate-patterns CLI, REPL, MCP server.
+**5 consumers:** Orchestrator, Pattern Graph CLI, validate-patterns CLI, REPL, MCP server.
 
 **`PipelineOptions` does NOT carry config:** It has raw glob arrays, not `ResolvedConfig`. The pipeline internally calls `loadConfig()` to get the registry, causing the double-load when orchestrator already loaded config.
 

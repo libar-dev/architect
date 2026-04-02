@@ -1,6 +1,6 @@
 # Data API CLI
 
-> **Deprecated:** The full CLI documentation is now auto-generated. See [CLI Reference Tables](../docs-live/reference/CLI-REFERENCE.md) and [Recipes & Workflow Guide](../docs-live/reference/PROCESS-API-RECIPES.md). This file retains only quick-start guidance and operational reference (JSON envelope, exit codes).
+> **Deprecated:** The full CLI documentation is now auto-generated. See [CLI Reference Tables](../docs-live/reference/CLI-REFERENCE.md) and [CLI Recipes & Workflow Guide](../docs-live/reference/CLI-RECIPES.md). This file retains only quick-start guidance and operational reference (JSON envelope, exit codes).
 >
 > Query process state directly from annotated source code.
 
@@ -18,7 +18,7 @@
 > For full CLI documentation, see the generated references below.
 
 - **[CLI Reference Tables](../docs-live/reference/CLI-REFERENCE.md)** — all flags, options, filters, and modifiers
-- **[Recipes & Workflow Guide](../docs-live/reference/PROCESS-API-RECIPES.md)** — command descriptions, usage examples, and common recipes
+- **[CLI Recipes & Workflow Guide](../docs-live/reference/CLI-RECIPES.md)** — command descriptions, usage examples, and common recipes
 
 ---
 

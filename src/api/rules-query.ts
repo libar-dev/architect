@@ -3,7 +3,7 @@
  * @architect-core
  * @architect-pattern RulesQueryModule
  * @architect-status completed
- * @architect-implements ProcessAPILayeredExtraction
+ * @architect-implements PatternGraphLayeredExtraction
  * @architect-product-area DataAPI
  * @architect-uses BusinessRulesCodec, CodecHelpers
  *
@@ -13,7 +13,7 @@
  * Groups rules by product area, phase, and feature pattern.
  *
  * Target: src/api/rules-query.ts
- * See: DD-4 (ProcessAPILayeredExtraction)
+ * See: DD-4 (PatternGraphLayeredExtraction)
  *
  * **When to Use:** When querying business rules and invariants from Gherkin specs via the `rules` CLI subcommand.
  */

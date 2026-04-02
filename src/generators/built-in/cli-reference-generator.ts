@@ -7,7 +7,7 @@
  * @architect-arch-layer application
  * @architect-product-area:Generation
  *
- * ## Standalone Generator for Process API CLI Reference
+ * ## Standalone Generator for CLI Reference
  *
  * Generates `CLI-REFERENCE.md` from the declarative CLI schema.
  * Does NOT consume PatternGraph (ADR-006 compliant — CLI schema is static
@@ -54,7 +54,7 @@ function buildReferenceDocument(): string {
 
   sections.push(
     paragraph(
-      '> Auto-generated from CLI schema. See [Process API Guide](../../docs/PROCESS-API.md) for usage examples and recipes.'
+      '> Auto-generated from CLI schema. See [Pattern Graph CLI Guide](../../docs/PROCESS-API.md) for usage examples and recipes.'
     )
   );
 
@@ -82,7 +82,7 @@ function buildReferenceDocument(): string {
   sections.push(separator());
   sections.push(...buildOptionSection(CLI_SCHEMA.sessionOptions, twoCol));
 
-  const doc = document('Process API CLI Reference', sections);
+  const doc = document('Pattern Graph CLI Reference', sections);
   return renderToMarkdown(doc);
 }
 

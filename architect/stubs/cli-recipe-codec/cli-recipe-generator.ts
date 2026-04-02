@@ -6,7 +6,7 @@
  *
  * ## CliRecipeGenerator — Standalone Generator for CLI Recipes and Narratives
  *
- * Produces `docs-live/reference/PROCESS-API-RECIPES.md` from the declarative
+ * Produces `docs-live/reference/CLI-RECIPES.md` from the declarative
  * CLI schema. Sibling to `CliReferenceGenerator` — both implement
  * `DocumentGenerator`, both consume `CLI_SCHEMA` directly, neither depends
  * on PatternGraph (ADR-006 compliant).
@@ -35,17 +35,17 @@
  * `architect.config.ts`, not in the generator source.
  *
  * **Design Decision DD-5 (No claude-md output):**
- * The generator produces only `docs-live/reference/PROCESS-API-RECIPES.md`.
+ * The generator produces only `docs-live/reference/CLI-RECIPES.md`.
  * It does NOT produce `_claude-md/` output because CLAUDE.md already has
  * a manually-authored "Data API CLI" section that serves the AI context use
  * case. Adding generated claude-md modules would create duplicate content.
  *
  * ### Output File Structure
  *
- * The generated `PROCESS-API-RECIPES.md` has this structure:
+ * The generated `CLI-RECIPES.md` has this structure:
  *
  * ```
- * # Process API CLI — Recipes & Workflow Guide
+ * # Pattern Graph CLI Recipes & Workflow Guide
  * > Auto-generated from CLI schema.
  *
  * [Preamble: Why Use This, Quick Start, Session Types]
@@ -206,7 +206,7 @@ function buildRecipeDocument(
   //   }
   // }
   //
-  // const doc = document('Process API CLI - Recipes & Workflow Guide', sections);
+  // const doc = document('Pattern Graph CLI Recipes & Workflow Guide', sections);
   // return renderToMarkdown(doc);
 
   throw new Error('CliRecipeCodec not yet implemented - roadmap pattern');
@@ -237,7 +237,7 @@ export interface CliRecipeGeneratorConfig {
 // =============================================================================
 
 /**
- * Standalone generator producing PROCESS-API-RECIPES.md from CLI schema.
+ * Standalone generator producing CLI-RECIPES.md from CLI schema.
  *
  * Follows the same pattern as CliReferenceGenerator:
  * - Implements DocumentGenerator interface
@@ -269,7 +269,7 @@ class CliRecipeGeneratorImpl {
     return Promise.resolve({
       files: [
         {
-          path: 'reference/PROCESS-API-RECIPES.md',
+          path: 'reference/CLI-RECIPES.md',
           content,
         },
       ],

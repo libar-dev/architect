@@ -57,8 +57,8 @@ const INDEX_DOCUMENT_ENTRIES: readonly DocumentEntry[] = [
   // --- Reference Guides ---
   { title: 'Annotation Reference', path: 'reference/ANNOTATION-REFERENCE.md', description: 'Annotation mechanics, shape extraction, tag reference', audience: 'Developers', topic: 'Reference Guides' },
   { title: 'Session Workflow Guide', path: 'reference/SESSION-WORKFLOW-GUIDE.md', description: 'Planning, Design, Implementation session workflows', audience: 'AI/Devs', topic: 'Reference Guides' },
-  { title: 'Process API Reference', path: 'reference/CLI-REFERENCE.md', description: 'CLI command reference with flags and examples', audience: 'AI/Devs', topic: 'Reference Guides' },
-  { title: 'Process API Recipes', path: 'reference/PROCESS-API-RECIPES.md', description: 'CLI workflow recipes and session guides', audience: 'AI/Devs', topic: 'Reference Guides' },
+  { title: 'CLI Reference', path: 'reference/CLI-REFERENCE.md', description: 'Pattern Graph CLI command reference with flags and examples', audience: 'AI/Devs', topic: 'Reference Guides' },
+  { title: 'CLI Recipes', path: 'reference/CLI-RECIPES.md', description: 'Pattern Graph CLI workflow recipes and session guides', audience: 'AI/Devs', topic: 'Reference Guides' },
   { title: 'Process Guard Reference', path: 'reference/PROCESS-GUARD-REFERENCE.md', description: 'Pre-commit hooks, error codes, programmatic API', audience: 'Team Leads', topic: 'Reference Guides' },
   { title: 'Architecture Codecs', path: 'reference/ARCHITECTURE-CODECS.md', description: 'All codecs with factory patterns and options', audience: 'Developers', topic: 'Reference Guides' },
   { title: 'Architecture Types', path: 'reference/ARCHITECTURE-TYPES.md', description: 'PatternGraph interface and type shapes', audience: 'Developers', topic: 'Reference Guides' },

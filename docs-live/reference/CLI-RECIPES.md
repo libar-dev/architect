@@ -1,4 +1,4 @@
-# Process API CLI — Recipes & Workflow Guide
+# Pattern Graph CLI Recipes & Workflow Guide
 
 > Auto-generated from CLI schema. See [CLI Reference](./CLI-REFERENCE.md) for flag tables.
 

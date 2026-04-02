@@ -400,7 +400,7 @@ function buildRegenerationFooter(context: CodecContext): SectionBlock[] {
         'pnpm docs:taxonomy              # Taxonomy reference',
         'pnpm docs:validation            # Validation rules',
         'pnpm docs:claude-modules        # Claude context modules',
-        'pnpm docs:cli-reference # Process API CLI reference',
+        'pnpm docs:cli-reference         # Pattern Graph CLI reference',
         'pnpm docs:cli-recipe            # CLI recipes & workflow guide',
       ].join('\n'),
       'bash'

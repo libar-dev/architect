@@ -1,10 +1,10 @@
 @architect
-@architect-pattern:ProcessApiCliMetadata
+@architect-pattern:PatternGraphCliMetadata
 @architect-implements:DataAPICLIErgonomics
 @architect-status:active
 @architect-product-area:DataAPI
 @cli @pattern-graph-cli @metadata
-Feature: Process API CLI - Response Metadata
+Feature: Pattern Graph CLI - Response Metadata
   Response metadata includes validation summary and pipeline timing for diagnostics.
 
   Background:

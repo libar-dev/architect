@@ -1,11 +1,11 @@
 @architect
-@architect-pattern:ProcessApiCliCore
-@architect-implements:ProcessApiCli
+@architect-pattern:PatternGraphCliCore
+@architect-implements:PatternGraphAPICLI
 @architect-status:completed
 @architect-unlock-reason:'Split-from-original'
 @architect-product-area:DataAPI
 @cli @pattern-graph-cli
-Feature: Process API CLI - Core Infrastructure
+Feature: Pattern Graph CLI - Core Infrastructure
   Core CLI infrastructure: help, version, input validation, status, query, pattern, arch basics, missing args, edge cases.
 
   Background:

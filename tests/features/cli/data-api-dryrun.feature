@@ -1,10 +1,10 @@
 @architect
-@architect-pattern:ProcessApiCliDryRun
+@architect-pattern:PatternGraphCliDryRun
 @architect-implements:DataAPICLIErgonomics
 @architect-status:active
 @architect-product-area:DataAPI
 @cli @pattern-graph-cli @dry-run
-Feature: Process API CLI - Dry Run
+Feature: Pattern Graph CLI - Dry Run
   Dry-run mode shows pipeline scope without processing data.
 
   Background:

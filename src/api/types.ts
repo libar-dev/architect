@@ -5,7 +5,7 @@
  * @architect-status active
  * @architect-depends-on:PatternGraph
  *
- * ## Process State API Types
+ * ## Pattern Graph API Types
  *
  * Type definitions for the PatternGraphAPI query interface.
  * Designed for programmatic access by Claude Code and other tools.

@@ -301,17 +301,17 @@ reference content from `docs-live/` instead of `docs-generated/`.
 
 These `docs-live/` subdirectories exist but have no sync function:
 
-| Directory                       | Files    | Content                                                                                                      |
-| ------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------ |
-| `docs-live/reference/`          | 5 files  | ARCHITECTURE-CODECS.md, ARCHITECTURE-TYPES.md, PROCESS-API-RECIPES.md, CLI-REFERENCE.md, REFERENCE-SAMPLE.md |
-| `docs-live/taxonomy/`           | 3 files  | categories.md, format-types.md, metadata-tags.md                                                             |
-| `docs-live/validation/`         | 3 files  | error-catalog.md, fsm-transitions.md, protection-levels.md                                                   |
-| `docs-live/business-rules/`     | 7 files  | Per-area business rule extractions                                                                           |
-| `docs-live/_claude-md/`         | 10 files | AI context (may not need website publishing)                                                                 |
-| `docs-live/INDEX.md`            | 1 file   | Generated docs master index                                                                                  |
-| `docs-live/TAXONOMY.md`         | 1 file   | Taxonomy overview                                                                                            |
-| `docs-live/VALIDATION-RULES.md` | 1 file   | Validation rules overview                                                                                    |
-| `docs-live/BUSINESS-RULES.md`   | 1 file   | Business rules overview                                                                                      |
+| Directory                       | Files    | Content                                                                                              |
+| ------------------------------- | -------- | ---------------------------------------------------------------------------------------------------- |
+| `docs-live/reference/`          | 5 files  | ARCHITECTURE-CODECS.md, ARCHITECTURE-TYPES.md, CLI-RECIPES.md, CLI-REFERENCE.md, REFERENCE-SAMPLE.md |
+| `docs-live/taxonomy/`           | 3 files  | categories.md, format-types.md, metadata-tags.md                                                     |
+| `docs-live/validation/`         | 3 files  | error-catalog.md, fsm-transitions.md, protection-levels.md                                           |
+| `docs-live/business-rules/`     | 7 files  | Per-area business rule extractions                                                                   |
+| `docs-live/_claude-md/`         | 10 files | AI context (may not need website publishing)                                                         |
+| `docs-live/INDEX.md`            | 1 file   | Generated docs master index                                                                          |
+| `docs-live/TAXONOMY.md`         | 1 file   | Taxonomy overview                                                                                    |
+| `docs-live/VALIDATION-RULES.md` | 1 file   | Validation rules overview                                                                            |
+| `docs-live/BUSINESS-RULES.md`   | 1 file   | Business rules overview                                                                              |
 
 ---
 
@@ -334,7 +334,7 @@ These `docs-live/` subdirectories exist but have no sync function:
 | **ARCHITECTURE.md**     | 1,638 | docs-live/product-areas/GENERATION.md (1,065 lines) + docs-live/reference/ARCHITECTURE-CODECS.md (630 lines) + docs-live/reference/ARCHITECTURE-TYPES.md (429 lines) | Partial      | Generated covers pipeline stages and codec listings well. Missing: executive summary, data flow diagrams, workflow integration section, "Extending the System" guide, programmatic usage examples, quick reference card.                                                                            |
 | **GHERKIN-PATTERNS.md** | 366   | None                                                                                                                                                                 | None         | Authoring style guide: 4 essential patterns, DataTable/DocString usage, tag conventions, feature file rich content rules, step linting reference. Pure editorial guidance -- no annotation source exists.                                                                                           |
 | **ANNOTATION-GUIDE.md** | 270   | docs-live/taxonomy/metadata-tags.md (649 lines)                                                                                                                      | Partial      | Generated has exhaustive tag reference (56 tags). Missing: getting-started guide, shape extraction modes explanation, "Zod schema gotcha" documentation, verification steps, common issues troubleshooting table.                                                                                   |
-| **PROCESS-API.md**      | ~60   | docs-live/reference/CLI-REFERENCE.md + PROCESS-API-RECIPES.md                                                                                                        | **Replaced** | Trimmed to pointer file with operational reference (JSON envelope, exit codes, piping). All prose content now generated by CliRecipeCodec (WP-6 complete).                                                                                                                                          |
+| **PROCESS-API.md**      | ~60   | docs-live/reference/CLI-REFERENCE.md + CLI-RECIPES.md                                                                                                                | **Replaced** | Trimmed to pointer file with operational reference (JSON envelope, exit codes, piping). All prose content now generated by CliRecipeCodec (WP-6 complete).                                                                                                                                          |
 | **PROCESS-GUARD.md**    | 341   | docs-live/validation/error-catalog.md (79 lines) + docs-live/validation/fsm-transitions.md (49 lines) + docs-live/validation/protection-levels.md                    | Partial      | Generated has error types, FSM matrix, protection levels. Missing: error fix rationale ("why this rule exists"), escape hatch alternatives, pre-commit setup instructions (Husky), programmatic API guide, Decider pattern architecture diagram.                                                    |
 | **VALIDATION.md**       | 418   | docs-live/product-areas/VALIDATION.md (1,115 lines)                                                                                                                  | Partial      | Generated has pattern listings and business rules. Missing: "Which command do I run?" decision tree, 32+ individual lint rule explanations with code examples, anti-pattern detection rationale, CI/CD integration patterns (GitHub Actions YAML), vitest-cucumber two-pattern problem explanation. |
 | **TAXONOMY.md**         | 107   | docs-live/TAXONOMY.md (199 lines) + docs-live/taxonomy/ (3 files)                                                                                                    | Good         | Generated taxonomy reference is actually more comprehensive than manual. Manual adds: architecture explanation (file structure of src/taxonomy/), preset-to-taxonomy mapping, generation commands. Small gap.                                                                                       |
@@ -354,18 +354,18 @@ These `docs-live/` subdirectories exist but have no sync function:
 
 ### 7.1 Missing Content Types in Generated Docs
 
-| Content Type                 | Present in docs/                         | Present in docs-live/        | Examples                                                                          |
-| ---------------------------- | ---------------------------------------- | ---------------------------- | --------------------------------------------------------------------------------- |
-| Decision trees               | Yes (3 docs)                             | No                           | "Which validation command?", "Which session type?", "When to use design session?" |
-| Step-by-step checklists      | Yes (SESSION-GUIDES)                     | No                           | Planning session checklist, implementation 5-step execution order                 |
-| CLI recipes with output      | Yes (PROCESS-API)                        | Yes (PROCESS-API-RECIPES.md) | WP-6 complete: generated from CLI_SCHEMA                                          |
-| Error fix guides             | Yes (PROCESS-GUARD)                      | Partial (error-catalog)      | "completed-protection: add unlock-reason tag" with alternatives                   |
-| Code examples (before/after) | Yes (VALIDATION)                         | No                           | Lint rule violation + fix side-by-side                                            |
-| Philosophical rationale      | Yes (METHODOLOGY)                        | No                           | USDP inversion thesis, event sourcing analogy                                     |
-| Integration patterns         | Yes (VALIDATION, PROCESS-GUARD)          | No                           | Husky pre-commit, GitHub Actions YAML, package.json scripts                       |
-| Getting-started guides       | Yes (ANNOTATION-GUIDE)                   | No                           | "Add your first annotation" walkthrough                                           |
-| Gotcha documentation         | Yes (ANNOTATION-GUIDE, GHERKIN-PATTERNS) | No                           | "Zod schema needs constant not type alias", "# kills Gherkin parsing"             |
-| Audience-based navigation    | Yes (INDEX)                              | No                           | "New user read X, Developer read Y, Team Lead read Z"                             |
+| Content Type                 | Present in docs/                         | Present in docs-live/   | Examples                                                                          |
+| ---------------------------- | ---------------------------------------- | ----------------------- | --------------------------------------------------------------------------------- |
+| Decision trees               | Yes (3 docs)                             | No                      | "Which validation command?", "Which session type?", "When to use design session?" |
+| Step-by-step checklists      | Yes (SESSION-GUIDES)                     | No                      | Planning session checklist, implementation 5-step execution order                 |
+| CLI recipes with output      | Yes (PROCESS-API)                        | Yes (CLI-RECIPES.md)    | WP-6 complete: generated from CLI_SCHEMA                                          |
+| Error fix guides             | Yes (PROCESS-GUARD)                      | Partial (error-catalog) | "completed-protection: add unlock-reason tag" with alternatives                   |
+| Code examples (before/after) | Yes (VALIDATION)                         | No                      | Lint rule violation + fix side-by-side                                            |
+| Philosophical rationale      | Yes (METHODOLOGY)                        | No                      | USDP inversion thesis, event sourcing analogy                                     |
+| Integration patterns         | Yes (VALIDATION, PROCESS-GUARD)          | No                      | Husky pre-commit, GitHub Actions YAML, package.json scripts                       |
+| Getting-started guides       | Yes (ANNOTATION-GUIDE)                   | No                      | "Add your first annotation" walkthrough                                           |
+| Gotcha documentation         | Yes (ANNOTATION-GUIDE, GHERKIN-PATTERNS) | No                      | "Zod schema needs constant not type alias", "# kills Gherkin parsing"             |
+| Audience-based navigation    | Yes (INDEX)                              | No                      | "New user read X, Developer read Y, Team Lead read Z"                             |
 
 ### 7.2 Structural Quality Comparison
 
@@ -782,7 +782,7 @@ adr-001 through adr-006, adr-021
 annotation.md, configuration.md, core-types.md, data-api.md, generation.md, process.md, validation.md
 
 **Reference (5 files):**
-ARCHITECTURE-CODECS.md, ARCHITECTURE-TYPES.md, PROCESS-API-RECIPES.md, CLI-REFERENCE.md, REFERENCE-SAMPLE.md
+ARCHITECTURE-CODECS.md, ARCHITECTURE-TYPES.md, CLI-RECIPES.md, CLI-REFERENCE.md, REFERENCE-SAMPLE.md
 
 **Taxonomy (3 files):**
 categories.md, format-types.md, metadata-tags.md

@@ -125,17 +125,11 @@ graph TB
     MCPModule --> MCPPipelineSession
     MCPModule --> MCPFileWatcher
     MCPModule --> MCPToolRegistry
-    LintEngine --> LintRules
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> GherkinASTParser
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
     GherkinExtractor --> GherkinASTParser
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
     Document_Extractor --> Pattern_Scanner
-    ConfigResolver --> ArchitectFactory
-    ArchitectFactory --> RegexBuilders
-    ConfigLoader --> ArchitectFactory
+    LintEngine --> LintRules
     ReplMode --> PatternGraphAPI
     PatternGraphCLIImpl --> PatternGraphAPI
     PatternGraphCLIImpl --> PatternGraph
@@ -144,6 +138,12 @@ graph TB
     PatternGraphCLIImpl --> OutputPipelineImpl
     OutputPipelineImpl --> PatternSummarizerImpl
     MCPServerBin --> MCPServerImpl
+    ConfigResolver --> ArchitectFactory
+    ArchitectFactory --> RegexBuilders
+    ConfigLoader --> ArchitectFactory
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> GherkinASTParser
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
     PatternSummarizerImpl --> PatternGraphAPI
     ScopeValidatorImpl --> PatternGraphAPI
     ScopeValidatorImpl --> PatternGraph
@@ -322,11 +322,11 @@ All components with architecture annotations:
 | 🚧 Normalized Status Testing                                      | -          | -              | -              | tests/features/types/normalized-status.feature                        |
 | ✅ Orchestrator Pipeline Factory Migration                        | -          | -              | -              | architect/specs/orchestrator-pipeline-factory-migration.feature       |
 | 🚧 Pattern Graph API Types                                        | -          | -              | -              | src/api/types.ts                                                      |
+| ✅ Pattern Graph Layered Extraction                               | -          | -              | -              | architect/specs/pattern-graph-layered-extraction.feature              |
 | ✅ Pipeline Factory                                               | -          | -              | -              | src/generators/pipeline/build-pipeline.ts                             |
 | ✅ Pipeline Module                                                | -          | -              | -              | src/generators/pipeline/index.ts                                      |
 | ✅ Planning Codecs                                                | -          | -              | -              | src/renderable/codecs/planning.ts                                     |
 | ✅ Pr Changes Codec                                               | -          | -              | -              | src/renderable/codecs/pr-changes.ts                                   |
-| ✅ Process API Layered Extraction                                 | -          | -              | -              | architect/specs/pattern-graph-layered-extraction.feature              |
 | 🚧 Process Guard Module                                           | -          | -              | -              | src/lint/process-guard/index.ts                                       |
 | ✅ Process Guard Testing                                          | -          | -              | -              | tests/features/validation/process-guard.feature                       |
 | 🚧 Process Guard Types                                            | -          | -              | -              | src/lint/process-guard/types.ts                                       |

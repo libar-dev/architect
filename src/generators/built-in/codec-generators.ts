@@ -189,11 +189,11 @@ generatorRegistry.register(createDecisionDocGenerator());
 generatorRegistry.register(createDesignReviewGenerator());
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Process API Reference Generator (Schema-Based, not Codec-Based)
+// CLI Reference Generator (Schema-Based, not Codec-Based)
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Process API CLI Reference Generator
+ * Pattern Graph CLI Reference Generator
  * Generates CLI-REFERENCE.md from declarative CLI schema.
  * Standalone: does not consume PatternGraph (ADR-006).
  */
@@ -205,7 +205,7 @@ generatorRegistry.register(createCliReferenceGenerator());
 
 /**
  * CLI Recipe & Workflow Guide Generator
- * Generates PROCESS-API-RECIPES.md from declarative CLI schema.
+ * Generates CLI-RECIPES.md from declarative CLI schema.
  * Standalone: does not consume PatternGraph (ADR-006).
  */
 let cliRecipePreamble: readonly SectionBlock[] = [];

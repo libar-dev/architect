@@ -1,11 +1,11 @@
 @architect
-@architect-pattern:ProcessApiReferenceTests
+@architect-pattern:PatternGraphCliReferenceTests
 @architect-implements:CliReferenceGeneration
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:DataAPI
 @behavior @cli @cli-reference
-Feature: Process API CLI Reference Generation
+Feature: Pattern Graph CLI Reference Generation
 
   Verifies that the declarative CLI schema drives reference table generation
   and stays in sync with the parser implementation.

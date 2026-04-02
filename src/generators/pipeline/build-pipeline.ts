@@ -3,7 +3,7 @@
  * @architect-generator @architect-infra
  * @architect-pattern PipelineFactory
  * @architect-status completed
- * @architect-implements ProcessAPILayeredExtraction
+ * @architect-implements PatternGraphLayeredExtraction
  * @architect-product-area DataAPI
  * @architect-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, PatternGraph
  * @architect-convention pipeline-architecture

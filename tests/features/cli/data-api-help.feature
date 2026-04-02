@@ -1,10 +1,10 @@
 @architect
-@architect-pattern:ProcessApiCliHelp
+@architect-pattern:PatternGraphCliHelp
 @architect-implements:DataAPICLIErgonomics
 @architect-status:active
 @architect-product-area:DataAPI
 @cli @pattern-graph-cli @help
-Feature: Process API CLI - Per-Subcommand Help
+Feature: Pattern Graph CLI - Per-Subcommand Help
   Per-subcommand help displays usage, flags, and examples for individual subcommands.
 
   Background:

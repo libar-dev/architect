@@ -1,11 +1,11 @@
 @architect
-@architect-pattern:ProcessApiCliSubcommands
-@architect-implements:ProcessApiCli
+@architect-pattern:PatternGraphCliSubcommands
+@architect-implements:PatternGraphAPICLI
 @architect-status:completed
 @architect-unlock-reason:'Split-from-original'
 @architect-product-area:DataAPI
 @cli @pattern-graph-cli
-Feature: Process API CLI - Discovery Subcommands
+Feature: Pattern Graph CLI - Discovery Subcommands
   Discovery subcommands: list, search, context assembly, tags/sources, extended arch, unannotated.
 
   Background:

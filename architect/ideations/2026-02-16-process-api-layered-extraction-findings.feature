@@ -1,14 +1,14 @@
 @ideation
 @ideation-status:active
 @ideation-scope:pattern-graph-cli,pipeline-factory,process-guard,adr-006-enforcement
-@relates-to:ProcessAPILayeredExtraction,ADR006SingleReadModelArchitecture,ProcessGuardLinter,ValidatorReadModelConsolidation
-Feature: Process API Layered Extraction — Investigation Findings
+@relates-to:PatternGraphLayeredExtraction,ADR006SingleReadModelArchitecture,ProcessGuardLinter,ValidatorReadModelConsolidation
+Feature: Pattern Graph Layered Extraction — Investigation Findings
 
   Trigger: ADR-006 architectural investigation revealed concrete violations
   in pattern-graph-cli.ts (1,703 lines, three responsibilities), pipeline duplication
   across four consumers, and a previously undocumented fifth consumer in the
   Process Guard. These findings inform the design session for
-  ProcessAPILayeredExtraction.
+  PatternGraphLayeredExtraction.
 
   Rule: Three responsibilities confirmed in pattern-graph-cli.ts
 
@@ -46,7 +46,7 @@ Feature: Process API Layered Extraction — Investigation Findings
 
     | Consumer | File | What It Imports |
     | Orchestrator | src/generators/orchestrator.ts:51-55 | scanPatterns, extractPatterns, scanGherkinFiles, extractPatternsFromGherkin |
-    | Process API CLI | src/cli/pattern-graph-cli.ts:45-47 | scanPatterns, extractPatterns, scanGherkinFiles |
+    | Pattern Graph CLI | src/cli/pattern-graph-cli.ts:45-47 | scanPatterns, extractPatterns, scanGherkinFiles |
     | Validate Patterns CLI | src/cli/validate-patterns.ts:32-35 | scanPatterns, scanGherkinFiles, extractPatterns, extractProcessMetadata |
     | Process Guard | src/lint/process-guard/derive-state.ts:33 | scanGherkinFiles, extractDeliverables |
 
@@ -110,7 +110,7 @@ Feature: Process API Layered Extraction — Investigation Findings
   Rule: Suggestions for deeper analysis in a dedicated design session
 
     The following topics require focused investigation before writing the
-    ProcessAPILayeredExtraction design spec:
+    PatternGraphLayeredExtraction design spec:
 
     **1. Output pipeline integration**
     pattern-graph-cli.ts has an output pipeline (src/cli/output-pipeline.ts) for

@@ -1,5 +1,5 @@
 /**
- * Process API CLI Shared Test State and Fixture Builders
+ * Pattern Graph CLI Shared Test State and Fixture Builders
  *
  * Extracted from pattern-graph-cli.steps.ts to be shared across
  * the split test files (core, subcommands, modifiers-rules).

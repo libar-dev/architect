@@ -1,5 +1,5 @@
 /**
- * Step definitions for Process API CLI Reference Generation tests (Phase 43)
+ * Step definitions for Pattern Graph CLI reference generation tests (Phase 43)
  */
 
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';

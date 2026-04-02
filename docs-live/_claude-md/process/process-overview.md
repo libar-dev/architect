@@ -124,4 +124,4 @@
 | superseded  | Replaced by another  |
 | n/a         | Not applicable       |
 
-**Components:** Other (ADR006SingleReadModelArchitecture, ADR003SourceFirstPatternArchitecture, ADR002GherkinOnlyTesting, ADR001TaxonomyCanonicalValues, ValidatorReadModelConsolidation, StepDefinitionCompletion, SessionFileCleanup, ProcessAPILayeredExtraction, OrchestratorPipelineFactoryMigration, MvpWorkflowImplementation, LivingRoadmapCLI, EffortVarianceTracking, ConfigBasedWorkflowDefinition, CliBehaviorTesting, SessionHandoffs, SessionFileLifecycle)
+**Components:** Other (ADR006SingleReadModelArchitecture, ADR003SourceFirstPatternArchitecture, ADR002GherkinOnlyTesting, ADR001TaxonomyCanonicalValues, ValidatorReadModelConsolidation, StepDefinitionCompletion, SessionFileCleanup, PatternGraphLayeredExtraction, OrchestratorPipelineFactoryMigration, MvpWorkflowImplementation, LivingRoadmapCLI, EffortVarianceTracking, ConfigBasedWorkflowDefinition, CliBehaviorTesting, SessionHandoffs, SessionFileLifecycle)

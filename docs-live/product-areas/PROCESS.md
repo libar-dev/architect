@@ -236,7 +236,7 @@ graph LR
     ValidatorReadModelConsolidation["ValidatorReadModelConsolidation"]
     StepDefinitionCompletion["StepDefinitionCompletion"]
     SessionFileCleanup["SessionFileCleanup"]
-    ProcessAPILayeredExtraction["ProcessAPILayeredExtraction"]
+    PatternGraphLayeredExtraction["PatternGraphLayeredExtraction"]
     OrchestratorPipelineFactoryMigration["OrchestratorPipelineFactoryMigration"]
     MvpWorkflowImplementation["MvpWorkflowImplementation"]
     LivingRoadmapCLI["LivingRoadmapCLI"]
@@ -252,8 +252,8 @@ graph LR
     ValidatorReadModelConsolidation -.->|depends on| ADR006SingleReadModelArchitecture
     StepDefinitionCompletion -.->|depends on| ADR002GherkinOnlyTesting
     SessionFileCleanup -.->|depends on| SessionFileLifecycle
-    ProcessAPILayeredExtraction -.->|depends on| ValidatorReadModelConsolidation
-    OrchestratorPipelineFactoryMigration -.->|depends on| ProcessAPILayeredExtraction
+    PatternGraphLayeredExtraction -.->|depends on| ValidatorReadModelConsolidation
+    OrchestratorPipelineFactoryMigration -.->|depends on| PatternGraphLayeredExtraction
     LivingRoadmapCLI -.->|depends on| MvpWorkflowImplementation
     EffortVarianceTracking -.->|depends on| MvpWorkflowImplementation
     ConfigBasedWorkflowDefinition -.->|depends on| MvpWorkflowImplementation

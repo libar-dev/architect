@@ -1,5 +1,5 @@
 @architect
-@architect-pattern:ProcessAPILayeredExtraction
+@architect-pattern:PatternGraphLayeredExtraction
 @architect-status:completed
 @architect-unlock-reason:PR28-review-structural-fixes
 @architect-phase:100
@@ -9,7 +9,7 @@
 @architect-depends-on:ValidatorReadModelConsolidation
 @architect-business-value:separate-cli-shell-from-domain-logic-in-pattern-graph-cli
 @architect-priority:high
-Feature: Process API Layered Extraction
+Feature: Pattern Graph Layered Extraction
 
   **Problem:**
   `pattern-graph-cli.ts` is 1,700 lines containing two remaining architectural

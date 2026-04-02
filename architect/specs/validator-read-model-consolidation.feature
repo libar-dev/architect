@@ -63,7 +63,7 @@ Feature: Validator Read Model Consolidation
   DD-1: Reuse the same pipeline as pattern-graph-cli.ts — not a shared factory yet.
   The validator will wire scan-extract-merge-transform inline, mirroring
   how pattern-graph-cli.ts does it today (lines 490-558). Extracting a shared
-  pipeline factory is scoped to ProcessAPILayeredExtraction, not this spec.
+  pipeline factory is scoped to PatternGraphLayeredExtraction, not this spec.
   This keeps the refactoring focused on data-access only.
 
   DD-2: The validatePatterns() function signature changes from

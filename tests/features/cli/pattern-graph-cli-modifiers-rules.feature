@@ -1,11 +1,11 @@
 @architect
-@architect-pattern:ProcessApiCliModifiersAndRules
-@architect-implements:ProcessApiCli
+@architect-pattern:PatternGraphCliModifiersAndRules
+@architect-implements:PatternGraphAPICLI
 @architect-status:completed
 @architect-unlock-reason:'Split-from-original'
 @architect-product-area:DataAPI
 @cli @pattern-graph-cli
-Feature: Process API CLI - Output Modifiers and Rules
+Feature: Pattern Graph CLI - Output Modifiers and Rules
   Output modifiers, arch health, and rules subcommand.
 
   Background:

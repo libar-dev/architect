@@ -1,6 +1,6 @@
-# Process API CLI Reference
+# Pattern Graph CLI Reference
 
-> Auto-generated from CLI schema. See [Process API Guide](../../docs/PROCESS-API.md) for usage examples and recipes.
+> Auto-generated from CLI schema. See [Pattern Graph CLI Guide](../../docs/PROCESS-API.md) for usage examples and recipes.
 
 ## Global Options
 

@@ -9,8 +9,8 @@
 | Understand the tag taxonomy    | [TAXONOMY.md](TAXONOMY.md)                                      |
 | Check validation rules         | [VALIDATION-RULES.md](VALIDATION-RULES.md)                      |
 | Browse the changelog           | [CHANGELOG-GENERATED.md](CHANGELOG-GENERATED.md)                |
-| Query process state via CLI    | [Process API Reference](reference/CLI-REFERENCE.md)             |
-| Find CLI workflow recipes      | [Process API Recipes](reference/PROCESS-API-RECIPES.md)         |
+| Query process state via CLI    | [CLI Reference](reference/CLI-REFERENCE.md)                     |
+| Find CLI workflow recipes      | [CLI Recipes](reference/CLI-RECIPES.md)                         |
 | Run AI coding sessions         | [Session Workflow Guide](reference/SESSION-WORKFLOW-GUIDE.md)   |
 | Enforce delivery process rules | [Process Guard Reference](reference/PROCESS-GUARD-REFERENCE.md) |
 | Learn annotation mechanics     | [Annotation Reference](reference/ANNOTATION-REFERENCE.md)       |
@@ -37,7 +37,7 @@
 
 7. **[Annotation Reference](reference/ANNOTATION-REFERENCE.md)** -- Annotation mechanics and tag reference
 8. **[Session Workflow Guide](reference/SESSION-WORKFLOW-GUIDE.md)** -- Planning, Design, Implementation workflows
-9. **[Process API Reference](reference/CLI-REFERENCE.md)** -- CLI command reference with flags and examples
+9. **[CLI Reference](reference/CLI-REFERENCE.md)** -- Pattern Graph CLI command reference with flags and examples
 10. **[Process Guard Reference](reference/PROCESS-GUARD-REFERENCE.md)** -- Pre-commit hooks, error codes, programmatic API
 
 ---
@@ -55,8 +55,8 @@
 | CHANGELOG-GENERATED.md  | Everyone   | Project changelog from release specs             |
 | Annotation Reference    | Developers | Annotation mechanics, shape extraction           |
 | Session Workflow Guide  | AI/Devs    | Session decision trees and workflow checklists   |
-| Process API Reference   | AI/Devs    | CLI command reference with flags and examples    |
-| Process API Recipes     | AI/Devs    | CLI workflow recipes and session guides          |
+| CLI Reference           | AI/Devs    | CLI command reference with flags and examples    |
+| CLI Recipes             | AI/Devs    | CLI workflow recipes and session guides          |
 | Process Guard Reference | Team Leads | Pre-commit hooks, error codes, programmatic API  |
 | Architecture Codecs     | Developers | All codecs with factory patterns and options     |
 | Architecture Types      | Developers | PatternGraph interface and type shapes           |

@@ -4,10 +4,10 @@
  * @architect-pattern APIModule
  * @architect-status active
  *
- * ## API Module - Programmatic Process State Interface
+ * ## API Module - Programmatic Pattern Graph Interface
  *
- * Central export for the Process State API, providing a TypeScript
- * interface for querying project state.
+ * Central export for the PatternGraphAPI, providing a TypeScript
+ * interface for querying the pattern graph and delivery state.
  *
  * ### When to Use
  *
@@ -58,7 +58,7 @@ export type {
 export { createSuccess, createError, QueryApiError } from './types.js';
 export type { NeighborEntry } from './types.js';
 
-// Process State API
+// Pattern Graph API
 export type { PatternGraphAPI } from './pattern-graph-api.js';
 export { createPatternGraphAPI } from './pattern-graph-api.js';
 

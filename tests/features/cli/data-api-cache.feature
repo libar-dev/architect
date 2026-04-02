@@ -1,10 +1,10 @@
 @architect
-@architect-pattern:ProcessApiCliCache
+@architect-pattern:PatternGraphCliCache
 @architect-implements:DataAPICLIErgonomics
 @architect-status:active
 @architect-product-area:DataAPI
 @cli @pattern-graph-cli @cache
-Feature: Process API CLI - Dataset Cache
+Feature: Pattern Graph CLI - Dataset Cache
   PatternGraph caching between CLI invocations: cache hits, mtime invalidation, and --no-cache bypass.
 
   Background:
