@@ -1,11 +1,21 @@
 @architect
-@scanner @architect-pattern:GherkinAstParser @unit
+@scanner @architect-pattern:GherkinRulesSupport @unit
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-phase:100
 @architect-product-area:Annotation
 Feature: Gherkin AST Parser
   The Gherkin AST parser extracts feature metadata, scenarios, and steps
   from .feature files for timeline generation and process documentation.
+
+  Extended the documentation pipeline to capture and render:
+  - Rule: keyword as Business Rules sections
+  - Rule descriptions (rationale, exceptions, context)
+  - DataTables in steps as Markdown tables
+  - DocStrings in steps as code blocks
+
+  Infrastructure changes (schema, scanner, extractor) are shared by all generators.
+  Confirmed vitest-cucumber supports Rules via Rule() + RuleScenario() syntax.
 
   Background:
     Given a Gherkin parser context

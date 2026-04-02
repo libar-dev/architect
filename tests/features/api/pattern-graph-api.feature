@@ -3,7 +3,8 @@
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
 @behavior @pattern-graph-api
-@architect-pattern:PatternGraphAPITesting
+@architect-pattern:PatternGraphAPIRelationshipQueries
+@architect-phase:24
 @architect-product-area:DataAPI
 Feature: Pattern Graph API
   Programmatic interface for querying the pattern graph and delivery process state.

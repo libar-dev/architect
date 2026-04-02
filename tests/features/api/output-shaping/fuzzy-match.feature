@@ -1,5 +1,6 @@
 @architect
 @architect-pattern:FuzzyMatchTests
+@architect-implements:DataAPIOutputShaping
 @architect-status:active
 @architect-product-area:DataAPI
 Feature: Fuzzy Pattern Matching

@@ -1,5 +1,6 @@
 @architect
 @architect-pattern:PatternSummarizeTests
+@architect-implements:DataAPIOutputShaping
 @architect-status:active
 @architect-product-area:DataAPI
 Feature: Pattern Summarization

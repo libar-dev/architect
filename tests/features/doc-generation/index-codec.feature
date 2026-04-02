@@ -1,10 +1,28 @@
 @architect
-@architect-pattern:IndexCodecTesting
-@architect-implements:IndexCodec
+@architect-pattern:EnhancedIndexGeneration
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-regression-safety-net
+@architect-phase:35
 @architect-product-area:Generation
 Feature: Index Document Codec
+
+  **Problem:**
+  `docs/INDEX.md` (354 lines) is a manually maintained navigation hub with audience-based
+  reading orders, per-document detailed TOC, document roles matrix, quick navigation
+  table, and key concepts glossary. The auto-generated `docs-live/INDEX.md` (112 lines)
+  is a simple file listing with regeneration commands. It lacks audience navigation,
+  document role context, pattern statistics, and phase progress summaries. When documents
+  are added, renamed, or restructured, the manual index drifts from the actual doc set.
+
+  **Solution:**
+  Create an `IndexCodec` that generates a comprehensive navigation hub by composing
+  auto-generated statistics from PatternGraph pre-computed views with editorial
+  navigation content via the preamble mechanism. The codec produces document listings,
+  pattern counts per product area, and phase progress from `byCategory`, `byPhase`,
+  `byProductArea`, and `byStatus` views. Audience reading paths, the document roles
+  matrix, and the quick finder table use `ReferenceDocConfig.preamble` as manually
+  authored `SectionBlock[]`. The generated output replaces both `docs/INDEX.md` and
+  `docs-live/INDEX.md` with a single unified navigation document.
 
   Validates the Index Codec that transforms PatternGraph into a
   RenderableDocument for the main documentation navigation index (INDEX.md).

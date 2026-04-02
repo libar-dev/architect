@@ -1,4 +1,3 @@
-@architect
 @architect-adr:021
 @architect-adr-status:superseded
 @architect-adr-category:documentation
@@ -177,8 +176,8 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
     | Intro & Context | THIS DECISION (Rule: Context above) | Decision rule description |
     | How It Works | THIS DECISION (Rule: Decision above) | Decision rule description |
     | Validation Rules | tests/features/validation/process-guard.feature | Rule blocks |
-    | Protection Levels | architect/specs/process-guard-linter.feature | Scenario Outline Examples |
-    | Valid Transitions | architect/specs/process-guard-linter.feature | Scenario Outline Examples |
+    | Protection Levels | tests/features/validation/process-guard.feature | Scenario Outline Examples |
+    | Valid Transitions | tests/features/validation/process-guard.feature | Scenario Outline Examples |
     | API Types | src/lint/process-guard/types.ts | @extract-shapes tag |
     | Decider API | src/lint/process-guard/decider.ts | @extract-shapes tag |
     | CLI Options | src/cli/lint-process.ts | JSDoc section |

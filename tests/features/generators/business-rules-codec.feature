@@ -4,6 +4,7 @@
 @architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
 @architect-implements:BusinessRulesGenerator
+@architect-implements:GherkinRulesSupport
 Feature: Business Rules Document Codec
 
   Tests the BusinessRulesCodec transformation from PatternGraph to RenderableDocument.

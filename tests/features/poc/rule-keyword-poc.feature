@@ -3,6 +3,7 @@
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Generation
+@architect-implements:GherkinRulesSupport
 @poc @rule-keyword
 Feature: PoC - Rule Keyword Support
   This feature tests whether vitest-cucumber supports the Rule keyword

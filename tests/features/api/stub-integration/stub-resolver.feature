@@ -1,6 +1,8 @@
 @architect
-@architect-pattern:StubResolverTests
-@architect-status:active
+@architect-pattern:DataAPIStubIntegration
+@architect-status:completed
+@architect-unlock-reason:Value-transfer-from-spec
+@architect-phase:25a
 @architect-product-area:DataAPI
 Feature: Stub Resolver - Design Stub Discovery and Resolution
 

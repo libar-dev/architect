@@ -1,7 +1,6 @@
 /**
  * @architect
  * @architect-pattern CliRecipeGenerator
- * @architect-implements CliRecipeCodec
  * @architect-arch-context generator
  * @architect-arch-layer application
  * @architect-product-area:Generation

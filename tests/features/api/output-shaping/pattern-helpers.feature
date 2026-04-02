@@ -1,5 +1,6 @@
 @architect
 @architect-pattern:PatternHelpersTests
+@architect-implements:DataAPIOutputShaping
 @architect-status:active
 @architect-phase:25a
 @architect-product-area:DataAPI

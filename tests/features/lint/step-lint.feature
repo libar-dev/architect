@@ -1,7 +1,27 @@
+@architect
+@architect-pattern:StepLintVitestCucumber
+@architect-status:completed
+@architect-unlock-reason:Value-transfer-from-spec
+@architect-phase:50
+@architect-product-area:Validation
 Feature: Step Lint - vitest-cucumber Compatibility Checks
 
-  Tests for the lint-steps static analysis rules that detect
-  vitest-cucumber compatibility issues before tests run.
+  **Problem:**
+  Hours are lost debugging vitest-cucumber-specific issues that only surface
+  at test runtime. These are semantic traps at the boundary between .feature
+  files and .steps.ts files: using {string} function params inside
+  ScenarioOutline (should use variables object), forgetting to destructure
+  the And keyword (causes StepAbleUnknowStepError), missing Rule() wrappers, and hash
+  comments inside description pseudo-code-blocks. All are statically
+  detectable but no existing linter catches them.
+
+  **Solution:**
+  A dedicated lint-steps CLI that statically analyzes .feature and .steps.ts
+  files for vitest-cucumber compatibility. Three check categories:
+  - Feature-only: hash-in-description, duplicate-and-step, dollar-in-step-text
+  - Step-only: regex-step-pattern, unsupported-phrase-type
+  - Cross-file: scenario-outline-function-params, missing-and-destructuring,
+    missing-rule-wrapper
 
   Background:
     Given a step lint context

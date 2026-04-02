@@ -1,9 +1,15 @@
 @architect
-@architect-pattern:RobustnessIntegration
+@architect-pattern:UniversalDocGeneratorRobustness
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-phase:28
 @architect-product-area:Generation
-Feature: Robustness Integration
+@architect-depends-on:DocGenerationProofOfConcept
+Feature: Universal Document Generator - Robustness Integration
+
+  This feature transforms the PoC document generator into a production-ready
+  universal generator capable of operating at monorepo scale (~210 manual docs
+  to be replaced across the convex-event-sourcing repository).
 
   **Context:** Document generation pipeline needs validation, deduplication, and
   warning collection to work together correctly for production use.

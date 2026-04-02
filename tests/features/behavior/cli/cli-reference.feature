@@ -1,11 +1,23 @@
 @architect
-@architect-pattern:PatternGraphCliReferenceTests
-@architect-implements:CliReferenceGeneration
+@architect-pattern:CliReferenceGeneration
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
-@architect-product-area:DataAPI
+@architect-phase:43
+@architect-product-area:Generation
 @behavior @cli @cli-reference
-Feature: Pattern Graph CLI Reference Generation
+Feature: CLI.md Hybrid Generation
+
+  **Problem:**
+  `docs/CLI.md` contains three reference tables that manually mirror CLI definitions
+  in source code. When CLI options change, these tables require manual updates and
+  risk falling out of sync with the implementation. The `showHelp()` function is a
+  hardcoded third copy of the same information, creating three-way drift risk.
+
+  **Solution:**
+  A declarative CLI schema (`src/cli/cli-schema.ts`) serves as the single source of
+  truth. A standalone `CliReferenceGenerator` reads this schema and produces a
+  complete generated reference file at `docs-live/reference/CLI-REFERENCE.md`.
+  The `showHelp()` function consumes the same schema, eliminating three-way sync.
 
   Verifies that the declarative CLI schema drives reference table generation
   and stays in sync with the parser implementation.

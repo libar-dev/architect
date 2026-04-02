@@ -1,11 +1,25 @@
 @architect
 @behavior @reference-codec
-@architect-pattern:ReferenceCodecCoreTesting
+@architect-pattern:ReferenceDocShowcase
 @architect-status:completed
 @architect-unlock-reason:'Split-from-original'
-@architect-implements:ReferenceDocShowcase
+@architect-phase:30
+@architect-depends-on:CodecDrivenReferenceGeneration,ScopedArchitecturalView,ShapeExtraction
 @architect-product-area:Generation
 Feature: Reference Codec - Core Behavior
+
+  **Problem:**
+  The Reference Generation Sample document exercises a small fraction of the
+  reference codec's capabilities: 2 convention rules, 1 flowchart diagram,
+  2 shapes from a single file, and 1 shallow behavior pattern. Of the 9
+  renderable block types (heading, paragraph, separator, table, list, code,
+  mermaid, collapsible, link-out), only 6 are used.
+
+  **Solution:**
+  Expand the reference sample into a comprehensive showcase that exercises every
+  content block type across all three detail levels. The sample document serves
+  as the integration test: if REFERENCE-SAMPLE.md renders every block type
+  correctly at every detail level, the codec system works end-to-end.
 
   Parameterized codec factory that creates reference document codecs
   from configuration objects. Core behavior including empty datasets,

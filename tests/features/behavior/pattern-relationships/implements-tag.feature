@@ -1,10 +1,21 @@
 @architect
-@architect-pattern:ImplementsTagProcessing
+@architect-pattern:PatternRelationshipModel
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
-@architect-implements:PatternRelationshipModel
+@architect-phase:99
 @architect-product-area:Annotation
-Feature: Implements Tag Extraction and Processing
+Feature: Pattern Relationship Model — Implements Tag Extraction and Processing
+
+  **Problem:** The delivery process lacks a comprehensive relationship model between artifacts.
+  Code files, roadmap specs, executable specs, and patterns exist but their relationships
+  are implicit or limited to basic dependency tracking (`uses`, `depends-on`).
+
+  **Solution:** Implement a relationship taxonomy inspired by UML/TML modeling practices:
+  - **Realization** (`implements`) - Code realizes a pattern specification
+  - **Generalization** (`extends`) - Pattern extends another pattern's capabilities
+  - **Dependency** (`uses`, `used-by`) - Technical dependencies between patterns
+  - **Composition** (`parent`, `level`) - Hierarchical pattern organization
+  - **Traceability** (`roadmap-spec`, `executable-specs`) - Cross-tier linking
 
   Tests for the @architect-implements tag which links implementation files
   to their corresponding roadmap pattern specifications.

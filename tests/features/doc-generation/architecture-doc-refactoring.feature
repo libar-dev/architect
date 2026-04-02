@@ -1,9 +1,26 @@
 @architect
-@architect-pattern:ArchitectureDocRefactoringTesting
-@architect-status:active
+@architect-pattern:ArchitectureDocRefactoring
+@architect-status:completed
+@architect-unlock-reason:Value-transfer-from-spec
+@architect-phase:36
 @architect-product-area:Generation
 @integration
 Feature: Architecture Doc Refactoring Coverage
+
+  **Problem:**
+  ARCHITECTURE.md is 1,287 lines of manually-maintained documentation covering 14
+  sections. The codec system already generates much of this content (codec references
+  via convention tags, PatternGraph types via shape extraction, pipeline diagrams
+  via architecture annotations). Maintaining parallel manual and generated versions
+  creates drift and duplication.
+
+  **Solution:**
+  Decompose ARCHITECTURE.md into a curated architecture overview (~320 lines of
+  editorial narrative optimized for Claude as primary consumer) that links to generated
+  reference documents for detailed content. Phase 2 established the convention-tag
+  pattern by extracting the 368-line Available Codecs section. Phase 4 applies
+  product area absorption, generated shapes, architecture diagram references, and
+  usefulness-driven editorial trimming to the remaining consolidatable content.
 
   Validates that ARCHITECTURE.md retains its full reference content and that
   generated documents in docs-live/ coexist alongside it, covering equivalent

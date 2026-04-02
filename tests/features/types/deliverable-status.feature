@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:DeliverableStatusTaxonomyTesting
 @architect-status:active
+@architect-implements:TypeScriptTaxonomyImplementation
 @architect-product-area:CoreTypes
 @architect-include:core-types
 @taxonomy @deliverable

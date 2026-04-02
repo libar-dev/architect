@@ -1,15 +1,24 @@
 @architect
-@architect-pattern:ComponentDiagramGeneration
+@architect-pattern:ArchitectureDiagramCore
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
-@architect-implements:ArchitectureDiagramGeneration
+@architect-phase:23
 @architect-product-area:Generation
 @architecture
-Feature: Component Diagram Generation
+Feature: Architecture Diagram Generation - Core (Component Diagrams)
 
-  As a documentation generator
-  I want to generate component diagrams from architecture metadata
-  So that system architecture is automatically visualized with bounded context subgraphs
+  **Problem:** Architecture documentation requires manually maintaining mermaid diagrams
+  that duplicate information already encoded in source code. When code changes,
+  diagrams become stale. Manual sync is error-prone and time-consuming.
+
+  **Solution:** Generate architecture diagrams automatically from source code annotations
+  using dedicated arch-tags for precise control. Three tags classify components:
+  - arch-role: Component type (preset-configurable: service, handler, repository, etc.)
+  - arch-context: Bounded context for subgraph grouping
+  - arch-layer: Architectural layer (domain, application, infrastructure)
+
+  Component diagrams group patterns by bounded context into Mermaid subgraphs,
+  with relationship arrows using UML-inspired styles.
 
   Background: Dataset with architecture metadata
     Given an architecture codec with default options

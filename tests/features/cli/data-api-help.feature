@@ -1,10 +1,28 @@
 @architect
-@architect-pattern:PatternGraphCliHelp
-@architect-implements:DataAPICLIErgonomics
-@architect-status:active
+@architect-pattern:DataAPICLIErgonomics
+@architect-status:completed
+@architect-unlock-reason:Value-transfer-from-spec
+@architect-phase:25d
 @architect-product-area:DataAPI
 @cli @pattern-graph-cli @help
-Feature: Pattern Graph CLI - Per-Subcommand Help
+Feature: Data API CLI Ergonomics - Performance and Interactive Mode
+  **Problem:**
+  The pattern-graph-cli CLI runs the full pipeline (scan, extract, transform) on every
+  invocation, taking 2-5 seconds. During design sessions with 10-20 queries, this
+  adds up to 1-2 minutes of waiting. There is no way to keep the pipeline loaded
+  between queries. Per-subcommand help is missing -- `pattern-graph-cli context --help`
+  does not work. FSM-only queries (like `isValidTransition`) run the full pipeline
+  even though FSM rules are static.
+
+  **Solution:**
+  Add performance and ergonomic improvements:
+  1. Pipeline caching -- Cache PatternGraph to temp file with mtime invalidation
+  2. REPL mode -- `pattern-graph-cli repl` keeps pipeline loaded for interactive queries
+  3. FSM short-circuit -- FSM queries skip the scan pipeline entirely
+  4. Per-subcommand help -- `pattern-graph-cli <subcommand> --help` with examples
+  5. Dry-run mode -- `--dry-run` shows what would be scanned without running
+  6. Validation summary -- Include pipeline health in response metadata
+
   Per-subcommand help displays usage, flags, and examples for individual subcommands.
 
   Background:

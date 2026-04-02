@@ -1,11 +1,25 @@
 @architect
 @behavior @reference-codec
-@architect-pattern:ReferenceCodecDiagramTypeTesting
+@architect-pattern:ScopedArchitecturalView
 @architect-status:completed
 @architect-unlock-reason:'Split-from-original'
 @architect-implements:ReferenceDocShowcase
+@architect-phase:28
+@architect-depends-on:ArchitectureDiagramGeneration,ShapeExtraction
 @architect-product-area:Generation
 Feature: Reference Codec - Diagram Type Rendering
+
+  **Problem:**
+  Full architecture diagrams show every annotated pattern in the project. For focused
+  use cases -- design session context, PR descriptions, CLAUDE.md module sections --
+  developers need views scoped to a small set of relevant patterns with their immediate
+  neighbors. Manually curating diagram content defeats the code-first principle.
+
+  **Solution:**
+  A `DiagramScope` filter interface that selects patterns by three dimensions
+  (`archContext`, `archView`, or explicit pattern names), automatically discovers
+  neighbor patterns via relationship edges, and renders scoped Mermaid diagrams
+  with subgraph grouping and distinct neighbor styling.
 
   Diagram type controls Mermaid output format including flowchart,
   sequenceDiagram, stateDiagram-v2, C4Context, and classDiagram.

@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:ContextFormatterTests
 @architect-status:active
+@architect-implements:DataAPIContextAssembly
 @architect-product-area:DataAPI
 Feature: Context Formatter - Plain Text Rendering
 

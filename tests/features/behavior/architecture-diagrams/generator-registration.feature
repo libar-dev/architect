@@ -2,7 +2,7 @@
 @architect-pattern:ArchGeneratorRegistration
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
-@architect-implements:ArchitectureDiagramGeneration
+@architect-implements:ArchitectureDiagramCore
 @architect-product-area:Generation
 @architecture
 Feature: Architecture Generator Registration

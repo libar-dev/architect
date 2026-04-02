@@ -1,10 +1,26 @@
 @architect
-@architect-pattern:DocumentationOrchestrator
+@architect-pattern:OrchestratorPipelineFactoryMigration
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-phase:101
 @architect-product-area:Generation
-@architect-implements:GeneratorInfrastructureTesting
+@architect-depends-on:PatternGraphLayeredExtraction
 Feature: Documentation Generation Orchestrator
+
+  **Problem:**
+  `orchestrator.ts` is the last feature consumer that wires the 8-step
+  scan-extract-merge-transform pipeline inline. This is the Parallel Pipeline
+  anti-pattern identified in ADR-006. The shared pipeline factory in
+  `build-pipeline.ts` already serves `pattern-graph-cli.ts` and
+  `validate-patterns.ts`, but the orchestrator was deferred because it
+  collects structured warnings that the factory's flat warnings cannot represent.
+
+  **Solution:**
+  Enrich the pipeline factory's `PipelineResult` with structured warnings
+  that capture the granularity the orchestrator needs, then migrate
+  `generateDocumentation()` to call `buildPatternGraph()`. Move
+  `mergePatterns()` to `src/generators/pipeline/merge-patterns.ts` as a
+  standalone pipeline step.
 
   Tests the orchestrator's pattern merging, conflict detection, and generator
   coordination capabilities. The orchestrator coordinates the full documentation
