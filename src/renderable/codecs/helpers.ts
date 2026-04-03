@@ -210,10 +210,20 @@ export interface RichContentOptions {
 
 /**
  * Default options type - all fields are required values from RichContentOptions.
- * Since RichContentOptions.onWarning explicitly allows undefined in its type definition,
- * Required<RichContentOptions> correctly allows undefined for onWarning.
+ *
+ * The warning hooks stay explicitly nullable because the default path intentionally
+ * falls back to console warnings when no collector or callback is supplied.
  */
-export type ResolvedRichContentOptions = Required<RichContentOptions>;
+export interface ResolvedRichContentOptions {
+  baseHeadingLevel: 2 | 3 | 4;
+  docStringLanguage: string;
+  includeDataTables: boolean;
+  includeDocStrings: boolean;
+  includeRules: boolean;
+  includeSteps: boolean;
+  onWarning: ((warning: RichContentWarning) => void) | undefined;
+  warningCollector: WarningCollector | undefined;
+}
 
 /**
  * Default rich content options
