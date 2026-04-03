@@ -106,6 +106,8 @@ export {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export {
+  decodeDocument,
+  decodeDocumentSafe,
   generateDocument,
   generateDocuments,
   generateAllDocuments,
@@ -113,7 +115,9 @@ export {
   isValidDocumentType,
   getDocumentTypeInfo,
   DOCUMENT_TYPES,
+  type CodecOptions,
   type DocumentType,
+  type GenerationError,
 } from './generate.js';
 
 // ═══════════════════════════════════════════════════════════════════════════

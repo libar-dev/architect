@@ -381,6 +381,111 @@ function resolveCodec(type: DocumentType, options?: CodecOptions): DocumentCodec
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
+ * Decode a document type to RenderableDocument without rendering to markdown.
+ *
+ * This is the Live Documentation API entry point: it invokes the codec's decode()
+ * step and returns the structured RenderableDocument, skipping the markdown render
+ * step entirely. Interactive consumers (Studio desktop, MCP clients) use this to
+ * receive typed document blocks for native rendering.
+ *
+ * @param type - Document type to decode
+ * @param dataset - PatternGraph with pattern data
+ * @param options - Optional codec-specific options (e.g., patternName for design-review)
+ * @param contextEnrichment - Optional runtime context (projectMetadata, tagExampleOverrides)
+ * @returns Result containing RenderableDocument on success, or GenerationError on failure
+ *
+ * @example
+ * ```typescript
+ * const result = decodeDocumentSafe("design-review", patternGraph, {
+ *   "design-review": { patternName: "SetupCommand" }
+ * });
+ * if (Result.isOk(result)) {
+ *   // result.value is RenderableDocument — structured JSON, not markdown
+ *   const doc = result.value;
+ *   console.log(doc.title, doc.sections.length);
+ * }
+ * ```
+ */
+export function decodeDocumentSafe(
+  type: DocumentType,
+  dataset: PatternGraph,
+  options?: CodecOptions,
+  contextEnrichment?: CodecContextEnrichment
+): Result<RenderableDocument, GenerationError> {
+  const codec = resolveCodec(type, options);
+  if (codec === undefined) {
+    return Result.err({
+      documentType: type,
+      message: `No codec registered for document type: ${type}`,
+      phase: 'decode',
+    });
+  }
+
+  if (contextEnrichment) {
+    setCodecContextEnrichment(contextEnrichment);
+  }
+
+  try {
+    const doc = codec.decode(dataset) as RenderableDocument;
+    return Result.ok(doc);
+  } catch (err) {
+    return Result.err({
+      documentType: type,
+      message: err instanceof Error ? err.message : String(err),
+      cause: err instanceof Error ? err : undefined,
+      phase: 'decode',
+    });
+  } finally {
+    if (contextEnrichment) {
+      clearCodecContextEnrichment();
+    }
+  }
+}
+
+/**
+ * Decode a document type to RenderableDocument without rendering to markdown.
+ *
+ * Throwing variant of `decodeDocumentSafe()`. Use when you prefer exceptions
+ * over Result-based error handling.
+ *
+ * @param type - Document type to decode
+ * @param dataset - PatternGraph with pattern data
+ * @param options - Optional codec-specific options
+ * @param contextEnrichment - Optional runtime context
+ * @returns RenderableDocument — the structured intermediate format
+ * @throws Error if the codec is not registered or decode fails
+ *
+ * @example
+ * ```typescript
+ * const doc = decodeDocument("architecture", patternGraph);
+ * // doc.sections contains heading, mermaid, table, paragraph blocks
+ * ```
+ */
+export function decodeDocument(
+  type: DocumentType,
+  dataset: PatternGraph,
+  options?: CodecOptions,
+  contextEnrichment?: CodecContextEnrichment
+): RenderableDocument {
+  const codec = resolveCodec(type, options);
+  if (codec === undefined) {
+    throw new Error(`No codec registered for document type: ${type}`);
+  }
+
+  if (contextEnrichment) {
+    setCodecContextEnrichment(contextEnrichment);
+  }
+
+  try {
+    return codec.decode(dataset) as RenderableDocument;
+  } finally {
+    if (contextEnrichment) {
+      clearCodecContextEnrichment();
+    }
+  }
+}
+
+/**
  * Generate a single document type with Result-based error handling.
  *
  * This function wraps codec.decode() and renderDocumentWithFiles() in try/catch,
