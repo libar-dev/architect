@@ -1,6 +1,6 @@
 {
   "name": "@libar-dev/architect",
-  "version": "1.0.0-pre.7",
+  "version": "1.0.0-pre.8",
   "description": "Context engineering platform: extract patterns from TypeScript and Gherkin into a queryable state with living docs, architecture graphs, and FSM-enforced workflows.",
   "type": "module",
   "sideEffects": false,
