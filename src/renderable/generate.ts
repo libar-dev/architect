@@ -396,9 +396,7 @@ function resolveCodec(type: DocumentType, options?: CodecOptions): DocumentCodec
  *
  * @example
  * ```typescript
- * const result = decodeDocumentSafe("design-review", patternGraph, {
- *   "design-review": { patternName: "SetupCommand" }
- * });
+ * const result = decodeDocumentSafe("architecture", patternGraph);
  * if (Result.isOk(result)) {
  *   // result.value is RenderableDocument — structured JSON, not markdown
  *   const doc = result.value;
@@ -416,7 +414,7 @@ export function decodeDocumentSafe(
   if (codec === undefined) {
     return Result.err({
       documentType: type,
-      message: `No codec registered for document type: ${type}`,
+      message: `No codec registered for document type: "${type}". Available types: ${CodecRegistry.getRegisteredTypes().join(', ')}`,
       phase: 'decode',
     });
   }
@@ -469,7 +467,9 @@ export function decodeDocument(
 ): RenderableDocument {
   const codec = resolveCodec(type, options);
   if (codec === undefined) {
-    throw new Error(`No codec registered for document type: ${type}`);
+    throw new Error(
+      `No codec registered for document type: "${type}". Available types: ${CodecRegistry.getRegisteredTypes().join(', ')}`
+    );
   }
 
   if (contextEnrichment) {
@@ -521,7 +521,7 @@ export function generateDocumentSafe(
   if (codec === undefined) {
     return Result.err({
       documentType: type,
-      message: `No codec registered for document type: ${type}`,
+      message: `No codec registered for document type: "${type}". Available types: ${CodecRegistry.getRegisteredTypes().join(', ')}`,
       phase: 'decode',
     });
   }
@@ -602,7 +602,9 @@ export function generateDocument(
 
   const codec = resolveCodec(type, options);
   if (codec === undefined) {
-    throw new Error(`No codec registered for document type: ${type}`);
+    throw new Error(
+      `No codec registered for document type: "${type}". Available types: ${CodecRegistry.getRegisteredTypes().join(', ')}`
+    );
   }
 
   // Set context enrichment before decode (cleared in finally)

@@ -25,14 +25,27 @@ if (!exports || typeof exports !== 'object') {
   process.exit(1);
 }
 
+/**
+ * Verify that a resolved path stays inside the project root.
+ * Prevents crafted export values (absolute paths, ../ traversal) from
+ * probing arbitrary filesystem locations.
+ */
+function assertInsideRoot(absolutePath, label) {
+  if (!absolutePath.startsWith(rootDir + '/') && absolutePath !== rootDir) {
+    console.error(`  SECURITY  ${label} resolves outside project root: ${absolutePath}`);
+    process.exit(1);
+  }
+}
+
 let missing = 0;
 let verified = 0;
 
 for (const [entryPoint, mapping] of Object.entries(exports)) {
   // Skip non-object entries (e.g., "./package.json": "./package.json")
   if (typeof mapping === 'string') {
-    const filePath = resolve(rootDir, mapping);
-    if (!existsSync(filePath)) {
+    const absolutePath = resolve(rootDir, mapping);
+    assertInsideRoot(absolutePath, entryPoint);
+    if (!existsSync(absolutePath)) {
       console.error(`  MISSING  ${entryPoint} → ${mapping}`);
       missing++;
     } else {
@@ -43,7 +56,12 @@ for (const [entryPoint, mapping] of Object.entries(exports)) {
 
   // Check both types and import paths
   for (const [condition, filePath] of Object.entries(mapping)) {
+    if (typeof filePath !== 'string') {
+      console.warn(`  SKIPPED  ${entryPoint} [${condition}] — nested conditional mapping (not verified)`);
+      continue;
+    }
     const absolutePath = resolve(rootDir, filePath);
+    assertInsideRoot(absolutePath, `${entryPoint} [${condition}]`);
     if (!existsSync(absolutePath)) {
       console.error(`  MISSING  ${entryPoint} [${condition}] → ${filePath}`);
       missing++;
@@ -53,10 +71,16 @@ for (const [entryPoint, mapping] of Object.entries(exports)) {
   }
 }
 
-// Also verify bin entries
-if (pkg.bin && typeof pkg.bin === 'object') {
-  for (const [cmd, filePath] of Object.entries(pkg.bin)) {
+// Also verify bin entries (supports both string and object forms)
+if (pkg.bin) {
+  const binEntries =
+    typeof pkg.bin === 'string'
+      ? [[pkg.name?.split('/').pop() ?? '(default)', pkg.bin]]
+      : Object.entries(pkg.bin);
+
+  for (const [cmd, filePath] of binEntries) {
     const absolutePath = resolve(rootDir, filePath);
+    assertInsideRoot(absolutePath, `bin.${cmd}`);
     if (!existsSync(absolutePath)) {
       console.error(`  MISSING  bin.${cmd} → ${filePath}`);
       missing++;
