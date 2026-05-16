@@ -1,7 +1,7 @@
 {
   "name": "@libar-dev/architect",
   "version": "2.0.0-pre.1",
-  "description": "Libar Architect — engineering lifecycle platform for AI-assisted development. Kitchen-sink meta-package that installs the full toolchain (core, projection, guard, cli, mcp) and re-exports every CLI bin.",
+  "description": "Libar Architect — engineering lifecycle platform for AI-assisted development. Meta-package that installs the full toolchain (core, projection, guard, cli, mcp) and exposes all 7 CLI bins.",
   "license": "(MIT AND BUSL-1.1)",
   "author": "Libar AI",
   "repository": {
@@ -18,17 +18,9 @@
     "provenance": true
   },
   "type": "module",
-  "sideEffects": false,
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
     "./package.json": "./package.json"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
   "bin": {
     "architect": "./bin/architect.js",
     "architect-generate": "./bin/architect-generate.js",
@@ -38,12 +30,6 @@
     "architect-validate": "./bin/architect-validate.js",
     "architect-mcp": "./bin/architect-mcp.js"
   },
-  "scripts": {
-    "build": "tsc -b",
-    "clean": "rm -rf dist *.tsbuildinfo",
-    "test": "node --test test/smoke.test.mjs",
-    "prepack": "pnpm clean && pnpm build"
-  },
   "dependencies": {
     "@libar-dev/architect-cli": "workspace:*",
     "@libar-dev/architect-core": "workspace:*",
@@ -51,14 +37,8 @@
     "@libar-dev/architect-mcp": "workspace:*",
     "@libar-dev/architect-projection": "workspace:*"
   },
-  "devDependencies": {
-    "@types/node": "^24.12.0",
-    "typescript": "^5.8.2"
-  },
   "files": [
     "bin",
-    "dist",
-    "src",
     "README.md"
   ],
   "engines": {

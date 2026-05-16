@@ -32,3 +32,4 @@ pnpm-debug.log*
 
 # Internal dev artifacts (not part of the published surface)
 .architect-cli-feedback.md
+.sisyphus/
