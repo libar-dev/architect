@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true
+  },
+  "include": [
+    "architect.config.ts",
+    "__tests__/**/*",
+    "tests/**/*",
+    "scripts/**/*",
+    "vitest.config.ts"
+  ],
+  "exclude": []
+}

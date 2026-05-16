@@ -1,0 +1,143 @@
+@architect
+@architect-pattern:DataAPIOutputShaping
+@architect-status:completed
+@architect-implements:DataAPIOutputShaping
+@architect-unlock-reason:Value-transfer-from-spec
+@architect-phase:25a
+@architect-product-area:DataAPI
+Feature: Output Modifier Pipeline
+
+  Validates the output pipeline transforms: summarization, modifiers,
+  list filters, empty stripping, and format output.
+
+  Background:
+    Given a temporary working directory
+      | Deliverable                  | Status   | Tests | Location                                                              |
+      | Output modifier pipeline      | complete | Yes   | packages/architect-core/src/read-api/output-pipeline.ts               |
+      | Output modifier CLI behavior  | complete | Yes   | packages/architect/tests/features/api/output-shaping/output-pipeline.feature |
+      | Output shaping step coverage  | complete | Yes   | packages/architect/tests/steps/api/output-shaping/output-pipeline.steps.ts |
+
+  Rule: Output modifiers apply with correct precedence
+
+    **Invariant:** Output modifiers (count, names-only, fields, full) must apply to pattern arrays with correct precedence, passing scalar inputs through unchanged, with summaries as the default mode.
+    **Rationale:** Predictable modifier behavior enables composable CLI queries — unexpected precedence or scalar handling would produce confusing output for piped commands.
+    **Verified by:** Default mode returns summaries for pattern arrays, Count modifier returns integer, Names-only modifier returns string array, Fields modifier picks specific fields, Full modifier bypasses summarization, Scalar input passes through unchanged, Fields with single field returns objects with one key
+
+    @acceptance-criteria @happy-path
+    Scenario: Default mode returns summaries for pattern arrays
+      Given 3 patterns in the pipeline
+      When I apply the output pipeline with default modifiers
+      Then the output is an array of 3 summaries
+      And each summary has a patternName field
+
+    @acceptance-criteria @happy-path
+    Scenario: Count modifier returns integer
+      Given 5 patterns in the pipeline
+      When I apply the output pipeline with count modifier
+      Then the output is the number 5
+
+    @acceptance-criteria @happy-path
+    Scenario: Names-only modifier returns string array
+      Given 3 patterns named "Alpha", "Beta", "Gamma" in the pipeline
+      When I apply the output pipeline with names-only modifier
+      Then the output is an array of strings "Alpha", "Beta", "Gamma"
+
+    @acceptance-criteria @happy-path
+    Scenario: Fields modifier picks specific fields
+      Given 2 patterns in the pipeline
+      When I apply the output pipeline with fields "patternName,status"
+      Then each output object has only "patternName" and "status" keys
+
+    @acceptance-criteria @happy-path
+    Scenario: Full modifier bypasses summarization
+      Given 2 patterns in the pipeline
+      When I apply the output pipeline with full modifier
+      Then each output object has a "directive" field
+
+    @acceptance-criteria @happy-path
+    Scenario: Scalar input passes through unchanged
+      Given a scalar value in the pipeline
+      When I apply the output pipeline with default modifiers
+      Then the output equals the original scalar
+
+    @edge-case
+    Scenario: Fields with single field returns objects with one key
+      Given 5 patterns in the pipeline
+      When I apply the output pipeline with fields "patternName"
+      Then each result object has exactly 1 key
+
+  Rule: Modifier conflicts are rejected
+
+    **Invariant:** Mutually exclusive modifier combinations (full+names-only, full+count, full+fields) and invalid field names must be rejected with clear error messages.
+    **Rationale:** Conflicting modifiers produce ambiguous intent — rejecting early with a clear message is better than silently picking one modifier and ignoring the other.
+    **Verified by:** Full combined with names-only is rejected, Full combined with count is rejected, Full combined with fields is rejected, Invalid field name is rejected
+
+    @acceptance-criteria @validation
+    Scenario: Full combined with names-only is rejected
+      When I validate modifiers with full and names-only both true
+      Then validation fails with "Conflicting modifiers"
+
+    @acceptance-criteria @validation
+    Scenario: Full combined with count is rejected
+      When I validate modifiers with full and count both true
+      Then validation fails with "Conflicting modifiers"
+
+    @acceptance-criteria @validation
+    Scenario: Full combined with fields is rejected
+      When I validate modifiers with full and fields "patternName"
+      Then validation fails with "Conflicting modifiers"
+
+    @acceptance-criteria @validation
+    Scenario: Invalid field name is rejected
+      When I validate modifiers with fields "patternName,bogusField"
+      Then validation fails with "Invalid field names: bogusField"
+
+  Rule: List filters compose via AND logic
+
+    **Invariant:** Multiple list filters (status, role) must compose via AND logic, with pagination (limit/offset) applied after filtering and empty results for out-of-range offsets.
+    **Rationale:** AND composition is the intuitive default for canonical role filters — "status=active AND role=core" should narrow results, not widen them via OR logic.
+    **Verified by:** Filter by status returns matching patterns, Filter by status and role narrows results, Role aliases resolve to canonical role filters, Pagination with limit and offset, Offset beyond array length returns empty results
+
+    @acceptance-criteria @happy-path
+    Scenario: Filter by status returns matching patterns
+      Given a dataset with 3 active and 2 roadmap patterns
+      When I apply list filters with status "active"
+      Then 3 patterns are returned
+
+    @acceptance-criteria @happy-path
+    Scenario: Filter by status and role narrows results
+      Given a dataset with active patterns in roles "core" and "api"
+      When I apply list filters with status "active" and role "core"
+      Then only core patterns are returned
+
+    # Wave 1 closed the role enum to a fixed Wave 1 vocabulary
+    # (projection, service, decider, read-model, codec, contract, barrel,
+    # utility); legacy `infra` / `core` aliases and the `infrastructure`
+    # alias resolution are no longer canonical, so the role-alias scenario
+    # was retired here.
+
+    @acceptance-criteria @happy-path
+    Scenario: Pagination with limit and offset
+      Given a dataset with 10 roadmap patterns
+      When I apply list filters with limit 3 and offset 2
+      Then 3 patterns are returned starting from index 2
+
+    @edge-case
+    Scenario: Offset beyond array length returns empty results
+      Given a dataset with 3 roadmap patterns
+      When I apply list filters with status "roadmap" and limit 5 and offset 10
+      Then 0 patterns are returned
+
+  Rule: Empty stripping removes noise
+
+    **Invariant:** Null and empty values must be stripped from output objects to reduce noise in API responses.
+    **Rationale:** Empty fields in pattern summaries create visual clutter and waste tokens in AI context windows — stripping them keeps output focused on meaningful data.
+    **Verified by:** Null and empty values are stripped
+
+    @acceptance-criteria @happy-path
+    Scenario: Null and empty values are stripped
+      Given an object with null, empty string, and empty array values
+      When I strip empty values
+      Then the result does not contain null values
+      And the result does not contain empty strings
+      And the result does not contain empty arrays

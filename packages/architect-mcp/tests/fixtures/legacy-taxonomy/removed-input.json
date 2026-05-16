@@ -1,0 +1,35 @@
+[
+  {
+    "tool": "architect_list",
+    "args": { "phase": 46 },
+    "removedKey": "phase"
+  },
+  {
+    "tool": "architect_list",
+    "args": { "maturity": "executable" },
+    "removedKey": "maturity"
+  },
+  {
+    "tool": "architect_taxonomy",
+    "args": { "phase": 46 },
+    "removedKey": "phase"
+  },
+  {
+    "tool": "architect_taxonomy",
+    "args": { "context": "api" },
+    "removedKey": "context"
+  },
+  {
+    "tool": "architect_taxonomy",
+    "args": { "layer": "application" },
+    "removedKey": "layer"
+  },
+  {
+    "tool": "architect_documentation",
+    "args": {
+      "documentType": "patterns",
+      "filter": { "maturity": ["executable"] }
+    },
+    "removedKey": "maturity"
+  }
+]

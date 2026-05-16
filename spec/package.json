@@ -1,0 +1,17 @@
+{
+  "name": "@libar-dev/architect-spec",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Architect Spec v0.1.0 — formal specification for architecture-connected software specifications. Not a toolchain specification; the reference implementation is the @libar-dev/architect package family.",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/libar-dev/architect.git",
+    "directory": "spec"
+  },
+  "homepage": "https://github.com/libar-dev/architect/tree/main/spec",
+  "type": "module",
+  "files": [
+    "*.md"
+  ]
+}

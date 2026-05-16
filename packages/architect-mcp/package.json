@@ -1,0 +1,66 @@
+{
+  "name": "@libar-dev/architect-mcp",
+  "version": "2.0.0-pre.1",
+  "description": "MCP server for the Libar Architect package family — 18 tools, tool registry, file watcher, pipeline session.",
+  "license": "(MIT AND BUSL-1.1)",
+  "author": "Libar AI",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/libar-dev/architect.git",
+    "directory": "packages/architect-mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/libar-dev/architect/issues"
+  },
+  "homepage": "https://github.com/libar-dev/architect#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./bin/architect-mcp": "./bin/architect-mcp.js",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "architect-mcp": "./bin/architect-mcp.js"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json",
+    "lint": "eslint src tests",
+    "test": "pnpm typecheck && vitest run --config vitest.config.ts",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "prepack": "pnpm clean && pnpm build"
+  },
+  "dependencies": {
+    "@libar-dev/architect-core": "workspace:*",
+    "@libar-dev/architect-projection": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "chokidar": "^5.0.0",
+    "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "@amiceli/vitest-cucumber": "^6.3.0",
+    "@types/node": "^24.12.0",
+    "eslint": "^9.17.0",
+    "typescript": "^5.8.2",
+    "vitest": "^4.1.4"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "runtime-bridge.js"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

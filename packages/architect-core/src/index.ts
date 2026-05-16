@@ -1,0 +1,272 @@
+export * from './types/index.js';
+export { createArchitect, type CreateArchitectOptions } from './config/factory.js';
+export { createRegexBuilders } from './config/regex-builders.js';
+export {
+  DEFAULT_CONTEXT_INFERENCE_RULES,
+  DEFAULT_FILE_OPT_IN_TAG,
+  DEFAULT_OUTPUT_DIRECTORY,
+  DEFAULT_PRESENTATION_OUTPUT_DIRECTORY,
+  DEFAULT_REGEX_BUILDERS,
+  DEFAULT_TAG_PREFIX,
+} from './config/defaults.js';
+export {
+  applyProjectSourceDefaults,
+  findConfigFile,
+  formatConfigError,
+  loadConfig,
+  loadProjectConfig,
+  type ConfigDiscoveryResult,
+  type ConfigLoadError,
+  type ConfigLoadResult,
+  type ProjectConfigLoadResult,
+} from './config/config-loader.js';
+export { defineConfig } from './config/define-config.js';
+export { mergeSourcesForGenerator } from './config/merge-sources.js';
+export { createDefaultResolvedConfig, resolveProjectConfig } from './config/resolve-config.js';
+export {
+  ARCHITECT_PACKAGE_ROLES,
+  PACKAGE_SELF_HOSTING_SOURCES,
+  resolveWorkspaceSources,
+  WORKSPACE_TAG_REGISTRY,
+} from './config/self-hosting.js';
+export {
+  EXTRACTION_DIAGNOSTIC_CODES,
+  EXTRACTION_DIAGNOSTIC_SEVERITIES,
+  EXTRACTION_DIAGNOSTIC_SEVERITY_BY_CODE,
+  createDiagnostic,
+  createDeprecatedTagDiagnostic,
+  type ExtractionDiagnostic,
+  type ExtractionDiagnosticCode,
+  type ExtractionDiagnosticSeverity,
+} from './extractor/extraction-diagnostics.js';
+export { parseFeatureFile } from './scanner/gherkin-ast-parser.js';
+export type { GherkinRule, GherkinScenario } from './validation-schemas/feature.js';
+export type { ScenarioDataTable, ScenarioStep } from './validation-schemas/scenario-ref.js';
+export type { PropertyDoc } from './validation-schemas/extracted-shape.js';
+export {
+  CANONICAL_PHASES,
+  CANONICAL_PHASE_NAMES,
+  CANONICAL_PHASE_ORDINALS,
+  formatWorkflowLoadError,
+  loadDefaultWorkflow,
+  loadWorkflowFromPath,
+  type LoadedWorkflow,
+  type WorkflowConfig,
+  type WorkflowLoadError,
+} from './config/workflow-loader.js';
+export {
+  ArchitectProjectConfigSchema,
+  SourcesConfigSchema,
+  OutputConfigSchema,
+  GeneratorSourceOverrideSchema,
+  isProjectConfig,
+} from './config/project-config-schema.js';
+export { SectionBlockSchema, type SectionBlock } from './config/section-block.js';
+export { DEFAULT_ROLES, DDD_ES_CQRS_ROLES, type RoleDefinition } from './config/role-constants.js';
+export { DEFAULT_GENERATORS, type DefaultGenerator } from './config/default-generators.js';
+export type { ArchitectConfig, ArchitectInstance, RegexBuilders } from './config/types.js';
+export type {
+  ArchitectProjectConfig,
+  GeneratorSourceOverride,
+  OutputConfig,
+  ProjectMetadata,
+  RegenerationCommand,
+  ResolvedConfig,
+  ResolvedProjectConfig,
+  ResolvedSourcesConfig,
+  SourcesConfig,
+} from './config/project-config.js';
+export type {
+  AggregationTagDefinition,
+  MetadataTagDefinition,
+  TagRegistry,
+} from './config/tag-registry-contract.js';
+export {
+  ACCEPTANCE_CRITERIA_FORMAT,
+  ACCEPTED_STATUS_VALUES,
+  ADR_CATEGORY_VALUES,
+  ADR_LAYER_VALUES,
+  ARCHITECT_PACKAGE_FEATURE_ONLY_TAG_SUFFIXES,
+  ARCHITECT_PACKAGE_PRODUCT_AREAS,
+  ADR_LIST_GROUP_BY,
+  ADR_STATUS_VALUES,
+  ADR_THEME_VALUES,
+  BOUNDED_CONTEXT_TAG,
+  CANONICAL_FEATURE_ONLY_TAG_SUFFIXES,
+  CONSTRAINTS_GROUP_BY,
+  CONVENTION_VALUES,
+  CORE_PATTERNS_FORMAT,
+  DEFAULT_DELIVERABLE_STATUS,
+  DEFAULT_HIERARCHY_LEVEL,
+  DEFAULT_MATURITY_BY_STATUS,
+  DEFAULT_STATUS,
+  DELIVERABLES_FORMAT,
+  DELIVERABLES_GROUP_BY,
+  DELIVERABLE_STATUS_VALUES,
+  DEPENDENCIES_FORMAT,
+  FORMAT_TYPES,
+  GLOBAL_FORMAT_OPTIONS,
+  HIERARCHY_LEVELS,
+  SCENARIO_LAYER_TYPES,
+  MATURITY_VALUES,
+  METADATA_TAGS_BY_GROUP,
+  NORMALIZED_STATUS_VALUES,
+  PATTERN_LIST_FORMAT,
+  PRIORITY_VALUES,
+  PROCESS_STATUS_VALUES,
+  QUARTER_PATTERN,
+  PRD_FEATURES_GROUP_BY,
+  PR_CHANGES_SORT_BY,
+  REMAINING_WORK_GROUP_BY,
+  REMAINING_WORK_SORT_BY,
+  RISK_LEVELS,
+  SEVERITY_TYPES,
+  SESSION_FINDINGS_GROUP_BY,
+  STATUS_NORMALIZATION_MAP,
+  TIMELINE_GROUP_BY,
+  VALID_DELIVERABLE_STATUS_SET,
+  VALID_ACCEPTED_STATUS_SET,
+  VALID_PROCESS_STATUS_SET,
+  WORKFLOW_VALUES,
+  buildRegisteredRoleValues,
+  buildRegistry,
+  describeValidMaturities,
+  getDeliverableStatusEmoji,
+  getValidMaturitiesForStatus,
+  inferMaturity,
+  isDeliverableStatusComplete,
+  isDeliverableStatusInProgress,
+  isDeliverableStatusPending,
+  isDeliverableStatusTerminal,
+  isPatternActive,
+  isPatternCandidate,
+  isPatternComplete,
+  isPatternPlanned,
+  isValidMaturityCombination,
+  normalizeStatus,
+  registerUnifiedRoleTaxonomy,
+  type AcceptedStatusValue,
+  type AcceptanceCriteriaFormat,
+  type AdrCategoryValue,
+  type AdrLayerValue,
+  type ArchitectPackageFeatureOnlyTag,
+  type ArchitectPackageProductArea,
+  type AdrListGroupBy,
+  type AdrStatusValue,
+  type AdrThemeValue,
+  type AggregationTagDefinitionForRegistry,
+  type CanonicalFeatureOnlyTag,
+  type ConstraintsGroupBy,
+  type ConventionValue,
+  type CorePatternsFormat,
+  type DeliverableStatus,
+  type DeliverablesFormat,
+  type DeliverablesGroupBy,
+  type DependenciesFormat,
+  type FormatType,
+  type GlobalFormatOption,
+  type HierarchyLevel,
+  type ScenarioLayerType,
+  type MaturityLevel,
+  type MetadataTagDefinitionForRegistry,
+  type NormalizedStatus,
+  type PatternListFormat,
+  type PrChangesSortBy,
+  type PrdFeaturesGroupBy,
+  type PriorityValue,
+  type ProcessStatusValue,
+  type RegisteredRoleValue,
+  type RemainingWorkGroupBy,
+  type RemainingWorkSortBy,
+  type RiskLevel,
+  type SeverityType,
+  type SessionFindingsGroupBy,
+  type TagRegistry as CoreTagRegistry,
+  type TimelineGroupBy,
+  type WorkflowValue,
+} from './taxonomy/index.js';
+export {
+  inferContext,
+  type ContextInferenceRule,
+} from './generators/pipeline/context-inference.js';
+export * from './validation-schemas/index.js';
+export {
+  type ArchIndex,
+  type ImplementationRef,
+  type PatternParseFailure,
+} from './validation-schemas/pattern-graph.js';
+export {
+  BoundaryParseError,
+  parseAtBoundary,
+  type BoundaryParseErrorDetails,
+  type BoundaryParseIssue,
+} from './validation/boundary.js';
+export * from './validation/fsm/index.js';
+export * from './scanner/index.js';
+export * from './extractor/index.js';
+export {
+  buildPatternGraph,
+  mergePatterns,
+  transformToPatternGraph,
+  transformToPatternGraphWithValidation,
+  type BuildResult,
+  type DanglingReference,
+  type MalformedPattern,
+  type PipelineError,
+  type PipelineOptions,
+  type PipelineWarning,
+  type PipelineWarningDetail,
+  type RawDataset,
+  type RuntimePatternGraph,
+  type ScanMetadata,
+  type TransformResult,
+} from './generators/pipeline/index.js';
+export * from './utils/index.js';
+export * from './read-api/index.js';
+export {
+  DIAGRAM_SOURCE_VALUES,
+  type CodecOptions,
+  type DiagramScope,
+  type DiagramSource,
+  type DocumentEntry,
+  type IndexCodecOptionsContract,
+  type ReferenceDocConfig,
+  type ShapeSelector,
+} from './config/presentation-contracts.js';
+export {
+  CLI_SCHEMA,
+  type CLIOptionDef,
+  type CLIOptionGroup,
+  type CLISchema,
+  type CommandNarrative,
+  type CommandNarrativeGroup,
+  type RecipeExample,
+  type RecipeGroup,
+  type RecipeStep,
+} from './config/cli-schema.js';
+export {
+  AcceptedStatusSchema,
+  DeliverableStatusSchema,
+  HandoffSessionTypeSchema,
+  MaturitySchema,
+  ProcessStatusSchema,
+  RenderFormatSchema,
+  ScopeTypeSchema,
+  SessionTypeSchema,
+  type HandoffSessionType,
+  type RenderFormat,
+  type ScopeType,
+  type SessionType,
+} from './domain-enums.js';
+export {
+  PackageSchema,
+  PackageConfigSchema,
+  PackageMatcherSchema,
+  ProjectionError,
+  createPackageResolver,
+  type Package,
+  type PackageConfig,
+  type PackageMatcher,
+  type PackageResolver,
+  type ProjectionErrorCode,
+} from './package/index.js';

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../tsconfig.architect-base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "./dist",
+    "composite": true,
+    "incremental": true,
+    "disableSourceOfProjectReferenceRedirect": true
+  },
+  "references": [
+    {
+      "path": "../architect-core"
+    },
+    {
+      "path": "../architect-guard"
+    },
+    {
+      "path": "../architect-cli"
+    },
+    {
+      "path": "../architect-mcp"
+    },
+    {
+      "path": "../architect-projection"
+    }
+  ],
+  "include": [
+    "architect.config.ts",
+    "tests/steps/api/**/*.steps.ts",
+    "tests/steps/cli/**/*.steps.ts",
+    "tests/steps/generation/load-preamble.steps.ts",
+    "tests/support/**/*.ts",
+    "tests/fixtures/**/*.ts",
+    "vitest.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests/support/helpers/shape-extraction-state.ts",
+    "tests/support/helpers/document-assertions.ts",
+    "tests/support/helpers/design-review-state.ts",
+    "tests/support/helpers/mcp-state.ts",
+    "tests/support/helpers/pr-changes-codec-state.ts",
+    "tests/support/helpers/reference-codec-state.ts"
+  ]
+}

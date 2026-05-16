@@ -1,0 +1,40 @@
+/**
+ * Source-ownership rules per ADR-001 Rule 6.
+ *
+ * Mirrors ADR-001 Rule 6 in `packages/architect/architect/decisions/`. Edit the
+ * ADR table and this constant together. The ADR is the decision record; these
+ * constants are its TypeScript projection.
+ *
+ * Two layers per the d8b6170 hybrid model (canonical minimum + per-instance
+ * extension):
+ *
+ * - `CANONICAL_FEATURE_ONLY_TAG_SUFFIXES` — the universal floor every project
+ *   shares. The Rule 6 ADR table at the canonical minimum lists these.
+ *   Anti-pattern detection MUST flag any of these in TypeScript JSDoc.
+ *   Sync-tested against the ADR table by `canonical-values-sync.feature`.
+ *
+ * - `ARCHITECT_PACKAGE_FEATURE_ONLY_TAG_SUFFIXES` — this package's choice of
+ *   how to extend the canonical minimum, enriching its requirement-doc
+ *   vocabulary (`workflow`, `completed`). Other
+ *   projects may declare their own extension list; they MUST include the
+ *   canonical minimum but may add to it freely. The package's extension is
+ *   NOT sync-tested against the ADR — extensions are per-project and may
+ *   legitimately drift from any single ADR's table.
+ *
+ * Source-ownership *violation detection* (flagging `@architect-uses` in
+ * `.feature` files, or `@architect-depends-on` in TS JSDoc) is graph-health
+ * work tracked under `DataAPIRelationshipGraph`, not the guard pipeline. See
+ * the ADR-001 Rule 6 narrative for the rationale.
+ */
+
+export const CANONICAL_FEATURE_ONLY_TAG_SUFFIXES = ['quarter', 'team'] as const;
+
+export const ARCHITECT_PACKAGE_FEATURE_ONLY_TAG_SUFFIXES = [
+  ...CANONICAL_FEATURE_ONLY_TAG_SUFFIXES,
+  'workflow',
+  'completed',
+] as const;
+
+export type CanonicalFeatureOnlyTag = (typeof CANONICAL_FEATURE_ONLY_TAG_SUFFIXES)[number];
+export type ArchitectPackageFeatureOnlyTag =
+  (typeof ARCHITECT_PACKAGE_FEATURE_ONLY_TAG_SUFFIXES)[number];

@@ -1,0 +1,21 @@
+/**
+ * @architect
+ * @architect-pattern BusinessRuleReference
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:governance
+ *
+ * ### When to Use
+ *
+ * - As a typed contract / data shape consumed by projection or render layers.
+ */
+import { z } from 'zod';
+
+export const BusinessRuleReferenceSchema = z.strictObject({
+  kind: z.literal('BusinessRuleReference'),
+  feature: z.string(),
+  ruleName: z.string(),
+  ownerRouteId: z.string().min(1),
+});
+
+export type BusinessRuleReference = z.infer<typeof BusinessRuleReferenceSchema>;

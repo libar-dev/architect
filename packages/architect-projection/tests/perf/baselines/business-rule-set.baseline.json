@@ -1,0 +1,71 @@
+{
+  "generatedAt": "2026-05-08T15:24:38.282Z",
+  "fixture": {
+    "name": "BusinessRuleSet grouped-by-product-area bundle",
+    "patterns": 36,
+    "rules": 108,
+    "sourceFiles": 36,
+    "boundedContexts": 6,
+    "layers": 4,
+    "requiredCoverageTags": 27,
+    "warmupIterations": 5
+  },
+  "project": {
+    "avgMs": 1.1706323000000054,
+    "p50Ms": 0.5370419999999285,
+    "iterations": 40
+  },
+  "renderObject": {
+    "avgMs": 0.4403969249999989,
+    "p50Ms": 0.39545799999996234,
+    "iterations": 40
+  },
+  "renderPretty": {
+    "avgMs": 0.7603312500000016,
+    "p50Ms": 0.5768330000000788,
+    "iterations": 40
+  },
+  "projectionHotPaths": {
+    "sessionContextBundle": {
+      "avgMs": 0.013877766666693485,
+      "p50Ms": 0.009500000000116415,
+      "iterations": 30
+    },
+    "scopeReadinessReport": {
+      "avgMs": 0.011734699999995732,
+      "p50Ms": 0.008333999999877051,
+      "iterations": 30
+    },
+    "documentationView": {
+      "avgMs": 0.019727866666645846,
+      "p50Ms": 0.01683299999990595,
+      "iterations": 30
+    },
+    "requirementDigestAllAreas": {
+      "avgMs": 0.15573196666667474,
+      "p50Ms": 0.15658300000018244,
+      "iterations": 30
+    },
+    "requirementDigestExecutable": {
+      "avgMs": 0.22038616666667016,
+      "p50Ms": 0.21408400000018446,
+      "iterations": 30
+    },
+    "patternSatisfiesTag": {
+      "avgMs": 0.07620699999999185,
+      "p50Ms": 0.08029099999998834,
+      "iterations": 30
+    },
+    "buildBoundedContext": {
+      "avgMs": 0.03054456666666283,
+      "p50Ms": 0.027166999999963082,
+      "iterations": 30
+    },
+    "graphBuild": {
+      "avgMs": 290.94890829999997,
+      "p50Ms": 283.45437500000025,
+      "iterations": 10
+    }
+  },
+  "isBundleP50Micros": 2.6250000000800355
+}

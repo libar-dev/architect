@@ -1,0 +1,33 @@
+/**
+ * @architect-bounded-context:_shared
+ */
+import { parseAtBoundary } from '@libar-dev/architect-core';
+import type { z } from 'zod';
+
+import type { ProjectionContext } from '../../context/projection-context.js';
+
+const NO_DEFAULT_RAW_OPTIONS = Symbol('NO_DEFAULT_RAW_OPTIONS');
+
+/**
+ * Shared trust-boundary wrapper for projection entrypoints. It parses raw
+ * caller options exactly once, then hands typed options to the projection.
+ *
+ * `NO_DEFAULT_RAW_OPTIONS` means "do not inject a default parse input" so
+ * `undefined` keeps its normal optional-input semantics.
+ */
+export function parseAndProject<Options, Output>(
+  schema: z.ZodType<Options>,
+  project: (context: ProjectionContext, options: Options) => Output,
+  projectionName: string,
+  defaultRawOptions: unknown = NO_DEFAULT_RAW_OPTIONS
+): (context: ProjectionContext, rawOptions?: unknown) => Output {
+  const errorContext = `Invalid options for ${projectionName}`;
+
+  return (context, rawOptions) => {
+    const optionsInput =
+      rawOptions === undefined && defaultRawOptions !== NO_DEFAULT_RAW_OPTIONS
+        ? defaultRawOptions
+        : rawOptions;
+    return project(context, parseAtBoundary(schema, optionsInput, errorContext));
+  };
+}

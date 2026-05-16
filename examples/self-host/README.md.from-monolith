@@ -1,0 +1,65 @@
+# @libar-dev/architect-dev
+
+Private self-hosting workspace package for the split `@libar-dev/architect` toolchain inside this monorepo.
+
+This package is **not** the published `@libar-dev/architect` umbrella runtime. It exists so the workspace can dogfood the real package docs, smoke tests, and query flows against the split source tree in `packages/architect-*`.
+
+## What this package owns
+
+- `architect.config.ts` for the package-local delivery process instance
+- workspace scripts that run docs, validation, smoke checks, and package-hosted query commands
+- the package README/docs surfaces that explain how this private host package is used during development
+
+For the public package story, API positioning, and broader product messaging, use the generated docs and the public-package materials instead of treating this README as the npm landing page.
+
+## Query surface in this host package
+
+From the monorepo root, the package-host query wrapper is:
+
+```bash
+pnpm pkg:query -- <subcommand>
+```
+
+Inside `packages/architect/` itself, the package-local entrypoint is:
+
+```bash
+pnpm architect:query -- <subcommand>
+```
+
+Common host checks:
+
+```bash
+pnpm architect:query -- files UnifiedRoleSystem
+pnpm architect:query -- scope-validate UnifiedRoleSystem implement
+pnpm architect:query -- context UnifiedRoleSystem --session implement
+```
+
+Equivalent monorepo-root commands are:
+
+```bash
+pnpm pkg:overview
+pnpm pkg:query -- files UnifiedRoleSystem
+pnpm pkg:query -- scope-validate UnifiedRoleSystem implement
+pnpm pkg:query -- context UnifiedRoleSystem --session implement
+pnpm pkg:query -- arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json
+```
+
+`architect query <method>` is intentionally a **small whitelisted compatibility surface**. Use dedicated subcommands like `files`, `scope-validate`, `context`, `dep-tree`, and `rules` for session work; use `query` only for the explicitly listed low-level methods shown in `pnpm exec architect query --help`.
+
+## Dev workflow clarity
+
+This package does **not** run its own long-lived app dev server.
+
+- `pnpm dev` in `packages/architect/` only runs the export-verification check (`verify:exports`) so the split package host stays honest.
+- For browser/web-mode verification against the monorepo root (`ARCHITECT_PROJECT_PATH=../..`), use `pnpm dev:web` from `apps/desktop/`.
+- For the package-hosted flow that points Studio at the package delivery-process instance, use `pnpm dev:pkg` from `apps/desktop/`.
+
+## Docs and test synchronization note
+
+Keep this README, `package.json` host metadata/scripts, and any package-host smoke/doc expectations aligned in the same change. This package is the private workspace host, so drift here creates misleading guidance even when the split runtime packages are correct.
+
+## Related docs
+
+- [docs-live/INDEX.md](docs-live/INDEX.md) — generated package docs
+- [docs/INDEX.md](docs/INDEX.md) — curated editorial index
+- [docs/SESSION-GUIDES.md](docs/SESSION-GUIDES.md) — day-to-day package session workflows

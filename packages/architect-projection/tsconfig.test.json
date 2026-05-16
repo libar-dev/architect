@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true,
+    "tsBuildInfoFile": "./tsconfig.test.tsbuildinfo",
+    "types": ["node", "vitest/globals"]
+  },
+  "include": ["src/**/*", "tests/**/*.ts", "vitest.config.ts", "vitest.perf-report.config.mjs"],
+  "exclude": ["node_modules", "dist"]
+}

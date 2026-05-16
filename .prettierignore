@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+coverage
+**/dist/**
+**/build/**
+**/coverage/**
+.changeset/*.md
+pnpm-lock.yaml
+*.tsbuildinfo
