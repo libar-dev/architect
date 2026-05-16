@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 
-import { PACKAGE_SELF_HOSTING_SOURCES } from '../../architect-core/src/config/self-hosting.js';
+import { PACKAGE_SELF_HOSTING_SOURCES } from '@libar-dev/architect-core/config';
 
 const args = [
   'exec',

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const cliPackageRoot = path.resolve(here, '..', '..');
 const monorepoRoot = path.resolve(cliPackageRoot, '..', '..');
-const selfHostExampleRoot = path.resolve(monorepoRoot, 'examples', 'self-host');
+const dogfoodRoot = monorepoRoot;
 
 export interface CliResult {
   exitCode: number;
@@ -24,8 +24,8 @@ const BIN_BY_COMMAND: Record<string, string> = {
 
 /**
  * Spawns one of the architect-cli bins as a real subprocess and captures
- * stdout / stderr / exit code. Run with cwd = examples/self-host so the CLI
- * sees the live `architect.config.ts` (the repo's dogfood corpus).
+ * stdout / stderr / exit code. Run with cwd = repo root so the CLI sees the
+ * live `architect.config.ts` (the repo's dogfood corpus).
  */
 export async function runCli(invocation: string): Promise<CliResult> {
   const tokens = invocation.trim().split(/\s+/);
@@ -43,15 +43,15 @@ export async function runCli(invocation: string): Promise<CliResult> {
   // execFile inherits parent's PWD, so we strip PWD/INIT_CWD to let the child
   // fall through to process.cwd() — which is the directory we set via `cwd:`.
   const childEnv = { ...process.env };
-  delete childEnv.PWD;
-  delete childEnv.INIT_CWD;
+  delete childEnv['PWD'];
+  delete childEnv['INIT_CWD'];
 
   return await new Promise<CliResult>((resolve) => {
     execFile(
       process.execPath,
       [binPath, ...tokens],
       {
-        cwd: selfHostExampleRoot,
+        cwd: dogfoodRoot,
         env: childEnv,
         maxBuffer: 32 * 1024 * 1024,
         encoding: 'utf8',

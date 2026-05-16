@@ -12,6 +12,9 @@ build/
 coverage/
 .generated-docs-tmp/
 
+# Generated docs (dogfood doc-gen output)
+docs-live/
+
 # Editor/OS
 .DS_Store
 .vscode/
@@ -33,3 +36,13 @@ pnpm-debug.log*
 # Internal dev artifacts (not part of the published surface)
 .architect-cli-feedback.md
 .sisyphus/
+
+# Claude Code local settings + planning artifacts
+.claude/settings.local.json
+.claude-layers/
+.plans/
+
+# Ephemeral working directories
+_ideation/
+_pr-review/
+_working-docs/

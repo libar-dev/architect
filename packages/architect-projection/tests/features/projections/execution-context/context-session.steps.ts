@@ -89,13 +89,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   },
                 ],
                 description: 'Implements the context/session body projections.',
-                executableSpecs: ['packages/architect/tests/features/query/context.feature'],
+                executableSpecs: ['tests/features/query/context.feature'],
               });
               const dependency = createPattern('DependencyPattern', {
                 status: 'roadmap',
               });
               const stub = createPattern('ProjectionBodyStub', {
-                file: 'packages/architect/architect/stubs/projection-body.stub.ts',
+                file: 'architect/stubs/projection-body.stub.ts',
                 implementsPatterns: ['ProjectionBody'],
                 description: 'DD-1: Keep projection helpers pure.',
               });
@@ -108,7 +108,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                     implementedBy: [
                       {
                         name: 'ProjectionBodyStub',
-                        file: 'packages/architect/architect/stubs/projection-body.stub.ts',
+                        file: 'architect/stubs/projection-body.stub.ts',
                         description: 'Projection stub',
                       },
                     ],
@@ -245,10 +245,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           () => {
             const pattern = createPattern('ProjectionBody', {
               status: 'active',
-              file: 'packages/architect/architect/specs/projection-body.feature',
+              file: 'architect/specs/projection-body.feature',
               description:
                 '**Problem:** Session work needs predictable context bundles.\n\n**Solution:** Projection bodies normalize those bundles.',
-              executableSpecs: ['packages/architect/tests/features/query/context.feature'],
+              executableSpecs: ['tests/features/query/context.feature'],
               deliverables: [
                 {
                   name: 'Session context module',
@@ -264,7 +264,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             });
             const dependency = createPattern('DependencyPattern', {
               status: 'completed',
-              file: 'packages/architect/architect/specs/dependency-pattern.feature',
+              file: 'architect/specs/dependency-pattern.feature',
             });
             const utility = createPattern('UtilityPattern', {
               status: 'active',
@@ -276,7 +276,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             });
             const enabled = createPattern('EnabledPattern', {
               status: 'roadmap',
-              file: 'packages/architect/docs-live/INDEX.md',
+              file: 'docs-live/INDEX.md',
             });
             const neighbor = createPattern('NeighborPattern', {
               status: 'active',
@@ -285,7 +285,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               role: 'projection',
             });
             const stub = createPattern('ProjectionBodyStub', {
-              file: 'packages/architect/architect/stubs/projection-body.stub.ts',
+              file: 'architect/stubs/projection-body.stub.ts',
               targetPath:
                 'packages/architect-projection/src/projections/execution-context/session-context.ts',
               implementsPatterns: ['ProjectionBody'],
@@ -302,7 +302,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   implementedBy: [
                     {
                       name: 'ProjectionBodyStub',
-                      file: 'packages/architect/architect/stubs/projection-body.stub.ts',
+                      file: 'architect/stubs/projection-body.stub.ts',
                       description: 'Projection stub',
                     },
                   ],
@@ -349,7 +349,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           () => {
             expect(state!.designContext?.root.stubs).toEqual([
               {
-                stubFile: 'packages/architect/architect/stubs/projection-body.stub.ts',
+                stubFile: 'architect/stubs/projection-body.stub.ts',
                 targetPath:
                   'packages/architect-projection/src/projections/execution-context/session-context.ts',
                 name: 'ProjectionBodyStub',
@@ -365,7 +365,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               {
                 name: 'EnabledPattern',
                 status: 'roadmap',
-                file: 'packages/architect/docs-live/INDEX.md',
+                file: 'docs-live/INDEX.md',
                 kind: 'planning',
               },
             ]);
@@ -383,7 +383,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
         And('the implement session context should include test files and FSM data', () => {
           expect(state!.implementContext?.root.testFiles).toEqual([
-            'packages/architect/tests/features/query/context.feature',
+            'tests/features/query/context.feature',
           ]);
           expect(state!.implementContext?.root.fsm).toEqual({
             currentStatus: 'active',
@@ -430,7 +430,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           () => {
             const pattern = createPattern('ProjectionBody', {
               status: 'active',
-              file: 'packages/architect/architect/specs/projection-body.feature',
+              file: 'architect/specs/projection-body.feature',
             });
 
             state!.context = createProjectionContext({ patterns: [pattern] });
@@ -467,8 +467,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'a Execution Context reading-list projection context with completed and roadmap dependencies',
           () => {
             const pattern = createPattern('ProjectionBody', {
-              file: 'packages/architect/architect/specs/projection-body.feature',
-              behaviorFile: 'packages/architect/tests/features/query/projection-body.feature',
+              file: 'architect/specs/projection-body.feature',
+              behaviorFile: 'tests/features/query/projection-body.feature',
               deliverables: [
                 {
                   name: 'Projection module',
@@ -489,8 +489,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             });
             const completedDependency = createPattern('CompletedDependency', {
               status: 'completed',
-              file: 'packages/architect/architect/specs/completed-dependency.feature',
-              behaviorFile: 'packages/architect/tests/features/query/completed-dependency.feature',
+              file: 'architect/specs/completed-dependency.feature',
+              behaviorFile: 'tests/features/query/completed-dependency.feature',
             });
             const completedDependencyImpl = createPattern('CompletedDependencyImpl', {
               file: 'packages/architect-projection/src/projections/pattern-relations/support.ts',
@@ -498,8 +498,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             });
             const roadmapDependency = createPattern('RoadmapDependency', {
               status: 'roadmap',
-              file: 'packages/architect/architect/specs/roadmap-dependency.feature',
-              behaviorFile: 'packages/architect/tests/features/query/roadmap-dependency.feature',
+              file: 'architect/specs/roadmap-dependency.feature',
+              behaviorFile: 'tests/features/query/roadmap-dependency.feature',
               deliverables: [
                 {
                   name: 'Roadmap dependency module',
@@ -514,7 +514,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               archContext: 'projection',
             });
             const stub = createPattern('ProjectionBodyStub', {
-              file: 'packages/architect/architect/stubs/projection-body.stub.ts',
+              file: 'architect/stubs/projection-body.stub.ts',
               implementsPatterns: ['ProjectionBody'],
             });
 
@@ -533,7 +533,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   implementedBy: [
                     {
                       name: 'ProjectionBodyStub',
-                      file: 'packages/architect/architect/stubs/projection-body.stub.ts',
+                      file: 'architect/stubs/projection-body.stub.ts',
                       description: 'Projection stub',
                     },
                   ],
@@ -575,20 +575,20 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               kind: 'FileReadingList',
               pattern: 'ProjectionBody',
               primary: [
-                'packages/architect/architect/specs/projection-body.feature',
-                'packages/architect/tests/features/query/projection-body.feature',
+                'architect/specs/projection-body.feature',
+                'tests/features/query/projection-body.feature',
                 'packages/architect-projection/src/projections/execution-context/session-context.ts',
                 'packages/architect-projection/tests/features/projections/execution-context/context-session.feature',
-                'packages/architect/architect/stubs/projection-body.stub.ts',
+                'architect/stubs/projection-body.stub.ts',
               ],
               completedDeps: [
-                'packages/architect/architect/specs/completed-dependency.feature',
-                'packages/architect/tests/features/query/completed-dependency.feature',
+                'architect/specs/completed-dependency.feature',
+                'tests/features/query/completed-dependency.feature',
                 'packages/architect-projection/src/projections/pattern-relations/support.ts',
               ],
               roadmapDeps: [
-                'packages/architect/architect/specs/roadmap-dependency.feature',
-                'packages/architect/tests/features/query/roadmap-dependency.feature',
+                'architect/specs/roadmap-dependency.feature',
+                'tests/features/query/roadmap-dependency.feature',
                 'packages/architect-query/src/api/scope-validator.ts',
               ],
               architectureNeighbors: [
@@ -610,7 +610,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             kind: 'Deliverable',
             name: 'Projection tests',
             status: 'pending',
-            tests: ['packages/architect/tests/features/query/projection-body.feature'],
+            tests: ['tests/features/query/projection-body.feature'],
             location:
               'packages/architect-projection/tests/features/projections/execution-context/context-session.feature',
           });
@@ -625,8 +625,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'a Execution Context reading-list projection context with completed and roadmap dependencies',
           () => {
             const pattern = createPattern('ProjectionBody', {
-              file: 'packages/architect/architect/specs/projection-body.feature',
-              behaviorFile: 'packages/architect/tests/features/query/projection-body.feature',
+              file: 'architect/specs/projection-body.feature',
+              behaviorFile: 'tests/features/query/projection-body.feature',
               deliverables: [
                 {
                   name: 'Projection module',
@@ -640,18 +640,18 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             });
             const completedDependency = createPattern('CompletedDependency', {
               status: 'completed',
-              file: 'packages/architect/architect/specs/completed-dependency.feature',
+              file: 'architect/specs/completed-dependency.feature',
             });
             const roadmapDependency = createPattern('RoadmapDependency', {
               status: 'roadmap',
-              file: 'packages/architect/architect/specs/roadmap-dependency.feature',
+              file: 'architect/specs/roadmap-dependency.feature',
             });
             const neighbor = createPattern('NeighborPattern', {
               file: 'packages/architect-projection/src/projections/governance/business-rules.ts',
               archContext: 'projection',
             });
             const stub = createPattern('ProjectionBodyStub', {
-              file: 'packages/architect/architect/stubs/projection-body.stub.ts',
+              file: 'architect/stubs/projection-body.stub.ts',
               implementsPatterns: ['ProjectionBody'],
             });
 
@@ -663,7 +663,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   implementedBy: [
                     {
                       name: 'ProjectionBodyStub',
-                      file: 'packages/architect/architect/stubs/projection-body.stub.ts',
+                      file: 'architect/stubs/projection-body.stub.ts',
                       description: 'Projection stub',
                     },
                   ],
@@ -686,10 +686,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             kind: 'FileReadingList',
             pattern: 'ProjectionBody',
             primary: [
-              'packages/architect/architect/specs/projection-body.feature',
-              'packages/architect/tests/features/query/projection-body.feature',
+              'architect/specs/projection-body.feature',
+              'tests/features/query/projection-body.feature',
               'packages/architect-projection/src/projections/execution-context/session-context.ts',
-              'packages/architect/architect/stubs/projection-body.stub.ts',
+              'architect/stubs/projection-body.stub.ts',
             ],
             completedDeps: [],
             roadmapDeps: [],

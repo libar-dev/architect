@@ -1,7 +1,7 @@
 /**
  * Canonical product-area list for the architect package family self-hosting.
  *
- * Mirrors ADR-001 Rule 1 in `packages/architect/architect/decisions/`. Edit
+ * Mirrors ADR-001 Rule 1 in `architect/decisions/`. Edit
  * the ADR table and this constant together. The ADR is the decision record;
  * this constant is its TypeScript projection.
  *

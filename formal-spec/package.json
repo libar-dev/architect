@@ -7,9 +7,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/libar-dev/architect.git",
-    "directory": "spec"
+    "directory": "formal-spec"
   },
-  "homepage": "https://github.com/libar-dev/architect/tree/main/spec",
+  "homepage": "https://github.com/libar-dev/architect/tree/main/formal-spec",
   "type": "module",
   "files": [
     "*.md"

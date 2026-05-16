@@ -7,38 +7,29 @@ settings:
 importers:
 
   .:
-    devDependencies:
-      '@changesets/cli':
-        specifier: ^2.27.0
-        version: 2.31.0(@types/node@24.12.4)
-      prettier:
-        specifier: ^3.8.1
-        version: 3.8.3
-      typescript:
-        specifier: ^5.8.2
-        version: 5.9.3
-
-  examples/self-host:
     dependencies:
       '@libar-dev/architect-core':
         specifier: workspace:*
-        version: link:../../packages/architect-core
+        version: link:packages/architect-core
       '@libar-dev/architect-guard':
         specifier: workspace:*
-        version: link:../../packages/architect-guard
+        version: link:packages/architect-guard
     devDependencies:
       '@amiceli/vitest-cucumber':
         specifier: ^6.3.0
         version: 6.5.0(vitest@4.1.6)
+      '@changesets/cli':
+        specifier: ^2.27.0
+        version: 2.31.0(@types/node@24.12.4)
       '@libar-dev/architect-cli':
         specifier: workspace:*
-        version: link:../../packages/architect-cli
+        version: link:packages/architect-cli
       '@libar-dev/architect-mcp':
         specifier: workspace:*
-        version: link:../../packages/architect-mcp
+        version: link:packages/architect-mcp
       '@libar-dev/architect-projection':
         specifier: workspace:*
-        version: link:../../packages/architect-projection
+        version: link:packages/architect-projection
       '@types/node':
         specifier: ^24.12.0
         version: 24.12.4
@@ -69,6 +60,8 @@ importers:
       zod:
         specifier: ^4.1.11
         version: 4.4.3
+
+  formal-spec: {}
 
   packages/architect:
     dependencies:
@@ -236,8 +229,6 @@ importers:
       vitest:
         specifier: ^4.1.4
         version: 4.1.6(@types/node@24.12.4)(@vitest/coverage-v8@4.1.6)(vite@8.0.13(@types/node@24.12.4)(esbuild@0.28.0)(tsx@4.22.0))
-
-  spec: {}
 
 packages:
 

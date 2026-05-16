@@ -2,7 +2,7 @@
   "name": "architect",
   "version": "0.0.0",
   "private": true,
-  "description": "Libar Architect — engineering lifecycle platform for AI-assisted development. Monorepo for the @libar-dev/architect-* package family and the Architect Spec.",
+  "description": "Libar Architect — engineering lifecycle platform for AI-assisted development. Monorepo for the @libar-dev/architect-* package family and the Architect Spec. The root also hosts the dogfood delivery-process instance (architect.config.ts + architect/ + tests/) that exercises the toolchain against itself.",
   "type": "module",
   "engines": {
     "node": ">=20.0.0"
@@ -13,17 +13,47 @@
     "typecheck": "pnpm -r --filter './packages/**' typecheck",
     "lint": "pnpm -r --filter './packages/**' lint",
     "test": "pnpm -r --filter './packages/**' test",
+    "test:dogfood": "vitest run",
+    "smoke": "tsx scripts/workspace-smoke.ts",
     "clean": "pnpm -r clean",
     "format": "prettier --write \"**/*.{ts,tsx,json,md,yml,yaml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,json,md,yml,yaml}\"",
+    "architect:query": "tsx ./packages/architect-cli/src/cli/pattern-graph-cli.ts --base-dir .",
+    "architect:overview": "tsx ./packages/architect-cli/src/cli/pattern-graph-cli.ts --base-dir . overview",
+    "architect:status": "tsx ./packages/architect-cli/src/cli/pattern-graph-cli.ts --base-dir . status",
+    "architect:guard": "pnpm exec architect-guard --base-dir . --staged",
+    "architect:guard:all": "pnpm exec architect-guard --base-dir . --all",
+    "architect:lint-steps": "pnpm exec architect-lint-steps --base-dir .",
+    "validate:patterns": "pnpm exec architect-validate --base-dir .",
+    "validate:all": "pnpm exec architect-validate --base-dir . --dod --anti-patterns",
+    "docs:patterns": "pnpm exec architect-generate --base-dir . -g patterns -f",
+    "docs:architecture": "pnpm exec architect-generate --base-dir . -g architecture -f",
+    "docs:roadmap": "pnpm exec architect-generate --base-dir . -g roadmap -f",
+    "docs:all": "pnpm exec architect-generate --base-dir . -g patterns -g architecture -g roadmap -g changelog -g requirements-executable -g requirements-specs -g decisions -g taxonomy -f",
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
     "release": "pnpm build && pnpm changeset:publish"
   },
+  "dependencies": {
+    "@libar-dev/architect-core": "workspace:*",
+    "@libar-dev/architect-guard": "workspace:*"
+  },
   "devDependencies": {
+    "@amiceli/vitest-cucumber": "^6.3.0",
     "@changesets/cli": "^2.27.0",
+    "@libar-dev/architect-cli": "workspace:*",
+    "@libar-dev/architect-mcp": "workspace:*",
+    "@libar-dev/architect-projection": "workspace:*",
+    "@types/node": "^24.12.0",
+    "@vitest/coverage-v8": "^4.1.4",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.8.1",
-    "typescript": "^5.8.2"
+    "tsx": "^4.7.0",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.18.2",
+    "vitest": "^4.1.4",
+    "zod": "^4.1.11"
   }
 }

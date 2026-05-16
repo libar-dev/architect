@@ -1,10 +1,8 @@
 /**
- * Canonical generator list shared by both architect.config.ts files (the
- * Studio config at repo root and the package config at packages/architect/).
- * The two configs previously hand-maintained byte-identical 12-entry arrays;
- * exporting them from a single source removes a drift surface and keeps
- * generator key defaults centralized in architect-core without duplicating the
- * projection-owned documentation display/path registry.
+ * Canonical generator list consumed by the dogfood architect.config.ts at repo
+ * root. Centralizing here keeps generator key defaults co-located with
+ * architect-core without duplicating the projection-owned documentation
+ * display/path registry.
  */
 export const DEFAULT_GENERATORS = [
   'architecture',

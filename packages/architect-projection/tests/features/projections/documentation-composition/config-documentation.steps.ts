@@ -167,8 +167,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
           When('I project the config snapshot', () => {
             state!.configSnapshot = parseAndProjectConfig(state!.context!, {
-              baseDir: '/Users/darkomijic/dev-projects/architect-studio',
-              configPath: '/Users/darkomijic/dev-projects/architect-studio/architect.config.ts',
+              baseDir: '/fixtures/architect-studio',
+              configPath: '/fixtures/architect-studio/architect.config.ts',
               sourceGlobs: {
                 input: ['packages/architect-projection/src/**/*.ts'],
                 features: ['packages/architect-projection/tests/features/**/*.feature'],
@@ -181,8 +181,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Then('the config snapshot should flatten source globs and preserve graph counts', () => {
             expect(state!.configSnapshot?.root).toEqual({
               kind: 'ProjectConfigSnapshot',
-              baseDir: '/Users/darkomijic/dev-projects/architect-studio',
-              configPath: '/Users/darkomijic/dev-projects/architect-studio/architect.config.ts',
+              baseDir: '/fixtures/architect-studio',
+              configPath: '/fixtures/architect-studio/architect.config.ts',
               sourceGlobs: [
                 'packages/architect-projection/src/**/*.ts',
                 'packages/architect-projection/tests/features/**/*.feature',
@@ -222,8 +222,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           When('I parse-and-project a config snapshot with malformed source glob groups', () => {
             try {
               parseAndProjectConfig(state!.context!, {
-                baseDir: '/Users/darkomijic/dev-projects/architect-studio',
-                configPath: '/Users/darkomijic/dev-projects/architect-studio/architect.config.ts',
+                baseDir: '/fixtures/architect-studio',
+                configPath: '/fixtures/architect-studio/architect.config.ts',
                 buildTimeMs: 184,
                 sourceGlobs: {
                   input: 'packages/architect-projection/src/**/*.ts',
@@ -910,7 +910,7 @@ function createDocumentationContext(): ProjectionContext {
     status: 'completed',
     phase: 10,
     role: 'service',
-    file: 'packages/architect/architect/decisions/adr-006-single-read-model.feature',
+    file: 'architect/decisions/adr-006-single-read-model.feature',
     description:
       '**Context:** Projection consumers must not re-derive relationships.\n**Decision:** PatternGraph remains the single read model.\n**Consequences:** Projections normalize graph output instead of leaking raw DTO wrappers.',
     adr: '006',

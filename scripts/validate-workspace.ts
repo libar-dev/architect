@@ -1,3 +1,12 @@
+/**
+ * Dogfood-only workspace validation gap-filler.
+ *
+ * Runs the equivalent of `architect-validate` but with workspace-tag-registry
+ * tagging and graph-build options that the canonical bin does not currently
+ * expose. Kept here while the canonical surface evolves; revisit folding this
+ * into the `architect-validate` bin once the bin gains the same tagRegistry +
+ * mergeConflictStrategy options (tracked as a follow-up to the W1.5 audit).
+ */
 import {
   applyProjectSourceDefaults,
   buildPatternGraph,

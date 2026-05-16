@@ -1,7 +1,7 @@
 /**
  * Source-ownership rules per ADR-001 Rule 6.
  *
- * Mirrors ADR-001 Rule 6 in `packages/architect/architect/decisions/`. Edit the
+ * Mirrors ADR-001 Rule 6 in `architect/decisions/`. Edit the
  * ADR table and this constant together. The ADR is the decision record; these
  * constants are its TypeScript projection.
  *

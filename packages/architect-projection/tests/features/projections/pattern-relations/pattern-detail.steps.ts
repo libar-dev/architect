@@ -58,7 +58,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           file: 'packages/architect-query/src/pattern-graph-api.ts',
           description:
             '**Problem:** Query consumers need one stable read model.\n\n**Solution:** The PatternGraph API centralizes those reads.',
-          executableSpecs: ['packages/architect/tests/features/query/pattern-graph.feature'],
+          executableSpecs: ['tests/features/query/pattern-graph.feature'],
           deliverables: [
             {
               name: 'PatternGraph API module',
@@ -80,7 +80,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           ],
         });
         const stub = createPattern('PatternGraphAPIStub', {
-          file: 'packages/architect/architect/stubs/query/pattern-graph-api.stub.ts',
+          file: 'architect/stubs/query/pattern-graph-api.stub.ts',
           targetPath: 'packages/architect-query/src/pattern-graph-api.ts',
         });
 
@@ -96,7 +96,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               implementedBy: [
                 {
                   name: 'PatternGraphAPIStub',
-                  file: 'packages/architect/architect/stubs/query/pattern-graph-api.stub.ts',
+                  file: 'architect/stubs/query/pattern-graph-api.stub.ts',
                   description: 'Stub for future implementation',
                 },
               ],
@@ -135,7 +135,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             deliverables: [
               {
                 name: 'PatternGraph API module',
-                tests: ['packages/architect/tests/features/query/pattern-graph.feature'],
+                tests: ['tests/features/query/pattern-graph.feature'],
               },
             ],
             relationships: {
@@ -159,7 +159,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ],
             stubs: [
               {
-                stubFile: 'packages/architect/architect/stubs/query/pattern-graph-api.stub.ts',
+                stubFile: 'architect/stubs/query/pattern-graph-api.stub.ts',
                 targetPath: 'packages/architect-query/src/pattern-graph-api.ts',
                 name: 'PatternGraphAPIStub',
               },

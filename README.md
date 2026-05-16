@@ -18,25 +18,29 @@ Engineering lifecycle platform for AI-assisted development — annotate your cod
 
 **Dependency direction (acyclic):** `core ← projection`, `core ← guard ← cli`, `core,projection ← mcp`. The meta-package depends on all five and has no inbound runtime deps.
 
-## Examples
+## Dogfood
 
-- [`examples/self-host/`](./examples/self-host/) — the toolchain applied to itself. Real specs, decisions, releases, stubs, and a working `architect.config.ts`. Use this as the reference for setting up Architect in your own project.
+The architect package family runs its own delivery process. The dogfood instance lives at the repo root: `architect.config.ts`, the `architect/` directory (specs, decisions, releases, stubs), `docs-sources/`, and the `tests/` suite. The toolchain is exercised against itself, so every release verifies the methodology end-to-end. Use this as the reference for setting up Architect in your own project.
 
 ## Workspace layout
 
 ```
 architect/
+├── architect.config.ts           # dogfood config
+├── architect/                    # dogfood specs, decisions, releases, stubs
+├── docs/                         # manual documentation
+├── docs-sources/                 # inputs for doc generation
+├── docs-live/                    # gitignored — generated docs output
+├── scripts/                      # dogfood scripts
+├── tests/                        # dogfood smoke + regression suite
 ├── packages/
-│   ├── architect/                # @libar-dev/architect (meta)
+│   ├── architect/                # @libar-dev/architect (meta — bin-only)
 │   ├── architect-core/
 │   ├── architect-projection/
 │   ├── architect-guard/
 │   ├── architect-cli/
 │   └── architect-mcp/
-├── examples/
-│   └── self-host/                # dogfooding harness
-├── spec/                          # @libar-dev/architect-spec (private)
-└── docs/
+└── formal-spec/                  # @libar-dev/architect-spec — methodology RFC (private)
 ```
 
 ## Development

@@ -477,7 +477,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               createPattern('DecisionRecord', {
                 status: 'completed',
                 role: 'service',
-                file: 'packages/architect/architect/decisions/adr-006.feature',
+                file: 'architect/decisions/adr-006.feature',
                 adr: '006',
               }),
               createPattern('ProjectionFeature', {
@@ -488,7 +488,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               createPattern('ProjectionStub', {
                 status: 'roadmap',
                 role: 'service',
-                file: 'packages/architect/architect/stubs/operational-insights.stub.ts',
+                file: 'architect/stubs/operational-insights.stub.ts',
               }),
             ],
           });
@@ -611,15 +611,15 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               kind: 'SourceInventoryEntry',
               type: 'Decisions',
               count: 1,
-              locationPattern: 'packages/architect/architect/decisions/**/*.feature',
-              files: ['packages/architect/architect/decisions/adr-006.feature'],
+              locationPattern: 'architect/decisions/**/*.feature',
+              files: ['architect/decisions/adr-006.feature'],
             },
             {
               kind: 'SourceInventoryEntry',
               type: 'Stubs',
               count: 1,
-              locationPattern: 'packages/architect/architect/stubs/**/*.ts',
-              files: ['packages/architect/architect/stubs/operational-insights.stub.ts'],
+              locationPattern: 'architect/stubs/**/*.ts',
+              files: ['architect/stubs/operational-insights.stub.ts'],
             },
           ]);
         });
@@ -744,13 +744,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                     productArea: 'Projection Platform',
                     description:
                       'Aggregate requirement digests without creating renderable documents.',
-                    behaviorFile: 'packages/architect/tests/features/query/context.feature',
+                    behaviorFile: 'tests/features/query/context.feature',
                   }),
                   createPattern('RoleInsights', {
                     status: 'roadmap',
                     productArea: 'Tooling Insights',
                     description: '',
-                    executableSpecs: ['packages/architect/tests/features/query/context.feature'],
+                    executableSpecs: ['tests/features/query/context.feature'],
                   }),
                   createPattern('OperatorNeeds', {
                     status: 'active',
@@ -758,7 +758,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                     businessValue: 'Expose requirement digests beyond product-area tags.',
                     description:
                       'Include PRD patterns that only carry user-role/business-value metadata.',
-                    executableSpecs: ['packages/architect/tests/features/query/context.feature'],
+                    executableSpecs: ['tests/features/query/context.feature'],
                   }),
                   createPattern('ADRProjectionDecision', {
                     status: 'completed',
@@ -810,7 +810,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                           text: 'Include PRD patterns that only carry user-role/business-value metadata.',
                         },
                       ],
-                      testFiles: ['packages/architect/tests/features/query/context.feature'],
+                      testFiles: ['tests/features/query/context.feature'],
                     },
                     {
                       pattern: 'CoverageProjection',
@@ -852,7 +852,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                           text: 'Aggregate requirement digests without creating renderable documents.',
                         },
                       ],
-                      testFiles: ['packages/architect/tests/features/query/context.feature'],
+                      testFiles: ['tests/features/query/context.feature'],
                     },
                     {
                       pattern: 'RoleInsights',
@@ -862,7 +862,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                       description: [
                         { type: 'paragraph', text: 'No requirement description recorded.' },
                       ],
-                      testFiles: ['packages/architect/tests/features/query/context.feature'],
+                      testFiles: ['tests/features/query/context.feature'],
                     },
                   ],
                 },
@@ -936,7 +936,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                           text: 'Aggregate requirement digests without creating renderable documents.',
                         },
                       ],
-                      testFiles: ['packages/architect/tests/features/query/context.feature'],
+                      testFiles: ['tests/features/query/context.feature'],
                     },
                   ],
                 },
@@ -961,7 +961,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                     phase: 12,
                     file: 'packages/architect-core/src/shared-requirement-ref.ts',
                     description: 'First package owns one rule for the shared requirement.',
-                    behaviorFile: 'packages/architect/tests/features/query/context.feature',
+                    behaviorFile: 'tests/features/query/context.feature',
                     rules: [
                       {
                         name: 'Alpha rule',
@@ -1042,7 +1042,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                       items: ['Alpha rule'],
                     },
                   ],
-                  testFiles: ['packages/architect/tests/features/query/context.feature'],
+                  testFiles: ['tests/features/query/context.feature'],
                 },
                 {
                   pattern: 'SharedRequirementRef',
@@ -1086,7 +1086,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                     phase: 12,
                     file: 'packages/architect-core/src/shared-requirement-ref.ts',
                     description: 'First package owns one rule for the shared requirement.',
-                    behaviorFile: 'packages/architect/tests/features/query/context.feature',
+                    behaviorFile: 'tests/features/query/context.feature',
                     rules: [
                       {
                         name: 'Alpha rule',
@@ -1167,7 +1167,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                       items: ['Alpha rule'],
                     },
                   ],
-                  testFiles: ['packages/architect/tests/features/query/context.feature'],
+                  testFiles: ['tests/features/query/context.feature'],
                 },
                 {
                   pattern: 'SharedRequirementRef',
@@ -1234,7 +1234,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                         items: ['Alpha rule'],
                       },
                     ],
-                    testFiles: ['packages/architect/tests/features/query/context.feature'],
+                    testFiles: ['tests/features/query/context.feature'],
                   },
                 ],
                 businessRuleReferences: [
@@ -1375,7 +1375,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   createPattern('NestedArchitectRelease', {
                     status: 'completed',
                     productArea: 'Projection Platform',
-                    file: 'packages/architect/architect/releases/2026-q2-release.feature',
+                    file: 'architect/releases/2026-q2-release.feature',
                     description: 'Release notes must not appear in requirement digests.',
                     rules: [
                       {

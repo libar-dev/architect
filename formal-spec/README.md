@@ -3,7 +3,7 @@
 > A formal specification for architecture-connected software specifications.
 >
 > **Version:** 0.2.0 (Draft)
-> **Status:** Working draft — internal to architect-studio until ready for publication
+> **Status:** Working draft — internal to the libar-dev/architect repo until ready for publication
 > **License:** To be determined (targeting open specification license)
 
 ---
@@ -98,11 +98,11 @@ This spec defines the format. The toolchain implements it.
 
 ## Publication Trajectory
 
-| Phase       | Location                                             | Status               |
-| ----------- | ---------------------------------------------------- | -------------------- |
-| **Phase 1** | `spec/` folder in architect-studio repo              | Current (v0.2 draft) |
-| **Phase 2** | Standalone npm package (`@libar-dev/architect-spec`) | Planned              |
-| **Phase 3** | Published HTML specification at `spec.libar.dev`     | Future               |
+| Phase       | Location                                                | Status               |
+| ----------- | ------------------------------------------------------- | -------------------- |
+| **Phase 1** | `formal-spec/` folder in libar-dev/architect repo       | Current (v0.2 draft) |
+| **Phase 2** | Standalone npm package (`@libar-dev/architect-spec`)    | Planned              |
+| **Phase 3** | Published HTML specification at `spec.libar.dev`        | Future               |
 
 ## CHANGELOG
 

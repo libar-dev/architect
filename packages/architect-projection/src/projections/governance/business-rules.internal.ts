@@ -468,8 +468,6 @@ function getFeaturePathCandidates(sourceFile: string): string[] {
 
   if (normalizedSource.startsWith('../')) {
     candidates.push(`packages/${normalizedSource.slice('../'.length)}`);
-  } else if (!normalizedSource.startsWith('packages/')) {
-    candidates.push(`packages/architect/${normalizedSource}`);
   }
 
   return [...new Set(candidates)];

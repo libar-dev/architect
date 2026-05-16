@@ -9,7 +9,7 @@ const workspaceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)),
 /**
  * Canonical role list for the architect package family self-hosting.
  *
- * Mirrors ADR-001 Rule 10 in `packages/architect/architect/decisions/`. Edit
+ * Mirrors ADR-001 Rule 10 in `architect/decisions/`. Edit
  * the ADR table and this constant together. The ADR is the decision record;
  * this constant is its TypeScript projection.
  */

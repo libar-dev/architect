@@ -48,7 +48,7 @@ Feature: Architect MCP server lifecycle, pipeline coalescing, and file watching
 
     **Invariant:** The server works with `.mcp.json`, `claude_desktop_config.json`, and any MCP client; accepts `--input`, `--features`, `--base-dir`, `--watch`; auto-detects `architect.config.ts`; reports the package version through `--version`; exits with a clear error when no config and no globs are present.
     **Rationale:** MCP clients discover servers through configuration files; sensible defaults plus explicit overrides cover the monorepo + standalone-package matrix without forcing wrappers.
-    **Verified by:** packages/architect/docs/MCP-SETUP.md + JSDoc on packages/architect-mcp/src/server.ts (HELP_TEXT, SessionOptionsSchema parsing) + JSDoc on packages/architect-mcp/src/cli/mcp-server.ts (bin entry)
+    **Verified by:** docs/MCP-SETUP.md + JSDoc on packages/architect-mcp/src/server.ts (HELP_TEXT, SessionOptionsSchema parsing) + JSDoc on packages/architect-mcp/src/cli/mcp-server.ts (bin entry)
 
     @contract
     Scenario: CLI options cover standard MCP client configuration

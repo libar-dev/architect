@@ -245,8 +245,8 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
   },
   ProjectConfigSnapshot: {
     kind: 'ProjectConfigSnapshot',
-    baseDir: '/Users/darkomijic/dev-projects/architect-studio',
-    configPath: '/Users/darkomijic/dev-projects/architect-studio/architect.config.ts',
+    baseDir: '/fixtures/architect-studio',
+    configPath: '/fixtures/architect-studio/architect.config.ts',
     sourceGlobs: ['src/**/*.ts', 'tests/features/**/*.feature', '!dist/**'],
     buildTimeMs: 184,
     patternCount: 47,
@@ -290,10 +290,10 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
         summary: 'Builds session-oriented context for implementation work.',
       },
     ],
-    specFiles: ['packages/architect/architect/specs/perspective-aware-projections.feature'],
+    specFiles: ['architect/specs/perspective-aware-projections.feature'],
     stubs: [
       {
-        stubFile: 'packages/architect/architect/stubs/perspectives.stub.ts',
+        stubFile: 'architect/stubs/perspectives.stub.ts',
         targetPath: 'packages/architect-query/src/api/context-assembler.ts',
         name: 'PerspectiveAwareProjectionsStub',
       },
@@ -347,7 +347,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
         },
       },
     ],
-    testFiles: ['packages/architect/tests/features/query/context.feature'],
+    testFiles: ['tests/features/query/context.feature'],
   },
   ScopeReadinessCheck: validScopeReadinessCheck,
   ScopeReadinessReport: {
@@ -405,7 +405,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       'packages/architect-query/src/api/scope-validator.ts',
     ],
     completedDeps: ['packages/architect-core/src/config/enforcement.ts'],
-    roadmapDeps: ['packages/architect/specs/enforcement-configuration.feature'],
+    roadmapDeps: ['architect/specs/enforcement-configuration.feature'],
     architectureNeighbors: ['packages/architect-query/src/api/handoff-generator.ts'],
   },
   Deliverable: validDeliverable,
@@ -786,7 +786,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
             text: 'Requirement descriptions use structured Block[] content instead of markdown strings.',
           },
         ],
-        testFiles: ['packages/architect/tests/features/query/context.feature'],
+        testFiles: ['tests/features/query/context.feature'],
       },
     ],
   },
@@ -873,7 +873,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       {
         name: 'PatternGraph API module',
         status: 'active',
-        tests: ['packages/architect/tests/features/query/pattern-graph.feature'],
+        tests: ['tests/features/query/pattern-graph.feature'],
         location: 'packages/architect-query/src/pattern-graph-api.ts',
         finding: 'Keeps read operations centralized.',
         release: '2026-Q2',
@@ -919,7 +919,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
         {
           name: 'PatternGraph API module',
           status: 'active',
-          tests: ['packages/architect/tests/features/query/pattern-graph.feature'],
+          tests: ['tests/features/query/pattern-graph.feature'],
           location: 'packages/architect-query/src/pattern-graph-api.ts',
           finding: 'Keeps read operations centralized.',
           release: '2026-Q2',
@@ -1076,8 +1076,8 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   },
   ProjectConfigSnapshot: {
     kind: 'ProjectConfigSnapshot',
-    baseDir: '/Users/darkomijic/dev-projects/architect-studio',
-    configPath: '/Users/darkomijic/dev-projects/architect-studio/architect.config.ts',
+    baseDir: '/fixtures/architect-studio',
+    configPath: '/fixtures/architect-studio/architect.config.ts',
     sourceGlobs: {
       input: ['src/**/*.ts'],
     },
