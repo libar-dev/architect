@@ -350,3 +350,46 @@ import { BusinessRuleSchema } from '@libar-dev/architect-projection';
 ```
 
 The meta package `@libar-dev/architect` is **no longer importable as JS** — it's bin-only. Any v1 code that did `import ... from '@libar-dev/architect'` will fail to resolve. The migration is mechanical (repoint to the owning split), but unavoidable.
+
+## TODO - Required work that needs additional detailing and specification
+
+### TODO #1 - Doc consolidation
+- `formal-spec/` need to be updated to match recent code changes/refactoring
+  - this will be published as separate repo later on
+  - we should reference content from formal specs in generated docs, skills, etc.
+  - generated docs (`docs-live/`) should also not duplicate content from formal specs
+  - AGENTS.md/CLAUDE.md also need to be included in information organization strategy and deduplication - this doc is not complete yet.
+  - there is probably a decent opportunity to make formal specs less verbose once we decide on appropriate "layering" and organization of docs
+- manual docs (`docs/`) and unused docs-sources (`docs-sources/`) neet to be made obsolete once work with generated docs and polishing of skills is coplete - we have ability to generate all required docs
+- we should assess what to do wiht `docs-live/TAXONOMY.md` which is generated doc with some content duplicated in the formal specs and taxonomy is also available throuhg PatternGraph API
+
+#### `doc-sources` additional context: 
+
+```markdown
+  Quick verdict: **no, the `docs-sources/` files are not currently consumed by doc generation.** Here's the trace:
+
+**The plumbing exists but is unwired:**
+- `parseMarkdownToBlocks()` in `packages/architect-core/src/utils/markdown-parser.ts:84` converts markdown → `SectionBlock[]` (exported from core)
+- `ReferenceDocConfig.preamble?: readonly SectionBlock[]` in `packages/architect-core/src/config/presentation-contracts.ts:43` — codecs accept preamble content via config
+- The intent (per `docs/DOCS-GAP-ANALYSIS.md:722-723`) was: author preamble markdown in `docs-sources/` → load via a `loadPreambleFromMarkdown()` utility → inject into codec config
+
+**What's actually missing:**
+- Zero references to `docs-sources` in any package source code, scripts, configs, or tests (only mentions are in README/AGENTS layout diagrams and the gap-analysis doc itself).
+- The dogfood `architect.config.ts` has no `preamble:` configuration — no codec is fed any markdown from `docs-sources/`.
+- No `loadPreambleFromMarkdown()` utility exists yet; only the low-level `parseMarkdownToBlocks` (tested in isolation against hardcoded strings in `tests/steps/generation/load-preamble.steps.ts`).
+
+**The content state:**
+- The 8 files in `docs-sources/` are hardcoded markdown that was meant to feed the codec pipeline.
+- They overlap significantly with the manual `docs/` files (e.g., `docs/ANNOTATION-GUIDE.md` vs `docs-sources/annotation-guide.md` — forked siblings, drifting separately).
+- `DOCS-GAP-ANALYSIS.md` confirms this is unfinished work: "WP-7 ProceduralGuideCodec design complete (8 findings), DD-7/DD-8 done" but "Phase 5 (guide trimming) … remain pending until generated docs reach quality parity for manual doc archival."
+
+**So today `docs-sources/` is dead-weight content with two outstanding decisions** for a future session: either (a) finish wiring it into the codec pipeline (the design exists), or (b) delete the directory and consolidate with manual `docs/`. Right now it's neither.
+
+`★ Insight ─────────────────────────────────────`
+The drift between `docs/ANNOTATION-GUIDE.md` and `docs-sources/annotation-guide.md` is exactly the failure mode the codec pipeline was designed to prevent — one canonical source feeds the generator, no dual maintenance. The fact that both exist and have diverged is itself the evidence that the wiring isn't done. Worth flagging in REMAINING-WORK.md as a small follow-up under W4 (docs polish) since it crosses the docs-cleanup boundary.
+`─────────────────────────────────────────────────`
+```
+
+### TODO #2 - License consolidation
+- `LICENSE` and `LICENSE-MCP` should be consolidated into just one MIT license
+
