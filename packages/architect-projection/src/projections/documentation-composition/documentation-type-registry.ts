@@ -150,9 +150,9 @@ function createLazyReadonlyArrayFacade<TValue>(load: () => readonly TValue[]): r
   }
 
   return new Proxy(target, {
-    get(currentTarget, property, receiver) {
+    get(currentTarget, property, receiver): unknown {
       initialize();
-      return Reflect.get(currentTarget, property, receiver);
+      return Reflect.get(currentTarget, property, receiver) as unknown;
     },
     getOwnPropertyDescriptor(currentTarget, property) {
       initialize();
