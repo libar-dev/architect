@@ -6,6 +6,13 @@ Pause-point context for the documentation-generation consolidation work. Capture
 
 A focused design-session input set for the next time we pick up documentation generation. The user is wrapping up two prerequisites first (core package extraction, skills consolidation), then returning to this.
 
+> **State of the substrate as of 2026-05-17:** the pre-W-DOCS-1 debt
+> cleanup is done — see `NEXT-SESSION.md` for the commit-by-commit record
+> and the maturity classification of every file in this folder. Session
+> sequencing is owned by `architect-session-router` against whichever
+> research artifact is the current focus; this folder is the input set,
+> not the agenda.
+
 ## Read order
 
 1. **`DEEP-DIVE.md`** — the headline finding, the architectural reframe, and the answers to the two big questions ("can PatternGraph extract what we need?" and "annotation-config vs rethink to something more flexible?"). Start here.

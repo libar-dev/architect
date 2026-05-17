@@ -1,10 +1,45 @@
 # Pre-W-DOCS-1 readiness — remaining work and sequencing
 
-> **Captured:** 2026-05-17, immediately after the `architect-projection` final-improvements campaign landed (5 commits `c74814f` → `a4c2ddb`) and was reviewed by `code-reviewer` and `code-simplifier`. **Status:** input to the next plan-tier session that opens W-DOCS-1.
+> **Captured:** 2026-05-17, immediately after the `architect-projection` final-improvements campaign landed (5 commits `c74814f` → `a4c2ddb`) and was reviewed by `code-reviewer` and `code-simplifier`. **Status:** **RESOLVED — historical.** All immediate, parallel, and most deferred items have been executed; the file is retained for audit. See § 0 below and `NEXT-SESSION.md` for the current state.
 >
 > **Read order:** `README.md` → `DEEP-DIVE.md` → `INVENTORY.md` → `PROPOSED-DESIGN.md` → `DECISIONS.md` → **this file** → `IDEATION-SPECS.md`.
 >
 > **Purpose:** consolidate every loose thread that touches the W-DOCS-1 PoC substrate so the next session opens with a clean working state. Nothing here invalidates `DECISIONS.md`; this file is a sequencing artifact, not a design artifact.
+
+---
+
+## 0. Resolved — 2026-05-17 cleanup mapping
+
+Every immediate (§ 4) and parallel (§ 5) item is done. One deferred item
+(D-1) is also done. Cleanup plan: `pre-w-docs-1-debt-cleanup.md`.
+
+| Section | Item | Commit | Notes |
+| ------- | ---- | ------ | ----- |
+| § 4 A-1 | Commit uncommitted fixups | `882c189` | Both hunks landed verbatim |
+| § 4 A-2 | Polish backlog issue | `fea0383`, `c95517c`, `aae1993` | Items inlined as commits instead of a backlog issue |
+| § 4 A-3 | Repo-wide Prettier sweep | `4f6a171` (+ drift fix `37ac815`) | 317 files, single atomic commit |
+| § 5 P-1 | Rename `DeliverableManifestSchema` pair | `aae1993` | Done pre-emptively (E in cleanup plan) |
+| § 5 P-2 | WHY comment in `splitOversizedDocument` | `fea0383` | One-line at `render-markdown.ts:2158` |
+| § 5 P-3 | Compare-baseline comparator dedup | `fea0383` | `checkBudget` helper, 4 → 1 call sites |
+| § 5 P-4 | `resolveInvocationDir` precedence audit | `f7f4e30` | Inverted to cwd-first; regression test in `architect-cli` |
+| § 6 D-1 | `@architect-usecase` retire-or-narrow | `691da3c` | **Retired.** End-to-end (registry + Zod schemas + AST extractor + 8 doc files). Net taxonomy delta: -1 tag |
+
+**Deliberate non-actions** (per `1833126` revert commit):
+
+- **No PDR-002** for the `resolveInvocationDir` change. Bug-fix rationale lives in the commit message + the regression test feature file. Decision records are reserved for durable doctrine, not operational changes.
+- **No ADR-010** for the `@architect-usecase` retirement. Consistent with ~30 prior tag retirements (W1.5 taxonomy shrink, DECISIONS.md D3''/D9) that were done without decision records.
+
+**Still deferred** (§ 6 items that remain accurate):
+
+- D-2 — Wave 9 Phase 3 skills packaging (gated on D7 design loop)
+- D-3 — Wave 4 public-surface READMEs (subsumed into W-DOCS-5 per Option A)
+- D-4 — Substrate splits W-DOCS-2+ will need (no advance work required)
+
+**Branch state:** `campaign/docs-and-skills-consolidation` is at
+release-candidate state. Cut `campaign/wdocs-1-poc` from its tip when
+W-DOCS-1 starts. See `NEXT-SESSION.md` for the kickoff sequence.
+
+---
 
 ---
 
