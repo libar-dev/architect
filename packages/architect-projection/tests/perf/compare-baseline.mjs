@@ -27,6 +27,12 @@ const HOT_PATH_BUDGETS = {
   graphBuild: { field: 'avgMs', budget: 2000, unit: 'ms' },
 };
 
+const RENDER_MARKDOWN_BUNDLE_BUDGETS = {
+  patterns: { field: 'avgMs', budget: 1, unit: 'ms' },
+  decisions: { field: 'avgMs', budget: 1, unit: 'ms' },
+  'requirements-executable': { field: 'avgMs', budget: 1, unit: 'ms' },
+};
+
 const BASELINE_MULTIPLIER = 1.5;
 
 const [report, baseline] = await Promise.all([
@@ -40,9 +46,8 @@ const failures = [
   checkAverageMetric('renderPretty'),
   checkScalarMetric('isBundleP50Micros'),
   ...Object.keys(HOT_PATH_BUDGETS).map((metricName) => checkHotPathAverageMetric(metricName)),
+  ...checkRenderMarkdownBundleMetrics(report),
 ].filter((failure) => failure !== undefined);
-
-validateRenderMarkdownBundleMetrics(report);
 
 if (failures.length > 0) {
   console.error(`Perf baseline check failed with ${String(failures.length)} exceeded budget(s):`);
@@ -128,8 +133,8 @@ function checkHotPathAverageMetric(metricName) {
   return undefined;
 }
 
-function validateRenderMarkdownBundleMetrics(source) {
-  const expectedDocumentTypes = ['patterns', 'decisions', 'requirements-executable'];
+function checkRenderMarkdownBundleMetrics(source) {
+  const expectedDocumentTypes = Object.keys(RENDER_MARKDOWN_BUNDLE_BUDGETS);
   const bundles = source.renderMarkdownBundles;
 
   if (bundles === undefined || typeof bundles !== 'object' || bundles === null) {
@@ -145,15 +150,31 @@ function validateRenderMarkdownBundleMetrics(source) {
     );
   }
 
-  for (const documentType of expectedDocumentTypes) {
-    getMetricValue(bundles, documentType, 'avgMs');
+  return expectedDocumentTypes.map((documentType) => {
+    const budget = RENDER_MARKDOWN_BUNDLE_BUDGETS[documentType];
+    const actual = getMetricValue(bundles, documentType, budget.field);
+    const baselineValue = getMetricValue(baseline.renderMarkdownBundles, documentType, budget.field);
+    const baselineBudget = baselineValue * BASELINE_MULTIPLIER;
+    const allowed = Math.min(budget.budget, baselineBudget);
+    const label = `renderMarkdownBundles.${documentType}.${budget.field}`;
+
     getMetricValue(bundles, documentType, 'p50Ms');
     getMetricValue(bundles, documentType, 'iterations');
-  }
 
-  console.log(
-    `PASS renderMarkdownBundles shape: ${expectedSortedDocumentTypes.join(', ')} measured without threshold enforcement`
-  );
+    if (actual > allowed) {
+      console.error(
+        `FAIL ${label}: ${format(actual, budget.unit)} exceeds ${format(allowed, budget.unit)} ` +
+          `(hard ${format(budget.budget, budget.unit)}, baseline ${format(baselineBudget, budget.unit)})`
+      );
+      return `${label} ${format(actual, budget.unit)} > ${format(allowed, budget.unit)}`;
+    }
+
+    console.log(
+      `PASS ${label}: ${format(actual, budget.unit)} <= ${format(allowed, budget.unit)} ` +
+        `(hard ${format(budget.budget, budget.unit)}, baseline ${format(baselineBudget, budget.unit)})`
+    );
+    return undefined;
+  });
 }
 
 function getMetricValue(source, metricName, fieldName) {
