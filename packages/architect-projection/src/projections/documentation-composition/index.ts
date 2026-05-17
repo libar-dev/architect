@@ -30,8 +30,8 @@ export {
   SUPPORTED_DOCUMENTATION_TYPES,
   getDocumentationTypeMetadata,
   getSupportedDocumentationTypeMetadata,
-  resolveProjectionFilter,
-} from './documentation-types.js';
+} from './documentation-type-registry.js';
+export { resolveProjectionFilter } from './projection-filter-resolver.js';
 export {
   LogicalRouteIdSchema,
   LogicalRouteSegmentSchema,
@@ -52,7 +52,7 @@ export type {
   SupportedDocumentationTypeRegistryEntry,
   SupportedDocumentationType,
   SupportedDocumentationTypeMetadata,
-} from './documentation-types.js';
+} from './documentation-type-registry.js';
 export type {
   LogicalRouteId,
   ProgressiveDisclosureLevel,

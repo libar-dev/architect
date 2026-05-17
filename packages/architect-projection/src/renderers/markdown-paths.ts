@@ -1,6 +1,6 @@
 import type { MarkdownRouteProfile } from './types.js';
 import { slugForFilename } from '../_internal/slug.js';
-import { getDocumentationTypeMetadata } from '../projections/documentation-composition/documentation-types.js';
+import { getDocumentationTypeMetadata } from '../projections/documentation-composition/documentation-type-registry.js';
 import type { LogicalRouteId } from '../projections/documentation-composition/progressive-disclosure.js';
 
 export const defaultMarkdownRouteProfile: MarkdownRouteProfile = {
@@ -13,9 +13,7 @@ export function resolveLogicalRoutePath(routeId: LogicalRouteId): string {
   const route = parseLogicalRouteId(routeId);
   const metadata = getDocumentationTypeMetadata(route.documentType);
   const directory =
-    metadata?.status === 'supported' && 'childDirectory' in metadata
-      ? metadata.childDirectory
-      : undefined;
+    metadata !== undefined && 'childDirectory' in metadata ? metadata.childDirectory : undefined;
   const resolvedDirectory = directory ?? route.documentType;
 
   if (route.kind === 'index') {
@@ -41,7 +39,7 @@ export function resolveLogicalRoutePath(routeId: LogicalRouteId): string {
 
 function resolveRootMarkdownPath(documentType: string): string {
   const metadata = getDocumentationTypeMetadata(documentType);
-  if (metadata?.status === 'supported') {
+  if (metadata !== undefined) {
     return metadata.markdownRootTarget;
   }
 

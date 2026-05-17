@@ -290,7 +290,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 supportedDocumentTypes
               );
               for (const metadata of SUPPORTED_DOCUMENTATION_TYPE_REGISTRY) {
-                expect(metadata.status).toBe('supported');
                 expect(metadata.displayTitle.length).toBeGreaterThan(0);
                 expect(metadata.rootRouteId).toBe(`${metadata.key}:index`);
                 expect(metadata.markdownRootTarget).toMatch(/\.md$/);

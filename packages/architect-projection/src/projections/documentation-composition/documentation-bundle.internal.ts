@@ -25,14 +25,13 @@ import {
 import { buildArchitectureDiagram } from './architecture-diagram.internal.js';
 import {
   getDocumentationTypeMetadata,
-  isDroppedDocumentationType,
-  resolveProjectionFilter,
   SUPPORTED_DOCUMENTATION_TYPES,
   type SupportedDocumentationType,
-} from './documentation-types.js';
+} from './documentation-type-registry.js';
+import { resolveProjectionFilter } from './projection-filter-resolver.js';
 import { ProgressiveDisclosureLevelSchema } from './progressive-disclosure.js';
 
-export type { SupportedDocumentationType } from './documentation-types.js';
+export type { SupportedDocumentationType } from './documentation-type-registry.js';
 
 export const ProjectDocumentationBundleOptionsSchema = z
   .strictObject({
@@ -79,13 +78,6 @@ const DOCUMENTATION_PROJECTION_FACTORIES = {
 } satisfies Record<SupportedDocumentationType, DocumentationProjectionFactory>;
 
 export function assertSupportedDocumentType(documentType: string): SupportedDocumentationType {
-  if (isDroppedDocumentationType(documentType)) {
-    throw new ProjectionError(
-      'UNKNOWN_DOCUMENT_TYPE',
-      `Document type "${documentType}" was intentionally dropped. Supported types: ${SUPPORTED_DOCUMENTATION_TYPES.join(', ')}.`
-    );
-  }
-
   const metadata = getDocumentationTypeMetadata(documentType);
   if (metadata !== undefined) {
     return metadata.key;

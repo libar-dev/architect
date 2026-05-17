@@ -47,7 +47,7 @@ import {
   type TraceabilityMatrix,
   type ValidationRuleDigest,
 } from '../fragments/index.js';
-import { getDocumentationTypeMetadata } from '../projections/documentation-composition/documentation-types.js';
+import { getDocumentationTypeMetadata } from '../projections/documentation-composition/documentation-type-registry.js';
 import { defaultMarkdownRouteProfile } from './markdown-paths.js';
 import type { DisclosureSpec } from '../projections/documentation-composition/disclosure-spec.js';
 import {
@@ -411,7 +411,7 @@ function resolveBundleDisclosureSpec(
   }
 
   const metadata = getDocumentationTypeMetadata(documentType);
-  if (metadata?.status !== 'supported') {
+  if (metadata === undefined) {
     return undefined;
   }
 
