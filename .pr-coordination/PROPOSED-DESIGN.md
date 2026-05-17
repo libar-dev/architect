@@ -569,3 +569,207 @@ Pending decisions noted in DEEP-DIVE § "Pending decisions for the design sessio
 3. Generated-insert syntax (`<!-- generated:source:start -->` vs `<!-- @architect-insert -->`?)
 4. `referenceDocConfigs` backward-compat (drop entirely vs ship as sugar?)
 5. Aggregation-tag multi-doc routing (`targetDoc: string[]` vs move routing to call site?)
+
+> **Status as of 2026-05-17:** all five questions ratified in
+> [`DECISIONS.md`](./DECISIONS.md) (D1–D9). § 10 below extends this proposal
+> with the wiki-tree-with-index design that emerged in the same session.
+
+## 10. Wiki-tree-with-index extension
+
+The fourth reuse boundary (alongside multi-target output, ContentFragment,
+and generated-insert directives) is the DeepWiki-style **wiki tree with a
+generated index**. One logical "topic" renders as a directory of small
+focused pages plus a rich navigation index; the index is itself a projection
+of the children.
+
+See [`DECISIONS.md`](./DECISIONS.md) D1–D9 for ratified design choices.
+
+### 10.1 Core types (additive to § 1)
+
+```ts
+// packages/architect-projection/src/doc-definition/wiki-index.ts
+
+import type { DocDefinition, DocBuildContext } from './types.js';
+import type { ProjectionBundle, Fragment } from '../fragments/index.js';
+
+export interface ReadingPathStep {
+  readonly routeId: string;       // LogicalRouteId of a child page
+  readonly rationale: string;     // why this step at this position
+}
+
+export interface ReadingPath {
+  readonly id: string;            // 'first-annotate'
+  readonly intent: string;        // 'I want to annotate a TypeScript service file for the first time'
+  readonly steps: readonly ReadingPathStep[];
+}
+
+export interface WikiIndexDefinition {
+  readonly id: string;            // 'annotation-guide'
+  readonly title: string;         // 'Annotation Guide'
+  readonly root: DocDefinition;   // produces the ProjectionBundle whose children become pages
+  readonly readingPaths?: readonly ReadingPath[];
+  readonly preambles?: Readonly<Record<string, string>>; // routeId → preamble markdown path
+}
+
+export function defineWikiIndex(spec: WikiIndexDefinition): WikiIndexDefinition {
+  return spec;
+}
+
+export function projectWikiIndex(
+  def: WikiIndexDefinition,
+  ctx: DocBuildContext,
+): ProjectionBundle<Fragment> {
+  // 1. Build the children: const bundle = await def.root.build(ctx)
+  // 2. Walk bundle.children (LogicalRouteId-keyed, entityPathLayout-routed)
+  // 3. For each child, derive: title, "Answers" (first paragraph), key entities, diagrams, tables
+  // 4. Build the five navigation sections (see § 10.3)
+  // 5. Return a new bundle with the INDEX as root + bundle.children as children
+}
+```
+
+### 10.2 Navigation surfaces — derivation rules (D8)
+
+Every section in the generated `INDEX.md` is derived. No hand-authored
+navigation. See [`DECISIONS.md`](./DECISIONS.md) D8 for the canonical table.
+
+The Concept Index is a **graph join over PatternGraph** (D3''), not a
+string-clustering pass. For each pattern contributing to any child page,
+collect its Gherkin `Scenario:` titles + `Rule:` titles + `Feature:`
+description; invert by intent string; emit one row per intent pointing at
+the matching pages.
+
+**UML mapping** used by the wiki index (canonical, not extensible per
+session) — see [`DECISIONS.md`](./DECISIONS.md) D3''.
+
+### 10.3 Worked example — `docs/ANNOTATION-GUIDE.md` as the W-DOCS-1 case
+
+```ts
+// docs-config/wikis/annotation-guide.wiki.ts
+import { defineWikiIndex } from '@libar-dev/architect-projection';
+import { gettingStartedFragment } from '../fragments/annotation-getting-started.fragment.js';
+import { ownershipModelFragment } from '../fragments/annotation-ownership-model.fragment.js';
+import { tagReferenceFragment } from '../fragments/tag-reference.fragment.js';
+// …other fragments
+
+export const annotationGuide = defineWikiIndex({
+  id: 'annotation-guide',
+  title: 'Annotation Guide',
+  root: {
+    id: 'annotation-guide-root',
+    title: 'Annotation Guide',
+    targets: [{ kind: 'website', path: 'docs-live/annotation-guide/' }],
+    build(ctx) {
+      return composeBundle('Annotation Guide', [
+        gettingStartedFragment.build(ctx, { disclosure: 'important' }),
+        ownershipModelFragment.build(ctx, { disclosure: 'advanced' }),
+        // …
+        tagReferenceFragment.build(ctx, { disclosure: 'advanced' }), // emits per-groupName subtree
+        // …
+      ]);
+    },
+  },
+  readingPaths: [
+    {
+      id: 'first-annotate',
+      intent: 'I want to annotate a TypeScript service file for the first time',
+      steps: [
+        { routeId: '1-getting-started',         rationale: 'add @architect opt-in' },
+        { routeId: '6-patterns-by-file-type',   rationale: 'find service-or-module pattern' },
+        { routeId: '4-tag-reference/4-1-core',  rationale: 'look up required core tags' },
+        { routeId: '7-verification/7-1-cli',     rationale: 'verify with pnpm architect:query' },
+      ],
+    },
+    {
+      id: 'add-new-tag',
+      intent: 'I want to add a new tag to the taxonomy',
+      steps: [
+        { routeId: '2-ownership-model',          rationale: 'understand TS vs Gherkin boundary' },
+        { routeId: '4-tag-reference',            rationale: 'pick the right group' },
+        { routeId: '5-format-types',             rationale: 'choose a format type' },
+        { routeId: '7-verification',             rationale: 'verify with diagnostics' },
+      ],
+    },
+    {
+      id: 'debug-missing-pattern',
+      intent: "My pattern isn't appearing in scanner output — what now?",
+      steps: [
+        { routeId: '1-getting-started',         rationale: 'confirm file-level opt-in is present' },
+        { routeId: '7-verification/7-2-common-issues', rationale: 'check the known-failure table' },
+        { routeId: '7-verification/7-1-cli',     rationale: 'run architect:query unannotated --path' },
+      ],
+    },
+  ],
+});
+```
+
+The resulting on-disk tree:
+
+```
+docs-live/annotation-guide/
+  INDEX.md                          ← projectWikiIndex output
+  1-getting-started.md              ← preamble + JSDoc lifted from a canonical example
+  2-ownership-model.md              ← projectTaxonomyDigest grouped by source-of-truth (TS vs Gherkin)
+  3-shape-extraction.md             ← extractJSDocProse on shape-extractor module
+  4-tag-reference/                  ← bundle child directory; one page per groupName
+    4-1-core-tags.md
+    4-2-relationship-tags.md
+    4-3-architecture-tags.md
+    4-4-timeline-tags.md
+    4-5-prd-tags.md
+    4-6-adr-tags.md
+    4-7-other-tags.md
+  5-format-types.md                 ← formatTypes[] from taxonomy JSON
+  6-patterns-by-file-type.md        ← preamble (editorial)
+  7-verification/
+    7-1-cli-commands.md             ← extractCliCommands (W-DOCS-2)
+    7-2-common-issues.md            ← preamble
+```
+
+`INDEX.md` is then generated mechanically per § 10.2; the manual
+`docs/ANNOTATION-GUIDE.md` is deleted in the same PR (D5).
+
+### 10.4 Three orthogonal disclosure axes (D2)
+
+| Axis                  | Question                                              | Mechanism                                              |
+| --------------------- | ----------------------------------------------------- | ------------------------------------------------------ |
+| **INPUT disclosure**  | "Which sub-sections does this fragment emit?"         | `ContentFragment.build(ctx, { disclosure })` (§ 3b)    |
+| **OUTPUT disclosure** | "Does this doc render inline or split into files?"   | `bundle.routing.disclosureSpec` + `splitOversizedDocument` |
+| **INDEX disclosure**  | "How deep does navigation expose the tree?"          | `WikiIndexDefinition` — the index page itself is the disclosure slice; readers descend by clicking |
+
+Same `essential | important | useful | advanced` vocabulary; three
+independent concerns. A package README is one-file with INPUT-side
+disclosure (no fan-out, no index); ANNOTATION-GUIDE is a tree with
+INDEX-side disclosure (index summarizes, pages hold full content); a
+formal-spec section is one-file at `advanced` everywhere (no disclosure
+logic at all). Same primitives, three different shapes.
+
+### 10.5 Agent-context skills as wiki trees (D7)
+
+Each `.agents/skills/architect-*-session/SKILL.md` becomes a
+`WikiIndexDefinition` with `targets: [{ kind: 'agent-context', path:
+'.agents/skills/<skill>/' }]`. Shared `_shared/` modules become
+ContentFragments embedded at chosen INPUT disclosure depths, with
+`linkToCanonical: true` pointing back at the canonical wiki under
+`docs-live/`.
+
+### 10.6 What this campaign explicitly does NOT do
+
+- Add annotation carriers (D3'').
+- Add `MetadataTagDefinition` schema fields (D3b).
+- Rely on `@architect-usecase` for any new wiring (D9).
+- Touch the W1.5 `referenceDocConfigs: []` field — it gets deleted in
+  W-DOCS-1 per § 8 ("Migration & risk").
+- Re-introduce the dropped `createReferenceCodec` / `composite.ts` shapes
+  verbatim — those become `DocDefinition.build()` composition (INVENTORY.md
+  § 2).
+
+### 10.7 Net taxonomy delta from the campaign
+
+| Change                                                      | Count  |
+| ----------------------------------------------------------- | ------ |
+| Tags added                                                  | **0**  |
+| Tags removed (under D9 follow-up; non-blocking)             | 0 or 1 |
+| Tag-registry schema fields added                            | **0**  |
+| New annotation carriers                                     | **0**  |
+
+The campaign shrinks or holds the taxonomy.

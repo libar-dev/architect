@@ -10,11 +10,12 @@ A focused design-session input set for the next time we pick up documentation ge
 
 1. **`DEEP-DIVE.md`** — the headline finding, the architectural reframe, and the answers to the two big questions ("can PatternGraph extract what we need?" and "annotation-config vs rethink to something more flexible?"). Start here.
 2. **`INVENTORY.md`** — concrete catalog: what exists in the post-W1.5 packages, what was dropped during the lift, what the pre-refactor monolith proved was possible. Use this for cross-reference while reading DEEP-DIVE.
-3. **`PROPOSED-DESIGN.md`** — sketches of the new `DocDefinition` API, the extractor catalog, the multi-target output surface, and the wave breakdown for execution.
+3. **`PROPOSED-DESIGN.md`** — sketches of the new `DocDefinition` API, the extractor catalog, the multi-target output surface, the wave breakdown for execution, and the § 10 wiki-tree-with-index extension.
+4. **`DECISIONS.md`** — ratified decisions D1–D9 from the 2026-05-17 design session. Supersedes the open questions in DEEP-DIVE and PROPOSED-DESIGN § 9 where they overlap; treat as source-of-truth for W-DOCS sequencing.
 
 ## Status
 
-**Blocking decisions:** none — design space is well-understood, the user has approved restoring the dropped capability and intends to extend rather than clone the pre-refactor design.
+**Blocking decisions:** none — design ratified in `DECISIONS.md` on 2026-05-17. W-DOCS-1 acceptance case is `docs/ANNOTATION-GUIDE.md` ported to a wiki tree under `docs-live/annotation-guide/`. Zero new annotation carriers added by the campaign.
 
 **Prerequisites in flight (not blocking this work but should land first):**
 
