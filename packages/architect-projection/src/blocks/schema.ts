@@ -1,75 +1,5 @@
 import { z } from 'zod';
 
-export interface HeadingBlock {
-  type: 'heading';
-  level: 1 | 2 | 3 | 4 | 5 | 6;
-  text: string;
-}
-
-export interface ParagraphBlock {
-  type: 'paragraph';
-  text: string;
-}
-
-export interface SeparatorBlock {
-  type: 'separator';
-}
-
-export interface TableBlock {
-  type: 'table';
-  columns: string[];
-  rows: string[][];
-  alignment?: ('left' | 'center' | 'right')[] | undefined;
-}
-
-export type ListItem =
-  | string
-  | {
-      text: string;
-      checked?: boolean | undefined;
-      children?: ListItem[] | undefined;
-    };
-
-export interface ListBlock {
-  type: 'list';
-  ordered: boolean;
-  items: ListItem[];
-}
-
-export interface CodeBlock {
-  type: 'code';
-  language?: string | undefined;
-  content: string;
-}
-
-export interface MermaidBlock {
-  type: 'mermaid';
-  content: string;
-}
-
-export interface CollapsibleBlock {
-  type: 'collapsible';
-  summary: string;
-  content: Block[];
-}
-
-export interface LinkOutBlock {
-  type: 'link-out';
-  text: string;
-  path: string;
-}
-
-export type Block =
-  | HeadingBlock
-  | ParagraphBlock
-  | SeparatorBlock
-  | TableBlock
-  | ListBlock
-  | CodeBlock
-  | MermaidBlock
-  | CollapsibleBlock
-  | LinkOutBlock;
-
 export const HeadingBlockSchema = z.strictObject({
   type: z.literal('heading'),
   level: z.union([
@@ -82,15 +12,18 @@ export const HeadingBlockSchema = z.strictObject({
   ]),
   text: z.string(),
 });
+export type HeadingBlock = z.infer<typeof HeadingBlockSchema>;
 
 export const ParagraphBlockSchema = z.strictObject({
   type: z.literal('paragraph'),
   text: z.string(),
 });
+export type ParagraphBlock = z.infer<typeof ParagraphBlockSchema>;
 
 export const SeparatorBlockSchema = z.strictObject({
   type: z.literal('separator'),
 });
+export type SeparatorBlock = z.infer<typeof SeparatorBlockSchema>;
 
 export const TableBlockSchema = z.strictObject({
   type: z.literal('table'),
@@ -98,7 +31,17 @@ export const TableBlockSchema = z.strictObject({
   rows: z.array(z.array(z.string())),
   alignment: z.array(z.enum(['left', 'center', 'right'])).optional(),
 });
+export type TableBlock = z.infer<typeof TableBlockSchema>;
 
+// Recursive: ListItem references itself. Zod cannot infer recursive lazy unions,
+// so the type is hand-written and the schema carries an explicit z.ZodType annotation.
+export type ListItem =
+  | string
+  | {
+      text: string;
+      checked?: boolean | undefined;
+      children?: ListItem[] | undefined;
+    };
 export const ListItemSchema: z.ZodType<ListItem> = z.lazy(() =>
   z.union([
     z.string(),
@@ -115,28 +58,52 @@ export const ListBlockSchema = z.strictObject({
   ordered: z.boolean().default(false),
   items: z.array(ListItemSchema),
 });
+export type ListBlock = z.infer<typeof ListBlockSchema>;
 
 export const CodeBlockSchema = z.strictObject({
   type: z.literal('code'),
   language: z.string().optional(),
   content: z.string(),
 });
+export type CodeBlock = z.infer<typeof CodeBlockSchema>;
 
 export const MermaidBlockSchema = z.strictObject({
   type: z.literal('mermaid'),
   content: z.string(),
 });
-
-export const CollapsibleBlockSchema = z.strictObject({
-  type: z.literal('collapsible'),
-  summary: z.string(),
-  content: z.lazy(() => z.array(BlockSchema)),
-});
+export type MermaidBlock = z.infer<typeof MermaidBlockSchema>;
 
 export const LinkOutBlockSchema = z.strictObject({
   type: z.literal('link-out'),
   text: z.string(),
   path: z.string(),
+});
+export type LinkOutBlock = z.infer<typeof LinkOutBlockSchema>;
+
+// Recursive: CollapsibleBlock contains Block[], which can contain more CollapsibleBlocks.
+// The `content` field uses z.lazy so it can reference BlockSchema (declared below).
+// Block is hand-written and BlockSchema carries an explicit z.ZodType annotation
+// because Zod cannot infer recursive lazy unions.
+export type CollapsibleBlock = {
+  type: 'collapsible';
+  summary: string;
+  content: Block[];
+};
+export type Block =
+  | HeadingBlock
+  | ParagraphBlock
+  | SeparatorBlock
+  | TableBlock
+  | ListBlock
+  | CodeBlock
+  | MermaidBlock
+  | CollapsibleBlock
+  | LinkOutBlock;
+
+export const CollapsibleBlockSchema = z.strictObject({
+  type: z.literal('collapsible'),
+  summary: z.string(),
+  content: z.lazy(() => z.array(BlockSchema)),
 });
 
 export const BlockSchema: z.ZodType<Block> = z.discriminatedUnion('type', [
@@ -150,7 +117,8 @@ export const BlockSchema: z.ZodType<Block> = z.discriminatedUnion('type', [
   CollapsibleBlockSchema,
   LinkOutBlockSchema,
 ]);
-export type BlockType = z.infer<typeof BlockSchema>['type'];
+
+export type BlockType = Block['type'];
 
 export const BLOCK_TYPES = new Set<BlockType>([
   'heading',
