@@ -51,7 +51,9 @@ export const EmbeddedRuleRefSchema = z.strictObject({
 
 export const DeliverableSchema = ExecutionContextDeliverableSchema.omit({ kind: true });
 
-export const DeliverableManifestSchema = ExecutionContextDeliverableManifestSchema.omit({ kind: true }).extend({
+export const DeliverableManifestSchema = ExecutionContextDeliverableManifestSchema.omit({
+  kind: true,
+}).extend({
   items: z.array(DeliverableSchema),
 });
 

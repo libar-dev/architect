@@ -14,13 +14,13 @@
 
 Five thematic commits on `campaign/docs-and-skills-consolidation`, matching the plan's commit strategy:
 
-| Commit    | Scope                                                                                            |
-| --------- | ------------------------------------------------------------------------------------------------ |
-| `c74814f` | Substrate contract coverage (T2 — registry-axis contract tests, TDD)                              |
-| `3b154d7` | 4-axis registry decomposition (T6) + consumer alignment (T7)                                      |
-| `58cb485` | Perf gate expansion across `renderMarkdown` doc types (T8) + baseline refresh (T9)                |
-| `cf7abe8` | Tranche-one hardening (T10–T13: KindTable, isPlainObject, route parsing, addRoutedDocument)       |
-| `a4c2ddb` | Markdown perf comparator budgets (final ratchet — `min(hard, baseline × 1.5)`)                    |
+| Commit    | Scope                                                                                       |
+| --------- | ------------------------------------------------------------------------------------------- |
+| `c74814f` | Substrate contract coverage (T2 — registry-axis contract tests, TDD)                        |
+| `3b154d7` | 4-axis registry decomposition (T6) + consumer alignment (T7)                                |
+| `58cb485` | Perf gate expansion across `renderMarkdown` doc types (T8) + baseline refresh (T9)          |
+| `cf7abe8` | Tranche-one hardening (T10–T13: KindTable, isPlainObject, route parsing, addRoutedDocument) |
+| `a4c2ddb` | Markdown perf comparator budgets (final ratchet — `min(hard, baseline × 1.5)`)              |
 
 ### What is uncommitted (legitimate fixup, both reviewers confirm)
 
@@ -29,10 +29,10 @@ Five thematic commits on `campaign/docs-and-skills-consolidation`, matching the 
 
 ### Reviewer verdicts
 
-| Reviewer          | Verdict                          | Blockers | Polish items |
-| ----------------- | -------------------------------- | -------- | ------------ |
-| `code-reviewer`   | "polish then ship"               | 0        | 4            |
-| `code-simplifier` | "matches design — ship"          | 0        | 4            |
+| Reviewer          | Verdict                 | Blockers | Polish items |
+| ----------------- | ----------------------- | -------- | ------------ |
+| `code-reviewer`   | "polish then ship"      | 0        | 4            |
+| `code-simplifier` | "matches design — ship" | 0        | 4            |
 
 Both reviewers verified the doctrine surface: zero `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `@deprecated`, or BC shims introduced in projection `src/`. Lint, typecheck, build, package tests (172) all green.
 
@@ -42,18 +42,18 @@ Both reviewers verified the doctrine surface: zero `eslint-disable`, `@ts-ignore
 
 These are the load-bearing primitives the `.pr-coordination/` design assumes are stable. State at capture:
 
-| Substrate                                           | State                                                      | Source                                                                                          |
-| --------------------------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| 4-axis documentation-type registry                  | Decomposed; exhaustive via `satisfies Record<…>`           | `packages/architect-projection/src/projections/documentation-composition/documentation-type-registry.*.ts` |
-| Markdown renderer dispatch                          | `StrictKindTable<…>` enforces compile-time exhaustiveness  | `packages/architect-projection/src/renderers/_shared/dispatch.ts:20-22` + `render-markdown.ts:219` |
-| Route-id parsing                                    | Centralized (`parseLogicalRouteId`, `tryParseLogicalRouteId`) | `packages/architect-projection/src/routing/route-id.ts:63-111`                                  |
-| `isPlainObject` plus lint guard                     | Single source + `no-restricted-syntax` rule                | `packages/architect-projection/src/shared/plain-object.ts` + `eslint.config.mjs:14-30`          |
-| Perf gate                                           | Real ratchet `min(hard, baseline × 1.5)` over 3 doc types  | `packages/architect-projection/tests/perf/compare-baseline.mjs:30-34, 73-158`                   |
-| `addRoutedDocument` split-path                      | One render reused across measure + emit; split-path threads parent render | `render-markdown.ts:337-340, 2117-2186`                                              |
-| Pattern-relations identity                          | `PatternIdentitySchema` extracted via `.omit({ kind: true })` | `packages/architect-projection/src/fragments/pattern-relations/pattern-summary.ts:28`           |
-| `parseMarkdownToBlocks` (preamble foundation)       | Already exported from core, untouched by this campaign     | `packages/architect-core/src/utils/markdown-parser.ts`                                          |
-| `extractShapes` + `discoverTaggedShapes`            | Already walks JSDoc for `@architect-extract-shapes`        | `packages/architect-core/src/extractor/shape-extractor.ts`                                      |
-| `presentation-contracts.ts` (ReferenceDocConfig etc.) | Schema present, no consumer — re-wiring is W-DOCS-1 work | `packages/architect-core/src/config/presentation-contracts.ts`                                  |
+| Substrate                                             | State                                                                     | Source                                                                                                     |
+| ----------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| 4-axis documentation-type registry                    | Decomposed; exhaustive via `satisfies Record<…>`                          | `packages/architect-projection/src/projections/documentation-composition/documentation-type-registry.*.ts` |
+| Markdown renderer dispatch                            | `StrictKindTable<…>` enforces compile-time exhaustiveness                 | `packages/architect-projection/src/renderers/_shared/dispatch.ts:20-22` + `render-markdown.ts:219`         |
+| Route-id parsing                                      | Centralized (`parseLogicalRouteId`, `tryParseLogicalRouteId`)             | `packages/architect-projection/src/routing/route-id.ts:63-111`                                             |
+| `isPlainObject` plus lint guard                       | Single source + `no-restricted-syntax` rule                               | `packages/architect-projection/src/shared/plain-object.ts` + `eslint.config.mjs:14-30`                     |
+| Perf gate                                             | Real ratchet `min(hard, baseline × 1.5)` over 3 doc types                 | `packages/architect-projection/tests/perf/compare-baseline.mjs:30-34, 73-158`                              |
+| `addRoutedDocument` split-path                        | One render reused across measure + emit; split-path threads parent render | `render-markdown.ts:337-340, 2117-2186`                                                                    |
+| Pattern-relations identity                            | `PatternIdentitySchema` extracted via `.omit({ kind: true })`             | `packages/architect-projection/src/fragments/pattern-relations/pattern-summary.ts:28`                      |
+| `parseMarkdownToBlocks` (preamble foundation)         | Already exported from core, untouched by this campaign                    | `packages/architect-core/src/utils/markdown-parser.ts`                                                     |
+| `extractShapes` + `discoverTaggedShapes`              | Already walks JSDoc for `@architect-extract-shapes`                       | `packages/architect-core/src/extractor/shape-extractor.ts`                                                 |
+| `presentation-contracts.ts` (ReferenceDocConfig etc.) | Schema present, no consumer — re-wiring is W-DOCS-1 work                  | `packages/architect-core/src/config/presentation-contracts.ts`                                             |
 
 **Implication:** every substrate primitive the W-DOCS-1 PoC needs is either (a) already in place and verified, or (b) explicitly part of W-DOCS-1 itself (`DocDefinition`, `WikiIndexDefinition`, `projectWikiIndex`, `composeDoc`). The campaign is not waiting on hidden substrate work.
 
@@ -65,15 +65,15 @@ These are the load-bearing primitives the `.pr-coordination/` design assumes are
 
 Candidate items investigated and rejected as blockers:
 
-| Candidate                                                             | Why it doesn't block                                                                                                                             |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Duplicate `DeliverableManifestSchema` (pattern-relations vs exec-context) | Plan T4 explicitly accepted internal duplication; public barrel only exports the canonical variant. Trigger for fixing is cross-module schema-by-name scanning — not on the PoC path. |
+| Candidate                                                                     | Why it doesn't block                                                                                                                                                                                                                              |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Duplicate `DeliverableManifestSchema` (pattern-relations vs exec-context)     | Plan T4 explicitly accepted internal duplication; public barrel only exports the canonical variant. Trigger for fixing is cross-module schema-by-name scanning — not on the PoC path.                                                             |
 | Hardcoded 12-entry generator dispatch (`documentation-bundle.internal.ts:64`) | The PoC explicitly does NOT touch the existing generator dispatch — it adds a NEW `DocDefinition` runner in `architect-generate` per § 7 of `PROPOSED-DESIGN.md`. The old dispatch stays until W-DOCS-5+ ports lift their respective docs across. |
-| Three-axis disclosure split (D2)                                       | The Zod enum stays; consumers split when they consume. W-DOCS-2d does the input-side split; W-DOCS-1 reads from the existing `ProgressiveDisclosurePolicy` consumer-side. No upfront refactor required.                                    |
-| `@architect-usecase` decision (D9)                                     | Explicitly non-blocking per D9; PoC does not depend on `@architect-usecase`.                                                                     |
-| Wave 4 public-surface README work                                      | Independent surface; can land in parallel or be subsumed into W-DOCS-5 ports.                                                                    |
-| Wave 9 Phase 3+ skills exposure                                        | D7 makes skills a *consumer* of W-DOCS machinery, not a prerequisite. W-DOCS-1 Target A is one skill; full Wave 9 exposure waits on the PoC.    |
-| Resolved-invocation-dir audit (`runtime-helpers.ts:36`)                | Test harness already strips `PWD`/`INIT_CWD`; not on the PoC critical path. Stays on the 1.5.x hardening backlog.                                |
+| Three-axis disclosure split (D2)                                              | The Zod enum stays; consumers split when they consume. W-DOCS-2d does the input-side split; W-DOCS-1 reads from the existing `ProgressiveDisclosurePolicy` consumer-side. No upfront refactor required.                                           |
+| `@architect-usecase` decision (D9)                                            | Explicitly non-blocking per D9; PoC does not depend on `@architect-usecase`.                                                                                                                                                                      |
+| Wave 4 public-surface README work                                             | Independent surface; can land in parallel or be subsumed into W-DOCS-5 ports.                                                                                                                                                                     |
+| Wave 9 Phase 3+ skills exposure                                               | D7 makes skills a _consumer_ of W-DOCS machinery, not a prerequisite. W-DOCS-1 Target A is one skill; full Wave 9 exposure waits on the PoC.                                                                                                      |
+| Resolved-invocation-dir audit (`runtime-helpers.ts:36`)                       | Test harness already strips `PWD`/`INIT_CWD`; not on the PoC critical path. Stays on the 1.5.x hardening backlog.                                                                                                                                 |
 
 ---
 
@@ -248,14 +248,14 @@ The W-DOCS-1 PoC is **not** a release blocker; it can ship after `2.0.0-pre.1` i
 
 ## 8. Verification gates per phase
 
-| Phase                          | Gate                                                                                                          | Command                                                                                                                                                                       |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Post-A-1 (fixup commit)        | Dogfood + projection still green                                                                              | `pnpm --filter @libar-dev/architect-projection test && pnpm test:dogfood`                                                                                                     |
-| Post-A-3 (Prettier sweep)      | Format clean; tests + lint + typecheck unaffected                                                             | `pnpm format:check && pnpm -r lint && pnpm typecheck && pnpm -r test`                                                                                                          |
-| Pre-W-DOCS-1 design-tier spec  | All idea-tier `.pr-coordination/ideation-specs/*.feature` marked ✅ by maintainer (per `README.md` gate)        | Manual review of the 5 ideation specs                                                                                                                                          |
-| W-DOCS-1 acceptance (D4'/D10)  | Two targets generated; ≥2 fragments shared at different disclosures; 4 data-source kinds exercised end-to-end | `pnpm docs:all` produces `.claude/skills/wiki-doc-generation/SKILL.md` AND `docs-live/wiki-doc-generation/INDEX.md` + child pages, both from one source; cross-refs resolve   |
-| W-DOCS-2+ regression           | Perf gate stays inside `min(hard, baseline × 1.5)` after each new doc type lands                              | `pnpm --filter @libar-dev/architect-projection test` (the perf comparator throws on metric drift)                                                                              |
-| Pre-publish (Wave 7)           | Doctrine clean; no `eslint-disable` / `@ts-ignore` / `@deprecated` regressions                                | `pnpm guard:no-suppressions && pnpm validate:all && pnpm -r lint && pnpm typecheck && pnpm -r test && pnpm test:dogfood`                                                       |
+| Phase                         | Gate                                                                                                          | Command                                                                                                                                                                     |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Post-A-1 (fixup commit)       | Dogfood + projection still green                                                                              | `pnpm --filter @libar-dev/architect-projection test && pnpm test:dogfood`                                                                                                   |
+| Post-A-3 (Prettier sweep)     | Format clean; tests + lint + typecheck unaffected                                                             | `pnpm format:check && pnpm -r lint && pnpm typecheck && pnpm -r test`                                                                                                       |
+| Pre-W-DOCS-1 design-tier spec | All idea-tier `.pr-coordination/ideation-specs/*.feature` marked ✅ by maintainer (per `README.md` gate)      | Manual review of the 5 ideation specs                                                                                                                                       |
+| W-DOCS-1 acceptance (D4'/D10) | Two targets generated; ≥2 fragments shared at different disclosures; 4 data-source kinds exercised end-to-end | `pnpm docs:all` produces `.claude/skills/wiki-doc-generation/SKILL.md` AND `docs-live/wiki-doc-generation/INDEX.md` + child pages, both from one source; cross-refs resolve |
+| W-DOCS-2+ regression          | Perf gate stays inside `min(hard, baseline × 1.5)` after each new doc type lands                              | `pnpm --filter @libar-dev/architect-projection test` (the perf comparator throws on metric drift)                                                                           |
+| Pre-publish (Wave 7)          | Doctrine clean; no `eslint-disable` / `@ts-ignore` / `@deprecated` regressions                                | `pnpm guard:no-suppressions && pnpm validate:all && pnpm -r lint && pnpm typecheck && pnpm -r test && pnpm test:dogfood`                                                    |
 
 ---
 

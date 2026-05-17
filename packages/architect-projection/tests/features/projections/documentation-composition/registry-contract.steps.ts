@@ -112,24 +112,27 @@ describeFeature(feature, ({ Background, Rule }) => {
   });
 
   Rule('Registry identity stays explicit across documentation types', ({ RuleScenario }) => {
-    RuleScenario('identity axis pins supported keys route identities and lookups', ({ Then, And }) => {
-      Then('the identity axis should expose the supported documentation keys in order', () => {
-        expect(SUPPORTED_DOCUMENTATION_TYPES).toEqual(expectedDocumentationTypes);
-        expect(SUPPORTED_DOCUMENTATION_TYPE_REGISTRY.map((entry) => entry.key)).toEqual(
-          expectedDocumentationTypes,
-        );
-        expect(entriesByType((entry) => entry.rootRouteId)).toEqual(
-          entriesByType((entry) => `${entry.key}:index`),
-        );
-      });
+    RuleScenario(
+      'identity axis pins supported keys route identities and lookups',
+      ({ Then, And }) => {
+        Then('the identity axis should expose the supported documentation keys in order', () => {
+          expect(SUPPORTED_DOCUMENTATION_TYPES).toEqual(expectedDocumentationTypes);
+          expect(SUPPORTED_DOCUMENTATION_TYPE_REGISTRY.map((entry) => entry.key)).toEqual(
+            expectedDocumentationTypes,
+          );
+          expect(entriesByType((entry) => entry.rootRouteId)).toEqual(
+            entriesByType((entry) => `${entry.key}:index`),
+          );
+        });
 
-      And('the identity axis should resolve each key to the same metadata entry', () => {
-        for (const entry of SUPPORTED_DOCUMENTATION_TYPE_REGISTRY) {
-          expect(getDocumentationTypeMetadata(entry.key)).toBe(entry);
-          expect(getSupportedDocumentationTypeMetadata(entry.key)).toBe(entry);
-        }
-      });
-    });
+        And('the identity axis should resolve each key to the same metadata entry', () => {
+          for (const entry of SUPPORTED_DOCUMENTATION_TYPE_REGISTRY) {
+            expect(getDocumentationTypeMetadata(entry.key)).toBe(entry);
+            expect(getSupportedDocumentationTypeMetadata(entry.key)).toBe(entry);
+          }
+        });
+      },
+    );
   });
 
   Rule('Registry output routing stays explicit across documentation types', ({ RuleScenario }) => {
@@ -162,13 +165,16 @@ describeFeature(feature, ({ Background, Rule }) => {
         );
       });
 
-      And('the disclosure axis should expose a complete disclosure matrix for every documentation type', () => {
-        for (const entry of SUPPORTED_DOCUMENTATION_TYPE_REGISTRY) {
-          expect(() => SupportedDocumentationTypeRegistryEntrySchema.parse(entry)).not.toThrow();
-          expect(Object.keys(entry.disclosureMatrix)).toEqual(PROGRESSIVE_DISCLOSURE_LEVELS);
-          expect(entry.disclosureMatrix[entry.defaultDisclosureLevel]).toBeDefined();
-        }
-      });
+      And(
+        'the disclosure axis should expose a complete disclosure matrix for every documentation type',
+        () => {
+          for (const entry of SUPPORTED_DOCUMENTATION_TYPE_REGISTRY) {
+            expect(() => SupportedDocumentationTypeRegistryEntrySchema.parse(entry)).not.toThrow();
+            expect(Object.keys(entry.disclosureMatrix)).toEqual(PROGRESSIVE_DISCLOSURE_LEVELS);
+            expect(entry.disclosureMatrix[entry.defaultDisclosureLevel]).toBeDefined();
+          }
+        },
+      );
     });
   });
 

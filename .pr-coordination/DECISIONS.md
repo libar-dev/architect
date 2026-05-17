@@ -58,27 +58,27 @@ The `essential | important | useful | advanced` vocabulary applies to three
 distinct concerns, each owned by a different layer. They compose without
 conflict.
 
-| Axis                   | Question it answers                                  | Mechanism                                                |
-| ---------------------- | ---------------------------------------------------- | -------------------------------------------------------- |
-| **INPUT disclosure**   | "Which sub-sections does this fragment emit?"        | `ContentFragment.build(ctx, { disclosure })` parameter   |
-| **OUTPUT disclosure**  | "Does this doc render inline or split into files?"   | `bundle.routing.disclosureSpec` + `splitOversizedDocument` |
-| **INDEX disclosure**   | "How deep does navigation expose the tree?"          | `WikiIndexDefinition` index page is itself a disclosure slice; readers descend by clicking |
+| Axis                  | Question it answers                                | Mechanism                                                                                  |
+| --------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| **INPUT disclosure**  | "Which sub-sections does this fragment emit?"      | `ContentFragment.build(ctx, { disclosure })` parameter                                     |
+| **OUTPUT disclosure** | "Does this doc render inline or split into files?" | `bundle.routing.disclosureSpec` + `splitOversizedDocument`                                 |
+| **INDEX disclosure**  | "How deep does navigation expose the tree?"        | `WikiIndexDefinition` index page is itself a disclosure slice; readers descend by clicking |
 
 Codebase implication: today's machinery conflates INPUT and OUTPUT under
 `ProgressiveDisclosurePolicy`. The campaign separates them. The Zod schemas
-keep the four-value enum; the *consumers* of that enum split.
+keep the four-value enum; the _consumers_ of that enum split.
 
 ### D3'' — No new annotation carriers; Concept Index sources from Gherkin
 
 The Concept Index ("intent → file" inversion) is built from existing
 executable-spec primitives, not from a new tag:
 
-| Concept Index source                | Carrier                                                                         |
-| ----------------------------------- | ------------------------------------------------------------------------------- |
-| Goal-shaped intents (actor + goal)  | Gherkin `Scenario:` titles (already typed via vitest-cucumber, executed in CI)  |
-| Invariant-shaped intents            | Gherkin `Rule:` titles (already required to carry rationale + verified-by)      |
-| Capability-shaped intents           | Gherkin `Feature:` name + description (one capability per file)                 |
-| TS-only code participation          | Indirect via `@architect-implements <Pattern>` → graph join → that pattern's scenarios |
+| Concept Index source               | Carrier                                                                                |
+| ---------------------------------- | -------------------------------------------------------------------------------------- |
+| Goal-shaped intents (actor + goal) | Gherkin `Scenario:` titles (already typed via vitest-cucumber, executed in CI)         |
+| Invariant-shaped intents           | Gherkin `Rule:` titles (already required to carry rationale + verified-by)             |
+| Capability-shaped intents          | Gherkin `Feature:` name + description (one capability per file)                        |
+| TS-only code participation         | Indirect via `@architect-implements <Pattern>` → graph join → that pattern's scenarios |
 
 The Concept Index is a **graph join over PatternGraph**, not a string-clustering
 pass. No paraphrase normalization needed; no free-text drift; no `@architect-usecase`
@@ -87,27 +87,27 @@ dependency.
 **UML mapping used by the wiki index** (canonical for this repo, not
 extensible per session):
 
-| UML concept                       | Repo primitive                                |
-| --------------------------------- | --------------------------------------------- |
-| Stereotype                        | `@architect-role` (8-value enum)              |
-| Package / System boundary         | `@architect-bounded-context`                  |
-| Generalization                    | `@architect-extends`                          |
-| Realization                       | `@architect-implements`                       |
-| Dependency                        | `@architect-uses`                             |
-| Association                       | `@architect-see-also`                         |
-| Containment / package hierarchy   | `@architect-parent` + `@architect-level`      |
-| Use case (Actor + goal + outcome) | Gherkin `Scenario:`                           |
-| Invariant / OCL constraint        | Gherkin `Rule:`                               |
-| Capability                        | Gherkin `Feature:`                            |
+| UML concept                       | Repo primitive                           |
+| --------------------------------- | ---------------------------------------- |
+| Stereotype                        | `@architect-role` (8-value enum)         |
+| Package / System boundary         | `@architect-bounded-context`             |
+| Generalization                    | `@architect-extends`                     |
+| Realization                       | `@architect-implements`                  |
+| Dependency                        | `@architect-uses`                        |
+| Association                       | `@architect-see-also`                    |
+| Containment / package hierarchy   | `@architect-parent` + `@architect-level` |
+| Use case (Actor + goal + outcome) | Gherkin `Scenario:`                      |
+| Invariant / OCL constraint        | Gherkin `Rule:`                          |
+| Capability                        | Gherkin `Feature:`                       |
 
 ### D3a' — Reading Paths derive from hierarchy or are declared editorially
 
 Two sources, no new annotation:
 
 1. **Hierarchical reading paths** are derived by walking `@architect-parent`
-   + `@architect-level` (re-rendering of `projectDependencyTree` already
-   exposed via `pnpm architect:query dep-tree`). The wiki-index renders the
-   walk as a numbered reading path.
+   - `@architect-level` (re-rendering of `projectDependencyTree` already
+     exposed via `pnpm architect:query dep-tree`). The wiki-index renders the
+     walk as a numbered reading path.
 2. **Cross-cutting editorial reading paths** are declared as a TypeScript
    field on `WikiIndexDefinition`:
 
@@ -117,13 +117,13 @@ Two sources, no new annotation:
        id: 'first-annotate',
        intent: 'I want to annotate a TypeScript service file for the first time',
        steps: [
-         { routeId: '1-getting-started',         rationale: 'add @architect opt-in' },
-         { routeId: '6-patterns-by-file-type',   rationale: 'find service-or-module pattern' },
-         { routeId: '4-tag-reference/4-1-core',  rationale: 'look up required core tags' },
-         { routeId: '7-verification/7-1-cli',     rationale: 'verify with pnpm architect:query' },
+         { routeId: '1-getting-started', rationale: 'add @architect opt-in' },
+         { routeId: '6-patterns-by-file-type', rationale: 'find service-or-module pattern' },
+         { routeId: '4-tag-reference/4-1-core', rationale: 'look up required core tags' },
+         { routeId: '7-verification/7-1-cli', rationale: 'verify with pnpm architect:query' },
        ],
      },
-   ]
+   ];
    ```
 
    Editorial intent lives in code, not in production-code annotations. This
@@ -169,16 +169,16 @@ later waves (W-DOCS-5 onward).
 The W-DOCS-1 PoC (D4') is green only if the two pilot targets exercise the
 full data-source surface that the design promises. Concretely:
 
-| Required surface                              | PoC instance                                                                                                                            |
-| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| ≥ 2 output documents                          | Target A (skill) + Target B (wiki tree).                                                                                                |
-| Shared content across both                    | At least 2 ContentFragments embedded in both targets at different INPUT disclosure depths.                                              |
-| Per-target unique content                     | Skill carries trigger-detection / when-this-fires section; wiki carries verb reference + type schemas at full depth.                    |
-| Different level of detail per target          | Fragments emit reduced section sets at lower disclosure; readers descend via `linkToCanonical` from skill → wiki.                       |
-| Data source — JSDoc from annotated block      | `extractJSDocProse` on the JSDoc block above `WikiIndexDefinition` (or `ContentFragment`) in `architect-projection`.                    |
-| Data source — interface / code-snippet shape  | `extractTypeShapes` on the `WikiIndexDefinition` interface; source-text or structured renderer for the code-snippet form.               |
-| Data source — small live mermaid diagram      | `extractGraphDiagram` or hand-built `MermaidBlock` — the generation pipeline (source → `DocDefinition.build` → `projectWikiIndex` → INDEX + pages). |
-| Data source — business rule                   | `extractBehaviors({ tag })` against a Gherkin `Rule:` block authored as part of the PoC (e.g. "INDEX disclosure summarizes content"). |
+| Required surface                             | PoC instance                                                                                                                                        |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ≥ 2 output documents                         | Target A (skill) + Target B (wiki tree).                                                                                                            |
+| Shared content across both                   | At least 2 ContentFragments embedded in both targets at different INPUT disclosure depths.                                                          |
+| Per-target unique content                    | Skill carries trigger-detection / when-this-fires section; wiki carries verb reference + type schemas at full depth.                                |
+| Different level of detail per target         | Fragments emit reduced section sets at lower disclosure; readers descend via `linkToCanonical` from skill → wiki.                                   |
+| Data source — JSDoc from annotated block     | `extractJSDocProse` on the JSDoc block above `WikiIndexDefinition` (or `ContentFragment`) in `architect-projection`.                                |
+| Data source — interface / code-snippet shape | `extractTypeShapes` on the `WikiIndexDefinition` interface; source-text or structured renderer for the code-snippet form.                           |
+| Data source — small live mermaid diagram     | `extractGraphDiagram` or hand-built `MermaidBlock` — the generation pipeline (source → `DocDefinition.build` → `projectWikiIndex` → INDEX + pages). |
+| Data source — business rule                  | `extractBehaviors({ tag })` against a Gherkin `Rule:` block authored as part of the PoC (e.g. "INDEX disclosure summarizes content").               |
 
 The four data-source kinds cover the substrate the design must support
 end-to-end. Any additional extractors (CLI commands, MCP tools, lint
@@ -275,15 +275,15 @@ machinery.
 All five wiki-index navigation sections are derived from the rendered
 bundle children + the graph. No hand-authored navigation.
 
-| Section                  | Derivation                                                                                              |
-| ------------------------ | ------------------------------------------------------------------------------------------------------- |
-| Header counts            | Walk bundle children: `N pages`, `~M lines`, `K mermaid diagrams`, `T tables`.                          |
-| File Map                 | One row per child. "Answers" = first paragraph of the page's source content (JSDoc summary / `Feature:` / `Rule:` invariant). "Key Entities" = extractor outputs for that child. |
-| Concept Index            | Graph join: for each pattern contributing to any child page, collect Scenario/Rule/Feature titles → invert by intent string. |
-| Key Entities Reference   | Aggregate extractor outputs across the tree; primary-definition page = the child where `@architect-pattern` / `@architect-implements` declares the symbol. |
-| Diagram Catalog          | Walk `MermaidBlock` nodes; group by `mermaidType`; list per-page densities.                             |
-| Reading Paths            | Hierarchical: re-render of `projectDependencyTree`. Editorial: from `WikiIndexDefinition.readingPaths`. |
-| Validation               | Generated grep/rg commands that reproduce the header counts (per `WIKI-INDEXING-FORMAT.md` § 10).       |
+| Section                | Derivation                                                                                                                                                                       |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Header counts          | Walk bundle children: `N pages`, `~M lines`, `K mermaid diagrams`, `T tables`.                                                                                                   |
+| File Map               | One row per child. "Answers" = first paragraph of the page's source content (JSDoc summary / `Feature:` / `Rule:` invariant). "Key Entities" = extractor outputs for that child. |
+| Concept Index          | Graph join: for each pattern contributing to any child page, collect Scenario/Rule/Feature titles → invert by intent string.                                                     |
+| Key Entities Reference | Aggregate extractor outputs across the tree; primary-definition page = the child where `@architect-pattern` / `@architect-implements` declares the symbol.                       |
+| Diagram Catalog        | Walk `MermaidBlock` nodes; group by `mermaidType`; list per-page densities.                                                                                                      |
+| Reading Paths          | Hierarchical: re-render of `projectDependencyTree`. Editorial: from `WikiIndexDefinition.readingPaths`.                                                                          |
+| Validation             | Generated grep/rg commands that reproduce the header counts (per `WIKI-INDEXING-FORMAT.md` § 10).                                                                                |
 
 ### D9 — Follow-up (non-blocking): re-examine `@architect-usecase`
 
@@ -310,12 +310,12 @@ not block on it.
 
 ## Net taxonomy delta from the docs campaign
 
-| Change                                                      | Count  |
-| ----------------------------------------------------------- | ------ |
-| Tags added                                                  | **0**  |
-| Tags removed (under D9 follow-up; non-blocking)             | 0 or 1 |
-| Tag-registry schema fields added                            | **0**  |
-| New annotation carriers                                     | **0**  |
+| Change                                          | Count  |
+| ----------------------------------------------- | ------ |
+| Tags added                                      | **0**  |
+| Tags removed (under D9 follow-up; non-blocking) | 0 or 1 |
+| Tag-registry schema fields added                | **0**  |
+| New annotation carriers                         | **0**  |
 
 The campaign shrinks or holds the taxonomy. This matches the past refactor
 direction and the doctrine pattern: when a new surface tempts vocabulary

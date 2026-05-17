@@ -109,7 +109,9 @@ function expectOrderedSubstrings(haystack: string, needles: readonly string[]): 
 const outputModifiersFeature = await loadFeature(
   'tests/features/cli/pattern-graph-cli-output-modifiers.feature',
 );
-const archHealthFeature = await loadFeature('tests/features/cli/pattern-graph-cli-arch-health.feature');
+const archHealthFeature = await loadFeature(
+  'tests/features/cli/pattern-graph-cli-arch-health.feature',
+);
 const rulesSubcommandFeature = await loadFeature(
   'tests/features/cli/pattern-graph-cli-rules-subcommand.feature',
 );

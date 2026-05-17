@@ -135,9 +135,7 @@ function buildSupportedDocumentationTypeRegistryState(): SupportedDocumentationT
   };
 }
 
-function createLazyReadonlyArrayFacade<TValue>(
-  load: () => readonly TValue[],
-): readonly TValue[] {
+function createLazyReadonlyArrayFacade<TValue>(load: () => readonly TValue[]): readonly TValue[] {
   const target: TValue[] = [];
   let initialized = false;
 

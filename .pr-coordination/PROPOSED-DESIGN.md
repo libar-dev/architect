@@ -593,20 +593,20 @@ import type { DocDefinition, DocBuildContext } from './types.js';
 import type { ProjectionBundle, Fragment } from '../fragments/index.js';
 
 export interface ReadingPathStep {
-  readonly routeId: string;       // LogicalRouteId of a child page
-  readonly rationale: string;     // why this step at this position
+  readonly routeId: string; // LogicalRouteId of a child page
+  readonly rationale: string; // why this step at this position
 }
 
 export interface ReadingPath {
-  readonly id: string;            // 'first-annotate'
-  readonly intent: string;        // 'I want to annotate a TypeScript service file for the first time'
+  readonly id: string; // 'first-annotate'
+  readonly intent: string; // 'I want to annotate a TypeScript service file for the first time'
   readonly steps: readonly ReadingPathStep[];
 }
 
 export interface WikiIndexDefinition {
-  readonly id: string;            // 'annotation-guide'
-  readonly title: string;         // 'Annotation Guide'
-  readonly root: DocDefinition;   // produces the ProjectionBundle whose children become pages
+  readonly id: string; // 'annotation-guide'
+  readonly title: string; // 'Annotation Guide'
+  readonly root: DocDefinition; // produces the ProjectionBundle whose children become pages
   readonly readingPaths?: readonly ReadingPath[];
   readonly preambles?: Readonly<Record<string, string>>; // routeId → preamble markdown path
 }
@@ -673,29 +673,29 @@ export const annotationGuide = defineWikiIndex({
       id: 'first-annotate',
       intent: 'I want to annotate a TypeScript service file for the first time',
       steps: [
-        { routeId: '1-getting-started',         rationale: 'add @architect opt-in' },
-        { routeId: '6-patterns-by-file-type',   rationale: 'find service-or-module pattern' },
-        { routeId: '4-tag-reference/4-1-core',  rationale: 'look up required core tags' },
-        { routeId: '7-verification/7-1-cli',     rationale: 'verify with pnpm architect:query' },
+        { routeId: '1-getting-started', rationale: 'add @architect opt-in' },
+        { routeId: '6-patterns-by-file-type', rationale: 'find service-or-module pattern' },
+        { routeId: '4-tag-reference/4-1-core', rationale: 'look up required core tags' },
+        { routeId: '7-verification/7-1-cli', rationale: 'verify with pnpm architect:query' },
       ],
     },
     {
       id: 'add-new-tag',
       intent: 'I want to add a new tag to the taxonomy',
       steps: [
-        { routeId: '2-ownership-model',          rationale: 'understand TS vs Gherkin boundary' },
-        { routeId: '4-tag-reference',            rationale: 'pick the right group' },
-        { routeId: '5-format-types',             rationale: 'choose a format type' },
-        { routeId: '7-verification',             rationale: 'verify with diagnostics' },
+        { routeId: '2-ownership-model', rationale: 'understand TS vs Gherkin boundary' },
+        { routeId: '4-tag-reference', rationale: 'pick the right group' },
+        { routeId: '5-format-types', rationale: 'choose a format type' },
+        { routeId: '7-verification', rationale: 'verify with diagnostics' },
       ],
     },
     {
       id: 'debug-missing-pattern',
       intent: "My pattern isn't appearing in scanner output — what now?",
       steps: [
-        { routeId: '1-getting-started',         rationale: 'confirm file-level opt-in is present' },
+        { routeId: '1-getting-started', rationale: 'confirm file-level opt-in is present' },
         { routeId: '7-verification/7-2-common-issues', rationale: 'check the known-failure table' },
-        { routeId: '7-verification/7-1-cli',     rationale: 'run architect:query unannotated --path' },
+        { routeId: '7-verification/7-1-cli', rationale: 'run architect:query unannotated --path' },
       ],
     },
   ],
@@ -730,11 +730,11 @@ docs-live/annotation-guide/
 
 ### 10.4 Three orthogonal disclosure axes (D2)
 
-| Axis                  | Question                                              | Mechanism                                              |
-| --------------------- | ----------------------------------------------------- | ------------------------------------------------------ |
-| **INPUT disclosure**  | "Which sub-sections does this fragment emit?"         | `ContentFragment.build(ctx, { disclosure })` (§ 3b)    |
-| **OUTPUT disclosure** | "Does this doc render inline or split into files?"   | `bundle.routing.disclosureSpec` + `splitOversizedDocument` |
-| **INDEX disclosure**  | "How deep does navigation expose the tree?"          | `WikiIndexDefinition` — the index page itself is the disclosure slice; readers descend by clicking |
+| Axis                  | Question                                           | Mechanism                                                                                          |
+| --------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| **INPUT disclosure**  | "Which sub-sections does this fragment emit?"      | `ContentFragment.build(ctx, { disclosure })` (§ 3b)                                                |
+| **OUTPUT disclosure** | "Does this doc render inline or split into files?" | `bundle.routing.disclosureSpec` + `splitOversizedDocument`                                         |
+| **INDEX disclosure**  | "How deep does navigation expose the tree?"        | `WikiIndexDefinition` — the index page itself is the disclosure slice; readers descend by clicking |
 
 Same `essential | important | useful | advanced` vocabulary; three
 independent concerns. A package README is one-file with INPUT-side
@@ -765,12 +765,12 @@ ContentFragments embedded at chosen INPUT disclosure depths, with
 
 ### 10.7 Net taxonomy delta from the campaign
 
-| Change                                                      | Count  |
-| ----------------------------------------------------------- | ------ |
-| Tags added                                                  | **0**  |
-| Tags removed (under D9 follow-up; non-blocking)             | 0 or 1 |
-| Tag-registry schema fields added                            | **0**  |
-| New annotation carriers                                     | **0**  |
+| Change                                          | Count  |
+| ----------------------------------------------- | ------ |
+| Tags added                                      | **0**  |
+| Tags removed (under D9 follow-up; non-blocking) | 0 or 1 |
+| Tag-registry schema fields added                | **0**  |
+| New annotation carriers                         | **0**  |
 
 The campaign shrinks or holds the taxonomy.
 
@@ -783,10 +783,10 @@ on its own description.
 
 ### 11.1 Two targets, shared content
 
-| Target | Path | Disclosure | Role |
-| ------ | ---- | ---------- | ---- |
-| **A — agent-context skill** | `.claude/skills/wiki-doc-generation/SKILL.md` | INPUT `important` / `useful` | Trigger-detection front-matter + when-this-fires + condensed how-to. Links to Target B for full content. |
-| **B — canonical wiki tree** | `docs-live/wiki-doc-generation/{INDEX.md, <pages>}` | INPUT `advanced` | Full content + child pages + index navigation surfaces. |
+| Target                      | Path                                                | Disclosure                   | Role                                                                                                     |
+| --------------------------- | --------------------------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------- |
+| **A — agent-context skill** | `.claude/skills/wiki-doc-generation/SKILL.md`       | INPUT `important` / `useful` | Trigger-detection front-matter + when-this-fires + condensed how-to. Links to Target B for full content. |
+| **B — canonical wiki tree** | `docs-live/wiki-doc-generation/{INDEX.md, <pages>}` | INPUT `advanced`             | Full content + child pages + index navigation surfaces.                                                  |
 
 Both targets are produced from the same source: a single
 `WikiIndexDefinition` whose `targets: DocTarget[]` carries both
@@ -815,11 +815,11 @@ on the canonical pipeline module.
 
 ### 11.3 Required ContentFragments (≥ 2, shared across both targets)
 
-| Fragment ID                  | Canonical doc (route) | Embedded in skill at | Source                                                                   |
-| ---------------------------- | --------------------- | -------------------- | ------------------------------------------------------------------------ |
-| `pipeline-overview`          | `1-overview`          | `important`          | JSDoc on the `projectWikiIndex` module + the mermaid diagram above.       |
-| `wiki-index-definition-shape`| `2-types/2-1-wiki-index` | `useful`         | `extractTypeShapes('WikiIndexDefinition')` — interface shape data source. |
-| `disclosure-axes-table`      | `3-disclosure`        | `important`          | `extractZodSchemaFields('ProgressiveDisclosurePolicySchema')` — already wired post commit `51035f4`. |
+| Fragment ID                   | Canonical doc (route)    | Embedded in skill at | Source                                                                                               |
+| ----------------------------- | ------------------------ | -------------------- | ---------------------------------------------------------------------------------------------------- |
+| `pipeline-overview`           | `1-overview`             | `important`          | JSDoc on the `projectWikiIndex` module + the mermaid diagram above.                                  |
+| `wiki-index-definition-shape` | `2-types/2-1-wiki-index` | `useful`             | `extractTypeShapes('WikiIndexDefinition')` — interface shape data source.                            |
+| `disclosure-axes-table`       | `3-disclosure`           | `important`          | `extractZodSchemaFields('ProgressiveDisclosurePolicySchema')` — already wired post commit `51035f4`. |
 
 ### 11.4 Required business rule (Gherkin source)
 

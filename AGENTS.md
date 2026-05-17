@@ -218,7 +218,7 @@ pnpm architect:guard --staged     # pre-commit gate
 > 1. **`architect-session-router`** — resolves session intent (planning / design / implement / refactor / review / review-implement / handoff), surfaces the relevant `_shared/` doctrine files, and hands off to the matching session skill.
 > 2. **`architect-data-api`** — the canonical reference for the CLI + MCP surface: verb shapes, deterministic gates (`scope-validate`, `query isValidTransition`, `arch dangling --strict`), JSON shapes, parity table, and known quirks.
 >
-> Load both before running any architect-scoped `Read` / `Glob` / `Grep`, before invoking any other architect-_ session skill, and before calling `pnpm architect:query` or any `architect\__` MCP tool. The Data API (CLI / MCP) is the canonical source of truth about patterns, specs, FSM state, and executable features — file scanning is not.
+> Load both before running any architect-scoped `Read` / `Glob` / `Grep`, before invoking any other architect-\_ session skill, and before calling `pnpm architect:query` or any `architect\__` MCP tool. The Data API (CLI / MCP) is the canonical source of truth about patterns, specs, FSM state, and executable features — file scanning is not.
 >
 > Harness-agnostic load instruction: if the harness supports skill description-based activation (Claude Code, OpenCode), simply mentioning this section in the system prompt is sufficient — both skill descriptions are written to trigger on the verbs and surface names a session uses. Harnesses without description-based skill activation should inline `.agents/skills/architect-session-router/SKILL.md` and `.agents/skills/architect-data-api/SKILL.md` into their system prompt.
 >

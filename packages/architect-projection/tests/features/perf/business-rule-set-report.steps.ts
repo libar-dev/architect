@@ -299,7 +299,11 @@ interface PerfPatternOptions {
 type ProjectionMeasure = (context: ProjectionContext) => unknown;
 type AsyncMeasure = () => Promise<unknown>;
 
-const RENDER_MARKDOWN_DOCUMENT_TYPES = ['patterns', 'decisions', 'requirements-executable'] as const;
+const RENDER_MARKDOWN_DOCUMENT_TYPES = [
+  'patterns',
+  'decisions',
+  'requirements-executable',
+] as const;
 type RenderMarkdownDocumentType = (typeof RENDER_MARKDOWN_DOCUMENT_TYPES)[number];
 
 let state: PerfReportState = {
