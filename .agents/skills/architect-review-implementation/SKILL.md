@@ -34,17 +34,22 @@ rules this skill operates under:
 
 ## Pre-flight
 
+Run the canonical implement-mode pre-flight from
+[`../architect-data-api/SKILL.md`](../architect-data-api/SKILL.md) §"Implement"
+— that's the reviewer's view of what just shipped (bundle composite +
+`scope-validate` + `files` + `rules --only-invariants`). Add the global blocker
+view:
+
 ```bash
-pnpm architect:query overview
 pnpm architect:query arch blocking
 ```
 
-Then for each pattern in scope (comma-separated list from the user):
+Then for each pattern in scope (comma-separated list from the user), pull the
+per-pattern slice:
 
 ```bash
 pnpm architect:query context <pattern> --session implement
 pnpm architect:query rules --pattern <pattern>
-pnpm architect:query dep-tree <pattern>
 pnpm architect:query files <pattern> --related
 ```
 
@@ -75,6 +80,12 @@ For each pattern, check:
    rationale that doesn't fit naturally in Gherkin lives in JSDoc
    `@architect-*` annotations. **Annotations are additive** — absence
    is not a blocker; presence enriches discoverability.
+6. **Graph integrity.** Run
+   `pnpm architect:query arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict`.
+   `--strict` exit 0 means the implementation introduced no new dangling
+   references; non-zero means the graph regressed and the new dangling edge
+   must be resolved (or, deliberately, the baseline rewritten with
+   `--write-baseline` and the change explained).
 
 If `pnpm architect:query value-transfer` is available, that verb returns this
 gate's verdict deterministically.

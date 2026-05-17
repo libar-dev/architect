@@ -24,7 +24,10 @@ export function printGlobalHelp(stream: NodeJS.WriteStream = process.stdout): vo
       commandLines +
       '\n' +
       'Global options:\n' +
-      optionLines
+      optionLines +
+      '\n' +
+      'Agent environments: load the `architect-data-api` skill for verb shapes,\n' +
+      'deterministic gates, JSON shapes, and known quirks.\n'
   );
 }
 

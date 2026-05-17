@@ -43,13 +43,11 @@ Related references this skill assumes:
 
 ## Pre-flight (mandatory CLI bootstrap)
 
-```bash
-pnpm architect:query overview
-pnpm architect:query scope-validate <pattern> implement     # must be PASS
-pnpm architect:query context <pattern> --session implement  # deliverables + FSM + tests
-pnpm architect:query files <pattern>                        # modification targets
-pnpm architect:query rules --pattern <pattern>              # invariants to encode
-```
+Run the canonical implement pre-flight from
+[`../architect-data-api/SKILL.md`](../architect-data-api/SKILL.md) §"Implement"
+— it covers `overview`, the `scope-validate` gate, the implement-mode
+`bundle`, `files`, `rules --only-invariants`, and the `query isValidTransition`
+FSM gate.
 
 If `scope-validate <pattern> implement` is not PASS, stop. Either the design
 is incomplete (route to `architect-design-session`) or a dependency is blocked
@@ -62,8 +60,10 @@ is incomplete (route to `architect-design-session`) or a dependency is blocked
    pnpm architect:query query isValidTransition <currentState> active
    ```
    The verb returns a deterministic verdict — proceed only if it confirms
-   the transition is valid. Then bump `@architect-status` from
-   `roadmap` to `active` in the spec via your normal edit flow. See
+   the transition is valid. See
+   [`../architect-data-api/SKILL.md`](../architect-data-api/SKILL.md)
+   §"Deterministic gates" for the JSON shape. Then bump `@architect-status`
+   from `roadmap` to `active` in the spec via your normal edit flow. See
    [`../_shared/fsm-transitions.md`](../_shared/fsm-transitions.md) for
    the full Process-Guard transition table and the
    `@architect-unlock-reason:` rules for unusual transitions.
@@ -77,7 +77,8 @@ is incomplete (route to `architect-design-session`) or a dependency is blocked
    verification to the end.
 6. **Author / refine executable Gherkin** under `tests/features/` as you go —
    transferring the design Scenarios with `**Invariant:** / **Rationale:** /
-**Verified by:**` blocks intact.
+**Verified by:**` blocks intact. To enumerate just the invariants that need
+   to land, use `pnpm architect:query rules --pattern <pattern> --only-invariants`.
 7. **Add `@architect-*` JSDoc annotations** to every production file you create
    or modify — at minimum `@architect-implements:<Pattern>` (the realization
    edge). Production code MUST NOT carry `@architect-pattern` — pattern

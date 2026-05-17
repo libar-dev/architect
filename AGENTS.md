@@ -33,7 +33,7 @@ There is exactly **one** delivery-process instance here (this repo IS the archit
 | `@libar-dev/architect-projection` | Fragment-based projection pipeline — Named Domain Fragments (Zod), block types, renderers. |
 | `@libar-dev/architect-guard` | Policy, validation, process guard, step-lint, DoD, anti-pattern detection. |
 | `@libar-dev/architect-cli` | Thin composition root — bins for `architect`, `architect-generate`, `architect-guard`, `architect-validate`, `architect-lint-steps`, `architect-lint-patterns`. |
-| `@libar-dev/architect-mcp` | MCP server (18 tools), tool registry, file watcher, pipeline session. Bin: `architect-mcp`. |
+| `@libar-dev/architect-mcp` | MCP server (21 tools), tool registry, file watcher, pipeline session. Bin: `architect-mcp`. |
 | `@libar-dev/architect` (meta) | Bin-only re-export of all 7 bins. No JS API. |
 
 **Dependency direction (acyclic):** `core ← projection`, `core ← guard ← cli`, `core, projection ← mcp`. No runtime package depends on the meta. The meta package has no JS exports — only bin re-exports. JS API consumers must import from the split that owns each symbol; the v1→v2 collision map is captured in the W1.5.7 appendix of `REMAINING-WORK.md` and will graduate to a standalone `MIGRATION.md` at the `2.0.0-pre.1` release.
@@ -111,22 +111,25 @@ Mixing them up causes the most painful "why doesn't my spec work?" debugging in 
 
 ## Agent skills
 
-Eight architect skills live under `.agents/skills/`, the single source of truth. Claude Code discovers them via symlinks at `.claude/skills/` (a projection — do not edit there).
+Nine architect skills live under `.agents/skills/`, the single source of truth. Claude Code discovers them via symlinks at `.claude/skills/` (a projection — do not edit there).
 
-| Skill | Intent |
-|---|---|
-| `architect-session-router` | Detect intent and route to the right session skill |
-| `architect-plan-session` | Idea/candidate-tier spec authoring |
-| `architect-design-session` | Design-tier spec; runs `scope-validate design` |
-| `architect-implement-spec` | Build spec end-to-end; transfer value to annotations + executable Gherkin |
-| `architect-review-spec` | Pre-implementation readiness review of a design spec |
-| `architect-review-implementation` | Post-merge implementation review; batch spec deletion |
-| `architect-refactor-session` | Modify shipped code with no extant design spec |
-| `architect-verify-handoff` | Wrap session; capture state and blockers |
+Two of the nine are **kernels** that every architect-scoped session loads first (see [Session bootstrap](#session-bootstrap-mandatory) at the bottom of this file); the other seven are intent-specific session skills the router hands off to.
 
-The router is the entry point for any architect-scoped session. Skill activation is description-based — no hooks, no slash-command bootstrap.
+| Skill | Role | Intent |
+|---|---|---|
+| `architect-session-router` | **Kernel** | Detect intent and route to the right session skill; surface `_shared/` doctrine |
+| `architect-data-api` | **Kernel** | Canonical reference for CLI + MCP verbs, deterministic gates, JSON shapes, known quirks |
+| `architect-plan-session` | Session | Idea/candidate-tier spec authoring |
+| `architect-design-session` | Session | Design-tier spec; runs `scope-validate design` |
+| `architect-implement-spec` | Session | Build spec end-to-end; transfer value to annotations + executable Gherkin |
+| `architect-review-spec` | Session | Pre-implementation readiness review of a design spec |
+| `architect-review-implementation` | Session | Post-merge implementation review; batch spec deletion |
+| `architect-refactor-session` | Session | Modify shipped code with no extant design spec |
+| `architect-verify-handoff` | Session | Wrap session; capture state and blockers |
 
-The `_shared/` directory holds the harness-agnostic doctrine kernel (four-tier ladder, FSM transitions, value transfer, annotation ownership, etc.). Skills reference these files; whether each gets inlined into AGENTS.md is a Phase 2 decision per file.
+The router is the entry point for any architect-scoped session. The data-api skill is the reference the router (and every downstream session skill) defers to for the actual verb shapes — every "run this CLI command first" instruction in a session skill ultimately points at `architect-data-api/SKILL.md` §"Pre-flight by session intent". Skill activation is description-based — no hooks, no slash-command bootstrap — which is why the kernel pair is restated in the [Session bootstrap](#session-bootstrap-mandatory) block below.
+
+The `_shared/` directory holds the harness-agnostic doctrine kernel (four-tier ladder, FSM transitions, value transfer, annotation ownership, canonical references, multi-session coordination, rule-block template, session preamble, spec-pattern relationships). Skills reference these files by relative path; loading the router surfaces the pointers without inlining the bodies.
 
 **Harness coverage today:** Claude Code (this repo's primary harness). OpenCode adapter and the Oh-My-OpenCode embedded-MCP variant remain in `architect-studio/.opencode/` and `architect-studio/.omo-architect-stash/` respectively — out of scope for this phase.
 
@@ -141,7 +144,7 @@ This repo runs **one** architect delivery process (its own dogfood). The skills 
 | CLI    | `pnpm architect:query -- <subcommand>` |
 | MCP    | `architect` → `mcp__architect__*` tools |
 
-**Prefer MCP tools over CLI** for active sessions — sub-millisecond vs 2–5s latency. The same verbs are available both ways (`overview`, `context`, `scope-validate`, `dep-tree`, `files`, `rules`, `arch blocking`, `handoff`, etc.).
+**Default to the CLI; reach for MCP only when bursting ≥5 verbs in close sequence.** Same verbs on both surfaces (`overview`, `context`, `scope-validate`, `dep-tree`, `files`, `rules`, `arch blocking`, `handoff`, etc.) — MCP names use underscores end-to-end (`architect_scope_validate`, not `architect_scope-validate`). The full parity table, latency/context-cost tradeoffs, and surface-selection rule live in `.agents/skills/architect-data-api/SKILL.md` — load that skill, do not re-derive the doctrine here.
 
 When the architect package family is consumed as a dependency by another project, the consumer configures their own `architect.config.ts` and conventionally exposes a `pnpm architect:query` script of their own. The skill bodies reference these names directly because `architect:query` is the canonical script name across architect-managed repos; consumers with non-standard setups override this table in their own `AGENTS.md`.
 
@@ -205,3 +208,18 @@ pnpm architect:guard --staged     # pre-commit gate
 - `pnpm exec architect-X` is the universal way to invoke bins from anywhere in the workspace.
 - The `architect-cli` resolves config via `process.env.PWD` before `process.cwd()`. This is fragile when embedding the CLI in subprocesses — strip `PWD` and `INIT_CWD` from the child env if you want the child to honour the `cwd:` you set. Worth revisiting (tracked in REMAINING-WORK.md).
 - `docs-live/` is regenerated, not committed (gitignored).
+
+---
+
+## Session bootstrap (mandatory)
+
+> **Every architect-scoped session in this repo MUST load the two kernel skills before any other work:**
+>
+> 1. **`architect-session-router`** — resolves session intent (planning / design / implement / refactor / review / review-implement / handoff), surfaces the relevant `_shared/` doctrine files, and hands off to the matching session skill.
+> 2. **`architect-data-api`** — the canonical reference for the CLI + MCP surface: verb shapes, deterministic gates (`scope-validate`, `query isValidTransition`, `arch dangling --strict`), JSON shapes, parity table, and known quirks.
+>
+> Load both before running any architect-scoped `Read` / `Glob` / `Grep`, before invoking any other architect-* session skill, and before calling `pnpm architect:query` or any `architect_*` MCP tool. The Data API (CLI / MCP) is the canonical source of truth about patterns, specs, FSM state, and executable features — file scanning is not.
+>
+> Harness-agnostic load instruction: if the harness supports skill description-based activation (Claude Code, OpenCode), simply mentioning this section in the system prompt is sufficient — both skill descriptions are written to trigger on the verbs and surface names a session uses. Harnesses without description-based skill activation should inline `.agents/skills/architect-session-router/SKILL.md` and `.agents/skills/architect-data-api/SKILL.md` into their system prompt.
+>
+> The router then routes to exactly one downstream session skill; that skill is the only other architect-* skill the session needs.

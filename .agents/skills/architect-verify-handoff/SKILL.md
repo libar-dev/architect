@@ -27,10 +27,13 @@ defer to the shared references:
 
 ## Pre-flight
 
+Run the canonical handoff pre-flight from
+[`../architect-data-api/SKILL.md`](../architect-data-api/SKILL.md) §"Handoff"
+(it covers `overview`, `context`, `arch blocking`, and `open-questions` for
+forward-looking signal). Then run the anchor verb of this skill — it writes
+the canonical record:
+
 ```bash
-pnpm architect:query overview
-pnpm architect:query context <pattern> --session <intent>     # the intent of the session you ran
-pnpm architect:query arch blocking
 pnpm architect:query handoff --pattern <pattern> --session <intent> [--modified-file <path>...]
 ```
 
@@ -44,11 +47,12 @@ For each pattern touched:
 | ----------------------------- | ----------------------------------------------------------------------- |
 | Session intent                | What you were doing (`planning` / `design` / `implement` / `review`)    |
 | Pattern name                  | The primary pattern under work                                          |
-| Current FSM state             | `pnpm architect:query pattern <name>`                                           |
+| Current FSM state             | `pnpm architect:query context <pattern> --session implement` — read the `=== FSM ===` line |
 | Transitions made this session | Your edit history                                                       |
 | Files modified                | Pass to `--modified-file` flags on handoff                              |
 | Open dependencies             | `pnpm architect:query dep-tree <pattern>` minus the satisfied ones              |
 | Open blockers                 | `pnpm architect:query arch blocking` filtered to anything touching this pattern |
+| Outstanding open questions    | `pnpm architect:query open-questions [--parent <pattern>]` — forward-looking signal |
 | Outstanding work              | What you didn't finish, with one-line "why" each                        |
 
 ## Handoff note format

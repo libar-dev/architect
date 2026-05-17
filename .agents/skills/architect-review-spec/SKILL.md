@@ -40,14 +40,11 @@ shared references:
 
 ## Pre-flight
 
-```bash
-pnpm architect:query overview
-pnpm architect:query scope-validate <pattern> implement     # gate: PASS / WARN / BLOCKED
-pnpm architect:query context <pattern> --session implement
-pnpm architect:query dep-tree <pattern>
-pnpm architect:query arch blocking
-pnpm architect:query files <pattern> --related
-```
+Run the canonical review pre-flight from
+[`../architect-data-api/SKILL.md`](../architect-data-api/SKILL.md) §"Review"
+(it covers `overview`, `scope-validate`, the review-mode `bundle`, `dep-tree`,
+`arch blocking`, and `files --related`). The `scope-validate` verdict is the
+PASS / WARN / BLOCKED gate that frames the rest of the gap-finding.
 
 **Tier note.** `scope-validate` only accepts `design` and `implement` — there
 is no `scope-validate <pattern> idea` or `... candidate`. For idea-tier and
@@ -78,7 +75,10 @@ instead of running `scope-validate`:
 - **Rules carry `**Invariant:**` only at idea tier.** Adding `**Rationale:**`
   or `**Verified by:**` at idea tier is a gap (those are plan-tier additions).
 - **Candidate tier carries `**Open Questions:**` and 1-2 happy-path
-  scenarios.** Missing the open-questions block is the most common gap.
+  scenarios.** Missing the open-questions block is the most common gap. To
+  inventory open questions across the graph (find candidates with empty
+  sections, or all questions under a given epic), run
+  `pnpm architect:query open-questions [--parent <Epic>] [--format json]`.
 - **No retroactive idea spec for shipped code.** If the pattern already has
   production code, the idea spec is the wrong artifact — flag it as a
   "retroactive spec" gap.

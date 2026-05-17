@@ -38,17 +38,15 @@ session if you haven't:
 
 ## Pre-flight
 
-You are here because the router selected `planning` intent. Confirm the
-instance and run the canonical bootstrap if the hook didn't:
-
-```bash
-pnpm architect:query overview
-pnpm architect:query list --status candidate
-pnpm architect:query context <pattern> --session planning   # if you have a pattern name in mind
-```
+You are here because the router selected `planning` intent. Run the canonical
+planning pre-flight from
+[`../architect-data-api/SKILL.md`](../architect-data-api/SKILL.md) §"Planning"
+— it covers `overview`, `list --status candidate`, `open-questions`, and
+`context --session planning`.
 
 Note: `scope-validate` only accepts `design` or `implement`. There is no
-`scope-validate <pattern> planning`. Skip it at this tier.
+`scope-validate <pattern> planning`. Skip it at this tier — idea/candidate
+readiness is structural (see the four-tier ladder below).
 
 ## Four-Tier Ladder
 
@@ -119,6 +117,11 @@ Feature: <EpicName> - <one-line purpose>
 ```
 
 **Slice:** same as epic with `@architect-level:slice` and a `**Usage:**` line under the members. Slices live in `architect/slices/<name>.feature`, not `architect/specs/ideas/`.
+
+To list the members of an existing epic directly from the graph (instead of
+hand-tracking them in the `**Members:**` bullet list), run
+`pnpm architect:query list --parent <EpicName> --names-only`. Unknown parent
+names exit non-zero with `Parent pattern not found: <Name>`.
 
 ## Candidate-tier delta (add only when promoting from idea)
 

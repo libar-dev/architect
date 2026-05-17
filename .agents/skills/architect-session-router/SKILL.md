@@ -36,15 +36,18 @@ Bare prose mentions of "epic", "slice", or "candidate" do **not** route. Those w
 
 ## Step 2 — Run the canonical bootstrap
 
-Run the minimum:
+Run the canonical pre-flight for the chosen intent from
+[`../architect-data-api/SKILL.md`](../architect-data-api/SKILL.md)
+§"Pre-flight by session intent" (one section per intent: Planning, Design tier
+authoring, Implement, Review, Refactor, Handoff, Generic inspection). The
+bundle-first composite plus the intent-specific drop-down verbs live there.
 
-```bash
-pnpm architect:query overview
-pnpm architect:query scope-validate <pattern> <design|implement>   # design and implement only
-pnpm architect:query context <pattern> --session <intent>
-```
-
-In an active session, **prefer MCP tools over CLI** — sub-millisecond vs 2–5s latency. The same verbs are available as `mcp__architect__overview`, `mcp__architect__scope-validate`, `mcp__architect__context`, etc.
+The same verbs are available via MCP for tool-mediated bursts —
+`architect_overview`, `architect_scope_validate`, `architect_context`, etc.
+**MCP names use underscores end-to-end**, not hyphens; see
+[`../architect-data-api/SKILL.md`](../architect-data-api/SKILL.md)
+§"CLI ↔ MCP tool-name mapping" for the full parity table and when CLI vs MCP
+is the right surface.
 
 **Do not Read / Glob / Grep architect-scoped files until after the bootstrap runs.** The Data API (CLI / MCP) is faster, more accurate, and more compact than file scanning. This is a discipline, not an enforced gate — keep it.
 

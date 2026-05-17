@@ -73,13 +73,12 @@ invariant-carrier gate".
 `scope-validate` is intentionally absent — the verb only accepts
 `design` or `implement` and refactors have no spec to validate.
 
-```bash
-pnpm architect:query overview
-pnpm architect:query context <pattern> --session implement   # current implementation surface
-pnpm architect:query files <pattern>                         # touched-file inventory
-pnpm architect:query dep-tree <pattern>                      # blast radius
-pnpm architect:query arch blocking                           # cross-pattern blockers
-```
+Run the canonical refactor pre-flight from
+[`../architect-data-api/SKILL.md`](../architect-data-api/SKILL.md) §"Refactor"
+— it covers `overview`, `context --session implement` (current surface),
+`files` (touched-file inventory), `dep-tree` (blast radius), `arch blocking`,
+and `arch dangling --baseline ... --strict` (the graph-integrity gate used in
+the closing checks below).
 
 If `pnpm architect:query` returns no rows for the pattern (the pattern is
 unknown to the graph), stop. Either the pattern name is wrong, or the
@@ -157,7 +156,11 @@ five must hold before declaring the refactor done.
 5. **Graph integrity.** `dep-tree <pattern>` after-state matches the
    refactor's intent — no surprise edges. `arch blocking` shows no
    new blockers introduced by the refactor. (Run both verbs again
-   after the final commit.)
+   after the final commit.) Use
+   `pnpm architect:query arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict`
+   as the deterministic graph-integrity gate — non-zero exit means the
+   refactor introduced (or removed) a dangling reference and the drift
+   must be resolved before declaring done.
 
 When all five hold, the refactor is durable. **No spec deletion
 step** — the executable feature was already the durable artifact and

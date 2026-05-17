@@ -13,7 +13,9 @@ multi-session campaigns lives in
 
 1. **Data API first, file-based search second.** Every pattern-related
    question goes through `mcp__architect__*` MCP tools or
-   `pnpm architect:query` before any `Read` / `Glob` / `Grep`. This is
+   `pnpm architect:query` (see
+   [`../architect-data-api/SKILL.md`](../architect-data-api/SKILL.md) for the
+   verb-by-verb reference) before any `Read` / `Glob` / `Grep`. This is
    a discipline, not an enforced gate — the Data API is faster
    (sub-ms for MCP, 2–5s for CLI) and more accurate than file scanning.
 

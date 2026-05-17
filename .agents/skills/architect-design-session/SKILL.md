@@ -40,17 +40,13 @@ per session if you haven't:
 
 ## Pre-flight (mandatory CLI bootstrap)
 
-Run the canonical bootstrap:
-
-```bash
-pnpm architect:query overview
-pnpm architect:query scope-validate <pattern> design        # PASS / WARN / BLOCKED
-pnpm architect:query context <pattern> --session design     # full bundle: deliverables, deps, stubs
-pnpm architect:query dep-tree <pattern>
-pnpm architect:query rules --pattern <pattern>
-```
-
-There is **no** `stubs` CLI verb — `context --session design` returns stubs.
+Run the canonical design-tier pre-flight from
+[`../architect-data-api/SKILL.md`](../architect-data-api/SKILL.md)
+§"Design tier authoring" — it covers `overview`, the `scope-validate design`
+gate, the design-mode `bundle` (deliverables + stubs + deps + open
+questions), and the per-slice drop-downs (`dep-tree`, `rules`). There is
+**no** `stubs` CLI verb — `context --session design` (or the design-mode
+bundle) returns stubs.
 
 If `scope-validate` returns BLOCKED, stop and surface the blocker. Do not
 attempt to design around a blocked dependency chain.
@@ -106,7 +102,7 @@ constraints, why-this-shape rationale.
 2. Adding a new `.ts` file under `src/` — wrong session. Stop and hand off to `architect-implement-spec`.
 3. Running `pnpm test` or modifying `tests/features/` — wrong session.
 4. Editing files outside the deliverables table — if you discover the design needs to touch a file you didn't list, **add it to the table** before editing.
-5. Re-deriving pattern data outside `PatternGraph` — read via `pnpm architect:query dep-tree`, `pnpm architect:query arch neighborhood`. Do not parallel-pipeline the data.
+5. Re-deriving pattern data outside `PatternGraph` — read via the canonical Data API verbs in [`../architect-data-api/SKILL.md`](../architect-data-api/SKILL.md) §"Verb reference". Do not parallel-pipeline the data.
 6. Inventing a new business rule from scratch without an invariant — every rule needs `**Invariant:**`.
 7. Promoting an idea straight to design — design tier requires plan tier first. If the source is an idea or candidate, route through `architect-plan-session`.
 
