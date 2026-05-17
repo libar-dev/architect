@@ -304,18 +304,25 @@ function addRoutedDocument(
   document: MarkdownDocument,
   options: ResolvedMarkdownOptions
 ): void {
-  const sizeBudget = options.sizeBudget;
-  const splitResult = shouldSplit(document, basePath, options)
-    ? splitOversizedDocument(document, sizeBudget ?? 0, basePath, (doc) =>
-        renderDocument(doc, options)
-      )
-    : null;
+  const parentRendered = renderDocument(document, options);
+  const parentLineCount = countLines(parentRendered);
 
-  if (!splitResult) {
-    addUniqueEntry(entries, basePath, renderDocument(document, options));
+  if (!shouldSplitFromLineCount(parentLineCount, basePath, options)) {
+    // Non-split path: reuse the rendered output. Saves one render per doc.
+    addUniqueEntry(entries, basePath, parentRendered);
     return;
   }
 
+  const splitResult = splitOversizedDocument(
+    document,
+    options.sizeBudget ?? 0,
+    basePath,
+    (doc) => renderDocument(doc, options)
+  );
+
+  // The split parent has DIFFERENT sections than `document` (heading+linkOut
+  // pairs replaced raw sections per the splitter's logic); requires a fresh
+  // render.
   addUniqueEntry(entries, basePath, renderDocument(splitResult.parent, options));
 
   for (const [path, childDocument] of Object.entries(splitResult.subFiles)) {
@@ -433,8 +440,8 @@ function createUniqueRoutedPath(path: string, stableId: string, usedPaths: Set<s
   return candidate;
 }
 
-function shouldSplit(
-  document: MarkdownDocument,
+function shouldSplitFromLineCount(
+  lineCount: number,
   basePath: string,
   options: ResolvedMarkdownOptions
 ): boolean {
@@ -450,8 +457,18 @@ function shouldSplit(
     return false;
   }
 
-  const rendered = renderDocument(document, options);
-  return rendered.split('\n').length > options.sizeBudget;
+  return lineCount > options.sizeBudget;
+}
+
+function countLines(s: string): number {
+  // Equivalent to s.split('\n').length but without allocating the intermediate
+  // array. Char code 10 is '\n'. An empty string still counts as 1 line, matching
+  // split('\n').length semantics.
+  let count = 1;
+  for (let i = 0; i < s.length; i++) {
+    if (s.charCodeAt(i) === 10) count++;
+  }
+  return count;
 }
 
 function resolveOptions(options: RenderMarkdownOptions | undefined): ResolvedMarkdownOptions {
@@ -2064,7 +2081,7 @@ function splitOversizedDocument(
     }
 
     const subDocument: MarkdownDocument = { title: group.heading, sections: group.sections };
-    const subLineCount = renderFn(subDocument).split('\n').length;
+    const subLineCount = countLines(renderFn(subDocument));
 
     if (subLineCount <= budget) {
       const subFileName = `${toKebabCase(group.heading)}.md`;
