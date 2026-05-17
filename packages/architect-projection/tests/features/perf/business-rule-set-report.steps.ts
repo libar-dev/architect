@@ -738,8 +738,12 @@ describeFeature(feature, ({ BeforeEachScenario, Rule }) => {
         And(
           'the perf report should include renderMarkdown metrics for representative documentation bundles',
           async () => {
-            expect(state.reportPath).not.toBeNull();
-            const report = JSON.parse(await readFile(state.reportPath!, 'utf8')) as {
+            const reportPath = state.reportPath;
+            expect(reportPath).not.toBeNull();
+            if (reportPath === null || reportPath === undefined) {
+              throw new Error('reportPath missing');
+            }
+            const report = JSON.parse(await readFile(reportPath, 'utf8')) as {
               readonly renderMarkdownBundles?: Record<string, PerfSummary>;
             };
 
@@ -750,9 +754,12 @@ describeFeature(feature, ({ BeforeEachScenario, Rule }) => {
             for (const documentType of RENDER_MARKDOWN_DOCUMENT_TYPES) {
               const summary = report.renderMarkdownBundles?.[documentType];
               expect(summary).toBeDefined();
-              expect(Number.isFinite(summary!.avgMs)).toBe(true);
-              expect(Number.isFinite(summary!.p50Ms)).toBe(true);
-              expect(summary!.iterations).toBeGreaterThan(0);
+              if (summary === undefined) {
+                throw new Error(`Missing renderMarkdownBundles summary for ${documentType}`);
+              }
+              expect(Number.isFinite(summary.avgMs)).toBe(true);
+              expect(Number.isFinite(summary.p50Ms)).toBe(true);
+              expect(summary.iterations).toBeGreaterThan(0);
             }
           },
         );

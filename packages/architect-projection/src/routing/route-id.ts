@@ -76,38 +76,39 @@ export function isLogicalRouteId(value: string): value is LogicalRouteId {
 
 function tryParseLogicalRouteId(value: string): ParsedLogicalRouteId | undefined {
   const segments = value.split(':');
-  const [documentType, second, third, fourth] = segments;
-
-  if (documentType === undefined || second === undefined) {
+  if (!segments.every(isLogicalRouteSegment)) {
     return undefined;
   }
 
-  if (segments.length === 2 && second === 'index') {
-    return isLogicalRouteSegment(documentType) ? { documentType, kind: 'index' } : undefined;
+  const [documentType, second, third, fourth] = segments;
+
+  if (documentType === undefined) {
+    return undefined;
   }
 
-  if (segments.length === 2) {
-    return isLogicalRouteSegment(documentType) && isLogicalRouteSegment(second)
-      ? { documentType, kind: 'entity', stableEntityId: second }
-      : undefined;
+  switch (segments.length) {
+    case 2:
+      if (second === undefined) {
+        return undefined;
+      }
+      if (second === 'index') {
+        return { documentType, kind: 'index' };
+      }
+      return { documentType, kind: 'entity', stableEntityId: second };
+    case 4:
+      if (second === undefined || third === undefined || fourth === undefined) {
+        return undefined;
+      }
+      return {
+        documentType,
+        kind: 'child',
+        stableEntityId: second,
+        childKind: third,
+        stableChildId: fourth,
+      };
+    default:
+      return undefined;
   }
-
-  if (segments.length === 4 && third !== undefined && fourth !== undefined) {
-    return isLogicalRouteSegment(documentType) &&
-      isLogicalRouteSegment(second) &&
-      isLogicalRouteSegment(third) &&
-      isLogicalRouteSegment(fourth)
-      ? {
-          documentType,
-          kind: 'child',
-          stableEntityId: second,
-          childKind: third,
-          stableChildId: fourth,
-        }
-      : undefined;
-  }
-
-  return undefined;
 }
 
 function assertLogicalRouteSegment(value: string, label: string): string {

@@ -2150,16 +2150,17 @@ function splitOversizedDocument(
       renderKey,
     );
 
-    if (renderedSubDocument.lineCount <= budget) {
-      const splitChildDocument: MarkdownDocument = {
-        title: group.heading,
-        sections: [linkOut(`← Back to ${document.title}`, parentFileName), ...group.sections],
-      };
-      subFiles[subPath] = renderMarkdownDocument(
-        splitChildDocument,
-        options,
-        subPath,
-        'emit',
+     if (renderedSubDocument.lineCount <= budget) {
+       const splitChildDocument: MarkdownDocument = {
+         title: group.heading,
+         sections: [linkOut(`← Back to ${document.title}`, parentFileName), ...group.sections],
+       };
+       // Re-renders splitChildDocument (not subDocument) because linkOut is prepended after the measure pass, so the emitted output is genuinely different.
+       subFiles[subPath] = renderMarkdownDocument(
+         splitChildDocument,
+         options,
+         subPath,
+         'emit',
         renderKey,
       );
       parentSections.push(heading(2, group.heading), linkOut(`See ${group.heading}`, subFileName));
