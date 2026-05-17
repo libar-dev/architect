@@ -10,7 +10,6 @@ Feature: CLI invocation directory precedence
   Precedence is `process.cwd()` first, with `INIT_CWD` and `PWD` as env-var
   fallbacks. Inverted from the legacy `PWD`-first behavior so that
   `execFile({ cwd })` embedding (required by the W-DOCS-1 runner) is honored.
-  See PDR-002.
 
   Rule: process.cwd() takes precedence over PWD and INIT_CWD
 
