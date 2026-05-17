@@ -36,7 +36,7 @@ There is exactly **one** delivery-process instance here (this repo IS the archit
 | `@libar-dev/architect-mcp` | MCP server (18 tools), tool registry, file watcher, pipeline session. Bin: `architect-mcp`. |
 | `@libar-dev/architect` (meta) | Bin-only re-export of all 7 bins. No JS API. |
 
-**Dependency direction (acyclic):** `core ← projection`, `core ← guard ← cli`, `core, projection ← mcp`. No runtime package depends on the meta. The meta package has no JS exports — only bin re-exports. JS API consumers must import from the split that owns each symbol (see `MIGRATION.md` for the v1→v2 map).
+**Dependency direction (acyclic):** `core ← projection`, `core ← guard ← cli`, `core, projection ← mcp`. No runtime package depends on the meta. The meta package has no JS exports — only bin re-exports. JS API consumers must import from the split that owns each symbol; the v1→v2 collision map is captured in the W1.5.7 appendix of `REMAINING-WORK.md` and will graduate to a standalone `MIGRATION.md` at the `2.0.0-pre.1` release.
 
 ## Engineering doctrine
 
@@ -108,6 +108,42 @@ These artifacts are **parsed by `@cucumber/gherkin` for doc generation and Patte
 | `@amiceli/vitest-cucumber` | Executable specs (`tests/features/`, `packages/*/tests/features/`) | At test time via vitest |
 
 Mixing them up causes the most painful "why doesn't my spec work?" debugging in this repo.
+
+## Agent skills
+
+Eight architect skills live under `.agents/skills/`, the single source of truth. Claude Code discovers them via symlinks at `.claude/skills/` (a projection — do not edit there).
+
+| Skill | Intent |
+|---|---|
+| `architect-session-router` | Detect intent and route to the right session skill |
+| `architect-plan-session` | Idea/candidate-tier spec authoring |
+| `architect-design-session` | Design-tier spec; runs `scope-validate design` |
+| `architect-implement-spec` | Build spec end-to-end; transfer value to annotations + executable Gherkin |
+| `architect-review-spec` | Pre-implementation readiness review of a design spec |
+| `architect-review-implementation` | Post-merge implementation review; batch spec deletion |
+| `architect-refactor-session` | Modify shipped code with no extant design spec |
+| `architect-verify-handoff` | Wrap session; capture state and blockers |
+
+The router is the entry point for any architect-scoped session. Skill activation is description-based — no hooks, no slash-command bootstrap.
+
+The `_shared/` directory holds the harness-agnostic doctrine kernel (four-tier ladder, FSM transitions, value transfer, annotation ownership, etc.). Skills reference these files; whether each gets inlined into AGENTS.md is a Phase 2 decision per file.
+
+**Harness coverage today:** Claude Code (this repo's primary harness). OpenCode adapter and the Oh-My-OpenCode embedded-MCP variant remain in `architect-studio/.opencode/` and `architect-studio/.omo-architect-stash/` respectively — out of scope for this phase.
+
+## Delivery process
+
+This repo runs **one** architect delivery process (its own dogfood). The skills assume this single-instance shape:
+
+| Aspect | Value |
+| --- | --- |
+| Config | `architect.config.ts` (at repo root) |
+| Specs  | `architect/` (specs, decisions, releases, stubs, step-stubs, design-reviews, ideations) |
+| CLI    | `pnpm architect:query -- <subcommand>` |
+| MCP    | `architect` → `mcp__architect__*` tools |
+
+**Prefer MCP tools over CLI** for active sessions — sub-millisecond vs 2–5s latency. The same verbs are available both ways (`overview`, `context`, `scope-validate`, `dep-tree`, `files`, `rules`, `arch blocking`, `handoff`, etc.).
+
+When the architect package family is consumed as a dependency by another project, the consumer configures their own `architect.config.ts` and conventionally exposes a `pnpm architect:query` script of their own. The skill bodies reference these names directly because `architect:query` is the canonical script name across architect-managed repos; consumers with non-standard setups override this table in their own `AGENTS.md`.
 
 ## Pattern graph — the AI-native language
 

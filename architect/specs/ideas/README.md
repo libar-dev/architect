@@ -1,11 +1,9 @@
 # Idea Inbox
 
-Captures ideas at the lightest possible Gherkin tier — 5–20 lines, six tags, one user story, one or more invariant-only Rules. Ideas are under consideration, not committed to delivery.
+Captures ideas at the lightest possible Gherkin tier — ≤30 lines (warn-only soft budget), five authored tags, one user story, one or more invariant-only Rules. Ideas are under consideration, not committed to delivery.
 
-**Format reference:** `packages/context/epic-candidates/02-lifecycle-mvp/01-minimum-gherkin-at-every-level.md` (§ "Idea Tier Template").
+**Format reference:** `formal-spec/08-spec-evolution.md` § "Idea Tier — Lightweight Pre-Candidate" and `formal-spec/05-feature-spec-format.md`. The plugin-internal canonical form lives in [`../../../.agents/skills/_shared/four-tier-ladder.md`](../../../.agents/skills/_shared/four-tier-ladder.md).
 
-**Parent epic convention:** Every idea carries `@architect-parent:<EpicName>`. The parent epic spec lives alongside the ideas it groups (e.g. `lifecycle-mvp-epic.feature`) and lists members in a human-facing `**Members:**` block.
+**Parent epic convention:** Every idea carries `@architect-parent:<EpicName>`. The parent epic spec lives alongside the ideas it groups (e.g. `lifecycle-mvp-epic.feature`) and lists members in a human-facing `**Members:**` block. Epic and slice variants (`@architect-level:epic|slice`) are exempt from the `@architect-parent` requirement.
 
-**Promotion:** When an idea matures, move the file to `architect/specs/candidates/` and bump `@architect-maturity:idea` → `plan`, adding open questions and at least one happy-path scenario per the candidate-tier delta in doc 01.
-
-**Source package:** `packages/context/epic-candidates/02-lifecycle-mvp/`.
+**Promotion:** When an idea matures, `git mv` the file to `../candidates/`, add an `**Open Questions:**` block, and add 1–2 happy-path scenarios per the candidate-tier delta in `formal-spec/08-spec-evolution.md` § "Promotion: Idea → Candidate". `@architect-status` stays `candidate` until the acceptance gate promotes the spec past candidate.
