@@ -30,6 +30,7 @@
     "docs:patterns": "pnpm exec architect-generate --base-dir . -g patterns -f",
     "docs:architecture": "pnpm exec architect-generate --base-dir . -g architecture -f",
     "docs:roadmap": "pnpm exec architect-generate --base-dir . -g roadmap -f",
+    "docs:taxonomy": "pnpm exec architect-generate --base-dir . -g taxonomy -f",
     "docs:all": "pnpm exec architect-generate --base-dir . -g patterns -g architecture -g roadmap -g changelog -g requirements-executable -g requirements-specs -g decisions -g taxonomy -f",
     "changeset": "changeset",
     "changeset:version": "changeset version",
