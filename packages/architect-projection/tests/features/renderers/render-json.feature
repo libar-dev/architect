@@ -54,3 +54,18 @@ Feature: renderJson produces stable JSON-safe projection output
       When I attempt to render the malformed bundle-like input as JSON
       Then the malformed bundle-like input should not be identified as a bundle
       And rendering the malformed bundle-like input should fail loudly
+
+  Rule: Plain-object checks stay shared and strict
+
+    **Invariant:** The shared plain-object helper accepts plain objects and null-prototype objects, but rejects class instances and polluted-prototype carriers.
+    **Rationale:** JSON rendering and bundle discrimination must stay aligned on what counts as safe object shape.
+    **Verified by:** render-json helper scenarios and bundle-discrimination scenarios
+
+    @plain-object
+    Scenario: Shared plain-object checks allow safe records and reject unsafe object carriers
+      Given plain-object helper candidates covering safe and unsafe object shapes
+      When I evaluate the shared plain-object helper for each candidate
+      Then the helper should accept the plain object candidate
+      And the helper should accept the null-prototype candidate
+      And the helper should reject the class instance candidate
+      And the helper should reject the polluted-prototype candidate

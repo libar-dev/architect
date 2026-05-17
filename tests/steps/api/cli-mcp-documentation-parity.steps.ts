@@ -3,8 +3,8 @@ import { fileURLToPath } from 'node:url';
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 
-import { invokeTool } from '../../../../architect-mcp/src/tool-registry.js';
-import { PipelineSessionManager } from '../../../../architect-mcp/src/pipeline-session.js';
+import { invokeTool } from '../../../packages/architect-mcp/src/tool-registry.js';
+import { PipelineSessionManager } from '../../../packages/architect-mcp/src/pipeline-session.js';
 import { runCLI } from '../../support/helpers/cli-runner.js';
 
 const feature = await loadFeature('tests/features/api/cli-mcp-documentation-parity.feature');

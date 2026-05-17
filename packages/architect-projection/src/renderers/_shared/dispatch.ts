@@ -17,6 +17,10 @@ export type KindTable<Out, Options> = {
   readonly [K in FragmentKind]?: (fragment: FragmentByKind<K>, options: Options) => Out;
 };
 
+export type StrictKindTable<Out, Options, Kinds extends FragmentKind> = {
+  readonly [K in Kinds]: (fragment: FragmentByKind<K>, options: Options) => Out;
+};
+
 export function dispatchByKind<Out, Options>(
   fragment: Fragment,
   table: KindTable<Out, Options>,

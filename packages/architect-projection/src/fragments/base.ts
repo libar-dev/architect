@@ -1,6 +1,7 @@
 import type { Fragment } from './fragment-schema.internal.js';
 import { isLogicalRouteId, type LogicalRouteId } from '../routing/route-id.js';
 import { DisclosureSpecSchema, type DisclosureSpec } from '../disclosure/spec.js';
+import { isPlainObject } from '../shared/plain-object.js';
 
 export interface BundleRouting {
   rootRouteId: LogicalRouteId;
@@ -97,13 +98,4 @@ function isAnchorStrategy(value: unknown): value is BundleRouting['anchorStrateg
 
 function isRouteIdValue(value: unknown): value is LogicalRouteId {
   return typeof value === 'string' && isLogicalRouteId(value);
-}
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-    return false;
-  }
-
-  const prototype: unknown = Object.getPrototypeOf(value);
-  return prototype === Object.prototype || prototype === null;
 }

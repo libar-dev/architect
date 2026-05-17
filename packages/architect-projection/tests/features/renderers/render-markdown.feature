@@ -42,6 +42,7 @@ Feature: renderMarkdown renders canonical markdown blocks
       When I render the bundle as markdown with an H2 size budget
       Then the markdown output should be a routed file record
       And the oversized child file should split at H2 boundaries
+      And each split-path routed fragment should render at most twice
 
   Rule: Routed documentation roots follow progressive disclosure policy
 

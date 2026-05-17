@@ -11,6 +11,7 @@ import {
   type Block,
   type BusinessRuleSet,
   type Fragment,
+  type MarkdownRenderEvent,
   type ProjectionBundle,
 } from '../../../src/index.js';
 
@@ -45,6 +46,7 @@ function documentationFixtureToFragment(view: SectionedDocumentFixture): Fragmen
 interface RenderMarkdownBlockState {
   input: Fragment | ProjectionBundle<Fragment> | null;
   rendered: string | Record<string, string> | null;
+  renderEvents: MarkdownRenderEvent[];
 }
 
 function assertRenderedString(value: string | Record<string, string> | null): string {
@@ -79,6 +81,7 @@ function createState(): RenderMarkdownBlockState {
   return {
     input: null,
     rendered: null,
+    renderEvents: [],
   };
 }
 
@@ -1190,10 +1193,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           );
 
           When('I render the bundle as markdown with an H2 size budget', () => {
+            state!.renderEvents = [];
             state!.rendered = renderMarkdown(state!.input!, {
               includeChildren: true,
               sizeBudget: 12,
               splitStrategy: 'h2-boundary',
+              onRenderDocument: (event) => state!.renderEvents.push(event),
             });
           });
 
@@ -1235,6 +1240,22 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(rendered['guides/gamma-section.md']).toContain(
               'Gamma details push the file over budget.',
             );
+          });
+
+          And('each split-path routed fragment should render at most twice', () => {
+            const counts = new Map<string, number>();
+            for (const event of state!.renderEvents) {
+              counts.set(event.renderKey, (counts.get(event.renderKey) ?? 0) + 1);
+            }
+
+            expect(Object.fromEntries(counts.entries())).toEqual({
+              'INDEX.md': 1,
+              'guides/renderer-guide.md': 2,
+              'guides/renderer-guide.md#0:alpha-section': 2,
+              'guides/renderer-guide.md#1:beta-section': 2,
+              'guides/renderer-guide.md#2:gamma-section': 2,
+            });
+            expect(Math.max(...counts.values())).toBeLessThanOrEqual(2);
           });
         },
       );

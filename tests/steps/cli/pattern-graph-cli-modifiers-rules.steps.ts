@@ -15,7 +15,7 @@ import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import { z } from 'zod';
 import { FragmentSchema } from '@libar-dev/architect-projection';
-import { writeJson } from '../../../../architect-cli/src/cli/commands/_shared/output.js';
+import { writeJson } from '../../../packages/architect-cli/src/cli/commands/_shared/output.js';
 import {
   type CLITestState,
   initState,
@@ -106,9 +106,15 @@ function expectOrderedSubstrings(haystack: string, needles: readonly string[]): 
 // Feature Definition
 // =============================================================================
 
-const feature = await loadFeature('tests/features/cli/pattern-graph-cli-modifiers-rules.feature');
+const outputModifiersFeature = await loadFeature(
+  'tests/features/cli/pattern-graph-cli-output-modifiers.feature',
+);
+const archHealthFeature = await loadFeature('tests/features/cli/pattern-graph-cli-arch-health.feature');
+const rulesSubcommandFeature = await loadFeature(
+  'tests/features/cli/pattern-graph-cli-rules-subcommand.feature',
+);
 
-describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
+describeFeature(outputModifiersFeature, ({ Background, Rule, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
   // Cleanup
   // ---------------------------------------------------------------------------
@@ -556,6 +562,23 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
   });
+});
+
+describeFeature(archHealthFeature, ({ Background, Rule, AfterEachScenario }) => {
+  AfterEachScenario(async () => {
+    if (state?.tempContext) {
+      await state.tempContext.cleanup();
+    }
+    state = null;
+    serializationError = null;
+  });
+
+  Background(({ Given }) => {
+    Given('a temporary working directory', async () => {
+      state = initState();
+      state.tempContext = await createTempDir({ prefix: 'cli-pattern-graph-test-' });
+    });
+  });
 
   // ---------------------------------------------------------------------------
   // Rule: CLI arch health subcommands detect graph quality issues
@@ -763,6 +786,23 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(arr[0]).toHaveProperty(field);
         },
       );
+    });
+  });
+});
+
+describeFeature(rulesSubcommandFeature, ({ Background, Rule, AfterEachScenario }) => {
+  AfterEachScenario(async () => {
+    if (state?.tempContext) {
+      await state.tempContext.cleanup();
+    }
+    state = null;
+    serializationError = null;
+  });
+
+  Background(({ Given }) => {
+    Given('a temporary working directory', async () => {
+      state = initState();
+      state.tempContext = await createTempDir({ prefix: 'cli-pattern-graph-test-' });
     });
   });
 

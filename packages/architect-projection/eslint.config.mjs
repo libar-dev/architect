@@ -12,6 +12,25 @@ export default [
     },
   },
   {
+    files: ['src/**/*.ts'],
+    ignores: ['src/shared/plain-object.ts'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'FunctionDeclaration[id.name="isPlainObject"]',
+          message:
+            '[arch-projection:shared-plain-object] Use src/shared/plain-object.ts instead of local isPlainObject copies.',
+        },
+        {
+          selector: 'VariableDeclarator[id.name="isPlainObject"]',
+          message:
+            '[arch-projection:shared-plain-object] Use src/shared/plain-object.ts instead of local isPlainObject copies.',
+        },
+      ],
+    },
+  },
+  {
     files: ['tests/**/*.ts'],
     rules: {
       '@typescript-eslint/array-type': 'off',

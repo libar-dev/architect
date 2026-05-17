@@ -14,6 +14,14 @@ export interface MarkdownRouteProfile {
   ) => string;
 }
 
+export interface MarkdownRenderEvent {
+  readonly renderKey: string;
+  readonly path: string;
+  readonly title: string;
+  readonly phase: 'measure' | 'emit';
+  readonly lineCount: number;
+}
+
 export interface RenderMarkdownOptions {
   sizeBudget?: number;
   splitStrategy?: 'h2-boundary' | 'never';
@@ -22,6 +30,7 @@ export interface RenderMarkdownOptions {
   disclosureLevel?: 'essential' | 'important' | 'useful' | 'advanced';
   disclosureSpec?: DisclosureSpec;
   routeProfile?: MarkdownRouteProfile;
+  onRenderDocument?: (event: MarkdownRenderEvent) => void;
 }
 
 export interface RenderCompactOptions {

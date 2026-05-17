@@ -59,7 +59,7 @@ const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 /**
  * Path to the split CLI package source tree.
  */
-const CLI_PACKAGE_ROOT = path.resolve(__dirname, '../../../../architect-cli');
+const CLI_PACKAGE_ROOT = path.resolve(__dirname, '../../../packages/architect-cli');
 const GUARD_PACKAGE_ROOT = path.resolve(__dirname, '../../../../architect-guard');
 
 /**

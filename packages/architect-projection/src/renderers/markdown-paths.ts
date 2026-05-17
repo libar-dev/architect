@@ -1,7 +1,7 @@
 import type { MarkdownRouteProfile } from './types.js';
 import { slugForFilename } from '../_internal/slug.js';
 import type { BundleRouting } from '../fragments/base.js';
-import type { LogicalRouteId } from '../routing/route-id.js';
+import { parseLogicalRouteId, type LogicalRouteId } from '../routing/route-id.js';
 
 export const defaultMarkdownRouteProfile: MarkdownRouteProfile = {
   mapPath(routeId, _kind, _key, routing) {
@@ -44,42 +44,4 @@ function resolveRootMarkdownPath(documentType: string, routing: BundleRouting | 
   }
 
   return `${documentType.toUpperCase()}.md`;
-}
-
-function parseLogicalRouteId(routeId: LogicalRouteId):
-  | { documentType: string; kind: 'index' }
-  | { documentType: string; kind: 'entity'; stableEntityId: string }
-  | {
-      documentType: string;
-      kind: 'child';
-      stableEntityId: string;
-      childKind: string;
-      stableChildId: string;
-    } {
-  const parts = routeId.split(':');
-  const [documentType, second, third, fourth] = parts;
-
-  if (documentType === undefined || second === undefined) {
-    throw new Error(`Invalid logical route id: ${routeId}`);
-  }
-
-  if (parts.length === 2 && second === 'index') {
-    return { documentType, kind: 'index' };
-  }
-
-  if (parts.length === 2) {
-    return { documentType, kind: 'entity', stableEntityId: second };
-  }
-
-  if (parts.length === 4 && third !== undefined && fourth !== undefined) {
-    return {
-      documentType,
-      kind: 'child',
-      stableEntityId: second,
-      childKind: third,
-      stableChildId: fourth,
-    };
-  }
-
-  throw new Error(`Invalid logical route id: ${routeId}`);
 }

@@ -8,6 +8,7 @@ import {
   type BundleRouting,
   isBundle,
   type Fragment,
+  type MarkdownRenderEvent,
   type PatternSummary,
   type ProjectionBundle,
   type RenderCompactOptions,
@@ -259,6 +260,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   routing: BundleRouting | undefined,
                 ) => string;
               };
+              onRenderDocument?: (event: MarkdownRenderEvent) => void;
             }>().toEqualTypeOf<RenderMarkdownOptions>();
 
             expectTypeOf<RenderCompactOptions>().toEqualTypeOf<{

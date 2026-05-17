@@ -11,6 +11,7 @@ import {
   type ProjectionBundle,
   type SessionContextBundle,
 } from '../../../src/index.js';
+import { isPlainObject } from '../../../src/shared/plain-object.js';
 
 interface RenderJsonState {
   input: Fragment | ProjectionBundle<Fragment> | null;
@@ -21,6 +22,25 @@ interface RenderJsonState {
   malformedBundleCandidate: unknown;
   malformedBundleDetectedAsBundle: boolean | null;
   malformedBundleError: string | null;
+  plainObjectCandidates: {
+    plainObject: unknown;
+    nullPrototype: unknown;
+    classInstance: unknown;
+    pollutedPrototype: unknown;
+  } | null;
+  plainObjectResults: {
+    plainObject: boolean;
+    nullPrototype: boolean;
+    classInstance: boolean;
+    pollutedPrototype: boolean;
+  } | null;
+}
+
+interface PlainObjectCandidates {
+  plainObject: Record<string, unknown>;
+  nullPrototype: Record<string, unknown>;
+  classInstance: CustomPrototypeValue;
+  pollutedPrototype: Record<string, unknown>;
 }
 
 class UnsupportedJsonValue {
@@ -45,6 +65,8 @@ function createState(): RenderJsonState {
     malformedBundleCandidate: null,
     malformedBundleDetectedAsBundle: null,
     malformedBundleError: null,
+    plainObjectCandidates: null,
+    plainObjectResults: null,
   };
 }
 
@@ -223,6 +245,25 @@ function createMalformedBundleCandidate(): unknown {
       childPathStrategy: 'nested',
       anchorStrategy: 'kind-id',
     },
+  };
+}
+
+function createPlainObjectCandidates(): PlainObjectCandidates {
+  const plainObject: Record<string, unknown> = { payload: 'plain' };
+  const nullPrototype = Object.create(null) as Record<string, unknown>;
+  const pollutedPrototype = Object.create({ polluted: true } as Record<string, unknown>) as Record<
+    string,
+    unknown
+  >;
+
+  nullPrototype['payload'] = 'null-prototype';
+  pollutedPrototype['payload'] = 'polluted';
+
+  return {
+    plainObject,
+    nullPrototype,
+    classInstance: new CustomPrototypeValue(),
+    pollutedPrototype,
   };
 }
 
@@ -431,6 +472,44 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             childPathStrategy: 'nested',
             rootRouteId: 'guide:index',
           });
+        });
+      },
+    );
+  });
+
+  Rule('Plain-object checks stay shared and strict', ({ RuleScenario }) => {
+    RuleScenario(
+      'Shared plain-object checks allow safe records and reject unsafe object carriers',
+      ({ Given, When, Then, And }) => {
+        Given('plain-object helper candidates covering safe and unsafe object shapes', () => {
+          state!.plainObjectCandidates = createPlainObjectCandidates();
+        });
+
+        When('I evaluate the shared plain-object helper for each candidate', () => {
+          const candidates = state!.plainObjectCandidates!;
+
+          state!.plainObjectResults = {
+            plainObject: isPlainObject(candidates.plainObject),
+            nullPrototype: isPlainObject(candidates.nullPrototype),
+            classInstance: isPlainObject(candidates.classInstance),
+            pollutedPrototype: isPlainObject(candidates.pollutedPrototype),
+          };
+        });
+
+        Then('the helper should accept the plain object candidate', () => {
+          expect(state!.plainObjectResults?.plainObject).toBe(true);
+        });
+
+        And('the helper should accept the null-prototype candidate', () => {
+          expect(state!.plainObjectResults?.nullPrototype).toBe(true);
+        });
+
+        And('the helper should reject the class instance candidate', () => {
+          expect(state!.plainObjectResults?.classInstance).toBe(false);
+        });
+
+        And('the helper should reject the polluted-prototype candidate', () => {
+          expect(state!.plainObjectResults?.pollutedPrototype).toBe(false);
         });
       },
     );

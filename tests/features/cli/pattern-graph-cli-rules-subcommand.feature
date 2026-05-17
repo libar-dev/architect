@@ -135,7 +135,7 @@ Feature: Pattern Graph CLI - Rules Subcommand
     Scenario: Rules feature path filter accepts package-host repo-relative path
       Given TypeScript files with pattern annotations
       And Gherkin feature files with business rules
-      When running "pattern-graph-cli -i 'src/**/*.ts' -f 'tests/features/**/*.feature' rules --feature packages/architect/tests/features/cli/package-host-rules.feature --count"
+      When running "pattern-graph-cli -i 'src/**/*.ts' -f 'tests/features/**/*.feature' rules --feature tests/features/cli/package-host-rules.feature --count"
       Then exit code is 0
       And stdout is a JSON number
       And the rules count equals 1
@@ -144,7 +144,7 @@ Feature: Pattern Graph CLI - Rules Subcommand
     Scenario: Rules feature glob filter accepts package-host repo-relative glob
       Given TypeScript files with pattern annotations
       And Gherkin feature files with business rules
-      When running "pattern-graph-cli -i 'src/**/*.ts' -f 'tests/features/**/*.feature' rules --feature 'packages/architect/tests/features/cli/*.feature' --names-only"
+      When running "pattern-graph-cli -i 'src/**/*.ts' -f 'tests/features/**/*.feature' rules --feature 'tests/features/cli/*.feature' --names-only"
       Then exit code is 0
       And stdout is a JSON string array
       And the rules names-only result has 1 entries

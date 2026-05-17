@@ -12,6 +12,17 @@ export type LogicalRouteId =
   | `${string}:${string}`
   | `${string}:${string}:${string}:${string}`;
 
+type ParsedLogicalRouteId =
+  | { documentType: string; kind: 'index' }
+  | { documentType: string; kind: 'entity'; stableEntityId: string }
+  | {
+      documentType: string;
+      kind: 'child';
+      stableEntityId: string;
+      childKind: string;
+      stableChildId: string;
+    };
+
 const ROUTE_SEGMENT_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]*$/;
 
 export const LogicalRouteSegmentSchema = z.string().regex(ROUTE_SEGMENT_PATTERN);
@@ -49,22 +60,54 @@ export function createChildRouteId(
   )}`;
 }
 
-export function isLogicalRouteId(value: string): value is LogicalRouteId {
-  const segments = value.split(':');
+export function parseLogicalRouteId(value: string): ParsedLogicalRouteId {
+  const parsed = tryParseLogicalRouteId(value);
 
-  if (segments.length === 2 && segments[1] === 'index') {
-    return isLogicalRouteSegment(segments[0]);
+  if (parsed !== undefined) {
+    return parsed;
+  }
+
+  throw new Error(`Invalid logical route id: ${value}`);
+}
+
+export function isLogicalRouteId(value: string): value is LogicalRouteId {
+  return tryParseLogicalRouteId(value) !== undefined;
+}
+
+function tryParseLogicalRouteId(value: string): ParsedLogicalRouteId | undefined {
+  const segments = value.split(':');
+  const [documentType, second, third, fourth] = segments;
+
+  if (documentType === undefined || second === undefined) {
+    return undefined;
+  }
+
+  if (segments.length === 2 && second === 'index') {
+    return isLogicalRouteSegment(documentType) ? { documentType, kind: 'index' } : undefined;
   }
 
   if (segments.length === 2) {
-    return segments.every(isLogicalRouteSegment);
+    return isLogicalRouteSegment(documentType) && isLogicalRouteSegment(second)
+      ? { documentType, kind: 'entity', stableEntityId: second }
+      : undefined;
   }
 
-  if (segments.length === 4) {
-    return segments.every(isLogicalRouteSegment);
+  if (segments.length === 4 && third !== undefined && fourth !== undefined) {
+    return isLogicalRouteSegment(documentType) &&
+      isLogicalRouteSegment(second) &&
+      isLogicalRouteSegment(third) &&
+      isLogicalRouteSegment(fourth)
+      ? {
+          documentType,
+          kind: 'child',
+          stableEntityId: second,
+          childKind: third,
+          stableChildId: fourth,
+        }
+      : undefined;
   }
 
-  return false;
+  return undefined;
 }
 
 function assertLogicalRouteSegment(value: string, label: string): string {

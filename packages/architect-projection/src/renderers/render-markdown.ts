@@ -59,7 +59,7 @@ import {
   REQUIREMENTS_SPECS_AREA_LABEL,
 } from '../fragments/operational-insights/requirement-digest.js';
 
-import { dispatchByKind, type KindTable } from './_shared/dispatch.js';
+import { dispatchByKind, type StrictKindTable } from './_shared/dispatch.js';
 import type { ProjectionInput, RenderMarkdownOptions } from './types.js';
 
 interface MarkdownDocument {
@@ -75,8 +75,14 @@ interface H2Group {
 }
 
 interface SplitResult {
-  readonly parent: MarkdownDocument;
-  readonly subFiles: Record<string, MarkdownDocument>;
+  readonly parent: RenderedMarkdownDocument;
+  readonly subFiles: Record<string, RenderedMarkdownDocument>;
+}
+
+interface RenderedMarkdownDocument {
+  readonly document: MarkdownDocument;
+  readonly markdown: string;
+  readonly lineCount: number;
 }
 
 interface MarkdownMetadata {
@@ -167,6 +173,18 @@ interface RoutedChildOutputMaps {
   readonly childRouteIdPathMap: Record<string, string>;
 }
 
+type MarkdownNormalizerKind =
+  | 'ArchitectureDiagram'
+  | 'BusinessRuleSet'
+  | 'DecisionCatalog'
+  | 'DecisionRecord'
+  | 'RoadmapTimeline'
+  | 'ReleaseNotesDigest'
+  | 'RequirementDigest'
+  | 'TaxonomyDigest'
+  | 'TraceabilityMatrix'
+  | 'ValidationRuleDigest';
+
 const DEFAULT_OPTIONS: {
   includeChildren: boolean;
   includeFrontmatter: boolean;
@@ -187,7 +205,7 @@ const DEFAULT_NORMALIZE_OPTIONS: NormalizeMarkdownOptions = {
   childRefAliases: new Set<string>(),
 };
 
-const MARKDOWN_NORMALIZERS: KindTable<MarkdownDocument, NormalizeMarkdownOptions> = {
+const MARKDOWN_NORMALIZERS = {
   ArchitectureDiagram: normalizeArchitectureDiagram,
   BusinessRuleSet: normalizeBusinessRuleSet,
   DecisionCatalog: normalizeDecisionCatalog,
@@ -198,7 +216,7 @@ const MARKDOWN_NORMALIZERS: KindTable<MarkdownDocument, NormalizeMarkdownOptions
   TaxonomyDigest: normalizeTaxonomyDigest,
   TraceabilityMatrix: normalizeTraceabilityMatrix,
   ValidationRuleDigest: normalizeValidationRuleDigest,
-};
+} satisfies StrictKindTable<MarkdownDocument, NormalizeMarkdownOptions, MarkdownNormalizerKind>;
 
 export const renderMarkdown = (
   input: ProjectionInput,
@@ -314,27 +332,40 @@ function addRoutedDocument(
   document: MarkdownDocument,
   options: ResolvedMarkdownOptions,
 ): void {
-  const parentRendered = renderDocument(document, options);
-  const parentLineCount = countLines(parentRendered);
+  const parentRendered = renderMarkdownDocument(document, options, basePath, 'measure');
 
-  if (!shouldSplitFromLineCount(parentLineCount, basePath, options)) {
+  if (!shouldSplitFromLineCount(parentRendered.lineCount, basePath, options)) {
     // Non-split path: reuse the rendered output. Saves one render per doc.
-    addUniqueEntry(entries, basePath, parentRendered);
+    addUniqueEntry(entries, basePath, parentRendered.markdown);
     return;
   }
 
-  const splitResult = splitOversizedDocument(document, options.sizeBudget ?? 0, basePath, (doc) =>
-    renderDocument(doc, options),
+  const splitResult = splitOversizedDocument(
+    document,
+    options.sizeBudget ?? 0,
+    basePath,
+    options,
+    parentRendered,
   );
 
-  // The split parent has DIFFERENT sections than `document` (heading+linkOut
-  // pairs replaced raw sections per the splitter's logic); requires a fresh
-  // render.
-  addUniqueEntry(entries, basePath, renderDocument(splitResult.parent, options));
+  addUniqueEntry(entries, basePath, splitResult.parent.markdown);
 
   for (const [path, childDocument] of Object.entries(splitResult.subFiles)) {
-    addUniqueEntry(entries, path, renderDocument(childDocument, options));
+    addUniqueEntry(entries, path, childDocument.markdown);
   }
+}
+
+function renderMarkdownDocument(
+  document: MarkdownDocument,
+  options: ResolvedMarkdownOptions,
+  path: string,
+  phase: 'measure' | 'emit',
+  renderKey = path,
+): RenderedMarkdownDocument {
+  const markdown = renderDocument(document, options);
+  const lineCount = countLines(markdown);
+  options.onRenderDocument?.({ renderKey, path, title: document.title, phase, lineCount });
+  return { document, markdown, lineCount };
 }
 
 function addUniqueEntry(entries: Map<string, string>, path: string, content: string): void {
@@ -487,6 +518,9 @@ function resolveOptions(options: RenderMarkdownOptions | undefined): ResolvedMar
     routeProfile: options?.routeProfile ?? DEFAULT_OPTIONS.routeProfile,
     splitStrategy: options?.splitStrategy ?? DEFAULT_OPTIONS.splitStrategy,
     ...(options?.sizeBudget !== undefined ? { sizeBudget: options.sizeBudget } : {}),
+    ...(options?.onRenderDocument !== undefined
+      ? { onRenderDocument: options.onRenderDocument }
+      : {}),
   };
 }
 
@@ -496,6 +530,7 @@ type ResolvedMarkdownOptions = Required<
   Required<Pick<RenderMarkdownOptions, 'splitStrategy'>> & {
     disclosureLevel?: NonNullable<RenderMarkdownOptions['disclosureLevel']>;
     disclosureSpec?: DisclosureSpec;
+    onRenderDocument?: NonNullable<RenderMarkdownOptions['onRenderDocument']>;
     sizeBudget?: number;
   };
 
@@ -2083,35 +2118,50 @@ function splitOversizedDocument(
   document: MarkdownDocument,
   budget: number,
   basePath: string,
-  renderFn: (document: MarkdownDocument) => string,
+  options: ResolvedMarkdownOptions,
+  renderedDocument: RenderedMarkdownDocument,
 ): SplitResult {
   const groups = groupByH2(document.sections);
 
   if (groups.length <= 1) {
-    return { parent: document, subFiles: {} };
+    return { parent: renderedDocument, subFiles: {} };
   }
 
-  const subFiles: Record<string, MarkdownDocument> = {};
+  const subFiles: Record<string, RenderedMarkdownDocument> = {};
   const parentSections: MarkdownRenderableBlock[] = [];
   const directory = extractDirectory(basePath);
   const parentFileName = extractFileName(basePath);
 
-  for (const group of groups) {
+  for (const [groupIndex, group] of groups.entries()) {
     if (group.heading === '_preamble') {
       parentSections.push(...group.sections);
       continue;
     }
 
     const subDocument: MarkdownDocument = { title: group.heading, sections: group.sections };
-    const subLineCount = countLines(renderFn(subDocument));
+    const subFileName = `${slugForFilename(group.heading)}.md`;
+    const subPath = directory ? `${directory}/${subFileName}` : subFileName;
+    const renderKey = `${basePath}#${String(groupIndex)}:${slugForFilename(group.heading)}`;
+    const renderedSubDocument = renderMarkdownDocument(
+      subDocument,
+      options,
+      subPath,
+      'measure',
+      renderKey,
+    );
 
-    if (subLineCount <= budget) {
-      const subFileName = `${slugForFilename(group.heading)}.md`;
-      const subPath = directory ? `${directory}/${subFileName}` : subFileName;
-      subFiles[subPath] = {
+    if (renderedSubDocument.lineCount <= budget) {
+      const splitChildDocument: MarkdownDocument = {
         title: group.heading,
         sections: [linkOut(`← Back to ${document.title}`, parentFileName), ...group.sections],
       };
+      subFiles[subPath] = renderMarkdownDocument(
+        splitChildDocument,
+        options,
+        subPath,
+        'emit',
+        renderKey,
+      );
       parentSections.push(heading(2, group.heading), linkOut(`See ${group.heading}`, subFileName));
       continue;
     }
@@ -2120,12 +2170,17 @@ function splitOversizedDocument(
   }
 
   return {
-    parent: {
-      title: document.title,
-      ...(document.purpose !== undefined ? { purpose: document.purpose } : {}),
-      ...(document.detailLevel !== undefined ? { detailLevel: document.detailLevel } : {}),
-      sections: parentSections,
-    },
+    parent: renderMarkdownDocument(
+      {
+        title: document.title,
+        ...(document.purpose !== undefined ? { purpose: document.purpose } : {}),
+        ...(document.detailLevel !== undefined ? { detailLevel: document.detailLevel } : {}),
+        sections: parentSections,
+      },
+      options,
+      basePath,
+      'emit',
+    ),
     subFiles,
   };
 }

@@ -16,6 +16,7 @@
  */
 import type { Fragment, ProjectionBundle } from '../fragments/index.js';
 import { isBundle } from '../fragments/index.js';
+import { isPlainObject } from '../shared/plain-object.js';
 
 import type { ProjectionInput, RenderJsonOptions } from './types.js';
 
@@ -199,24 +200,6 @@ function appendPath(basePath: string, key: string): string {
   return /^[A-Za-z_$][A-Za-z0-9_$]*$/u.test(key)
     ? `${basePath}.${key}`
     : `${basePath}[${JSON.stringify(key)}]`;
-}
-
-/**
- * Reject non-plain objects at the JSON boundary so the renderer only recurses
- * through plain records and never accepts prototype-pollution carriers or
- * class instances.
- */
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  if (!isRecord(value)) {
-    return false;
-  }
-
-  const prototype: unknown = Object.getPrototypeOf(value);
-  return prototype === Object.prototype || prototype === null;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function getConstructorName(value: object): string {

@@ -27,6 +27,7 @@ export type {
   TagExampleOverrides,
 } from './context/projection-context.js';
 export type {
+  MarkdownRenderEvent,
   ProjectionInput,
   RenderCompactOptions,
   RenderJsonOptions,

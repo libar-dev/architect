@@ -3,8 +3,8 @@ import { expect } from 'vitest';
 import {
   invokeTool,
   type RegisteredToolName,
-} from '../../../../architect-mcp/src/tool-registry.js';
-import type { PipelineSessionManager } from '../../../../architect-mcp/src/pipeline-session.js';
+} from '../../../packages/architect-mcp/src/tool-registry.js';
+import type { PipelineSessionManager } from '../../../packages/architect-mcp/src/pipeline-session.js';
 
 const feature = await loadFeature('tests/features/api/architect-mcp-integration.feature');
 

@@ -3,6 +3,7 @@ export { renderJson } from './render-json.js';
 export { renderMarkdown } from './render-markdown.js';
 export { renderUi } from './render-ui.js';
 export type {
+  MarkdownRenderEvent,
   ProjectionInput,
   RenderCompactOptions,
   RenderJsonOptions,
