@@ -100,7 +100,12 @@ function materializeMarkdownRecord(
   }
 
   fileMap[
-    defaultMarkdownRouteProfile.mapPath(routing.rootRouteId as LogicalRouteId, bundle.root.kind)
+    defaultMarkdownRouteProfile.mapPath(
+      routing.rootRouteId as LogicalRouteId,
+      bundle.root.kind,
+      undefined,
+      routing
+    )
   ] = `root:${bundle.root.patternName}`;
 
   for (const [key, child] of Object.entries(bundle.children)) {
@@ -109,8 +114,9 @@ function materializeMarkdownRecord(
       throw new Error(`Missing child route id for ${key}`);
     }
 
-    fileMap[defaultMarkdownRouteProfile.mapPath(routeId as LogicalRouteId, child.kind, key)] =
-      `child:${child.kind}:${key}`;
+    fileMap[
+      defaultMarkdownRouteProfile.mapPath(routeId as LogicalRouteId, child.kind, key, routing)
+    ] = `child:${child.kind}:${key}`;
   }
 
   return fileMap;
@@ -244,7 +250,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               disclosureLevel?: 'essential' | 'important' | 'useful' | 'advanced';
               disclosureSpec?: DisclosureSpec;
               routeProfile?: {
-                mapPath: (routeId: LogicalRouteId, kind: Fragment['kind'], key?: string) => string;
+                mapPath: (
+                  routeId: LogicalRouteId,
+                  kind: Fragment['kind'],
+                  key: string | undefined,
+                  routing: BundleRouting | undefined,
+                ) => string;
               };
             }>().toEqualTypeOf<RenderMarkdownOptions>();
 

@@ -8,6 +8,19 @@ export interface BundleRouting {
   childPathStrategy: 'flat' | 'nested';
   anchorStrategy: 'heading-slug' | 'kind-id';
   disclosureSpec?: DisclosureSpec;
+  /** Filename for the root document under the markdown route profile (e.g. `PATTERNS.md`). */
+  markdownRootTarget?: string;
+  /**
+   * Child directory for entity and child routes under the markdown route profile.
+   * Falls back to `documentType` from the routeId when undefined.
+   */
+  markdownChildDirectory?: string;
+  /**
+   * Entity-route file layout. When `'nested-index'`, entities resolve to
+   * `${dir}/${slug}/INDEX.md`; otherwise (or when undefined) entities resolve
+   * to a flat `${dir}/${slug}.md` file.
+   */
+  entityPathLayout?: 'flat' | 'nested-index';
 }
 
 export interface ProjectionBundle<T extends Fragment> {
@@ -55,8 +68,19 @@ function isRoutingLike(value: unknown): value is BundleRouting {
     Object.values(value['childRouteIds']).every(isRouteIdValue) &&
     isChildPathStrategy(value['childPathStrategy']) &&
     isAnchorStrategy(value['anchorStrategy']) &&
-    isValidDisclosureSpec(value['disclosureSpec'])
+    isValidDisclosureSpec(value['disclosureSpec']) &&
+    isOptionalString(value['markdownRootTarget']) &&
+    isOptionalString(value['markdownChildDirectory']) &&
+    isOptionalEntityPathLayout(value['entityPathLayout'])
   );
+}
+
+function isOptionalString(value: unknown): boolean {
+  return value === undefined || typeof value === 'string';
+}
+
+function isOptionalEntityPathLayout(value: unknown): boolean {
+  return value === undefined || value === 'flat' || value === 'nested-index';
 }
 
 function isValidDisclosureSpec(value: unknown): boolean {

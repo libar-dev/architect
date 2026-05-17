@@ -233,7 +233,7 @@ function renderBundle(
   const routing = bundle.routing;
   const entries = new Map<string, string>();
   const rootPath = normalizeRequiredRoutedOutputPath(
-    options.routeProfile.mapPath(routing.rootRouteId, bundle.root.kind),
+    options.routeProfile.mapPath(routing.rootRouteId, bundle.root.kind, undefined, routing),
     routing.rootRouteId
   );
   const sortedKeys = [...childKeys].sort((left, right) => left.localeCompare(right));
@@ -393,7 +393,7 @@ function resolveChildRoutePath(
     throw new Error(`renderMarkdown missing child route ID for bundle child key: ${key}`);
   }
 
-  return options.routeProfile.mapPath(routeId, child.kind, key);
+  return options.routeProfile.mapPath(routeId, child.kind, key, bundle.routing);
 }
 
 function resolveBundleDisclosureSpec(

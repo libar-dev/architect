@@ -1,27 +1,28 @@
 import type { MarkdownRouteProfile } from './types.js';
 import { slugForFilename } from '../_internal/slug.js';
-import { getDocumentationTypeMetadata } from '../projections/documentation-composition/documentation-type-registry.js';
+import type { BundleRouting } from '../fragments/base.js';
 import type { LogicalRouteId } from '../routing/route-id.js';
 
 export const defaultMarkdownRouteProfile: MarkdownRouteProfile = {
-  mapPath(routeId) {
-    return resolveLogicalRoutePath(routeId);
+  mapPath(routeId, _kind, _key, routing) {
+    return resolveLogicalRoutePath(routeId, routing);
   },
 };
 
-export function resolveLogicalRoutePath(routeId: LogicalRouteId): string {
+export function resolveLogicalRoutePath(
+  routeId: LogicalRouteId,
+  routing: BundleRouting | undefined
+): string {
   const route = parseLogicalRouteId(routeId);
-  const metadata = getDocumentationTypeMetadata(route.documentType);
-  const directory =
-    metadata !== undefined && 'childDirectory' in metadata ? metadata.childDirectory : undefined;
-  const resolvedDirectory = directory ?? route.documentType;
 
   if (route.kind === 'index') {
-    return resolveRootMarkdownPath(route.documentType);
+    return resolveRootMarkdownPath(route.documentType, routing);
   }
 
+  const resolvedDirectory = routing?.markdownChildDirectory ?? route.documentType;
+
   if (route.kind === 'entity') {
-    if (route.documentType === 'requirements-executable') {
+    if (routing?.entityPathLayout === 'nested-index') {
       return `${resolvedDirectory}/${slugForFilename(route.stableEntityId)}/INDEX.md`;
     }
 
@@ -37,14 +38,12 @@ export function resolveLogicalRoutePath(routeId: LogicalRouteId): string {
     : `${slugForFilename(route.stableEntityId)}/${childFileName}.md`;
 }
 
-function resolveRootMarkdownPath(documentType: string): string {
-  const metadata = getDocumentationTypeMetadata(documentType);
-  if (metadata !== undefined) {
-    return metadata.markdownRootTarget;
-  }
-
-  if (documentType === 'milestones') {
-    return 'COMPLETED-MILESTONES.md';
+function resolveRootMarkdownPath(
+  documentType: string,
+  routing: BundleRouting | undefined
+): string {
+  if (routing?.markdownRootTarget !== undefined) {
+    return routing.markdownRootTarget;
   }
 
   return `${documentType.toUpperCase()}.md`;

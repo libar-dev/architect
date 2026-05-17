@@ -30,6 +30,12 @@ export const SupportedDocumentationTypeRegistryEntrySchema = z.strictObject({
   rootRouteId: LogicalRouteIdSchema,
   markdownRootTarget: z.string().regex(/\.md$/u),
   childDirectory: z.string().min(1).optional(),
+  entityPathLayout: z
+    .literal('nested-index')
+    .optional()
+    .describe(
+      'Entity-route file layout for this doc type. When "nested-index", each entity routes to `${childDirectory}/${slug}/INDEX.md`; otherwise entities render as flat `${childDirectory}/${slug}.md` files. The bundle carries this onto `routing.entityPathLayout` so the markdown renderer never has to special-case a documentation type.'
+    ),
   defaultDisclosureLevel: ProgressiveDisclosureLevelSchema,
   disclosureMatrix: DisclosureMatrixSchema,
   generatorName: z.string().min(1),
@@ -127,6 +133,7 @@ const DOCUMENTATION_TYPE_REGISTRY = Object.freeze([
     rootRouteId: createIndexRouteId('requirements-executable'),
     markdownRootTarget: 'REQUIREMENTS-EXECUTABLE.md',
     childDirectory: 'requirements-executable',
+    entityPathLayout: 'nested-index',
     defaultDisclosureLevel: 'important',
     disclosureMatrix: requirementsDisclosureMatrix,
     generatorName: 'requirements-executable',

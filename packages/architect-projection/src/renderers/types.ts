@@ -1,11 +1,17 @@
 import type { Fragment, ProjectionBundle } from '../fragments/index.js';
+import type { BundleRouting } from '../fragments/base.js';
 import type { DisclosureSpec } from '../disclosure/spec.js';
 import type { LogicalRouteId } from '../routing/route-id.js';
 
 export type ProjectionInput = Fragment | ProjectionBundle<Fragment>;
 
 export interface MarkdownRouteProfile {
-  mapPath: (routeId: LogicalRouteId, kind: Fragment['kind'], key?: string) => string;
+  mapPath: (
+    routeId: LogicalRouteId,
+    kind: Fragment['kind'],
+    key: string | undefined,
+    routing: BundleRouting | undefined,
+  ) => string;
 }
 
 export interface RenderMarkdownOptions {

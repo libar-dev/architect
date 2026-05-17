@@ -100,11 +100,20 @@ export function projectDocumentationBundleInternal(
   const metadata = getDocumentationTypeMetadata(documentType);
   if (metadata !== undefined && bundle.routing !== undefined) {
     const level = options.disclosureLevel ?? metadata.defaultDisclosureLevel;
+    const childDirectory =
+      'childDirectory' in metadata ? metadata.childDirectory : undefined;
+    const entityPathLayout =
+      'entityPathLayout' in metadata ? metadata.entityPathLayout : undefined;
     return {
       ...bundle,
       routing: {
         ...bundle.routing,
         disclosureSpec: metadata.disclosureMatrix[level],
+        markdownRootTarget: metadata.markdownRootTarget,
+        ...(childDirectory !== undefined
+          ? { markdownChildDirectory: childDirectory }
+          : {}),
+        ...(entityPathLayout !== undefined ? { entityPathLayout } : {}),
       },
     };
   }
