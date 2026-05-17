@@ -139,6 +139,83 @@ The `pnpm architect:query taxonomy --format json` output is the data. Two questi
 1. Should the `TAXONOMY.md` doc be generated FROM the query output, or should it CALL `extractTagRegistry()` directly? (Doc definitions calling extractors is the cleaner answer — no shell-out, no JSON parsing.)
 2. Should the manual `docs/TAXONOMY.md` be deleted entirely (the docs-live equivalent already exists and is generated)? **Yes** — the deprecation banner already points there. Delete on next pass.
 
+## Q3 — Multi-doc content reuse and progressive disclosure
+
+Added 2026-05-17 after the user pointed out two specific patterns my initial design under-served.
+
+### Pattern A — same content at different depths in multiple docs
+
+Concrete example: stub-format guidance appears in three places at three depths:
+
+| Audience | Depth needed | Today's location |
+|---|---|---|
+| Spec readers (full normative) | All sections | `formal-spec/07-stub-format.md` |
+| Design-session agents (operational) | Directory + lifecycle + tag-table, with link to canonical | `.agents/skills/architect-design-session/SKILL.md` (currently links via prose ref) |
+| Brief consumers (drive-by readers) | Link only | (potential package READMEs) |
+
+The same pattern applies to the 9-block-type catalog (`formal-spec/12` full, package READMEs would want a brief summary, annotation-reference doc would want full), `RenderableDocument` envelope, FSM transitions, value-transfer gate, etc.
+
+**Multi-target output (`DocTarget[]`)** handles "same generated doc to multiple outputs." **Generated-insert directive** handles "same data table in multiple hand-authored files." Neither handles "same conceptual content unit at different depths in N different generated docs."
+
+### Pattern B — pre-existing progressive-disclosure substrate
+
+The `architect-projection` package ALREADY ships first-class progressive-disclosure support that the initial inventory missed:
+
+- `RenderMarkdownOptions.disclosureLevel?: 'essential' | 'important' | 'useful' | 'advanced'` (see `tests/features/renderers/contract.feature.steps.ts:244`).
+- `RenderMarkdownOptions.disclosureSpec?: DisclosureSpec` for fine-grained control.
+- `DisclosureSpec` type at `projection/projections/documentation-composition/disclosure-spec.ts`.
+- `ProjectionBundle.children` + `routing` mechanism for fan-out to per-disclosure-level child documents — already tested, already enforced by the renderer contract.
+- `splitOversizedDocument` (markdown-only) for size-budget-driven splitting (see `tests/fixtures/renderers/progressive-disclosure.md`).
+
+This is the OUTPUT-side disclosure machinery — it controls how a built document renders. The missing piece is INPUT-side: how a single content unit produces different `SectionBlock[]` arrays based on requested depth at build-time.
+
+### The fix — ContentFragments as a third reuse boundary
+
+Add a layer between extractors and DocDefinitions:
+
+```ts
+defineContentFragment({
+  id: 'stub-format',
+  canonicalDoc: 'formal-spec/07-stub-format',
+  build(ctx, opts: { disclosure?: DisclosureSpec; mode?: 'inline' | 'link-only'; linkToCanonical?: boolean }): SectionBlock[]
+})
+```
+
+Then DocDefinitions compose ContentFragments:
+
+```ts
+// formal-spec/07
+build(ctx) { return composeDoc('07 — Stub Format', [...preamble(...), ...stubFormatFragment.build(ctx, { disclosure: 'advanced' })]); }
+
+// SKILL.md
+build(ctx) { return composeDoc('...', [..., ...stubFormatFragment.build(ctx, { disclosure: 'important', linkToCanonical: true }), ...skillSpecific()]); }
+
+// brief consumer
+build(ctx) { return composeDoc('...', [...stubFormatFragment.build(ctx, { mode: 'link-only' })]); }
+```
+
+**Two orthogonal disclosure axes:**
+
+| Axis | Controls | Mechanism |
+|---|---|---|
+| INPUT disclosure (new) | Which sub-sections this ContentFragment emits | `ContentFragment.build(ctx, { disclosure })` parameter |
+| OUTPUT disclosure (existing) | Whether bundle children inline or split into separate files | `RenderMarkdownOptions.disclosureLevel` / `disclosureSpec` |
+
+Same vocabulary (`essential | important | useful | advanced`), independent concerns. The two compose: a DocDefinition's `build()` may emit ContentFragments at chosen input depth, and the resulting `RenderableDocument` may then be rendered at a chosen output disclosure level.
+
+### Cross-document linking
+
+When a ContentFragment appears in doc A at depth `important` and doc B at depth `advanced`, doc A should link to doc B's canonical location for the omitted detail. `ContentFragment.canonicalDoc` declares this. `linkToCanonical: true` flag on the build call emits an auto-resolved link-out block at the end of the rendered fragment. The link target uses the bundle routing system (`LogicalRouteId`) already in place.
+
+### Build-time consistency
+
+Because ContentFragments are TypeScript modules, the build pipeline can:
+- Reject a DocDefinition that references a `ContentFragment.id` that doesn't exist.
+- Warn if a ContentFragment is referenced at `disclosure: 'advanced'` from more than one DocDefinition (the "canonical doc" should be unique for that depth).
+- Optionally enforce that the canonical doc actually emits the highest disclosure level.
+
+Spec/impl traceability extension (future): a ContentFragment can declare `reflects: { module: 'projection-bundle', schema: 'ProgressiveDisclosurePolicySchema' }` and the build fails if that symbol moves or changes shape — closing the formal-spec drift problem at the fragment level.
+
 ## Pending decisions for the design session
 
 These are the choices that need a person, not more analysis:
@@ -148,5 +225,9 @@ These are the choices that need a person, not more analysis:
 3. **Generated-insert directive syntax.** Proposed: `<!-- generated:<source>[:<scope>]:start --><!-- generated:<source>[:<scope>]:end -->`. Alternative: `<!-- @architect-insert <source> <scope> -->...<!-- @architect-insert-end -->`. The first is more readable; the second is more discoverable via existing tag-grep tooling.
 4. **Backward compat with `ReferenceDocConfig`.** Should `referenceDocConfigs:` in `architect.config.ts` still work as sugar after the new `DocDefinition` API lands, or is the migration mandatory? (Repo doctrine is no-BC; recommend: delete the field, port any consumers — none exist today.)
 5. **Aggregation-tag extension.** Today the aggregation kind has `targetDoc`. To support multi-doc aggregation (a tag that flows into N docs), we need to either (a) allow `targetDoc: string[]`, or (b) move routing out of the registry into the extractor call site (`extractAggregations('decision').forDoc('DECISIONS')`). Recommend (b) — registry is for taxonomy, not transport.
+
+6. **ContentFragment location.** Same options as DocDefinition (root `docs-config/content-fragments/`, per-package, or hybrid). Recommend: cross-cutting fragments (block-type catalog, stub format, FSM transitions) live at root `docs-config/content-fragments/`; package-specific fragments (e.g., a `projection-bundle-contract` fragment) live in `packages/<pkg>/.docs/content-fragments/` so they ship with the code they describe.
+
+7. **ContentFragment disclosure default.** If a DocDefinition includes a ContentFragment without specifying disclosure, default to `important` or require explicit choice? Recommend: explicit choice (typed as required), so authors think about depth per inclusion site rather than getting a surprise default.
 
 See `PROPOSED-DESIGN.md` for concrete type sketches that bias these decisions toward a coherent endpoint.

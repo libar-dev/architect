@@ -9,10 +9,11 @@
 
 import type { PatternGraph } from '@libar-dev/architect-core';
 import type { RenderableDocument, SectionBlock } from '../blocks/schema.js';
+import type { DisclosureSpec } from '../projections/documentation-composition/disclosure-spec.js';
 
 export interface DocBuildContext {
   readonly graph: PatternGraph;
-  // Future: extractors injected here for test-time replacement
+  readonly emittingDocId: string;  // current doc — used for "am I canonical?" checks
 }
 
 export interface DocTarget {
@@ -25,6 +26,27 @@ export interface DocDefinition {
   readonly title: string;
   readonly targets: readonly DocTarget[];
   build(ctx: DocBuildContext): RenderableDocument | Promise<RenderableDocument>;
+}
+
+// ContentFragment — reusable content unit included by multiple DocDefinitions
+// at potentially different disclosure depths. See DEEP-DIVE § Q3.
+
+export type DisclosureLevel = 'essential' | 'important' | 'useful' | 'advanced';
+
+export interface ContentFragmentOpts {
+  readonly disclosure: DisclosureLevel;  // required — no default
+  readonly mode?: 'inline' | 'link-only';  // default: 'inline'
+  readonly linkToCanonical?: boolean;  // default: false; auto-link to canonicalDoc if non-canonical inclusion
+}
+
+export interface ContentFragment {
+  readonly id: string;
+  readonly canonicalDoc: string;  // DocDefinition.id where 'advanced' depth lives
+  build(ctx: DocBuildContext, opts: ContentFragmentOpts): SectionBlock[];
+}
+
+export function defineContentFragment(spec: ContentFragment): ContentFragment {
+  return spec;  // identity helper for type-safe authoring
 }
 ```
 
@@ -126,6 +148,155 @@ generatedInsert(source: string, scope?: string): SectionBlock[]
 // NEW — emits `<!-- generated:source[:scope]:start -->...<!-- generated:source[:scope]:end -->`
 // fences that the doc-gen pipeline rewrites on docs:all.
 ```
+
+## 3b. ContentFragment example — stub-format reused across 3 docs
+
+```ts
+// docs-config/content-fragments/stub-format.fragment.ts
+import { defineContentFragment } from '@libar-dev/architect-projection';
+import {
+  composeSections, heading, paragraph, asTable, linkToCanonical, gte,
+} from '@libar-dev/architect-projection/compose';
+
+export const stubFormatFragment = defineContentFragment({
+  id: 'stub-format',
+  canonicalDoc: 'formal-spec-07',
+
+  build(ctx, opts) {
+    const { disclosure, mode = 'inline', linkToCanonical: addLink = false } = opts;
+
+    if (mode === 'link-only') {
+      return [linkToCanonical(this, { text: 'Stub Format spec' })];
+    }
+
+    return composeSections([
+      // ESSENTIAL — always emitted
+      paragraph(
+        'Design stubs are TypeScript files defining interfaces, types, and ' +
+        'API shapes as design artifacts. They are ephemeral — deleted at ' +
+        'implementation time.'
+      ),
+
+      // IMPORTANT — operational reference
+      ...(gte(disclosure, 'important') ? [
+        heading('Directory convention', 3),
+        ...directoryConventionSection(),
+        heading('Lifecycle', 3),
+        ...lifecycleSection(),
+      ] : []),
+
+      // USEFUL — authoring detail
+      ...(gte(disclosure, 'useful') ? [
+        heading('Required JSDoc tags', 3),
+        ...requiredTagsTable(),
+        heading('Code conventions', 3),
+        ...codeConventionsSection(),
+      ] : []),
+
+      // ADVANCED — full normative content
+      ...(gte(disclosure, 'advanced') ? [
+        heading('Tag syntax rules', 3),
+        ...tagSyntaxRules(),
+        heading('Exported type surface', 3),
+        ...exportedTypeSurfaceSection(),
+      ] : []),
+
+      // Cross-reference if this is a non-canonical inclusion
+      ...(addLink && ctx.emittingDocId !== this.canonicalDoc ? [
+        linkToCanonical(this, { text: 'Full reference: Stub Format spec' }),
+      ] : []),
+    ]);
+  },
+});
+```
+
+Three consumers, each at a different depth:
+
+```ts
+// docs-config/formal-spec/07-stub-format.doc.ts
+export const formalSpec07: DocDefinition = {
+  id: 'formal-spec-07',
+  title: '07 — Stub Format',
+  targets: [{ kind: 'website', path: 'formal-spec/07-stub-format.md' }],
+  build(ctx) {
+    return composeDoc('07 — Stub Format', [
+      ...preamble('docs-sources/formal-spec/07-intro.md'),
+      ...stubFormatFragment.build(ctx, { disclosure: 'advanced' }),
+    ]);
+  },
+};
+
+// docs-config/skills/architect-design-session.doc.ts
+export const designSessionSkill: DocDefinition = {
+  id: 'skill-design-session',
+  title: 'Architect Design-Tier Session',
+  targets: [{ kind: 'agent-context', path: '.agents/skills/architect-design-session/SKILL.md' }],
+  build(ctx) {
+    return composeDoc('Architect Design-Tier Session', [
+      ...preamble('docs-sources/skills/design-session-frontmatter.md'),
+      ...doctrineReferencesSection(),
+      ...preflightSection(),
+      heading('Stubs (ephemeral scaffolds)', 2),
+      ...stubFormatFragment.build(ctx, {
+        disclosure: 'important',
+        linkToCanonical: true,   // appends "Full reference: Stub Format spec" link
+      }),
+      ...antiDriftTripwiresSection(),
+      ...acceptanceCriteriaSection(),
+    ]);
+  },
+};
+
+// docs-config/packages/architect-cli-readme.doc.ts (brief drive-by mention)
+build(ctx) {
+  return composeDoc('@libar-dev/architect-cli', [
+    ...packageHeader(ctx),
+    heading('Stubs (out of scope)', 3),
+    ...stubFormatFragment.build(ctx, { mode: 'link-only' }),
+    ...cliCommandsSection(ctx),
+  ]);
+}
+```
+
+The same content unit ships at three depths from one source. The canonical doc owns the full normative content; consumers pick what depth they need; cross-references resolve automatically.
+
+### Integration with existing progressive-disclosure substrate
+
+Two orthogonal disclosure axes:
+
+| Axis | Controls | Mechanism |
+|---|---|---|
+| **INPUT disclosure** (new) | Which sub-sections a ContentFragment emits | `ContentFragment.build(ctx, { disclosure })` |
+| **OUTPUT disclosure** (existing — `RenderMarkdownOptions`) | Whether bundle children inline or split into separate files | `disclosureLevel` / `disclosureSpec` on render call |
+
+Composition: a `DocDefinition.build()` may emit ContentFragments at chosen input depths, returning a `RenderableDocument`. That document may be a `ProjectionBundle` with `children`, which the renderer fans out per its own output disclosure level. Same vocabulary across both axes; independent concerns.
+
+### Build-time invariants for ContentFragments
+
+The doc runner can enforce:
+
+1. **Canonical doc uniqueness:** at most one DocDefinition references each ContentFragment at `disclosure: 'advanced'`. Warning if violated.
+2. **Canonical depth consistency:** the DocDefinition declared as `canonicalDoc` MUST include the fragment at `disclosure: 'advanced'`. Error if mismatched.
+3. **Link resolvability:** `linkToCanonical: true` only valid if `canonicalDoc` resolves to a real DocDefinition with a website target. Error otherwise.
+4. **Fragment ID uniqueness:** all `ContentFragment.id` values globally unique. Error if duplicated.
+
+### Spec/impl traceability (future extension)
+
+A ContentFragment can declare a code reflection:
+
+```ts
+defineContentFragment({
+  id: 'block-type-catalog',
+  canonicalDoc: 'formal-spec-12',
+  reflects: { module: 'architect-projection/blocks/schema', symbol: 'SectionBlock' },
+  build(ctx, opts) {
+    const blockTypes = extractEnumValues(ctx, 'SectionBlockKind');
+    // ...
+  },
+});
+```
+
+If `SectionBlock` moves or its variants change, the build fails — closing the formal-spec drift problem at the fragment level. The fragment's CONTENT comes from the extractor; the CODE LINK is enforced by the build runner.
 
 ## 4. Worked example — `packages/architect-projection/README.md`
 
@@ -303,6 +474,14 @@ Sequenced; each wave delivers an end-to-end slice.
   - W-DOCS-2c: diagram extractors — `extractSequenceDiagram`, `extractClassDiagram`, `extractC4ContextDiagram`, `extractGraphDiagram` (LR direction). Lift from pre-refactor `reference-diagrams.ts`.
 - **Verification:** rebuild `REFERENCE-SAMPLE.md` from a new `DocDefinition`. Diff against the pre-refactor 1,135-line output. Any structural divergence is a bug in the extractor.
 
+### W-DOCS-2d: ContentFragments + disclosure integration (~1 session)
+- `defineContentFragment` helper + types.
+- `gte(level, threshold)` disclosure comparator.
+- `linkToCanonical(fragment, opts)` link-out builder.
+- Build-runner enforcement of the four ContentFragment invariants (canonical uniqueness, canonical depth, link resolvability, ID uniqueness).
+- Integration with existing `RenderMarkdownOptions.disclosureLevel` — the output-side machinery stays as-is; the new build-time mechanism feeds into it cleanly.
+- **Verification:** ship a `stubFormatFragment` referenced by 3 test DocDefinitions at 3 disclosure levels. Assert each consumer renders the expected section set; assert non-canonical inclusions emit the cross-reference link; assert the build-runner rejects duplicate canonical declarations.
+
 ### W-DOCS-3: Multi-target output (~1 session)
 - `DocTarget.kind: 'website' | 'agent-context' | 'package-readme' | 'json'`.
 - Per-target path conventions and write logic.
@@ -336,13 +515,14 @@ Sequenced; each wave delivers an end-to-end slice.
 
 ### Independence and sequencing
 - W-DOCS-1 blocks everything.
-- W-DOCS-2 ⊥ W-DOCS-3, W-DOCS-4 (parallel after W-DOCS-1).
-- W-DOCS-5 needs W-DOCS-1, W-DOCS-2.
-- W-DOCS-6 needs W-DOCS-1, W-DOCS-2. Individual carriers ship independently.
+- W-DOCS-2a/2b/2c ⊥ W-DOCS-3, W-DOCS-4 (parallel after W-DOCS-1).
+- W-DOCS-2d (ContentFragments) needs W-DOCS-1 and W-DOCS-2a (shape extractors). The compose helpers come from W-DOCS-1; the fragment runner is the new code.
+- W-DOCS-5 needs W-DOCS-1, W-DOCS-2, AND W-DOCS-2d (the 11 reference docs benefit from ContentFragments for cross-doc reuse — `ARCHITECTURE-CODECS`, `ARCHITECTURE-TYPES`, and `REFERENCE-SAMPLE` overlap on type-catalog content).
+- W-DOCS-6 needs W-DOCS-1, W-DOCS-2, AND W-DOCS-2d (doctrine reuse across `_shared/`, `docs/`, and `formal-spec/` is the core use case for ContentFragments).
 - W-DOCS-7 needs everything before.
 - W-DOCS-8 is fully independent of the rest.
 
-Total: ~10-13 sessions. Most under 4 hours each. W-DOCS-1 + W-DOCS-2 + W-DOCS-5 is the MVP (~6 sessions) — produces parity with pre-refactor + the architecture improvements.
+Total: ~11-14 sessions. Most under 4 hours each. W-DOCS-1 + W-DOCS-2 + W-DOCS-2d + W-DOCS-5 is the MVP (~7 sessions) — produces parity with pre-refactor PLUS the cross-doc reuse capability the pre-refactor design lacked.
 
 ## 8. Migration & risk
 

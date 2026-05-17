@@ -91,6 +91,29 @@ Source: `/Users/darkomijic/dev-projects/delivery-process/architect.config.ts`
 - **`shapeSelectors: [{ group: 'pattern-graph' }, { group: 'reference-sample' }]`** — proving the shape-group registry resolver worked. The enum still exists at `architect-core/src/config/presentation-contracts.ts:3-7`; the resolver was dropped.
 - **`claudeMdSection` + `claudeMdFilename`** on each entry — the dual-target output (website + agent context) from one source.
 
+## 3b. Surviving progressive-disclosure substrate (initially missed)
+
+The post-W1.5 `architect-projection` package already ships first-class progressive-disclosure support. Discovered after the user pointed at `tests/fixtures/renderers/progressive-disclosure.md` + `tests/features/renderers/contract.feature.steps.ts`. The OUTPUT-side machinery is in place; the new ContentFragments work plugs INPUT-side disclosure into it.
+
+| Component | Location | Purpose |
+|---|---|---|
+| `RenderMarkdownOptions.disclosureLevel` | `renderers/types.ts` | `'essential' \| 'important' \| 'useful' \| 'advanced'` — controls which bundle children inline vs split |
+| `RenderMarkdownOptions.disclosureSpec` | `renderers/types.ts` | `DisclosureSpec` for fine-grained per-section control |
+| `DisclosureSpec` type | `projections/documentation-composition/disclosure-spec.ts` | Detail-level descriptor used by both input and output disclosure |
+| `ProjectionBundle.children` + `routing` | `fragments/base.ts` | Fan-out mechanism for per-disclosure-level child documents |
+| `BundleRouting` with `rootRouteId` / `childRouteIds` / `childPathStrategy` / `anchorStrategy` | `fragments/base.ts` | Stable logical route IDs decouple bundle structure from file paths/anchors |
+| `LogicalRouteId` | `projections/documentation-composition/progressive-disclosure.js` | Format: `<docType>:index`, `<docType>:<entityId>`, `<docType>:<entityId>:<childKind>:<childId>` |
+| `defaultMarkdownRouteProfile.mapPath()` | `renderers/markdown-paths.ts` | Renderer-side route-id → file-path resolver |
+| `splitOversizedDocument` (via `sizeBudget` + `splitStrategy: 'h2-boundary' \| 'never'`) | `renderers/render-markdown.ts` | Markdown-only auto-pagination |
+| Renderer-contract enforcement | `tests/features/renderers/contract.feature.steps.ts:244` | Type signatures enforced via `expectTypeOf` |
+
+**The contract decisions** documented in `tests/fixtures/renderers/progressive-disclosure.md`:
+1. View splitting stays at projection layer (no runtime `view` switching in one projector).
+2. `splitOversizedDocument` is markdown-only; compact-text / JSON / UI never split.
+3. Legacy `additionalFiles` flattens via `ProjectionBundle.children` + `routing`.
+
+**Implication for ContentFragments:** the new INPUT-side disclosure (what depth of content does a fragment emit?) plugs into the existing OUTPUT-side disclosure (how does the renderer fan out the resulting bundle?) without any infrastructure rework. Both use the same `'essential' | 'important' | 'useful' | 'advanced'` vocabulary. See DEEP-DIVE § Q3 and PROPOSED-DESIGN § 3b.
+
 ## 4. Surviving schemas — the foundation
 
 Source: `packages/architect-core/src/config/presentation-contracts.ts`
