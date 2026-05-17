@@ -20,7 +20,7 @@ What follows is everything still owed before this repo can publish a `2.0.0-pre.
 - [x] `pnpm build` — green after dropping the meta-package's broken JS barrel (see note below).
 - [x] `pnpm typecheck` — green across all 5 publishable packages with TS source.
 - [x] `pnpm test` — **2828 tests passing** across 65 test files (`architect-core` 1070 / `-projection` 1534 / `-guard` 37 / `-cli` 17 / `-mcp` 170). One real bug fixed along the way (see CLI tests note).
-- [ ] `pnpm -r lint` — still fails because no root eslint config and most packages don't depend on eslint. Deferred to W2.
+- [x] `pnpm -r lint` — config loads after `eslint-plugin-import` + `eslint-import-resolver-typescript` added to root devDependencies (between W1.2 and W1.3 of the substrate-prep campaign). Lint surfaces real findings now; broader W2 lint wiring (custom `no-suppression-comments` rule, per-package coverage) is still open below.
 
 ### Structural changes landed during W1
 
@@ -130,9 +130,9 @@ Captured here to close the loop: the changesets config (`.changeset/config.json`
 
 ## Wave 2 — Root tooling (eslint, lint-staged, husky, turbo)
 
-The lift skipped opinionated tooling files because they reach across the studio monorepo. Pick a minimal version for the new repo. W1.5 lifted the dogfood `eslint.config.mjs` and `lint-staged.config.mjs` to root, but they're not wired into the workspace yet (and `eslint-plugin-import` isn't installed — would crash if you ran `pnpm lint`).
+The lift skipped opinionated tooling files because they reach across the studio monorepo. Pick a minimal version for the new repo. W1.5 lifted the dogfood `eslint.config.mjs` and `lint-staged.config.mjs` to root, but they're not yet fully wired into the workspace.
 
-- [ ] Author a root `eslint.config.mjs` that works across the whole workspace. Studio's version (`architect-studio/eslint.config.mjs`, ~11 KB) bundles the custom `no-suppression-comments` rule plus TailwindCSS / React rules — strip everything React/Tailwind, keep the TypeScript + import + no-suppression bits. Add `eslint-plugin-import` to root devDependencies.
+- [ ] Author a root `eslint.config.mjs` that works across the whole workspace. Studio's version (`architect-studio/eslint.config.mjs`, ~11 KB) bundles the custom `no-suppression-comments` rule plus TailwindCSS / React rules — strip everything React/Tailwind, keep the TypeScript + import + no-suppression bits. (`eslint-plugin-import` and `eslint-import-resolver-typescript` are now installed at root — DONE.)
 - [ ] Decide on Turbo. Two options:
   - **Skip it.** Use `pnpm -r --filter` for orchestration. Simpler for a 6-package repo.
   - **Keep it.** Lift `turbo.json` (already in studio root) and add `turbo` as a dev dep. Useful if build times grow.
