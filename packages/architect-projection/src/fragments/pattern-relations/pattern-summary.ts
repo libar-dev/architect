@@ -25,4 +25,6 @@ export const PatternSummarySchema = z.strictObject({
   source: PatternSourceSchema,
 });
 
+export const PatternIdentitySchema = PatternSummarySchema.omit({ kind: true });
+
 export type PatternSummary = z.infer<typeof PatternSummarySchema>;

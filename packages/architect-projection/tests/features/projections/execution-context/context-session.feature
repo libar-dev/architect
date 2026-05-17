@@ -75,7 +75,7 @@ Feature: Execution Context context and session projections
     type needs, and invalid session options must fail at the parse boundary
     instead of producing an ambiguous bundle.
 
-    **Verified by:** planning design and implement sessions expose different shapes, parseAndProjectSessionContext rejects invalid session options
+    **Verified by:** planning design and implement sessions expose different shapes, parseAndProjectSessionContext rejects invalid session options, parseAndProjectSessionContext rejects extra option properties
 
     Scenario: planning design and implement sessions expose different shapes
       Given a Execution Context session projection context with metadata stubs neighbors and tests
@@ -89,6 +89,11 @@ Feature: Execution Context context and session projections
       Given a Execution Context session projection context with metadata stubs neighbors and tests
       When I parse-and-project session context with an invalid session type
       Then parsing session context options should fail loudly
+
+    Scenario: parseAndProjectSessionContext rejects extra option properties
+      Given a Execution Context session projection context with metadata stubs neighbors and tests
+      When I parse-and-project session context with an extra option property
+      Then parsing session context options should reject the extra property
 
   Rule: Reading lists and deliverables stay deterministic
 

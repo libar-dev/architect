@@ -5,7 +5,7 @@
  * @architect-role:contract
  * @architect-bounded-context:execution-context
  *
- * Defines the `DeliverableManifest` fragment shape for one pattern's ordered deliverables.
+ * Defines the canonical `DeliverableManifest` fragment shape for one pattern's ordered deliverables.
  */
 import { z } from 'zod';
 

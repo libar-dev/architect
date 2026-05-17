@@ -1,5 +1,5 @@
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
-import { describe, expect, it } from 'vitest';
+import { expect } from 'vitest';
 
 import {
   FragmentSchema,
@@ -457,6 +457,42 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         });
       },
     );
+
+    RuleScenario(
+      'parseAndProjectSessionContext rejects extra option properties',
+      ({ Given, When, Then }) => {
+        Given(
+          'a Execution Context session projection context with metadata stubs neighbors and tests',
+          () => {
+            const pattern = createPattern('ProjectionBody', {
+              status: 'active',
+              file: 'architect/specs/projection-body.feature',
+            });
+
+            state!.context = createProjectionContext({ patterns: [pattern] });
+          },
+        );
+
+        When('I parse-and-project session context with an extra option property', () => {
+          try {
+            parseAndProjectSessionContext(state!.context!, {
+              patterns: ['ProjectionBody'],
+              sessionType: 'implement',
+              extra: 'not allowed',
+            });
+            state!.invalidOptionsError = null;
+          } catch (error) {
+            state!.invalidOptionsError = error instanceof Error ? error.message : String(error);
+          }
+        });
+
+        Then('parsing session context options should reject the extra property', () => {
+          expect(state!.invalidOptionsError).toMatch(
+            /Invalid options for parseAndProjectSessionContext:[\s\S]*Unrecognized key: "extra"/u,
+          );
+        });
+      },
+    );
   });
 
   Rule('Reading lists and deliverables stay deterministic', ({ RuleScenario }) => {
@@ -815,26 +851,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           },
         );
       },
-    );
-  });
-});
-
-describe('Execution Context context and session projections adversarial coverage', () => {
-  it('rejects extra session-context option properties at the strict parse boundary', () => {
-    const pattern = createPattern('ProjectionBody', {
-      status: 'active',
-      file: 'architect/specs/projection-body.feature',
-    });
-    const context = createProjectionContext({ patterns: [pattern] });
-
-    expect(() =>
-      parseAndProjectSessionContext(context, {
-        patterns: ['ProjectionBody'],
-        sessionType: 'implement',
-        extra: 'not allowed',
-      }),
-    ).toThrow(
-      /Invalid options for parseAndProjectSessionContext:[\s\S]*Unrecognized key: "extra"/u,
     );
   });
 });

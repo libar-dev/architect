@@ -11,6 +11,7 @@
  */
 import { z } from 'zod';
 
+import { DeliverableManifestSchema as ExecutionContextDeliverableManifestSchema } from '../execution-context/deliverable-manifest.js';
 import { DeliverableSchema as ExecutionContextDeliverableSchema } from '../execution-context/deliverable.js';
 
 export const PatternSourceSchema = z.enum(['typescript', 'gherkin']);
@@ -50,8 +51,7 @@ export const EmbeddedRuleRefSchema = z.strictObject({
 
 export const DeliverableSchema = ExecutionContextDeliverableSchema.omit({ kind: true });
 
-export const DeliverableManifestSchema = z.strictObject({
-  pattern: z.string(),
+export const DeliverableManifestSchema = ExecutionContextDeliverableManifestSchema.omit({ kind: true }).extend({
   items: z.array(DeliverableSchema),
 });
 

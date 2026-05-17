@@ -11,7 +11,7 @@
  */
 import { z } from 'zod';
 
-import { PatternSummarySchema } from './pattern-summary.js';
+import { PatternIdentitySchema } from './pattern-summary.js';
 import {
   DeliverableManifestSchema,
   DeliverableSchema,
@@ -21,7 +21,7 @@ import {
   StubRefSchema,
 } from './supporting.js';
 
-export const PatternDetailSchema = PatternSummarySchema.extend({
+export const PatternDetailSchema = PatternIdentitySchema.extend({
   kind: z.literal('PatternDetail'),
   description: z.string().optional(),
   openQuestions: z.array(z.string()).optional(),
