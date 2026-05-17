@@ -71,8 +71,6 @@ export interface TestPatternOptions {
   lines?: readonly [number, number];
   /** Export information (default: single function export) */
   exports?: ExportInfo[] | undefined;
-  /** Use cases (default: none) */
-  useCases?: string[] | undefined;
   /** Scenarios (default: none) */
   scenarios?: readonly ScenarioRef[] | undefined;
   /** Uses relationships (default: none) */
@@ -163,8 +161,6 @@ export interface PatternSetOptions {
   patternsPerCategory?: number;
   /** Include relationship data (default: false) */
   withRelationships?: boolean;
-  /** Include use case data (default: false) */
-  withUseCases?: boolean;
   /** Include all optional features (default: false) */
   withAllFeatures?: boolean;
 }
@@ -187,7 +183,7 @@ let patternCounter = 0;
  * const customPattern = createTestPattern({
  *   name: "CommandOrchestrator",
  *   category: "core",
- *   useCases: ["When implementing a new command"],
+ *   description: "Coordinates command execution.",
  * });
  * ```
  */
@@ -207,7 +203,6 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     filePath = `packages/@libar-dev/platform-${category}/src/test.ts`,
     lines = [1, 10] as const,
     exports = [{ name: name.replace(/\s+/g, ''), type: 'function' as const }],
-    useCases,
     scenarios,
     uses,
     usedBy,
@@ -264,7 +259,6 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     description,
     examples: [],
     position: { startLine: lines[0], endLine: lines[1] },
-    ...(useCases && useCases.length > 0 ? { useCases } : {}),
     ...(mergedUses.length > 0 ? { uses: mergedUses } : {}),
     ...(phase !== undefined ? { phase } : {}),
     ...(whenToUse && whenToUse.length > 0 ? { whenToUse } : {}),
@@ -300,7 +294,6 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     extractedAt: new Date().toISOString(),
     patternName: patternName ?? name,
     ...(scenarios && scenarios.length > 0 ? { scenarios } : {}),
-    ...(useCases && useCases.length > 0 ? { useCases } : {}),
     ...(mergedUses.length > 0 ? { uses: mergedUses } : {}),
     ...(phase !== undefined ? { phase } : {}),
     ...(whenToUse && whenToUse.length > 0 ? { whenToUse } : {}),
@@ -370,7 +363,6 @@ export function createTestPatternSet(options: PatternSetOptions = {}): Extracted
     categories = ['core', 'ddd'],
     patternsPerCategory = 2,
     withRelationships = false,
-    withUseCases = false,
     withAllFeatures = false,
   } = options;
 
@@ -401,14 +393,6 @@ export function createTestPatternSet(options: PatternSetOptions = {}): Extracted
         lines: [10 * patternIndex, 10 * patternIndex + 5],
         exports: [{ name: name.replace(/\s+/g, ''), type: 'function' as const }],
       };
-
-      // Add use cases
-      if (withUseCases || withAllFeatures) {
-        patternOptions.useCases = [
-          `When implementing ${category} logic`,
-          `When refactoring existing ${category} code`,
-        ];
-      }
 
       // Add relationships
       if (withRelationships || withAllFeatures) {
@@ -533,36 +517,6 @@ export function createRoadmapPatterns(): ExtractedPattern[] {
       status: 'roadmap',
       phase: 3,
       dependsOn: ['Domain Model', 'Base Utilities'],
-    }),
-  ];
-}
-
-/**
- * Create patterns with comprehensive use case coverage
- */
-export function createUseCasePatterns(): ExtractedPattern[] {
-  return [
-    createTestPattern({
-      id: 'pattern-c0a0d001',
-      name: 'Command Handler',
-      category: 'cqrs',
-      useCases: [
-        'When implementing a new command',
-        'When adding validation logic',
-        'When orchestrating multiple services',
-      ],
-      whenToUse: [
-        'Complex business operations',
-        'Operations that modify state',
-        'Operations requiring transaction boundaries',
-      ],
-    }),
-    createTestPattern({
-      id: 'pattern-00e27002',
-      name: 'Query Handler',
-      category: 'cqrs',
-      useCases: ['When implementing read operations', 'When optimizing for performance'],
-      whenToUse: ['Read-only operations', 'Operations that benefit from caching'],
     }),
   ];
 }

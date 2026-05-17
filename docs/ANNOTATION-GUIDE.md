@@ -23,7 +23,6 @@ Every file that participates in the annotation system needs the bare `@architect
  * @architect-role service
  * @architect-bounded-context generation
  * @architect-uses EventStore, CommandBus
- * @architect-usecase "When assembling command execution flow"
  *
  * ## My Pattern
  *
@@ -52,7 +51,7 @@ The executable feature is the canonical pattern definition. TypeScript annotatio
 | Source            | Owns                                                                                     | Representative tags                                                                       |
 | ----------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | **Feature files** | Pattern identity, lifecycle, executable linkage, structural grouping, rich rule content  | `pattern`, `status`, `implements`, `executable-specs`, `bounded-context`, `unlock-reason` |
-| **TypeScript**    | Implementation dependencies, use guidance, implementation classification, decision links | `uses`, `usecase`, `role`, `bounded-context`, `decision`                                  |
+| **TypeScript**    | Implementation dependencies, use guidance, implementation classification, decision links | `uses`, `role`, `bounded-context`, `decision`                                             |
 
 The important boundary is simple: feature files define the pattern, TypeScript files explain how the code realizes it.
 
@@ -115,7 +114,6 @@ Stub files can point at their future production home while still exposing shapes
  * @architect
  * @architect-implements ProjectionBarrel
  * @architect-role barrel
- * @architect-usecase "When consumers need the supported public entrypoints"
  */
 ```
 
@@ -147,7 +145,7 @@ Feature: Process Guard linter executable tests
 
 | Group            | Representative retained tags                  |
 | ---------------- | --------------------------------------------- |
-| **Core**         | `pattern`, `status`, `usecase`                |
+| **Core**         | `pattern`, `status`                           |
 | **Relationship** | `uses`, `implements`, `extends`, `see-also`   |
 | **Architecture** | `role`, `bounded-context`                     |
 | **Timeline**     | `completed`                                   |
@@ -159,14 +157,14 @@ Feature: Process Guard linter executable tests
 
 ### Format types
 
-| Format         | Syntax example                        |
-| -------------- | ------------------------------------- |
-| `flag`         | `@architect`                          |
-| `value`        | `@architect-pattern Foo`              |
-| `enum`         | `@architect-status roadmap`           |
-| `csv`          | `@architect-uses A, B, C`             |
-| `number`       | `@architect-adr:2`                    |
-| `quoted-value` | `@architect-usecase "When X happens"` |
+| Format         | Syntax example                             |
+| -------------- | ------------------------------------------ |
+| `flag`         | `@architect`                               |
+| `value`        | `@architect-pattern Foo`                   |
+| `enum`         | `@architect-status roadmap`                |
+| `csv`          | `@architect-uses A, B, C`                  |
+| `number`       | `@architect-adr:2`                         |
+| `quoted-value` | `@architect-unlock-reason "Correct drift"` |
 
 ---
 

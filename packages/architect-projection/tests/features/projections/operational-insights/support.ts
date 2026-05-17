@@ -47,7 +47,6 @@ interface PatternFixtureOptions {
   readonly team?: ExtractedPattern['team'];
   readonly effort?: ExtractedPattern['effort'];
   readonly priority?: ExtractedPattern['priority'];
-  readonly useCases?: readonly string[];
   readonly rules?: readonly RuleFixture[];
 }
 
@@ -85,7 +84,6 @@ export function createPattern(name: string, options: PatternFixtureOptions = {})
     ...(options.team !== undefined ? { team: options.team } : {}),
     ...(options.effort !== undefined ? { effort: options.effort } : {}),
     ...(options.priority !== undefined ? { priority: options.priority } : {}),
-    ...(options.useCases !== undefined ? { useCases: options.useCases } : {}),
     ...(options.rules !== undefined ? { rules: options.rules } : {}),
   });
   _nextPatternId += 1;

@@ -5,9 +5,9 @@
 Feature: PRD Implementation Section
 
   **Problem:** Implementation files with `@architect-implements:PatternName` contain rich
-  relationship metadata (`@architect-uses`, `@architect-used-by`, `@architect-usecase`)
-  that is not rendered in generated PRD documentation. This metadata provides valuable API
-  guidance and dependency information.
+  relationship metadata (`@architect-uses`, `@architect-used-by`) that is not rendered in
+  generated PRD documentation. This metadata provides valuable dependency and visibility
+  information.
 
   **Solution:** Extend the PRD generator to collect all files with `@architect-implements:X`
   and render their metadata in a dedicated "## Implementations" section. This leverages the
@@ -17,7 +17,6 @@ Feature: PRD Implementation Section
   | Benefit | How |
   | PRDs include implementation context | `implements` files auto-discovered and rendered |
   | Dependency visibility | `uses`/`used-by` from implementations shown in PRD |
-  | Usage guidance in docs | `usecase` annotations rendered as "When to Use" |
   | Zero manual sync | Code declares relationship, PRD reflects it |
 
   Background: Deliverables
@@ -53,9 +52,9 @@ Feature: PRD Implementation Section
     @acceptance-criteria @happy-path
     Scenario: Multiple implementations aggregated
       Given pattern "EventStoreDurability" with implementations:
-        | File | Uses | Usecase |
-        | outbox.ts | Workpool, ActionRetrier | "Capture external results" |
-        | idempotentAppend.ts | EventStore | "Prevent duplicate events" |
+        | File | Uses |
+        | outbox.ts | Workpool, ActionRetrier |
+        | idempotentAppend.ts | EventStore |
       When the PRD generator runs
       Then the "## Implementations" section lists both files
       And each file's metadata is rendered separately
@@ -67,13 +66,13 @@ Feature: PRD Implementation Section
   Rule: Implementation metadata appears in dedicated PRD section
 
     **Invariant:** The PRD output includes a "## Implementations" section listing
-    all files that implement the pattern. Each file shows its `uses`, `usedBy`,
-    and `usecase` metadata in a consistent format.
+    all files that implement the pattern. Each file shows its `uses` and `usedBy`
+    metadata in a consistent format.
 
     **Rationale:** Developers reading PRDs benefit from seeing the implementation
     landscape alongside requirements, without cross-referencing code files.
 
-    **Verified by:** Section generated, Dependencies rendered, Usecases rendered
+    **Verified by:** Section generated, Dependencies rendered, Used-by rendered
 
     @acceptance-criteria @happy-path
     Scenario: Implementations section generated in PRD
@@ -87,12 +86,6 @@ Feature: PRD Implementation Section
       Given implementation file with `@architect-uses EventStore, Workpool`
       When rendered in PRD
       Then output includes "**Dependencies:** EventStore, Workpool"
-
-    @acceptance-criteria @happy-path
-    Scenario: Usecases rendered as guidance
-      Given implementation file with `@architect-usecase "When event append must survive failures"`
-      When rendered in PRD
-      Then output includes "**When to Use:** When event append must survive failures"
 
     @acceptance-criteria @happy-path
     Scenario: Used-by rendered for visibility

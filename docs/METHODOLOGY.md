@@ -110,7 +110,6 @@ Run `pnpm docs:patterns` and these annotations become a searchable pattern regis
 | --------------------------- | ------------------------------------------ |
 | `@<prefix>-implements`      | Production file realizes the pattern       |
 | `@<prefix>-uses`            | Declared dependency edges to real patterns |
-| `@<prefix>-usecase`         | When and how to use the implementation     |
 | `@<prefix>-role`            | Implementation classification              |
 | `@<prefix>-bounded-context` | Structural grouping where helpful          |
 | `@<prefix>-decision`        | ADR or DD link                             |

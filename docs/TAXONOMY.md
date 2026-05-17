@@ -39,14 +39,14 @@ Historical role names such as `core`, `api`, and `infra` are no longer part of t
 
 ## Format types
 
-| Format         | Example                               | Parsing                          |
-| -------------- | ------------------------------------- | -------------------------------- |
-| `flag`         | `@architect`                          | Boolean presence with no value   |
-| `value`        | `@architect-pattern MyPattern`        | Simple string                    |
-| `enum`         | `@architect-status completed`         | Constrained to predefined values |
-| `csv`          | `@architect-uses A, B, C`             | Comma-separated values           |
-| `number`       | `@architect-adr:2`                    | Numeric value                    |
-| `quoted-value` | `@architect-usecase "When X happens"` | Preserves spaces                 |
+| Format         | Example                                    | Parsing                          |
+| -------------- | ------------------------------------------ | -------------------------------- |
+| `flag`         | `@architect`                               | Boolean presence with no value   |
+| `value`        | `@architect-pattern MyPattern`             | Simple string                    |
+| `enum`         | `@architect-status completed`              | Constrained to predefined values |
+| `csv`          | `@architect-uses A, B, C`                  | Comma-separated values           |
+| `number`       | `@architect-adr:2`                         | Numeric value                    |
+| `quoted-value` | `@architect-unlock-reason "Correct drift"` | Preserves spaces                 |
 
 ---
 

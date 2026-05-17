@@ -337,7 +337,7 @@ Given the following code:
 For values with spaces, use the `quoted-value` format where supported:
 
 ```gherkin
-@architect-usecase "When handling command failures"
+@architect-unlock-reason "Correct post-completion process drift"
 ```
 
 ---

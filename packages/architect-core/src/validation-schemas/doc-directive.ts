@@ -56,7 +56,6 @@ export const DocDirectiveSchema = z.strictObject({
   role: z.string().optional(),
   unlockReason: z.string().optional(),
   boundedContext: z.string().optional(),
-  useCases: z.array(z.string()).readonly().optional(),
   whenToUse: z.array(z.string()).readonly().optional(),
   uses: z.array(PatternReferenceSchema).readonly().optional(),
   phase: z.number().int().positive().optional(),

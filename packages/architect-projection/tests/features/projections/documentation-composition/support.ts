@@ -46,7 +46,6 @@ interface PatternFixtureOptions {
   readonly usedBy?: readonly string[];
   readonly enables?: readonly string[];
   readonly implementsPatterns?: ExtractedPattern['implementsPatterns'];
-  readonly useCases?: readonly string[];
   readonly rules?: readonly RuleFixture[];
   readonly adr?: ExtractedPattern['adr'];
 }

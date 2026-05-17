@@ -267,8 +267,6 @@ export function buildPattern(
     ...(directive.unlockReason !== undefined && { unlockReason: directive.unlockReason }),
     status,
     ...(directive.boundedContext !== undefined && { boundedContext: directive.boundedContext }),
-    ...(directive.useCases !== undefined &&
-      directive.useCases.length > 0 && { useCases: directive.useCases }),
     ...(directive.whenToUse !== undefined && { whenToUse: directive.whenToUse }),
     ...(directive.uses !== undefined && directive.uses.length > 0 && { uses: directive.uses }),
     ...(directive.phase !== undefined && { phase: directive.phase }),

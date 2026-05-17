@@ -284,7 +284,6 @@ interface PerfPatternOptions {
   readonly usedBy: readonly string[];
   readonly enables: readonly string[];
   readonly implementsPatterns: ExtractedPattern['implementsPatterns'];
-  readonly useCases: readonly string[];
   readonly seeAlso: ExtractedPattern['seeAlso'];
   readonly apiRef: ExtractedPattern['apiRef'];
   readonly workflow: string;
@@ -359,10 +358,6 @@ function createBusinessRuleSetPerfContext(): BusinessRuleSetPerfFixture {
       usedBy: [relatedPattern],
       enables: [relatedPattern],
       implementsPatterns: [`${boundedContext}-contract`],
-      useCases: [
-        `${boundedContext}-throughput`,
-        `${productArea.toLowerCase().replace(/\s+/g, '-')}-budget`,
-      ],
       seeAlso: [`ADR-${String((patternIndex % 4) + 1).padStart(3, '0')}`],
       apiRef: [`https://example.test/${patternName.toLowerCase()}`],
       workflow: WORKFLOWS[patternIndex % WORKFLOWS.length]!,
@@ -459,7 +454,6 @@ function createPerfPattern(name: string, options: PerfPatternOptions): Extracted
     usedBy: options.usedBy,
     enables: options.enables,
     implementsPatterns: options.implementsPatterns,
-    useCases: options.useCases,
     seeAlso: options.seeAlso,
     apiRef: options.apiRef,
     rules: options.rules,

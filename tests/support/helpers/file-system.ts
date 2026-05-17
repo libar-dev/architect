@@ -167,7 +167,6 @@ export function createTsFileWithDirective(options: {
   description?: string;
   status?: string;
   dependsOn?: string[];
-  useCases?: string[];
   uses?: string[];
   usedBy?: string[];
   archRole?: string;
@@ -181,7 +180,6 @@ export function createTsFileWithDirective(options: {
     description = 'A test pattern.',
     status,
     dependsOn = [],
-    useCases = [],
     usedBy = [],
     uses = [],
     archRole,
@@ -215,10 +213,6 @@ export function createTsFileWithDirective(options: {
   // generated source so the resolver picks it up.
   if (dependsOn.length > 0) {
     lines.push(` * @architect-uses ${dependsOn.join(', ')}`);
-  }
-
-  for (const useCase of useCases) {
-    lines.push(` * @architect-usecase "${useCase}"`);
   }
 
   for (const uses_ of uses) {

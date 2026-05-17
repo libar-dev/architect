@@ -202,7 +202,6 @@ interface ExtractedPattern {
   phase?: number;
   quarter?: string; // Q1-2025
   release?: string; // v0.1.0 or vNEXT
-  useCases?: string[];
   uses?: string[];
   usedBy?: string[];
   dependsOn?: string[];
@@ -933,7 +932,6 @@ The `detailLevel` option controls output verbosity:
  * @architect-status completed // Status: roadmap|active|completed|deferred
  * @architect-bounded-context generation // Structural grouping
  * @architect-uses OtherPattern, Another // Declared dependencies (CSV)
- * @architect-usecase "When doing X" // Use cases (repeatable)
  * @architect-decision DD-12 // Decision link
  * // Auto-shape discovery (wildcard = all exports)
  *
@@ -1079,7 +1077,7 @@ Data-driven configuration for pattern categorization:
     { "tag": "status", "format": "enum", "values": ["roadmap", "active", "completed", "deferred"] },
     { "tag": "phase", "format": "number" },
     { "tag": "release", "format": "value" },
-    { "tag": "usecase", "format": "quoted-value", "repeatable": true }
+    { "tag": "unlock-reason", "format": "quoted-value" }
   ]
 }
 ```

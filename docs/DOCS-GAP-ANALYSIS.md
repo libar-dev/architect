@@ -147,7 +147,7 @@ Step 1: Pick the reference slice you want to generate.
           Examples: codec catalog, pipeline architecture, taxonomy overview.
 
 Step 2: Gather the source material from retained carriers.
-          TypeScript: JSDoc prose, shapes, `@architect-decision`, `@architect-usecase`
+          TypeScript: JSDoc prose, shapes, `@architect-decision`
           Gherkin: Rule blocks, scenarios, acceptance criteria
 
 Step 3: Add ReferenceDocConfig in architect.config.ts

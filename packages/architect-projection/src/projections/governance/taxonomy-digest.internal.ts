@@ -143,7 +143,7 @@ function buildFormatTypeEntries(
     },
     'quoted-value': {
       description: 'String in quotes (preserves spaces)',
-      example: '@architect-usecase "When X happens"',
+      example: '@architect-unlock-reason "Correct post-completion drift"',
     },
     csv: { description: 'Comma-separated values', example: '@architect-uses A, B, C' },
     number: { description: 'Numeric value', example: '@architect-adr 2' },

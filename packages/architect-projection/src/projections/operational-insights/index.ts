@@ -420,9 +420,6 @@ function patternSatisfiesTag(
       return hasNonEmptyString(pattern.targetPath);
     case 'since':
       return hasNonEmptyString(pattern.since);
-    case 'usecase':
-    case 'use-case':
-      return (pattern.useCases?.length ?? 0) > 0;
     case 'depends-on': {
       const relationships = getRelationships(context, getPatternName(pattern));
       return (relationships?.dependsOn.length ?? pattern.uses?.length ?? 0) > 0;
@@ -691,15 +688,10 @@ function createRequirementOwnerRouteId(pattern: ExtractedPattern, packageId: str
 function buildRequirementDescription(pattern: ExtractedPattern): Block[] {
   const blocks: Block[] = [];
   const description = pattern.directive.description.trim();
-  const useCases = pattern.useCases ?? [];
   const rules = pattern.rules ?? [];
 
   if (description.length > 0) {
     blocks.push(heading(2, 'Requirement'), paragraph(description));
-  }
-
-  if (useCases.length > 0) {
-    blocks.push(heading(3, 'Use Cases'), list([...useCases]));
   }
 
   if (rules.length > 0) {

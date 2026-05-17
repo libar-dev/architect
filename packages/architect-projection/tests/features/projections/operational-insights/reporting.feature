@@ -120,7 +120,7 @@ Feature: Operational Insights reporting projections
     area then normalized status (completed → active → planned → candidate)
     then pattern name,
     structures each requirement's description as a block list
-    (Requirement / Use Cases / Business Rules) with resolved `testFiles`
+    (Requirement / Business Rules) with resolved `testFiles`
     from executable specs or the behaviour file, and exposes governance-owned
     `businessRuleReferences` instead of embedding `BusinessRule` child fragments;
     for duplicate feature names across packages, all-areas digests aggregate

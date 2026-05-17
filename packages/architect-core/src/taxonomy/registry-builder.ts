@@ -63,7 +63,7 @@ export function buildRegisteredRoleValues(
 export const BOUNDED_CONTEXT_TAG = 'bounded-context';
 
 export const METADATA_TAGS_BY_GROUP = {
-  core: ['pattern', 'status', 'usecase'] as const,
+  core: ['pattern', 'status'] as const,
   relationship: ['uses', 'implements', 'extends', 'see-also'] as const,
   process: ['completed'] as const,
   prd: ['product-area'] as const,
@@ -170,13 +170,6 @@ export function buildRegistry(options: BuildRegistryOptions = {}): TagRegistry {
         purpose: 'Reason for intentionally modifying a completed pattern despite hard lock',
         example: '@architect-unlock-reason "Correct post-completion process drift"',
         metadataKey: 'unlockReason',
-      },
-      {
-        tag: 'usecase',
-        format: 'quoted-value',
-        purpose: 'Use case association',
-        repeatable: true,
-        example: '@architect-usecase "When handling command failures"',
       },
       {
         tag: 'uses',

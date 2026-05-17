@@ -279,7 +279,6 @@ function parseDirective(
   const patternName = metadataResults.get('pattern') as string | undefined;
   const status = metadataResults.get('status') as AcceptedStatusValue | undefined;
   const boundedContext = metadataResults.get('bounded-context') as string | undefined;
-  const useCases = metadataResults.get('usecase') as string[] | undefined;
   const uses = metadataResults.get('uses') as string[] | undefined;
   const phase = metadataResults.get('phase') as number | undefined;
   const level = metadataResults.get('level') as DocDirective['level'];
@@ -361,7 +360,6 @@ function parseDirective(
     ...(patternName && { patternName }),
     ...(status && { status }),
     ...(boundedContext && { boundedContext }),
-    ...(useCases && useCases.length > 0 && { useCases }),
     ...(whenToUse && { whenToUse }),
     ...(uses && uses.length > 0 && { uses }),
     ...(phase !== undefined && { phase }),

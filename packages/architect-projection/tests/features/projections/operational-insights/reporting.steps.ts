@@ -727,7 +727,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                     productArea: 'Projection Platform',
                     userRole: 'Maintainer',
                     description: 'Expose graph-only annotation coverage as a typed fragment.',
-                    useCases: ['Report numeric coverage in Studio dashboards'],
                     rules: [
                       {
                         name: 'Numeric coverage only',
@@ -824,12 +823,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                           type: 'paragraph',
                           text: 'Expose graph-only annotation coverage as a typed fragment.',
                         },
-                        { type: 'heading', level: 3, text: 'Use Cases' },
-                        {
-                          type: 'list',
-                          ordered: false,
-                          items: ['Report numeric coverage in Studio dashboards'],
-                        },
                         { type: 'heading', level: 3, text: 'Business Rules' },
                         {
                           type: 'list',
@@ -907,12 +900,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                         {
                           type: 'paragraph',
                           text: 'Expose graph-only annotation coverage as a typed fragment.',
-                        },
-                        { type: 'heading', level: 3, text: 'Use Cases' },
-                        {
-                          type: 'list',
-                          ordered: false,
-                          items: ['Report numeric coverage in Studio dashboards'],
                         },
                         { type: 'heading', level: 3, text: 'Business Rules' },
                         {

@@ -75,7 +75,6 @@ const ExtractedPatternBaseSchema = z.strictObject({
   patternName: PatternIdentifierSchema.optional(),
   status: PatternStatusSchema,
   boundedContext: z.string().optional(),
-  useCases: z.array(z.string()).readonly().optional(),
   whenToUse: z.array(z.string()).readonly().optional(),
   uses: z.array(PatternReferenceSchema).readonly().optional(),
   scenarios: z.array(ScenarioRefSchema).readonly().optional(),
