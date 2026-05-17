@@ -2,7 +2,7 @@
   "name": "@libar-dev/architect-cli",
   "version": "2.0.0-pre.1",
   "description": "Thin composition root for the Libar Architect CLI bins — architect, architect-generate, architect-guard, architect-lint-patterns, architect-lint-steps, architect-validate.",
-  "license": "(MIT AND BUSL-1.1)",
+  "license": "MIT",
   "author": "Libar AI",
   "repository": {
     "type": "git",

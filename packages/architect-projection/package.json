@@ -2,7 +2,7 @@
   "name": "@libar-dev/architect-projection",
   "version": "2.0.0-pre.1",
   "description": "Fragment-based projection pipeline for the Libar Architect package family — Named Domain Fragments, block types, and renderers (compact-text, json, markdown, ui).",
-  "license": "(MIT AND BUSL-1.1)",
+  "license": "MIT",
   "author": "Libar AI",
   "repository": {
     "type": "git",

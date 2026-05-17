@@ -43,4 +43,4 @@ If you imported JS APIs from `'@libar-dev/architect'`, update each import to poi
 
 ## License
 
-`MIT AND BUSL-1.1`. See [LICENSE](https://github.com/libar-dev/architect/blob/main/LICENSE) and [LICENSE-MCP](https://github.com/libar-dev/architect/blob/main/LICENSE-MCP).
+MIT. See [LICENSE](https://github.com/libar-dev/architect/blob/main/LICENSE).

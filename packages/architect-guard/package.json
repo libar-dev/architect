@@ -2,7 +2,7 @@
   "name": "@libar-dev/architect-guard",
   "version": "2.0.0-pre.1",
   "description": "Policy, validation, process guard, step-lint, DoD, anti-pattern detection, and git helpers for the Libar Architect package family.",
-  "license": "(MIT AND BUSL-1.1)",
+  "license": "MIT",
   "author": "Libar AI",
   "repository": {
     "type": "git",

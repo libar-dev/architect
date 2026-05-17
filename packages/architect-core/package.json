@@ -2,7 +2,7 @@
   "name": "@libar-dev/architect-core",
   "version": "2.0.0-pre.1",
   "description": "Canonical model, ingestion, graph build, scanner/extractor, taxonomy, config, and the read API for the Libar Architect package family.",
-  "license": "(MIT AND BUSL-1.1)",
+  "license": "MIT",
   "author": "Libar AI",
   "repository": {
     "type": "git",

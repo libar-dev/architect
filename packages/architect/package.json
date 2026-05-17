@@ -2,7 +2,7 @@
   "name": "@libar-dev/architect",
   "version": "2.0.0-pre.1",
   "description": "Libar Architect — engineering lifecycle platform for AI-assisted development. Meta-package that installs the full toolchain (core, projection, guard, cli, mcp) and exposes all 7 CLI bins.",
-  "license": "(MIT AND BUSL-1.1)",
+  "license": "MIT",
   "author": "Libar AI",
   "repository": {
     "type": "git",

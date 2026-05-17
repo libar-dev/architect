@@ -55,4 +55,4 @@ Versioning is managed by [changesets](https://github.com/changesets/changesets).
 
 ## License
 
-`MIT AND BUSL-1.1`. See [LICENSE](./LICENSE) and [LICENSE-MCP](./LICENSE-MCP).
+MIT. See [LICENSE](./LICENSE).
