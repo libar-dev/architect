@@ -31,6 +31,18 @@
       "types": "./dist/blocks/schema.d.ts",
       "import": "./dist/blocks/schema.js"
     },
+    "./context": {
+      "types": "./dist/context/projection-context.d.ts",
+      "import": "./dist/context/projection-context.js"
+    },
+    "./disclosure": {
+      "types": "./dist/disclosure/index.d.ts",
+      "import": "./dist/disclosure/index.js"
+    },
+    "./routing": {
+      "types": "./dist/routing/index.d.ts",
+      "import": "./dist/routing/index.js"
+    },
     "./fragments": {
       "types": "./dist/fragments/index.d.ts",
       "import": "./dist/fragments/index.js"

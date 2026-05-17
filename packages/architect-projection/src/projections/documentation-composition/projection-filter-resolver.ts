@@ -2,12 +2,12 @@
  * @architect-bounded-context:documentation-composition
  */
 import type { ProjectionContext } from '../../context/projection-context.js';
-import type { DisclosureSpec } from './disclosure-spec.js';
+import type { DisclosureSpec } from '../../disclosure/spec.js';
 import {
   getSupportedDocumentationTypeMetadata,
   type SupportedDocumentationType,
 } from './documentation-type-registry.js';
-import type { ProgressiveDisclosureLevel } from './progressive-disclosure.js';
+import type { ProgressiveDisclosureLevel } from '../../disclosure/levels.js';
 
 export function resolveProjectionFilter(
   context: ProjectionContext,

@@ -1,6 +1,6 @@
 import type { Fragment, ProjectionBundle } from '../fragments/index.js';
-import type { DisclosureSpec } from '../projections/documentation-composition/disclosure-spec.js';
-import type { LogicalRouteId } from '../projections/documentation-composition/progressive-disclosure.js';
+import type { DisclosureSpec } from '../disclosure/spec.js';
+import type { LogicalRouteId } from '../routing/route-id.js';
 
 export type ProjectionInput = Fragment | ProjectionBundle<Fragment>;
 

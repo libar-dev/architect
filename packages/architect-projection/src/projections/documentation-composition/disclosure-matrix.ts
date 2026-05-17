@@ -1,8 +1,8 @@
 /**
  * @architect-bounded-context:documentation-composition
  */
-import type { DisclosureSpec } from './disclosure-spec.js';
-import type { ProgressiveDisclosureLevel } from './progressive-disclosure.js';
+import type { DisclosureSpec } from '../../disclosure/spec.js';
+import type { ProgressiveDisclosureLevel } from '../../disclosure/levels.js';
 
 export type DocumentationDisclosureMatrix = Readonly<
   Record<ProgressiveDisclosureLevel, DisclosureSpec>

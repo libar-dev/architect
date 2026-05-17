@@ -14,6 +14,8 @@
 // TagExampleOverride, etc.) stay explicitly enumerated below.
 
 export * from './blocks/schema.js';
+export * from './disclosure/index.js';
+export * from './routing/index.js';
 export * from './fragments/index.js';
 export * from './projections/index.js';
 export * from './renderers/index.js';

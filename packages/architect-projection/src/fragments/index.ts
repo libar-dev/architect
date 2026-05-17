@@ -67,7 +67,7 @@ export {
 } from './documentation-composition/index.js';
 export { FragmentSchema } from './fragment-schema.internal.js';
 export { isBundle, projectSingle } from './base.js';
-export type { BundleRouting, ProjectionBundle, BundleRouteId } from './base.js';
+export type { BundleRouting, ProjectionBundle } from './base.js';
 export type {
   ArchitectureComparison,
   BoundedContext,

@@ -16,9 +16,9 @@ import {
   PatternBundleOptionsSchema,
   OpenQuestionListOptionsSchema,
   ProjectDocumentationBundleOptionsSchema,
-  ProgressiveDisclosureLevelSchema,
   TaxonomyDigestOptionsSchema,
 } from '@libar-dev/architect-projection/projections';
+import { ProgressiveDisclosureLevelSchema } from '@libar-dev/architect-projection/disclosure';
 import { z } from 'zod';
 
 export const MAX_HANDOFF_MODIFIED_FILES = 200;

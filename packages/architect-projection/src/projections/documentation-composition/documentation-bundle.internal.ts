@@ -29,7 +29,7 @@ import {
   type SupportedDocumentationType,
 } from './documentation-type-registry.js';
 import { resolveProjectionFilter } from './projection-filter-resolver.js';
-import { ProgressiveDisclosureLevelSchema } from './progressive-disclosure.js';
+import { ProgressiveDisclosureLevelSchema } from '../../disclosure/levels.js';
 
 export type { SupportedDocumentationType } from './documentation-type-registry.js';
 

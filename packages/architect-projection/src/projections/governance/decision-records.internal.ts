@@ -15,10 +15,7 @@ import { ProjectionError } from '../errors.js';
 import { type ProjectionBundle } from '../../fragments/base.js';
 import { type DecisionCatalog, type DecisionRecord } from '../../fragments/governance/index.js';
 import { filterPatterns } from '../_shared/filter.js';
-import {
-  createEntityRouteId,
-  createIndexRouteId,
-} from '../documentation-composition/progressive-disclosure.js';
+import { createEntityRouteId, createIndexRouteId } from '../../routing/route-id.js';
 
 import {
   getPatternName,

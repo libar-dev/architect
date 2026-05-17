@@ -1,9 +1,12 @@
 /**
- * @architect-bounded-context:documentation-composition
+ * Disclosure-spec vocabulary — composition recipes for documentation outputs.
+ * Schemas live here (rather than under projections/documentation-composition/)
+ * so renderers, fragments, and projections can consume them without a layering
+ * inversion.
  */
 import { z } from 'zod';
 
-import { ProjectionFilterSchema } from '../_shared/filter.js';
+import { ProjectionFilterSchema } from '../projections/_shared/filter.js';
 
 export const ContentRichnessSchema = z
   .enum(['name-only', 'summary', 'summary-with-references', 'full'])

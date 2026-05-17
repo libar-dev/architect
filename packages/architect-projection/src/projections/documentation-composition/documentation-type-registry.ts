@@ -3,7 +3,7 @@
  */
 import { z } from 'zod';
 
-import { DisclosureSpecSchema } from './disclosure-spec.js';
+import { DisclosureSpecSchema } from '../../disclosure/spec.js';
 import {
   architectureDisclosureMatrix,
   businessRulesDisclosureMatrix,
@@ -18,11 +18,8 @@ import {
   traceabilityDisclosureMatrix,
   validationRulesDisclosureMatrix,
 } from './disclosure-matrix.js';
-import {
-  createIndexRouteId,
-  LogicalRouteIdSchema,
-  ProgressiveDisclosureLevelSchema,
-} from './progressive-disclosure.js';
+import { ProgressiveDisclosureLevelSchema } from '../../disclosure/levels.js';
+import { createIndexRouteId, LogicalRouteIdSchema } from '../../routing/route-id.js';
 
 const DisclosureMatrixSchema = z.record(ProgressiveDisclosureLevelSchema, DisclosureSpecSchema);
 

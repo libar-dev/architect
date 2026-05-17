@@ -49,7 +49,7 @@ import {
 } from '../fragments/index.js';
 import { getDocumentationTypeMetadata } from '../projections/documentation-composition/documentation-type-registry.js';
 import { defaultMarkdownRouteProfile } from './markdown-paths.js';
-import type { DisclosureSpec } from '../projections/documentation-composition/disclosure-spec.js';
+import type { DisclosureSpec } from '../disclosure/spec.js';
 import {
   REQUIREMENTS_ALL_AREAS_LABEL,
   REQUIREMENTS_EXECUTABLE_AREA_LABEL,

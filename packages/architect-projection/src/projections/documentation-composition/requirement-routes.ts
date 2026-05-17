@@ -9,7 +9,7 @@ import {
   createChildRouteId,
   createEntityRouteId,
   type LogicalRouteId,
-} from './progressive-disclosure.js';
+} from '../../routing/route-id.js';
 
 export type RequirementDocumentationBucket = 'executable' | 'specs';
 

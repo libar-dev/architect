@@ -19,7 +19,7 @@ import {
   BundleIncludeSchema,
   BundleModeSchema,
 } from '../../fragments/pattern-relations/pattern-bundle-entry.js';
-import { createEntityRouteId, createIndexRouteId } from '../documentation-composition/index.js';
+import { createEntityRouteId, createIndexRouteId } from '../../routing/route-id.js';
 import { projectBusinessRuleSet } from '../governance/business-rules.js';
 
 import { requirePattern } from '../_shared/pattern-helpers.internal.js';

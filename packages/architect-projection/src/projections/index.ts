@@ -74,9 +74,6 @@ export {
   projectTagUsage,
 } from './operational-insights/index.js';
 export {
-  ContentRichnessSchema,
-  DisclosureSpecSchema,
-  GroupingAxisSchema,
   SupportedDocumentationTypeRegistryEntrySchema,
   SUPPORTED_DOCUMENTATION_TYPE_REGISTRY,
   SUPPORTED_DOCUMENTATION_TYPES,
@@ -93,16 +90,6 @@ export {
   projectDocumentationBundle,
   parseAndProjectPrChangeReview,
   projectPrChangeReview,
-  LogicalRouteIdSchema,
-  LogicalRouteSegmentSchema,
-  PROGRESSIVE_DISCLOSURE_LEVELS,
-  PROGRESSIVE_DISCLOSURE_POLICY,
-  ProgressiveDisclosureLevelSchema,
-  ProgressiveDisclosurePolicySchema,
-  createChildRouteId,
-  createEntityRouteId,
-  createIndexRouteId,
-  isLogicalRouteId,
 } from './documentation-composition/index.js';
 export type {
   PatternBundleOptions,
@@ -122,19 +109,13 @@ export type {
   SessionContextOptions,
 } from './execution-context/index.js';
 export type {
-  ContentRichness,
-  DisclosureSpec,
   ProjectArchitectureDiagramOptions,
   ProjectDocumentationBundleOptions,
   ProjectConfigOptions,
   ProjectPrChangeReviewOptions,
   SourceGlobGroups,
-  GroupingAxis,
   DocumentationTypeMetadata,
   SupportedDocumentationTypeRegistryEntry,
   SupportedDocumentationType,
   SupportedDocumentationTypeMetadata,
-  LogicalRouteId,
-  ProgressiveDisclosureLevel,
-  ProgressiveDisclosurePolicy,
 } from './documentation-composition/index.js';

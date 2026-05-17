@@ -1,13 +1,9 @@
 import type { Fragment } from './fragment-schema.internal.js';
-
-export type BundleRouteId =
-  | `${string}:index`
-  | `${string}:${string}`
-  | `${string}:${string}:${string}:${string}`;
+import { isLogicalRouteId, type LogicalRouteId } from '../routing/route-id.js';
 
 export interface BundleRouting {
-  rootRouteId: BundleRouteId;
-  childRouteIds: Readonly<Record<string, BundleRouteId>>;
+  rootRouteId: LogicalRouteId;
+  childRouteIds: Readonly<Record<string, LogicalRouteId>>;
   childPathStrategy: 'flat' | 'nested';
   anchorStrategy: 'heading-slug' | 'kind-id';
 }
@@ -52,9 +48,9 @@ function isFragmentLike(value: unknown): value is Fragment {
 function isRoutingLike(value: unknown): value is BundleRouting {
   return (
     isPlainObject(value) &&
-    isRouteId(value['rootRouteId']) &&
+    isRouteIdValue(value['rootRouteId']) &&
     isPlainObject(value['childRouteIds']) &&
-    Object.values(value['childRouteIds']).every(isRouteId) &&
+    Object.values(value['childRouteIds']).every(isRouteIdValue) &&
     isChildPathStrategy(value['childPathStrategy']) &&
     isAnchorStrategy(value['anchorStrategy'])
   );
@@ -68,11 +64,8 @@ function isAnchorStrategy(value: unknown): value is BundleRouting['anchorStrateg
   return value === 'heading-slug' || value === 'kind-id';
 }
 
-function isRouteId(value: unknown): value is BundleRouteId {
-  return (
-    typeof value === 'string' &&
-    /^([A-Za-z0-9][A-Za-z0-9_-]*)(:([A-Za-z0-9][A-Za-z0-9_-]*)){1,3}$/u.test(value)
-  );
+function isRouteIdValue(value: unknown): value is LogicalRouteId {
+  return typeof value === 'string' && isLogicalRouteId(value);
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

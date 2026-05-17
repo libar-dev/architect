@@ -20,8 +20,8 @@ import type {
   renderMarkdown,
   renderUi,
 } from '../../../src/index.js';
-import type { LogicalRouteId } from '../../../src/projections/documentation-composition/progressive-disclosure.js';
-import type { DisclosureSpec } from '../../../src/projections/documentation-composition/disclosure-spec.js';
+import type { LogicalRouteId } from '../../../src/routing/route-id.js';
+import type { DisclosureSpec } from '../../../src/disclosure/spec.js';
 import { defaultMarkdownRouteProfile } from '../../../src/renderers/markdown-paths.js';
 import { dispatchByKind } from '../../../src/renderers/_shared/dispatch.js';
 import { projectSingle } from '../../../src/fragments/base.js';

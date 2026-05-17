@@ -59,10 +59,7 @@ import {
 } from '../_shared/pattern-helpers.internal.js';
 import type { Deliverable } from '../../fragments/pattern-relations/supporting.js';
 import { filterPatterns } from '../_shared/filter.js';
-import {
-  createEntityRouteId,
-  createIndexRouteId,
-} from '../documentation-composition/progressive-disclosure.js';
+import { createEntityRouteId, createIndexRouteId } from '../../routing/route-id.js';
 
 export function buildPhaseProgress(
   context: ProjectionContext,

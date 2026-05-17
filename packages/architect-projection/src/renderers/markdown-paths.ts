@@ -1,7 +1,7 @@
 import type { MarkdownRouteProfile } from './types.js';
 import { slugForFilename } from '../_internal/slug.js';
 import { getDocumentationTypeMetadata } from '../projections/documentation-composition/documentation-type-registry.js';
-import type { LogicalRouteId } from '../projections/documentation-composition/progressive-disclosure.js';
+import type { LogicalRouteId } from '../routing/route-id.js';
 
 export const defaultMarkdownRouteProfile: MarkdownRouteProfile = {
   mapPath(routeId) {

@@ -24,10 +24,7 @@ import {
   normalizeLineEndings,
   slugify,
 } from './governance-shared.internal.js';
-import {
-  createEntityRouteId,
-  createIndexRouteId,
-} from '../documentation-composition/progressive-disclosure.js';
+import { createEntityRouteId, createIndexRouteId } from '../../routing/route-id.js';
 
 type ExtractedRule = NonNullable<ExtractedPattern['rules']>[number];
 
