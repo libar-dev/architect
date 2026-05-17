@@ -32,7 +32,7 @@ export type FileReadingListOptions = z.infer<typeof FileReadingListOptionsSchema
 
 export function buildFileReadingList(
   context: ProjectionContext,
-  options: FileReadingListOptions
+  options: FileReadingListOptions,
 ): FileReadingList | undefined {
   const pattern = findPatternByName(context.graph, options.pattern);
   if (pattern === undefined) {
@@ -74,7 +74,7 @@ export function buildFileReadingList(
       if (bucket === completedDeps) {
         const dependencyRelationships = getRelationships(
           context,
-          getPatternName(dependencyPattern)
+          getPatternName(dependencyPattern),
         );
         for (const implementationRef of dependencyRelationships?.implementedBy ?? []) {
           pushUnique(completedDeps, implementationRef.file);

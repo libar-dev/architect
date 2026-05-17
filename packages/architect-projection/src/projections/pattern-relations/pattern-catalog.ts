@@ -49,7 +49,7 @@ export type { PatternCatalogOptions } from './pattern-catalog.internal.js';
 
 export function projectPatternCatalog(
   context: ProjectionContext,
-  options: PatternCatalogOptions = {}
+  options: PatternCatalogOptions = {},
 ): ProjectionBundle<PatternCatalog> {
   return projectSingle(buildPatternCatalog(context, options));
 }
@@ -58,5 +58,5 @@ export const parseAndProjectPatternCatalog = parseAndProject(
   PatternCatalogOptionsSchema,
   projectPatternCatalog,
   'parseAndProjectPatternCatalog',
-  {}
+  {},
 );

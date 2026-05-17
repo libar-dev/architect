@@ -30,7 +30,7 @@ export type PatternCatalogOptions = z.infer<typeof PatternCatalogOptionsSchema>;
 
 export function buildPatternCatalog(
   context: ProjectionContext,
-  options: PatternCatalogOptions = {}
+  options: PatternCatalogOptions = {},
 ): PatternCatalog {
   const canonicalRole = resolveCanonicalRoleFilter(context, options.role);
   const parentChildNames = resolveParentChildNames(context, options.parent);
@@ -42,7 +42,7 @@ export function buildPatternCatalog(
         (options.maturity === undefined || summary.maturity === options.maturity) &&
         (options.phase === undefined || summary.phase === options.phase) &&
         (canonicalRole === undefined || summary.role.toLowerCase() === canonicalRole) &&
-        (parentChildNames === undefined || parentChildNames.has(summary.patternName))
+        (parentChildNames === undefined || parentChildNames.has(summary.patternName)),
     )
     .sort((left, right) => left.patternName.localeCompare(right.patternName));
 
@@ -65,7 +65,7 @@ export function buildPatternCatalog(
 
 export function resolveParentChildNames(
   context: ProjectionContext,
-  parent: string | undefined
+  parent: string | undefined,
 ): ReadonlySet<string> | undefined {
   if (parent === undefined) {
     return undefined;
@@ -81,7 +81,7 @@ export function resolveParentChildNames(
 
 function resolveCanonicalRoleFilter(
   context: ProjectionContext,
-  role: string | undefined
+  role: string | undefined,
 ): string | undefined {
   if (role === undefined) {
     return undefined;
@@ -89,7 +89,7 @@ function resolveCanonicalRoleFilter(
 
   const normalized = role.toLowerCase();
   const definition = context.graph.tagRegistry.roles.find(
-    (entry) => entry.tag === normalized || entry.aliases?.includes(normalized) === true
+    (entry) => entry.tag === normalized || entry.aliases?.includes(normalized) === true,
   );
 
   return definition?.tag ?? normalized;

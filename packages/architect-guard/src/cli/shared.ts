@@ -16,7 +16,7 @@ function readGuardPackageJson(): { version?: string; name?: string } {
 export function printVersionAndExit(cliName: string): never {
   const packageJson = readGuardPackageJson();
   process.stdout.write(
-    `${cliName} (${packageJson.name ?? '@libar-dev/architect-guard'}) v${packageJson.version ?? 'unknown'}\n`
+    `${cliName} (${packageJson.name ?? '@libar-dev/architect-guard'}) v${packageJson.version ?? 'unknown'}\n`,
   );
   process.exit(0);
 }

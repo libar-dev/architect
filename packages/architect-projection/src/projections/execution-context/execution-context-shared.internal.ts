@@ -53,6 +53,6 @@ export function normalizeExecutionContextDeliverables(pattern: ExtractedPattern)
     (deliverable): Deliverable => ({
       kind: 'Deliverable',
       ...deliverable,
-    })
+    }),
   );
 }

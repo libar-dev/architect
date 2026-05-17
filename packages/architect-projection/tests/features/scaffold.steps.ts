@@ -66,7 +66,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 ['blocks/schema.ts', 'scaffolded'],
                 ['context/projection-context.ts', 'scaffolded'],
               ],
-              ['left', 'left']
+              ['left', 'left'],
             ),
             list(['heading', { text: 'collapsible', checked: true }]),
             code('export type Fragment = never;', 'ts'),
@@ -74,7 +74,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             collapsible('Future work', [paragraph('Wave 2 will extend the fragment union.')]),
             linkOut(
               'Projection plan',
-              '.sisyphus/plans/ddd-projections-refactoring-opus-4.7-bkp-rtry.md'
+              '.sisyphus/plans/ddd-projections-refactoring-opus-4.7-bkp-rtry.md',
             ),
           ];
         });
@@ -103,7 +103,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           });
           expect(state!.emptyChildren).toEqual({});
         });
-      }
+      },
     );
   });
 });

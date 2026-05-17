@@ -54,23 +54,23 @@ of the architecture — the fundamental unit from which everything else is deriv
 
 ### Status and Lifecycle
 
-| Field          | Type                                                              | Description                     |
-| -------------- | ----------------------------------------------------------------- | ------------------------------- |
-| `status`       | `'candidate' \| 'roadmap' \| 'active' \| 'completed' \| 'deferred'` | FSM state                       |
-| `maturity`     | `'idea' \| 'plan' \| 'design' \| 'executable'`?                    | Spec maturity (auto-defaulted from status when absent — see §04) |
-| `completed`    | ISO8601?                                                           | Completion date                 |
-| `unlockReason` | string?                                                            | Required when modifying a `completed` pattern (§09) |
+| Field          | Type                                                                | Description                                                      |
+| -------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `status`       | `'candidate' \| 'roadmap' \| 'active' \| 'completed' \| 'deferred'` | FSM state                                                        |
+| `maturity`     | `'idea' \| 'plan' \| 'design' \| 'executable'`?                     | Spec maturity (auto-defaulted from status when absent — see §04) |
+| `completed`    | ISO8601?                                                            | Completion date                                                  |
+| `unlockReason` | string?                                                             | Required when modifying a `completed` pattern (§09)              |
 
 ### Relationships
 
-| Field                | Type     | Description                                                  |
-| -------------------- | -------- | ------------------------------------------------------------ |
-| `uses`               | string[] | Pattern names this depends on / uses (authored)              |
-| `usedBy`             | string[] | Pattern names that declare `uses` of this (derived reverse)  |
-| `implementsPatterns` | string[] | Spec patterns this code or stub realizes (authored)          |
-| `implementedBy`      | string[] | Pattern names that implement this (derived reverse)          |
-| `extendsPattern`     | string?  | Pattern this extends or specializes (authored)               |
-| `seeAlso`            | string[] | Related pattern names — informational cross-reference        |
+| Field                | Type     | Description                                                 |
+| -------------------- | -------- | ----------------------------------------------------------- |
+| `uses`               | string[] | Pattern names this depends on / uses (authored)             |
+| `usedBy`             | string[] | Pattern names that declare `uses` of this (derived reverse) |
+| `implementsPatterns` | string[] | Spec patterns this code or stub realizes (authored)         |
+| `implementedBy`      | string[] | Pattern names that implement this (derived reverse)         |
+| `extendsPattern`     | string?  | Pattern this extends or specializes (authored)              |
+| `seeAlso`            | string[] | Related pattern names — informational cross-reference       |
 
 > _Informative:_ Earlier drafts surfaced separate `dependsOn`, `enables`, and `apiRef`
 > fields. In v0.2.0 the authored vocabulary collapses to `@architect-uses`; reverse
@@ -78,13 +78,13 @@ of the architecture — the fundamental unit from which everything else is deriv
 
 ### Architecture
 
-| Field            | Type                                                  | Description                                    |
-| ---------------- | ----------------------------------------------------- | ---------------------------------------------- |
-| `roleDefinition` | RoleDefinition?                                       | Resolved role metadata (diagram shape, labels) |
-| `archContext`    | string?                                                | Bounded context                                |
-| `archLayer`      | `'domain' \| 'application' \| 'infrastructure'`?       | Layer                                          |
-| `productArea`    | string?                                                | Product area                                   |
-| `boundedContext` | string?                                                | Bounded context (alias)                        |
+| Field            | Type                                             | Description                                    |
+| ---------------- | ------------------------------------------------ | ---------------------------------------------- |
+| `roleDefinition` | RoleDefinition?                                  | Resolved role metadata (diagram shape, labels) |
+| `archContext`    | string?                                          | Bounded context                                |
+| `archLayer`      | `'domain' \| 'application' \| 'infrastructure'`? | Layer                                          |
+| `productArea`    | string?                                          | Product area                                   |
+| `boundedContext` | string?                                          | Bounded context (alias)                        |
 
 > **Historical note:** `archRole` appears in legacy extraction aliases and preserved reference docs only.
 
@@ -132,11 +132,11 @@ Each `Deliverable`:
 
 ### Hierarchy
 
-| Field      | Type                                          | Description                    |
-| ---------- | --------------------------------------------- | ------------------------------ |
-| `level`    | `'epic' \| 'phase' \| 'task' \| 'slice'`?     | Hierarchy level                |
-| `parent`   | string?                                        | Parent pattern name            |
-| `children` | string[]?                                      | Child pattern names (computed) |
+| Field      | Type                                      | Description                    |
+| ---------- | ----------------------------------------- | ------------------------------ |
+| `level`    | `'epic' \| 'phase' \| 'task' \| 'slice'`? | Hierarchy level                |
+| `parent`   | string?                                   | Parent pattern name            |
+| `children` | string[]?                                 | Child pattern names (computed) |
 
 > _Informative:_ Earlier drafts of this spec also surfaced "Product & Business" and
 > "Discovery" field groups (`businessValue`, `userRole`, `constraints`,

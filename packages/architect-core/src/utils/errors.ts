@@ -16,7 +16,7 @@ export function formatZodError(error: z.ZodError, prefix = 'Validation failed'):
 export function parseOrThrow<TSchema extends z.ZodType>(
   schema: TSchema,
   raw: unknown,
-  context = 'Validation failed'
+  context = 'Validation failed',
 ): z.infer<TSchema> {
   return parseAtBoundary(schema, raw, context);
 }

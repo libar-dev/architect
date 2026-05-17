@@ -8,7 +8,7 @@
  * ### When to Use
  *
  * - Defines the PrChangeReview fragment shape for branch changes and reviewer
-*   recommendations.
+ *   recommendations.
  */
 import { z } from 'zod';
 

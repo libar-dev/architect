@@ -22,7 +22,7 @@ function initState(): TagRegistryTestState {
 
 function findMetadataTag(
   registry: TagRegistry,
-  tagName: string
+  tagName: string,
 ): MetadataTagDefinition | undefined {
   return registry.metadataTags.find((tag) => tag.tag === tagName);
 }
@@ -79,7 +79,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           const tag = findMetadataTag(state!.registry!, tagName);
           expect(tag).toBeDefined();
           expect(tag!.required).toBe(true);
-        }
+        },
       );
     });
 
@@ -109,7 +109,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           expect(tag!.transform).toBeDefined();
           expect(typeof tag!.transform).toBe('function');
           state!.foundTag = tag!;
-        }
+        },
       );
 
       And(
@@ -119,7 +119,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           expect(state!.foundTag!.transform).toBeDefined();
           state!.transformResult = state!.foundTag!.transform!(input);
           expect(state!.transformResult).toBe(expected);
-        }
+        },
       );
     });
   });

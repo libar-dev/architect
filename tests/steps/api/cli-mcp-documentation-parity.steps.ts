@@ -31,7 +31,7 @@ function initState(): DocumentationParityState {
 
 async function runDocumentationCli(
   documentType: string,
-  options: { disclosure?: string; filter?: string } = {}
+  options: { disclosure?: string; filter?: string } = {},
 ): Promise<unknown> {
   const args = ['--base-dir', '.', '--format', 'json', 'documentation', documentType];
   if (options.disclosure !== undefined) {
@@ -44,7 +44,7 @@ async function runDocumentationCli(
   const result = await runCLI('architect', args, { cwd: PACKAGE_HOST_ROOT });
   if (result.exitCode !== 0) {
     throw new Error(
-      `architect documentation failed (${String(result.exitCode)}): ${result.stderr || result.stdout}`
+      `architect documentation failed (${String(result.exitCode)}): ${result.stderr || result.stdout}`,
     );
   }
   return JSON.parse(result.stdout) as unknown;
@@ -85,7 +85,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Then('the two outputs deep-equal', () => {
             expect(state!.cliOutput).toEqual(state!.mcpOutput);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -95,7 +95,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'I generate {string} via the CLI documentation command as JSON with disclosure {string} and filter {string}',
             async (_ctx: unknown, documentType: string, disclosure: string, filter: string) => {
               state!.cliOutput = await runDocumentationCli(documentType, { disclosure, filter });
-            }
+            },
           );
 
           And(
@@ -107,14 +107,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 filter: { status: ['completed'] },
               });
               state!.mcpOutput = JSON.parse(result.text) as unknown;
-            }
+            },
           );
 
           Then('the two outputs deep-equal', () => {
             expect(state!.cliOutput).toEqual(state!.mcpOutput);
           });
-        }
+        },
       );
-    }
+    },
   );
 });

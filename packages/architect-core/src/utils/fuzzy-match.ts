@@ -34,7 +34,7 @@ export function levenshteinDistance(a: string, b: string): number {
 
 function scoreMatch(
   query: string,
-  patternName: string
+  patternName: string,
 ): { score: number; matchType: FuzzyMatch['matchType'] } | undefined {
   const queryLower = query.toLowerCase();
   const nameLower = patternName.toLowerCase();
@@ -62,7 +62,7 @@ function scoreMatch(
 export function fuzzyMatchPatterns(
   query: string,
   patternNames: readonly string[],
-  maxResults = 10
+  maxResults = 10,
 ): readonly FuzzyMatch[] {
   const matches: FuzzyMatch[] = [];
 
@@ -85,7 +85,7 @@ export function fuzzyMatchPatterns(
 
 export function findBestMatch(
   query: string,
-  patternNames: readonly string[]
+  patternNames: readonly string[],
 ): FuzzyMatch | undefined {
   const results = fuzzyMatchPatterns(query, patternNames, 1);
   return results.length > 0 ? results[0] : undefined;

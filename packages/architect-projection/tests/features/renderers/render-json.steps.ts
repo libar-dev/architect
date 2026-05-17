@@ -303,9 +303,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ]);
 
             expect(SessionContextBundleSchema.safeParse(rendered).success).toBe(true);
-          }
+          },
         );
-      }
+      },
     );
 
     RuleScenario(
@@ -328,7 +328,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('the JSON object output should equal the original fragment fixture', () => {
           expect(state!.rendered).toEqual(state!.input);
         });
-      }
+      },
     );
 
     RuleScenario('Pretty mode returns a formatted JSON string', ({ Given, When, Then }) => {
@@ -397,7 +397,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             rootRouteId: 'patterns:index',
           });
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -432,7 +432,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             rootRouteId: 'guide:index',
           });
         });
-      }
+      },
     );
   });
 
@@ -463,7 +463,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'renderJson encountered a non-JSON-safe UnsupportedJsonValue at $.file.',
           ]);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -490,10 +490,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
         And('rendering the malformed bundle-like input should fail loudly', () => {
           expect(state!.malformedBundleError).toBe(
-            'renderJson encountered a non-JSON-safe function at $.routing.rootRouteId.'
+            'renderJson encountered a non-JSON-safe function at $.routing.rootRouteId.',
           );
         });
-      }
+      },
     );
   });
 });
@@ -506,22 +506,25 @@ describe('renderJson adversarial security coverage', () => {
     };
 
     expect(() => renderJson(input)).toThrow(
-      'renderJson encountered a non-JSON-safe CustomPrototypeValue at $.file.'
+      'renderJson encountered a non-JSON-safe CustomPrototypeValue at $.file.',
     );
   });
 
   it('rejects prototype-polluted nested objects', () => {
     const pollutedPrototype = { polluted: true };
-    const pollutedObject = Object.assign(Object.create(pollutedPrototype) as Record<string, unknown>, {
-      path: 'polluted.md',
-    });
+    const pollutedObject = Object.assign(
+      Object.create(pollutedPrototype) as Record<string, unknown>,
+      {
+        path: 'polluted.md',
+      },
+    );
     const input = {
       ...createPatternSummaryFixture(),
       file: pollutedObject as unknown as string,
     };
 
     expect(() => renderJson(input)).toThrow(
-      'renderJson encountered a non-JSON-safe Object at $.file.'
+      'renderJson encountered a non-JSON-safe Object at $.file.',
     );
   });
 });

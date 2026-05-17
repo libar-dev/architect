@@ -249,7 +249,7 @@ import { mergeSourcesForGenerator } from '@libar-dev/architect/config';
 const effectiveSources = mergeSourcesForGenerator(
   resolved.project.sources,
   'changelog',
-  resolved.project.generatorOverrides
+  resolved.project.generatorOverrides,
 );
 // effectiveSources.typescript - merged TypeScript globs
 // effectiveSources.features   - merged or replaced feature globs

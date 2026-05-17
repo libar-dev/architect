@@ -87,7 +87,7 @@ export interface CommandDef {
   readonly validateParsedInput?: (parsed: ParsedCommandInput) => void;
   readonly execute: (
     context: CommandRuntimeContext,
-    parsed: ParsedCommandInput
+    parsed: ParsedCommandInput,
   ) => Promise<void> | void;
 }
 
@@ -169,7 +169,7 @@ function parseCommandInput(def: CommandDef, argv: readonly string[]): ParsedComm
     parsedPositional = parseAtBoundary(
       def.positional,
       positional,
-      def.usage ?? 'Invalid arguments'
+      def.usage ?? 'Invalid arguments',
     );
   } catch {
     throw new Error(def.usage ?? `Unknown subcommand: ${def.name}`);
@@ -180,7 +180,7 @@ function parseCommandInput(def: CommandDef, argv: readonly string[]): ParsedComm
     parsedFlags = parseAtBoundary(
       def.flags,
       rawFlags,
-      def.usage ?? `Failed to parse options for ${def.name}.`
+      def.usage ?? `Failed to parse options for ${def.name}.`,
     );
   } catch (error) {
     const prefix = def.usage ?? `Failed to parse options for ${def.name}.`;
@@ -210,7 +210,7 @@ export function validateCommandInput(name: string, argv: readonly string[]): voi
 export async function runCommand(
   context: CommandRuntimeContext,
   name: string,
-  argv: readonly string[]
+  argv: readonly string[],
 ): Promise<void> {
   if (!isCommandName(name)) {
     throw new Error(`Unknown subcommand: ${name}`);

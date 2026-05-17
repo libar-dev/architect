@@ -17,7 +17,7 @@ interface ProgressProjectionState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/delivery-reporting/phase-progress-status.feature'
+  'tests/features/projections/delivery-reporting/phase-progress-status.feature',
 );
 
 let state: ProgressProjectionState | null = null;
@@ -132,7 +132,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           });
         });
       });
-    }
+    },
   );
 
   Rule('Status distribution keeps zero-delivery percentages honest', ({ RuleScenario }) => {
@@ -151,7 +151,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 createPattern('CandidateOne', { status: 'candidate' }),
               ],
             });
-          }
+          },
         );
 
         When('I project the status distribution', () => {
@@ -176,7 +176,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             },
           });
         });
-      }
+      },
     );
 
     RuleScenario('zero-delivery projects report zero percentages', ({ Given, When, Then }) => {
@@ -219,7 +219,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               status: ['active', 'completed'],
             },
           });
-        }
+        },
       );
 
       When('I project the status distribution', () => {

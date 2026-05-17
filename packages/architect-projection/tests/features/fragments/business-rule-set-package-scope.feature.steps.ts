@@ -131,7 +131,7 @@ function makePackageFixture(scopeValue: string): unknown {
 }
 
 const feature = await loadFeature(
-  'tests/features/fragments/business-rule-set-package-scope.feature'
+  'tests/features/fragments/business-rule-set-package-scope.feature',
 );
 
 describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
@@ -157,7 +157,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             if (state!.parseResult.success) {
               state!.parsed = state!.parseResult.data;
             }
-          }
+          },
         );
 
         Then('the parse should succeed', () => {
@@ -172,10 +172,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(
             state!.parsed && 'scopeValue' in state!.parsed
               ? (state!.parsed as { scopeValue: unknown }).scopeValue
-              : null
+              : null,
           ).toBe(scopeValue);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -188,7 +188,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         Then('the grouping parse should succeed', () => {
           expect(state!.groupingParseResult?.success).toBe(true);
         });
-      }
+      },
     );
 
     RuleScenario('Round-trip preserves the package-scoped shape', ({ When, Then }) => {
@@ -199,7 +199,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const parsed = BusinessRuleSetSchema.parse(state!.fixture);
           const json = JSON.stringify(parsed);
           state!.roundTripped = BusinessRuleSetSchema.parse(JSON.parse(json));
-        }
+        },
       );
 
       Then('the round-tripped value should equal the original fixture', () => {
@@ -234,7 +234,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             }
             const bundle = parseAndProjectBusinessRuleSet(
               { ...context, packageResolver: createStudioStyleResolver() },
-              { scope: 'all', groupedBy: 'package' }
+              { scope: 'all', groupedBy: 'package' },
             );
             state!.previousRuntimeKeys = [];
             state!.runtimeKeys = Object.keys(bundle.children).sort();
@@ -245,7 +245,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             (_ctx: unknown, left: string, right: string) => {
               expect(state!.runtimeKeys).toContain(left);
               expect(state!.runtimeKeys).toContain(right);
-            }
+            },
           );
 
           When('I project the same bundle with an architect-pkg-style packages config', () => {
@@ -256,7 +256,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             state!.previousRuntimeKeys = [...state!.runtimeKeys];
             const bundle = parseAndProjectBusinessRuleSet(
               { ...context, packageResolver: createArchitectPkgStyleResolver() },
-              { scope: 'all', groupedBy: 'package' }
+              { scope: 'all', groupedBy: 'package' },
             );
             state!.runtimeKeys = Object.keys(bundle.children).sort();
           });
@@ -267,7 +267,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
           And('no source code changed between the two runs', () => {
             expect(
-              state!.runtimeContext?.graph.patterns.map((pattern) => pattern.source.file)
+              state!.runtimeContext?.graph.patterns.map((pattern) => pattern.source.file),
             ).toEqual([
               'packages/architect-core/src/config/package-resolver.ts',
               'packages/architect-projection/src/projections/governance/business-rules.ts',
@@ -275,8 +275,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               'apps/desktop/src/main/architect-mcp.ts',
             ]);
           });
-        }
+        },
       );
-    }
+    },
   );
 });

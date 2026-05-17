@@ -16,7 +16,7 @@ interface SmokeState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/execution-context/smoke-session-context.feature'
+  'tests/features/projections/execution-context/smoke-session-context.feature',
 );
 
 let state: SmokeState | null = null;
@@ -87,8 +87,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(state!.bundle!.root.sessionType).toBe('implement');
             expect(state!.bundle!.root.metadata).toHaveLength(2);
           });
-        }
+        },
       );
-    }
+    },
   );
 });

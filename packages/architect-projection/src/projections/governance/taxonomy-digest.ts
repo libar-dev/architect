@@ -47,7 +47,7 @@ export { summarizeTaxonomyDigest } from '../../fragments/governance/index.js';
 
 export function projectTaxonomyDigest(
   context: ProjectionContext,
-  options: TaxonomyDigestOptions = {}
+  options: TaxonomyDigestOptions = {},
 ): ProjectionBundle<TaxonomyDigest> {
   const exampleOverrides = {
     ...(context.tagExampleOverrides ?? {}),
@@ -58,7 +58,7 @@ export function projectTaxonomyDigest(
     buildTaxonomyDigest(context, {
       ...options,
       ...(Object.keys(exampleOverrides).length > 0 ? { exampleOverrides } : {}),
-    })
+    }),
   );
 }
 
@@ -66,5 +66,5 @@ export const parseAndProjectTaxonomyDigest = parseAndProject(
   TaxonomyDigestOptionsSchema,
   projectTaxonomyDigest,
   'parseAndProjectTaxonomyDigest',
-  {}
+  {},
 );

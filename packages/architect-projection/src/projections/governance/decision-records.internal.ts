@@ -47,7 +47,7 @@ export function buildDecisionRecord(context: ProjectionContext, id: string): Dec
 }
 
 export function buildDecisionCatalog(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<DecisionCatalog> {
   const decisions = collectDecisionPatterns(context).map(createDecisionRecord);
   const root: DecisionCatalog = {
@@ -56,7 +56,7 @@ export function buildDecisionCatalog(
   };
 
   const children = Object.fromEntries(
-    decisions.map((decision) => [slugify(decision.id), decision])
+    decisions.map((decision) => [slugify(decision.id), decision]),
   );
 
   return {
@@ -65,7 +65,7 @@ export function buildDecisionCatalog(
     routing: {
       rootRouteId: createIndexRouteId('decisions'),
       childRouteIds: Object.fromEntries(
-        Object.keys(children).map((key) => [key, createEntityRouteId('decisions', key)])
+        Object.keys(children).map((key) => [key, createEntityRouteId('decisions', key)]),
       ),
       childPathStrategy: 'nested',
       anchorStrategy: 'heading-slug',
@@ -77,7 +77,7 @@ function requireDecisionPattern(context: ProjectionContext, id: string): Extract
   const normalizedId = normalizeDecisionLookup(id);
   const matches = collectDecisionPatterns(context);
   const pattern = matches.find(
-    (candidate) => normalizeDecisionLookup(getDecisionId(candidate)) === normalizedId
+    (candidate) => normalizeDecisionLookup(getDecisionId(candidate)) === normalizedId,
   );
 
   if (pattern !== undefined) {
@@ -87,7 +87,7 @@ function requireDecisionPattern(context: ProjectionContext, id: string): Extract
   const available = matches.map((candidate) => getDecisionId(candidate)).join(', ');
   throw new ProjectionError(
     'DECISION_NOT_FOUND',
-    `Decision not found: "${normalizeDecisionLookup(id)}".${available.length > 0 ? ` Available decisions: ${available}` : ''}`
+    `Decision not found: "${normalizeDecisionLookup(id)}".${available.length > 0 ? ` Available decisions: ${available}` : ''}`,
   );
 }
 
@@ -122,19 +122,19 @@ function extractDecisionSections(pattern: ExtractedPattern): DecisionSections {
   return {
     context: mergeDecisionBlocks(
       sectionsFromDescription.context,
-      partitionedRules.context.flatMap((rule) => toBlocks(rule.description))
+      partitionedRules.context.flatMap((rule) => toBlocks(rule.description)),
     ),
     decision: mergeDecisionBlocks(
       sectionsFromDescription.decision,
-      partitionedRules.decision.flatMap((rule) => toBlocks(rule.description))
+      partitionedRules.decision.flatMap((rule) => toBlocks(rule.description)),
     ),
     consequences: mergeDecisionBlocks(
       sectionsFromDescription.consequences,
-      partitionedRules.consequences.flatMap((rule) => toBlocks(rule.description))
+      partitionedRules.consequences.flatMap((rule) => toBlocks(rule.description)),
     ),
     alternatives: mergeDecisionBlocks(
       sectionsFromDescription.alternatives,
-      partitionedRules.alternatives.flatMap((rule) => toBlocks(rule.description))
+      partitionedRules.alternatives.flatMap((rule) => toBlocks(rule.description)),
     ),
   };
 }
@@ -336,7 +336,7 @@ function parseTextBlocks(text: string): Block[] {
       return [
         list(
           lines.map((line) => line.replace(/^(?:[-*]|\d+\.)\s+/, '').trim()),
-          lines.every((line) => /^\d+\.\s+/.test(line))
+          lines.every((line) => /^\d+\.\s+/.test(line)),
         ),
       ];
     }

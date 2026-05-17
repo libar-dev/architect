@@ -356,7 +356,7 @@ Examples:
  */
 function isDirectNameMatch(
   patternName: string,
-  counterpart: ExtractedPattern | undefined
+  counterpart: ExtractedPattern | undefined,
 ): counterpart is ExtractedPattern {
   if (counterpart === undefined) {
     return false;
@@ -378,7 +378,7 @@ function isDirectNameMatch(
 function hasCrossSourceRelationshipMatch(
   patternName: string,
   counterpartByName: ReadonlyMap<string, ExtractedPattern>,
-  dataset: RuntimePatternGraph
+  dataset: RuntimePatternGraph,
 ): boolean {
   const relationships = getRelationships(dataset, patternName);
   if (relationships === undefined) {
@@ -621,7 +621,7 @@ function formatPretty(output: ValidatePatternsOutput, verbose = false): string {
     lines.push(`Extraction Diagnostics (${String(diagnostics.length)}):`);
     for (const diagnostic of diagnostics) {
       lines.push(
-        `  [${diagnostic.severity.toUpperCase()}] ${diagnostic.code}: ${diagnostic.message}`
+        `  [${diagnostic.severity.toUpperCase()}] ${diagnostic.code}: ${diagnostic.message}`,
       );
       lines.push(`          at ${diagnostic.filePath}`);
       if (diagnostic.suggestion) {
@@ -647,7 +647,7 @@ function formatPretty(output: ValidatePatternsOutput, verbose = false): string {
     lines.push('All validations passed.');
   } else {
     lines.push(
-      `Found ${String(errors.length)} error(s), ${String(warnings.length)} warning(s), ${String(infos.length)} info message(s).`
+      `Found ${String(errors.length)} error(s), ${String(warnings.length)} warning(s), ${String(infos.length)} info message(s).`,
     );
   }
 
@@ -682,7 +682,7 @@ function formatDanglingEntry(entry: DanglingReference): string {
 async function enforceDanglingBaseline(
   summary: ValidationSummary,
   entries: readonly DanglingReference[],
-  updateBaseline: boolean
+  updateBaseline: boolean,
 ): Promise<{ updatedEntryCount: number | null }> {
   let updatedEntryCount: number | null = null;
 
@@ -728,7 +728,7 @@ async function main(): Promise<void> {
 
   if (!configApplied && config.input.length === 0) {
     console.error(
-      '  (No architect.config.ts or architect.config.js found; provide -i/--input flags)'
+      '  (No architect.config.ts or architect.config.js found; provide -i/--input flags)',
     );
   }
 
@@ -736,14 +736,14 @@ async function main(): Promise<void> {
   if (config.input.length === 0) {
     console.error('Error: No TypeScript sources specified.');
     console.error(
-      'Provide -i/--input flags or configure sources in architect.config.ts or architect.config.js'
+      'Provide -i/--input flags or configure sources in architect.config.ts or architect.config.js',
     );
     process.exit(1);
   }
   if (config.features.length === 0) {
     console.error('Error: No feature files specified.');
     console.error(
-      'Provide -F/--features flags or configure sources in architect.config.ts or architect.config.js'
+      'Provide -F/--features flags or configure sources in architect.config.ts or architect.config.js',
     );
     process.exit(1);
   }
@@ -779,7 +779,7 @@ async function main(): Promise<void> {
     });
     if (!pipelineResult.ok) {
       throw new Error(
-        `Pipeline error [${pipelineResult.error.step}]: ${pipelineResult.error.message}`
+        `Pipeline error [${pipelineResult.error.step}]: ${pipelineResult.error.message}`,
       );
     }
     const {
@@ -807,14 +807,14 @@ async function main(): Promise<void> {
     const { updatedEntryCount } = await enforceDanglingBaseline(
       summary,
       pipelineValidation.danglingReferences,
-      config.updateBaseline
+      config.updateBaseline,
     );
 
     // Output cross-source results
     if (config.format === 'pretty') {
       if (updatedEntryCount !== null) {
         process.stdout.write(
-          `Updated dangling baseline at ${DANGLING_BASELINE_SOURCE_PATH} with ${String(updatedEntryCount)} entries.\n\n`
+          `Updated dangling baseline at ${DANGLING_BASELINE_SOURCE_PATH} with ${String(updatedEntryCount)} entries.\n\n`,
         );
       }
       process.stdout.write(`${formatPretty({ ...summary, diagnostics }, config.verbose)}\n`);
@@ -921,7 +921,7 @@ async function main(): Promise<void> {
 
 // Entry point — catch ensures parseArgs errors reach the unified handler
 export async function runValidatePatternsCli(
-  argv: string[] = process.argv.slice(2)
+  argv: string[] = process.argv.slice(2),
 ): Promise<void> {
   process.argv = [process.argv[0] ?? 'node', process.argv[1] ?? 'architect-validate', ...argv];
   await main();

@@ -43,17 +43,17 @@ For multi-pattern sessions, run `handoff` per pattern.
 
 For each pattern touched:
 
-| Field                         | Source                                                                  |
-| ----------------------------- | ----------------------------------------------------------------------- |
-| Session intent                | What you were doing (`planning` / `design` / `implement` / `review`)    |
-| Pattern name                  | The primary pattern under work                                          |
+| Field                         | Source                                                                                     |
+| ----------------------------- | ------------------------------------------------------------------------------------------ |
+| Session intent                | What you were doing (`planning` / `design` / `implement` / `review`)                       |
+| Pattern name                  | The primary pattern under work                                                             |
 | Current FSM state             | `pnpm architect:query context <pattern> --session implement` — read the `=== FSM ===` line |
-| Transitions made this session | Your edit history                                                       |
-| Files modified                | Pass to `--modified-file` flags on handoff                              |
-| Open dependencies             | `pnpm architect:query dep-tree <pattern>` minus the satisfied ones              |
-| Open blockers                 | `pnpm architect:query arch blocking` filtered to anything touching this pattern |
-| Outstanding open questions    | `pnpm architect:query open-questions [--parent <pattern>]` — forward-looking signal |
-| Outstanding work              | What you didn't finish, with one-line "why" each                        |
+| Transitions made this session | Your edit history                                                                          |
+| Files modified                | Pass to `--modified-file` flags on handoff                                                 |
+| Open dependencies             | `pnpm architect:query dep-tree <pattern>` minus the satisfied ones                         |
+| Open blockers                 | `pnpm architect:query arch blocking` filtered to anything touching this pattern            |
+| Outstanding open questions    | `pnpm architect:query open-questions [--parent <pattern>]` — forward-looking signal        |
+| Outstanding work              | What you didn't finish, with one-line "why" each                                           |
 
 ## Handoff note format
 

@@ -40,7 +40,7 @@ export interface UpsertGeneratedDocManifestOptions {
 }
 
 export async function loadGeneratedDocsManifest(
-  outputDir: string
+  outputDir: string,
 ): Promise<GeneratedDocsManifest | null> {
   const manifestPath = resolveGeneratedDocsManifestPath(outputDir);
 
@@ -57,7 +57,7 @@ export async function loadGeneratedDocsManifest(
 }
 
 export async function upsertGeneratedDocsManifest(
-  options: UpsertGeneratedDocManifestOptions
+  options: UpsertGeneratedDocManifestOptions,
 ): Promise<void> {
   const existing = (await loadGeneratedDocsManifest(options.outputDir)) ?? {
     version: 1 as const,
@@ -92,7 +92,7 @@ export async function upsertGeneratedDocsManifest(
 
 export function createPublishedEntries(
   rootPath: string,
-  filePaths: readonly string[]
+  filePaths: readonly string[],
 ): GeneratedDocManifestEntry[] {
   return [...new Set(filePaths)]
     .sort((left, right) => left.localeCompare(right))
@@ -110,7 +110,7 @@ export function createPublishedEntries(
             audience: 'published' as const,
             tracking: 'commit' as const,
             parentPath: rootPath,
-          }
+          },
     );
 }
 
@@ -121,7 +121,7 @@ export function resolveGeneratedDocsManifestPath(outputDir: string): string {
 async function pruneStaleGeneratedFiles(
   outputDir: string,
   previousEntries: readonly GeneratedDocManifestEntry[],
-  nextEntries: readonly GeneratedDocManifestEntry[]
+  nextEntries: readonly GeneratedDocManifestEntry[],
 ): Promise<void> {
   const nextPaths = new Set(nextEntries.map((entry) => entry.path));
   const stale = previousEntries

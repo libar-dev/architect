@@ -30,10 +30,10 @@ pattern, **stop** — there is a verb for that.
 
 ## CLI vs MCP — which to use
 
-| Surface                              | Latency                          | Context cost per call                                      | When to prefer                                                                                                       |
-| ------------------------------------ | -------------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `pnpm architect:query <verb>` (CLI) | ~2–5s cold, ~0.5s warm cache    | One Bash tool result; pastes cleanly into PRs and handoffs | **Default.** Deterministic, easy to share, JSON pipes into `jq`.                                                     |
-| `architect_*` MCP tools              | Sub-millisecond per call         | Each call is a separate tool-use round trip                | Tool-mediated bursts where you'll call ≥5 verbs back-to-back and the harness can amortize the round-trip overhead.  |
+| Surface                             | Latency                      | Context cost per call                                      | When to prefer                                                                                                     |
+| ----------------------------------- | ---------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `pnpm architect:query <verb>` (CLI) | ~2–5s cold, ~0.5s warm cache | One Bash tool result; pastes cleanly into PRs and handoffs | **Default.** Deterministic, easy to share, JSON pipes into `jq`.                                                   |
+| `architect_*` MCP tools             | Sub-millisecond per call     | Each call is a separate tool-use round trip                | Tool-mediated bursts where you'll call ≥5 verbs back-to-back and the harness can amortize the round-trip overhead. |
 
 **Doctrine:** default to CLI. Reach for MCP only when you'll burst-call
 several verbs in close sequence — the sub-ms-per-call win reverses once you
@@ -42,34 +42,34 @@ not split documentation per surface.
 
 ## CLI ↔ MCP tool-name mapping (parity)
 
-Every CLI subcommand has an MCP twin. Names map by snake_casing the CLI form
-and prefixing with `architect_`. **The MCP names use underscores end-to-end
-— `architect_scope_validate`, not `architect_scope-validate`.** Writing the
+Every CLI subcommand has an MCP twin. Names map by snake*casing the CLI form
+and prefixing with `architect*`. **The MCP names use underscores end-to-end
+— `architect_scope_validate`, not `architect_scope-validate`.\*\* Writing the
 hyphenated form will 404 against the registry.
 
-| CLI subcommand        | MCP tool name                  |
-| --------------------- | ------------------------------ |
-| `overview`            | `architect_overview`           |
-| `status`              | `architect_status`             |
-| `context`             | `architect_context`            |
-| `dep-tree`            | `architect_dep_tree`           |
-| `files`               | `architect_files`              |
-| `scope-validate`      | `architect_scope_validate`     |
-| `handoff`             | `architect_handoff`            |
-| `pattern`             | `architect_pattern`            |
-| `bundle`              | `architect_bundle`             |
-| `list`                | `architect_list`               |
-| `open-questions`      | `architect_open_questions`     |
-| `search`              | `architect_search`             |
-| `rules`               | `architect_rules`              |
-| `taxonomy`            | `architect_taxonomy`           |
-| `arch neighborhood`   | `architect_arch_neighborhood`  |
-| `arch blocking`       | `architect_arch_blocking`      |
-| `arch coverage`       | `architect_coverage`           |
-| `documentation`       | `architect_documentation`      |
-| (no CLI twin)         | `architect_rebuild`            |
-| (no CLI twin)         | `architect_config`             |
-| (no CLI twin)         | `architect_help`               |
+| CLI subcommand      | MCP tool name                 |
+| ------------------- | ----------------------------- |
+| `overview`          | `architect_overview`          |
+| `status`            | `architect_status`            |
+| `context`           | `architect_context`           |
+| `dep-tree`          | `architect_dep_tree`          |
+| `files`             | `architect_files`             |
+| `scope-validate`    | `architect_scope_validate`    |
+| `handoff`           | `architect_handoff`           |
+| `pattern`           | `architect_pattern`           |
+| `bundle`            | `architect_bundle`            |
+| `list`              | `architect_list`              |
+| `open-questions`    | `architect_open_questions`    |
+| `search`            | `architect_search`            |
+| `rules`             | `architect_rules`             |
+| `taxonomy`          | `architect_taxonomy`          |
+| `arch neighborhood` | `architect_arch_neighborhood` |
+| `arch blocking`     | `architect_arch_blocking`     |
+| `arch coverage`     | `architect_coverage`          |
+| `documentation`     | `architect_documentation`     |
+| (no CLI twin)       | `architect_rebuild`           |
+| (no CLI twin)       | `architect_config`            |
+| (no CLI twin)       | `architect_help`              |
 
 Source of truth: `packages/architect-mcp/src/tool-registry.ts`. The current
 inventory is **21 MCP tools** — CLAUDE.md still says 18, that line is stale.
@@ -183,9 +183,9 @@ remediation wave and are not yet reflected in older skill bodies.
 ### Health & inventory (any session)
 
 - **`overview`** — text: progress (e.g. `260 delivery patterns (114 completed,
-  120 active, 26 planned) = 44%`) + blocking summary + Data-API hint footer.
+120 active, 26 planned) = 44%`) + blocking summary + Data-API hint footer.
   Note: the hint footer currently advertises a non-existent `stubs
-  --unresolved` verb — ignore that line; see "Known quirks" below.
+--unresolved` verb — ignore that line; see "Known quirks" below.
 - **`status`** — status distribution counts + percentages, no per-pattern detail.
 - **`list [--status v] [--role tag] [--parent X] [--count] [--names-only]`**
   — pattern catalog. `--parent` is **NEW** and resolves strictly; unknown
@@ -206,7 +206,7 @@ remediation wave and are not yet reflected in older skill bodies.
   rules, role, maturity, file). **NEW behavior:** when the underlying feature
   file fails to parse, this verb reports parse provenance
   `(kind, path, parser line:col)` instead of a flat "Pattern not found."
-  *A "Pattern not found" response is no longer binary* — could mean
+  _A "Pattern not found" response is no longer binary_ — could mean
   "doesn't exist" OR "exists but failed to parse." Cross-check with `search`
   or `list --names-only` before concluding it doesn't exist.
 - **`context <Pattern> [--session planning|design|implement]`** — curated
@@ -215,10 +215,10 @@ remediation wave and are not yet reflected in older skill bodies.
   status + valid transitions + protection level.
 - **`files <Pattern> [--related]`** — primary deliverable file. With
   `--related`, adds `=== COMPLETED DEPENDENCIES ===`, `=== ROADMAP
-  DEPENDENCIES ===`, and `=== ARCHITECTURE NEIGHBORS ===` sections.
+DEPENDENCIES ===`, and `=== ARCHITECTURE NEIGHBORS ===` sections.
 - **`dep-tree <Pattern> [--depth <n>]`** — dependency chain walk.
 - **`rules [--product-area n] [--pattern n] [--package n] [--feature glob]
-  [--only-invariants] [--count] [--names-only]`** — business-rule catalog.
+[--only-invariants] [--count] [--names-only]`** — business-rule catalog.
   `--package` and `--feature` are **NEW**:
   - `--package <workspace-name>` filters by canonical workspace name
     (e.g. `@libar-dev/architect-projection`).
@@ -228,7 +228,7 @@ remediation wave and are not yet reflected in older skill bodies.
 ### Composite (the new default pre-flight)
 
 - **`bundle <Pattern> [--mode plan|design|implement|review] [--include
-  <block[,block...]>] [--estimate-tokens] [--format json]`** — **NEW**.
+<block[,block...]>] [--estimate-tokens] [--format json]`** — **NEW**.
   Composite of deliverables + deps + rules + open-questions + docstring.
   Mode default-include sets apply only when `--include` is omitted. Token
   estimation is heuristic (chars / 4).
@@ -273,7 +273,7 @@ remediation wave and are not yet reflected in older skill bodies.
 ### Session-record
 
 - **`handoff --pattern <X> [--session planning|design|implement|review]
-  [--modified-file <p>]...`** — emits `=== HANDOFF ===` block. Pass
+[--modified-file <p>]...`** — emits `=== HANDOFF ===` block. Pass
   `--modified-file` once per file touched.
 
 ### Whitelisted `query` methods
@@ -290,7 +290,7 @@ remediation wave and are not yet reflected in older skill bodies.
 ### Documentation projection
 
 - **`documentation <document-type> [--disclosure <level>] [--filter
-  <status=csv>]...`** — emits projected docs (patterns / architecture /
+<status=csv>]...`** — emits projected docs (patterns / architecture /
   roadmap / changelog / decisions / taxonomy / requirements-executable /
   requirements-specs). The disclosure level controls verbosity.
 
@@ -300,17 +300,17 @@ remediation wave and are not yet reflected in older skill bodies.
 
 ## Output formats & JSON consumption
 
-| Verb                              | Default output | `--format json` available |
-| --------------------------------- | -------------- | -------------------------- |
-| `query <method>`                  | JSON           | (default)                  |
-| `diagnostics`                     | JSON           | (default)                  |
-| `arch dangling`                   | JSON           | (default)                  |
-| `search`                          | JSON           | (default)                  |
-| `list --names-only`               | JSON           | (default)                  |
-| `open-questions`                  | Text           | yes (`--format json`)      |
-| `bundle`                          | Text           | yes (`--format json`)      |
-| `taxonomy`                        | Text           | yes (`--format json`)      |
-| `overview` / `status` / `context` / `files` / `scope-validate` / `handoff` / `pattern` / `dep-tree` / `rules` / `tags` / `arch blocking` | Text | text-only today |
+| Verb                                                                                                                                     | Default output | `--format json` available |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ------------------------- |
+| `query <method>`                                                                                                                         | JSON           | (default)                 |
+| `diagnostics`                                                                                                                            | JSON           | (default)                 |
+| `arch dangling`                                                                                                                          | JSON           | (default)                 |
+| `search`                                                                                                                                 | JSON           | (default)                 |
+| `list --names-only`                                                                                                                      | JSON           | (default)                 |
+| `open-questions`                                                                                                                         | Text           | yes (`--format json`)     |
+| `bundle`                                                                                                                                 | Text           | yes (`--format json`)     |
+| `taxonomy`                                                                                                                               | Text           | yes (`--format json`)     |
+| `overview` / `status` / `context` / `files` / `scope-validate` / `handoff` / `pattern` / `dep-tree` / `rules` / `tags` / `arch blocking` | Text           | text-only today           |
 
 Pipe JSON through `jq` for downstream consumption. Text output is for human
 review.
@@ -326,7 +326,12 @@ review.
   "metadata": {
     "timestamp": "2026-05-17T01:06:21.673Z",
     "patternCount": 268,
-    "validation": { "danglingReferenceCount": 2, "malformedPatternCount": 0, "unknownStatusCount": 0, "warningCount": 2 },
+    "validation": {
+      "danglingReferenceCount": 2,
+      "malformedPatternCount": 0,
+      "unknownStatusCount": 0,
+      "warningCount": 2
+    },
     "cache": { "hit": true, "ageMs": 1002463 },
     "pipelineMs": 482
   }
@@ -366,12 +371,26 @@ review.
     "memberCount": 0,
     "members": [],
     "includes": ["docstring", "rules", "scenarios", "open-questions"],
-    "pattern": { "patternName": "ChildAlpha", "status": "active", "maturity": "design", "source": "gherkin", "file": "..." },
+    "pattern": {
+      "patternName": "ChildAlpha",
+      "status": "active",
+      "maturity": "design",
+      "source": "gherkin",
+      "file": "..."
+    },
     "blocks": {
       "docstring": "...",
       "openQuestions": ["..."],
-      "rules": [ { "kind": "BusinessRule", "ruleName": "...", "invariant": "...", "verifiedBy": ["..."], "scenarioCount": 1 } ],
-      "scenarios": [ { "ruleName": "...", "count": 1, "scenarios": ["..."] } ]
+      "rules": [
+        {
+          "kind": "BusinessRule",
+          "ruleName": "...",
+          "invariant": "...",
+          "verifiedBy": ["..."],
+          "scenarioCount": 1
+        }
+      ],
+      "scenarios": [{ "ruleName": "...", "count": 1, "scenarios": ["..."] }]
     }
   }
 }
@@ -383,10 +402,20 @@ review.
 {
   "success": true,
   "data": [
-    { "pattern": "ArchitectBriefDeterministicBundle", "field": "seeAlso", "missing": "ADR005CodecRendererSeparation" },
-    { "pattern": "ModelEnrichedDataAPI", "field": "seeAlso", "missing": "ADR005CodecRendererSeparation" }
+    {
+      "pattern": "ArchitectBriefDeterministicBundle",
+      "field": "seeAlso",
+      "missing": "ADR005CodecRendererSeparation"
+    },
+    {
+      "pattern": "ModelEnrichedDataAPI",
+      "field": "seeAlso",
+      "missing": "ADR005CodecRendererSeparation"
+    }
   ],
-  "metadata": { /* ... */ }
+  "metadata": {
+    /* ... */
+  }
 }
 ```
 

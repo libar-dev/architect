@@ -39,7 +39,7 @@ export interface JsonOutputCodec<T> {
   serialize(data: T, source?: string): Result<string, CodecError>;
   serializeWithOptions(
     data: T,
-    options: { indent?: number | undefined; source?: string | undefined }
+    options: { indent?: number | undefined; source?: string | undefined },
   ): Result<string, CodecError>;
 }
 
@@ -104,7 +104,7 @@ export function createJsonInputCodec<T>(schema: ZodType<T>): JsonInputCodec<T> {
 
 export function createJsonOutputCodec<T>(
   schema: ZodType<T>,
-  defaultIndent = 2
+  defaultIndent = 2,
 ): JsonOutputCodec<T> {
   return {
     serialize(data: T, source?: string): Result<string, CodecError> {
@@ -113,7 +113,7 @@ export function createJsonOutputCodec<T>(
 
     serializeWithOptions(
       data: T,
-      options: { indent?: number | undefined; source?: string | undefined }
+      options: { indent?: number | undefined; source?: string | undefined },
     ): Result<string, CodecError> {
       const parseResult = schema.safeParse(data);
       if (!parseResult.success) {
@@ -147,7 +147,7 @@ export function createJsonOutputCodec<T>(
 
 export function createFileLoader<T>(
   codec: JsonInputCodec<T>,
-  readFile?: (filePath: string) => Promise<string>
+  readFile?: (filePath: string) => Promise<string>,
 ): { load(filePath: string): Promise<Result<T, CodecError>> } {
   return {
     async load(filePath: string): Promise<Result<T, CodecError>> {

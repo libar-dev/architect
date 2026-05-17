@@ -17,7 +17,7 @@ interface TimelineProjectionState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/delivery-reporting/roadmap-timeline.feature'
+  'tests/features/projections/delivery-reporting/roadmap-timeline.feature',
 );
 
 let state: TimelineProjectionState | null = null;
@@ -60,7 +60,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 });
               }),
             });
-          }
+          },
         );
 
         When('I project the roadmap timeline', () => {
@@ -125,9 +125,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               ],
             });
             expect(state!.bundle?.root.quarters.map((entry) => entry.quarter).join(', ')).toBe(
-              orderedQuarters
+              orderedQuarters,
             );
-          }
+          },
         );
 
         And(
@@ -139,7 +139,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               'q10-2026',
             ]);
             expect(Object.keys(state!.bundle?.children ?? {}).join(', ')).toBe(orderedKeys);
-          }
+          },
         );
       });
 
@@ -169,11 +169,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ]);
             expect(
               state!.bundle?.root.quarters.flatMap((entry) =>
-                entry.patterns.map((pattern) => pattern.patternName)
-              )
+                entry.patterns.map((pattern) => pattern.patternName),
+              ),
             ).toEqual(['CompletedA', 'CompletedB']);
           });
-        }
+        },
       );
 
       RuleScenario('current work keeps only active quarter entries', ({ Given, When, Then }) => {
@@ -200,11 +200,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           ]);
           expect(
             state!.bundle?.root.quarters.flatMap((entry) =>
-              entry.patterns.map((pattern) => pattern.patternName)
-            )
+              entry.patterns.map((pattern) => pattern.patternName),
+            ),
           ).toEqual(['ActiveA', 'ActiveB']);
         });
       });
-    }
+    },
   );
 });

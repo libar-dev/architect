@@ -74,7 +74,7 @@ function createFeatureFile(status: string, unlockReason?: string): string {
     '    Given a test condition',
     '    When an action occurs',
     '    Then a result is expected',
-    ''
+    '',
   );
 
   return lines.join('\n');
@@ -273,7 +273,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a feature file {string} with status {string}',
         async (_ctx: unknown, filePath: string, status: string) => {
           await writeTempFile(getTempDir(), filePath, createFeatureFile(status));
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -294,7 +294,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a feature file {string} with status {string}',
         async (_ctx: unknown, filePath: string, status: string) => {
           await writeTempFile(getTempDir(), filePath, createFeatureFile(status));
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -436,9 +436,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             await writeTempFile(
               getTempDir(),
               'architect.config.ts',
-              createArchitectConfig(featurePattern)
+              createArchitectConfig(featurePattern),
             );
-          }
+          },
         );
 
         And(
@@ -447,9 +447,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             await writeTempFile(
               getTempDir(),
               filePath,
-              createFeatureFile('completed', unlockReason)
+              createFeatureFile('completed', unlockReason),
             );
-          }
+          },
         );
 
         And('all files are staged', () => {
@@ -468,7 +468,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const combined = getResult().stdout + getResult().stderr;
           expect(combined).not.toContain(text);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -484,16 +484,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             await writeTempFile(
               getTempDir(),
               'architect.config.ts',
-              createArchitectConfig(featurePattern)
+              createArchitectConfig(featurePattern),
             );
-          }
+          },
         );
 
         And(
           'a markdown file {string} containing {string}',
           async (_ctx: unknown, filePath: string, content: string) => {
             await writeTempFile(getTempDir(), filePath, `# Example\n\n${content}\n`);
-          }
+          },
         );
 
         And('all files are staged', () => {
@@ -512,7 +512,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const combined = getResult().stdout + getResult().stderr;
           expect(combined).not.toContain(text);
         });
-      }
+      },
     );
   });
 });

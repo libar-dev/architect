@@ -1041,7 +1041,7 @@ export const TIER_A_LINT_BASELINE: readonly TierABaselineEntry[] = [
 
 export function applyTierABaseline(
   summary: LintSummary,
-  options: TierABaselineFilterOptions
+  options: TierABaselineFilterOptions,
 ): LintSummary {
   if (TIER_A_LINT_BASELINE.length === 0) {
     return summary;
@@ -1050,8 +1050,8 @@ export function applyTierABaseline(
   const repoRoot = findRepoRoot(options.baseDir);
   const baselineKeys = new Set(
     TIER_A_LINT_BASELINE.map((entry) =>
-      createBaselineKey(entry.path, entry.rule, entry.line, entry.message)
-    )
+      createBaselineKey(entry.path, entry.rule, entry.line, entry.message),
+    ),
   );
   const results = summary.results
     .map((result) => {
@@ -1059,8 +1059,8 @@ export function applyTierABaseline(
       const violations = result.violations.filter(
         (violation) =>
           !baselineKeys.has(
-            createBaselineKey(relativePath, violation.rule, violation.line, violation.message)
-          )
+            createBaselineKey(relativePath, violation.rule, violation.line, violation.message),
+          ),
       );
       return { file: result.file, violations };
     })
@@ -1072,7 +1072,7 @@ export function applyTierABaseline(
 export function summarizeLintResults(
   results: readonly { readonly file: string; readonly violations: readonly LintViolation[] }[],
   filesScanned: number,
-  directivesChecked: number
+  directivesChecked: number,
 ): LintSummary {
   let errorCount = 0;
   let warningCount = 0;
@@ -1111,7 +1111,7 @@ function createBaselineKey(filePath: string, rule: string, line: number, message
 function normalizeViolationPath(
   filePath: string,
   baseDir: string,
-  repoRoot: string | undefined
+  repoRoot: string | undefined,
 ): string {
   const absolutePath = path.resolve(filePath);
   const root = repoRoot ?? path.resolve(baseDir);

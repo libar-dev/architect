@@ -66,7 +66,7 @@ function createState(): ContractState {
 
 function createPatternSummary(
   patternName: string,
-  status: 'completed' | 'active' | 'planned' | 'candidate'
+  status: 'completed' | 'active' | 'planned' | 'candidate',
 ): PatternSummary {
   return {
     kind: 'PatternSummary',
@@ -92,7 +92,7 @@ function createRouting(): BundleRouting {
 }
 
 function materializeMarkdownRecord(
-  bundle: ProjectionBundle<PatternSummary>
+  bundle: ProjectionBundle<PatternSummary>,
 ): Record<string, string> {
   const fileMap: Record<string, string> = {};
   const routing = bundle.routing;
@@ -106,7 +106,7 @@ function materializeMarkdownRecord(
       routing.rootRouteId as LogicalRouteId,
       bundle.root.kind,
       undefined,
-      routing
+      routing,
     )
   ] = `root:${bundle.root.patternName}`;
 
@@ -158,7 +158,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('the bundle should not define routing', () => {
           expect(state!.bundle?.routing).toBeUndefined();
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -171,7 +171,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             children: {
               'projection-renderer-contract': createPatternSummary(
                 'ProjectionRendererContractDetail',
-                'completed'
+                'completed',
               ),
             },
             routing: createRouting(),
@@ -195,7 +195,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('bundle discrimination should expose the bundle root kind', () => {
           expect(state!.discriminatedRootKind).toBe('PatternSummary');
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -215,14 +215,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 `direct:${value.kind}:${options.label}`,
             },
             (value, options) => `fallback:${value.kind}:${options.label}`,
-            { label: 'renderer-contract' }
+            { label: 'renderer-contract' },
           );
 
           state!.dispatchFallbackResult = dispatchByKind(
             fragment,
             {},
             (value, options: { label: string }) => `fallback:${value.kind}:${options.label}`,
-            { label: 'renderer-contract' }
+            { label: 'renderer-contract' },
           );
         });
 
@@ -233,7 +233,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('dispatchByKind should use the fallback when the kind handler is omitted', () => {
           expect(state!.dispatchFallbackResult).toBe('fallback:PatternSummary:renderer-contract');
         });
-      }
+      },
     );
   });
 
@@ -279,25 +279,25 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expectTypeOf<typeof renderMarkdown>().toEqualTypeOf<
               (
                 input: Fragment | ProjectionBundle<Fragment>,
-                options?: RenderMarkdownOptions
+                options?: RenderMarkdownOptions,
               ) => string | Record<string, string>
             >();
 
             expectTypeOf<typeof renderCompactText>().toEqualTypeOf<
               (
                 input: Fragment | ProjectionBundle<Fragment>,
-                options?: RenderCompactOptions
+                options?: RenderCompactOptions,
               ) => string
             >();
 
             expectTypeOf<typeof renderJson>().toEqualTypeOf<{
               (
                 input: Fragment | ProjectionBundle<Fragment>,
-                options: RenderJsonOptions & { pretty: true }
+                options: RenderJsonOptions & { pretty: true },
               ): string;
               (
                 input: Fragment | ProjectionBundle<Fragment>,
-                options?: RenderJsonOptions & { pretty?: false | undefined }
+                options?: RenderJsonOptions & { pretty?: false | undefined },
               ): object;
             }>();
 
@@ -311,7 +311,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Then('the renderer contract assertions should compile', () => {
             expect(state!.contractAssertionsRan).toBe(true);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -323,11 +323,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               children: {
                 'projection-bundle-contract': createPatternSummary(
                   'ProjectionBundleContract',
-                  'completed'
+                  'completed',
                 ),
                 'progressive-disclosure-doc': createPatternSummary(
                   'ProgressiveDisclosureDoc',
-                  'planned'
+                  'planned',
                 ),
               },
               routing: createRouting(),
@@ -352,9 +352,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const paths = Object.keys(state!.markdownRecord);
             expect(new Set(paths).size).toBe(paths.length);
           });
-        }
+        },
       );
-    }
+    },
   );
 
   Rule(
@@ -367,9 +367,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             state!.documentation = await readFile(
               new URL(
                 '../../../tests/fixtures/renderers/progressive-disclosure.md',
-                import.meta.url
+                import.meta.url,
               ),
-              'utf8'
+              'utf8',
             );
           });
 
@@ -382,16 +382,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'the document should name the retained public delivery-reporting projection entrypoints',
             () => {
               expect(state!.documentation).toContain('explicit public projection entrypoints');
-            }
+            },
           );
 
           And(
             'the document should keep roadmap generation inside documentation composition',
             () => {
               expect(state!.documentation).toContain("documentType: 'roadmap'");
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -401,9 +401,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             state!.documentation = await readFile(
               new URL(
                 '../../../tests/fixtures/renderers/progressive-disclosure.md',
-                import.meta.url
+                import.meta.url,
               ),
-              'utf8'
+              'utf8',
             );
           });
 
@@ -413,7 +413,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
           Then('the document should mark oversized splitting as markdown-only', () => {
             expect(state!.documentation).toContain(
-              'Oversized-document splitting stays a Markdown concern.'
+              'Oversized-document splitting stays a Markdown concern.',
             );
           });
 
@@ -423,16 +423,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(state!.documentation).toContain('Compact text does not split.');
               expect(state!.documentation).toContain('JSON does not split.');
               expect(state!.documentation).toContain('UI does not split.');
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario('Additional files flatten only for markdown', ({ Given, When, Then, And }) => {
         Given('the progressive disclosure contract document', async () => {
           state!.documentation = await readFile(
             new URL('../../../tests/fixtures/renderers/progressive-disclosure.md', import.meta.url),
-            'utf8'
+            'utf8',
           );
         });
 
@@ -449,7 +449,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(state!.documentation).toContain('UI keeps the structured');
         });
       });
-    }
+    },
   );
 });
 

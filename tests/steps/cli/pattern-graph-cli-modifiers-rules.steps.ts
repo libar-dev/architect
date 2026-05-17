@@ -96,7 +96,7 @@ function expectOrderedSubstrings(haystack: string, needles: readonly string[]): 
     const index = haystack.indexOf(needle);
     expect(index, `Expected stdout to contain ${needle}`).toBeGreaterThanOrEqual(0);
     expect(index, `Expected ${needle} to appear after the previous serialized key`).toBeGreaterThan(
-      lastIndex
+      lastIndex,
     );
     lastIndex = index;
   }
@@ -157,7 +157,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const parsed = JSON.parse(result.stdout) as unknown;
           expect(typeof parsed).toBe('number');
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -183,7 +183,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(arr.length).toBeGreaterThan(0);
           expect(typeof arr[0]).toBe('string');
         });
-      }
+      },
     );
 
     RuleScenario('Count modifier combined with list filter', ({ Given, When, Then, And }) => {
@@ -229,7 +229,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('the list names-only result equals {string}', (_ctx: unknown, names: string) => {
           expect(parseStdoutArray()).toEqual(names.split(',').map((name) => name.trim()));
         });
-      }
+      },
     );
 
     RuleScenario('Parent filter with count returns child count', ({ Given, When, Then, And }) => {
@@ -273,7 +273,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('stdout is an empty JSON string array', () => {
           expect(parseStdoutArray()).toEqual([]);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -297,9 +297,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const root = parseProjectionRoot();
             const items = root['items'] as Array<{ pattern: string }>;
             expect(items.map((item) => item.pattern)).toEqual(
-              names.split(',').map((name) => name.trim())
+              names.split(',').map((name) => name.trim()),
             );
-          }
+          },
         );
 
         And('every open question result entry has at least one question', () => {
@@ -308,7 +308,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(items.length).toBeGreaterThan(0);
           expect(items.every((item) => item.questions.length > 0)).toBe(true);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -331,7 +331,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(root['count']).toBe(0);
           expect(root['items']).toEqual([]);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -350,7 +350,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const combined = getResult(state).stdout + getResult(state).stderr;
           expect(combined).toContain(text);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -374,7 +374,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
         And('the bundle result contains children {string}', (_ctx: unknown, names: string) => {
           expect(Object.keys(parseBundleStdout().children)).toEqual(
-            names.split(',').map((name) => name.trim())
+            names.split(',').map((name) => name.trim()),
           );
         });
 
@@ -394,7 +394,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 expect(blocks).toHaveProperty(blockKey);
               }
             }
-          }
+          },
         );
 
         And('the bundle result preserves the ChildAlpha dependency on ChildBeta', () => {
@@ -405,7 +405,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const deps = childAlpha['blocks'] as { deps?: { uses?: string[] } };
           expect(deps.deps?.uses).toContain('ChildBeta');
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -446,7 +446,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 expect(blocks).toHaveProperty(blockKey);
               }
             }
-          }
+          },
         );
 
         And(
@@ -463,9 +463,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 expect(blockEstimate.estimate.method).toBe(method);
               }
             }
-          }
+          },
         );
-      }
+      },
     );
 
     RuleScenario('Bundle unknown root pattern fails deterministically', ({ Given, When, Then }) => {
@@ -517,7 +517,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(blocks).toHaveProperty(blockKey);
             }
           }
-        }
+        },
       );
     });
 
@@ -589,7 +589,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const arr = parsed.data;
           expect(arr.length).toBeGreaterThan(0);
           expect(arr[0]).toHaveProperty(field);
-        }
+        },
       );
     });
 
@@ -604,7 +604,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           await writeTempFile(
             getTempDir(state),
             'dangling-baseline.json',
-            createBaselineContent([CURRENT_DANGLING_BASELINE_ENTRY])
+            createBaselineContent([CURRENT_DANGLING_BASELINE_ENTRY]),
           );
         });
 
@@ -624,7 +624,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(parsed.data['addedCount']).toBe(0);
           expect(parsed.data['removedCount']).toBe(0);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -638,7 +638,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           await writeTempFile(
             getTempDir(state),
             'dangling-baseline.json',
-            createBaselineContent([REMOVED_DANGLING_BASELINE_ENTRY])
+            createBaselineContent([REMOVED_DANGLING_BASELINE_ENTRY]),
           );
         });
 
@@ -666,7 +666,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(parsed.data.added[0]).toEqual(CURRENT_DANGLING_BASELINE_ENTRY);
           expect(parsed.data.removed[0]).toEqual(REMOVED_DANGLING_BASELINE_ENTRY);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -689,7 +689,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const content = await readFile(baselinePath, 'utf8');
           expect(content).toBe(createBaselineContent([CURRENT_DANGLING_BASELINE_ENTRY]));
         });
-      }
+      },
     );
 
     RuleScenario('Arch orphans returns isolated patterns', ({ Given, When, Then, And }) => {
@@ -719,7 +719,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const arr = parsed.data;
           expect(arr.length).toBeGreaterThan(0);
           expect(arr[0]).toHaveProperty(field);
-        }
+        },
       );
     });
 
@@ -750,7 +750,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const arr = parsed.data;
           expect(arr.length).toBeGreaterThan(0);
           expect(arr[0]).toHaveProperty(field);
-        }
+        },
       );
 
       And(
@@ -761,7 +761,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const arr = parsed.data;
           expect(arr.length).toBeGreaterThan(0);
           expect(arr[0]).toHaveProperty(field);
-        }
+        },
       );
     });
   });
@@ -793,7 +793,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('stdout contains {string}', (_ctx: unknown, text: string) => {
           expect(getResult(state).stdout).toContain(text);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -872,7 +872,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
           expect(result.success, result.success ? '' : z.prettifyError(result.error)).toBe(true);
         });
-      }
+      },
     );
 
     RuleScenario('Rules filters by product area', ({ Given, When, Then, And }) => {
@@ -995,7 +995,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('stdout contains {string}', (_ctx: unknown, text: string) => {
           expect(getResult(state).stdout).toContain(text);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -1020,7 +1020,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('stdout contains {string}', (_ctx: unknown, text: string) => {
           expect(getResult(state).stdout).toContain(text);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -1045,7 +1045,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('stdout contains {string}', (_ctx: unknown, text: string) => {
           expect(getResult(state).stdout).toContain(text);
         });
-      }
+      },
     );
 
     RuleScenario('Rules filters by canonical package name', ({ Given, When, Then, And }) => {
@@ -1159,7 +1159,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(Array.isArray(parsed)).toBe(true);
           expect(parsed).toHaveLength(count);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -1190,7 +1190,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const parsed = JSON.parse(getResult(state).stdout) as unknown;
           expect(parsed).toBe(count);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -1222,7 +1222,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(Array.isArray(parsed)).toBe(true);
           expect(parsed).toHaveLength(count);
         });
-      }
+      },
     );
 
     RuleScenario('Rules rejects retired phase filter', ({ Given, When, Then, And }) => {
@@ -1271,7 +1271,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const combined = getResult(state).stdout + getResult(state).stderr;
           expect(combined).toContain(text);
         });
-      }
+      },
     );
   });
 });

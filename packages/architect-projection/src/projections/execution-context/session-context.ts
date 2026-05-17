@@ -47,7 +47,7 @@ export type { SessionContextOptions } from './session-context.internal.js';
 
 export function projectSessionContextBundle(
   context: ProjectionContext,
-  options: SessionContextOptions
+  options: SessionContextOptions,
 ): ProjectionBundle<SessionContextBundle> {
   return projectSingle(buildSessionContextBundle(context, options));
 }
@@ -55,5 +55,5 @@ export function projectSessionContextBundle(
 export const parseAndProjectSessionContext = parseAndProject(
   SessionContextOptionsSchema,
   projectSessionContextBundle,
-  'parseAndProjectSessionContext'
+  'parseAndProjectSessionContext',
 );

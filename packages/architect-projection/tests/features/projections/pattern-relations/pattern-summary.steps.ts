@@ -20,7 +20,7 @@ interface PatternSummaryState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/pattern-relations/pattern-summary.feature'
+  'tests/features/projections/pattern-relations/pattern-summary.feature',
 );
 
 let state: PatternSummaryState | null = null;
@@ -236,7 +236,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             phase,
             role,
           }).root;
-        }
+        },
       );
 
       Then('the projected catalog should resolve the canonical role filter', () => {
@@ -289,7 +289,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('the projected catalog should omit item details', () => {
           expect(state!.catalog?.items).toEqual([]);
         });
-      }
+      },
     );
   });
 });

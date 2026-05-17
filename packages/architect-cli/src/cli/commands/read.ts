@@ -92,9 +92,9 @@ function mergeProjectionFilter(filters: readonly ProjectionFilter[]): Projection
           ? { status: [...(merged.status ?? []), ...(next.status ?? [])] }
           : {}),
       }),
-      {}
+      {},
     ),
-    '--filter'
+    '--filter',
   );
 }
 
@@ -109,7 +109,7 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
       const pattern = requireFirstPositional(
         context,
         parsed.positional,
-        'Usage: architect pattern <name>'
+        'Usage: architect pattern <name>',
       );
       if (pattern === undefined) {
         return;
@@ -150,7 +150,7 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
       const documentType = requireFirstPositional(
         context,
         parsed.positional,
-        'Usage: architect documentation <document-type> [--disclosure <level>] [--filter <status=csv>]...'
+        'Usage: architect documentation <document-type> [--disclosure <level>] [--filter <status=csv>]...',
       );
       if (documentType === undefined) {
         return;
@@ -171,8 +171,8 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
           {
             documentType,
             ...(flags.disclosure !== undefined ? { disclosureLevel: flags.disclosure } : {}),
-          }
-        )
+          },
+        ),
       );
     },
   },
@@ -217,7 +217,7 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
       const pattern = requireFirstPositional(
         context,
         parsed.positional,
-        'Usage: architect bundle <pattern> [--mode <plan|design|implement|review>] [--include <block[,block...]>] [--estimate-tokens]'
+        'Usage: architect bundle <pattern> [--mode <plan|design|implement|review>] [--include <block[,block...]>] [--estimate-tokens]',
       );
       if (pattern === undefined) {
         return;
@@ -244,7 +244,7 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
             ? { include: flags.include }
             : {}),
           estimateTokens: flags.estimateTokens === true,
-        })
+        }),
       );
     },
   },
@@ -331,7 +331,7 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
         flags.format === undefined ? context.args : { ...context.args, format: flags.format },
         projectOpenQuestionList(requireCliContext(context).projection, {
           ...(flags.parent !== undefined ? { parent: flags.parent } : {}),
-        })
+        }),
       );
     },
   },
@@ -345,7 +345,7 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
       const query = requireFirstPositional(
         context,
         parsed.positional,
-        'Usage: architect search <query>'
+        'Usage: architect search <query>',
       );
       if (query === undefined) {
         return;
@@ -384,7 +384,7 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
         requireCliContext(context),
         'arch',
         parsed.positional,
-        parsed.flags
+        parsed.flags,
       );
     },
   },

@@ -37,7 +37,7 @@ export type ProjectConfigOptions = z.infer<typeof ProjectConfigOptionsSchema>;
 
 export function buildProjectConfigSnapshot(
   context: ProjectionContext,
-  options: ProjectConfigOptions
+  options: ProjectConfigOptions,
 ): ProjectConfigSnapshot {
   return {
     kind: 'ProjectConfigSnapshot',
@@ -47,7 +47,7 @@ export function buildProjectConfigSnapshot(
       ...options.sourceGlobs.input,
       ...options.sourceGlobs.features,
       ...(options.sourceGlobs.exclude ?? []).map((entry) =>
-        entry.trim().startsWith('!') ? entry : `!${entry}`
+        entry.trim().startsWith('!') ? entry : `!${entry}`,
       ),
     ]),
     buildTimeMs: options.buildTimeMs,
@@ -62,7 +62,7 @@ export function buildProjectConfigSnapshot(
 
 function resolveProjectName(
   context: ProjectionContext,
-  explicitProjectName: string | undefined
+  explicitProjectName: string | undefined,
 ): string | undefined {
   if (hasText(explicitProjectName)) {
     return explicitProjectName.trim();

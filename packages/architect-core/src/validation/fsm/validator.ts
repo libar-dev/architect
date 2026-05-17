@@ -59,7 +59,7 @@ export interface FSMValidationOptions {
 
 export function validateStatus(
   status: string,
-  options?: FSMValidationOptions
+  options?: FSMValidationOptions,
 ): StatusValidationResult {
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
 
@@ -74,7 +74,7 @@ export function validateStatus(
   const warnings: string[] = [];
   if (isTerminalState(status)) {
     warnings.push(
-      `Status 'completed' is a terminal state. Use ${tagPrefix}unlock-reason to modify.`
+      `Status 'completed' is a terminal state. Use ${tagPrefix}unlock-reason to modify.`,
     );
   }
 
@@ -120,7 +120,7 @@ export function validateTransition(from: string, to: string): TransitionValidati
 
 export function validateCompletionMetadata(
   pattern: PatternMetadata,
-  options?: FSMValidationOptions
+  options?: FSMValidationOptions,
 ): CompletionMetadataValidationResult {
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
   const warnings: string[] = [];
@@ -136,7 +136,7 @@ export function validateCompletionMetadata(
   if (pattern.effortPlanned && !pattern.effortActual) {
     warnings.push(
       `Pattern has ${tagPrefix}effort but missing ${tagPrefix}effort-actual. ` +
-        'Consider adding actual effort for tracking.'
+        'Consider adding actual effort for tracking.',
     );
   }
 
@@ -145,7 +145,7 @@ export function validateCompletionMetadata(
 
 export function validatePatternStatus(
   pattern: PatternMetadata,
-  options?: FSMValidationOptions
+  options?: FSMValidationOptions,
 ): {
   valid: boolean;
   statusResult: StatusValidationResult;
@@ -166,7 +166,7 @@ export function validatePatternStatus(
 
 export function getProtectionSummary(
   status: ProcessStatusValue,
-  options?: FSMValidationOptions
+  options?: FSMValidationOptions,
 ): {
   level: ProtectionLevel;
   description: string;

@@ -142,7 +142,7 @@ report with elaborate restating.
 - **Reading source files via Read/Glob/Grep before the CLI bootstrap.** The
   Data API is faster, more accurate, and more compact than file scanning. Use
   `pnpm architect:query files <pattern>` and `pnpm architect:query dep-tree
-  <pattern>` first.
+<pattern>` first.
 
 ## Do not
 

@@ -47,7 +47,7 @@ export type { HandoffOptions } from './handoff.internal.js';
 
 export function projectHandoffRecord(
   context: ProjectionContext,
-  options: HandoffOptions
+  options: HandoffOptions,
 ): ProjectionBundle<HandoffRecord> {
   return projectSingle(buildHandoffRecord(context, options));
 }
@@ -55,5 +55,5 @@ export function projectHandoffRecord(
 export const parseAndProjectHandoffRecord = parseAndProject(
   HandoffOptionsSchema,
   projectHandoffRecord,
-  'parseAndProjectHandoffRecord'
+  'parseAndProjectHandoffRecord',
 );

@@ -167,7 +167,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a raw config with output directory {string} and overwrite true',
         (_ctx: unknown, directory: string) => {
           state!.rawConfig = { output: { directory, overwrite: true } };
-        }
+        },
       );
       When('resolving the project config', () => {
         state!.resolvedConfig = resolveProjectConfig(state!.rawConfig!, {
@@ -219,7 +219,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
       And('the default rules should follow after the user rule', () => {
         expect(requireResolvedConfig().project.contextInferenceRules.slice(1)).toEqual(
-          DEFAULT_CONTEXT_INFERENCE_RULES
+          DEFAULT_CONTEXT_INFERENCE_RULES,
         );
       });
     });
@@ -234,7 +234,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'resolving the project config with configPath {string}',
         (_ctx: unknown, configPath: string) => {
           state!.resolvedConfig = resolveProjectConfig(state!.rawConfig!, { configPath });
-        }
+        },
       );
       Then('the resolved configPath should be {string}', (_ctx: unknown, configPath: string) => {
         expect(requireResolvedConfig().configPath).toBe(configPath);

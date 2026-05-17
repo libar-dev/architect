@@ -55,7 +55,7 @@ export function buildValidationRuleDigest(): ValidationRuleDigest {
     fsm: {
       initialState: 'roadmap',
       terminalStates: PROCESS_STATUS_VALUES.filter(
-        (status) => VALID_TRANSITIONS[status].length === 0
+        (status) => VALID_TRANSITIONS[status].length === 0,
       ),
       states: [...PROCESS_STATUS_VALUES],
       transitions: PROCESS_STATUS_VALUES.flatMap((from) =>
@@ -63,12 +63,12 @@ export function buildValidationRuleDigest(): ValidationRuleDigest {
           from,
           to,
           description: describeTransition(from, to),
-        }))
+        })),
       ),
     },
     protectionLevels: PROTECTION_LEVEL_ORDER.map((level) => {
       const statuses = PROCESS_STATUS_VALUES.filter(
-        (status) => PROTECTION_LEVELS[status] === level
+        (status) => PROTECTION_LEVELS[status] === level,
       );
       return {
         level,

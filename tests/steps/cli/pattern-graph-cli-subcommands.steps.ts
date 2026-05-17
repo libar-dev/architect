@@ -318,7 +318,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('stdout contains {string}', (_ctx: unknown, text: string) => {
           expect(getResult(state).stdout).toContain(text);
         });
-      }
+      },
     );
   });
 
@@ -385,7 +385,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         const stdout = getResult(state).stdout.trim();
         expect(stdout.split('\n')).toHaveLength(1);
         expect(stdout).toMatch(
-          /^\d+ roles \| \d+ metadata tags \| \d+ aggregation tags \| \d+ total$/u
+          /^\d+ roles \| \d+ metadata tags \| \d+ aggregation tags \| \d+ total$/u,
         );
       });
     });
@@ -458,7 +458,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('stdout contains {string}', (_ctx: unknown, text: string) => {
           expect(getResult(state).stdout).toContain(text);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -480,7 +480,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const result = getResult(state);
           expect(() => JSON.parse(result.stdout) as unknown).not.toThrow();
         });
-      }
+      },
     );
 
     RuleScenario('Arch coverage returns annotation coverage', ({ Given, When, Then, And }) => {
@@ -526,7 +526,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('stdout contains {string}', (_ctx: unknown, text: string) => {
           expect(getResult(state).stdout).toContain(text);
         });
-      }
+      },
     );
   });
 });

@@ -16,7 +16,7 @@ export function assertHasValue(value: string | undefined, label: string): assert
   }
   if (value.startsWith('-')) {
     throw new Error(
-      `${label} requires a value, but received another flag (${value}). Use -- to pass values that start with "-".`
+      `${label} requires a value, but received another flag (${value}). Use -- to pass values that start with "-".`,
     );
   }
   assertNoNullBytes(value, `${label} value`);

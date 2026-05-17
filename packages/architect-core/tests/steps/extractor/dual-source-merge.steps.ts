@@ -34,7 +34,7 @@ function initState(): DualSourceMergeState {
 function createCodePattern(
   patternName: string,
   phase: number,
-  status: 'candidate' | 'roadmap' | 'active' | 'completed' | 'deferred' = 'roadmap'
+  status: 'candidate' | 'roadmap' | 'active' | 'completed' | 'deferred' = 'roadmap',
 ): ExtractedPattern {
   patternCounter += 1;
   return {
@@ -60,7 +60,7 @@ function createCodePattern(
 function createFeatureFile(
   patternName: string,
   phase: number,
-  options: { status?: string; deliverable?: string } = {}
+  options: { status?: string; deliverable?: string } = {},
 ): ScannedGherkinFile {
   const headers = ['Deliverable', 'Status', 'Tests', 'Location'];
   const rows =
@@ -155,9 +155,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             (_ctx: unknown, count: number) => {
               expect(state!.summary!.warnings).toHaveLength(count);
               expect(state!.summary!.warnings[0]).toContain('has code stub but no feature file');
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -167,7 +167,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a spec-only roadmap feature for pattern {string} in phase {int}',
             (_ctx: unknown, name: string, phase: number) => {
               state!.featureFiles = [createFeatureFile(name, phase)];
-            }
+            },
           );
 
           When('I combine and validate the dual-source inputs', () => {
@@ -187,7 +187,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(state!.summary!.warnings).toHaveLength(count);
             expect(state!.summary!.warnings[0]).toContain('has no code stub');
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -197,14 +197,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a code pattern {string} in phase {int}',
             (_ctx: unknown, name: string, phase: number) => {
               state!.codePatterns = [createCodePattern(name, phase)];
-            }
+            },
           );
 
           And(
             'a feature file for pattern {string} in phase {int} with deliverable {string}',
             (_ctx: unknown, name: string, phase: number, deliverable: string) => {
               state!.featureFiles = [createFeatureFile(name, phase, { deliverable })];
-            }
+            },
           );
 
           When('I combine and validate the dual-source inputs', () => {
@@ -220,21 +220,21 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'combined pattern {string} has process phase {int}',
             (_ctx: unknown, name: string, phase: number) => {
               expect(getCombinedPattern(name).process?.phase).toBe(phase);
-            }
+            },
           );
 
           And(
             'combined pattern {string} has {int} deliverable',
             (_ctx: unknown, name: string, count: number) => {
               expect(getCombinedPattern(name).deliverables).toHaveLength(count);
-            }
+            },
           );
 
           And('validation passes without errors', () => {
             expect(state!.summary!.isValid).toBe(true);
             expect(state!.summary!.errors).toHaveLength(0);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -244,14 +244,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a code pattern {string} in phase {int}',
             (_ctx: unknown, name: string, phase: number) => {
               state!.codePatterns = [createCodePattern(name, phase)];
-            }
+            },
           );
 
           And(
             'a feature file for pattern {string} in phase {int}',
             (_ctx: unknown, name: string, phase: number) => {
               state!.featureFiles = [createFeatureFile(name, phase)];
-            }
+            },
           );
 
           When('I combine and validate the dual-source inputs', () => {
@@ -272,8 +272,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(state!.summary!.isValid).toBe(false);
             expect(state!.summary!.errors).toHaveLength(count);
           });
-        }
+        },
       );
-    }
+    },
   );
 });

@@ -17,6 +17,7 @@ A focused design-session input set for the next time we pick up documentation ge
 **Blocking decisions:** none — design space is well-understood, the user has approved restoring the dropped capability and intends to extend rather than clone the pre-refactor design.
 
 **Prerequisites in flight (not blocking this work but should land first):**
+
 - Core package extraction finalization (W1.5.x hardening backlog)
 - Skills consolidation (W9)
 

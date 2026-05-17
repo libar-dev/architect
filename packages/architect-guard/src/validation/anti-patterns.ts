@@ -102,7 +102,7 @@ export interface AntiPatternDetectionOptions extends WithTagRegistry {
  */
 export function detectProcessInCode(
   scannedFiles: readonly ScannedFile[],
-  registry?: TagRegistry
+  registry?: TagRegistry,
 ): AntiPatternViolation[] {
   const violations: AntiPatternViolation[] = [];
   const tagPrefix = registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
@@ -147,7 +147,7 @@ export function detectProcessInCode(
  */
 export function detectRemovedTags(
   features: readonly ScannedGherkinFile[],
-  registry?: TagRegistry
+  registry?: TagRegistry,
 ): AntiPatternViolation[] {
   const violations: AntiPatternViolation[] = [];
   const tagPrefix = registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
@@ -203,7 +203,7 @@ export function detectRemovedTags(
  */
 export function detectMagicComments(
   features: readonly ScannedGherkinFile[],
-  threshold: number = DEFAULT_THRESHOLDS.magicCommentThreshold
+  threshold: number = DEFAULT_THRESHOLDS.magicCommentThreshold,
 ): AntiPatternViolation[] {
   const violations: AntiPatternViolation[] = [];
 
@@ -254,7 +254,7 @@ export function detectMagicComments(
  */
 export function detectScenarioBloat(
   features: readonly ScannedGherkinFile[],
-  threshold: number = DEFAULT_THRESHOLDS.scenarioBloatThreshold
+  threshold: number = DEFAULT_THRESHOLDS.scenarioBloatThreshold,
 ): AntiPatternViolation[] {
   const violations: AntiPatternViolation[] = [];
 
@@ -286,7 +286,7 @@ export function detectScenarioBloat(
  */
 export function detectMegaFeature(
   features: readonly ScannedGherkinFile[],
-  threshold: number = DEFAULT_THRESHOLDS.megaFeatureLineThreshold
+  threshold: number = DEFAULT_THRESHOLDS.megaFeatureLineThreshold,
 ): AntiPatternViolation[] {
   const violations: AntiPatternViolation[] = [];
 
@@ -340,7 +340,7 @@ export function detectMegaFeature(
 export function detectAntiPatterns(
   scannedFiles: readonly ScannedFile[],
   features: readonly ScannedGherkinFile[],
-  options: AntiPatternDetectionOptions = {}
+  options: AntiPatternDetectionOptions = {},
 ): AntiPatternViolation[] {
   const { registry, thresholds = {} } = options;
   const mergedThresholds: AntiPatternThresholds = {
@@ -382,7 +382,7 @@ export function formatAntiPatternReport(violations: AntiPatternViolation[]): str
   const warnings = violations.filter((v) => v.severity === 'warning');
 
   lines.push(
-    `Total: ${String(violations.length)} (${String(errors.length)} errors, ${String(warnings.length)} warnings)`
+    `Total: ${String(violations.length)} (${String(errors.length)} errors, ${String(warnings.length)} warnings)`,
   );
   lines.push('');
 

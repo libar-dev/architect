@@ -16,7 +16,7 @@ interface SmokeState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/operational-insights/smoke-overview.feature'
+  'tests/features/projections/operational-insights/smoke-overview.feature',
 );
 
 let state: SmokeState | null = null;
@@ -61,7 +61,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 ],
                 phaseNames: { 1: 'Foundation', 2: 'Extension' },
               });
-            }
+            },
           );
 
           When('I project the overview digest', () => {
@@ -78,8 +78,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(state!.bundle!.root.progress.active).toBe(1);
             expect(state!.bundle!.root.progress.planned).toBe(1);
           });
-        }
+        },
       );
-    }
+    },
   );
 });

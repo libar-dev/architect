@@ -262,7 +262,7 @@ export function hasTag(tag: string): boolean {
  * Build content with multiple directives in same file.
  */
 export function buildContentWithMultipleDirectives(
-  items: Array<{ category: string; name: string; description: string }>
+  items: Array<{ category: string; name: string; description: string }>,
 ): string {
   return items
     .map(
@@ -272,7 +272,7 @@ export function buildContentWithMultipleDirectives(
  */
 export function ${item.name}() {
   return '${item.name}';
-}`
+}`,
     )
     .join('\n\n');
 }
@@ -516,7 +516,7 @@ import type { ScannerScenarioState } from '../support/world.js';
  * Used by step definitions to initialize module-level state.
  */
 export function createScannerState(
-  overrides: Partial<ScannerScenarioState> = {}
+  overrides: Partial<ScannerScenarioState> = {},
 ): ScannerScenarioState {
   return {
     tempDir: null,

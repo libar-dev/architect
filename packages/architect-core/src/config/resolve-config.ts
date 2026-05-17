@@ -12,7 +12,7 @@ import { createArchitect, type CreateArchitectOptions } from './factory.js';
 
 export function resolveProjectConfig(
   raw: ArchitectProjectConfig,
-  options: { readonly configPath: string }
+  options: { readonly configPath: string },
 ): ResolvedConfig {
   const instanceOptions: CreateArchitectOptions = {};
   if (raw.tagPrefix !== undefined) instanceOptions.tagPrefix = raw.tagPrefix;

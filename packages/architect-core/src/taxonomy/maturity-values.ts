@@ -14,7 +14,7 @@ export const DEFAULT_MATURITY_BY_STATUS: Readonly<Record<AcceptedStatusValue, Ma
 
 export function inferMaturity(
   status: AcceptedStatusValue,
-  explicitMaturity?: string
+  explicitMaturity?: string,
 ): MaturityLevel {
   if (
     explicitMaturity !== undefined &&

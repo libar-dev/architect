@@ -23,7 +23,7 @@ interface PatternDetailState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/pattern-relations/pattern-detail.feature'
+  'tests/features/projections/pattern-relations/pattern-detail.feature',
 );
 
 let state: PatternDetailState | null = null;
@@ -165,12 +165,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               },
             ],
           });
-        }
+        },
       );
 
       And('the renderer outputs should stay non-empty and type-valid', () => {
         expect(typeof state!.markdown === 'string' || typeof state!.markdown === 'object').toBe(
-          true
+          true,
         );
         expect(state!.compact.length).toBeGreaterThan(0);
         expect(state!.json).toBeTruthy();
@@ -216,7 +216,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             apiRef: ['architect_pattern'],
           });
         });
-      }
+      },
     );
 
     RuleScenario('detail projection keeps empty arrays explicit', ({ Given, When, Then }) => {
@@ -299,7 +299,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'What is the durable rollout signal?',
           ]);
         });
-      }
+      },
     );
   });
 });

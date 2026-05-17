@@ -28,7 +28,7 @@
  * ### When to Use
  *
  * - Projects a normalized ProjectConfigSnapshot bundle from config input and
-*   graph metadata.
+ *   graph metadata.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -47,7 +47,7 @@ export { SourceGlobGroupsSchema } from './project-config.internal.js';
 
 export function projectConfig(
   context: ProjectionContext,
-  options: ProjectConfigOptions
+  options: ProjectConfigOptions,
 ): ProjectionBundle<ProjectConfigSnapshot> {
   return projectSingle(buildProjectConfigSnapshot(context, options));
 }
@@ -55,7 +55,7 @@ export function projectConfig(
 export const parseAndProjectConfig = parseAndProject(
   ProjectConfigOptionsSchema,
   projectConfig,
-  'parseAndProjectConfig'
+  'parseAndProjectConfig',
 );
 
 export type { ProjectConfigOptions } from './project-config.internal.js';

@@ -62,7 +62,7 @@ export async function runCli(invocation: string): Promise<CliResult> {
           exitCode = typeof error.code === 'number' ? error.code : 1;
         }
         resolve({ exitCode, stdout, stderr });
-      }
+      },
     );
   });
 }

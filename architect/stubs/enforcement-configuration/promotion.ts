@@ -46,7 +46,7 @@ import type { AcceptedStatusValue } from '../../src/taxonomy/status-values.js';
  */
 export declare function isValidPromotion(
   from: AcceptedStatusValue,
-  to: AcceptedStatusValue
+  to: AcceptedStatusValue,
 ): boolean;
 
 /**

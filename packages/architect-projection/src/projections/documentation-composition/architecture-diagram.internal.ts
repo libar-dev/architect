@@ -60,13 +60,13 @@ export type ProjectArchitectureDiagramOptions = z.infer<
 
 export function buildArchitectureDiagram(
   context: ProjectionContext,
-  options: ProjectArchitectureDiagramOptions
+  options: ProjectArchitectureDiagramOptions,
 ): ArchitectureDiagram {
   const scope = options.scope;
   if ((scope === 'bounded-context' || scope === 'product-area') && !hasText(options.scopeValue)) {
     throw new ProjectionError(
       'MISSING_SCOPE_VALUE',
-      `Architecture scope "${scope}" requires a scopeValue.`
+      `Architecture scope "${scope}" requires a scopeValue.`,
     );
   }
 
@@ -83,7 +83,7 @@ export function buildArchitectureDiagram(
     scope,
     ...(hasText(options.scopeValue) ? { scopeValue: options.scopeValue.trim() } : {}),
     diagram: mermaid(
-      buildArchitectureMermaid(nodes, collectArchitectureEdges(context, nodes), resolvedOptions)
+      buildArchitectureMermaid(nodes, collectArchitectureEdges(context, nodes), resolvedOptions),
     ),
     legend: [
       heading(3, 'Legend'),
@@ -100,7 +100,7 @@ export function buildArchitectureDiagram(
 
 function collectArchitectureNodes(
   context: ProjectionContext,
-  options: ProjectArchitectureDiagramOptions
+  options: ProjectArchitectureDiagramOptions,
 ): NodeShape[] {
   const filteredPatterns = filterPatterns(context.graph.patterns, context.projectionFilter);
   const scopedPatterns = filterPatternsForArchitecture(filteredPatterns, options);
@@ -110,7 +110,7 @@ function collectArchitectureNodes(
       ? filterArchitecturallyInterestingPatterns(withFallback)
       : withFallback;
   const patterns = [...(selectedPatterns.length > 0 ? selectedPatterns : withFallback)].sort(
-    (left, right) => getPatternName(left).localeCompare(getPatternName(right))
+    (left, right) => getPatternName(left).localeCompare(getPatternName(right)),
   );
 
   const seenNodeIds = new Set<string>();
@@ -133,14 +133,14 @@ function collectArchitectureNodes(
 }
 
 function filterArchitecturallyInterestingPatterns(
-  patterns: readonly ExtractedPattern[]
+  patterns: readonly ExtractedPattern[],
 ): readonly ExtractedPattern[] {
   const filtered = patterns.filter(
     (pattern) =>
       hasText(pattern.role) ||
       hasText(pattern.boundedContext) ||
       hasText(pattern.adrLayer) ||
-      hasText(pattern.productArea)
+      hasText(pattern.productArea),
   );
 
   return filtered.length > 0 ? filtered : patterns;
@@ -148,7 +148,7 @@ function filterArchitecturallyInterestingPatterns(
 
 function filterPatternsForArchitecture(
   patterns: readonly ExtractedPattern[],
-  options: ProjectArchitectureDiagramOptions
+  options: ProjectArchitectureDiagramOptions,
 ): readonly ExtractedPattern[] {
   const scopeValue = hasText(options.scopeValue)
     ? options.scopeValue.trim().toLowerCase()
@@ -163,13 +163,13 @@ function filterPatternsForArchitecture(
       return patterns.filter(
         (pattern) =>
           hasText(pattern.boundedContext) &&
-          (scopeValue === undefined || pattern.boundedContext.trim().toLowerCase() === scopeValue)
+          (scopeValue === undefined || pattern.boundedContext.trim().toLowerCase() === scopeValue),
       );
     case 'product-area':
       return patterns.filter(
         (pattern) =>
           hasText(pattern.productArea) &&
-          (scopeValue === undefined || pattern.productArea.trim().toLowerCase() === scopeValue)
+          (scopeValue === undefined || pattern.productArea.trim().toLowerCase() === scopeValue),
       );
   }
 }
@@ -192,7 +192,7 @@ function ensureUniqueNodeId(seenNodeIds: Set<string>, baseId: string): string {
 
 function collectArchitectureEdges(
   context: ProjectionContext,
-  nodes: readonly NodeShape[]
+  nodes: readonly NodeShape[],
 ): EdgeShape[] {
   const nodeIdByName = new Map(nodes.map((node) => [node.name, node.nodeId] as const));
   const edgeMap = new Map<string, EdgeShape>();
@@ -213,7 +213,7 @@ function collectArchitectureEdges(
     (left, right) =>
       left.from.localeCompare(right.from) ||
       left.to.localeCompare(right.to) ||
-      left.label.localeCompare(right.label)
+      left.label.localeCompare(right.label),
   );
 }
 
@@ -223,7 +223,7 @@ function appendEdges(
   fromName: string,
   targets: readonly string[],
   label: string,
-  operator: EdgeShape['operator']
+  operator: EdgeShape['operator'],
 ): void {
   const from = nodeIdByName.get(fromName);
   if (from === undefined) {
@@ -246,7 +246,7 @@ function appendEdges(
 function buildArchitectureMermaid(
   nodes: readonly NodeShape[],
   edges: readonly EdgeShape[],
-  options: ProjectArchitectureDiagramOptions
+  options: ProjectArchitectureDiagramOptions,
 ): string {
   if (nodes.length === 0) {
     return [
@@ -288,7 +288,7 @@ function buildArchitectureMermaid(
 
 function groupNodesForScope(
   nodes: readonly NodeShape[],
-  scope: ArchitectureDiagramScope
+  scope: ArchitectureDiagramScope,
 ): (readonly [string, NodeShape[]])[] {
   const grouped = new Map<string, NodeShape[]>();
 
@@ -304,7 +304,7 @@ function groupNodesForScope(
       [
         groupName,
         [...groupNodes].sort((left, right) => left.name.localeCompare(right.name)),
-      ] as const
+      ] as const,
   );
 }
 

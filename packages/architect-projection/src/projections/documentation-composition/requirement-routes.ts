@@ -20,14 +20,14 @@ const REQUIREMENT_DOCUMENT_TYPES = {
 
 export function createRequirementDetailRouteId(
   bucket: RequirementDocumentationBucket,
-  patternName: string
+  patternName: string,
 ): LogicalRouteId {
   return createEntityRouteId(getRequirementDocumentType(bucket), slugForRouteSegment(patternName));
 }
 
 export function createRequirementPackageIndexRouteId(
   bucket: RequirementDocumentationBucket,
-  packageId: string
+  packageId: string,
 ): LogicalRouteId {
   return createEntityRouteId(getRequirementDocumentType(bucket), slugForRouteSegment(packageId));
 }
@@ -35,26 +35,26 @@ export function createRequirementPackageIndexRouteId(
 export function createRequirementPackageDetailRouteId(
   bucket: RequirementDocumentationBucket,
   packageId: string,
-  patternName: string
+  patternName: string,
 ): LogicalRouteId {
   return createChildRouteId(
     getRequirementDocumentType(bucket),
     slugForRouteSegment(packageId),
     'requirement',
-    slugForRouteSegment(patternName)
+    slugForRouteSegment(patternName),
   );
 }
 
 export function createRequirementBusinessRuleRouteId(
   bucket: RequirementDocumentationBucket,
   requirementEntityId: string,
-  ruleId: string
+  ruleId: string,
 ): LogicalRouteId {
   return createChildRouteId(
     getRequirementDocumentType(bucket),
     slugForRouteSegment(requirementEntityId),
     'business-rule',
-    slugForRouteSegment(ruleId)
+    slugForRouteSegment(ruleId),
   );
 }
 
@@ -64,12 +64,12 @@ export function createBusinessRuleOwnerRouteId(packageId: string): LogicalRouteI
 
 export function createRequirementDocumentationRouting(
   bucket: RequirementDocumentationBucket,
-  childRouteKeys: readonly string[]
+  childRouteKeys: readonly string[],
 ): NonNullable<ProjectionBundle<Fragment>['routing']> {
   return {
     rootRouteId: createIndexRouteId(getRequirementDocumentType(bucket)),
     childRouteIds: Object.fromEntries(
-      childRouteKeys.map((routeId) => [routeId, routeId as LogicalRouteId])
+      childRouteKeys.map((routeId) => [routeId, routeId as LogicalRouteId]),
     ),
     childPathStrategy: 'nested',
     anchorStrategy: 'heading-slug',

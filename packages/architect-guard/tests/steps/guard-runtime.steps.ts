@@ -85,7 +85,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         And('the DoD result should not report missing acceptance criteria', () => {
           expect(state.dodResult?.missingAcceptanceCriteria).toBe(false);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -111,7 +111,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
           expect(state.processViolations).toHaveLength(1);
           expect(state.processViolations?.[0]?.id).toBe('process-in-code');
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -135,7 +135,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
             [],
             {
               registry: { tagPrefix: '@acme-' } as never,
-            }
+            },
           );
         });
 
@@ -143,7 +143,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
           expect(state.antiPatternViolations).toHaveLength(1);
           expect(state.antiPatternViolations?.[0]?.message).toContain(tag);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -164,17 +164,17 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
                 ],
               },
             ] as never,
-            []
+            [],
           );
         });
 
         Then('the removed tag-duplication anti-pattern id should not be reported', () => {
           expect(state.antiPatternViolations?.map((violation) => violation.id)).not.toContain(
-            'tag-duplication'
+            'tag-duplication',
           );
           expect(state.antiPatternViolations?.[0]?.id).toBe('process-in-code');
         });
-      }
+      },
     );
 
     RuleScenario('Block completed spec edits without unlock reason', ({ When, Then }): void => {
@@ -225,7 +225,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
 
         writeFileSync(
           path.join(baseDir, 'tests', 'features', 'demo.feature'),
-          ['Feature: Demo', '', '  Scenario: Success', '    Given the demo is ready'].join('\n')
+          ['Feature: Demo', '', '  Scenario: Success', '    Given the demo is ready'].join('\n'),
         );
         writeFileSync(
           path.join(baseDir, 'tests', 'steps', 'demo.steps.ts'),
@@ -239,7 +239,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
             "    given('the demo is ready', () => {});",
             '  });',
             '});',
-          ].join('\n')
+          ].join('\n'),
         );
 
         state.stepLintSummary = runStepLint({ baseDir });
@@ -268,7 +268,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
               '  Background:',
               '    | Deliverable | Status |',
               '    | src/example.ts | pending |',
-            ].join('\n')
+            ].join('\n'),
           );
 
           state.changeDetectionResult = detectFileChanges(baseDir, [relativePath], {
@@ -283,12 +283,12 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
           }
 
           expect(state.changeDetectionResult.value.addedFiles).toContain(
-            'architect/specs/new-pattern.feature'
+            'architect/specs/new-pattern.feature',
           );
           expect(
             state.changeDetectionResult.value.statusTransitions.get(
-              'architect/specs/new-pattern.feature'
-            )
+              'architect/specs/new-pattern.feature',
+            ),
           ).toMatchObject({
             from: 'roadmap',
             to: 'active',
@@ -296,11 +296,11 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
           });
           expect(
             state.changeDetectionResult.value.deliverableChanges.get(
-              'architect/specs/new-pattern.feature'
-            )?.added
+              'architect/specs/new-pattern.feature',
+            )?.added,
           ).toContain('src/example.ts');
         });
-      }
+      },
     );
 
     RuleScenario('Idea-tier soft lint passes on a clean idea-tier spec', ({ When, Then }): void => {
@@ -324,7 +324,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
             '  Rule: Idea has a single load-bearing constraint',
             '',
             '    **Invariant:** The idea must remain expressible in one sentence.',
-          ].join('\n')
+          ].join('\n'),
         );
 
         state.ideaTierSummary = runIdeaTierLint({ baseDir });
@@ -363,7 +363,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
               '    Scenario: Premature scenario',
               '      Given the user opens the spec',
               '      Then the system should warn about the early scenario',
-            ].join('\n')
+            ].join('\n'),
           );
 
           state.ideaTierSummary = runIdeaTierLint({ baseDir });
@@ -371,7 +371,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
 
         Then('the idea-tier summary should report a no-scenarios warning', () => {
           const ruleIds = (state.ideaTierSummary?.results ?? []).flatMap((r) =>
-            r.violations.map((v) => v.rule)
+            r.violations.map((v) => v.rule),
           );
           expect(ruleIds).toContain(IDEA_TIER_LINT_RULES.noScenarios.id);
         });
@@ -379,7 +379,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         And('the idea-tier summary should have no errors', () => {
           expect(state.ideaTierSummary?.errorCount).toBe(0);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -405,7 +405,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
               '  Scenario: Legacy plan-tier scenario',
               '    Given the user opens the spec',
               '    Then the system should accept it',
-            ].join('\n')
+            ].join('\n'),
           );
 
           state.ideaTierSummary = runIdeaTierLint({ baseDir });
@@ -418,7 +418,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         And('the idea-tier summary should have no errors', () => {
           expect(state.ideaTierSummary?.errorCount).toBe(0);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -444,7 +444,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
               '  Rule: Epic groups related ideas',
               '',
               '    **Invariant:** Members are listed under **Members:**.',
-            ].join('\n')
+            ].join('\n'),
           );
 
           state.ideaTierSummary = runIdeaTierLint({ baseDir });
@@ -452,7 +452,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
 
         Then('the idea-tier summary should not report an insufficient-tags warning', () => {
           const ruleIds = (state.ideaTierSummary?.results ?? []).flatMap((r) =>
-            r.violations.map((v) => v.rule)
+            r.violations.map((v) => v.rule),
           );
           expect(ruleIds).not.toContain(IDEA_TIER_LINT_RULES.insufficientTags.id);
         });
@@ -460,7 +460,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         And('the idea-tier summary should have no errors', () => {
           expect(state.ideaTierSummary?.errorCount).toBe(0);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -486,7 +486,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
               '  Rule: Slice describes a cross-cutting view',
               '',
               '    **Invariant:** Slices are exempt from the parent requirement.',
-            ].join('\n')
+            ].join('\n'),
           );
 
           state.ideaTierSummary = runIdeaTierLint({ baseDir });
@@ -494,7 +494,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
 
         Then('the idea-tier summary should not report an insufficient-tags warning', () => {
           const ruleIds = (state.ideaTierSummary?.results ?? []).flatMap((r) =>
-            r.violations.map((v) => v.rule)
+            r.violations.map((v) => v.rule),
           );
           expect(ruleIds).not.toContain(IDEA_TIER_LINT_RULES.insufficientTags.id);
         });
@@ -502,7 +502,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
         And('the idea-tier summary should have no errors', () => {
           expect(state.ideaTierSummary?.errorCount).toBe(0);
         });
-      }
+      },
     );
   });
 });

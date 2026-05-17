@@ -8,7 +8,7 @@
  * ### When to Use
  *
  * - Defines the TraceabilityMatrix fragment shape for pattern-to-test trace
-*   rows.
+ *   rows.
  */
 import { z } from 'zod';
 

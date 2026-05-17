@@ -38,7 +38,11 @@ export default defineConfig({
     },
     { id: 'architect-cli', displayName: 'Architect CLI', match: /^packages\/architect-cli\// },
     { id: 'architect-mcp', displayName: 'Architect MCP', match: /^packages\/architect-mcp\// },
-    { id: 'architect-guard', displayName: 'Architect Guard', match: /^packages\/architect-guard\// },
+    {
+      id: 'architect-guard',
+      displayName: 'Architect Guard',
+      match: /^packages\/architect-guard\//,
+    },
     { id: 'architect-dev', displayName: 'Architect Host (Dev)', match: 'tests/features/' },
     { id: 'architect-pkg-content', displayName: 'Architect Package Content', match: 'architect/' },
   ],

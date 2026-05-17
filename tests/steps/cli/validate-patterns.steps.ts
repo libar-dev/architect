@@ -95,7 +95,7 @@ function createDoDGherkinPatternFile(
   options: {
     deliverableStatus?: string;
     includeAcceptanceCriteria?: boolean;
-  } = {}
+  } = {},
 ): string {
   const { deliverableStatus = 'complete', includeAcceptanceCriteria = true } = options;
 
@@ -284,14 +284,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createTypeScriptPatternFile(patternName, phase, status)
+            createTypeScriptPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       And(
@@ -301,14 +301,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createGherkinPatternFile(patternName, phase, status)
+            createGherkinPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -336,14 +336,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createTypeScriptPatternFile(patternName, phase, status)
+            createTypeScriptPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       And(
@@ -353,14 +353,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createGherkinPatternFile(patternName, phase, status)
+            createGherkinPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -390,14 +390,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createTypeScriptPatternFile(patternName, phase, status)
+            createTypeScriptPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       And(
@@ -407,14 +407,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createGherkinPatternFile(patternName, phase, status)
+            createGherkinPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -447,14 +447,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createTypeScriptPatternFile(patternName, phase, status)
+            createTypeScriptPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       And(
@@ -464,14 +464,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createGherkinPatternFile(patternName, phase, status)
+            createGherkinPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -506,14 +506,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createTypeScriptPatternFile(patternName, phase, status)
+            createTypeScriptPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -539,14 +539,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createTypeScriptPatternFile(patternName, phase, status)
+            createTypeScriptPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       And(
@@ -556,14 +556,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createGherkinPatternFile(patternName, phase, status)
+            createGherkinPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -596,14 +596,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             filePath: string,
             patternName: string,
             phase: number,
-            status: string
+            status: string,
           ) => {
             await writeTempFile(
               getTempDir(),
               filePath,
-              createTypeScriptPatternFile(patternName, phase, status)
+              createTypeScriptPatternFile(patternName, phase, status),
             );
-          }
+          },
         );
 
         And(
@@ -612,9 +612,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             await writeTempFile(
               getTempDir(),
               filePath,
-              createDoDGherkinPatternFile(patternName, phase, 'completed')
+              createDoDGherkinPatternFile(patternName, phase, 'completed'),
             );
-          }
+          },
         );
 
         When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -628,7 +628,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('stdout contains {string}', (_ctx: unknown, text: string) => {
           expect(getResult().stdout).toContain(text);
         });
-      }
+      },
     );
 
     // Wave 1 retired phase-grouping for DoD validation; the matching

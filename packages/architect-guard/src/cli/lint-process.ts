@@ -238,7 +238,7 @@ function formatJson(output: ReturnType<typeof validateChanges>): string {
       events,
     },
     null,
-    2
+    2,
   );
 }
 
@@ -278,7 +278,7 @@ async function main(): Promise<void> {
     });
     if (!pipelineResult.ok) {
       throw new Error(
-        `Pipeline error [${pipelineResult.error.step}]: ${pipelineResult.error.message}`
+        `Pipeline error [${pipelineResult.error.step}]: ${pipelineResult.error.message}`,
       );
     }
 
@@ -301,7 +301,7 @@ async function main(): Promise<void> {
       for (const [path, fileState] of state.files) {
         process.stdout.write(`  ${path}\n`);
         process.stdout.write(
-          `    Status: ${fileState.status} (${fileState.protection} protection)\n`
+          `    Status: ${fileState.status} (${fileState.protection} protection)\n`,
         );
         if (fileState.deliverables.length > 0) {
           process.stdout.write(`    Deliverables: ${String(fileState.deliverables.length)}\n`);

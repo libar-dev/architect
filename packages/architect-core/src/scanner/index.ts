@@ -40,7 +40,7 @@ export interface ScanResults {
 
 export async function scanPatterns(
   config: ScannerConfig,
-  registry?: TagRegistry
+  registry?: TagRegistry,
 ): Promise<Result<ScanResults, never>> {
   const files = await findFilesToScan(config);
 
@@ -75,7 +75,7 @@ export async function scanPatterns(
           filePath,
           error instanceof Error ? error.message : String(error),
           undefined,
-          error
+          error,
         ),
       });
     }

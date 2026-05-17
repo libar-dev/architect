@@ -63,7 +63,7 @@ async function resolveSourcePlan(args: ParsedArgs): Promise<SourcePlan> {
 
   if (input.length === 0) {
     throw new Error(
-      'No source files specified. Provide --input <glob> or configure architect.config.* sources.'
+      'No source files specified. Provide --input <glob> or configure architect.config.* sources.',
     );
   }
 
@@ -106,7 +106,7 @@ function getCacheFilePath(sourcePlan: SourcePlan): string {
         sourcePlan.baseDir,
         ...sourcePlan.input.map((entry) => `input:${entry}`),
         ...sourcePlan.features.map((entry) => `feature:${entry}`),
-      ].join('\n')
+      ].join('\n'),
     )
     .digest('hex');
   return path.join(CACHE_DIRECTORY, `${key}.json`);
@@ -142,7 +142,7 @@ function writeCacheRecord(cacheFilePath: string, record: CacheRecord): void {
 
 function createProjectionContext(
   graph: BuildResult['graph'],
-  sourcePlan: SourcePlan
+  sourcePlan: SourcePlan,
 ): ProjectionContext {
   return {
     graph,
@@ -272,6 +272,6 @@ export async function writeDryRun(args: ParsedArgs): Promise<void> {
       `TypeScript files: ${String(typescriptFiles.length)}\n` +
       `Feature files: ${String(featureFiles.length)}\n` +
       `Config: ${sourcePlan.configLabel}\n` +
-      `Cache: ${args.noCache ? 'disabled (--no-cache)' : 'available'}\n`
+      `Cache: ${args.noCache ? 'disabled (--no-cache)' : 'available'}\n`,
   );
 }

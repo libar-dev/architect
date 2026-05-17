@@ -8,7 +8,7 @@
  * ### When to Use
  *
  * - Defines shared documentation-composition support schemas for sections and
-*   architecture diagram scopes.
+ *   architecture diagram scopes.
  */
 import { z } from 'zod';
 

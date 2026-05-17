@@ -14,7 +14,7 @@ import { getPatternName, getRelationships } from '../_shared/pattern-helpers.int
 export function buildArchitectureComparison(
   context: ProjectionContext,
   leftContext: string,
-  rightContext: string
+  rightContext: string,
 ): ArchitectureComparison {
   const archIndex = context.graph.archIndex;
   const leftPatterns = archIndex?.byContext[leftContext];
@@ -23,7 +23,7 @@ export function buildArchitectureComparison(
   if (leftPatterns === undefined || rightPatterns === undefined) {
     throw new ProjectionError(
       'BOUNDED_CONTEXT_NOT_FOUND',
-      `Bounded context not found: ${leftContext} or ${rightContext}`
+      `Bounded context not found: ${leftContext} or ${rightContext}`,
     );
   }
 
@@ -80,7 +80,7 @@ export function buildArchitectureComparison(
 
 function collectContextDependencies(
   context: ProjectionContext,
-  patternNames: readonly string[]
+  patternNames: readonly string[],
 ): Set<string> {
   const dependencies = new Set<string>();
 
@@ -107,7 +107,7 @@ function collectIntegrationPoints(
   patternNames: readonly string[],
   fromContext: string,
   targetPatternNames: ReadonlySet<string>,
-  toContext: string
+  toContext: string,
 ): ArchitectureComparison['integrationPoints'] {
   const points: ArchitectureComparison['integrationPoints'] = [];
 

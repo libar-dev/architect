@@ -88,7 +88,7 @@ export class PipelineSessionManager {
 
     if (input.length === 0 || features.length === 0) {
       const applied = await this.withWorkingDirectory(baseDir, () =>
-        applyProjectSourceDefaults({ baseDir, input, features })
+        applyProjectSourceDefaults({ baseDir, input, features }),
       );
       if (!applied) {
         this.applyFallbackDefaults({ baseDir, input, features });
@@ -97,12 +97,12 @@ export class PipelineSessionManager {
 
     if (input.length === 0) {
       throw new Error(
-        'No TypeScript source globs found. Provide --input or create architect.config.ts'
+        'No TypeScript source globs found. Provide --input or create architect.config.ts',
       );
     }
 
     const session = await this.withWorkingDirectory(baseDir, () =>
-      this.buildSession(baseDir, input, features, tagRegistryOverride)
+      this.buildSession(baseDir, input, features, tagRegistryOverride),
     );
     this.session = session;
     return session;
@@ -151,8 +151,8 @@ export class PipelineSessionManager {
           latestSession.baseDir,
           [...latestSession.sourceGlobs.input],
           [...latestSession.sourceGlobs.features],
-          latestSession.tagRegistryOverride
-        )
+          latestSession.tagRegistryOverride,
+        ),
       );
       this.session = newSession;
       latestSession = newSession;
@@ -173,7 +173,7 @@ export class PipelineSessionManager {
     baseDir: string,
     input: readonly string[],
     features: readonly string[],
-    tagRegistryOverride?: TagRegistry
+    tagRegistryOverride?: TagRegistry,
   ): Promise<PipelineSession> {
     const startMs = Date.now();
     const discoveredConfigPath = await findConfigFile(baseDir);

@@ -37,7 +37,7 @@ import type { ValidationRuleDigest } from '../../fragments/governance/index.js';
 import { buildValidationRuleDigest } from './validation-rule-digest.internal.js';
 
 export function projectValidationRuleDigest(
-  _context: ProjectionContext
+  _context: ProjectionContext,
 ): ProjectionBundle<ValidationRuleDigest> {
   return projectSingle(buildValidationRuleDigest());
 }

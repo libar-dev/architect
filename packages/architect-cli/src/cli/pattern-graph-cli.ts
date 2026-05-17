@@ -174,7 +174,7 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
       sessionTypeExplicit,
       depth,
     },
-    'Failed to parse CLI arguments'
+    'Failed to parse CLI arguments',
   );
 }
 
@@ -212,7 +212,7 @@ async function runRepl(args: ParsedArgs): Promise<void> {
       await runCommand(
         { args, mode: 'repl', cli: context, services: { runRepl } },
         command,
-        commandArgs
+        commandArgs,
       );
     }
   } finally {
@@ -264,7 +264,7 @@ async function main(): Promise<void> {
   await runCommand(
     { args, mode: 'main', cli: context, services: { runRepl } },
     command,
-    args.commandArgs
+    args.commandArgs,
   );
 }
 

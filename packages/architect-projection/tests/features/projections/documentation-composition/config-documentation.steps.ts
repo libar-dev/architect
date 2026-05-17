@@ -48,7 +48,7 @@ interface OptionsSchemaBarrelAuditSummary {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/documentation-composition/config-documentation.feature'
+  'tests/features/projections/documentation-composition/config-documentation.feature',
 );
 
 let state: DocumentationCompositionState | null = null;
@@ -98,7 +98,7 @@ function assertRequirementDocumentationLinksResolve(
   requirementsView: ProjectionBundle<Fragment> | undefined,
   rootFile: string,
   documentType: 'requirements-executable' | 'requirements-specs',
-  expectedTarget: string
+  expectedTarget: string,
 ): void {
   expect(requirementsView).toBeDefined();
 
@@ -162,7 +162,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                 ],
               });
-            }
+            },
           );
 
           When('I project the config snapshot', () => {
@@ -203,7 +203,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(rendered).not.toBeNull();
             expect(FragmentSchema.safeParse(rendered).success).toBe(true);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -216,7 +216,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 projectMetadata,
                 patterns: [createPattern('ProjectionDocs', { status: 'active', phase: 20 })],
               });
-            }
+            },
           );
 
           When('I parse-and-project a config snapshot with malformed source glob groups', () => {
@@ -238,13 +238,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
           Then('parsing config projection options should fail loudly', () => {
             expect(state!.invalidOptionsError).toContain(
-              'Invalid options for parseAndProjectConfig:'
+              'Invalid options for parseAndProjectConfig:',
             );
             expect(state!.invalidOptionsError).toContain('sourceGlobs');
           });
-        }
+        },
       );
-    }
+    },
   );
 
   Rule(
@@ -257,7 +257,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a Documentation Composition documentation context with delivery architecture requirements and decisions data',
             () => {
               state!.context = createDocumentationContext();
-            }
+            },
           );
 
           When('I project every supported documentation bundle', () => {
@@ -270,13 +270,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 documentType: typeof documentType;
                 disclosureLevel?: 'useful';
               } =
-                documentType === 'requirements-executable' ||
-                documentType === 'requirements-specs'
+                documentType === 'requirements-executable' || documentType === 'requirements-specs'
                   ? { documentType, disclosureLevel: 'useful' }
                   : { documentType };
               state!.documentationViews[documentType] = parseAndProjectDocumentationBundle(
                 state!.context!,
-                projectionOptions
+                projectionOptions,
               );
             }
           });
@@ -289,31 +288,31 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 expect(result).toBeDefined();
                 expect(FragmentSchema.safeParse(result?.root).success).toBe(true);
                 expect(result?.routing?.rootRouteId ?? `${documentType}:index`).toBe(
-                  `${documentType}:index`
+                  `${documentType}:index`,
                 );
               }
-            }
+            },
           );
 
           And(
             'the supported documentation registry should expose metadata for every live surface',
             () => {
               expect(SUPPORTED_DOCUMENTATION_TYPE_REGISTRY.map((entry) => entry.key)).toEqual(
-                supportedDocumentTypes
+                supportedDocumentTypes,
               );
               for (const metadata of SUPPORTED_DOCUMENTATION_TYPE_REGISTRY) {
                 expect(metadata.displayTitle.length).toBeGreaterThan(0);
                 expect(metadata.rootRouteId).toBe(`${metadata.key}:index`);
                 expect(metadata.markdownRootTarget).toMatch(/\.md$/);
                 expect(metadata.defaultDisclosureLevel).toMatch(
-                  /^(essential|important|useful|advanced)$/
+                  /^(essential|important|useful|advanced)$/,
                 );
                 expect(metadata.generatorName.length).toBeGreaterThan(0);
                 expect(
-                  SupportedDocumentationTypeRegistryEntrySchema.safeParse(metadata).success
+                  SupportedDocumentationTypeRegistryEntrySchema.safeParse(metadata).success,
                 ).toBe(true);
               }
-            }
+            },
           );
 
           And(
@@ -321,7 +320,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               for (const metadata of SUPPORTED_DOCUMENTATION_TYPE_REGISTRY) {
                 expect(Object.keys(metadata.disclosureMatrix).sort()).toEqual(
-                  [...PROGRESSIVE_DISCLOSURE_LEVELS].sort()
+                  [...PROGRESSIVE_DISCLOSURE_LEVELS].sort(),
                 );
 
                 for (const level of PROGRESSIVE_DISCLOSURE_LEVELS) {
@@ -333,7 +332,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   expect(typeof disclosureSpec.committed).toBe('boolean');
                 }
               }
-            }
+            },
           );
 
           And(
@@ -363,7 +362,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 expect(metadata.disclosureMatrix.useful.filter).toEqual(expectedUsefulFilter);
                 expect(metadata.disclosureMatrix.advanced.filter).toBeUndefined();
               }
-            }
+            },
           );
 
           And(
@@ -372,7 +371,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               for (const metadata of SUPPORTED_DOCUMENTATION_TYPE_REGISTRY) {
                 expect(metadata.disclosureMatrix[metadata.defaultDisclosureLevel]).toBeDefined();
               }
-            }
+            },
           );
 
           And(
@@ -399,7 +398,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               }
 
               expect(actualOptInDetailLevels).toEqual(optInDetailLevels);
-            }
+            },
           );
 
           And(
@@ -408,7 +407,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               const patternsBundle = state!.documentationViews['patterns'];
               expect(patternsBundle?.root.kind).toBe('PatternCatalog');
               expect(JSON.stringify(patternsBundle)).toContain('ProjectionAPI');
-            }
+            },
           );
 
           And(
@@ -418,9 +417,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 state!.documentationViews['requirements-executable'],
                 'REQUIREMENTS-EXECUTABLE.md',
                 'requirements-executable',
-                'requirements-executable/architect-projection/projection-api.md'
+                'requirements-executable/architect-projection/projection-api.md',
               );
-            }
+            },
           );
 
           And(
@@ -432,12 +431,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(Object.keys(requirementsView!.children)).toEqual([
                 'requirements-specs:idea-active-rules',
               ]);
-            }
+            },
           );
 
           And('the roadmap documentation should include roadmap work by default', () => {
             expect(JSON.stringify(state!.documentationViews['roadmap'])).toContain(
-              'ProjectionDocs'
+              'ProjectionDocs',
             );
           });
 
@@ -460,7 +459,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               runtimeOverrideContext,
               {
                 documentType: 'business-rules',
-              }
+              },
             );
             const rendered = JSON.stringify(runtimeFilteredBusinessRules);
 
@@ -471,7 +470,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(rendered).not.toContain('Idea active documentation rule');
             expect(rendered).not.toContain('Candidate documentation rule');
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -481,14 +480,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a Documentation Composition documentation context with delivery architecture requirements and decisions data',
             () => {
               state!.context = createDocumentationContext();
-            }
+            },
           );
 
           When('I project every supported documentation bundle', () => {
             for (const documentType of supportedDocumentTypes) {
               state!.documentationViews[documentType] = parseAndProjectDocumentationBundle(
                 state!.context!,
-                { documentType }
+                { documentType },
               );
             }
           });
@@ -502,7 +501,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               const childKeys = Object.keys(requirementsView!.children);
               const businessRuleKeys = childKeys.filter((key) => key.includes(':business-rule:'));
               expect(businessRuleKeys).toEqual([]);
-            }
+            },
           );
 
           And(
@@ -520,7 +519,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               ] as Fragment | undefined;
               expect(ruleMatrixDetail).toBeDefined();
               expect(JSON.stringify(ruleMatrixDetail)).not.toContain(':business-rule:');
-            }
+            },
           );
 
           And(
@@ -537,25 +536,25 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 emittedBusinessRuleRouteIds.add(rootRouteId);
               }
               for (const routeId of Object.values(
-                businessRulesView!.routing?.childRouteIds ?? {}
+                businessRulesView!.routing?.childRouteIds ?? {},
               )) {
                 emittedBusinessRuleRouteIds.add(routeId);
               }
               const referencedOwnerRouteIds = new Set(
                 Object.values(requirementsView!.children)
                   .flatMap((child) =>
-                    child.kind === 'RequirementDigest' ? child.businessRuleReferences : []
+                    child.kind === 'RequirementDigest' ? child.businessRuleReferences : [],
                   )
-                  .map((reference) => reference.ownerRouteId)
+                  .map((reference) => reference.ownerRouteId),
               );
               expect(referencedOwnerRouteIds).toContain('business-rules:architect-projection');
 
               for (const routeId of referencedOwnerRouteIds) {
                 expect(emittedBusinessRuleRouteIds.has(routeId)).toBe(true);
               }
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -565,7 +564,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a Documentation Composition documentation context with delivery architecture requirements and decisions data',
             () => {
               state!.context = createDocumentationContext();
-            }
+            },
           );
 
           When('I project dropped and unknown documentation bundle types', () => {
@@ -603,9 +602,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(barrel).not.toMatch(/\bisDroppedDocumentationType\b/u);
             }
           });
-        }
+        },
       );
-    }
+    },
   );
 
   Rule(
@@ -618,7 +617,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a Documentation Composition architecture context with bounded contexts layers and product areas',
             () => {
               state!.context = createBoundedContextScopeContext();
-            }
+            },
           );
 
           When('I project architecture diagrams for each supported scope', () => {
@@ -633,14 +632,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               {
                 scope: 'bounded-context',
                 scopeValue: 'projection',
-              }
+              },
             );
             state!.architectureDiagrams['product-area'] = projectArchitectureDiagram(
               state!.context!,
               {
                 scope: 'product-area',
                 scopeValue: 'Studio UI',
-              }
+              },
             );
           });
 
@@ -672,7 +671,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   scope: 'bounded-context',
                   scopeValue: 'projection',
                   patterns: ['ProjectionAPI', 'ProjectionDocs'],
-                })
+                }),
               );
 
               expect(productAreaDiagram?.root).toEqual(
@@ -680,13 +679,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   scope: 'product-area',
                   scopeValue: 'Studio UI',
                   patterns: ['ProjectionDocs', 'StudioSettings'],
-                })
+                }),
               );
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
 
   Rule(
@@ -699,7 +698,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a Documentation Composition PR review context with changed deliverable and feature files',
             () => {
               state!.context = createDocumentationContext();
-            }
+            },
           );
 
           When('I project the PR change review for branch "feat/documentation-composition"', () => {
@@ -722,7 +721,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   'apps/desktop/src/views/Settings.tsx',
                 ],
                 affectedPatterns: ['ProjectionAPI', 'StudioSettings'],
-              })
+              }),
             );
           });
 
@@ -730,11 +729,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'the PR change review should list affected patterns matched from the changed file options',
             () => {
               expect(state!.prChangeReview?.root.recommendations.length).toBeGreaterThan(0);
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
 
   Rule(
@@ -769,14 +768,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'the audit should confirm the public subtree export set matches the projections barrel export set',
             () => {
               expect(state!.barrelAudit?.publicOptionsSchemaExports).toEqual(
-                state!.barrelAudit?.rootOptionsSchemaExports
+                state!.barrelAudit?.rootOptionsSchemaExports,
               );
               expect(state!.barrelAudit?.publicOptionsSchemaExports.length).toBeGreaterThan(0);
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
 });
 

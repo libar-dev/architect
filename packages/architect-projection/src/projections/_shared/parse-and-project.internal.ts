@@ -23,7 +23,7 @@ export function parseAndProject<Options, Output>(
   schema: z.ZodType<Options>,
   project: (context: ProjectionContext, options: Options) => Output,
   projectionName: string,
-  defaultRawOptions: unknown = NO_DEFAULT_RAW_OPTIONS
+  defaultRawOptions: unknown = NO_DEFAULT_RAW_OPTIONS,
 ): (context: ProjectionContext, rawOptions?: unknown) => Output {
   const errorContext = `Invalid options for ${projectionName}`;
 

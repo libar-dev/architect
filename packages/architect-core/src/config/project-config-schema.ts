@@ -55,7 +55,7 @@ export const GeneratorSourceOverrideSchema = z
     {
       message:
         'replaceFeatures and additionalFeatures are mutually exclusive — use one or the other',
-    }
+    },
   );
 
 const ContextInferenceRuleSchema = z.strictObject({

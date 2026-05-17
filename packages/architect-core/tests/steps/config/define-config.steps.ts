@@ -83,7 +83,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a config object with only fileOptInTag {string}',
         (_ctx: unknown, fileOptInTag: string) => {
           state!.testObject = { fileOptInTag };
-        }
+        },
       );
 
       When('validating against ArchitectProjectConfigSchema', () => {
@@ -162,7 +162,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
       And('the validation error should contain {string}', (_ctx: unknown, text: string) => {
         expect(
-          state!.validationResult!.error!.issues.map((issue) => issue.message).join('; ')
+          state!.validationResult!.error!.issues.map((issue) => issue.message).join('; '),
         ).toContain(text);
       });
     });
@@ -182,7 +182,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
       And('the validation error should contain {string}', (_ctx: unknown, text: string) => {
         expect(
-          state!.validationResult!.error!.issues.map((issue) => issue.message).join('; ')
+          state!.validationResult!.error!.issues.map((issue) => issue.message).join('; '),
         ).toContain(text);
       });
     });
@@ -199,7 +199,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
         When('validating the generator override against schema', () => {
           state!.overrideValidationResult = GeneratorSourceOverrideSchema.safeParse(
-            state!.testObject
+            state!.testObject,
           );
         });
 
@@ -209,10 +209,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
         And('the validation error should contain {string}', (_ctx: unknown, text: string) => {
           expect(
-            state!.overrideValidationResult!.error!.issues.map((issue) => issue.message).join('; ')
+            state!.overrideValidationResult!.error!.issues.map((issue) => issue.message).join('; '),
           ).toContain(text);
         });
-      }
+      },
     );
 
     RuleScenario('Removed preset field rejected', ({ Given, When, Then }) => {
@@ -284,7 +284,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'a config object with only fileOptInTag {string}',
           (_ctx: unknown, fileOptInTag: string) => {
             state!.testObject = { fileOptInTag };
-          }
+          },
         );
 
         When('checking isProjectConfig', () => {
@@ -294,7 +294,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         Then('the result should be true', () => {
           expect(state!.typeGuardResult).toBe(true);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -311,7 +311,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         Then('the result should be false', () => {
           expect(state!.typeGuardResult).toBe(false);
         });
-      }
+      },
     );
 
     RuleScenario('isProjectConfig returns false for non-config object', ({ Given, When, Then }) => {

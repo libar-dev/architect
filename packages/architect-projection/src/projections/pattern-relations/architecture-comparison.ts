@@ -40,7 +40,7 @@ import { buildArchitectureComparison } from './architecture-comparison.internal.
 export function projectArchitectureComparison(
   context: ProjectionContext,
   leftContext: string,
-  rightContext: string
+  rightContext: string,
 ): ProjectionBundle<ArchitectureComparison> {
   return projectSingle(buildArchitectureComparison(context, leftContext, rightContext));
 }

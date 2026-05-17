@@ -28,6 +28,7 @@ The 36-pattern / 108-rule fixture exercises the projection layer well. **The cam
 ## Findings
 
 ### H1 — `addRoutedDocument` renders each output document 2N+1 times when splitting kicks in
+
 **Severity:** High
 **File:** `src/renderers/render-markdown.ts:308–325, 447–466, 2054–2103`
 
@@ -62,6 +63,7 @@ A cheaper alternative: render with a `measureOnly: true` flag returning a precom
 ---
 
 ### H2 — Perf gate has zero coverage of `renderMarkdown` + bundle routing + splitter
+
 **Severity:** High
 **File:** `tests/features/perf/business-rule-set-report.steps.ts:608–658`, `tests/perf/compare-baseline.mjs:12–28`
 
@@ -93,6 +95,7 @@ Extend to at least 3 representative documentation types so the table-rendering a
 ---
 
 ### M1 — Documentation-bundle perf gate uses only one document type ('patterns')
+
 **Severity:** Medium
 **File:** `tests/features/perf/business-rule-set-report.steps.ts:628–635`
 
@@ -103,6 +106,7 @@ The "documentationView" hot path only exercises `documentType: 'patterns'`. The 
 **Why it matters for the campaign:** Newly-added doc types ship without perf-gate coverage until someone remembers to wire them in.
 
 **Fix:** Parameterise the hot-path table over `SUPPORTED_DOCUMENTATION_TYPE_REGISTRY` and bake per-type budgets. Either:
+
 - Loop the 12 (soon 18+) types and store one budget keyed by document-type, or
 - Pick 4 representative types (`patterns`, `requirements-executable`, `roadmap`, `taxonomy`) and assert each.
 
@@ -111,6 +115,7 @@ The second is cheaper and stays representative.
 ---
 
 ### M2 — `filterPatterns(patterns, undefined)` allocates a fresh shallow clone every call
+
 **Severity:** Medium
 **File:** `src/projections/_shared/filter.ts:22–28`
 
@@ -131,7 +136,7 @@ The no-filter branch unconditionally clones. The function is invoked from 20+ pr
 ```ts
 export function filterPatterns(
   patterns: readonly ExtractedPattern[],
-  filter: ProjectionFilter | undefined
+  filter: ProjectionFilter | undefined,
 ): readonly ExtractedPattern[] {
   return filter === undefined ? patterns : patterns.filter((p) => filterPattern(p, filter));
 }
@@ -142,6 +147,7 @@ export function filterPatterns(
 ---
 
 ### M3 — Perf baseline last refreshed at the initial multi-package split commit
+
 **Severity:** Medium
 **File:** `tests/perf/baselines/business-rule-set.baseline.json`
 
@@ -156,6 +162,7 @@ export function filterPatterns(
 ---
 
 ### M4 — Documentation-type lookups are O(N) linear scans, called from the renderer hot path
+
 **Severity:** Medium
 **File:** `src/projections/documentation-composition/documentation-types.ts:379–385`, `src/renderers/render-markdown.ts:413`
 
@@ -175,7 +182,9 @@ export function getDocumentationTypeMetadata(key: string) {
 
 ```ts
 const SUPPORTED_BY_KEY = new Map(SUPPORTED_DOCUMENTATION_TYPE_REGISTRY.map((e) => [e.key, e]));
-export function getDocumentationTypeMetadata(key: string) { return SUPPORTED_BY_KEY.get(key); }
+export function getDocumentationTypeMetadata(key: string) {
+  return SUPPORTED_BY_KEY.get(key);
+}
 ```
 
 Same for `DROPPED_DOCUMENTATION_TYPE_REGISTRY`. Bonus: removes the need to filter `'dropped'` entries at lookup time once they're deleted per H2 in Phase 1.
@@ -183,6 +192,7 @@ Same for `DROPPED_DOCUMENTATION_TYPE_REGISTRY`. Bonus: removes the need to filte
 ---
 
 ### M5 — `splitOversizedDocument` size budget is a line count, not a byte count
+
 **Severity:** Medium
 **File:** `src/renderers/render-markdown.ts:447–466`, `2054–2103`
 
@@ -207,6 +217,7 @@ Folds naturally into the H1 fix (return `{ rendered, lineCount }` from a single 
 ---
 
 ### L1 — `stableStringify` deep-clones values before stringifying
+
 **Severity:** Low
 **File:** `src/_internal/format-utils.ts:22–40`, used at `render-markdown.ts:1106, 1115`
 
@@ -229,6 +240,7 @@ Defer until profiled.
 ---
 
 ### L2 — `isBundle` runs a regex on every child route ID + a full `Object.values` walk
+
 **Severity:** Low
 **File:** `src/fragments/base.ts:21–39, 71–76`
 
@@ -249,11 +261,14 @@ Defer.
 ---
 
 ### L3 — `JSON.stringify` deep-walks the entire serialised tree twice in the pretty path
+
 **Severity:** Low
 **File:** `src/renderers/render-json.ts:53–60`
 
 ```ts
-const payload = isBundle(input) ? serializeBundle(input, opts) : serializeFragment(input, opts, '$');
+const payload = isBundle(input)
+  ? serializeBundle(input, opts)
+  : serializeFragment(input, opts, '$');
 return resolvedOptions.pretty ? JSON.stringify(payload, null, 2) : payload;
 ```
 
@@ -268,6 +283,7 @@ The `serialize*` helpers walk the input tree and produce a plain-object copy (wh
 ---
 
 ### L4 — Stable key ordering allocates a fresh sorted array for every object during JSON serialization
+
 **Severity:** Low
 **File:** `src/renderers/render-json.ts:178, 189–194`
 
@@ -282,6 +298,7 @@ The `serialize*` helpers walk the input tree and produce a plain-object copy (wh
 ---
 
 ### L5 — `renderBlock` `default` branch JSON-stringifies the block for the diagnostic comment
+
 **Severity:** Low
 **File:** `src/renderers/render-markdown.ts:1710`
 

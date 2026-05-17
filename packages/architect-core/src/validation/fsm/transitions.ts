@@ -39,7 +39,7 @@ export function getValidTransitionsFrom(status: ProcessStatusValue): readonly Pr
 export function getTransitionErrorMessage(
   from: ProcessStatusValue,
   to: ProcessStatusValue,
-  options?: TransitionMessageOptions
+  options?: TransitionMessageOptions,
 ): string {
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
 

@@ -13,11 +13,13 @@ Reviewed against the doc-generation consolidation campaign (DEEP-DIVE + PROPOSED
 ## Findings
 
 ### F1 — Five security invariants (I1–I5) are invisible at the code level
+
 **Severity:** Critical
 
 **What's missing:** The five load-bearing invariants identified in Phase 2 (`sanitizeMarkdownLinkTarget` as single chokepoint, UI renderer missing URL sanitizer, `TRUSTED_MARKDOWN` module-private discipline, `isPlainObject` prototype check, `parseAndProject` as single options-parsing entrypoint) have no JSDoc annotation anywhere in the codebase. `sanitizeMarkdownLinkTarget` at `render-markdown.ts:1938` is a bare `function` with no doc comment. `isPlainObject` in both `render-json.ts:203` and `fragments/base.ts:78` similarly has no doc comment. `TRUSTED_MARKDOWN` at `render-markdown.ts:85` is a bare `const` with no annotation.
 
 **Where it should live:**
+
 - `render-markdown.ts:1938`: JSDoc block documenting I1 (single chokepoint, HTML-entity decode before classification, allowlist enforcement). Reference: "trust-boundary invariant I1".
 - `render-markdown.ts:85`: JSDoc block documenting I3 (module-private by design; `composeDoc` must not export or accept externally tagged content).
 - `render-json.ts:203`: JSDoc block documenting I4 (anti-prototype-pollution; `DocDefinition.build()` must not return non-default-prototype objects).
@@ -31,11 +33,13 @@ Reviewed against the doc-generation consolidation campaign (DEEP-DIVE + PROPOSED
 ---
 
 ### F2 — Zero `.describe()` calls across all 135 source files
+
 **Severity:** Critical
 
 **What's missing:** The campaign's `extractZodSchemaFields()` extractor (PROPOSED-DESIGN §2) is designed to parse `z.strictObject({...}).describe(...)` calls into structured field-table rows. `ProgressiveDisclosurePolicySchema`, `DisclosureSpecSchema`, `SupportedDocumentationTypeRegistryEntrySchema`, `BlockSchema` (9 variants), and `ProjectionBundle` are the schemas whose field tables the campaign intends to generate. Zero of them use `.describe()`. This means `extractZodSchemaFields()` on its primary targets would return empty rows on day one, making the generated README's "Documentation Composition Contract" table unpopulateable until annotations are backfilled.
 
 **Where it should live:** `.describe()` calls on each field of:
+
 - `ProgressiveDisclosurePolicySchema` (3 fields: `level`, `availability`, `purpose`) — this is the exact table the README already hand-authors.
 - `DisclosureSpecSchema` (6 fields: `grouping`, `richness`, `rootShape`, `emitChildren`, `committed`, `filter`) — campaign authors need to understand these to write ContentFragments correctly.
 - `ContentRichnessSchema` and `GroupingAxisSchema` enum values — these are the vocabulary for the disclosure contract.
@@ -47,11 +51,13 @@ Reviewed against the doc-generation consolidation campaign (DEEP-DIVE + PROPOSED
 ---
 
 ### F3 — All four renderer `### When to Use` stubs carry a verbatim placeholder copied from contract files
+
 **Severity:** High
 
 **What's missing:** Every renderer (`render-markdown.ts`, `render-compact-text.ts`, `render-json.ts`, `render-ui.ts`) has `### When to Use\n * - As a typed contract / data shape consumed by projection or render layers.` as its file-level JSDoc. This text accurately describes fragment contracts and projection files. It is factually wrong for a renderer — renderers are not contracts, they are output surfaces. The campaign's `extractJSDocProse()` and DEEP-DIVE's `@architect-renderer` JSDoc tag plan both depend on renderer entry-point prose being meaningful. Today they would extract boilerplate.
 
 **Where it should live:** File-level JSDoc on each renderer, with distinct "When to Use" content:
+
 - `renderMarkdown`: "Use for all documentation output targets (`docs-live/`, `package-readme`). Returns `string` for fragments, `Record<string, string>` for multi-file bundles with routing. This is the renderer where ContentFragment output will land."
 - `renderCompactText`: "Use for all CLI/MCP context outputs destined for LLM consumption. Returns structured plain text with `=== SECTION ===` markers."
 - `renderJson`: "Use for structured tool output (MCP tools returning JSON, `architect_status`, `architect_rules`). Validates serializability and blocks non-plain-object prototype chains."
@@ -64,11 +70,13 @@ Reviewed against the doc-generation consolidation campaign (DEEP-DIVE + PROPOSED
 ---
 
 ### F4 — `documentation-bundle.internal.ts:64` dispatch table has no doc comment explaining it is the campaign's substrate
+
 **Severity:** High
 
 **What's missing:** `DOCUMENTATION_PROJECTION_FACTORIES` at `documentation-bundle.internal.ts:64` is the closed dispatch table that Phase 1 (C1) identified as the campaign's primary replacement target. It has no JSDoc, no inline comment, and no cross-reference to the `DocDefinition` replacement work. Campaign implementers arriving at W-DOCS-1 will not know this is the table to delete, not extend. The `assertSupportedDocumentType` and `projectDocumentationBundleInternal` functions also have no doc comments.
 
 **Where it should live:** A block comment immediately above `DOCUMENTATION_PROJECTION_FACTORIES`:
+
 ```ts
 /**
  * Registry-driven dispatch table for the current 12 supported documentation types.
@@ -86,11 +94,13 @@ Reviewed against the doc-generation consolidation campaign (DEEP-DIVE + PROPOSED
 ---
 
 ### F5 — `DisclosureSpec` and `LogicalRouteId` are undocumented package-level primitives with no prose JSDoc
+
 **Severity:** High
 
 **What's missing:** `DisclosureSpec` (`disclosure-spec.ts`) and `LogicalRouteId` (`progressive-disclosure.ts`) are exported through the public `./projections` entry point and are the two types the campaign authors will use most. Neither has any prose JSDoc. The fields `grouping`, `richness`, `emitChildren`, `committed` are opaque without documentation. `LogicalRouteId` is a branded string type but its format rules (`<docType>:index`, `<docType>:<entityId>`, etc.) appear only in README prose, not adjacent to the type itself.
 
 **Where it should live:**
+
 - `DisclosureSpec`: 3–5 line JSDoc explaining the four fields that govern output shape, and that `emitChildren` controls bundle fan-out.
 - `LogicalRouteId`: inline comment citing the three valid formats and a note that campaign `DocDefinition.targets` depend on these IDs for routing resolution.
 - `ContentRichnessSchema` values: one-line comments per enum value (`'name-only'` = only the entity name, `'summary'` = name + one-paragraph description, `'full'` = all fields rendered).
@@ -102,11 +112,13 @@ Reviewed against the doc-generation consolidation campaign (DEEP-DIVE + PROPOSED
 ---
 
 ### F6 — `addRoutedDocument` and `splitOversizedDocument` have no invariant documentation
+
 **Severity:** High
 
 **What's missing:** `addRoutedDocument` (`render-markdown.ts:302`) performs 2N+2 render passes (Phase 2 H1 finding), a known performance issue. It has no doc comment explaining this behavior or the campaign impact. `splitOversizedDocument` (`render-markdown.ts:2054`) is the output-side disclosure mechanism that ContentFragments will feed into — its invariants (groups by H2, skips `_preamble` group, emits back-links) are not documented.
 
 **Where it should live:** JSDoc blocks on both functions explaining:
+
 - `addRoutedDocument`: the pre-render + split-render sequence, the known 2N+2 over-rendering, and the campaign note to cache before W-DOCS-1 lands (Phase 2 H1).
 - `splitOversizedDocument`: the `_preamble` group behavior, the H2-boundary split contract, and the cross-reference link (`← Back to <title>`) it emits.
 
@@ -117,6 +129,7 @@ Reviewed against the doc-generation consolidation campaign (DEEP-DIVE + PROPOSED
 ---
 
 ### F7 — `blocks/schema.ts` and `fragments/base.ts` have zero `@architect-*` annotations
+
 **Severity:** Medium
 
 **What's missing:** `blocks/schema.ts` defines the 9-block-type catalog and the `BlockSchema` discriminated union — the deepest shared substrate the campaign builds on. It has no file-level JSDoc, no `@architect-pattern`, no `@architect-role:contract`. Similarly, `fragments/base.ts` defines `ProjectionBundle`, `BundleRouting`, and `isBundle` — the fan-out contract every renderer depends on — and has no annotations or JSDoc at all.
@@ -130,6 +143,7 @@ Reviewed against the doc-generation consolidation campaign (DEEP-DIVE + PROPOSED
 ---
 
 ### F8 — README's "Documentation Composition Contract" table is not regeneratable today (sync gap with schema)
+
 **Severity:** Medium
 
 **What's missing:** The README's "Documentation Composition Contract" section (lines 99–127) describes the four disclosure levels with human-readable purpose descriptions. `PROGRESSIVE_DISCLOSURE_POLICY` in `progressive-disclosure.ts` contains equivalent data (`level`, `availability`, `purpose`). However, the README prose uses "Level 0–3" numbering and routing-position descriptions, while `PROGRESSIVE_DISCLOSURE_POLICY.purpose` uses different wording ("Root summaries and orientation needed before any drill-down" vs README's "index content that is always visible at `<docType>:index`"). The two are substantially — but not exactly — aligned.
@@ -145,6 +159,7 @@ More importantly, `ProgressiveDisclosurePolicySchema` has no `.describe()` on it
 ---
 
 ### F9 — `MIGRATION.md` is accurate but does not acknowledge the v1→v2 collision map or `2.0.0-pre.1` status
+
 **Severity:** Medium
 
 **What's missing:** `MIGRATION.md` is accurate about the codec-to-projection mapping and the trust boundary contract. However: (1) it does not reference the 8 collision symbols documented in `REMAINING-WORK.md` appendix W1.5.7 — the document that JS consumers need to migrate v1 → v2 imports; (2) there is no CHANGELOG anywhere in the package (the root `docs-live/CHANGELOG.md` is generated; there is no committed CHANGELOG at the package level or repo root); (3) the v1→v2 collision map draft lives only in `REMAINING-WORK.md:344`, referenced in CLAUDE.md as "will graduate to a standalone MIGRATION.md at the 2.0.0-pre.1 release" — that graduation has not happened.
@@ -158,6 +173,7 @@ More importantly, `ProgressiveDisclosurePolicySchema` has no `.describe()` on it
 ---
 
 ### F10 — `context/projection-context.ts` lacks `@architect-*` annotation and has partial JSDoc
+
 **Severity:** Medium
 
 **What's missing:** `ProjectionContext` is the type passed to every one of the 43 projection functions. It has a partial JSDoc comment (lines 24–32) explaining `packageResolver`, but no `@architect-pattern`, `@architect-role:contract`, no mention of `projectionFilter` semantics, and no note on why `perspective` and `tagExampleOverrides` are optional. `PerspectiveHint` and `TagExampleOverrides` exported from this file have no documentation.
@@ -171,6 +187,7 @@ More importantly, `ProgressiveDisclosurePolicySchema` has no `.describe()` on it
 ---
 
 ### F11 — `ddd-inventory.md` does not acknowledge the 11 unreachable projections or explain the distinction between docs:all-reachable and CLI/MCP-reachable
+
 **Severity:** Medium
 
 **What's missing:** `docs/ddd-inventory.md` is an accurate fragment catalog but it does not note which projections are currently wired into `docs:all` (8 of 43), which are CLI/MCP-only (16+14), and which are unreachable from any consumer (11). The INVENTORY in `.pr-coordination/` has this data but it is outside the package. Campaign authors writing DocDefinitions need to know which projection functions are battle-tested vs. newly surfaced.
@@ -184,6 +201,7 @@ More importantly, `ProgressiveDisclosurePolicySchema` has no `.describe()` on it
 ---
 
 ### F12 — `renderers/types.ts` does not document `disclosureLevel` or `disclosureSpec` field semantics
+
 **Severity:** Medium
 
 **What's missing:** `RenderMarkdownOptions` at `renderers/types.ts:11` exports `disclosureLevel` and `disclosureSpec` as optional fields with no documentation. These are the OUTPUT-side disclosure axis that ContentFragments will feed into. Neither field has a JSDoc comment. `disclosureSpec` in particular is the fine-grained override — its relationship to `disclosureLevel` (they compose) is undocumented.
@@ -197,6 +215,7 @@ More importantly, `ProgressiveDisclosurePolicySchema` has no `.describe()` on it
 ---
 
 ### F13 — ADR-005, ADR-006, ADR-009 are referenced only in README and MIGRATION.md, not in the source files where violations occur
+
 **Severity:** Low
 
 **What's missing:** The three load-bearing ADRs governing this package are mentioned in README.md (ADR-006 at line 70) and MIGRATION.md ("Residual ADR-006 leaks" section), but nowhere in the source files where their rules are implemented or where Phase 1 found drift. `render-markdown.ts` (ADR-005 violator via `getDocumentationTypeMetadata` call) and `markdown-paths.ts` (ADR-009 violator via `routing.rootRouteId.split(':')[0]` parsing) have no ADR cross-references.
@@ -210,11 +229,13 @@ More importantly, `ProgressiveDisclosurePolicySchema` has no `.describe()` on it
 ---
 
 ### F14 — `PERF.md` does not reflect Phase 2's H2 finding (zero `renderMarkdown` end-to-end coverage)
+
 **Severity:** Low
 
 **What's missing:** `docs/PERF.md` accurately documents the current perf gate metrics and budgets. It does not note that `renderMarkdown` end-to-end through the documentation bundle pipeline has zero perf gate coverage (Phase 2 H2). Campaign authors setting up W-DOCS-1 will look at PERF.md, see "Budgets" and "Refresh Protocol", and not know they need to add a `renderMarkdown` gate before the campaign multiplies doc count.
 
 **Where it should live:** A "Known gaps" section in `PERF.md`:
+
 ```
 ## Known gaps (pre-campaign)
 - `renderMarkdown` end-to-end through `parseAndProjectDocumentationBundle` has no perf gate.
@@ -229,6 +250,7 @@ More importantly, `ProgressiveDisclosurePolicySchema` has no `.describe()` on it
 ---
 
 ### F15 — `RenderMarkdownOptions.disclosureSpec` imports `DisclosureSpec` from deep path inside `documentation-composition/`
+
 **Severity:** Low
 
 **What's missing:** `renderers/types.ts:2` imports `DisclosureSpec` via `'../projections/documentation-composition/disclosure-spec.js'`. This is the "layering inversion" Phase 1 H7 identified: a package-level primitive lives inside one projection subdomain. The import itself works, but when campaign code in `src/doc-definition/` imports `DisclosureSpec`, it will also reach into `documentation-composition/` — across the future subdomain boundary.
@@ -243,36 +265,36 @@ More importantly, `ProgressiveDisclosurePolicySchema` has no `.describe()` on it
 
 ## JSDoc coverage matrix
 
-| Symbol | `@architect-pattern` tag | `@architect-role` tag | Prose JSDoc | I1–I5 invariant doc |
-|--------|--------------------------|------------------------|-------------|---------------------|
-| `renderMarkdown` (entry point) | Yes (MarkdownRenderer) | Yes (codec) | Present (general) | **Missing** (I1, I3) |
-| `renderCompactText` (entry point) | Yes | Yes (codec) | Present (general) | None (no applicable I) |
-| `renderJson` (entry point) | Yes | Yes (codec) | Present (general) | **Missing** (I4) |
-| `renderUi` (entry point) | Yes | Yes (codec) | Present (general) | **Missing** (I2 note) |
-| `sanitizeMarkdownLinkTarget` | No | No | **None** | **Missing** (I1) |
-| `isPlainObject` (`render-json.ts`) | No | No | **None** | **Missing** (I4) |
-| `TRUSTED_MARKDOWN` symbol | No | No | **None** | **Missing** (I3) |
-| `parseAndProject` wrapper | No | No | Present (partial) | Present (partial, I5) |
-| `ProjectionBundle` interface | No | No | **None** | None |
-| `DisclosureSpec` type | No | No | **None** | None |
-| `ProgressiveDisclosurePolicySchema` | No | No | **None** | None |
-| `DOCUMENTATION_PROJECTION_FACTORIES` | No | No | **None** | None |
+| Symbol                               | `@architect-pattern` tag | `@architect-role` tag | Prose JSDoc       | I1–I5 invariant doc    |
+| ------------------------------------ | ------------------------ | --------------------- | ----------------- | ---------------------- |
+| `renderMarkdown` (entry point)       | Yes (MarkdownRenderer)   | Yes (codec)           | Present (general) | **Missing** (I1, I3)   |
+| `renderCompactText` (entry point)    | Yes                      | Yes (codec)           | Present (general) | None (no applicable I) |
+| `renderJson` (entry point)           | Yes                      | Yes (codec)           | Present (general) | **Missing** (I4)       |
+| `renderUi` (entry point)             | Yes                      | Yes (codec)           | Present (general) | **Missing** (I2 note)  |
+| `sanitizeMarkdownLinkTarget`         | No                       | No                    | **None**          | **Missing** (I1)       |
+| `isPlainObject` (`render-json.ts`)   | No                       | No                    | **None**          | **Missing** (I4)       |
+| `TRUSTED_MARKDOWN` symbol            | No                       | No                    | **None**          | **Missing** (I3)       |
+| `parseAndProject` wrapper            | No                       | No                    | Present (partial) | Present (partial, I5)  |
+| `ProjectionBundle` interface         | No                       | No                    | **None**          | None                   |
+| `DisclosureSpec` type                | No                       | No                    | **None**          | None                   |
+| `ProgressiveDisclosurePolicySchema`  | No                       | No                    | **None**          | None                   |
+| `DOCUMENTATION_PROJECTION_FACTORIES` | No                       | No                    | **None**          | None                   |
 
 ---
 
 ## Dogfooding readiness table
 
-| README section | Regeneratable today? | Regeneratable post-campaign? | Stays manual? |
-|----------------|---------------------|------------------------------|---------------|
-| Package title + one-paragraph description | No (no `@architect-package-summary` JSDoc) | Yes (after annotation) | No |
-| Pipeline ASCII diagram | No (no `sequenceDiagram` extractor yet) | Yes (W-DOCS-2c) | No |
-| Usage example (parseAndProjectSessionContext) | No (no `extractFunctionSignature`) | Yes (W-DOCS-2a) | No |
-| Architecture invariants bullets | No (no `adr-006` tag on `render-markdown.ts`) | Yes (after F13 + W-DOCS-2b) | No |
-| Markdown/content trust boundary section | No (no `@architect-trust-boundary` tag) | Yes (after F1 + W-DOCS-2b) | No |
-| "Documentation Composition Contract" table | No (F2: no `.describe()` calls) | Yes (after F2 + W-DOCS-2a) | No |
-| Testing section | Mostly no (no `@architect-test-strategy` tag) | Partial | Yes (preamble prose) |
-| Entry points list (sub-exports) | No | Yes (W-DOCS-2a extractImportMap) | No |
-| "Renderer Overview" (MIGRATION.md) | No (F3: placeholder When to Use) | Yes (after F3) | No |
-| "Residual ADR-006 leaks" (MIGRATION.md) | No — chronological narrative | No | Yes (frozen) |
-| "Performance gate" (PERF.md) | Partial (budgets table from code, prose stays) | Yes for budgets table | Yes for prose + Known gaps |
-| Tables A/B/C codec mapping (MIGRATION.md) | No — source side deleted | No | Yes (frozen historical reference) |
+| README section                                | Regeneratable today?                           | Regeneratable post-campaign?     | Stays manual?                     |
+| --------------------------------------------- | ---------------------------------------------- | -------------------------------- | --------------------------------- |
+| Package title + one-paragraph description     | No (no `@architect-package-summary` JSDoc)     | Yes (after annotation)           | No                                |
+| Pipeline ASCII diagram                        | No (no `sequenceDiagram` extractor yet)        | Yes (W-DOCS-2c)                  | No                                |
+| Usage example (parseAndProjectSessionContext) | No (no `extractFunctionSignature`)             | Yes (W-DOCS-2a)                  | No                                |
+| Architecture invariants bullets               | No (no `adr-006` tag on `render-markdown.ts`)  | Yes (after F13 + W-DOCS-2b)      | No                                |
+| Markdown/content trust boundary section       | No (no `@architect-trust-boundary` tag)        | Yes (after F1 + W-DOCS-2b)       | No                                |
+| "Documentation Composition Contract" table    | No (F2: no `.describe()` calls)                | Yes (after F2 + W-DOCS-2a)       | No                                |
+| Testing section                               | Mostly no (no `@architect-test-strategy` tag)  | Partial                          | Yes (preamble prose)              |
+| Entry points list (sub-exports)               | No                                             | Yes (W-DOCS-2a extractImportMap) | No                                |
+| "Renderer Overview" (MIGRATION.md)            | No (F3: placeholder When to Use)               | Yes (after F3)                   | No                                |
+| "Residual ADR-006 leaks" (MIGRATION.md)       | No — chronological narrative                   | No                               | Yes (frozen)                      |
+| "Performance gate" (PERF.md)                  | Partial (budgets table from code, prose stays) | Yes for budgets table            | Yes for prose + Known gaps        |
+| Tables A/B/C codec mapping (MIGRATION.md)     | No — source side deleted                       | No                               | Yes (frozen historical reference) |

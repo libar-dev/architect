@@ -68,7 +68,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 }),
               ],
             });
-          }
+          },
         );
 
         When('I project and render the roadmap documentation bundle as markdown', () => {
@@ -94,7 +94,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               'roadmap/q1-2026.md',
               'roadmap/q2-2026.md',
             ]);
-          }
+          },
         );
 
         And('the roadmap root markdown should summarize the roadmap quarters', () => {
@@ -115,7 +115,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(child).toContain('RoadmapAlpha');
           expect(child).toContain('packages/architect-projection/fixtures/RoadmapAlpha.ts');
         });
-      }
+      },
     );
   });
 });

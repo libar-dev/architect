@@ -16,7 +16,7 @@ interface SmokeState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/documentation-composition/smoke-documentation-bundle.feature'
+  'tests/features/projections/documentation-composition/smoke-documentation-bundle.feature',
 );
 
 let state: SmokeState | null = null;
@@ -88,7 +88,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 AuthService: 'patterns:authservice',
                 SessionStore: 'patterns:sessionstore',
               });
-            }
+            },
           );
 
           And(
@@ -96,10 +96,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               expect(state!.bundle!.root.kind).toBe('PatternCatalog');
               expect(JSON.stringify(state!.bundle!.root)).toContain('AuthService');
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
 });

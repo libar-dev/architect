@@ -16,7 +16,7 @@ interface OpenQuestionListState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/pattern-relations/open-question-list.feature'
+  'tests/features/projections/pattern-relations/open-question-list.feature',
 );
 
 let state: OpenQuestionListState | null = null;
@@ -140,7 +140,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             items: [],
           });
         });
-      }
+      },
     );
 
     RuleScenario('rejecting an unknown parent', ({ Given, When, Then }) => {
@@ -161,9 +161,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         () => {
           expect(state!.caughtError).toBeInstanceOf(Error);
           expect((state!.caughtError as Error).message).toBe(
-            'Parent pattern not found: UnknownParent'
+            'Parent pattern not found: UnknownParent',
           );
-        }
+        },
       );
     });
   });

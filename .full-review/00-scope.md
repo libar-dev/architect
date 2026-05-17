@@ -20,12 +20,14 @@ This review is therefore scoped to surface issues that would **block, complicate
 Full package: `packages/architect-projection/src/**` (135 TS files), with extra weight on the areas the campaign touches:
 
 **Hot zones (campaign will modify these):**
+
 - `src/projections/documentation-composition/` — 14 files, 1,692 LOC; especially `documentation-bundle.internal.ts` (the hardcoded 12-entry dispatch table at line 64 that is the current ceiling on `architect-generate` output), `documentation-types.ts` (517 LOC type definitions), `progressive-disclosure.ts`, `disclosure-spec.ts`.
 - `src/blocks/schema.ts` — the 9-block-type catalog + `RenderableDocument` envelope; ContentFragment proposal layers on top of this.
 - `src/fragments/**` — 43 projection functions across pattern-relations, governance, operational-insights, delivery-reporting, execution-context, documentation-composition; only 8 reachable through `docs:all` today.
 - `src/renderers/**` — `render-markdown.ts`, `render-compact-text.ts`, `render-json.ts`, `render-ui.ts`, plus `markdown-paths.ts` and `_shared/dispatch.ts`; progressive-disclosure output mechanism lives here.
 
 **Architectural perimeters:**
+
 - `src/index.ts` + sub-entry barrels (`./blocks`, `./fragments`, `./projections`, `./renderers`) — public API surface (`exports` map in `package.json`).
 - `src/context/projection-context.ts` — the context type passed to every projection.
 - `src/_internal/` — slug + format-utils; trust boundary helpers.

@@ -90,7 +90,7 @@ function getHelpState(current: HelpTestState | null): HelpTestState {
 function extractSectionLines(
   stdout: string,
   sectionHeading: string,
-  nextHeading?: string
+  nextHeading?: string,
 ): string[] {
   const startMarker = `${sectionHeading}\n`;
   const startIndex = stdout.indexOf(startMarker);
@@ -180,7 +180,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const lines = extractSectionLines(
             getResult(state).stdout,
             'Commands:',
-            'Global options:'
+            'Global options:',
           );
           expect(lines).toEqual(FROZEN_COMMAND_INVENTORY);
         });
@@ -189,7 +189,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const lines = extractSectionLines(getResult(state).stdout, 'Global options:');
           expect(lines).toEqual(FROZEN_GLOBAL_FLAGS);
         });
-      }
+      },
     );
 
     RuleScenario('Unknown subcommand help', ({ When, Then, And }) => {
@@ -303,18 +303,18 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             )?.root?.kind;
 
             expect(topLevelKind ?? rootKind ?? dataRootKind, result.command).toBe(
-              result.expectedKind
+              result.expectedKind,
             );
 
             if (result.expectedDataKeys !== undefined) {
               expect(
                 Object.keys(result.parsed['data'] as Record<string, unknown>),
-                result.command
+                result.command,
               ).toEqual(result.expectedDataKeys);
             }
           }
         });
-      }
+      },
     );
   });
 });

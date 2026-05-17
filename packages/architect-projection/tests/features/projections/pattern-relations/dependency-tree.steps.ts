@@ -15,7 +15,7 @@ interface DependencyTreeState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/pattern-relations/dependency-tree.feature'
+  'tests/features/projections/pattern-relations/dependency-tree.feature',
 );
 
 let state: DependencyTreeState | null = null;
@@ -156,7 +156,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               children: [],
             });
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -196,8 +196,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               },
             });
           });
-        }
+        },
       );
-    }
+    },
   );
 });

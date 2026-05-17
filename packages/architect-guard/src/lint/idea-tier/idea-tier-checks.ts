@@ -101,7 +101,7 @@ export function detectIdeaTier(lines: readonly string[]): IdeaTierDetection {
 
 export function checkLineBudget(
   lines: readonly string[],
-  filePath: string
+  filePath: string,
 ): readonly LintViolation[] {
   let meaningful = 0;
   for (const rawLine of lines) {
@@ -129,7 +129,7 @@ function checkForbiddenLinePattern(
   filePath: string,
   pattern: RegExp,
   rule: { readonly id: string; readonly severity: 'error' | 'warning' | 'info' },
-  message: string
+  message: string,
 ): readonly LintViolation[] {
   const violations: LintViolation[] = [];
   for (let i = 0; i < lines.length; i++) {
@@ -150,27 +150,27 @@ function checkForbiddenLinePattern(
 
 export function checkNoScenarios(
   lines: readonly string[],
-  filePath: string
+  filePath: string,
 ): readonly LintViolation[] {
   return checkForbiddenLinePattern(
     lines,
     filePath,
     SCENARIO_LINE,
     IDEA_TIER_LINT_RULES.noScenarios,
-    'Idea-tier spec contains a Scenario block. Idea-tier uses rules-with-invariants only — promote to plan-level for scenarios.'
+    'Idea-tier spec contains a Scenario block. Idea-tier uses rules-with-invariants only — promote to plan-level for scenarios.',
   );
 }
 
 export function checkNoBackground(
   lines: readonly string[],
-  filePath: string
+  filePath: string,
 ): readonly LintViolation[] {
   return checkForbiddenLinePattern(
     lines,
     filePath,
     BACKGROUND_LINE,
     IDEA_TIER_LINT_RULES.noBackground,
-    'Idea-tier spec contains a Background block. Deliverables and shared setup belong at plan-level or design-level.'
+    'Idea-tier spec contains a Background block. Deliverables and shared setup belong at plan-level or design-level.',
   );
 }
 
@@ -178,7 +178,7 @@ export function checkNoBackground(
 // description before the next `Rule:`, `Scenario:`, or `Feature:` boundary.
 export function checkRuleHasInvariant(
   lines: readonly string[],
-  filePath: string
+  filePath: string,
 ): readonly LintViolation[] {
   const violations: LintViolation[] = [];
   let currentRuleStartLine: number | null = null;
@@ -233,7 +233,7 @@ export function checkRuleHasInvariant(
 // pattern, status, maturity, product-area (parent waived for epic/slice).
 export function checkTagMinimum(
   detection: IdeaTierDetection,
-  filePath: string
+  filePath: string,
 ): readonly LintViolation[] {
   if (detection.explicitArchitectTagCount >= IDEA_TIER_MIN_EXPLICIT_TAGS) {
     // Epics (top-of-chain) and slices (cross-cutting views) have no parent by design.

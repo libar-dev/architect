@@ -41,7 +41,7 @@ import {
 
 export function projectPatternSummary(
   context: ProjectionContext,
-  name: string
+  name: string,
 ): ProjectionBundle<PatternSummary> {
   return projectSingle(createPatternSummaryFragment(requirePattern(context, name)));
 }

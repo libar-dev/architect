@@ -50,13 +50,13 @@ function parseSource(sourceCode: string, jsx: boolean): TSESTree.Program {
 export function extractShapes(
   sourceCode: string,
   shapeNames: string[],
-  options: ShapeExtractionOptionsInput = {}
+  options: ShapeExtractionOptionsInput = {},
 ): Result<ShapeExtractionResult> {
   if (sourceCode.length > MAX_SOURCE_SIZE_BYTES) {
     return Result.err(
       new Error(
-        `Source code size (${String(sourceCode.length)} bytes) exceeds maximum allowed (${String(MAX_SOURCE_SIZE_BYTES)} bytes)`
-      )
+        `Source code size (${String(sourceCode.length)} bytes) exceeds maximum allowed (${String(MAX_SOURCE_SIZE_BYTES)} bytes)`,
+      ),
     );
   }
 
@@ -72,7 +72,7 @@ export function extractShapes(
     ast = parseSource(sourceCode, options.jsx ?? false);
   } catch (error) {
     return Result.err(
-      error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`)
+      error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`),
     );
   }
 
@@ -87,7 +87,7 @@ export function extractShapes(
         extractShape(sourceCode, declaration, ast.comments ?? [], {
           includeJsDoc,
           preserveFormatting,
-        })
+        }),
       );
       continue;
     }
@@ -142,7 +142,7 @@ function findDeclarations(ast: TSESTree.Program): Map<string, FoundDeclaration[]
         const existing = declarations.get(declaration.name);
         if (existing !== undefined) {
           const hasExportedSameKind = existing.some(
-            (entry) => entry.exported && entry.kind === declaration.kind
+            (entry) => entry.exported && entry.kind === declaration.kind,
           );
           if (!hasExportedSameKind) existing.push(declaration);
         } else {
@@ -261,7 +261,7 @@ function extractShape(
   sourceCode: string,
   declaration: FoundDeclaration,
   comments: TSESTree.Comment[],
-  options: { includeJsDoc: boolean; preserveFormatting: boolean }
+  options: { includeJsDoc: boolean; preserveFormatting: boolean },
 ): ExtractedShape {
   const { node, kind, name, exported } = declaration;
   let sourceText = sourceCode.slice(node.range[0], node.range[1]);
@@ -304,7 +304,7 @@ function extractShape(
     const params = node.typeParameters;
     if (params?.params) {
       typeParameters = params.params.map((param) =>
-        sourceCode.slice(param.range[0], param.range[1])
+        sourceCode.slice(param.range[0], param.range[1]),
       );
     }
   }
@@ -329,7 +329,7 @@ function extractShape(
           sourceCode,
           member,
           sortedComments,
-          interfaceBodyStartLine
+          interfaceBodyStartLine,
         );
         if (propJsDoc) {
           const cleanedJsDoc = extractJsDocText(propJsDoc);
@@ -390,7 +390,7 @@ function stripArchitectTags(jsDoc: string): string | undefined {
 function extractPrecedingJsDoc(
   sourceCode: string,
   node: TSESTree.Node,
-  comments: TSESTree.Comment[]
+  comments: TSESTree.Comment[],
 ): string | undefined {
   const nodeStart = node.range[0];
   const nodeLine = node.loc.start.line;
@@ -435,7 +435,7 @@ function prepareJsDocComments(comments: readonly TSESTree.Comment[]): JsDocComme
 
 function findCommentEndingAtLine(
   sortedComments: readonly JsDocCommentWithLine[],
-  targetLine: number
+  targetLine: number,
 ): number {
   if (sortedComments.length === 0) return -1;
 
@@ -465,7 +465,7 @@ function findStrictlyAdjacentPropertyJsDoc(
   sourceCode: string,
   member: TSESTree.Node,
   sortedComments: readonly JsDocCommentWithLine[],
-  interfaceBodyStartLine: number
+  interfaceBodyStartLine: number,
 ): string | undefined {
   const memberStartLine = member.loc.start.line;
   const memberStart = member.range[0];
@@ -628,13 +628,13 @@ function extractIncludeTag(jsDocText: string): readonly string[] | undefined {
 
 export function discoverTaggedShapes(
   sourceCode: string,
-  options?: { readonly jsx?: boolean }
+  options?: { readonly jsx?: boolean },
 ): Result<ProcessExtractShapesResult> {
   if (sourceCode.length > MAX_SOURCE_SIZE_BYTES) {
     return Result.err(
       new Error(
-        `Source code size (${String(sourceCode.length)} bytes) exceeds maximum allowed (${String(MAX_SOURCE_SIZE_BYTES)} bytes)`
-      )
+        `Source code size (${String(sourceCode.length)} bytes) exceeds maximum allowed (${String(MAX_SOURCE_SIZE_BYTES)} bytes)`,
+      ),
     );
   }
 
@@ -643,7 +643,7 @@ export function discoverTaggedShapes(
     ast = parseSource(sourceCode, options?.jsx ?? false);
   } catch (error) {
     return Result.err(
-      error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`)
+      error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`),
     );
   }
 

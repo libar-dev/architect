@@ -32,7 +32,7 @@ async function main(): Promise<void> {
   }
 
   process.stdout.write(
-    `workspace smoke ok: ${result.value.graph.patterns.length} patterns, ${result.value.diagnostics.length} diagnostics\n`
+    `workspace smoke ok: ${result.value.graph.patterns.length} patterns, ${result.value.diagnostics.length} diagnostics\n`,
   );
 }
 

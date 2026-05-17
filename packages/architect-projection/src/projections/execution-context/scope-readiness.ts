@@ -47,7 +47,7 @@ export type { ScopeReadinessOptions } from './scope-readiness.internal.js';
 
 export function projectScopeReadinessReport(
   context: ProjectionContext,
-  options: ScopeReadinessOptions
+  options: ScopeReadinessOptions,
 ): ProjectionBundle<ScopeReadinessReport> {
   return projectSingle(buildScopeReadinessReport(context, options));
 }
@@ -55,5 +55,5 @@ export function projectScopeReadinessReport(
 export const parseAndProjectScopeReadinessReport = parseAndProject(
   ScopeReadinessOptionsSchema,
   projectScopeReadinessReport,
-  'parseAndProjectScopeReadinessReport'
+  'parseAndProjectScopeReadinessReport',
 );

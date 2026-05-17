@@ -29,7 +29,7 @@ export type { PatternBundleOptions } from './bundle.internal.js';
 
 export function projectPatternBundle(
   context: ProjectionContext,
-  options: PatternBundleOptions
+  options: PatternBundleOptions,
 ): ProjectionBundle<PatternBundleEntry> {
   return buildPatternBundle(context, options);
 }
@@ -37,5 +37,5 @@ export function projectPatternBundle(
 export const parseAndProjectPatternBundle = parseAndProject(
   PatternBundleOptionsSchema,
   projectPatternBundle,
-  'parseAndProjectPatternBundle'
+  'parseAndProjectPatternBundle',
 );

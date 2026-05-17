@@ -70,7 +70,7 @@ export interface ContextComparison {
 
 export function computeNeighborhood(
   name: string,
-  dataset: PatternGraph
+  dataset: PatternGraph,
 ): NeighborhoodResult | undefined {
   const pattern = findPatternByName(dataset.patterns, name);
   if (pattern === undefined) {
@@ -81,16 +81,16 @@ export function computeNeighborhood(
   const relationships = getRelationships(dataset, patternName);
 
   const uses = (relationships?.uses ?? []).map((entry) =>
-    resolveNeighborEntry(dataset.patterns, entry)
+    resolveNeighborEntry(dataset.patterns, entry),
   );
   const usedBy = (relationships?.usedBy ?? []).map((entry) =>
-    resolveNeighborEntry(dataset.patterns, entry)
+    resolveNeighborEntry(dataset.patterns, entry),
   );
   const dependsOn = (relationships?.dependsOn ?? []).map((entry) =>
-    resolveNeighborEntry(dataset.patterns, entry)
+    resolveNeighborEntry(dataset.patterns, entry),
   );
   const enables = (relationships?.enables ?? []).map((entry) =>
-    resolveNeighborEntry(dataset.patterns, entry)
+    resolveNeighborEntry(dataset.patterns, entry),
   );
 
   const sameContext: NeighborEntry[] = [];
@@ -122,7 +122,7 @@ export function computeNeighborhood(
 
 function aggregateContextDependencies(
   patterns: readonly ExtractedPattern[],
-  dataset: PatternGraph
+  dataset: PatternGraph,
 ): Set<string> {
   const dependencies = new Set<string>();
 
@@ -146,7 +146,7 @@ function findIntegrationPoints(
   fromContext: string,
   targetPatternNames: ReadonlySet<string>,
   toContext: string,
-  dataset: PatternGraph
+  dataset: PatternGraph,
 ): IntegrationPoint[] {
   const points: IntegrationPoint[] = [];
 
@@ -185,7 +185,7 @@ function findIntegrationPoints(
 export function compareContexts(
   leftContext: string,
   rightContext: string,
-  dataset: PatternGraph
+  dataset: PatternGraph,
 ): ContextComparison | undefined {
   const archIndex: ArchIndex | undefined = dataset.archIndex;
   if (archIndex === undefined) {

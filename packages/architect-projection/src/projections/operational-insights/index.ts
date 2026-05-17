@@ -181,7 +181,7 @@ export function buildOverviewDigest(context: ProjectionContext): OverviewDigest 
 
 export function buildAnnotationCoverage(context: ProjectionContext): AnnotationCoverage {
   const files = collectSourceFileEntries(
-    filterPatterns(context.graph.patterns, context.projectionFilter)
+    filterPatterns(context.graph.patterns, context.projectionFilter),
   );
   const requiredTags = resolveRequiredCoverageTags(context);
   const gapsByTag = new Map<string, string[]>();
@@ -219,7 +219,7 @@ export function buildAnnotationCoverage(context: ProjectionContext): AnnotationC
         .map(([tag, filePaths]) => [
           tag,
           [...filePaths].sort((left, right) => left.localeCompare(right)),
-        ])
+        ]),
     ),
   };
 }
@@ -286,13 +286,13 @@ export function buildSourceInventory(context: ProjectionContext): SourceInventor
         right.count - left.count ||
         (SOURCE_TYPE_PRIORITY.get(left.type) ?? Number.MAX_SAFE_INTEGER) -
           (SOURCE_TYPE_PRIORITY.get(right.type) ?? Number.MAX_SAFE_INTEGER) ||
-        left.type.localeCompare(right.type)
+        left.type.localeCompare(right.type),
     );
 }
 
 export function buildRoleProfile(
   context: ProjectionContext,
-  role: string
+  role: string,
 ): RoleProfile | undefined {
   const definition = resolveRoleDefinition(context, role);
   if (definition === undefined) {
@@ -304,27 +304,29 @@ export function buildRoleProfile(
 
 export function buildRoleProfiles(context: ProjectionContext): RoleProfile[] {
   return context.graph.tagRegistry.roles.map((definition) =>
-    createRoleProfile(context, definition)
+    createRoleProfile(context, definition),
   );
 }
 
 export function buildRequirementDigest(
   context: ProjectionContext,
-  productArea?: string
+  productArea?: string,
 ): RequirementDigest {
   const sourceEntries = createRequirementSourceEntries(context, productArea);
 
   return createRequirementDigest(
     productArea ?? 'All Product Areas',
     sourceEntries.map(({ entry }) => entry),
-    sourceEntries.flatMap(({ pattern }) => createBusinessRuleReferencesForPattern(context, pattern))
+    sourceEntries.flatMap(({ pattern }) =>
+      createBusinessRuleReferencesForPattern(context, pattern),
+    ),
   );
 }
 
 function incrementTagUsage(
   tagMap: Map<string, Map<string, number>>,
   tag: string,
-  value: string
+  value: string,
 ): void {
   const values = tagMap.get(tag) ?? new Map<string, number>();
   values.set(value, (values.get(value) ?? 0) + 1);
@@ -332,7 +334,7 @@ function incrementTagUsage(
 }
 
 function collectSourceFileEntries(
-  patterns: readonly ExtractedPattern[]
+  patterns: readonly ExtractedPattern[],
 ): Map<string, readonly ExtractedPattern[]> {
   const grouped = new Map<string, ExtractedPattern[]>();
 
@@ -345,7 +347,7 @@ function collectSourceFileEntries(
   return new Map(
     [...grouped.entries()]
       .sort(([left], [right]) => left.localeCompare(right))
-      .map(([file, filePatterns]) => [file, [...filePatterns]] as const)
+      .map(([file, filePatterns]) => [file, [...filePatterns]] as const),
   );
 }
 
@@ -368,7 +370,7 @@ function resolveRequiredCoverageTags(context: ProjectionContext): string[] {
 function fileSatisfiesTag(
   context: ProjectionContext,
   patterns: readonly ExtractedPattern[],
-  tag: string
+  tag: string,
 ): boolean {
   return patterns.some((pattern) => patternSatisfiesTag(context, pattern, tag));
 }
@@ -376,7 +378,7 @@ function fileSatisfiesTag(
 function patternSatisfiesTag(
   context: ProjectionContext,
   pattern: ExtractedPattern,
-  tag: string
+  tag: string,
 ): boolean {
   switch (tag) {
     case 'status':
@@ -492,12 +494,12 @@ function deriveLocationPattern(files: readonly string[]): string {
 
 function resolveRoleDefinition(
   context: ProjectionContext,
-  role: string
+  role: string,
 ): RoleDefinition | undefined {
   const normalizedRole = role.toLowerCase();
   return context.graph.tagRegistry.roles.find(
     (definition) =>
-      definition.tag === normalizedRole || definition.aliases?.includes(normalizedRole) === true
+      definition.tag === normalizedRole || definition.aliases?.includes(normalizedRole) === true,
   );
 }
 
@@ -517,7 +519,7 @@ function createRoleProfile(context: ProjectionContext, definition: RoleDefinitio
 
 function resolvePatternsForRole(
   context: ProjectionContext,
-  definition: RoleDefinition
+  definition: RoleDefinition,
 ): ExtractedPattern[] {
   const indexed = context.graph.byRole[definition.tag];
   if (indexed !== undefined) {
@@ -528,12 +530,12 @@ function resolvePatternsForRole(
     (pattern) =>
       pattern.role !== undefined &&
       (pattern.role.toLowerCase() === definition.tag ||
-        definition.aliases?.includes(pattern.role.toLowerCase()) === true)
+        definition.aliases?.includes(pattern.role.toLowerCase()) === true),
   );
 }
 
 function createStatusCounts(
-  patterns: readonly ExtractedPattern[]
+  patterns: readonly ExtractedPattern[],
 ): ProjectionContext['graph']['counts'] {
   return {
     completed: patterns.filter((pattern) => isPatternComplete(pattern.status)).length,
@@ -546,7 +548,7 @@ function createStatusCounts(
 
 function createRequirementSourceEntries(
   context: ProjectionContext,
-  productArea?: string
+  productArea?: string,
 ): RequirementSourceEntry[] {
   return resolveRequirementPatterns(context, productArea).map((pattern) => {
     const packageId = context.packageResolver(pattern.source.file).id;
@@ -560,7 +562,7 @@ function createRequirementSourceEntries(
 }
 
 function createRequirementProjectionSourceData(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): RequirementProjectionSourceData {
   const sourceEntries = createRequirementSourceEntries(context);
 
@@ -578,7 +580,7 @@ function createRequirementProjectionSourceData(
 function createRequirementDigest(
   productArea: string,
   requirements: readonly RequirementEntry[],
-  businessRuleReferences: readonly BusinessRuleReference[] = []
+  businessRuleReferences: readonly BusinessRuleReference[] = [],
 ): RequirementDigest {
   return {
     kind: 'RequirementDigest',
@@ -589,14 +591,14 @@ function createRequirementDigest(
 }
 
 function dedupeBusinessRuleReferences(
-  businessRuleReferences: readonly BusinessRuleReference[]
+  businessRuleReferences: readonly BusinessRuleReference[],
 ): BusinessRuleReference[] {
   const deduped = new Map<string, BusinessRuleReference>();
 
   for (const reference of businessRuleReferences) {
     deduped.set(
       `${reference.ownerRouteId}::${reference.feature}::${reference.ruleName}`,
-      reference
+      reference,
     );
   }
 
@@ -605,11 +607,11 @@ function dedupeBusinessRuleReferences(
 
 function createBusinessRuleReferencesForPattern(
   context: ProjectionContext,
-  pattern: ExtractedPattern
+  pattern: ExtractedPattern,
 ): readonly BusinessRuleReference[] {
   const feature = getPatternName(pattern);
   const ownerRouteId = createBusinessRuleOwnerRouteId(
-    context.packageResolver(pattern.source.file).id
+    context.packageResolver(pattern.source.file).id,
   );
 
   return (pattern.rules ?? []).map((rule) => ({
@@ -622,7 +624,7 @@ function createBusinessRuleReferencesForPattern(
 
 function resolveRequirementPatterns(
   context: ProjectionContext,
-  productArea: string | undefined
+  productArea: string | undefined,
 ): ExtractedPattern[] {
   const patterns =
     productArea !== undefined
@@ -631,7 +633,7 @@ function resolveRequirementPatterns(
           (pattern) =>
             hasNonEmptyString(pattern.productArea) ||
             hasNonEmptyString(pattern.userRole) ||
-            hasNonEmptyString(pattern.businessValue)
+            hasNonEmptyString(pattern.businessValue),
         );
 
   return filterPatterns(patterns, context.projectionFilter)
@@ -761,7 +763,7 @@ function resolveRequirementTestFiles(pattern: ExtractedPattern): string[] {
  * - Projects the annotation coverage fragment for CI gates and dashboards.
  */
 export function projectAnnotationCoverage(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<AnnotationCoverage> {
   return projectSingle(buildAnnotationCoverage(context));
 }
@@ -799,7 +801,7 @@ export function projectAnnotationCoverage(
  * - Projects the overview digest used by session-start workflows and CLI bootstrap hints.
  */
 export function projectOverviewDigest(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<OverviewDigest> {
   return projectSingle(buildOverviewDigest(context));
 }
@@ -846,7 +848,7 @@ export function projectOverviewDigest(
  */
 export function projectRequirementDigest(
   context: ProjectionContext,
-  productArea?: string
+  productArea?: string,
 ): ProjectionBundle<RequirementDigest> {
   return projectSingle(buildRequirementDigest(context, productArea));
 }
@@ -885,7 +887,7 @@ export function projectRequirementDigest(
  * - Projects the executable requirements digest for implemented patterns.
  */
 export function projectRequirementExecutableDigest(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<RequirementDigest> {
   return projectBucketedRequirementDigest(context, 'executable');
 }
@@ -922,7 +924,7 @@ export function projectRequirementExecutableDigest(
  * - Projects the spec-tier requirements digest for design-level patterns.
  */
 export function projectRequirementSpecsDigest(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<RequirementDigest> {
   return projectBucketedRequirementDigest(context, 'specs');
 }
@@ -954,14 +956,14 @@ function isPlannedStatus(status: string | undefined): boolean {
 
 function projectBucketedRequirementDigest(
   context: ProjectionContext,
-  bucket: RequirementDocumentationBucket
+  bucket: RequirementDocumentationBucket,
 ): ProjectionBundle<RequirementDigest> {
   return createBucketedRequirementDigest(createRequirementProjectionSourceData(context), bucket);
 }
 
 function createBucketedRequirementDigest(
   sourceData: RequirementProjectionSourceData,
-  bucket: RequirementDocumentationBucket
+  bucket: RequirementDocumentationBucket,
 ): ProjectionBundle<RequirementDigest> {
   const bucketLabel =
     bucket === 'executable' ? REQUIREMENTS_EXECUTABLE_AREA_LABEL : REQUIREMENTS_SPECS_AREA_LABEL;
@@ -976,7 +978,7 @@ function createBucketedRequirementDigest(
     const root = createRequirementDigest(
       bucketLabel,
       rootEntries,
-      bucketEntries.flatMap((entry) => entry.businessRuleReferences)
+      bucketEntries.flatMap((entry) => entry.businessRuleReferences),
     );
 
     const flatChildren: Record<string, RequirementDigest> = {};
@@ -986,7 +988,7 @@ function createBucketedRequirementDigest(
       ] = createRequirementDigest(
         sourceEntry.entry.pattern,
         [sourceEntry.entry],
-        sourceEntry.businessRuleReferences
+        sourceEntry.businessRuleReferences,
       );
     }
 
@@ -1020,14 +1022,14 @@ function createBucketedRequirementDigest(
     children[createRequirementPackageIndexRouteId(bucket, pkgId)] = createRequirementDigest(
       pkgId,
       perPackageIndexEntries,
-      entries.flatMap((entry) => entry.businessRuleReferences)
+      entries.flatMap((entry) => entry.businessRuleReferences),
     );
     for (const sourceEntry of entries) {
       children[createRequirementPackageDetailRouteId(bucket, pkgId, sourceEntry.entry.pattern)] =
         createRequirementDigest(
           sourceEntry.entry.pattern,
           [sourceEntry.entry],
-          sourceEntry.businessRuleReferences
+          sourceEntry.businessRuleReferences,
         );
     }
   }
@@ -1035,7 +1037,7 @@ function createBucketedRequirementDigest(
   const root = createRequirementDigest(
     bucketLabel,
     rootEntries,
-    bucketEntries.flatMap((entry) => entry.businessRuleReferences)
+    bucketEntries.flatMap((entry) => entry.businessRuleReferences),
   );
 
   if (Object.keys(children).length === 0) {
@@ -1062,7 +1064,7 @@ function usesFlatSpecsRoute(pattern: ExtractedPattern): boolean {
 function createRequirementChildRouteIdForBucket(
   bucket: RequirementDocumentationBucket,
   packageId: string,
-  pattern: ExtractedPattern
+  pattern: ExtractedPattern,
 ): string {
   const feature = getPatternName(pattern);
 
@@ -1109,14 +1111,14 @@ function createRequirementChildRouteIdForBucket(
  */
 export function projectRoleProfile(
   context: ProjectionContext,
-  role: string
+  role: string,
 ): ProjectionBundle<RoleProfile> | undefined {
   const profile = buildRoleProfile(context, role);
   return profile === undefined ? undefined : projectSingle(profile);
 }
 
 export function projectRoleProfiles(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<RoleProfileCollection> {
   return projectSingle({
     kind: 'RoleProfileCollection',
@@ -1159,7 +1161,7 @@ export function projectRoleProfiles(
  * - Projects the tag usage matrix that summarizes metadata-tag counts across the graph.
  */
 export function projectSourceInventoryDigest(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<SourceInventoryDigest> {
   return projectSingle({
     kind: 'SourceInventoryDigest',

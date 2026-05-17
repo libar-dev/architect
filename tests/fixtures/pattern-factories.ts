@@ -661,7 +661,7 @@ export function mergePatterns(...patternSets: ExtractedPattern[][]): ExtractedPa
  */
 export function filterByCategory(
   patterns: ExtractedPattern[],
-  category: string
+  category: string,
 ): ExtractedPattern[] {
   return patterns.filter((p) => p.role === category);
 }

@@ -29,7 +29,7 @@ function disclosureSpec(
   emitChildren: boolean,
   committed: boolean,
   filter?: DisclosureSpec['filter'],
-  rootShape?: DisclosureSpec['rootShape']
+  rootShape?: DisclosureSpec['rootShape'],
 ): DisclosureSpec {
   return {
     grouping,
@@ -61,7 +61,7 @@ function omitFilter(spec: DisclosureSpec): DisclosureSpec {
 }
 
 export function freezeDisclosureMatrix(
-  matrix: DocumentationDisclosureMatrix
+  matrix: DocumentationDisclosureMatrix,
 ): DocumentationDisclosureMatrix {
   freezeDisclosureSpec(matrix.essential);
   freezeDisclosureSpec(matrix.important);
@@ -79,7 +79,7 @@ export function freezeDisclosureSpec(spec: DisclosureSpec): DisclosureSpec {
 }
 
 function freezeProjectionFilter(
-  filter: NonNullable<DisclosureSpec['filter']>
+  filter: NonNullable<DisclosureSpec['filter']>,
 ): NonNullable<DisclosureSpec['filter']> {
   if (filter.maturity !== undefined) {
     Object.freeze(filter.maturity);

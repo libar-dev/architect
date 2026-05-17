@@ -38,7 +38,7 @@ export const ProjectDocumentationBundleOptionsSchema = z
     documentType: z.custom<SupportedDocumentationType>(
       (value): value is SupportedDocumentationType =>
         typeof value === 'string' && getDocumentationTypeMetadata(value) !== undefined,
-      { message: `Supported types: ${SUPPORTED_DOCUMENTATION_TYPES.join(', ')}` }
+      { message: `Supported types: ${SUPPORTED_DOCUMENTATION_TYPES.join(', ')}` },
     ),
     disclosureLevel: ProgressiveDisclosureLevelSchema.optional(),
   })
@@ -91,13 +91,13 @@ export function assertSupportedDocumentType(documentType: string): SupportedDocu
 
   throw new ProjectionError(
     'UNKNOWN_DOCUMENT_TYPE',
-    `Unknown document type "${documentType}". Supported types: ${SUPPORTED_DOCUMENTATION_TYPES.join(', ')}.`
+    `Unknown document type "${documentType}". Supported types: ${SUPPORTED_DOCUMENTATION_TYPES.join(', ')}.`,
   );
 }
 
 export function projectDocumentationBundleInternal(
   context: ProjectionContext,
-  options: RawProjectDocumentationBundleOptions
+  options: RawProjectDocumentationBundleOptions,
 ): ProjectionBundle<Fragment> {
   const documentType = assertSupportedDocumentType(options.documentType);
   const filteredContext = withDocumentationFilter(context, documentType, options.disclosureLevel);
@@ -106,19 +106,15 @@ export function projectDocumentationBundleInternal(
   const metadata = getDocumentationTypeMetadata(documentType);
   if (metadata !== undefined && bundle.routing !== undefined) {
     const level = options.disclosureLevel ?? metadata.defaultDisclosureLevel;
-    const childDirectory =
-      'childDirectory' in metadata ? metadata.childDirectory : undefined;
-    const entityPathLayout =
-      'entityPathLayout' in metadata ? metadata.entityPathLayout : undefined;
+    const childDirectory = 'childDirectory' in metadata ? metadata.childDirectory : undefined;
+    const entityPathLayout = 'entityPathLayout' in metadata ? metadata.entityPathLayout : undefined;
     return {
       ...bundle,
       routing: {
         ...bundle.routing,
         disclosureSpec: metadata.disclosureMatrix[level],
         markdownRootTarget: metadata.markdownRootTarget,
-        ...(childDirectory !== undefined
-          ? { markdownChildDirectory: childDirectory }
-          : {}),
+        ...(childDirectory !== undefined ? { markdownChildDirectory: childDirectory } : {}),
         ...(entityPathLayout !== undefined ? { entityPathLayout } : {}),
       },
     };
@@ -130,7 +126,7 @@ export function projectDocumentationBundleInternal(
 function withDocumentationFilter(
   context: ProjectionContext,
   documentType: SupportedDocumentationType,
-  disclosureLevel: ProjectDocumentationBundleOptions['disclosureLevel']
+  disclosureLevel: ProjectDocumentationBundleOptions['disclosureLevel'],
 ): ProjectionContext {
   const projectionFilter = resolveProjectionFilter(context, documentType, disclosureLevel);
 

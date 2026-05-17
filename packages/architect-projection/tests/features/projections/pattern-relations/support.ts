@@ -82,7 +82,7 @@ export function createPattern(name: string, options: PatternFixtureOptions = {})
 }
 
 export function createRelationshipEntry(
-  overrides: Partial<RelationshipEntry> = {}
+  overrides: Partial<RelationshipEntry> = {},
 ): RelationshipEntry {
   return {
     uses: overrides.uses ?? [],

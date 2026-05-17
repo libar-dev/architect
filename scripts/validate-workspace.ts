@@ -48,7 +48,7 @@ async function main(): Promise<void> {
   const warnings = result.value.warnings.length;
   const diagnostics = result.value.diagnostics.length;
   process.stdout.write(
-    `workspace validate ok: ${result.value.graph.patterns.length} patterns, ${warnings} warnings, ${diagnostics} diagnostics\n`
+    `workspace validate ok: ${result.value.graph.patterns.length} patterns, ${warnings} warnings, ${diagnostics} diagnostics\n`,
   );
 }
 

@@ -62,7 +62,7 @@ export function createDiagnostic(
   filePath: string,
   code: ExtractionDiagnosticCode,
   message: string,
-  suggestion?: string
+  suggestion?: string,
 ): ExtractionDiagnostic {
   return {
     filePath,
@@ -81,33 +81,33 @@ function normalizeDeprecatedTag(tag: string): string {
 export function createDeprecatedTagDiagnostic(
   filePath: string,
   deprecatedTag: string,
-  replacementTag: string
+  replacementTag: string,
 ): ExtractionDiagnostic {
   const normalizedTag = normalizeDeprecatedTag(deprecatedTag);
   return createDiagnostic(
     filePath,
     'deprecated-tag',
     `Deprecated tag '${normalizedTag}' is no longer recognized`,
-    `Use ${replacementTag} instead of legacy tag '${normalizedTag}'`
+    `Use ${replacementTag} instead of legacy tag '${normalizedTag}'`,
   );
 }
 
 export function createRemovedLayerTagDiagnostic(
   filePath: string,
-  deprecatedTag: string
+  deprecatedTag: string,
 ): ExtractionDiagnostic {
   const normalizedTag = normalizeDeprecatedTag(deprecatedTag);
   return createDiagnostic(
     filePath,
     'deprecated-tag',
     `Deprecated tag '${normalizedTag}' is no longer recognized`,
-    'Remove the legacy tag. Wave 1 has no direct replacement; author @architect-bounded-context only when the annotation is actually expressing bounded-context ownership.'
+    'Remove the legacy tag. Wave 1 has no direct replacement; author @architect-bounded-context only when the annotation is actually expressing bounded-context ownership.',
   );
 }
 
 export function createPatternContractDiagnostics(
   filePath: string,
-  validationErrors: readonly string[]
+  validationErrors: readonly string[],
 ): ExtractionDiagnostic[] {
   const diagnostics: ExtractionDiagnostic[] = [];
   const seen = new Set<string>();
@@ -124,8 +124,8 @@ export function createPatternContractDiagnostics(
           filePath,
           'invalid-pattern-name',
           `Invalid @architect-pattern identifier. ${message}`,
-          'Use @architect-pattern PascalCaseName and keep headings descriptive only.'
-        )
+          'Use @architect-pattern PascalCaseName and keep headings descriptive only.',
+        ),
       );
       continue;
     }
@@ -140,8 +140,8 @@ export function createPatternContractDiagnostics(
           filePath,
           'invalid-uses-target',
           `Invalid @architect-uses target. ${message}`,
-          'Use a declared pattern name like SomePattern or package-id:SomePattern.'
-        )
+          'Use a declared pattern name like SomePattern or package-id:SomePattern.',
+        ),
       );
     }
   }

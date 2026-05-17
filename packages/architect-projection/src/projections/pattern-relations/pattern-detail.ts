@@ -53,7 +53,7 @@ import {
 
 export function projectPatternDetail(
   context: ProjectionContext,
-  name: string
+  name: string,
 ): ProjectionBundle<PatternDetail> {
   const pattern = requirePattern(context, name);
   const summary = createPatternSummaryFragment(pattern);

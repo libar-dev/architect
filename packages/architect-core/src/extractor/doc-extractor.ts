@@ -70,7 +70,7 @@ function buildRoleLookup(roles: readonly RoleLike[]): {
 
 function resolveCanonicalRole(
   rawValue: string | undefined,
-  roles: readonly RoleLike[]
+  roles: readonly RoleLike[],
 ): string | undefined {
   if (rawValue === undefined) return undefined;
   const lookup = buildRoleLookup(roles);
@@ -89,14 +89,14 @@ function collectRoleDiagnostics(
   directive: DocDirective,
   patternRole: string | undefined,
   registry: TagRegistry,
-  filePath: string
+  filePath: string,
 ): ExtractionDiagnostic[] {
   const diagnostics: ExtractionDiagnostic[] = [];
   const validRoleValues = createRoleValuesSuggestion(registry.roles);
   const canonicalRoleTagPrefix = `${registry.tagPrefix}role`;
 
   const canonicalRoleTags = directive.tags.filter(
-    (tag) => tag === canonicalRoleTagPrefix || tag.startsWith(`${canonicalRoleTagPrefix}:`)
+    (tag) => tag === canonicalRoleTagPrefix || tag.startsWith(`${canonicalRoleTagPrefix}:`),
   );
   if (canonicalRoleTags.length > 1) {
     diagnostics.push(
@@ -104,8 +104,8 @@ function collectRoleDiagnostics(
         filePath,
         'invalid-enum-value',
         `Multiple @architect-role tags found; using the first value and ignoring ${String(canonicalRoleTags.length - 1)} duplicate tag(s)`,
-        'Keep exactly one @architect-role tag'
-      )
+        'Keep exactly one @architect-role tag',
+      ),
     );
   }
 
@@ -115,8 +115,8 @@ function collectRoleDiagnostics(
         filePath,
         'invalid-enum-value',
         `Unrecognized value '${directive.role}' for @architect-role`,
-        `Valid values: ${validRoleValues}`
-      )
+        `Valid values: ${validRoleValues}`,
+      ),
     );
   }
 
@@ -129,7 +129,7 @@ function collectRoleDiagnostics(
       const value = normalized.substring('arch-role:'.length);
       const canonicalRole = resolveCanonicalRole(value, registry.roles) ?? value;
       diagnostics.push(
-        createDeprecatedTagDiagnostic(filePath, deprecatedTag, `@architect-role:${canonicalRole}`)
+        createDeprecatedTagDiagnostic(filePath, deprecatedTag, `@architect-role:${canonicalRole}`),
       );
       continue;
     }
@@ -140,8 +140,8 @@ function collectRoleDiagnostics(
         createDeprecatedTagDiagnostic(
           filePath,
           deprecatedTag,
-          `@architect-bounded-context:${value}`
-        )
+          `@architect-bounded-context:${value}`,
+        ),
       );
       continue;
     }
@@ -154,7 +154,7 @@ function collectRoleDiagnostics(
     const canonicalRole = resolveCanonicalRole(normalized, registry.roles);
     if (canonicalRole !== undefined) {
       diagnostics.push(
-        createDeprecatedTagDiagnostic(filePath, deprecatedTag, `@architect-role:${canonicalRole}`)
+        createDeprecatedTagDiagnostic(filePath, deprecatedTag, `@architect-role:${canonicalRole}`),
       );
     }
   }
@@ -165,7 +165,7 @@ function collectRoleDiagnostics(
 export function extractPatterns(
   scannedFiles: readonly ScannedFile[],
   baseDir: string,
-  registry?: TagRegistry
+  registry?: TagRegistry,
 ): ExtractionResults {
   const patterns: ExtractedPattern[] = [];
   const errors: PatternValidationError[] = [];
@@ -180,7 +180,7 @@ export function extractPatterns(
         item.exports,
         scannedFile.filePath,
         baseDir,
-        effectiveRegistry
+        effectiveRegistry,
       );
 
       if (Result.isOk(result)) {
@@ -190,16 +190,16 @@ export function extractPatterns(
             item.directive,
             result.value.role,
             effectiveRegistry,
-            path.relative(baseDir, scannedFile.filePath)
-          )
+            path.relative(baseDir, scannedFile.filePath),
+          ),
         );
       } else {
         errors.push(result.error);
         diagnostics.push(
           ...createPatternContractDiagnostics(
             path.relative(baseDir, scannedFile.filePath),
-            result.error.validationErrors ?? []
-          )
+            result.error.validationErrors ?? [],
+          ),
         );
       }
     }
@@ -214,7 +214,7 @@ export function buildPattern(
   exports: readonly ExportInfo[],
   filePath: string,
   baseDir: string,
-  registry: TagRegistry
+  registry: TagRegistry,
 ): Result<ExtractedPattern, PatternValidationError> {
   const relativePath = path.relative(baseDir, filePath);
   const id = asPatternId(generatePatternId(relativePath, directive.position.startLine));
@@ -231,7 +231,7 @@ export function buildPattern(
       sourceContent = fs.readFileSync(filePath, 'utf-8');
     } catch (error) {
       extractionWarnings.push(
-        `[shape-extraction] Failed to read file: ${filePath} - ${error instanceof Error ? error.message : String(error)}`
+        `[shape-extraction] Failed to read file: ${filePath} - ${error instanceof Error ? error.message : String(error)}`,
       );
     }
 
@@ -300,8 +300,8 @@ export function buildPattern(
         asSourceFilePath(relativePath),
         name,
         'Pattern validation failed',
-        validation.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`)
-      )
+        validation.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`),
+      ),
     );
   }
 
@@ -311,7 +311,7 @@ export function buildPattern(
 export function inferPatternName(
   directive: DocDirective,
   exports: readonly ExportInfo[],
-  registry: TagRegistry
+  registry: TagRegistry,
 ): string {
   if (directive.patternName) return directive.patternName;
 
@@ -332,7 +332,7 @@ export function inferPatternName(
 export function hasAggregationTag(
   tags: readonly string[],
   aggregationTagName: string,
-  registry: TagRegistry
+  registry: TagRegistry,
 ): boolean {
   const aggregationTag = registry.aggregationTags.find((tag) => tag.tag === aggregationTagName);
   if (!aggregationTag) return false;
@@ -348,7 +348,7 @@ export interface AggregationTags {
 
 export function getAggregationTags(
   tags: readonly string[],
-  registry: TagRegistry
+  registry: TagRegistry,
 ): AggregationTags {
   return {
     overview: hasAggregationTag(tags, 'overview', registry),

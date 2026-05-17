@@ -30,7 +30,7 @@ Source: merged PRs in `libar-ai/architect-studio` (private). Aggregated across P
 - The single entry-point helper is now `parseAndProject` (located at `architect-projection/src/projections/_shared/parse-and-project.internal.ts`) (#19).
 - **Public-CLI subcommand names and MCP tool names did NOT change** for these renames — only the JS surface (#19).
 - All `format*()` text-concatenation functions in `architect-query` are gone — use `renderCompactText` / `renderJson` / `renderMarkdown` / `renderUi` instead (#17).
-- **Removed CLI subcommands** (#31): `arch layer`, `list --phase N`, `list --maturity` *(wait — `--maturity` was added in #24 then removed-or-narrowed depending on tag-status; verify against current source)*.
+- **Removed CLI subcommands** (#31): `arch layer`, `list --phase N`, `list --maturity` _(wait — `--maturity` was added in #24 then removed-or-narrowed depending on tag-status; verify against current source)_.
 - **Renamed CLI subcommand** (#31): `arch context` → `arch bounded-context`.
 - **`scope-check` removed**; replaced with `scope-validate` (#15).
 - **No-BC posture is policy** (#19): no `@deprecated` shims, no `eslint-disable`, no compatibility re-export barrels. Removed exports are simply gone. Any consumer pinning to the old names will break.
@@ -38,18 +38,20 @@ Source: merged PRs in `libar-ai/architect-studio` (private). Aggregated across P
 ## 3. Taxonomy & annotation tag changes (PR #31 — "cut 26 tags")
 
 **22 tag cuts (Part A.1):** `@architect-used-by`, `@architect-enables`, `@architect-depends-on`, `@architect-depends-on-external`, `@architect-api-ref`, `@architect-extract-shapes`, `@architect-phase`, `@architect-level`\*, `@architect-parent`\*, `@architect-parent-external`, `@architect-quarter`, `@architect-release`, `@architect-team`, `@architect-workflow`, `@architect-risk`, `@architect-since`, `@architect-discovered-gap`, `@architect-discovered-improvement`, `@architect-discovered-learning`, `@architect-discovered-risk`, `@architect-business-value`, `@architect-convention`.
-*\* `@architect-level` and `@architect-parent` were retained-and-narrowed to the hierarchy axis (Wave 2.5).*
+_\* `@architect-level` and `@architect-parent` were retained-and-narrowed to the hierarchy axis (Wave 2.5)._
 
 **4 sequence-diagram tags cut:** `@architect-sequence-error`, `@architect-sequence-module`, `@architect-sequence-orchestrator`, `@architect-sequence-step`.
 
 **4 additional cuts (Q2/Q3/Q4):** `@architect-effort`, `@architect-priority`, `@architect-include`, `@architect-shape`.
 
 **3 consolidations:**
+
 - C1: `arch-context` + `arch-layer` + `bounded-context` → single `@architect-bounded-context`.
 - C2: `@architect-context` (alias) deprecated → migrate to `@architect-bounded-context`.
 - C3: `@architect-maturity` derived from `@architect-status` at projection time (still emitted, but not authored).
 
 **4 redefinitions:**
+
 - `@architect-uses <Pattern>` argument **must** resolve to a declared `@architect-pattern` (was loose before).
 - `@architect-pattern <Name>` regex now strictly `^[A-Z][A-Za-z0-9]+$` — PascalCase only.
 - `@architect-implements <Pattern>` is required on production source for feature-originated patterns.
@@ -58,6 +60,7 @@ Source: merged PRs in `libar-ai/architect-studio` (private). Aggregated across P
 **Tag inventory:** ~50 → 28 entries (44% reduction). 0 dangling references. CI enforces this.
 
 **Newly important consumer-facing tags (PR #24):**
+
 - `@architect-level:slice` added to hierarchy enum.
 - `@architect-depends-on-external` and `@architect-parent-external` for cross-process tags (must be declared in registry to be parsed).
 - `@architect-maturity` exposed end-to-end (filter via `list --maturity`, surfaced on `PatternSummary`/`PatternDetail`).
@@ -65,6 +68,7 @@ Source: merged PRs in `libar-ai/architect-studio` (private). Aggregated across P
 ## 4. CLI bin changes
 
 **7 bins shipped by the meta-package** (#15, #35):
+
 - `architect` (main multi-command CLI)
 - `architect-generate` (regenerates `docs-live/*.md` via projection pipeline)
 - `architect-guard` (process-guard linter, staged or all-files)
@@ -74,6 +78,7 @@ Source: merged PRs in `libar-ai/architect-studio` (private). Aggregated across P
 - `architect-mcp` (MCP server, owned by `architect-mcp` package)
 
 **New `architect` subcommands** (#15, #35):
+
 - `architect files <pattern>`
 - `architect scope-validate <pattern> <session>` (replaces removed `scope-check`)
 - `architect open-questions [--parent <Pattern>] [--format compact|json]` (#35)
@@ -82,6 +87,7 @@ Source: merged PRs in `libar-ai/architect-studio` (private). Aggregated across P
 - `architect taxonomy --count` (#35)
 
 **New filter flags on existing read commands** (#35):
+
 - `list --parent <Pattern>`, `list --maturity <value>`
 - `rules --package <name>`, `rules --feature <glob>`
 
@@ -136,6 +142,7 @@ The "doctrine kernel" is the set of shared decision documents under `architect-c
 - `_shared/fsm-transitions.md` — code-originated patterns get FSM status ownership too.
 
 **12 strategic decisions (D1–D12) codified.** Most impactful for consumers:
+
 - **D1**: `ProjectionContext` is forbidden from `@architect-uses`.
 - **D5**: `@architect-pattern` allowed on `.ts` for codec/contract/utility.
 - **D9**: `@architect-pattern` annotation (not heading text) is canonical for identity.

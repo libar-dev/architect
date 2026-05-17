@@ -122,7 +122,7 @@ function formatGherkinParseReason(error: {
 }
 
 export async function buildPatternGraph(
-  options: PipelineOptions
+  options: PipelineOptions,
 ): Promise<Result<BuildResult, PipelineError>> {
   const baseDir = path.resolve(options.baseDir);
   const warnings: PipelineWarning[] = [];
@@ -148,7 +148,7 @@ export async function buildPatternGraph(
       baseDir,
       ...(options.exclude !== undefined ? { exclude: options.exclude } : {}),
     },
-    registry
+    registry,
   );
   if (!scanResult.ok) {
     return Result.err({

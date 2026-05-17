@@ -128,7 +128,7 @@ export function parseSessionTypeValue(value: string): SessionType {
   return parseSchemaValue(
     SessionTypeSchema,
     value,
-    '--session must be planning, design, or implement'
+    '--session must be planning, design, or implement',
   );
 }
 
@@ -140,7 +140,7 @@ export function parseHandoffSessionTypeValue(value: string): HandoffSessionType 
   return parseSchemaValue(
     HandoffSessionTypeSchema,
     value,
-    '--session must be planning, design, implement, or review'
+    '--session must be planning, design, implement, or review',
   );
 }
 
@@ -148,7 +148,7 @@ export function parseAcceptedStatusValue(value: string): AcceptedStatusValue {
   return parseSchemaValue(
     AcceptedStatusSchema,
     value,
-    `Expected accepted status value, received: ${value}`
+    `Expected accepted status value, received: ${value}`,
   );
 }
 
@@ -156,7 +156,7 @@ export function parseProcessStatusValue(value: string): ProcessStatusValue {
   return parseSchemaValue(
     ProcessStatusSchema,
     value,
-    `Expected process status value, received: ${value}`
+    `Expected process status value, received: ${value}`,
   );
 }
 
@@ -170,7 +170,7 @@ export function parseBundleIncludeValues(value: string): z.infer<typeof BundleIn
     .map((entry) => entry.trim())
     .filter((entry) => entry.length > 0)
     .map((entry) =>
-      parseSchemaValue(BundleIncludeSchema, entry, `Unknown bundle include: ${entry}`)
+      parseSchemaValue(BundleIncludeSchema, entry, `Unknown bundle include: ${entry}`),
     );
 
   if (includes.length === 0) {
@@ -184,6 +184,6 @@ export function parseBundleModeValue(value: string): z.infer<typeof BundleModeSc
   return parseSchemaValue(
     BundleModeSchema,
     value,
-    '--mode must be plan, design, implement, or review'
+    '--mode must be plan, design, implement, or review',
   );
 }

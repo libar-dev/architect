@@ -37,7 +37,7 @@ function makePatternId(name: string): string {
 function makePattern(
   name: string,
   sourceFile: string,
-  uses: readonly string[] = []
+  uses: readonly string[] = [],
 ): ExtractedPattern {
   return ExtractedPatternSchema.parse({
     id: makePatternId(name),
@@ -61,7 +61,7 @@ function makePattern(
 
 function makeGraph(
   patterns: ExtractedPattern[],
-  relationshipIndex?: Record<string, RelationshipEntry>
+  relationshipIndex?: Record<string, RelationshipEntry>,
 ): PatternGraph {
   const graph: PatternGraph = {
     patterns,
@@ -128,7 +128,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         And('the relationships field "enables" contains "AlphaCore"', () => {
           expect(state.relationships?.enables).toContain('AlphaCore');
         });
-      }
+      },
     );
   });
 
@@ -165,7 +165,7 @@ describeFeature(feature, ({ Background, Rule }) => {
                   apiRef: [],
                 },
               });
-            }
+            },
           );
 
           When('I query pattern dependencies for "BetaCore"', () => {
@@ -180,9 +180,9 @@ describeFeature(feature, ({ Background, Rule }) => {
           And('the dependencies field "enables" contains "AlphaCore"', () => {
             expect(state.dependencies?.enables).toContain('AlphaCore');
           });
-        }
+        },
       );
-    }
+    },
   );
 
   Rule('Shared read-api helpers fail loudly for missing canonical entries', ({ RuleScenario }) => {
@@ -207,7 +207,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         Then('the invariant error equals {string}', (_ctx: unknown, message: string) => {
           expect(state.invariantError).toBe(message);
         });
-      }
+      },
     );
   });
 
@@ -231,7 +231,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             const collection =
               field === 'usedBy' ? state.neighborhoodUsedBy : state.neighborhoodEnables;
             expect(collection).toContain(value);
-          }
+          },
         );
 
         And(
@@ -240,9 +240,9 @@ describeFeature(feature, ({ Background, Rule }) => {
             const collection =
               field === 'usedBy' ? state.neighborhoodUsedBy : state.neighborhoodEnables;
             expect(collection).toContain(value);
-          }
+          },
         );
-      }
+      },
     );
   });
 });

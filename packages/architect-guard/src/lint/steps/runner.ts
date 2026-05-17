@@ -137,7 +137,7 @@ function readFileSafe(filePath: string): string | null {
  */
 function buildSummary(
   violationsByFile: Map<string, LintViolation[]>,
-  filesScanned: number
+  filesScanned: number,
 ): LintSummary {
   const results: LintResult[] = [];
   let errorCount = 0;

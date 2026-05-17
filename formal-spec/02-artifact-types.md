@@ -113,15 +113,15 @@ The executable spec is the permanent artifact. The design-level spec is construc
 
 **Required tags (Level 2):**
 
-| Tag                          | Purpose                       |
-| ---------------------------- | ----------------------------- |
-| `@architect`                 | Gate tag (opt-in)             |
-| `@architect-pattern`         | PascalCase pattern name       |
-| `@architect-status`          | FSM state                     |
-| `@architect-product-area`    | Product area grouping         |
-| `@architect-bounded-context` | Architecture grouping         |
+| Tag                          | Purpose                                                            |
+| ---------------------------- | ------------------------------------------------------------------ |
+| `@architect`                 | Gate tag (opt-in)                                                  |
+| `@architect-pattern`         | PascalCase pattern name                                            |
+| `@architect-status`          | FSM state                                                          |
+| `@architect-product-area`    | Product area grouping                                              |
+| `@architect-bounded-context` | Architecture grouping                                              |
 | `@architect-arch-layer`      | Architecture layer (`domain` \| `application` \| `infrastructure`) |
-| `@architect-role`            | Canonical role                |
+| `@architect-role`            | Canonical role                                                     |
 
 > _Informative:_ Earlier draft versions of this spec also listed `@architect-phase`,
 > `@architect-effort`, `@architect-priority`, and `@architect-release` as required.

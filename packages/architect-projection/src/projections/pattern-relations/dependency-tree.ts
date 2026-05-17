@@ -48,7 +48,7 @@ export type { DepTreeOptions } from './dependency-tree.internal.js';
 
 export function projectDependencyTree(
   context: ProjectionContext,
-  options: DepTreeOptions
+  options: DepTreeOptions,
 ): ProjectionBundle<DependencyTree> {
   const { rootName, rootNode } = buildDependencyTreeRoot(context, options);
 
@@ -66,5 +66,5 @@ export function projectDependencyTree(
 export const parseAndProjectDependencyTree = parseAndProject(
   DepTreeOptionsSchema,
   projectDependencyTree,
-  'parseAndProjectDependencyTree'
+  'parseAndProjectDependencyTree',
 );

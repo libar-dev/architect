@@ -24,7 +24,7 @@ export type OpenQuestionListOptions = z.infer<typeof OpenQuestionListOptionsSche
 
 export function buildOpenQuestionList(
   context: ProjectionContext,
-  options: OpenQuestionListOptions = {}
+  options: OpenQuestionListOptions = {},
 ): OpenQuestionList {
   const parentChildNames = resolveParentChildNames(context, options.parent);
   const items = filterPatterns(context.graph.patterns, context.projectionFilter)

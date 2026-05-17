@@ -38,7 +38,7 @@ import { buildBoundedContext } from './architecture-context.internal.js';
 
 export function projectBoundedContext(
   context: ProjectionContext,
-  scope?: string
+  scope?: string,
 ): ProjectionBundle<BoundedContext> {
   return projectSingle(buildBoundedContext(context, scope));
 }

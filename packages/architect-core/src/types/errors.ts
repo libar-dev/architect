@@ -236,7 +236,7 @@ export interface BatchError<E extends DocError> extends BaseDocError {
 export function createFileSystemError(
   file: string,
   reason: FileSystemError['reason'],
-  originalError?: unknown
+  originalError?: unknown,
 ): FileSystemError {
   const reasonMessages: Record<FileSystemError['reason'], string> = {
     NOT_FOUND: `File not found: ${file}`,
@@ -277,7 +277,7 @@ export function createFileParseError(
   file: string,
   reason: string,
   location?: { line: number; column: number },
-  originalError?: unknown
+  originalError?: unknown,
 ): FileParseError {
   const locationStr = location
     ? ` at line ${String(location.line)}, column ${String(location.column)}`
@@ -316,7 +316,7 @@ export function createDirectiveValidationError(
   file: string,
   line: number,
   reason: string,
-  directive?: string
+  directive?: string,
 ): DirectiveValidationError {
   return {
     type: 'DIRECTIVE_VALIDATION_ERROR',
@@ -351,7 +351,7 @@ export function createPatternValidationError(
   file: SourceFilePath,
   patternName: string,
   reason: string,
-  validationErrors?: string[]
+  validationErrors?: string[],
 ): PatternValidationError {
   return {
     type: 'PATTERN_VALIDATION_ERROR',
@@ -383,7 +383,7 @@ export function createPatternValidationError(
 export function createFeatureParseError(
   file: string,
   reason: string,
-  originalError?: unknown
+  originalError?: unknown,
 ): FeatureParseError {
   return {
     type: 'FEATURE_PARSE_ERROR',
@@ -414,7 +414,7 @@ export function createFeatureParseError(
 export function createProcessMetadataValidationError(
   file: string,
   reason: string,
-  validationErrors?: readonly string[]
+  validationErrors?: readonly string[],
 ): ProcessMetadataValidationError {
   return {
     type: 'PROCESS_METADATA_VALIDATION_ERROR',
@@ -448,7 +448,7 @@ export function createDeliverableValidationError(
   file: string,
   reason: string,
   deliverableName?: string,
-  validationErrors?: readonly string[]
+  validationErrors?: readonly string[],
 ): DeliverableValidationError {
   const nameStr = deliverableName ? ` "${deliverableName}"` : '';
   return {
@@ -484,7 +484,7 @@ export function createGherkinPatternValidationError(
   file: string,
   patternName: string,
   reason: string,
-  validationErrors?: readonly string[]
+  validationErrors?: readonly string[],
 ): GherkinPatternValidationError {
   return {
     type: 'GHERKIN_PATTERN_VALIDATION_ERROR',

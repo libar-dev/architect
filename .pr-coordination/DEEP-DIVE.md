@@ -9,6 +9,7 @@
 Proof: `delivery-process/docs-live/reference/REFERENCE-SAMPLE.md` is 1,135 lines of high-density generated content with all 5 Mermaid diagram types (graph TB/LR, sequenceDiagram, classDiagram, stateDiagram-v2, C4Context), TypeScript shape extraction with JSDoc preservation, behavior-spec collapsibles, and ADR-decomposed rendering.
 
 What got dropped (zero grep hits in post-W1.5 packages):
+
 - `loadPreambleFromMarkdown()` utility.
 - `createReferenceCodec()` factory and `createProductAreaConfigs()` helper.
 - 13 codec files: `reference.ts`, `reference-builders.ts`, `reference-diagrams.ts`, `reference-types.ts`, `composite.ts`, `convention-extractor.ts`, `shape-matcher.ts`, `claude-module.ts`, `index-codec.ts`, `session.ts`, `pr-changes.ts`, `product-area-metadata.ts`, plus generator wrappers (`cli-recipe`, `cli-reference`, `decision-doc`, `design-review`).
@@ -24,21 +25,22 @@ The user's instinct was right: **don't blindly restore the old `ReferenceDocConf
 
 The old reference codec collapsed extraction, routing, and composition into one config object. Separate them:
 
-| Layer | Concern | Today's status |
-|---|---|---|
-| **Extractors** | "What can we pull from PatternGraph + AST?" | Most exist; a few key ones missing (Zod-fields, structured function-signatures, CLI/MCP/lint catalogs) |
-| **Routing** | "Which content belongs in which doc?" | Pull model (config-driven) and push model (aggregation tags with `targetDoc`) both exist in the data model; only pull is exercised |
-| **Composition** | "How is a doc assembled?" | Was a static config template; should be TypeScript doc-builder functions for conditional logic, joins, reuse |
+| Layer           | Concern                                     | Today's status                                                                                                                     |
+| --------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **Extractors**  | "What can we pull from PatternGraph + AST?" | Most exist; a few key ones missing (Zod-fields, structured function-signatures, CLI/MCP/lint catalogs)                             |
+| **Routing**     | "Which content belongs in which doc?"       | Pull model (config-driven) and push model (aggregation tags with `targetDoc`) both exist in the data model; only pull is exercised |
+| **Composition** | "How is a doc assembled?"                   | Was a static config template; should be TypeScript doc-builder functions for conditional logic, joins, reuse                       |
 
 Plus a fourth concern that pre-refactor handled via `claudeMdFilename`:
 
-| Layer | Concern | Today's status |
-|---|---|---|
+| Layer              | Concern                                                    | Today's status                                       |
+| ------------------ | ---------------------------------------------------------- | ---------------------------------------------------- |
 | **Output routing** | "Where does the output go — website, agent context, JSON?" | Dropped; needs restoration with multi-target support |
 
 ### 2. Doc definitions become code, not config
 
 Replace `referenceDocConfigs:` (an array of object configs) with `DocDefinition` (a TypeScript module that exports a `build(graph)` function). This buys:
+
 - Conditional sections (`if (decisions.length > 0)`)
 - Computed joins (e.g., for each codec shape, find the ADR that decided it, inline as a footnote)
 - Reusable helpers (`packageReadmeSection(pkg)` shared across 6 package READMEs)
@@ -50,6 +52,7 @@ The `ReferenceDocConfig` shape can survive as sugar — a thin wrapper that comp
 ### 3. The push model already exists — use it
 
 The TAXONOMY JSON output already includes an `Aggregation Tags` group with entries like:
+
 ```json
 { "kind": "aggregation", "tag": "decision", "targetDoc": "DECISIONS.md" }
 ```
@@ -57,6 +60,7 @@ The TAXONOMY JSON output already includes an `Aggregation Tags` group with entri
 `kind: 'aggregation'` with `targetDoc` IS the push-model routing primitive. Any source annotated with `@architect-decision X` aggregates into `DECISIONS.md`. The registry already supports this — almost no consumer uses it.
 
 The smart extension is **not** to invent a parallel `@architect-doc` annotation, but to:
+
 - Use aggregation tags for content with a clear shared destination (decisions, intros, overviews — the existing pattern).
 - Use pull-model extractors for sections whose content is identified structurally (types from a package, behaviors from a tag, diagrams from a scope).
 - Add a third routing mode only when both fail — e.g., `@architect-doc-section <id>` as a SECTION-membership marker (not destination), used in conjunction with a doc that calls `extractBySection('codec-catalog').sortBy('doc-order')`.
@@ -67,30 +71,30 @@ The smart extension is **not** to invent a parallel `@architect-doc` annotation,
 
 Mostly yes. Concrete answer per extractor:
 
-| Shape | Extracted today | Quality |
-|---|---|---|
-| `interface` / `type` / `enum` / `const` declarations | ✅ | Source text + JSDoc preserved via `extractShapes()` |
-| `function` declarations | ✅ | Source text + JSDoc — **but as raw text, not structured `{ name, params: [...], returns, ... }`** |
-| JSDoc prose (`# Heading`, paragraphs, tables, code, lists) | ✅ | `parseMarkdownToBlocks()` — 6 of 9 block types (heading, paragraph, separator, table, code, list); collapsible/link-out flattened |
-| `@architect-*` JSDoc tags | ✅ | Parsed to `tagRegistry` |
-| Gherkin `Rule:` blocks (invariant/rationale/verified-by) | ✅ | `BusinessRule` fragment |
-| Decision records (Context/Decision/Consequences) | ✅ | `DecisionRecord` fragment |
-| Pattern edges (depends-on/uses/implements/extends/see-also/api-ref) | ✅ | Full graph |
-| Aggregation tags with `targetDoc` | ✅ | Registry-level, see Q2 |
-| `@architect-extract-shapes` discovery | ✅ | `discoverTaggedShapes()` already walks JSDoc looking for this — **wired but unused** |
+| Shape                                                               | Extracted today | Quality                                                                                                                           |
+| ------------------------------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `interface` / `type` / `enum` / `const` declarations                | ✅              | Source text + JSDoc preserved via `extractShapes()`                                                                               |
+| `function` declarations                                             | ✅              | Source text + JSDoc — **but as raw text, not structured `{ name, params: [...], returns, ... }`**                                 |
+| JSDoc prose (`# Heading`, paragraphs, tables, code, lists)          | ✅              | `parseMarkdownToBlocks()` — 6 of 9 block types (heading, paragraph, separator, table, code, list); collapsible/link-out flattened |
+| `@architect-*` JSDoc tags                                           | ✅              | Parsed to `tagRegistry`                                                                                                           |
+| Gherkin `Rule:` blocks (invariant/rationale/verified-by)            | ✅              | `BusinessRule` fragment                                                                                                           |
+| Decision records (Context/Decision/Consequences)                    | ✅              | `DecisionRecord` fragment                                                                                                         |
+| Pattern edges (depends-on/uses/implements/extends/see-also/api-ref) | ✅              | Full graph                                                                                                                        |
+| Aggregation tags with `targetDoc`                                   | ✅              | Registry-level, see Q2                                                                                                            |
+| `@architect-extract-shapes` discovery                               | ✅              | `discoverTaggedShapes()` already walks JSDoc looking for this — **wired but unused**                                              |
 
 What's **structurally missing** but reachable with modest extractor work:
 
-| Missing extractor | Source available? | Unlocks |
-|---|---|---|
-| **Zod-schema → field table** (parse `z.strictObject({...}).describe(...)` calls into rows) | Yes — every contract is Zod by doctrine | `formal-spec/11-project-configuration.md`, `CONFIGURATION-GUIDE.md`, README "Documentation Composition Contract" table, the `ProgressiveDisclosurePolicySchema` table |
-| **Function-signature → structured fragment** (`{ name, params: [{name, type, jsdoc}], returns: {type, jsdoc}, examples: [...] }`) | Yes — AST + JSDoc | "Usage" code blocks in package READMEs; CLI command param tables |
-| **CLI-command catalog from `cli-schema.ts`** | Yes — `COMMAND_NAMES` + `helpSignature` + `helpDetail` | `CLI-REFERENCE.md` (63 lines pre-refactor — pure mechanical generation) |
-| **MCP-tool catalog from `ARCHITECT_MCP_TOOLS`** | Yes — `tool-metadata.ts` | `MCP-SETUP.md` tool table |
-| **Lint-rule catalog from `architect-guard/src/lint/rules/`** | Needs `@architect-lint-rule:<id>` annotation per rule (new carrier) | `VALIDATION.md` rule tables |
-| **Test-extracted code examples** (find `// @example:foo` in test files, lift the test body as a code block) | Yes — vitest-cucumber steps are typed | Real usage examples that can't drift |
-| **Imports/re-exports map** | Yes — TS AST | "Public surface" tables in package READMEs |
-| **Generated-insert directive** (`<!-- generated:<source>:start -->...<!-- generated:<source>:end -->` fences in any manual file) | Source-agnostic — just write a rewrite pass | Spec/manual files keep prose hand-authored, tables come from one source. Solves the `formal-spec/04` ↔ tag registry ↔ `_shared/annotation-ownership.md` drift |
+| Missing extractor                                                                                                                 | Source available?                                                   | Unlocks                                                                                                                                                               |
+| --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Zod-schema → field table** (parse `z.strictObject({...}).describe(...)` calls into rows)                                        | Yes — every contract is Zod by doctrine                             | `formal-spec/11-project-configuration.md`, `CONFIGURATION-GUIDE.md`, README "Documentation Composition Contract" table, the `ProgressiveDisclosurePolicySchema` table |
+| **Function-signature → structured fragment** (`{ name, params: [{name, type, jsdoc}], returns: {type, jsdoc}, examples: [...] }`) | Yes — AST + JSDoc                                                   | "Usage" code blocks in package READMEs; CLI command param tables                                                                                                      |
+| **CLI-command catalog from `cli-schema.ts`**                                                                                      | Yes — `COMMAND_NAMES` + `helpSignature` + `helpDetail`              | `CLI-REFERENCE.md` (63 lines pre-refactor — pure mechanical generation)                                                                                               |
+| **MCP-tool catalog from `ARCHITECT_MCP_TOOLS`**                                                                                   | Yes — `tool-metadata.ts`                                            | `MCP-SETUP.md` tool table                                                                                                                                             |
+| **Lint-rule catalog from `architect-guard/src/lint/rules/`**                                                                      | Needs `@architect-lint-rule:<id>` annotation per rule (new carrier) | `VALIDATION.md` rule tables                                                                                                                                           |
+| **Test-extracted code examples** (find `// @example:foo` in test files, lift the test body as a code block)                       | Yes — vitest-cucumber steps are typed                               | Real usage examples that can't drift                                                                                                                                  |
+| **Imports/re-exports map**                                                                                                        | Yes — TS AST                                                        | "Public surface" tables in package READMEs                                                                                                                            |
+| **Generated-insert directive** (`<!-- generated:<source>:start -->...<!-- generated:<source>:end -->` fences in any manual file)  | Source-agnostic — just write a rewrite pass                         | Spec/manual files keep prose hand-authored, tables come from one source. Solves the `formal-spec/04` ↔ tag registry ↔ `_shared/annotation-ownership.md` drift         |
 
 **The cheaper end of the problem is extraction. Routing and composition are the harder design choices.**
 
@@ -98,11 +102,11 @@ What's **structurally missing** but reachable with modest extractor work:
 
 The cleanest answer is "both, with code at the top." Three modes, all supported, picked per-doc:
 
-| Mode | When right | Example |
-|---|---|---|
-| **Pull** (doc config lists tags / shape groups / diagrams) | Doc structure changes more often than content placement; central control desired | `extractBehaviors({ tag: 'codec-registry' })` |
-| **Push** (annotation declares destination via aggregation tag) | Content scattered across many files; want to add content without touching central config | `@architect-decision codec-registry` on a feature → aggregates into the doc that calls `extractAggregations('decision').where(tag === 'codec-registry')` |
-| **Hybrid (registry-mediated)** | Want a name in the registry that names the destination but lets content opt in via the annotation | Today's `{ kind: 'aggregation', tag: 'decision', targetDoc: 'DECISIONS.md' }` |
+| Mode                                                           | When right                                                                                        | Example                                                                                                                                                  |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Pull** (doc config lists tags / shape groups / diagrams)     | Doc structure changes more often than content placement; central control desired                  | `extractBehaviors({ tag: 'codec-registry' })`                                                                                                            |
+| **Push** (annotation declares destination via aggregation tag) | Content scattered across many files; want to add content without touching central config          | `@architect-decision codec-registry` on a feature → aggregates into the doc that calls `extractAggregations('decision').where(tag === 'codec-registry')` |
+| **Hybrid (registry-mediated)**                                 | Want a name in the registry that names the destination but lets content opt in via the annotation | Today's `{ kind: 'aggregation', tag: 'decision', targetDoc: 'DECISIONS.md' }`                                                                            |
 
 These are configuration MODES, not separate APIs. The user-facing surface is `DocDefinition.build(graph)` which calls extractors. Each extractor internally chooses pull / push / hybrid as appropriate.
 
@@ -111,6 +115,7 @@ These are configuration MODES, not separate APIs. The user-facing surface is `Do
 ### `packages/architect-projection/README.md` (137 lines)
 
 Generatable shape breakdown:
+
 - **Package title + one-paragraph description**: `package.json` + `@architect-package-summary` JSDoc on a `package.ts` symbol
 - **Pipeline diagram (ASCII art)**: a `documentation-pipeline` shape group with a `sequenceDiagram` scope
 - **Usage examples**: `@architect-usage` JSDoc on `parseAndProjectSessionContext` (auto-extracted import path + signature + example body)
@@ -127,7 +132,7 @@ Generatable shape breakdown:
 
 Fundamentally different shape that exposes a sharp tradeoff:
 
-- **Tables A/B/C (66 rows total)**: historical mapping from deleted codecs → surviving projections. The source side (deleted codecs) is *gone*. You can't extract a mapping where one side doesn't exist anymore. **This is a doc that captures a one-time event — it must stay frozen.**
+- **Tables A/B/C (66 rows total)**: historical mapping from deleted codecs → surviving projections. The source side (deleted codecs) is _gone_. You can't extract a mapping where one side doesn't exist anymore. **This is a doc that captures a one-time event — it must stay frozen.**
 - **"Renderer Overview" section**: fully extractable via `@architect-renderer` JSDoc on the 4 renderer entry points (`renderCompactText`, `renderJson`, `renderMarkdown`, `renderUi`).
 - **"Residual ADR-006 leaks" section**: chronological narrative — stays manual.
 
@@ -136,6 +141,7 @@ Fundamentally different shape that exposes a sharp tradeoff:
 ### `docs/TAXONOMY.md` (74 lines, today manual but trivially generatable)
 
 The `pnpm architect:query taxonomy --format json` output is the data. Two questions left:
+
 1. Should the `TAXONOMY.md` doc be generated FROM the query output, or should it CALL `extractTagRegistry()` directly? (Doc definitions calling extractors is the cleaner answer — no shell-out, no JSON parsing.)
 2. Should the manual `docs/TAXONOMY.md` be deleted entirely (the docs-live equivalent already exists and is generated)? **Yes** — the deprecation banner already points there. Delete on next pass.
 
@@ -147,11 +153,11 @@ Added 2026-05-17 after the user pointed out two specific patterns my initial des
 
 Concrete example: stub-format guidance appears in three places at three depths:
 
-| Audience | Depth needed | Today's location |
-|---|---|---|
-| Spec readers (full normative) | All sections | `formal-spec/07-stub-format.md` |
+| Audience                            | Depth needed                                              | Today's location                                                                   |
+| ----------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Spec readers (full normative)       | All sections                                              | `formal-spec/07-stub-format.md`                                                    |
 | Design-session agents (operational) | Directory + lifecycle + tag-table, with link to canonical | `.agents/skills/architect-design-session/SKILL.md` (currently links via prose ref) |
-| Brief consumers (drive-by readers) | Link only | (potential package READMEs) |
+| Brief consumers (drive-by readers)  | Link only                                                 | (potential package READMEs)                                                        |
 
 The same pattern applies to the 9-block-type catalog (`formal-spec/12` full, package READMEs would want a brief summary, annotation-reference doc would want full), `RenderableDocument` envelope, FSM transitions, value-transfer gate, etc.
 
@@ -196,9 +202,9 @@ build(ctx) { return composeDoc('...', [...stubFormatFragment.build(ctx, { mode: 
 
 **Two orthogonal disclosure axes:**
 
-| Axis | Controls | Mechanism |
-|---|---|---|
-| INPUT disclosure (new) | Which sub-sections this ContentFragment emits | `ContentFragment.build(ctx, { disclosure })` parameter |
+| Axis                         | Controls                                                    | Mechanism                                                  |
+| ---------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------- |
+| INPUT disclosure (new)       | Which sub-sections this ContentFragment emits               | `ContentFragment.build(ctx, { disclosure })` parameter     |
 | OUTPUT disclosure (existing) | Whether bundle children inline or split into separate files | `RenderMarkdownOptions.disclosureLevel` / `disclosureSpec` |
 
 Same vocabulary (`essential | important | useful | advanced`), independent concerns. The two compose: a DocDefinition's `build()` may emit ContentFragments at chosen input depth, and the resulting `RenderableDocument` may then be rendered at a chosen output disclosure level.
@@ -210,6 +216,7 @@ When a ContentFragment appears in doc A at depth `important` and doc B at depth 
 ### Build-time consistency
 
 Because ContentFragments are TypeScript modules, the build pipeline can:
+
 - Reject a DocDefinition that references a `ContentFragment.id` that doesn't exist.
 - Warn if a ContentFragment is referenced at `disclosure: 'advanced'` from more than one DocDefinition (the "canonical doc" should be unique for that depth).
 - Optionally enforce that the canonical doc actually emits the highest disclosure level.

@@ -31,7 +31,7 @@ export function sortValue(value: unknown): unknown {
   return Object.fromEntries(
     Object.entries(value as Record<string, unknown>)
       .sort(([left], [right]) => left.localeCompare(right))
-      .map(([key, entry]) => [key, sortValue(entry)])
+      .map(([key, entry]) => [key, sortValue(entry)]),
   );
 }
 

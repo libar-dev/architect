@@ -45,7 +45,7 @@ interface OperationalInsightsState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/operational-insights/reporting.feature'
+  'tests/features/projections/operational-insights/reporting.feature',
 );
 
 let state: OperationalInsightsState | null = null;
@@ -146,7 +146,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                 },
               });
-            }
+            },
           );
 
           When('I project the overview digest', () => {
@@ -219,7 +219,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 },
                 children: {},
               });
-            }
+            },
           );
 
           And('the overview digest should preserve unnamed active phase parity', () => {
@@ -235,9 +235,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(rendered).not.toBeNull();
             expect(FragmentSchema.safeParse(rendered).success).toBe(true);
           });
-        }
+        },
       );
-    }
+    },
   );
 
   Rule('Annotation coverage stays numeric and graph-only', ({ RuleScenario }) => {
@@ -318,7 +318,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 ],
               }),
             });
-          }
+          },
         );
 
         When('I project the annotation coverage digest', () => {
@@ -352,9 +352,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               },
               children: {},
             });
-          }
+          },
         );
-      }
+      },
     );
 
     RuleScenario(
@@ -404,7 +404,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 throw new Error('relationshipIndex should not be read for scalar coverage tags');
               },
             });
-          }
+          },
         );
 
         When('I project the annotation coverage digest', () => {
@@ -428,9 +428,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 ],
               },
             });
-          }
+          },
         );
-      }
+      },
     );
   });
 
@@ -624,7 +624,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             },
           ]);
         });
-      }
+      },
     );
   });
 
@@ -661,7 +661,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   ],
                 }),
               });
-            }
+            },
           );
 
           When('I project the role profile for "APP-SERVICE" and all role profiles', () => {
@@ -704,11 +704,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   examples: ['PatternGraphCli'],
                 },
               ]);
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
 
   Rule(
@@ -769,7 +769,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                 ],
               });
-            }
+            },
           );
 
           When(
@@ -778,9 +778,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               state!.allRequirements = projectRequirementDigest(state!.context!);
               state!.filteredRequirements = projectRequirementDigest(
                 state!.context!,
-                'Projection Platform'
+                'Projection Platform',
               );
-            }
+            },
           );
 
           Then(
@@ -869,16 +869,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 },
                 children: {},
               });
-            }
+            },
           );
 
           And(
             'the all-areas requirement digest should include product-metadata requirements without a product area',
             () => {
               expect(
-                state!.allRequirements?.root.requirements.map((requirement) => requirement.pattern)
+                state!.allRequirements?.root.requirements.map((requirement) => requirement.pattern),
               ).toContain('OperatorNeeds');
-            }
+            },
           );
 
           And(
@@ -943,9 +943,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 },
                 children: {},
               });
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -994,7 +994,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                 ],
               });
-            }
+            },
           );
 
           When('I project the requirement digest for all areas', () => {
@@ -1018,7 +1018,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   ownerRouteId: 'business-rules:architect-projection',
                 },
               ]);
-            }
+            },
           );
 
           And(
@@ -1068,9 +1068,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   ],
                 },
               ]);
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1119,7 +1119,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                 ],
               });
-            }
+            },
           );
 
           When('I project the requirements-executable digest', () => {
@@ -1143,7 +1143,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   ownerRouteId: 'business-rules:architect-projection',
                 },
               ]);
-            }
+            },
           );
 
           And(
@@ -1193,26 +1193,26 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   ],
                 },
               ]);
-            }
+            },
           );
 
           And(
             'the executable requirement root should preserve all-areas sort order for duplicate-feature entries',
             () => {
               expect(
-                state!.executableRequirements?.root.requirements.map((entry) => entry.ownerRouteId)
+                state!.executableRequirements?.root.requirements.map((entry) => entry.ownerRouteId),
               ).toEqual([
                 'requirements-executable:architect-core:requirement:shared-requirement-ref',
                 'requirements-executable:architect-projection:requirement:shared-requirement-ref',
               ]);
-            }
+            },
           );
 
           And(
             'the executable requirement package and detail children should keep only local business-rule references',
             () => {
               expect(
-                state!.executableRequirements?.children['requirements-executable:architect-core']
+                state!.executableRequirements?.children['requirements-executable:architect-core'],
               ).toEqual({
                 kind: 'RequirementDigest',
                 productArea: 'architect-core',
@@ -1251,7 +1251,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(
                 state!.executableRequirements?.children[
                   'requirements-executable:architect-projection:requirement:shared-requirement-ref'
-                ]
+                ],
               ).toEqual({
                 kind: 'RequirementDigest',
                 productArea: 'SharedRequirementRef',
@@ -1288,9 +1288,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   },
                 ],
               });
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1321,7 +1321,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 ],
                 packageResolver: createTestPackageResolver(),
               });
-            }
+            },
           );
 
           When('I project the requirements-executable digest', () => {
@@ -1355,14 +1355,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               ]);
 
               expect(state!.executableRequirements?.children).toHaveProperty(
-                'requirements-executable:architect-dev'
+                'requirements-executable:architect-dev',
               );
               expect(state!.executableRequirements?.children).toHaveProperty(
-                'requirements-executable:architect-dev:requirement:harness-requirement'
+                'requirements-executable:architect-dev:requirement:harness-requirement',
               );
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1397,7 +1397,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                 ],
               });
-            }
+            },
           );
 
           When('I project the requirement digest for all areas', () => {
@@ -1422,9 +1422,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   ],
                 },
               ]);
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1466,7 +1466,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                 ],
               });
-            }
+            },
           );
 
           When('I project the requirements-specs digest', () => {
@@ -1504,22 +1504,22 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   testFiles: [],
                 },
               ]);
-            }
+            },
           );
 
           And(
             'the requirements-specs child routes should stay package-stable for duplicate planned feature names',
             () => {
               expect(state!.specRequirements?.children).toHaveProperty(
-                'requirements-specs:architect-core:requirement:shared-planned-requirement'
+                'requirements-specs:architect-core:requirement:shared-planned-requirement',
               );
               expect(state!.specRequirements?.children).toHaveProperty(
-                'requirements-specs:architect-projection:requirement:shared-planned-requirement'
+                'requirements-specs:architect-projection:requirement:shared-planned-requirement',
               );
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
 });

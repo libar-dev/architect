@@ -29,7 +29,7 @@ export const reportingCommands = {
     execute(context): void {
       writeProjectionOutput(
         context.args,
-        projectOverviewDigest(requireCliContext(context).projection)
+        projectOverviewDigest(requireCliContext(context).projection),
       );
     },
   },
@@ -42,7 +42,7 @@ export const reportingCommands = {
     execute(context): void {
       writeProjectionOutput(
         context.args,
-        projectStatusDistribution(requireCliContext(context).projection)
+        projectStatusDistribution(requireCliContext(context).projection),
       );
     },
   },
@@ -68,7 +68,7 @@ export const reportingCommands = {
         context,
         parsed.positional,
         'Usage: architect context <pattern> [--session planning|design|implement]',
-        'Usage: architect context <pattern>'
+        'Usage: architect context <pattern>',
       );
       if (pattern === undefined) {
         return;
@@ -79,7 +79,7 @@ export const reportingCommands = {
         projectSessionContextBundle(requireCliContext(context).projection, {
           patterns: [pattern],
           sessionType: flags.session ?? context.args.sessionType,
-        })
+        }),
       );
     },
   },
@@ -102,7 +102,7 @@ export const reportingCommands = {
         context,
         parsed.positional,
         'Usage: architect dep-tree <pattern> [--depth <n>]',
-        'Usage: architect dep-tree <pattern>'
+        'Usage: architect dep-tree <pattern>',
       );
       if (pattern === undefined) {
         return;
@@ -114,7 +114,7 @@ export const reportingCommands = {
           pattern,
           maxDepth: flags.depth ?? context.args.depth,
           includeImplementationDeps: false,
-        })
+        }),
       );
     },
   },

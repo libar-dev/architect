@@ -35,7 +35,7 @@ import { buildDeliverable, buildDeliverableManifest } from './deliverables.inter
 
 export function projectDeliverableManifest(
   context: ProjectionContext,
-  pattern: string
+  pattern: string,
 ): ProjectionBundle<DeliverableManifest> | undefined {
   const manifest = buildDeliverableManifest(context, pattern);
   return manifest === undefined ? undefined : projectSingle(manifest);
@@ -44,7 +44,7 @@ export function projectDeliverableManifest(
 export function projectDeliverable(
   context: ProjectionContext,
   pattern: string,
-  name: string
+  name: string,
 ): ProjectionBundle<Deliverable> | undefined {
   const deliverable = buildDeliverable(context, pattern, name);
   return deliverable === undefined ? undefined : projectSingle(deliverable);

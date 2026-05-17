@@ -17,7 +17,7 @@ import {
 
 export function buildArchitectureNeighborhood(
   context: ProjectionContext,
-  patternName: string
+  patternName: string,
 ): {
   pattern: string;
   context: string | undefined;

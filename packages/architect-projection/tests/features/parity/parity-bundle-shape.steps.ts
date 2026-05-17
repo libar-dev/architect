@@ -72,7 +72,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
           And('every BusinessRuleReference carries a populated ownerRouteId', () => {
             const references = collectRequirementDigests(state!.requirementBundle!).flatMap(
-              (digest) => digest.businessRuleReferences
+              (digest) => digest.businessRuleReferences,
             );
             for (const reference of references) {
               expect(reference.kind).toBe('BusinessRuleReference');
@@ -81,9 +81,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(reference.ruleName.length).toBeGreaterThan(0);
             }
           });
-        }
+        },
       );
-    }
+    },
   );
 
   Rule('Default-disclosure business-rules bundle stays compact', ({ RuleScenario }) => {
@@ -117,23 +117,23 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
         And('no rendered file path matches a business-rule-*.md pattern', () => {
           const offenders = Object.keys(state!.markdown!).filter((path) =>
-            /business-rule-[^/]+\.md$/.test(path)
+            /business-rule-[^/]+\.md$/.test(path),
           );
           expect(offenders).toEqual([]);
         });
-      }
+      },
     );
   });
 });
 
 function collectRequirementDigests(
-  bundle: ProjectionBundle<RequirementDigest>
+  bundle: ProjectionBundle<RequirementDigest>,
 ): RequirementDigest[] {
   // ProjectionBundle.children is structurally `Record<string, Fragment>` (the
   // full discriminated union); the bundle's type parameter promises children
   // share root's kind, which the parity scenarios assert at runtime.
   const childDigests = Object.values(bundle.children).filter(
-    (fragment): fragment is RequirementDigest => fragment.kind === 'RequirementDigest'
+    (fragment): fragment is RequirementDigest => fragment.kind === 'RequirementDigest',
   );
   return [bundle.root, ...childDigests];
 }

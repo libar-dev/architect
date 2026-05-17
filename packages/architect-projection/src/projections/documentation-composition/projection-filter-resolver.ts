@@ -12,7 +12,7 @@ import type { ProgressiveDisclosureLevel } from '../../disclosure/levels.js';
 export function resolveProjectionFilter(
   context: ProjectionContext,
   documentType: SupportedDocumentationType,
-  disclosureLevel?: ProgressiveDisclosureLevel
+  disclosureLevel?: ProgressiveDisclosureLevel,
 ): DisclosureSpec['filter'] {
   const metadata = getSupportedDocumentationTypeMetadata(documentType);
   const level = disclosureLevel ?? metadata.defaultDisclosureLevel;

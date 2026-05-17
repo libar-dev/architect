@@ -355,7 +355,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(block.content).toContain('const x = 1;');
             expect(block.content).toContain('const y = 2;');
           }
-        }
+        },
       );
     });
 

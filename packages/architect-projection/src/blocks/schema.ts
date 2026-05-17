@@ -50,7 +50,7 @@ export const ListItemSchema: z.ZodType<ListItem> = z.lazy(() =>
       checked: z.boolean().optional(),
       children: z.array(ListItemSchema).optional(),
     }),
-  ])
+  ]),
 );
 
 export const ListBlockSchema = z.strictObject({
@@ -163,7 +163,7 @@ export const separator = (): SeparatorBlock => ({
 export const table = (
   columns: string[],
   rows: string[][],
-  alignment?: ('left' | 'center' | 'right')[]
+  alignment?: ('left' | 'center' | 'right')[],
 ): TableBlock => ({
   type: 'table',
   columns,

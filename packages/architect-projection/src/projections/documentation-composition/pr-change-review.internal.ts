@@ -27,7 +27,7 @@ export type ProjectPrChangeReviewOptions = z.infer<typeof ProjectPrChangeReviewO
 
 export function buildPrChangeReview(
   context: ProjectionContext,
-  options: ProjectPrChangeReviewOptions
+  options: ProjectPrChangeReviewOptions,
 ): PrChangeReview {
   const changedFiles = dedupeStrings(options.changedFiles);
   const affectedPatterns = filterPatterns(context.graph.patterns, context.projectionFilter)
@@ -39,7 +39,7 @@ export function buildPrChangeReview(
     affectedPatterns.length === 0
       ? [
           paragraph(
-            `No patterns were matched from ${String(changedFiles.length)} changed ${changedFiles.length === 1 ? 'file' : 'files'} on branch ${options.branch}.`
+            `No patterns were matched from ${String(changedFiles.length)} changed ${changedFiles.length === 1 ? 'file' : 'files'} on branch ${options.branch}.`,
           ),
           list([
             'Review whether the changed files belong to unannotated implementation surfaces.',
@@ -48,7 +48,7 @@ export function buildPrChangeReview(
         ]
       : [
           paragraph(
-            `Branch ${options.branch} touches ${String(affectedPatterns.length)} affected ${affectedPatterns.length === 1 ? 'pattern' : 'patterns'}.`
+            `Branch ${options.branch} touches ${String(affectedPatterns.length)} affected ${affectedPatterns.length === 1 ? 'pattern' : 'patterns'}.`,
           ),
           list([
             'Verify affected business rules and deliverables still match the changed files.',
@@ -68,7 +68,7 @@ export function buildPrChangeReview(
 
 function patternMatchesChangedFiles(
   pattern: ExtractedPattern,
-  changedFiles: readonly string[]
+  changedFiles: readonly string[],
 ): boolean {
   if (changedFiles.length === 0) {
     return false;
@@ -89,8 +89,8 @@ function patternMatchesChangedFiles(
         (reference) =>
           reference === changedFile ||
           reference.endsWith(`/${changedFile}`) ||
-          changedFile.endsWith(`/${reference}`)
-      )
+          changedFile.endsWith(`/${reference}`),
+      ),
     );
 }
 

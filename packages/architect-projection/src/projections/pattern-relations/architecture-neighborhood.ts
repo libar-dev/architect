@@ -42,7 +42,7 @@ import { buildArchitectureNeighborhood } from './architecture-neighborhood.inter
 
 export function projectArchitectureNeighborhood(
   context: ProjectionContext,
-  pattern: string
+  pattern: string,
 ): ProjectionBundle<ArchitectureNeighborhood> {
   return projectSingle({
     kind: 'ArchitectureNeighborhood',

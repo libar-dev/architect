@@ -13,12 +13,12 @@ import type { DisclosureSpec } from '../projections/documentation-composition/di
 
 export interface DocBuildContext {
   readonly graph: PatternGraph;
-  readonly emittingDocId: string;  // current doc — used for "am I canonical?" checks
+  readonly emittingDocId: string; // current doc — used for "am I canonical?" checks
 }
 
 export interface DocTarget {
   readonly kind: 'website' | 'agent-context' | 'package-readme' | 'json';
-  readonly path: string;   // relative to repo root
+  readonly path: string; // relative to repo root
 }
 
 export interface DocDefinition {
@@ -34,19 +34,19 @@ export interface DocDefinition {
 export type DisclosureLevel = 'essential' | 'important' | 'useful' | 'advanced';
 
 export interface ContentFragmentOpts {
-  readonly disclosure: DisclosureLevel;  // required — no default
-  readonly mode?: 'inline' | 'link-only';  // default: 'inline'
-  readonly linkToCanonical?: boolean;  // default: false; auto-link to canonicalDoc if non-canonical inclusion
+  readonly disclosure: DisclosureLevel; // required — no default
+  readonly mode?: 'inline' | 'link-only'; // default: 'inline'
+  readonly linkToCanonical?: boolean; // default: false; auto-link to canonicalDoc if non-canonical inclusion
 }
 
 export interface ContentFragment {
   readonly id: string;
-  readonly canonicalDoc: string;  // DocDefinition.id where 'advanced' depth lives
+  readonly canonicalDoc: string; // DocDefinition.id where 'advanced' depth lives
   build(ctx: DocBuildContext, opts: ContentFragmentOpts): SectionBlock[];
 }
 
 export function defineContentFragment(spec: ContentFragment): ContentFragment {
-  return spec;  // identity helper for type-safe authoring
+  return spec; // identity helper for type-safe authoring
 }
 ```
 
@@ -155,7 +155,12 @@ generatedInsert(source: string, scope?: string): SectionBlock[]
 // docs-config/content-fragments/stub-format.fragment.ts
 import { defineContentFragment } from '@libar-dev/architect-projection';
 import {
-  composeSections, heading, paragraph, asTable, linkToCanonical, gte,
+  composeSections,
+  heading,
+  paragraph,
+  asTable,
+  linkToCanonical,
+  gte,
 } from '@libar-dev/architect-projection/compose';
 
 export const stubFormatFragment = defineContentFragment({
@@ -173,38 +178,44 @@ export const stubFormatFragment = defineContentFragment({
       // ESSENTIAL — always emitted
       paragraph(
         'Design stubs are TypeScript files defining interfaces, types, and ' +
-        'API shapes as design artifacts. They are ephemeral — deleted at ' +
-        'implementation time.'
+          'API shapes as design artifacts. They are ephemeral — deleted at ' +
+          'implementation time.',
       ),
 
       // IMPORTANT — operational reference
-      ...(gte(disclosure, 'important') ? [
-        heading('Directory convention', 3),
-        ...directoryConventionSection(),
-        heading('Lifecycle', 3),
-        ...lifecycleSection(),
-      ] : []),
+      ...(gte(disclosure, 'important')
+        ? [
+            heading('Directory convention', 3),
+            ...directoryConventionSection(),
+            heading('Lifecycle', 3),
+            ...lifecycleSection(),
+          ]
+        : []),
 
       // USEFUL — authoring detail
-      ...(gte(disclosure, 'useful') ? [
-        heading('Required JSDoc tags', 3),
-        ...requiredTagsTable(),
-        heading('Code conventions', 3),
-        ...codeConventionsSection(),
-      ] : []),
+      ...(gte(disclosure, 'useful')
+        ? [
+            heading('Required JSDoc tags', 3),
+            ...requiredTagsTable(),
+            heading('Code conventions', 3),
+            ...codeConventionsSection(),
+          ]
+        : []),
 
       // ADVANCED — full normative content
-      ...(gte(disclosure, 'advanced') ? [
-        heading('Tag syntax rules', 3),
-        ...tagSyntaxRules(),
-        heading('Exported type surface', 3),
-        ...exportedTypeSurfaceSection(),
-      ] : []),
+      ...(gte(disclosure, 'advanced')
+        ? [
+            heading('Tag syntax rules', 3),
+            ...tagSyntaxRules(),
+            heading('Exported type surface', 3),
+            ...exportedTypeSurfaceSection(),
+          ]
+        : []),
 
       // Cross-reference if this is a non-canonical inclusion
-      ...(addLink && ctx.emittingDocId !== this.canonicalDoc ? [
-        linkToCanonical(this, { text: 'Full reference: Stub Format spec' }),
-      ] : []),
+      ...(addLink && ctx.emittingDocId !== this.canonicalDoc
+        ? [linkToCanonical(this, { text: 'Full reference: Stub Format spec' })]
+        : []),
     ]);
   },
 });
@@ -264,9 +275,9 @@ The same content unit ships at three depths from one source. The canonical doc o
 
 Two orthogonal disclosure axes:
 
-| Axis | Controls | Mechanism |
-|---|---|---|
-| **INPUT disclosure** (new) | Which sub-sections a ContentFragment emits | `ContentFragment.build(ctx, { disclosure })` |
+| Axis                                                       | Controls                                                    | Mechanism                                           |
+| ---------------------------------------------------------- | ----------------------------------------------------------- | --------------------------------------------------- |
+| **INPUT disclosure** (new)                                 | Which sub-sections a ContentFragment emits                  | `ContentFragment.build(ctx, { disclosure })`        |
 | **OUTPUT disclosure** (existing — `RenderMarkdownOptions`) | Whether bundle children inline or split into separate files | `disclosureLevel` / `disclosureSpec` on render call |
 
 Composition: a `DocDefinition.build()` may emit ContentFragments at chosen input depths, returning a `RenderableDocument`. That document may be a `ProjectionBundle` with `children`, which the renderer fans out per its own output disclosure level. Same vocabulary across both axes; independent concerns.
@@ -305,19 +316,25 @@ If `SectionBlock` moves or its variants change, the build fails — closing the 
 
 import type { DocDefinition } from '@libar-dev/architect-projection';
 import {
-  extractFunctionSignature, extractBehaviors, extractZodSchemaFields,
-  extractSequenceDiagram, extractJSDocProse,
+  extractFunctionSignature,
+  extractBehaviors,
+  extractZodSchemaFields,
+  extractSequenceDiagram,
+  extractJSDocProse,
 } from '@libar-dev/architect-projection/extractors';
 import {
-  composeDoc, preamble, heading, paragraph, asTable, asDiagram,
+  composeDoc,
+  preamble,
+  heading,
+  paragraph,
+  asTable,
+  asDiagram,
 } from '@libar-dev/architect-projection/compose';
 
 export const projectionReadme: DocDefinition = {
   id: 'architect-projection-readme',
   title: '@libar-dev/architect-projection',
-  targets: [
-    { kind: 'package-readme', path: 'packages/architect-projection/README.md' },
-  ],
+  targets: [{ kind: 'package-readme', path: 'packages/architect-projection/README.md' }],
   async build(ctx) {
     const usageExample = extractFunctionSignature(ctx, 'parseAndProjectSessionContext');
     const adr006Rules = extractBehaviors(ctx, { tag: 'adr-006', onlyInvariants: true });
@@ -422,7 +439,9 @@ The tag registry below is the reference implementation's current state.
 The conformance shape itself is defined in [section 3](./03-tag-system.md).
 
 <!-- generated:tag-registry:start -->
+
 ... (rewritten by `pnpm docs:all`) ...
+
 <!-- generated:tag-registry:end -->
 
 ## Adding a new tag
@@ -460,6 +479,7 @@ This pattern closes the formal-spec/impl drift surfaces (`04` ↔ tag registry, 
 Sequenced; each wave delivers an end-to-end slice.
 
 ### W-DOCS-1: Foundation infrastructure (~1 session)
+
 - Create `DocDefinition` type + `DocBuildContext`.
 - Port `loadPreambleFromMarkdown` → `architect-core/src/utils/load-preamble.ts`.
 - Add `composeDoc` + foundational helpers in `architect-projection/src/doc-definition/compose.ts`.
@@ -468,6 +488,7 @@ Sequenced; each wave delivers an end-to-end slice.
 - **Verification:** ship one trivial `DocDefinition` (e.g., a regenerated `CLI-REFERENCE.md` from `extractCliCommands` — the 63-line pre-refactor doc is the simplest target).
 
 ### W-DOCS-2: Extractor catalog (~2-3 sessions, parallel-friendly)
+
 - Build the missing extractors. Sub-divide:
   - W-DOCS-2a: shape extractors — `extractZodSchemaFields`, `extractFunctionSignature`, `extractEnumValues`, `extractImportMap`. Most leverage existing AST plumbing.
   - W-DOCS-2b: registry extractors — `extractCliCommands`, `extractMcpTools`, `extractLintRules`. The first two are mechanical; lint-rules needs the `@architect-lint-rule` carrier added.
@@ -475,6 +496,7 @@ Sequenced; each wave delivers an end-to-end slice.
 - **Verification:** rebuild `REFERENCE-SAMPLE.md` from a new `DocDefinition`. Diff against the pre-refactor 1,135-line output. Any structural divergence is a bug in the extractor.
 
 ### W-DOCS-2d: ContentFragments + disclosure integration (~1 session)
+
 - `defineContentFragment` helper + types.
 - `gte(level, threshold)` disclosure comparator.
 - `linkToCanonical(fragment, opts)` link-out builder.
@@ -483,37 +505,44 @@ Sequenced; each wave delivers an end-to-end slice.
 - **Verification:** ship a `stubFormatFragment` referenced by 3 test DocDefinitions at 3 disclosure levels. Assert each consumer renders the expected section set; assert non-canonical inclusions emit the cross-reference link; assert the build-runner rejects duplicate canonical declarations.
 
 ### W-DOCS-3: Multi-target output (~1 session)
+
 - `DocTarget.kind: 'website' | 'agent-context' | 'package-readme' | 'json'`.
 - Per-target path conventions and write logic.
 - **Verification:** a `DocDefinition` with two targets writes both files from one `build()` call.
 
 ### W-DOCS-4: Generated-insert directive (~1 session)
+
 - New module: `architect-projection/src/inserts/`.
 - `InsertDefinition` type + runner that scans `consumers[]` for fence pairs and rewrites between them.
 - Three initial inserts: `tag-registry`, `fsm-table`, `config-schema`.
 - **Verification:** running `pnpm docs:all` rewrites the inserts in `formal-spec/04`, `formal-spec/09`, `formal-spec/11`. Idempotent — second run is a no-op.
 
 ### W-DOCS-5: Port the 11 reference docs (~2 sessions, parallel-friendly)
+
 - Author one `DocDefinition` per pre-refactor reference doc.
 - Some are trivial (CLI-REFERENCE — pure mechanical). Some have heavy preamble (CLI-RECIPES, SESSION-WORKFLOW-GUIDE).
 - Each port deletes the corresponding manual doc.
 - **Verification:** `pnpm docs:all` produces all 11 reference docs in `docs-live/reference/`. Spot-check against pre-refactor outputs.
 
 ### W-DOCS-6: Doctrine carriers (~3 small sessions, one per carrier)
+
 - Add `@architect-tier-rule` + `taxonomy/tier-registry.ts`. Author `DocDefinition` for `_shared/four-tier-ladder.md`. Delete manual version.
 - Add `ownership` field to `MetadataTagDefinition`. Author `DocDefinition` for `_shared/annotation-ownership.md`. Delete manual version.
 - Add `@architect-lint-rule` carrier. Author `DocDefinition` for `_shared/fsm-transitions.md` (via existing FSM module). Author `DocDefinition` (or generated-insert) for `docs/VALIDATION.md`.
 
 ### W-DOCS-7: Cleanup pass (~1 session)
+
 - Delete dead docs: `DOCS-GAP-ANALYSIS.md`, `CROSS-INSTANCE-CONVENTIONS.md`, `PR-NOTE-TAXONOMY-CAMPAIGN.md`, deprecated `INDEX.md`, deprecated `TAXONOMY.md`.
 - Rewrite `docs/ARCHITECTURE.md` (1,627 lines) as a `DocDefinition` with rich shape extraction + 4 diagram types + ~150-line preamble.
 - Author `docs/CLI.md`, `docs/MCP-SETUP.md`, `docs/VALIDATION.md` as `DocDefinition`s.
 
 ### W-DOCS-8: Query surface gaps (~1 session)
+
 - Add the 9 missing query endpoints from INVENTORY § 5.
 - 5-line CLI / MCP wrappers over existing projections.
 
 ### Independence and sequencing
+
 - W-DOCS-1 blocks everything.
 - W-DOCS-2a/2b/2c ⊥ W-DOCS-3, W-DOCS-4 (parallel after W-DOCS-1).
 - W-DOCS-2d (ContentFragments) needs W-DOCS-1 and W-DOCS-2a (shape extractors). The compose helpers come from W-DOCS-1; the fragment runner is the new code.

@@ -7,7 +7,7 @@
  * ### When to Use
  *
  * - Defines the discriminated union that collects every projection fragment
-*   kind into one read model.
+ *   kind into one read model.
  */
 import { z } from 'zod';
 

@@ -55,7 +55,7 @@ async function scanWorkspace(patterns: readonly string[], baseDir: string): Prom
       patterns,
       baseDir,
     },
-    createDefaultTagRegistry()
+    createDefaultTagRegistry(),
   );
 
   if (!Result.isOk(result)) throw new Error('Expected scanPatterns to succeed');
@@ -97,7 +97,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         When('I scan the invalid pattern fixture', async () => {
           state!.scanResult = await scanWorkspace(
             ['tests/fixtures/legacy-taxonomy/invalid-pattern-name.ts'],
-            packageRoot
+            packageRoot,
           );
         });
 
@@ -108,7 +108,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('the skipped directive reason mentions {string}', (_ctx: unknown, snippet: string) => {
           expect(state!.scanResult?.skippedDirectives[0]?.error.reason).toContain(snippet);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -118,7 +118,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'a TypeScript file {string} with content:',
           async (_ctx: unknown, filePath: string, content: string) => {
             await writeTempFile(filePath, content);
-          }
+          },
         );
 
         When('I extract TypeScript patterns from the temporary workspace', async () => {
@@ -128,7 +128,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const extraction = extractPatterns(
             scanResult.files,
             state!.tempDir!,
-            createDefaultTagRegistry()
+            createDefaultTagRegistry(),
           );
           state!.extractionDiagnostics = extraction.diagnostics;
           state!.extractionErrors = extraction.errors;
@@ -138,18 +138,18 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'TypeScript extraction reports diagnostic code {string}',
           (_ctx: unknown, code: string) => {
             expect(
-              state!.extractionDiagnostics.some((diagnostic) => diagnostic.code === code)
+              state!.extractionDiagnostics.some((diagnostic) => diagnostic.code === code),
             ).toBe(true);
-          }
+          },
         );
 
         And(
           'TypeScript extraction reports {int} pattern validation error',
           (_ctx: unknown, count: number) => {
             expect(state!.extractionErrors).toHaveLength(count);
-          }
+          },
         );
-      }
+      },
     );
   });
 
@@ -159,7 +159,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a TypeScript file {string} with content:',
         async (_ctx: unknown, filePath: string, content: string) => {
           await writeTempFile(filePath, content);
-        }
+        },
       );
 
       When('I build the runtime graph from the temporary workspace', async () => {
@@ -174,10 +174,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               (reference) =>
                 reference.field === 'uses' &&
                 reference.missing === missing &&
-                reference.pattern === pattern
-            )
+                reference.pattern === pattern,
+            ),
           ).toBe(true);
-        }
+        },
       );
     });
 
@@ -186,14 +186,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a TypeScript file {string} with content:',
         async (_ctx: unknown, filePath: string, content: string) => {
           await writeTempFile(filePath, content);
-        }
+        },
       );
 
       And(
         'a TypeScript file {string} with content:',
         async (_ctx: unknown, filePath: string, content: string) => {
           await writeTempFile(filePath, content);
-        }
+        },
       );
 
       When('I build the runtime graph from the temporary workspace', async () => {
@@ -202,7 +202,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
       Then('graph validation has no dangling uses targets', () => {
         const danglingUses = state!.buildResult?.validation.danglingReferences.filter(
-          (reference) => reference.field === 'uses'
+          (reference) => reference.field === 'uses',
         );
         expect(danglingUses).toEqual([]);
       });
@@ -211,7 +211,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'relationship entry {string} has usedBy value {string}',
         (_ctx: unknown, pattern: string, usedBy: string) => {
           expect(state!.buildResult?.graph.relationshipIndex?.[pattern]?.usedBy).toContain(usedBy);
-        }
+        },
       );
     });
 
@@ -220,14 +220,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a TypeScript file {string} with content:',
         async (_ctx: unknown, filePath: string, content: string) => {
           await writeTempFile(filePath, content);
-        }
+        },
       );
 
       And(
         'a TypeScript file {string} with content:',
         async (_ctx: unknown, filePath: string, content: string) => {
           await writeTempFile(filePath, content);
-        }
+        },
       );
 
       When('I build the runtime graph from the temporary workspace', async () => {
@@ -236,7 +236,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
       Then('graph validation has no dangling uses targets', () => {
         const danglingUses = state!.buildResult?.validation.danglingReferences.filter(
-          (reference) => reference.field === 'uses'
+          (reference) => reference.field === 'uses',
         );
         expect(danglingUses).toEqual([]);
       });
@@ -245,14 +245,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'relationship entry {string} preserves uses target {string}',
         (_ctx: unknown, pattern: string, target: string) => {
           expect(state!.buildResult?.graph.relationshipIndex?.[pattern]?.uses).toContain(target);
-        }
+        },
       );
 
       And(
         'relationship entry {string} has usedBy value {string}',
         (_ctx: unknown, pattern: string, usedBy: string) => {
           expect(state!.buildResult?.graph.relationshipIndex?.[pattern]?.usedBy).toContain(usedBy);
-        }
+        },
       );
     });
   });

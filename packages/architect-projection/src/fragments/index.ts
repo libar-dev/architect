@@ -7,8 +7,8 @@
  * ### When to Use
  *
  * - Re-exports the projection fragment contracts across pattern-relations,
-*   delivery-reporting, governance, execution-context, operational-insights,
-*   and documentation-composition.
+ *   delivery-reporting, governance, execution-context, operational-insights,
+ *   and documentation-composition.
  */
 export {
   ArchitectureComparisonSchema,

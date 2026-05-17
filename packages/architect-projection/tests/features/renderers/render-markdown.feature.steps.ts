@@ -59,7 +59,7 @@ function assertRenderedString(value: string | Record<string, string> | null): st
 }
 
 function assertRenderedRecord(
-  value: string | Record<string, string> | null
+  value: string | Record<string, string> | null,
 ): Record<string, string> {
   expect(value).not.toBeNull();
   expect(typeof value).toBe('object');
@@ -778,7 +778,7 @@ function createRouteIdCollisionBundle(): ProjectionBundle<Fragment> {
 }
 
 function createRequirementsDisclosureBundle(
-  documentType: 'requirements-executable' | 'requirements-specs'
+  documentType: 'requirements-executable' | 'requirements-specs',
 ): ProjectionBundle<Fragment> {
   const label =
     documentType === 'requirements-executable'
@@ -869,7 +869,7 @@ function createRequirementsDisclosureBundle(
 }
 
 function createRequirementsDisclosureBundleWithRejectedChildren(
-  documentType: 'requirements-executable' | 'requirements-specs'
+  documentType: 'requirements-executable' | 'requirements-specs',
 ): ProjectionBundle<Fragment> {
   const label =
     documentType === 'requirements-executable'
@@ -1042,7 +1042,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'a SectionedDocumentFixture fixture containing hostile markdown text and unsafe links',
           () => {
             state!.input = createUnsafeMarkdownFixture();
-          }
+          },
         );
 
         When('I render the fragment as markdown', () => {
@@ -1052,7 +1052,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         Then('the markdown output should escape hostile plain text', () => {
           const markdown = assertRenderedString(state!.rendered);
           expect(markdown).toContain(
-            '&lt;script&gt;alert\\("x"\\)&lt;/script&gt; \\[trap\\]\\(javascript:alert\\(1\\)\\) \\*\\*bold\\*\\*'
+            '&lt;script&gt;alert\\("x"\\)&lt;/script&gt; \\[trap\\]\\(javascript:alert\\(1\\)\\) \\*\\*bold\\*\\*',
           );
           expect(markdown).toContain('- \\!\\[img\\]\\(https://example.com/x.png\\)');
           expect(markdown).toContain('- \\[link\\]\\(javascript:alert\\(2\\)\\)');
@@ -1070,7 +1070,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('the markdown output should escape hostile collapsible summaries', () => {
           const markdown = assertRenderedString(state!.rendered);
           expect(markdown).toContain(
-            '<summary>\\*\\*Summary\\*\\* \\[trap\\]\\(javascript:alert\\(9\\)\\) &lt;b&gt;tag&lt;/b&gt;</summary>'
+            '<summary>\\*\\*Summary\\*\\* \\[trap\\]\\(javascript:alert\\(9\\)\\) &lt;b&gt;tag&lt;/b&gt;</summary>',
           );
         });
 
@@ -1115,7 +1115,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(markdown).not.toContain('[Trailing Numeric NewLine HTTPS](');
           expect(markdown).toContain('[Safe Colonized Path](docs/&colonization-guide.md)');
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -1132,17 +1132,17 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         Then('the release notes markdown should escape trusted interpolation values', () => {
           const markdown = assertRenderedString(state!.rendered);
           expect(markdown).toContain(
-            '## [v1.0\\]\\(javascript:alert\\(1\\)\\)] - &lt;script&gt;alert\\(2\\)&lt;/script&gt;'
+            '## [v1.0\\]\\(javascript:alert\\(1\\)\\)] - &lt;script&gt;alert\\(2\\)&lt;/script&gt;',
           );
           expect(markdown).toContain(
-            '- **Deliverable \\[click\\]\\(javascript:alert\\(4\\)\\)**: &lt;script&gt;alert\\(5\\)&lt;/script&gt;'
+            '- **Deliverable \\[click\\]\\(javascript:alert\\(4\\)\\)**: &lt;script&gt;alert\\(5\\)&lt;/script&gt;',
           );
           expect(markdown).toContain(
-            '- Pattern \\*\\*bold\\*\\* \\[trap\\]\\(javascript:alert\\(3\\)\\)'
+            '- Pattern \\*\\*bold\\*\\* \\[trap\\]\\(javascript:alert\\(3\\)\\)',
           );
           expect(markdown).toContain('Release note \\[trap\\]\\(javascript:alert\\(6\\)\\)');
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -1163,16 +1163,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         Then('the requirement markdown should escape trusted interpolation values', () => {
           const rendered = assertRenderedRecord(state!.rendered);
           expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-            '[RendererRequirement \\[trap\\]\\(javascript:alert\\(7\\)\\)](requirements-executable/renderer-package/renderer-threat.md)'
+            '[RendererRequirement \\[trap\\]\\(javascript:alert\\(7\\)\\)](requirements-executable/renderer-package/renderer-threat.md)',
           );
           expect(rendered['requirements-executable/renderer-package/renderer-threat.md']).toContain(
-            '**Status:** active \\*\\*bold\\*\\* \\[trap\\]\\(javascript:alert\\(8\\)\\)'
+            '**Status:** active \\*\\*bold\\*\\* \\[trap\\]\\(javascript:alert\\(8\\)\\)',
           );
           expect(rendered['requirements-executable/renderer-package/renderer-threat.md']).toContain(
-            'Requirement body remains plain text.'
+            'Requirement body remains plain text.',
           );
         });
-      }
+      },
     );
   });
 
@@ -1186,7 +1186,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed SectionedDocumentFixture bundle fixture that exceeds the markdown size budget',
             () => {
               state!.input = createSplitBundle();
-            }
+            },
           );
 
           When('I render the bundle as markdown with an H2 size budget', () => {
@@ -1226,19 +1226,19 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 '',
                 '[See Gamma Section](gamma-section.md)',
                 '',
-              ].join('\n')
+              ].join('\n'),
             );
             expect(rendered['guides/alpha-section.md']).toContain(
-              '[← Back to Renderer Guide](renderer-guide.md)'
+              '[← Back to Renderer Guide](renderer-guide.md)',
             );
             expect(rendered['guides/beta-section.md']).toContain('Beta details stay together too.');
             expect(rendered['guides/gamma-section.md']).toContain(
-              'Gamma details push the file over budget.'
+              'Gamma details push the file over budget.',
             );
           });
-        }
+        },
       );
-    }
+    },
   );
 
   Rule(
@@ -1251,7 +1251,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed business-rules SectionedDocumentFixture bundle with detailed children',
             () => {
               state!.input = createBusinessRulesDisclosureBundle();
-            }
+            },
           );
 
           When('I render the bundle as markdown without H2 splitting', () => {
@@ -1272,16 +1272,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['BUSINESS-RULES.md']).toContain('Canonical document types');
-            }
+            },
           );
 
           And('the documentation detail child should retain its detail body', () => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(rendered['business-rules/projection-api.md']).toContain(
-              'Full invariant detail stays in the child page.'
+              'Full invariant detail stays in the child page.',
             );
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1305,7 +1305,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(rendered['BUSINESS-RULES.md']).toContain('## Packages');
             expect(rendered['BUSINESS-RULES.md']).toContain(
-              '| Package              | Features | Rules | With Invariants |'
+              '| Package              | Features | Rules | With Invariants |',
             );
           });
 
@@ -1325,7 +1325,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(rendered['business-rules/architect-projection.md']).toContain('## Rules');
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1354,18 +1354,18 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['BUSINESS-RULES.md']).toContain(
-                '| \\[CLI Trap\\]\\(javascript:alert\\(10\\)\\) | 1        | 1     | 1               |'
+                '| \\[CLI Trap\\]\\(javascript:alert\\(10\\)\\) | 1        | 1     | 1               |',
               );
               expect(rendered['BUSINESS-RULES.md']).not.toMatch(/\]\(\s*javascript:alert\(10\)\)/i);
               expect(rendered['BUSINESS-RULES.md']).not.toContain('## Package Detail');
-            }
+            },
           );
 
           And('the routed output should not contain the rejected child path', () => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(rendered['javascript:alert(10)']).toBeUndefined();
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1401,10 +1401,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Then('the business-rules root should render traversal labels as plain text', () => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(rendered['BUSINESS-RULES.md']).toContain(
-              '| \\[CLI Trap\\]\\(javascript:alert\\(10\\)\\) | 1        | 1     | 1               |'
+              '| \\[CLI Trap\\]\\(javascript:alert\\(10\\)\\) | 1        | 1     | 1               |',
             );
             expect(rendered['BUSINESS-RULES.md']).not.toContain(
-              '[architect-projection](/tmp/absolute.md)'
+              '[architect-projection](/tmp/absolute.md)',
             );
             expect(rendered['BUSINESS-RULES.md']).not.toContain('## Package Detail');
           });
@@ -1414,7 +1414,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(rendered['../outside.md']).toBeUndefined();
             expect(rendered['/tmp/absolute.md']).toBeUndefined();
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1435,7 +1435,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 includeChildren: false,
                 splitStrategy: 'never',
               });
-            }
+            },
           );
 
           Then('the business-rules root should contain a Packages counts table', () => {
@@ -1443,7 +1443,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const markdown = state!.rendered as string;
             expect(markdown).toContain('## Packages');
             expect(markdown).toContain(
-              '| Package              | Features | Rules | With Invariants |'
+              '| Package              | Features | Rules | With Invariants |',
             );
           });
 
@@ -1458,7 +1458,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const markdown = state!.rendered as string;
             expect(markdown).not.toContain('## Rules');
           });
-        }
+        },
       );
 
       RuleScenarioOutline(
@@ -1485,7 +1485,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const markdown = state!.rendered as string;
             expect(countRuleTableColumns(markdown)).toBe(Number(examples['columns']));
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1495,7 +1495,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed SectionedDocumentFixture bundle whose children request duplicate paths',
             () => {
               state!.input = createDuplicatePathBundle();
-            }
+            },
           );
 
           When('I render the bundle as markdown without H2 splitting', () => {
@@ -1521,10 +1521,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(rendered['PATTERNS.md']).toContain('[First Pattern](patterns/detail.md)');
             expect(rendered['PATTERNS.md']).toContain(
-              '[Second Pattern](patterns/detail--second-pattern.md)'
+              '[Second Pattern](patterns/detail--second-pattern.md)',
             );
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1534,7 +1534,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed SectionedDocumentFixture bundle whose children request duplicate paths',
             () => {
               state!.input = createDuplicatePathBundle();
-            }
+            },
           );
 
           When('I render the bundle as markdown without H2 splitting', () => {
@@ -1550,7 +1550,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(rendered['PATTERNS.md']).toContain('Ambiguous Detail Alias');
             expect(rendered['PATTERNS.md']).not.toContain('[Ambiguous Detail Alias](');
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1560,7 +1560,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed SectionedDocumentFixture bundle with a child-key and route-id collision',
             () => {
               state!.input = createRouteIdCollisionBundle();
-            }
+            },
           );
 
           When('I render the bundle as markdown without H2 splitting', () => {
@@ -1576,7 +1576,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(rendered['PATTERNS.md']).toContain('Colliding Alias');
             expect(rendered['PATTERNS.md']).not.toContain('[Colliding Alias](');
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1586,7 +1586,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed requirements-executable SectionedDocumentFixture bundle with detailed children',
             () => {
               state!.input = createRequirementsDisclosureBundle('requirements-executable');
-            }
+            },
           );
 
           When('I render the bundle as markdown without H2 splitting', () => {
@@ -1602,26 +1602,26 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-                '[RendererExecutableRequirement](requirements-executable/renderer-package/renderer-requirement.md)'
+                '[RendererExecutableRequirement](requirements-executable/renderer-package/renderer-requirement.md)',
               );
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-                'RendererExecutableRequirement'
+                'RendererExecutableRequirement',
               );
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).not.toContain(
-                'RendererExecutableRequirement full requirement body is retained in the detail page.'
+                'RendererExecutableRequirement full requirement body is retained in the detail page.',
               );
-            }
+            },
           );
 
           And('the requirements-executable detail child should retain its requirement body', () => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(
-              rendered['requirements-executable/renderer-package/renderer-requirement.md']
+              rendered['requirements-executable/renderer-package/renderer-requirement.md'],
             ).toContain(
-              'RendererExecutableRequirement full requirement body is retained in the detail page.'
+              'RendererExecutableRequirement full requirement body is retained in the detail page.',
             );
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1631,7 +1631,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed requirements-executable SectionedDocumentFixture bundle with detailed children',
             () => {
               state!.input = createRequirementsDisclosureBundle('requirements-executable');
-            }
+            },
           );
 
           When('I render the requirements-executable bundle with traversal route targets', () => {
@@ -1653,12 +1653,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-                'RendererExecutableRequirement'
+                'RendererExecutableRequirement',
               );
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).not.toContain(
-                '[RendererExecutableRequirement](../outside.md)'
+                '[RendererExecutableRequirement](../outside.md)',
               );
-            }
+            },
           );
 
           And(
@@ -1666,9 +1666,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['../outside.md']).toBeUndefined();
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1678,7 +1678,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed requirements-executable SectionedDocumentFixture bundle with detailed children',
             () => {
               state!.input = createRequirementsDisclosureBundle('requirements-executable');
-            }
+            },
           );
 
           When(
@@ -1695,7 +1695,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                       : '..%2Foutside.md',
                 },
               });
-            }
+            },
           );
 
           Then(
@@ -1703,12 +1703,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-                'RendererExecutableRequirement'
+                'RendererExecutableRequirement',
               );
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).not.toContain(
-                '[RendererExecutableRequirement](..%2Foutside.md)'
+                '[RendererExecutableRequirement](..%2Foutside.md)',
               );
-            }
+            },
           );
 
           And(
@@ -1716,9 +1716,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['..%2Foutside.md']).toBeUndefined();
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1728,7 +1728,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed requirements-executable SectionedDocumentFixture bundle with detailed children',
             () => {
               state!.input = createRequirementsDisclosureBundle('requirements-executable');
-            }
+            },
           );
 
           When(
@@ -1745,7 +1745,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                       : '%09renderer.md',
                 },
               });
-            }
+            },
           );
 
           Then(
@@ -1753,12 +1753,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-                'RendererExecutableRequirement'
+                'RendererExecutableRequirement',
               );
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).not.toContain(
-                '[RendererExecutableRequirement](%09renderer.md)'
+                '[RendererExecutableRequirement](%09renderer.md)',
               );
-            }
+            },
           );
 
           And(
@@ -1766,9 +1766,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['%09renderer.md']).toBeUndefined();
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1779,7 +1779,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               state!.input =
                 createRequirementsDisclosureBundleWithRejectedChildren('requirements-executable');
-            }
+            },
           );
 
           When(
@@ -1798,7 +1798,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                         : 'renderer.txt',
                 },
               });
-            }
+            },
           );
 
           Then(
@@ -1806,18 +1806,18 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-                'RendererExecutableRequirement'
+                'RendererExecutableRequirement',
               );
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-                'RendererExecutableRequirementTxt'
+                'RendererExecutableRequirementTxt',
               );
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).not.toContain(
-                '[RendererExecutableRequirement]('
+                '[RendererExecutableRequirement](',
               );
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).not.toContain(
-                '[RendererExecutableRequirementTxt]('
+                '[RendererExecutableRequirementTxt](',
               );
-            }
+            },
           );
 
           And(
@@ -1826,9 +1826,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered[' renderer.md ']).toBeUndefined();
               expect(rendered['renderer.txt']).toBeUndefined();
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1838,7 +1838,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed requirements-executable SectionedDocumentFixture bundle with detailed children',
             () => {
               state!.input = createRequirementsDisclosureBundle('requirements-executable');
-            }
+            },
           );
 
           When(
@@ -1855,7 +1855,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                       : 'requirements-executable/renderer-package/renderer-requirement.md',
                 },
               });
-            }
+            },
           );
 
           Then(
@@ -1864,9 +1864,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toBeDefined();
               expect(rendered[' REQUIREMENTS-EXECUTABLE.md ']).toBeUndefined();
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1876,7 +1876,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed requirements-specs SectionedDocumentFixture bundle with detailed children',
             () => {
               state!.input = createRequirementsDisclosureBundle('requirements-specs');
-            }
+            },
           );
 
           When('I render the bundle as markdown without H2 splitting', () => {
@@ -1892,24 +1892,24 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['REQUIREMENTS-SPECS.md']).toContain(
-                '[RendererSpecsRequirement](requirements-specs/renderer-requirement.md)'
+                '[RendererSpecsRequirement](requirements-specs/renderer-requirement.md)',
               );
               expect(rendered['REQUIREMENTS-SPECS.md']).toContain('RendererSpecsRequirement');
               expect(rendered['REQUIREMENTS-SPECS.md']).not.toContain(
-                'RendererSpecsRequirement full requirement body is retained in the detail page.'
+                'RendererSpecsRequirement full requirement body is retained in the detail page.',
               );
-            }
+            },
           );
 
           And('the requirements-specs detail child should retain its requirement body', () => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(rendered['requirements-specs/renderer-requirement.md']).toContain(
-              'RendererSpecsRequirement full requirement body is retained in the detail page.'
+              'RendererSpecsRequirement full requirement body is retained in the detail page.',
             );
           });
-        }
+        },
       );
-    }
+    },
   );
 });
 
@@ -1930,7 +1930,7 @@ describe('renderMarkdown adversarial security coverage', () => {
             ],
           },
         ],
-      })
+      }),
     );
 
     const markdown = assertRenderedString(rendered);
@@ -1948,10 +1948,12 @@ describe('renderMarkdown adversarial security coverage', () => {
           {
             id: 'links',
             title: 'Links',
-            blocks: [{ type: 'link-out', text: 'Data URL', path: 'data:text/html,<script>x</script>' }],
+            blocks: [
+              { type: 'link-out', text: 'Data URL', path: 'data:text/html,<script>x</script>' },
+            ],
           },
         ],
-      })
+      }),
     );
 
     const markdown = assertRenderedString(rendered);
@@ -1972,7 +1974,7 @@ describe('renderMarkdown adversarial security coverage', () => {
             blocks: [{ type: 'link-out', text: 'File URL', path: 'file:///etc/passwd' }],
           },
         ],
-      })
+      }),
     );
 
     const markdown = assertRenderedString(rendered);
@@ -1995,7 +1997,7 @@ describe('renderMarkdown adversarial security coverage', () => {
             ],
           },
         ],
-      })
+      }),
     );
 
     const markdown = assertRenderedString(rendered);
@@ -2013,10 +2015,12 @@ describe('renderMarkdown adversarial security coverage', () => {
           {
             id: 'links',
             title: 'Links',
-            blocks: [{ type: 'link-out', text: 'Control Target', path: 'https://example.com/\u0000x' }],
+            blocks: [
+              { type: 'link-out', text: 'Control Target', path: 'https://example.com/\u0000x' },
+            ],
           },
         ],
-      })
+      }),
     );
 
     const markdown = assertRenderedString(rendered);

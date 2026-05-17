@@ -56,7 +56,7 @@ export function isDeliverableComplete(deliverable: Deliverable): boolean {
 export function hasAcceptanceCriteria(pattern: ExtractedPattern): boolean {
   return (pattern.scenarios ?? []).some((scenario) => {
     const semanticMatch = scenario.semanticTags.some(
-      (tag) => tag.toLowerCase() === 'acceptance-criteria'
+      (tag) => tag.toLowerCase() === 'acceptance-criteria',
     );
     const tagMatch = scenario.tags.some((tag) => tag.toLowerCase() === 'acceptance-criteria');
     return semanticMatch || tagMatch;
@@ -73,7 +73,7 @@ export function extractAcceptanceCriteriaScenarios(pattern: ExtractedPattern): r
   return (pattern.scenarios ?? [])
     .filter((scenario) => {
       const semanticMatch = scenario.semanticTags.some(
-        (tag) => tag.toLowerCase() === 'acceptance-criteria'
+        (tag) => tag.toLowerCase() === 'acceptance-criteria',
       );
       const tagMatch = scenario.tags.some((tag) => tag.toLowerCase() === 'acceptance-criteria');
       return semanticMatch || tagMatch;
@@ -96,7 +96,7 @@ export function extractAcceptanceCriteriaScenarios(pattern: ExtractedPattern): r
 export function validateDoDForPhase(
   patternName: string,
   phase: number,
-  pattern: ExtractedPattern
+  pattern: ExtractedPattern,
 ): DoDValidationResult {
   const deliverables = pattern.deliverables ?? [];
   const messages: string[] = [];
@@ -109,7 +109,7 @@ export function validateDoDForPhase(
     messages.push(`No deliverables defined for phase ${String(phase)}`);
   } else if (!allDeliverablesComplete) {
     messages.push(
-      `${String(incompleteDeliverables.length)}/${String(deliverables.length)} deliverables incomplete`
+      `${String(incompleteDeliverables.length)}/${String(deliverables.length)} deliverables incomplete`,
     );
     for (const d of incompleteDeliverables) {
       messages.push(`  - "${d.name}" (status: ${d.status})`);
@@ -126,7 +126,7 @@ export function validateDoDForPhase(
 
   if (isDoDMet) {
     messages.push(
-      `DoD met: ${String(deliverables.length)} deliverables complete, AC scenarios present`
+      `DoD met: ${String(deliverables.length)} deliverables complete, AC scenarios present`,
     );
   }
 
@@ -153,7 +153,7 @@ export function validateDoDForPhase(
  */
 export function getDeliverableWorkflowPatterns(
   dataset: RuntimePatternGraph,
-  phaseFilter: readonly number[] = []
+  phaseFilter: readonly number[] = [],
 ): readonly ExtractedPattern[] {
   const shouldFilterPhases = phaseFilter.length > 0;
 
@@ -186,7 +186,7 @@ export function getDeliverableWorkflowPatterns(
  */
 export function validateDoD(
   dataset: RuntimePatternGraph,
-  phaseFilter: readonly number[] = []
+  phaseFilter: readonly number[] = [],
 ): DoDValidationSummary {
   const results: DoDValidationResult[] = [];
 
@@ -253,7 +253,7 @@ export function formatDoDSummary(summary: DoDValidationSummary): string {
     for (const result of passed) {
       const deliverableCount = result.deliverables.length;
       lines.push(
-        `  [PASS] Phase ${String(result.phase)}: ${result.patternName} (${String(deliverableCount)} deliverables)`
+        `  [PASS] Phase ${String(result.phase)}: ${result.patternName} (${String(deliverableCount)} deliverables)`,
       );
     }
     lines.push('');

@@ -105,7 +105,7 @@ export function createParityContext(overrides: Partial<ProjectionContext> = {}):
       userRole: 'developer',
       businessValue: 'demonstrates parity invariants',
       rules: seed.rules.map((rule) => buildBusinessRuleStub(rule)),
-    })
+    }),
   );
   return {
     graph: buildGraphFromPatterns({

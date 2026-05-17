@@ -111,7 +111,7 @@ const GENERATORS: readonly GeneratorDescriptor[] = [...PROJECTION_GENERATORS, IN
 function renderDocumentationIndex(): string {
   const rows = SUPPORTED_DOCUMENTATION_TYPE_REGISTRY.map(
     (metadata) =>
-      `| ${metadata.displayTitle} | [${metadata.markdownRootTarget}](${metadata.markdownRootTarget}) |`
+      `| ${metadata.displayTitle} | [${metadata.markdownRootTarget}](${metadata.markdownRootTarget}) |`,
   ).join('\n');
 
   return `# Documentation Index
@@ -155,7 +155,7 @@ function parseFilterValue(value: string): ProjectionFilter {
 
 function mergeProjectionFilter(
   current: ProjectionFilter | undefined,
-  next: ProjectionFilter
+  next: ProjectionFilter,
 ): ProjectionFilter {
   return parseAtBoundary(
     ProjectionFilterSchema,
@@ -164,7 +164,7 @@ function mergeProjectionFilter(
         ? { status: [...(current?.status ?? []), ...(next.status ?? [])] }
         : {}),
     },
-    '--filter'
+    '--filter',
   );
 }
 
@@ -335,7 +335,7 @@ function printHelp(): void {
       '  -v, --version          Show version\n\n' +
       'Examples:\n' +
       '  architect-generate -g business-rules --disclosure useful --filter status=active,completed\n' +
-      '  architect-generate --filter status=completed\n'
+      '  architect-generate --filter status=completed\n',
   );
 }
 
@@ -349,11 +349,11 @@ function resolveRequestedGenerators(requested: readonly string[]): readonly Gene
 
   for (const name of requested) {
     const descriptor = GENERATORS.find(
-      (candidate) => candidate.name === name || candidate.aliases.includes(name)
+      (candidate) => candidate.name === name || candidate.aliases.includes(name),
     );
     if (descriptor === undefined) {
       throw new Error(
-        `Unknown generator: ${name}. Supported generators: ${GENERATORS.map((entry) => entry.name).join(', ')}`
+        `Unknown generator: ${name}. Supported generators: ${GENERATORS.map((entry) => entry.name).join(', ')}`,
       );
     }
 
@@ -387,7 +387,7 @@ async function buildGraph(config: ResolvedConfig, baseDir: string): Promise<Buil
 function createProjectionContext(
   config: ResolvedConfig,
   graph: Awaited<ReturnType<typeof buildGraph>>['graph'],
-  projectionFilter: ProjectionFilter | undefined
+  projectionFilter: ProjectionFilter | undefined,
 ): ProjectionContext {
   return {
     graph,
@@ -403,7 +403,7 @@ function createProjectionContext(
 function renderProjectionDocument(
   context: ProjectionContext,
   generator: ProjectionGenerator,
-  disclosureLevel: ProgressiveDisclosureLevel | undefined
+  disclosureLevel: ProgressiveDisclosureLevel | undefined,
 ): { files: readonly GeneratedFile[]; rootDocument: GeneratedRootDocument } {
   const projection = buildDocumentationProjection(context, generator.documentType, disclosureLevel);
   const rendered = renderMarkdown(projection, {
@@ -446,7 +446,7 @@ function renderIndexDocument(): {
 function buildDocumentationProjection(
   context: ProjectionContext,
   documentType: SupportedDocumentationType,
-  disclosureLevel: ProgressiveDisclosureLevel | undefined
+  disclosureLevel: ProgressiveDisclosureLevel | undefined,
 ): MarkdownProjection {
   getProjectionGeneratorMetadata(documentType);
   return parseAndProjectDocumentationBundle(context, {
@@ -456,10 +456,10 @@ function buildDocumentationProjection(
 }
 
 function getProjectionGeneratorMetadata(
-  documentType: SupportedDocumentationType
+  documentType: SupportedDocumentationType,
 ): SupportedDocumentationTypeMetadata {
   const metadata = SUPPORTED_DOCUMENTATION_TYPE_REGISTRY.find(
-    (entry) => entry.key === documentType
+    (entry) => entry.key === documentType,
   );
 
   if (metadata === undefined) {
@@ -478,7 +478,7 @@ function resolveOutputDirectory(
   config: ResolvedConfig,
   args: ParsedArgs,
   generatorName: string,
-  baseDir: string
+  baseDir: string,
 ): string {
   const configuredOutputDir =
     args.outputDir ??
@@ -500,7 +500,7 @@ async function pathExists(targetPath: string): Promise<boolean> {
 async function writeGeneratedFiles(
   outputDir: string,
   files: readonly GeneratedFile[],
-  overwrite: boolean
+  overwrite: boolean,
 ): Promise<void> {
   for (const file of files) {
     const absolutePath = path.resolve(outputDir, file.path);
@@ -517,7 +517,7 @@ async function writeGeneratedFiles(
 function renderGeneratorExecution(
   context: ProjectionContext,
   generator: GeneratorDescriptor,
-  disclosureLevel: ProgressiveDisclosureLevel | undefined
+  disclosureLevel: ProgressiveDisclosureLevel | undefined,
 ): GeneratorExecution {
   if (generator.kind === 'projection') {
     const projectionResult = renderProjectionDocument(context, generator, disclosureLevel);
@@ -582,7 +582,7 @@ async function main(): Promise<void> {
   const projectionContext = createProjectionContext(
     effectiveConfig,
     build.graph,
-    args.projectionFilter
+    args.projectionFilter,
   );
   const overwrite = args.overwrite || effectiveConfig.project.output.overwrite;
 
@@ -606,7 +606,7 @@ async function main(): Promise<void> {
       const prior = seenAbsolutePaths.get(absolute);
       if (prior !== undefined && prior !== execution.generator.name) {
         throw new Error(
-          `File-path collision: ${absolute} would be written by both ${prior} and ${execution.generator.name}`
+          `File-path collision: ${absolute} would be written by both ${prior} and ${execution.generator.name}`,
         );
       }
       seenAbsolutePaths.set(absolute, execution.generator.name);
@@ -617,8 +617,8 @@ async function main(): Promise<void> {
   // (verified above), so concurrent writes are safe.
   await Promise.all(
     executions.map(({ execution, outputDir }) =>
-      writeGeneratedFiles(outputDir, execution.files, overwrite)
-    )
+      writeGeneratedFiles(outputDir, execution.files, overwrite),
+    ),
   );
 
   // Phase 3: upsert the generated-docs manifest sequentially per outputDir.
@@ -644,7 +644,7 @@ async function main(): Promise<void> {
           rootPath: execution.rootDocument.path,
           entries: createPublishedEntries(
             execution.rootDocument.path,
-            execution.files.map((file) => file.path)
+            execution.files.map((file) => file.path),
           ),
           ...(execution.generator.kind === 'projection'
             ? { documentType: execution.generator.documentType }
@@ -652,7 +652,7 @@ async function main(): Promise<void> {
           pruneStaleFiles: overwrite,
         });
       }
-    })
+    }),
   );
 
   // Deterministic summary: generators in user-requested order, output
@@ -662,7 +662,7 @@ async function main(): Promise<void> {
   const generatorList = requestedGenerators.map((generator) => generator.name).join(', ');
 
   process.stdout.write(
-    `Generated ${String(fileCount)} files from ${String(build.graph.counts.total)} patterns using ${generatorList} in ${outputDirs.join(', ')}.\n`
+    `Generated ${String(fileCount)} files from ${String(build.graph.counts.total)} patterns using ${generatorList} in ${outputDirs.join(', ')}.\n`,
   );
 }
 

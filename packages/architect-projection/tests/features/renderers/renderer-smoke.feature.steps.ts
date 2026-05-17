@@ -84,7 +84,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               runRenderer('renderJson', () => renderJson(fixture));
               runRenderer('renderMarkdown', () => renderMarkdown(fixture));
               runRenderer('renderUi', () => renderUi(fixture));
-            }
+            },
           );
 
           Then('no renderer throws', () => {
@@ -103,7 +103,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(output, `${name} output for ${kind}`).toBeDefined();
               expect(
                 isNonEmptyProjection(output),
-                `${name} output for ${kind} should be non-empty`
+                `${name} output for ${kind} should be non-empty`,
               ).toBe(true);
             }
 
@@ -120,8 +120,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(compactText).not.toContain('Date: unknown');
             }
           });
-        }
+        },
       );
-    }
+    },
   );
 });

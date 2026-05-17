@@ -15,7 +15,7 @@ interface TraceabilityState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/delivery-reporting/traceability-matrix.feature'
+  'tests/features/projections/delivery-reporting/traceability-matrix.feature',
 );
 
 let state: TraceabilityState | null = null;
@@ -116,7 +116,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'behavior-phase-two',
           ]);
         });
-      }
+      },
     );
   });
 });

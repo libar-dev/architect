@@ -86,7 +86,7 @@ export function lintDirective(
   file: string,
   line: number,
   rules: readonly LintRule[],
-  context?: LintContext
+  context?: LintContext,
 ): LintViolation[] {
   const violations: LintViolation[] = [];
 
@@ -116,7 +116,7 @@ export function lintDirective(
 export function lintFiles(
   files: Map<string, readonly DirectiveWithLocation[]>,
   rules: readonly LintRule[],
-  context?: LintContext
+  context?: LintContext,
 ): LintSummary {
   const results: LintResult[] = [];
   let errorCount = 0;

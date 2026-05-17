@@ -67,7 +67,7 @@ function assignIfDefined(obj: Record<string, unknown>, key: string, value: unkno
 function assignIfNonEmpty(
   obj: Record<string, unknown>,
   key: string,
-  arr: readonly unknown[] | undefined
+  arr: readonly unknown[] | undefined,
 ): void {
   if (arr && arr.length > 0) obj[key] = arr;
 }
@@ -77,7 +77,7 @@ const MIN_UNLOCK_REASON_LENGTH = 10;
 
 function validateUnlockReason(
   rawValue: string | undefined,
-  filePath: string
+  filePath: string,
 ): { unlockReason?: string; diagnostic?: ExtractionDiagnostic } {
   if (rawValue === undefined) return {};
   const unlockReason = rawValue.trim();
@@ -92,7 +92,7 @@ function validateUnlockReason(
       filePath,
       'invalid-unlock-reason',
       `Invalid @architect-unlock-reason value '${unlockReason || rawValue}'`,
-      'Use a meaningful reason with at least 10 characters and avoid placeholders like test, temp, todo, or fixme'
+      'Use a meaningful reason with at least 10 characters and avoid placeholders like test, temp, todo, or fixme',
     ),
   };
 }
@@ -117,7 +117,7 @@ function buildRoleLookup(roles: readonly RoleLike[]): {
 
 function resolveCanonicalRole(
   rawValue: string | undefined,
-  roles: readonly RoleLike[]
+  roles: readonly RoleLike[],
 ): string | undefined {
   if (rawValue === undefined) return undefined;
   const lookup = buildRoleLookup(roles);
@@ -128,7 +128,7 @@ function resolveCanonicalRole(
 function collectDeprecatedTagDiagnostics(
   metadata: ReturnType<typeof extractPatternTags>,
   filePath: string,
-  roles: readonly RoleLike[]
+  roles: readonly RoleLike[],
 ): ExtractionDiagnostic[] {
   const diagnostics: ExtractionDiagnostic[] = [];
   const validRoleValues = roles.map((role) => role.tag).join(', ');
@@ -140,8 +140,8 @@ function collectDeprecatedTagDiagnostics(
         filePath,
         'invalid-enum-value',
         `Multiple @architect-role tags found; using the first value and ignoring ${String(roleValues.length - 1)} duplicate tag(s)`,
-        'Keep exactly one @architect-role tag'
-      )
+        'Keep exactly one @architect-role tag',
+      ),
     );
   }
 
@@ -151,8 +151,8 @@ function collectDeprecatedTagDiagnostics(
         filePath,
         'invalid-enum-value',
         `Unrecognized value '${unknownRoleValue}' for @architect-role`,
-        `Valid values: ${validRoleValues}`
-      )
+        `Valid values: ${validRoleValues}`,
+      ),
     );
   }
 
@@ -161,14 +161,14 @@ function collectDeprecatedTagDiagnostics(
       const value = tag.substring('arch-role:'.length);
       const canonicalRole = resolveCanonicalRole(value, roles) ?? value;
       diagnostics.push(
-        createDeprecatedTagDiagnostic(filePath, tag, `@architect-role:${canonicalRole}`)
+        createDeprecatedTagDiagnostic(filePath, tag, `@architect-role:${canonicalRole}`),
       );
       continue;
     }
     if (tag.startsWith('arch-context:')) {
       const value = tag.substring('arch-context:'.length);
       diagnostics.push(
-        createDeprecatedTagDiagnostic(filePath, tag, `@architect-bounded-context:${value}`)
+        createDeprecatedTagDiagnostic(filePath, tag, `@architect-bounded-context:${value}`),
       );
       continue;
     }
@@ -181,8 +181,8 @@ function collectDeprecatedTagDiagnostics(
       createDeprecatedTagDiagnostic(
         filePath,
         tag,
-        `@architect-role:${resolveCanonicalRole(tag, roles) ?? tag}`
-      )
+        `@architect-role:${resolveCanonicalRole(tag, roles) ?? tag}`,
+      ),
     );
   }
 
@@ -226,7 +226,7 @@ function buildGherkinRawPattern(input: {
     ...(metadata.role !== undefined && { role: metadata.role }),
     directive: {
       tags: feature.tags.map((tag) =>
-        asDirectiveTag(`@architect-${tag}`)
+        asDirectiveTag(`@architect-${tag}`),
       ) as readonly DirectiveTag[],
       description: feature.description,
       examples: [],
@@ -302,7 +302,7 @@ function buildGherkinRawPattern(input: {
         featureDescription: feature.description,
         scenarioName: scenario.name,
         semanticTags: scenario.tags.filter((tag) =>
-          (SEMANTIC_SCENARIO_TAGS as readonly string[]).includes(tag)
+          (SEMANTIC_SCENARIO_TAGS as readonly string[]).includes(tag),
         ),
         tags: scenario.tags,
         layer: inferFeatureLayer(filePath),
@@ -352,7 +352,7 @@ export interface GherkinExtractionResult {
 
 export function extractPatternsFromGherkin(
   scannedFiles: readonly ScannedGherkinFile[],
-  config: GherkinExtractorConfig
+  config: GherkinExtractorConfig,
 ): GherkinExtractionResult {
   const patterns: ExtractedPattern[] = [];
   const errors: GherkinPatternValidationError[] = [];
@@ -383,14 +383,14 @@ export function extractPatternsFromGherkin(
             relativePath,
             code,
             `Unrecognized value '${entry.value}' for @architect-${entry.tag}`,
-            `Valid values: ${entry.validValues.join(', ')}`
-          )
+            `Valid values: ${entry.validValues.join(', ')}`,
+          ),
         );
       }
     }
 
     diagnostics.push(
-      ...collectDeprecatedTagDiagnostics(metadata, relativePath, effectiveRegistry.roles)
+      ...collectDeprecatedTagDiagnostics(metadata, relativePath, effectiveRegistry.roles),
     );
 
     if (!metadata.pattern) {
@@ -399,23 +399,23 @@ export function extractPatternsFromGherkin(
           relativePath,
           'missing-pattern-name',
           'File has @architect gate tag but no @architect-pattern tag',
-          'Add @architect-pattern YourPatternName'
-        )
+          'Add @architect-pattern YourPatternName',
+        ),
       );
       continue;
     }
 
     if (!metadata.status) {
       const nonCandidateStatuses = ACCEPTED_STATUS_VALUES.filter((v) => v !== 'candidate').join(
-        '/'
+        '/',
       );
       diagnostics.push(
         createDiagnostic(
           relativePath,
           'missing-status',
           'File has @architect gate tag but no @architect-status tag',
-          `Add @architect-status candidate (or ${nonCandidateStatuses})`
-        )
+          `Add @architect-status candidate (or ${nonCandidateStatuses})`,
+        ),
       );
       continue;
     }
@@ -448,7 +448,7 @@ export function extractPatternsFromGherkin(
 
     const { unlockReason, diagnostic: unlockReasonDiagnostic } = validateUnlockReason(
       metadata.unlockReason,
-      relativePath
+      relativePath,
     );
     if (unlockReasonDiagnostic !== undefined) diagnostics.push(unlockReasonDiagnostic);
 
@@ -467,12 +467,12 @@ export function extractPatternsFromGherkin(
         unlockReason,
         behaviorFile,
         behaviorFileVerified,
-      })
+      }),
     );
 
     if (!validation.success) {
       const validationErrors = validation.error.issues.map(
-        (issue) => `${issue.path.join('.')}: ${issue.message}`
+        (issue) => `${issue.path.join('.')}: ${issue.message}`,
       );
       diagnostics.push(...createPatternContractDiagnostics(relativePath, validationErrors));
       errors.push(
@@ -480,8 +480,8 @@ export function extractPatternsFromGherkin(
           relativePath,
           patternName,
           'Schema validation failed',
-          validationErrors
-        )
+          validationErrors,
+        ),
       );
       continue;
     }
@@ -516,7 +516,7 @@ async function fileExistsAsync(filePath: string): Promise<boolean> {
 
 export async function extractPatternsFromGherkinAsync(
   scannedFiles: readonly ScannedGherkinFile[],
-  config: GherkinExtractorConfig
+  config: GherkinExtractorConfig,
 ): Promise<GherkinExtractionResult> {
   const { baseDir } = config;
   const scenariosAsUseCases = config.scenariosAsUseCases ?? true;
@@ -540,7 +540,7 @@ export async function extractPatternsFromGherkinAsync(
     if (!hasOptIn) continue;
 
     diagnostics.push(
-      ...collectDeprecatedTagDiagnostics(metadata, relativePath, effectiveRegistry.roles)
+      ...collectDeprecatedTagDiagnostics(metadata, relativePath, effectiveRegistry.roles),
     );
 
     if (!metadata.pattern) {
@@ -549,23 +549,23 @@ export async function extractPatternsFromGherkinAsync(
           relativePath,
           'missing-pattern-name',
           'File has @architect gate tag but no @architect-pattern tag',
-          'Add @architect-pattern YourPatternName'
-        )
+          'Add @architect-pattern YourPatternName',
+        ),
       );
       continue;
     }
 
     if (!metadata.status) {
       const nonCandidateStatuses = ACCEPTED_STATUS_VALUES.filter((v) => v !== 'candidate').join(
-        '/'
+        '/',
       );
       diagnostics.push(
         createDiagnostic(
           relativePath,
           'missing-status',
           'File has @architect gate tag but no @architect-status tag',
-          `Add @architect-status candidate (or ${nonCandidateStatuses})`
-        )
+          `Add @architect-status candidate (or ${nonCandidateStatuses})`,
+        ),
       );
       continue;
     }
@@ -585,7 +585,7 @@ export async function extractPatternsFromGherkinAsync(
     diagnostics.push(...deliverableDiagnostics);
     const { unlockReason, diagnostic: unlockReasonDiagnostic } = validateUnlockReason(
       metadata.unlockReason,
-      relativePath
+      relativePath,
     );
     if (unlockReasonDiagnostic !== undefined) diagnostics.push(unlockReasonDiagnostic);
 
@@ -618,7 +618,7 @@ export async function extractPatternsFromGherkinAsync(
         unlockReason,
         behaviorFile,
         behaviorFileVerified: undefined,
-      })
+      }),
     );
 
     if (!validation.success) {
@@ -627,8 +627,8 @@ export async function extractPatternsFromGherkinAsync(
           relativePath,
           patternName,
           'Schema validation failed',
-          validation.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`)
-        )
+          validation.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`),
+        ),
       );
       continue;
     }
@@ -645,14 +645,14 @@ export async function extractPatternsFromGherkinAsync(
         return { ...pattern, behaviorFileVerified: exists };
       }
       return pattern;
-    })
+    }),
   );
 
   return { patterns, errors, diagnostics };
 }
 
 export function computeHierarchyChildren(
-  patterns: readonly ExtractedPattern[]
+  patterns: readonly ExtractedPattern[],
 ): ExtractedPattern[] {
   const parentToChildren = new Map<string, string[]>();
   for (const pattern of patterns) {

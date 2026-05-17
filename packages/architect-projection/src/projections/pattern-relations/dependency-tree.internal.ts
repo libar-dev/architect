@@ -29,7 +29,7 @@ export type DepTreeOptions = z.infer<typeof DepTreeOptionsSchema>;
 
 export function buildDependencyTreeRoot(
   context: ProjectionContext,
-  options: DepTreeOptions
+  options: DepTreeOptions,
 ): {
   rootName: string;
   rootNode: DependencyTreeNode;
@@ -47,7 +47,7 @@ export function buildDependencyTreeRoot(
       0,
       options.maxDepth,
       options.includeImplementationDeps,
-      new Set<string>()
+      new Set<string>(),
     ),
   };
 }
@@ -55,7 +55,7 @@ export function buildDependencyTreeRoot(
 function findDependencyTreeRoot(
   context: ProjectionContext,
   focalName: string,
-  includeImplementationDeps: boolean
+  includeImplementationDeps: boolean,
 ): string {
   const visited = new Set<string>();
   let current = focalName;
@@ -74,7 +74,7 @@ function findDependencyTreeRoot(
     ];
     const nextParent = parentCandidates.find(
       (candidate) =>
-        !visited.has(candidate) && findPatternByName(context.graph, candidate) !== undefined
+        !visited.has(candidate) && findPatternByName(context.graph, candidate) !== undefined,
     );
 
     if (nextParent === undefined) {
@@ -94,7 +94,7 @@ function buildTreeNode(
   depth: number,
   maxDepth: number,
   includeImplementationDeps: boolean,
-  visited: Set<string>
+  visited: Set<string>,
 ): DependencyTreeNode {
   const pattern = findPatternByName(context.graph, name);
   const isFocal = name.toLowerCase() === focalName.toLowerCase();
@@ -154,8 +154,8 @@ function buildTreeNode(
         depth + 1,
         maxDepth,
         includeImplementationDeps,
-        nextVisited
-      )
+        nextVisited,
+      ),
     );
 
   return {

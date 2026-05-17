@@ -49,7 +49,7 @@ const COMPACT_NORMALIZERS: KindTable<string, RenderCompactOptions | undefined> =
 
 export const renderCompactText = (
   input: ProjectionInput,
-  options?: RenderCompactOptions
+  options?: RenderCompactOptions,
 ): string => {
   if (isBundle(input)) {
     return renderBundle(input, options);
@@ -60,11 +60,11 @@ export const renderCompactText = (
 
 function renderBundle(
   bundle: ProjectionBundle<Fragment>,
-  options: RenderCompactOptions | undefined
+  options: RenderCompactOptions | undefined,
 ): string {
   const renderedRoot = renderFragment(bundle.root, options).trimEnd();
   const childEntries = Object.entries(bundle.children).sort(([left], [right]) =>
-    left.localeCompare(right)
+    left.localeCompare(right),
   );
 
   if (childEntries.length === 0) {
@@ -86,7 +86,7 @@ function renderFragment(fragment: Fragment, options: RenderCompactOptions | unde
 
 function renderOverviewDigest(
   overview: OverviewDigest,
-  options: RenderCompactOptions | undefined
+  options: RenderCompactOptions | undefined,
 ): string {
   const sections: string[] = [];
   const { progress } = overview;
@@ -97,7 +97,7 @@ function renderOverviewDigest(
       `${String(progress.total)} delivery patterns (${String(progress.completed)} completed, ${String(progress.active)} active, ${String(progress.planned)} planned) = ${String(progress.percentage)}%` +
       (progress.candidate > 0
         ? `\n${String(progress.candidate)} candidate patterns excluded from delivery progress`
-        : '')
+        : ''),
   );
 
   if (overview.activePhases.length > 0) {
@@ -110,7 +110,7 @@ function renderOverviewDigest(
 
   if (overview.blocking.length > 0) {
     const lines = overview.blocking.map(
-      (entry) => `${entry.pattern} blocked by: ${entry.blockedBy.join(', ')}`
+      (entry) => `${entry.pattern} blocked by: ${entry.blockedBy.join(', ')}`,
     );
     sections.push(renderMarker('BLOCKING', options) + '\n' + lines.join('\n'));
   }
@@ -124,7 +124,7 @@ function renderOverviewDigest(
 
 function renderSessionContextBundle(
   bundle: SessionContextBundle,
-  options: RenderCompactOptions | undefined
+  options: RenderCompactOptions | undefined,
 ): string {
   const sections: string[] = [];
 
@@ -139,7 +139,7 @@ function renderSessionContextBundle(
         '\n' +
         `${parts.join(' | ')}\n` +
         (meta.summary !== '' ? `${meta.summary}\n` : '') +
-        `File: ${meta.file}`
+        `File: ${meta.file}`,
     );
   }
 
@@ -149,7 +149,7 @@ function renderSessionContextBundle(
 
   if (bundle.stubs.length > 0) {
     const lines = bundle.stubs.map((stub) =>
-      stub.targetPath !== '' ? `${stub.stubFile} -> ${stub.targetPath}` : stub.stubFile
+      stub.targetPath !== '' ? `${stub.stubFile} -> ${stub.targetPath}` : stub.stubFile,
     );
     sections.push(renderMarker('STUBS', options) + '\n' + lines.join('\n'));
   }
@@ -171,7 +171,7 @@ function renderSessionContextBundle(
 
   if (bundle.consumers.length > 0) {
     const lines = bundle.consumers.map(
-      (consumer) => `${consumer.name} (${consumer.status ?? 'unknown'})`
+      (consumer) => `${consumer.name} (${consumer.status ?? 'unknown'})`,
     );
     sections.push(renderMarker('CONSUMERS', options) + '\n' + lines.join('\n'));
   }
@@ -184,7 +184,7 @@ function renderSessionContextBundle(
       return `${neighbor.name} (${status}${role})`;
     });
     sections.push(
-      renderMarker(`ARCHITECTURE (context: ${context})`, options) + '\n' + lines.join('\n')
+      renderMarker(`ARCHITECTURE (context: ${context})`, options) + '\n' + lines.join('\n'),
     );
   }
 
@@ -209,7 +209,7 @@ function renderSessionContextBundle(
     sections.push(
       renderMarker('FSM', options) +
         '\n' +
-        `Status: ${bundle.fsm.currentStatus} | Transitions: ${transitions} | Protection: ${bundle.fsm.protectionLevel}`
+        `Status: ${bundle.fsm.currentStatus} | Transitions: ${transitions} | Protection: ${bundle.fsm.protectionLevel}`,
     );
   } else if (bundle.fsmByPattern.length === 1) {
     const entry = bundle.fsmByPattern[0];
@@ -219,7 +219,7 @@ function renderSessionContextBundle(
       sections.push(
         renderMarker('FSM', options) +
           '\n' +
-          `${entry.pattern}: Status: ${entry.fsm.currentStatus} | Transitions: ${transitions} | Protection: ${entry.fsm.protectionLevel}`
+          `${entry.pattern}: Status: ${entry.fsm.currentStatus} | Transitions: ${transitions} | Protection: ${entry.fsm.protectionLevel}`,
       );
     }
   }
@@ -244,7 +244,7 @@ function renderDependencyTree(tree: DependencyTree): string {
 function renderDependencyTreeNode(
   node: DependencyTree['nodes'][number],
   depth: number,
-  lines: string[]
+  lines: string[],
 ): void {
   const indent = depth > 0 ? '  '.repeat(depth) + '-> ' : '';
   const phase = node.phase !== undefined ? `${String(node.phase)}, ` : '';
@@ -266,7 +266,7 @@ function renderDependencyTreeNode(
 
 function renderFileReadingList(
   list: FileReadingList,
-  options: RenderCompactOptions | undefined
+  options: RenderCompactOptions | undefined,
 ): string {
   const sections: string[] = [];
 
@@ -276,19 +276,21 @@ function renderFileReadingList(
 
   if (list.completedDeps.length > 0) {
     sections.push(
-      renderMarker('COMPLETED DEPENDENCIES', options) + '\n' + list.completedDeps.join('\n')
+      renderMarker('COMPLETED DEPENDENCIES', options) + '\n' + list.completedDeps.join('\n'),
     );
   }
 
   if (list.roadmapDeps.length > 0) {
     sections.push(
-      renderMarker('ROADMAP DEPENDENCIES', options) + '\n' + list.roadmapDeps.join('\n')
+      renderMarker('ROADMAP DEPENDENCIES', options) + '\n' + list.roadmapDeps.join('\n'),
     );
   }
 
   if (list.architectureNeighbors.length > 0) {
     sections.push(
-      renderMarker('ARCHITECTURE NEIGHBORS', options) + '\n' + list.architectureNeighbors.join('\n')
+      renderMarker('ARCHITECTURE NEIGHBORS', options) +
+        '\n' +
+        list.architectureNeighbors.join('\n'),
     );
   }
 
@@ -297,12 +299,12 @@ function renderFileReadingList(
 
 function renderScopeReadinessReport(
   report: ScopeReadinessReport,
-  options: RenderCompactOptions | undefined
+  options: RenderCompactOptions | undefined,
 ): string {
   const sections: string[] = [];
 
   sections.push(
-    renderMarker(`SCOPE VALIDATION: ${report.pattern} (${report.sessionType})`, options)
+    renderMarker(`SCOPE VALIDATION: ${report.pattern} (${report.sessionType})`, options),
   );
 
   const checkLines = report.checks.map((check) => {
@@ -315,10 +317,10 @@ function renderScopeReadinessReport(
   sections.push(renderMarker('CHECKLIST', options) + '\n' + checkLines.join('\n'));
 
   const blockedChecks = report.checks.filter(
-    (check) => renderLegacyCheckSeverity(check) === 'BLOCKED'
+    (check) => renderLegacyCheckSeverity(check) === 'BLOCKED',
   );
   const warningChecks = report.checks.filter(
-    (check) => renderLegacyCheckSeverity(check) === 'WARN'
+    (check) => renderLegacyCheckSeverity(check) === 'WARN',
   );
 
   let verdictText: string;
@@ -352,7 +354,7 @@ function renderLegacyCheckSeverity(check: ScopeReadinessCheck): 'PASS' | 'WARN' 
 
 function renderHandoffRecord(
   handoff: HandoffRecord,
-  options: RenderCompactOptions | undefined
+  options: RenderCompactOptions | undefined,
 ): string {
   const sections: string[] = [];
   const headerLines = [
@@ -375,7 +377,7 @@ function renderHandoffRecord(
 
   if (handoff.filesModified.length > 0) {
     sections.push(
-      renderMarker('FILES MODIFIED', options) + '\n' + handoff.filesModified.join('\n')
+      renderMarker('FILES MODIFIED', options) + '\n' + handoff.filesModified.join('\n'),
     );
   }
 
@@ -386,7 +388,7 @@ function renderHandoffRecord(
   sections.push(
     renderMarker('BLOCKERS', options) +
       '\n' +
-      (handoff.blockers.length > 0 ? handoff.blockers.join('\n') : 'None')
+      (handoff.blockers.length > 0 ? handoff.blockers.join('\n') : 'None'),
   );
 
   if (handoff.nextSession !== '') {
@@ -398,12 +400,12 @@ function renderHandoffRecord(
 
 function renderMinimalStructured(
   fragment: Fragment,
-  options: RenderCompactOptions | undefined
+  options: RenderCompactOptions | undefined,
 ): string {
   const sections: string[] = [renderMarker(fragment.kind, options)];
 
   for (const [key, value] of Object.entries(fragment).sort(([left], [right]) =>
-    left.localeCompare(right)
+    left.localeCompare(right),
   )) {
     if (key === 'kind' || value === undefined) {
       continue;
@@ -423,7 +425,7 @@ function renderMinimalStructured(
       sections.push(
         renderMarker(humanizeKey(key), options) +
           '\n' +
-          value.map((entry) => stableStringify(entry)).join('\n')
+          value.map((entry) => stableStringify(entry)).join('\n'),
       );
       continue;
     }

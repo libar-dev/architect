@@ -110,7 +110,7 @@ work is feature work disguised as refactor — route to
    edit, run the closest targeted typecheck / test slice for the
    surface you changed, then run `pnpm typecheck` at the next phase
    boundary. Before any commit or handoff, run `pnpm typecheck &&
-   pnpm test && pnpm validate:all`. Do not batch verification to the
+pnpm test && pnpm validate:all`. Do not batch verification to the
    end. Per
    [`../_shared/session-preamble.md`](../_shared/session-preamble.md)
    Rule 2, gates are non-negotiable.

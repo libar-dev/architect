@@ -8,7 +8,7 @@
  * ### When to Use
  *
  * - Defines the ProjectConfigSnapshot fragment shape for config, source glob,
-*   and graph metrics.
+ *   and graph metrics.
  */
 import { z } from 'zod';
 

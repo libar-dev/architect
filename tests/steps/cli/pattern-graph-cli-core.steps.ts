@@ -146,7 +146,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           await writeTempFile(
             state!.tempContext!.tempDir,
             'architect.config.js',
-            createJsProjectConfig()
+            createJsProjectConfig(),
           );
         });
 
@@ -161,7 +161,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('stdout contains {string}', (_ctx: unknown, text: string) => {
           expect(getResult(state).stdout).toContain(text);
         });
-      }
+      },
     );
 
     RuleScenario('Reject unknown options', ({ When, Then, And }) => {
@@ -194,9 +194,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           await runCLICommand(
             state,
             `pattern-graph-cli -i 'src/**/*.ts' handoff --pattern ${patternName} ${modifiedFiles}`,
-            { timeout: 60000 }
+            { timeout: 60000 },
           );
-        }
+        },
       );
 
       Then('exit code is {int}', (_ctx: unknown, code: number) => {
@@ -227,7 +227,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('stdout contains {string}', (_ctx: unknown, text: string) => {
           expect(getResult(state).stdout).toContain(text);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -249,7 +249,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const combined = getResult(state).stdout + getResult(state).stderr;
           expect(combined).toContain(text);
         });
-      }
+      },
     );
   });
 
@@ -443,7 +443,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               '      Given a broken feature source',
               '      """',
               '      missing closing docstring',
-            ].join('\n')
+            ].join('\n'),
           );
         });
 
@@ -461,7 +461,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(combined).toContain(filePath);
           expect(combined).toContain('line');
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -487,7 +487,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               '      Given a broken feature source',
               '      """',
               '      missing closing docstring',
-            ].join('\n')
+            ].join('\n'),
           );
         });
 
@@ -508,7 +508,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const combined = getResult(state).stdout + getResult(state).stderr;
           expect(combined).not.toContain(text);
         });
-      }
+      },
     );
   });
 
@@ -555,7 +555,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const result = getResult(state);
           expect(() => JSON.parse(result.stdout) as unknown).not.toThrow();
         });
-      }
+      },
     );
 
     RuleScenario('Arch layer reports unknown subcommand', ({ Given, When, Then, And }) => {
@@ -689,7 +689,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           const combined = getResult(state).stdout + getResult(state).stderr;
           expect(combined).toContain(text);
         });
-      }
+      },
     );
   });
 });

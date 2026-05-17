@@ -54,7 +54,7 @@ export class BoundaryParseError extends Error {
 export function parseAtBoundary<TSchema extends z.ZodType>(
   schema: TSchema,
   input: unknown,
-  context = 'Validation failed'
+  context = 'Validation failed',
 ): z.infer<TSchema> {
   const parsed = schema.safeParse(input);
   if (parsed.success) {

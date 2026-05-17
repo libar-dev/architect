@@ -504,20 +504,20 @@ dependency relationships, and phase assignments — but sourced from executable 
 
 ## Comparison: Plan vs. Design vs. Executable
 
-| Aspect             | Plan (Level 2)                | Design (Level 3)                       | Executable (Level 4)                                              |
-| ------------------ | ----------------------------- | -------------------------------------- | ----------------------------------------------------------------- |
-| Location           | `architect/specs/<group>/`    | `architect/specs/<group>/` (same file) | `tests/features/<group>/`                                         |
-| Status             | `roadmap`                     | `roadmap`                              | `completed`                                                       |
-| Description        | Business Value + How It Works | Problem + Solution                     | Narrative transferred from design                                 |
-| Rules              | 4-6                           | 6-9                                    | 6-9 (from design)                                                 |
-| Scenarios          | 9-15 (intent)                 | 20-40 (behavior)                       | 20-40 (executable)                                                |
-| Deliverables table | 5-column, all `pending`       | 5-column, statuses updated             | **Dropped** (implementation IS the deliverable)                   |
-| Input/Output       | —                             | Present                                | **Dropped** (in implementation code)                              |
+| Aspect             | Plan (Level 2)                | Design (Level 3)                       | Executable (Level 4)                                                                              |
+| ------------------ | ----------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Location           | `architect/specs/<group>/`    | `architect/specs/<group>/` (same file) | `tests/features/<group>/`                                                                         |
+| Status             | `roadmap`                     | `roadmap`                              | `completed`                                                                                       |
+| Description        | Business Value + How It Works | Problem + Solution                     | Narrative transferred from design                                                                 |
+| Rules              | 4-6                           | 6-9                                    | 6-9 (from design)                                                                                 |
+| Scenarios          | 9-15 (intent)                 | 20-40 (behavior)                       | 20-40 (executable)                                                                                |
+| Deliverables table | 5-column, all `pending`       | 5-column, statuses updated             | **Dropped** (implementation IS the deliverable)                                                   |
+| Input/Output       | —                             | Present                                | **Dropped** (in implementation code)                                                              |
 | Surviving tags     | All present                   | All present                            | Pattern, status, uses, implements, product-area, bounded-context, arch-layer, role, level, parent |
-| Stubs              | —                             | Created alongside                      | **Deleted**                                                       |
-| Step definitions   | —                             | —                                      | Present                                                           |
-| N:1 mapping        | —                             | —                                      | Primary gets canonical name; siblings get `@architect-implements` |
-| Permanent?         | Evolves into design           | **Deleted** at implementation          | **Yes**                                                           |
+| Stubs              | —                             | Created alongside                      | **Deleted**                                                                                       |
+| Step definitions   | —                             | —                                      | Present                                                                                           |
+| N:1 mapping        | —                             | —                                      | Primary gets canonical name; siblings get `@architect-implements`                                 |
+| Permanent?         | Evolves into design           | **Deleted** at implementation          | **Yes**                                                                                           |
 
 ## Folder Organization
 

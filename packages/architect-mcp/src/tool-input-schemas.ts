@@ -24,7 +24,7 @@ import { z } from 'zod';
 export const MAX_HANDOFF_MODIFIED_FILES = 200;
 
 function createStrictReadonlyObjectSchema<TShape extends z.ZodRawShape>(
-  shape: TShape
+  shape: TShape,
 ): z.ZodReadonly<z.ZodObject<TShape>> {
   return z.strictObject(shape).readonly();
 }

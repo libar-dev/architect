@@ -11,7 +11,7 @@ export const defaultMarkdownRouteProfile: MarkdownRouteProfile = {
 
 export function resolveLogicalRoutePath(
   routeId: LogicalRouteId,
-  routing: BundleRouting | undefined
+  routing: BundleRouting | undefined,
 ): string {
   const route = parseLogicalRouteId(routeId);
 
@@ -38,10 +38,7 @@ export function resolveLogicalRoutePath(
     : `${slugForFilename(route.stableEntityId)}/${childFileName}.md`;
 }
 
-function resolveRootMarkdownPath(
-  documentType: string,
-  routing: BundleRouting | undefined
-): string {
+function resolveRootMarkdownPath(documentType: string, routing: BundleRouting | undefined): string {
   if (routing?.markdownRootTarget !== undefined) {
     return routing.markdownRootTarget;
   }

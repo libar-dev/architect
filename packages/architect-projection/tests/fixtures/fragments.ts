@@ -1547,7 +1547,7 @@ export const FRAGMENT_SCHEMAS: Record<PublicFragmentKind, ZodType<Fragment>> = {
 };
 
 export const FRAGMENT_KINDS: readonly PublicFragmentKind[] = Object.keys(
-  FRAGMENT_SCHEMAS
+  FRAGMENT_SCHEMAS,
 ) as PublicFragmentKind[];
 
 export const INVALID_ARCHITECTURE_DIAGRAM_SCOPE_FIXTURE: unknown = {

@@ -202,7 +202,7 @@ const MARKDOWN_NORMALIZERS: KindTable<MarkdownDocument, NormalizeMarkdownOptions
 
 export const renderMarkdown = (
   input: ProjectionInput,
-  options?: RenderMarkdownOptions
+  options?: RenderMarkdownOptions,
 ): string | Record<string, string> => {
   const resolvedOptions = resolveOptions(options);
 
@@ -215,7 +215,7 @@ export const renderMarkdown = (
 
 function renderBundle(
   bundle: ProjectionBundle<Fragment>,
-  options: ResolvedMarkdownOptions
+  options: ResolvedMarkdownOptions,
 ): string | Record<string, string> {
   const childKeys = Object.keys(bundle.children);
 
@@ -231,7 +231,7 @@ function renderBundle(
       [],
       new Set<string>(),
       false,
-      disclosureSpec
+      disclosureSpec,
     );
     return renderDocument(rootDocument, options);
   }
@@ -244,7 +244,7 @@ function renderBundle(
   const entries = new Map<string, string>();
   const rootPath = normalizeRequiredRoutedOutputPath(
     options.routeProfile.mapPath(routing.rootRouteId, bundle.root.kind, undefined, routing),
-    routing.rootRouteId
+    routing.rootRouteId,
   );
   const sortedKeys = [...childKeys].sort((left, right) => left.localeCompare(right));
 
@@ -252,7 +252,7 @@ function renderBundle(
     bundle,
     sortedKeys,
     rootPath,
-    options
+    options,
   );
   const childRefAliases = new Set<string>([
     ...sortedKeys,
@@ -272,7 +272,7 @@ function renderBundle(
     childRoutes,
     childRefAliases,
     true,
-    disclosureSpec
+    disclosureSpec,
   );
 
   addRoutedDocument(entries, rootPath, rootDocument, options);
@@ -292,19 +292,19 @@ function renderBundle(
       childRoutes,
       childRefAliases,
       false,
-      disclosureSpec
+      disclosureSpec,
     );
     const childDocument = appendBundleBackLink(
       normalizedChild,
       rootDocument.title,
       childPath,
-      rootPath
+      rootPath,
     );
     addRoutedDocument(entries, childPath, childDocument, options);
   }
 
   return Object.fromEntries(
-    Array.from(entries.entries()).sort(([left], [right]) => left.localeCompare(right))
+    Array.from(entries.entries()).sort(([left], [right]) => left.localeCompare(right)),
   );
 }
 
@@ -312,7 +312,7 @@ function addRoutedDocument(
   entries: Map<string, string>,
   basePath: string,
   document: MarkdownDocument,
-  options: ResolvedMarkdownOptions
+  options: ResolvedMarkdownOptions,
 ): void {
   const parentRendered = renderDocument(document, options);
   const parentLineCount = countLines(parentRendered);
@@ -323,11 +323,8 @@ function addRoutedDocument(
     return;
   }
 
-  const splitResult = splitOversizedDocument(
-    document,
-    options.sizeBudget ?? 0,
-    basePath,
-    (doc) => renderDocument(doc, options)
+  const splitResult = splitOversizedDocument(document, options.sizeBudget ?? 0, basePath, (doc) =>
+    renderDocument(doc, options),
   );
 
   // The split parent has DIFFERENT sections than `document` (heading+linkOut
@@ -352,7 +349,7 @@ function resolveChildOutputPaths(
   bundle: ProjectionBundle<Fragment>,
   sortedKeys: readonly string[],
   rootPath: string,
-  options: ResolvedMarkdownOptions
+  options: ResolvedMarkdownOptions,
 ): RoutedChildOutputMaps {
   const routing = bundle.routing;
   if (!routing) {
@@ -402,7 +399,7 @@ function resolveChildRoutePath(
   bundle: ProjectionBundle<Fragment>,
   key: string,
   child: Fragment,
-  options: ResolvedMarkdownOptions
+  options: ResolvedMarkdownOptions,
 ): string {
   const routeId = bundle.routing?.childRouteIds[key];
 
@@ -415,7 +412,7 @@ function resolveChildRoutePath(
 
 function resolveBundleDisclosureSpec(
   bundle: ProjectionBundle<Fragment>,
-  options: ResolvedMarkdownOptions
+  options: ResolvedMarkdownOptions,
 ): DisclosureSpec | undefined {
   // Renderer-side override wins (per-render-call disclosureSpec option).
   if (options.disclosureSpec !== undefined) {
@@ -453,7 +450,7 @@ function createUniqueRoutedPath(path: string, stableId: string, usedPaths: Set<s
 function shouldSplitFromLineCount(
   lineCount: number,
   basePath: string,
-  options: ResolvedMarkdownOptions
+  options: ResolvedMarkdownOptions,
 ): boolean {
   if (
     options.splitStrategy !== 'h2-boundary' ||
@@ -510,7 +507,7 @@ function normalizeFragment(
   childRoutes: readonly ChildRouteRef[] = [],
   childRefAliases: ReadonlySet<string> = new Set<string>(),
   isRootDocument = false,
-  disclosureSpec?: DisclosureSpec
+  disclosureSpec?: DisclosureSpec,
 ): MarkdownDocument {
   const normalizeOptions =
     currentPath === undefined &&
@@ -545,7 +542,7 @@ function normalizeArchitectureDiagram(fragment: ArchitectureDiagram): MarkdownDo
   const sections: MarkdownRenderableBlock[] = [
     heading(2, 'Overview'),
     paragraph(
-      `This diagram captures ${String(fragment.patterns.length)} ${fragment.patterns.length === 1 ? 'pattern' : 'patterns'} in the ${scopeDescription}`
+      `This diagram captures ${String(fragment.patterns.length)} ${fragment.patterns.length === 1 ? 'pattern' : 'patterns'} in the ${scopeDescription}`,
     ),
     heading(2, 'Diagram'),
     fragment.diagram,
@@ -564,7 +561,7 @@ function normalizeArchitectureDiagram(fragment: ArchitectureDiagram): MarkdownDo
 
 function normalizeBusinessRuleSet(
   fragment: BusinessRuleSet,
-  options: NormalizeMarkdownOptions
+  options: NormalizeMarkdownOptions,
 ): MarkdownDocument {
   const metadata = resolveFragmentMetadata(fragment);
   const rules = [...fragment.rules].sort((left, right) => {
@@ -577,7 +574,7 @@ function normalizeBusinessRuleSet(
   const sections: MarkdownRenderableBlock[] = [
     heading(2, 'Overview'),
     paragraph(
-      `Structured business-rule catalog with ${String(rules.length)} ${rules.length === 1 ? 'rule' : 'rules'}${fragment.groupedBy !== undefined ? ` grouped by ${humanizeKey(fragment.groupedBy).toLowerCase()}` : ''}.`
+      `Structured business-rule catalog with ${String(rules.length)} ${rules.length === 1 ? 'rule' : 'rules'}${fragment.groupedBy !== undefined ? ` grouped by ${humanizeKey(fragment.groupedBy).toLowerCase()}` : ''}.`,
     ),
   ];
 
@@ -590,7 +587,7 @@ function normalizeBusinessRuleSet(
     const groupingLinks = buildBusinessRuleGroupingLinks(
       fragment.groupedBy,
       fragment.groupingEntries,
-      options.childRoutes
+      options.childRoutes,
     );
     if (groupingLinks !== null) {
       sections.push(heading(2, groupingLinks.heading), groupingLinks.links);
@@ -611,13 +608,13 @@ function normalizeBusinessRuleSet(
 
 function createBusinessRuleTable(
   rules: readonly BusinessRule[],
-  richness: DisclosureSpec['richness']
+  richness: DisclosureSpec['richness'],
 ): TableBlock {
   if (richness === 'name-only') {
     return table(
       ['Feature', 'Rule Name'],
       rules.map((rule) => [rule.feature, rule.ruleName]),
-      ['left', 'left']
+      ['left', 'left'],
     );
   }
 
@@ -625,7 +622,7 @@ function createBusinessRuleTable(
     return table(
       ['Feature', 'Rule Name', 'Invariant'],
       rules.map((rule) => [rule.feature, rule.ruleName, rule.invariant ?? '']),
-      ['left', 'left', 'left']
+      ['left', 'left', 'left'],
     );
   }
 
@@ -639,7 +636,7 @@ function createBusinessRuleTable(
         rule.verifiedBy.join(', '),
         String(rule.scenarioCount),
       ]),
-      ['left', 'left', 'left', 'left', 'left']
+      ['left', 'left', 'left', 'left', 'left'],
     );
   }
 
@@ -666,7 +663,7 @@ function createBusinessRuleTable(
       rule.phase === undefined ? '' : String(rule.phase),
       rule.productArea ?? '',
     ]),
-    ['left', 'left', 'left', 'left', 'left', 'left', 'left', 'left', 'left']
+    ['left', 'left', 'left', 'left', 'left', 'left', 'left', 'left', 'left'],
   );
 }
 
@@ -690,18 +687,18 @@ function normalizeDecisionCatalog(fragment: DecisionCatalog): MarkdownDocument {
         ['Deprecated', String(counts.get('deprecated') ?? 0)],
         ['Superseded', String(counts.get('superseded') ?? 0)],
       ],
-      ['left', 'left']
+      ['left', 'left'],
     ),
     heading(2, 'ADR Index'),
-      table(
-        ['ADR', 'Title', 'Status', 'Type'],
-        decisions.map((decision) => [
+    table(
+      ['ADR', 'Title', 'Status', 'Type'],
+      decisions.map((decision) => [
         toMarkdownLink(decision.id, `decisions/${slugForFilename(decision.id)}.md`) ?? decision.id,
         decision.title,
         decision.status,
         decision.type,
       ]),
-      ['left', 'left', 'left', 'left']
+      ['left', 'left', 'left', 'left'],
     ),
   ]);
 }
@@ -718,7 +715,7 @@ function normalizeDecisionRecord(fragment: DecisionRecord): MarkdownDocument {
         ['Status', fragment.status],
         ['Type', fragment.type],
       ],
-      ['left', 'left']
+      ['left', 'left'],
     ),
     heading(2, 'Context'),
     ...fragment.context,
@@ -753,7 +750,7 @@ function normalizeRoadmapTimeline(fragment: RoadmapTimeline): MarkdownDocument {
   const sections: MarkdownRenderableBlock[] = [
     heading(2, 'Overview'),
     paragraph(
-      `Quarter-grouped ${viewLabel} timeline covering ${String(fragment.quarters.length)} ${fragment.quarters.length === 1 ? 'quarter' : 'quarters'}.`
+      `Quarter-grouped ${viewLabel} timeline covering ${String(fragment.quarters.length)} ${fragment.quarters.length === 1 ? 'quarter' : 'quarters'}.`,
     ),
   ];
 
@@ -774,7 +771,7 @@ function normalizeRoadmapTimeline(fragment: RoadmapTimeline): MarkdownDocument {
           ['Planned', String(entry.counts.planned)],
           ['Candidate', String(entry.counts.candidate)],
         ],
-        ['left', 'left']
+        ['left', 'left'],
       ),
       table(
         ['Pattern', 'Status', 'Role', 'Phase', 'Source File'],
@@ -785,8 +782,8 @@ function normalizeRoadmapTimeline(fragment: RoadmapTimeline): MarkdownDocument {
           pattern.phase === undefined ? '' : String(pattern.phase),
           pattern.file,
         ]),
-        ['left', 'left', 'left', 'left', 'left']
-      )
+        ['left', 'left', 'left', 'left', 'left'],
+      ),
     );
   }
 
@@ -798,7 +795,7 @@ function normalizeReleaseNotesDigest(fragment: ReleaseNotesDigest): MarkdownDocu
   const sections: MarkdownRenderableBlock[] = [
     paragraph('All notable changes to this project will be documented in this file.'),
     trustedMarkdownParagraph(
-      'The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).'
+      'The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).',
     ),
   ];
 
@@ -806,7 +803,7 @@ function normalizeReleaseNotesDigest(fragment: ReleaseNotesDigest): MarkdownDocu
     const addedEntries = dedupeStrings([
       ...release.deliverables.map(
         (deliverable) =>
-          `**${escapePlainMarkdownText(deliverable.name)}**${deliverable.location.length > 0 ? `: ${escapePlainMarkdownText(deliverable.location)}` : ''}`
+          `**${escapePlainMarkdownText(deliverable.name)}**${deliverable.location.length > 0 ? `: ${escapePlainMarkdownText(deliverable.location)}` : ''}`,
       ),
       ...release.patterns.map((pattern) => escapePlainMarkdownText(pattern.patternName)),
     ]);
@@ -814,8 +811,8 @@ function normalizeReleaseNotesDigest(fragment: ReleaseNotesDigest): MarkdownDocu
     sections.push(
       trustedMarkdownHeading(
         2,
-        `[${escapePlainMarkdownText(release.release)}]${release.date !== undefined ? ` - ${escapePlainMarkdownText(release.date)}` : ''}`
-      )
+        `[${escapePlainMarkdownText(release.release)}]${release.date !== undefined ? ` - ${escapePlainMarkdownText(release.date)}` : ''}`,
+      ),
     );
 
     if (release.notes !== undefined && release.notes.trim().length > 0) {
@@ -826,7 +823,7 @@ function normalizeReleaseNotesDigest(fragment: ReleaseNotesDigest): MarkdownDocu
       heading(3, 'Added'),
       ...(addedEntries.length > 0
         ? [trustedMarkdownList(addedEntries)]
-        : [paragraph('No release additions were recorded.')])
+        : [paragraph('No release additions were recorded.')]),
     );
   }
 
@@ -835,11 +832,11 @@ function normalizeReleaseNotesDigest(fragment: ReleaseNotesDigest): MarkdownDocu
 
 function normalizeRequirementDigest(
   fragment: RequirementDigest,
-  options: NormalizeMarkdownOptions
+  options: NormalizeMarkdownOptions,
 ): MarkdownDocument {
   const metadata = resolveFragmentMetadata(fragment);
   const requirements = [...fragment.requirements].sort((left, right) =>
-    left.pattern.localeCompare(right.pattern)
+    left.pattern.localeCompare(right.pattern),
   );
 
   // Per-pattern detail file (single-entry digest where the productArea label
@@ -857,7 +854,7 @@ function normalizeRequirementDigest(
     const sections: MarkdownRenderableBlock[] = [];
     if (requirement.status !== undefined) {
       sections.push(
-        trustedMarkdownParagraph(`**Status:** ${escapePlainMarkdownText(requirement.status)}`)
+        trustedMarkdownParagraph(`**Status:** ${escapePlainMarkdownText(requirement.status)}`),
       );
     }
     sections.push(...requirement.description);
@@ -879,14 +876,14 @@ function normalizeRequirementDigest(
         requirement.status ?? '',
         requirement.testFiles.join(', '),
       ]),
-      ['left', 'left', 'left']
+      ['left', 'left', 'left'],
     ),
   ]);
 }
 
 function renderRequirementPatternCell(
   patternName: string,
-  options: NormalizeMarkdownOptions
+  options: NormalizeMarkdownOptions,
 ): MarkdownText {
   const detailRoute = options.childRoutes.find((route) => {
     const child = route.fragment;
@@ -918,12 +915,12 @@ function normalizeTaxonomyDigest(fragment: TaxonomyDigest): MarkdownDocument {
   const roleGroups = fragment.tags.filter((group) => group.entries[0]?.kind === 'role');
   const metadataGroups = fragment.tags.filter((group) => group.entries[0]?.kind === 'metadata');
   const aggregationGroups = fragment.tags.filter(
-    (group) => group.entries[0]?.kind === 'aggregation'
+    (group) => group.entries[0]?.kind === 'aggregation',
   );
   const sections: Block[] = [
     heading(2, 'Overview'),
     paragraph(
-      `**${String(counts.roles)} roles** | **${String(counts.metadata)} metadata tags** | **${String(counts.aggregation)} aggregation tags** | **${String(counts.total)} total**`
+      `**${String(counts.roles)} roles** | **${String(counts.metadata)} metadata tags** | **${String(counts.aggregation)} aggregation tags** | **${String(counts.total)} total**`,
     ),
     table(
       ['Component', 'Count'],
@@ -933,7 +930,7 @@ function normalizeTaxonomyDigest(fragment: TaxonomyDigest): MarkdownDocument {
         ['Aggregation Tags', String(counts.aggregation)],
         ['Total', String(counts.total)],
       ],
-      ['left', 'left']
+      ['left', 'left'],
     ),
   ];
 
@@ -964,8 +961,8 @@ function normalizeTaxonomyDigest(fragment: TaxonomyDigest): MarkdownDocument {
         formatType.description,
         formatType.example,
       ]),
-      ['left', 'left', 'left']
-    )
+      ['left', 'left', 'left'],
+    ),
   );
 
   if (
@@ -979,8 +976,8 @@ function normalizeTaxonomyDigest(fragment: TaxonomyDigest): MarkdownDocument {
         Object.entries(fragment.exampleOverrides)
           .sort(([left], [right]) => left.localeCompare(right))
           .map(([format, example]) => [format, example]),
-        ['left', 'left']
-      )
+        ['left', 'left'],
+      ),
     );
   }
 
@@ -993,7 +990,7 @@ function normalizeTraceabilityMatrix(fragment: TraceabilityMatrix): MarkdownDocu
   return createMarkdownDocument(metadata, [
     heading(2, 'Summary'),
     paragraph(
-      `Traceability matrix covering ${String(fragment.rows.length)} ${fragment.rows.length === 1 ? 'pattern row' : 'pattern rows'}.`
+      `Traceability matrix covering ${String(fragment.rows.length)} ${fragment.rows.length === 1 ? 'pattern row' : 'pattern rows'}.`,
     ),
     heading(2, 'Rows'),
     table(
@@ -1005,7 +1002,7 @@ function normalizeTraceabilityMatrix(fragment: TraceabilityMatrix): MarkdownDocu
         row.specs.join(', '),
         row.deliverables.join(', '),
       ]),
-      ['left', 'left', 'left', 'left', 'left']
+      ['left', 'left', 'left', 'left', 'left'],
     ),
   ]);
 }
@@ -1019,16 +1016,16 @@ function normalizeValidationRuleDigest(fragment: ValidationRuleDigest): Markdown
       level.canAddDeliverables ? 'Yes' : 'No',
       level.needsUnlock ? 'Yes' : 'No',
       level.meaning ?? '',
-    ])
+    ]),
   );
 
   return createMarkdownDocument(metadata, [
     heading(2, 'Overview'),
     paragraph(
-      `Process Guard validates delivery workflow changes at commit time using a Decider pattern. It enforces the ${String(fragment.fsm.states.length)}-state FSM and prevents common workflow violations.`
+      `Process Guard validates delivery workflow changes at commit time using a Decider pattern. It enforces the ${String(fragment.fsm.states.length)}-state FSM and prevents common workflow violations.`,
     ),
     paragraph(
-      `**${String(fragment.rules.length)} validation rules** | **${String(fragment.fsm.states.length)} FSM states** | **${String(fragment.protectionLevels.length)} protection levels**`
+      `**${String(fragment.rules.length)} validation rules** | **${String(fragment.fsm.states.length)} FSM states** | **${String(fragment.protectionLevels.length)} protection levels**`,
     ),
     heading(2, 'Validation Rules'),
     table(
@@ -1039,7 +1036,7 @@ function normalizeValidationRuleDigest(fragment: ValidationRuleDigest): Markdown
         rule.description,
         rule.appliesToRoles?.join(', ') ?? '',
       ]),
-      ['left', 'left', 'left', 'left']
+      ['left', 'left', 'left', 'left'],
     ),
     heading(2, 'FSM State Diagram'),
     paragraph('Valid transitions for the delivery workflow FSM:'),
@@ -1057,7 +1054,7 @@ function normalizeValidationRuleDigest(fragment: ValidationRuleDigest): Markdown
 
 function normalizeGenericFragment(
   fragment: Fragment,
-  options: NormalizeMarkdownOptions
+  options: NormalizeMarkdownOptions,
 ): MarkdownDocument {
   const fields = Object.entries(fragment).filter(([key]) => key !== 'kind');
   const metadataRows: string[][] = [];
@@ -1066,7 +1063,7 @@ function normalizeGenericFragment(
   const title = metadata.title;
   const embeddedSections = renderEmbeddedSections(
     (fragment as Record<string, unknown>)['sections'],
-    options
+    options,
   );
 
   if (embeddedSections.length > 0) {
@@ -1175,7 +1172,7 @@ function renderEmbeddedSections(value: unknown, options: NormalizeMarkdownOption
         options.childPathMap,
         options.childRouteIdPathMap,
         options.childRefAliases,
-        options.currentPath
+        options.currentPath,
       ),
     ];
   });
@@ -1183,7 +1180,7 @@ function renderEmbeddedSections(value: unknown, options: NormalizeMarkdownOption
 
 function createMarkdownDocument(
   metadata: MarkdownMetadata,
-  sections: MarkdownRenderableBlock[]
+  sections: MarkdownRenderableBlock[],
 ): MarkdownDocument {
   return {
     title: metadata.title,
@@ -1318,7 +1315,7 @@ function formatPrimitiveLike(value: PrimitiveLike): string {
 }
 
 function buildBusinessRuleGroupingSummary(
-  fragment: BusinessRuleSet
+  fragment: BusinessRuleSet,
 ): { heading: string; table: TableBlock } | null {
   const groupedBy = fragment.groupedBy;
   if (groupedBy === undefined) {
@@ -1341,7 +1338,7 @@ function buildBusinessRuleGroupingSummary(
           String(entry.ruleCount),
           String(entry.invariantCount),
         ]),
-        ['left', 'left', 'left', 'left']
+        ['left', 'left', 'left', 'left'],
       ),
     };
   }
@@ -1357,7 +1354,7 @@ function buildBusinessRuleGroupingSummary(
           String(entry.ruleCount),
           String(entry.invariantCount),
         ]),
-        ['left', 'left', 'left', 'left']
+        ['left', 'left', 'left', 'left'],
       ),
     };
   }
@@ -1373,7 +1370,7 @@ function buildBusinessRuleGroupingSummary(
           String(entry.ruleCount),
           String(entry.invariantCount),
         ]),
-        ['left', 'left', 'left', 'left']
+        ['left', 'left', 'left', 'left'],
       ),
     };
   }
@@ -1388,7 +1385,7 @@ function buildBusinessRuleGroupingSummary(
         String(entry.ruleCount),
         String(entry.invariantCount),
       ]),
-      ['left', 'left', 'left', 'left']
+      ['left', 'left', 'left', 'left'],
     ),
   };
 }
@@ -1396,7 +1393,7 @@ function buildBusinessRuleGroupingSummary(
 function buildBusinessRuleGroupingLinks(
   groupedBy: BusinessRuleSet['groupedBy'],
   groupingEntries: BusinessRuleSet['groupingEntries'],
-  childRoutes: readonly ChildRouteRef[]
+  childRoutes: readonly ChildRouteRef[],
 ): { heading: string; links: TrustedListBlock } | null {
   if (groupedBy === undefined || groupingEntries === undefined || groupingEntries.length === 0) {
     return null;
@@ -1451,7 +1448,7 @@ function buildTaxonomyGroupTable(group: TaxonomyDigest['tags'][number]): TableBl
         entry.description ?? '',
         entry.aliases?.join(', ') ?? '',
       ]),
-      ['left', 'left', 'left', 'left', 'left']
+      ['left', 'left', 'left', 'left', 'left'],
     );
   }
 
@@ -1459,7 +1456,7 @@ function buildTaxonomyGroupTable(group: TaxonomyDigest['tags'][number]): TableBl
     return table(
       ['Tag', 'Target Document', 'Purpose'],
       group.entries.map((entry) => [`\`${entry.tag}\``, entry.targetDoc ?? '', entry.purpose]),
-      ['left', 'left', 'left']
+      ['left', 'left', 'left'],
     );
   }
 
@@ -1475,7 +1472,7 @@ function buildTaxonomyGroupTable(group: TaxonomyDigest['tags'][number]): TableBl
       entry.defaultValue ?? '',
       entry.example ?? '',
     ]),
-    ['left', 'left', 'left', 'left', 'left', 'left', 'left', 'left']
+    ['left', 'left', 'left', 'left', 'left', 'left', 'left', 'left'],
   );
 }
 
@@ -1500,7 +1497,7 @@ function rewriteDocumentationLinks(
   childPathMap: Readonly<Record<string, string>>,
   childRouteIdPathMap: Readonly<Record<string, string>>,
   childRefAliases: ReadonlySet<string>,
-  currentPath: string | undefined
+  currentPath: string | undefined,
 ): Block[] {
   return blocks.map((block) => {
     if (block.type === 'link-out') {
@@ -1534,7 +1531,7 @@ function rewriteDocumentationLinks(
           childPathMap,
           childRouteIdPathMap,
           childRefAliases,
-          currentPath
+          currentPath,
         ),
       };
     }
@@ -1654,9 +1651,9 @@ function renderRecordArrayTable(rows: TabularRow[]): TableBlock {
       columns.map((column) => {
         const value = row[column];
         return value === undefined || !isPrimitiveLike(value) ? '' : formatPrimitiveLike(value);
-      })
+      }),
     ),
-    columns.map(() => 'left')
+    columns.map(() => 'left'),
   );
 }
 
@@ -1664,7 +1661,7 @@ function appendBundleBackLink(
   document: MarkdownDocument,
   rootTitle: string,
   currentPath: string,
-  rootPath: string
+  rootPath: string,
 ): MarkdownDocument {
   return {
     ...document,
@@ -1733,7 +1730,7 @@ function renderBlock(block: MarkdownRenderableBlock): string[] {
 function pickFence(content: string): string {
   const longestRun = (content.match(/`{3,}/g) ?? []).reduce(
     (max, run) => Math.max(max, run.length),
-    0
+    0,
   );
   return '`'.repeat(Math.max(3, longestRun + 1));
 }
@@ -1792,10 +1789,10 @@ function renderTable(block: TableBlock | TrustedTableBlock): string[] {
 
   const lines: string[] = [];
   lines.push(
-    `| ${escapedColumns.map((cell, index) => padCell(cell, widths[index] ?? 0)).join(' | ')} |`
+    `| ${escapedColumns.map((cell, index) => padCell(cell, widths[index] ?? 0)).join(' | ')} |`,
   );
   lines.push(
-    `| ${separators.map((cell, index) => padSeparator(cell, widths[index] ?? 0, index)).join(' | ')} |`
+    `| ${separators.map((cell, index) => padSeparator(cell, widths[index] ?? 0, index)).join(' | ')} |`,
   );
 
   for (const row of escapedRows) {
@@ -1823,7 +1820,7 @@ function renderList(block: ListBlock | TrustedListBlock): string[] {
 function renderListItem(
   item: ListItem | MarkdownListItem,
   prefix: string,
-  indent: number
+  indent: number,
 ): string[] {
   const lines: string[] = [];
   const indentation = '  '.repeat(indent);
@@ -1901,7 +1898,7 @@ function trustedMarkdownList(items: readonly string[], ordered = false): Trusted
 function markdownTable(
   columns: MarkdownText[],
   rows: MarkdownText[][],
-  alignment?: ('left' | 'center' | 'right')[]
+  alignment?: ('left' | 'center' | 'right')[],
 ): TrustedTableBlock {
   return { type: 'table', columns, rows, ...(alignment !== undefined ? { alignment } : {}) };
 }
@@ -1911,7 +1908,7 @@ function isTrustedMarkdown(value: MarkdownText): value is TrustedMarkdownText {
 }
 
 function isTrustedListItemObject(
-  value: ListItem | MarkdownListItem
+  value: ListItem | MarkdownListItem,
 ): value is TrustedListItemObject | Exclude<ListItem, string> {
   return typeof value === 'object' && !(TRUSTED_MARKDOWN in value);
 }
@@ -2086,7 +2083,7 @@ function splitOversizedDocument(
   document: MarkdownDocument,
   budget: number,
   basePath: string,
-  renderFn: (document: MarkdownDocument) => string
+  renderFn: (document: MarkdownDocument) => string,
 ): SplitResult {
   const groups = groupByH2(document.sections);
 

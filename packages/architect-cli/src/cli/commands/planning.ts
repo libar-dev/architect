@@ -48,7 +48,7 @@ export const planningCommands = {
           pattern: options.pattern,
           sessionType: options.scopeType,
           strict: options.strict,
-        })
+        }),
       );
     },
   },
@@ -86,11 +86,11 @@ export const planningCommands = {
       const options = normalizeHandoffInput(
         parsed.positional,
         parsed.flags,
-        context.args.sessionTypeExplicit ? context.args.sessionType : undefined
+        context.args.sessionTypeExplicit ? context.args.sessionType : undefined,
       );
       writeProjectionOutput(
         context.args,
-        requireProjectedHandoff(requireCliContext(context), options)
+        requireProjectedHandoff(requireCliContext(context), options),
       );
     },
   },

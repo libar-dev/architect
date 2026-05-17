@@ -16,7 +16,7 @@ interface DependencyEdgeState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/pattern-relations/dependency-edges.feature'
+  'tests/features/projections/pattern-relations/dependency-edges.feature',
 );
 
 let state: DependencyEdgeState | null = null;
@@ -112,7 +112,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             },
           ]);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -149,7 +149,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'extends',
           ]);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -174,9 +174,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           () => {
             expect(state!.error).toBeInstanceOf(ProjectionError);
             expect((state!.error as Error).message).toContain('Did you mean: PatternGraphAPI?');
-          }
+          },
         );
-      }
+      },
     );
   });
 });

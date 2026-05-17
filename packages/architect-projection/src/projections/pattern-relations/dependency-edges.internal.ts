@@ -16,7 +16,7 @@ import {
 
 export function projectOutgoingEdges(
   context: ProjectionContext,
-  from: string
+  from: string,
 ): {
   from: string;
   to: string;
@@ -48,7 +48,7 @@ function appendEdges(
   edges: { from: string; to: string; relationKind: DependencyRelationKind }[],
   from: string,
   targets: readonly string[],
-  relationKind: DependencyRelationKind
+  relationKind: DependencyRelationKind,
 ): void {
   for (const to of targets) {
     edges.push({ from, to, relationKind });

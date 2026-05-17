@@ -106,7 +106,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           await writeTempFile(
             state!.tempContext!.tempDir,
             'architect.config.js',
-            createJsProjectConfig()
+            createJsProjectConfig(),
           );
         });
 
@@ -125,7 +125,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('stdout does not contain {string}', (_ctx: unknown, text: string) => {
           expect(getResult(state).stdout).not.toContain(text);
         });
-      }
+      },
     );
   });
 });

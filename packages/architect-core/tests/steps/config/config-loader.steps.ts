@@ -217,9 +217,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         async (_ctx: unknown, tagPrefix: string) => {
           await fs.writeFile(
             path.join(state!.tempDir!, 'architect.config.js'),
-            `export default { tagPrefix: ${JSON.stringify(tagPrefix)} };`
+            `export default { tagPrefix: ${JSON.stringify(tagPrefix)} };`,
           );
-        }
+        },
       );
 
       When('loading config from base directory', async () => {
@@ -265,7 +265,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       Given('a config file without default export', async () => {
         await fs.writeFile(
           path.join(state!.tempDir!, 'architect.config.js'),
-          NO_DEFAULT_EXPORT_CONFIG
+          NO_DEFAULT_EXPORT_CONFIG,
         );
       });
 
@@ -307,7 +307,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a config load error with path {string} and message {string}',
         (_ctx: unknown, pathText: string, message: string) => {
           state!.error = { type: 'config-load-error', path: pathText, message };
-        }
+        },
       );
 
       When('formatting the config error', () => {

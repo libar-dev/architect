@@ -18,24 +18,26 @@ No Critical or High findings. Two Low defense-in-depth items + 5 invariants.
 ### Low-severity defense-in-depth items
 
 **L1 — Code-block fence escalation bounded at 4 backticks**
+
 - **File:** `src/renderers/render-markdown.ts:1700-1702` (escalation logic), `:1704` (Mermaid block has no escalation)
 - **Why it matters:** ContentFragment will route preamble markdown through this path; user-authored preamble could contain 4+ backtick sequences. Today only `decision-records.internal.ts` feeds external text via a regex that captures triple-backtick boundaries only, so it's not exploitable. Activates if the campaign adds new sources of unconstrained text.
 - **Fix:** generalize fence escalation to `max(content_max_run + 1, 3)` and apply uniformly to code + Mermaid blocks.
 
 **L2 — `CodeBlock.language` is unconstrained `z.string().optional()`**
+
 - **File:** `src/fragments/base.ts` (schema), `render-markdown.ts` (interpolation into fence line)
 - **Why it matters:** newline in `language` breaks the fence. Same activation profile as L1.
 - **Fix:** `z.string().regex(/^[A-Za-z0-9_+-]*$/).optional()` at the schema layer.
 
 ### Invariants the campaign MUST preserve (highest-value output of the audit)
 
-| ID | Invariant | Why it's load-bearing |
-|---|---|---|
-| **I1** | `sanitizeMarkdownLinkTarget` is the single chokepoint for link-href validation (decodes HTML entities before scheme classification, enforces `http`/`https`/`mailto` allowlist, rejects control chars). | Any new link-emitting normalizer that bypasses this opens injection routes. |
-| **I2** | URL discipline is split: schema rejects malformed shape; renderer rejects unsafe targets. **The UI renderer does NOT sanitize URLs.** | Campaign-relevant: when multi-target output adds new consumers of `RenderableDocument` (e.g., Studio surfacing UI fragments), the missing UI-side sanitizer becomes exploitable. **Hardening priority when Studio comes online.** |
-| **I3** | `TRUSTED_MARKDOWN` symbol is module-private (unexported). All 4 call sites feed pre-escaped substrate. | The campaign's `composeDoc(title, sections)` MUST NOT export or accept `TRUSTED_MARKDOWN`-tagged content from outside the renderer module. |
-| **I4** | JSON renderer uses `isPlainObject` prototype check before stringify (anti-prototype-pollution). | If `DocDefinition.build()` returns objects with non-default prototypes, JSON output silently changes shape. Preserve the check. |
-| **I5** | `parseAndProject` is the single options-parsing entry point. 113 `z.strictObject` uses, zero `z.object`. | The campaign's `DocDefinition` MUST inherit this discipline — open-shape Zod at the new trust boundary is a regression. |
+| ID     | Invariant                                                                                                                                                                                               | Why it's load-bearing                                                                                                                                                                                                             |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **I1** | `sanitizeMarkdownLinkTarget` is the single chokepoint for link-href validation (decodes HTML entities before scheme classification, enforces `http`/`https`/`mailto` allowlist, rejects control chars). | Any new link-emitting normalizer that bypasses this opens injection routes.                                                                                                                                                       |
+| **I2** | URL discipline is split: schema rejects malformed shape; renderer rejects unsafe targets. **The UI renderer does NOT sanitize URLs.**                                                                   | Campaign-relevant: when multi-target output adds new consumers of `RenderableDocument` (e.g., Studio surfacing UI fragments), the missing UI-side sanitizer becomes exploitable. **Hardening priority when Studio comes online.** |
+| **I3** | `TRUSTED_MARKDOWN` symbol is module-private (unexported). All 4 call sites feed pre-escaped substrate.                                                                                                  | The campaign's `composeDoc(title, sections)` MUST NOT export or accept `TRUSTED_MARKDOWN`-tagged content from outside the renderer module.                                                                                        |
+| **I4** | JSON renderer uses `isPlainObject` prototype check before stringify (anti-prototype-pollution).                                                                                                         | If `DocDefinition.build()` returns objects with non-default prototypes, JSON output silently changes shape. Preserve the check.                                                                                                   |
+| **I5** | `parseAndProject` is the single options-parsing entry point. 113 `z.strictObject` uses, zero `z.object`.                                                                                                | The campaign's `DocDefinition` MUST inherit this discipline — open-shape Zod at the new trust boundary is a regression.                                                                                                           |
 
 ## Performance findings
 
@@ -46,12 +48,14 @@ No Critical or High findings. Two Low defense-in-depth items + 5 invariants.
 ### High-priority items
 
 **H1 — `addRoutedDocument` re-renders each split document 2N+2 times**
+
 - **File:** `src/renderers/render-markdown.ts:308-325, 447-466, 2054`
 - **Mechanism:** `shouldSplit` pre-render + per-subdoc line-count render in `splitOversizedDocument` + final parent render + sub-file renders. For a doc that splits into N children, the renderer runs N+2 full passes when 1 would suffice.
 - **Campaign impact:** the campaign fans out from ~8 docs to ~40, many of which will exercise the disclosure-split path. Today's wasted rendering becomes a noticeable hot spot.
 - **Fix:** render once, cache the block stream, take size/split decisions on the cached output. Memoization keyed on `(fragment, options)`.
 
 **H2 — Perf gate has zero end-to-end coverage of `renderMarkdown`**
+
 - **Files:** `tests/features/perf/business-rule-set-report.steps.ts`, `tests/perf/compare-baseline.mjs`
 - **What's measured today:** `parseAndProjectDocumentationBundle` (projection) and `renderJson` (JSON renderer).
 - **What's NOT measured:** `renderMarkdown` end-to-end through the bundle pipeline. The 2152-LOC renderer where the campaign's 5× fan-out lands has no perf gate.
@@ -61,23 +65,28 @@ No Critical or High findings. Two Low defense-in-depth items + 5 invariants.
 ### Medium-priority items
 
 **M1 — `documentationView` perf metric only exercises `documentType: 'patterns'`**
+
 - The other 11 (soon 18+) types have no gate. Campaign adds 25+ docs through new `DocDefinition`s. None will be measured.
 - **Fix:** parameterize the perf test over `documentType`; one baseline per type.
 
 **M2 — Repeated filter passes in `src/projections/_shared/filter.ts`**
+
 - Many projections call into shared filters that walk the graph each invocation. No memoization on filter result by `(graph_version, predicate_signature)`.
 - **Campaign impact:** compounds linearly with `DocDefinition` count.
 - **Fix:** add `WeakMap<Graph, Map<predicateKey, filtered[]>>` cache; invalidate on graph rebuild.
 
 **M3 — Perf baseline is anchored to commit `ee58aac` (initial multi-package split, ~year old)**
+
 - The `× 1.5` ceiling is anchored to year-old numbers. ~50% slack against post-W1.5 reality.
 - **Fix:** regenerate baselines on a clean post-W1.5 build before the campaign starts. Don't let the campaign inherit invisible headroom.
 
 **M4 — `documentation-types.ts:140-340` registry literal is re-evaluated on every module import**
+
 - 200 LOC of object literals; `as const` keeps shape but each registry consumer pays the cost. Negligible alone, but the campaign adds many more consumers.
 - **Fix:** part of the C1/C2 decomposition from Phase 1 — registry as data + small accessor functions.
 
 **M5 — `renderBlock` `default` arm has a silent megabyte-comment trap**
+
 - See raw report. Not a production hazard; flagged for awareness.
 
 ### Low-priority items

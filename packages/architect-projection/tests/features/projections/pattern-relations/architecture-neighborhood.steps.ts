@@ -24,7 +24,7 @@ interface ArchitectureNeighborhoodState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/pattern-relations/architecture-neighborhood.feature'
+  'tests/features/projections/pattern-relations/architecture-neighborhood.feature',
 );
 
 let state: ArchitectureNeighborhoodState | null = null;
@@ -116,9 +116,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   },
                 ],
               });
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -158,9 +158,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 implements: [],
                 implementedBy: [],
               });
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -192,9 +192,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(state!.bundle?.root.sameContext).toEqual([]);
             expect(state!.bundle?.root.uses).toEqual(['PatternHelpers']);
           });
-        }
+        },
       );
-    }
+    },
   );
 
   Rule('Bounded-context navigation stays projection-owned', ({ RuleScenario }) => {
@@ -281,7 +281,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ],
           });
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -296,7 +296,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               configurable: true,
               value: () => {
                 throw new Error(
-                  'layer bucket some() should not be used during bounded-context assembly'
+                  'layer bucket some() should not be used during bounded-context assembly',
                 );
               },
             });
@@ -335,7 +335,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ],
           });
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -391,7 +391,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ],
           });
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -405,7 +405,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           state!.comparison = projectArchitectureComparison(
             state!.context!,
             'scanner',
-            'codec'
+            'codec',
           ).root;
         });
 
@@ -446,9 +446,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 },
               ],
             });
-          }
+          },
         );
-      }
+      },
     );
   });
 });

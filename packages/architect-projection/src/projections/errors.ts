@@ -10,7 +10,7 @@ export type ProjectionErrorCode =
 export class ProjectionError extends Error {
   constructor(
     readonly code: ProjectionErrorCode,
-    message: string
+    message: string,
   ) {
     super(message);
     this.name = 'ProjectionError';

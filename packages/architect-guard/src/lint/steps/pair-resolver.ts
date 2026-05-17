@@ -27,7 +27,7 @@ export function extractFeaturePath(stepFileContent: string): string | null {
 
   // Pattern 2: resolve(__dirname, 'relative/path')
   const resolveMatch = /loadFeature\s*\(\s*resolve\s*\([^,]*,\s*['"]([^'"]+)['"]\s*\)\s*\)/.exec(
-    stepFileContent
+    stepFileContent,
   );
   if (resolveMatch?.[1] !== undefined) {
     return resolveMatch[1];
@@ -46,7 +46,7 @@ export function extractFeaturePath(stepFileContent: string): string | null {
  */
 export function resolveFeatureStepPairs(
   stepFiles: readonly string[],
-  baseDir: string
+  baseDir: string,
 ): { readonly pairs: readonly FeatureStepPair[]; readonly warnings: readonly LintViolation[] } {
   const pairs: FeatureStepPair[] = [];
   const warnings: LintViolation[] = [];

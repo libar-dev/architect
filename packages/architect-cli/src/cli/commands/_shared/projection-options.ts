@@ -4,7 +4,7 @@ import { parseSchemaValue } from './schemas.js';
 
 export function normalizeScopeValidateInput(
   positional: readonly string[],
-  flags: Readonly<Record<string, unknown>>
+  flags: Readonly<Record<string, unknown>>,
 ): { pattern: string; scopeType: ScopeType; strict: boolean } {
   const usage =
     'Usage: architect scope-validate <pattern> <design|implement> [--type <design|implement>] [--strict]';
@@ -23,7 +23,7 @@ export function normalizeScopeValidateInput(
     scopeTypeFromPositional = parseSchemaValue(
       ScopeTypeSchema,
       positionalScopeType,
-      'Scope type must be design or implement'
+      'Scope type must be design or implement',
     );
   }
 
@@ -48,7 +48,7 @@ export function normalizeScopeValidateInput(
 }
 
 export function buildBusinessRuleSetProjectionOptions(
-  flags: Readonly<Record<string, unknown>>
+  flags: Readonly<Record<string, unknown>>,
 ): BusinessRuleSetOptions {
   const typedFlags = flags as {
     readonly productArea?: string;

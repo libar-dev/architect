@@ -79,7 +79,7 @@ const TOOL_METADATA_BY_NAME: Record<RegisteredToolName, (typeof ARCHITECT_MCP_TO
   >;
 
 export const REGISTERED_TOOL_NAMES: readonly RegisteredToolName[] = ARCHITECT_MCP_TOOLS.map(
-  (tool) => tool.name
+  (tool) => tool.name,
 );
 
 export const MCP_SERVER_INSTRUCTIONS =

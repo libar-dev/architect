@@ -5,7 +5,7 @@ export interface ContextInferenceRule {
 
 export function inferContext(
   filePath: string,
-  rules: readonly ContextInferenceRule[] | undefined
+  rules: readonly ContextInferenceRule[] | undefined,
 ): string | undefined {
   if (!rules || rules.length === 0) {
     return undefined;

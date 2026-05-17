@@ -55,7 +55,7 @@ Goal: address naming + topology issues that the lift inherited from the monolith
 - [x] Delete dogfood `CHANGELOG.md` and `.gitignore` (merged relevant entries to root `.gitignore`).
 - [x] Update `packages/architect-cli/tests/support/run-cli.ts`: cwd target moves from `examples/self-host` back to repo root. PWD-stripping logic from W1 stays in place. **Plus** `delete childEnv.PWD` → `delete childEnv['PWD']` to satisfy `noPropertyAccessFromIndexSignature` (latent typecheck failure surfaced when the tsconfig consolidation cleared a previous masking).
 - [x] Sweep `examples/self-host/` references in `README.md` (minimal sweep — full rewrite is W4).
-- [x] Sweep `packages/architect/` references across the codebase. **The original REMAINING-WORK.md scoped this to a single file (`fragments.ts`); reality was ~100 references across 5 large step-definition files in `packages/architect-projection/tests/features/projections/` (pattern-detail, context-session, reporting, decision-records, config-documentation), plus `fragments.ts`, 1 source ref in `business-rules.internal.ts`, and JSDoc comments in `architect-core/src/{config/self-hosting.ts, taxonomy/{source-ownership.ts, adr-category-values.ts, product-area-values.ts}}`. Bulk-fixed via `sed` on `packages/architect/architect/` → `architect/` + `packages/architect/tests/` → `tests/` + `packages/architect/docs-live/` → `docs-live/`. Individual edits for the residual cases.
+- [x] Sweep `packages/architect/` references across the codebase. \*\*The original REMAINING-WORK.md scoped this to a single file (`fragments.ts`); reality was ~100 references across 5 large step-definition files in `packages/architect-projection/tests/features/projections/` (pattern-detail, context-session, reporting, decision-records, config-documentation), plus `fragments.ts`, 1 source ref in `business-rules.internal.ts`, and JSDoc comments in `architect-core/src/{config/self-hosting.ts, taxonomy/{source-ownership.ts, adr-category-values.ts, product-area-values.ts}}`. Bulk-fixed via `sed` on `packages/architect/architect/` → `architect/` + `packages/architect/tests/` → `tests/` + `packages/architect/docs-live/` → `docs-live/`. Individual edits for the residual cases.
 - [x] **Fix the 2 hardcoded `/Users/darkomijic/dev-projects/architect-studio` paths** in `packages/architect-projection/tests/{fixtures/fragments.ts, features/projections/documentation-composition/config-documentation.steps.ts}`. Replaced with `/fixtures/architect-studio` (clearly fictional, machine-independent). Tests pass.
 - [x] **Drop the `packages/architect/` candidate-path branch** in `business-rules.internal.ts:472`. That branch existed for the studio-era nested layout (`packages/architect/architect/...`). Post-eject the dogfood IS at root, so the prefix is dead code.
 - [x] **Rewrite `architect.config.ts` package match regexes:** from `/^\.\.\/architect-core\//` (relative-to-old-dogfood-location) to `/^packages\/architect-core\//` (relative-to-repo-root).
@@ -64,20 +64,20 @@ Goal: address naming + topology issues that the lift inherited from the monolith
 
 Original REMAINING-WORK.md described 7 scripts to audit; inventory found 12. Final decisions:
 
-| File | Size | Decision |
-|---|---|---|
-| `query.ts` | 4.2 KB | **DELETED** — re-implements canonical CLI commands |
-| `query.mjs` | 546 B | **DELETED** — MJS variant of above |
-| `codemod-wave2.mjs` | 6.7 KB | **DELETED** — one-off codemod, hardcoded studio nested paths |
-| `verify-exports.mjs` | 3.3 KB | **DELETED** — asserted v1 `@libar-dev/architect-dev` export map (no longer exists) |
-| `lint-patterns.ts` | 481 B | **FIXED** — repointed import from `../../architect-core/src/config/self-hosting.js` to `@libar-dev/architect-core/config` (published surface) |
-| `validate-workspace.ts` | 1.4 KB | **KEPT + documented** — added header comment explaining dogfood-only gap-filler vs `architect-validate` bin; revisit folding into bin in a later wave |
-| `workspace-smoke.ts` | 1.2 KB | **KEPT** — smoke test |
-| `assert-deprecated-query-surfaces.ts` | 1.6 KB | **KEPT** — regression test |
-| `generate-docs.mjs` | 573 B | **KEPT** — fixed path from `../../../node_modules/.bin/architect-generate` to `../node_modules/.bin/architect-generate` post-promotion |
-| `session-stats.sh` | 5.4 KB | **KEPT** — dev tooling |
-| `fetch-pr-comments.mjs` | 22.8 KB | **KEPT** — PR comment fetching |
-| `lint-steps.ts` | 1.5 KB | **KEPT** — simple wrapper around `architect-lint-steps` |
+| File                                  | Size    | Decision                                                                                                                                              |
+| ------------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `query.ts`                            | 4.2 KB  | **DELETED** — re-implements canonical CLI commands                                                                                                    |
+| `query.mjs`                           | 546 B   | **DELETED** — MJS variant of above                                                                                                                    |
+| `codemod-wave2.mjs`                   | 6.7 KB  | **DELETED** — one-off codemod, hardcoded studio nested paths                                                                                          |
+| `verify-exports.mjs`                  | 3.3 KB  | **DELETED** — asserted v1 `@libar-dev/architect-dev` export map (no longer exists)                                                                    |
+| `lint-patterns.ts`                    | 481 B   | **FIXED** — repointed import from `../../architect-core/src/config/self-hosting.js` to `@libar-dev/architect-core/config` (published surface)         |
+| `validate-workspace.ts`               | 1.4 KB  | **KEPT + documented** — added header comment explaining dogfood-only gap-filler vs `architect-validate` bin; revisit folding into bin in a later wave |
+| `workspace-smoke.ts`                  | 1.2 KB  | **KEPT** — smoke test                                                                                                                                 |
+| `assert-deprecated-query-surfaces.ts` | 1.6 KB  | **KEPT** — regression test                                                                                                                            |
+| `generate-docs.mjs`                   | 573 B   | **KEPT** — fixed path from `../../../node_modules/.bin/architect-generate` to `../node_modules/.bin/architect-generate` post-promotion                |
+| `session-stats.sh`                    | 5.4 KB  | **KEPT** — dev tooling                                                                                                                                |
+| `fetch-pr-comments.mjs`               | 22.8 KB | **KEPT** — PR comment fetching                                                                                                                        |
+| `lint-steps.ts`                       | 1.5 KB  | **KEPT** — simple wrapper around `architect-lint-steps`                                                                                               |
 
 ### 1.5.3 End-to-end doc generation smoke — DONE
 
@@ -209,24 +209,25 @@ Once the published artifacts are stable, decide on studio's dependency.
 
 **Phase 2 — doctrine cleanup.** Four cleanup passes landed:
 
-| Class | Examples | Result |
-|---|---|---|
-| Temporal/wave language stripped | "Wave 1.5", "Phase 1" inside skill bodies | Skills now read as evergreen kernel doctrine |
-| Dual-instance routing collapsed | `pkg:query`, `architect-pkg`, "package instance", "Architect Studio", `<cli-prefix>` | All references rewritten to single-instance shape (`pnpm architect:query`, one `architect.config.ts`, one MCP namespace `mcp__architect__*`) |
-| Hook-enforcement claims softened | `PreToolUse`, `UserPromptSubmit` framed as gates | Reframed as "Data API discipline, not enforced gate" — MCP-over-CLI latency advantage preserved as the actual reason to prefer it |
-| Deleted-infrastructure references removed | `feedback:cli`, `.architect-cli-feedback.md`, `feedback/` failure-capture flow | Wholesale removed; archived in W9 future-resurrection note below |
-| Stale paths (post-W1.5.5) | 5× `spec/…` → `formal-spec/…` | Repointed. `spec/08-spec-evolution.md:456-468` (which pointed into an ASCII-art diagram after section growth) repointed to section reference |
-| Broken anchor citations | `#status--maturity-defaults` against the renamed `Status → Maturity Defaults` heading | Switched to `§ "Status → Maturity Defaults"` form |
-| Studio-era doc names | `VALUE-TRANSFER-NOTES.md`, `01-minimum-gherkin-at-every-level.md`, `tag-taxonomy.md`, `METHODOLOGY.md`, `GHERKIN-PATTERNS.md` | Repointed to `formal-spec/` sections or the live taxonomy query (`pnpm architect:query taxonomy --format json`) |
-| Validation cadence | Skills cited `pnpm ci:phase-gate` / `:full` which don't exist in this repo's `package.json` (studio-only script) | Replaced with real composite: `pnpm typecheck` between phases, `pnpm typecheck && pnpm test && pnpm validate:all` before commit/handoff. The studio's `phase-gate.mjs` bundled checks specific to its monorepo shape (`ci:typecheck`, `lint:dirty`, `architect-dev-tests`); not worth recreating here |
-| Dual-instance residue in handoff | `Instance` row in handoff field table; `<instance>` in handoff note template | Both dropped |
-| Missing tier folders | Skills referenced `git mv` to `architect/specs/candidates/` and slice files in `architect/slices/` — neither dir existed | Created both with READMEs. `architect/specs/ideas/README.md` also rewritten (had studio-era refs + contradicted "maturity is derived" doctrine) |
-| `architect:query --` vs `architect:query` | Style mismatch — 5 `_shared/*` refs used `--`, all 8 skill bodies didn't | Standardized to no `--` everywhere (modern pnpm passes positionals automatically) |
-| `MIGRATION.md` reference in AGENTS.md | File doesn't exist yet (W1.5.7 appendix here is the prep) | Reworded as forward-looking placeholder pointing at this file's W1.5.7 appendix |
+| Class                                     | Examples                                                                                                                      | Result                                                                                                                                                                                                                                                                                                |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Temporal/wave language stripped           | "Wave 1.5", "Phase 1" inside skill bodies                                                                                     | Skills now read as evergreen kernel doctrine                                                                                                                                                                                                                                                          |
+| Dual-instance routing collapsed           | `pkg:query`, `architect-pkg`, "package instance", "Architect Studio", `<cli-prefix>`                                          | All references rewritten to single-instance shape (`pnpm architect:query`, one `architect.config.ts`, one MCP namespace `mcp__architect__*`)                                                                                                                                                          |
+| Hook-enforcement claims softened          | `PreToolUse`, `UserPromptSubmit` framed as gates                                                                              | Reframed as "Data API discipline, not enforced gate" — MCP-over-CLI latency advantage preserved as the actual reason to prefer it                                                                                                                                                                     |
+| Deleted-infrastructure references removed | `feedback:cli`, `.architect-cli-feedback.md`, `feedback/` failure-capture flow                                                | Wholesale removed; archived in W9 future-resurrection note below                                                                                                                                                                                                                                      |
+| Stale paths (post-W1.5.5)                 | 5× `spec/…` → `formal-spec/…`                                                                                                 | Repointed. `spec/08-spec-evolution.md:456-468` (which pointed into an ASCII-art diagram after section growth) repointed to section reference                                                                                                                                                          |
+| Broken anchor citations                   | `#status--maturity-defaults` against the renamed `Status → Maturity Defaults` heading                                         | Switched to `§ "Status → Maturity Defaults"` form                                                                                                                                                                                                                                                     |
+| Studio-era doc names                      | `VALUE-TRANSFER-NOTES.md`, `01-minimum-gherkin-at-every-level.md`, `tag-taxonomy.md`, `METHODOLOGY.md`, `GHERKIN-PATTERNS.md` | Repointed to `formal-spec/` sections or the live taxonomy query (`pnpm architect:query taxonomy --format json`)                                                                                                                                                                                       |
+| Validation cadence                        | Skills cited `pnpm ci:phase-gate` / `:full` which don't exist in this repo's `package.json` (studio-only script)              | Replaced with real composite: `pnpm typecheck` between phases, `pnpm typecheck && pnpm test && pnpm validate:all` before commit/handoff. The studio's `phase-gate.mjs` bundled checks specific to its monorepo shape (`ci:typecheck`, `lint:dirty`, `architect-dev-tests`); not worth recreating here |
+| Dual-instance residue in handoff          | `Instance` row in handoff field table; `<instance>` in handoff note template                                                  | Both dropped                                                                                                                                                                                                                                                                                          |
+| Missing tier folders                      | Skills referenced `git mv` to `architect/specs/candidates/` and slice files in `architect/slices/` — neither dir existed      | Created both with READMEs. `architect/specs/ideas/README.md` also rewritten (had studio-era refs + contradicted "maturity is derived" doctrine)                                                                                                                                                       |
+| `architect:query --` vs `architect:query` | Style mismatch — 5 `_shared/*` refs used `--`, all 8 skill bodies didn't                                                      | Standardized to no `--` everywhere (modern pnpm passes positionals automatically)                                                                                                                                                                                                                     |
+| `MIGRATION.md` reference in AGENTS.md     | File doesn't exist yet (W1.5.7 appendix here is the prep)                                                                     | Reworded as forward-looking placeholder pointing at this file's W1.5.7 appendix                                                                                                                                                                                                                       |
 
 `AGENTS.md` gained a `## Delivery process` section during Phase 1 codifying this repo's single-instance shape (`architect.config.ts`, `architect/`, `pnpm architect:query`, `mcp__architect__*` tools) plus a note that consumers override that table in their own AGENTS.md. The router skill (`architect-session-router/SKILL.md`) was rewritten holistically rather than patched — bulk sed left nonsense like "Replace `pnpm architect:query` with the instance you picked in Step 1" after the dual-instance prose was stripped.
 
 **Verification (uncommitted, pre-commit):**
+
 - `pnpm typecheck` — green
 - Skill discovery — all 8 frontmatters parse, descriptions 190–510 tok
 - Audit grep — zero residue of `ci:phase-gate`, stale `spec/N` paths, studio doc names, `<instance>`, `architect:query --`
@@ -252,16 +253,16 @@ The skills are present and clean in `.agents/skills/`, with `.claude/skills/` sy
 
 ### 8 session skills + 1 router (REMAINING-WORK.md's earlier list was missing `architect-refactor-session`)
 
-| Skill | Intent | Purpose |
-|---|---|---|
-| `architect-session-router` | (router) | Detects intent, runs CLI bootstrap, routes to downstream skill |
-| `architect-plan-session` | `planning` | Capture/refine idea or candidate spec (minimum-Gherkin enforcement: ideas ≤30 lines, 5 mandatory tags) |
-| `architect-design-session` | `design` | Design-tier spec authoring; runs `scope-validate <pattern> design` gate |
-| `architect-implement-spec` | `implement` | Build spec end-to-end; transition FSM states; value transfer (deletion of design spec is explicit) |
-| `architect-review-spec` | `review` | Read design-level spec for implementation readiness; find pre-implementation gaps |
-| `architect-review-implementation` | `review-implement` | Review **completed** implementations post-merge; batch-delete safe-to-remove specs |
-| `architect-refactor-session` | `refactor` | Modify shipped code with **no design spec** (spec was deleted at implement-time) |
-| `architect-verify-handoff` | `handoff` | Wrap session, capture state, list blockers, prepare continuation |
+| Skill                             | Intent             | Purpose                                                                                                |
+| --------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------ |
+| `architect-session-router`        | (router)           | Detects intent, runs CLI bootstrap, routes to downstream skill                                         |
+| `architect-plan-session`          | `planning`         | Capture/refine idea or candidate spec (minimum-Gherkin enforcement: ideas ≤30 lines, 5 mandatory tags) |
+| `architect-design-session`        | `design`           | Design-tier spec authoring; runs `scope-validate <pattern> design` gate                                |
+| `architect-implement-spec`        | `implement`        | Build spec end-to-end; transition FSM states; value transfer (deletion of design spec is explicit)     |
+| `architect-review-spec`           | `review`           | Read design-level spec for implementation readiness; find pre-implementation gaps                      |
+| `architect-review-implementation` | `review-implement` | Review **completed** implementations post-merge; batch-delete safe-to-remove specs                     |
+| `architect-refactor-session`      | `refactor`         | Modify shipped code with **no design spec** (spec was deleted at implement-time)                       |
+| `architect-verify-handoff`        | `handoff`          | Wrap session, capture state, list blockers, prepare continuation                                       |
 
 ### 9 doctrine kernel files in `_shared/`
 
@@ -269,13 +270,13 @@ The skills are present and clean in `.agents/skills/`, with `.claude/skills/` sy
 
 ### 5 hooks with documented removal mapping
 
-| Hook | What it does today | W9 replacement |
-|---|---|---|
-| `UserPromptSubmit` | Detects Architect intent in prompt, injects CLI bootstrap as `additionalContext`, sets `sessionTitle` | Router skill becomes entry point; runs bootstrap as skill step |
-| `PreToolUse` (Read\|Glob\|Grep on architect paths) | Denies file access until CLI bootstrap has run | Skill-level routing enforcement (skills cannot proceed until router has run bootstrap). Optional per-harness safety-net hook. |
-| `CwdChanged` | Re-injects bootstrap when cwd enters architect-scoped dir | Per-harness observability hook (optional) |
-| `PostToolUseFailure` | Captures `architect:*` CLI / `mcp__architect__*` failures to `.architect-cli-feedback.md` | Per-harness observability hook OR skill utility |
-| `PostCompact` | Re-detects intent from compact summary, re-injects bootstrap if Architect patterns mentioned | Per-harness or router skill extension |
+| Hook                                               | What it does today                                                                                    | W9 replacement                                                                                                                |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `UserPromptSubmit`                                 | Detects Architect intent in prompt, injects CLI bootstrap as `additionalContext`, sets `sessionTitle` | Router skill becomes entry point; runs bootstrap as skill step                                                                |
+| `PreToolUse` (Read\|Glob\|Grep on architect paths) | Denies file access until CLI bootstrap has run                                                        | Skill-level routing enforcement (skills cannot proceed until router has run bootstrap). Optional per-harness safety-net hook. |
+| `CwdChanged`                                       | Re-injects bootstrap when cwd enters architect-scoped dir                                             | Per-harness observability hook (optional)                                                                                     |
+| `PostToolUseFailure`                               | Captures `architect:*` CLI / `mcp__architect__*` failures to `.architect-cli-feedback.md`             | Per-harness observability hook OR skill utility                                                                               |
+| `PostCompact`                                      | Re-detects intent from compact summary, re-injects bootstrap if Architect patterns mentioned          | Per-harness or router skill extension                                                                                         |
 
 ### Two-instance topology collapses to one
 
@@ -367,6 +368,7 @@ Three documents drafted before the review: `DEEP-DIVE.md`, `INVENTORY.md`, `PROP
 ## TODO - Required work that needs additional detailing and specification
 
 ### TODO #1 - Doc consolidation
+
 - `formal-spec/` need to be updated to match recent code changes/refactoring
   - this will be published as separate repo later on
   - we should reference content from formal specs in generated docs, skills, etc.
@@ -376,22 +378,25 @@ Three documents drafted before the review: `DEEP-DIVE.md`, `INVENTORY.md`, `PROP
 - manual docs (`docs/`) and unused docs-sources (`docs-sources/`) neet to be made obsolete once work with generated docs and polishing of skills is coplete - we have ability to generate all required docs
 - we should assess what to do wiht `docs-live/TAXONOMY.md` which is generated doc with some content duplicated in the formal specs and taxonomy is also available throuhg PatternGraph API
 
-#### `doc-sources` additional context: 
+#### `doc-sources` additional context:
 
 ```markdown
-  Quick verdict: **no, the `docs-sources/` files are not currently consumed by doc generation.** Here's the trace:
+Quick verdict: **no, the `docs-sources/` files are not currently consumed by doc generation.** Here's the trace:
 
 **The plumbing exists but is unwired:**
+
 - `parseMarkdownToBlocks()` in `packages/architect-core/src/utils/markdown-parser.ts:84` converts markdown → `SectionBlock[]` (exported from core)
 - `ReferenceDocConfig.preamble?: readonly SectionBlock[]` in `packages/architect-core/src/config/presentation-contracts.ts:43` — codecs accept preamble content via config
 - The intent (per `docs/DOCS-GAP-ANALYSIS.md:722-723`) was: author preamble markdown in `docs-sources/` → load via a `loadPreambleFromMarkdown()` utility → inject into codec config
 
 **What's actually missing:**
+
 - Zero references to `docs-sources` in any package source code, scripts, configs, or tests (only mentions are in README/AGENTS layout diagrams and the gap-analysis doc itself).
 - The dogfood `architect.config.ts` has no `preamble:` configuration — no codec is fed any markdown from `docs-sources/`.
 - No `loadPreambleFromMarkdown()` utility exists yet; only the low-level `parseMarkdownToBlocks` (tested in isolation against hardcoded strings in `tests/steps/generation/load-preamble.steps.ts`).
 
 **The content state:**
+
 - The 8 files in `docs-sources/` are hardcoded markdown that was meant to feed the codec pipeline.
 - They overlap significantly with the manual `docs/` files (e.g., `docs/ANNOTATION-GUIDE.md` vs `docs-sources/annotation-guide.md` — forked siblings, drifting separately).
 - `DOCS-GAP-ANALYSIS.md` confirms this is unfinished work: "WP-7 ProceduralGuideCodec design complete (8 findings), DD-7/DD-8 done" but "Phase 5 (guide trimming) … remain pending until generated docs reach quality parity for manual doc archival."
@@ -410,10 +415,11 @@ The drift between `docs/ANNOTATION-GUIDE.md` and `docs-sources/annotation-guide.
 ### Formal specs - firs pass of fixes completed
 
 `★ Insight ─────────────────────────────────────`
+
 - The biggest editorial decision was treating §04's "tag registry" as **two layers**: (a) the v0.2.0 canonical authored set (~22 tags + gate + 3 aggregation) verified against `packages/architect-core/src/taxonomy/registry-builder.ts`, and (b) the wider "earlier-draft" set that the spec used to claim as standard. Marking removed groups with explicit "**Not in v0.2.0 canonical taxonomy**" callouts preserves the migration history without lying about current truth.
 - The Live Documentation API (§12) was the most surprising drift — three named tools that simply do not exist. The shipped reality is a single `architect_documentation` MCP tool with `documentType` / `disclosure` / `filter` params. This kind of drift usually means the spec was written from a design proposal, not from the shipped implementation.
 - §10's PatternGraph schema described ~10 fields that don't exist in the ExtractedPattern Zod schema (`phase`, `effort`, `priority`, `quarter`, `team`, `risk`, `workflow`, `businessValue`, `userRole`, `constraints`, `discoveredGaps`, `discoveredImprovements`, `discoveredRisks`, `discoveredLearnings`). All cleanly removed; replaced with the actual `maturity` and `unlockReason` fields that do exist.
-`─────────────────────────────────────────────────`
+  `─────────────────────────────────────────────────`
 
 ## Summary
 

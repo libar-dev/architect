@@ -107,7 +107,7 @@ export const ListItemSchema: z.ZodType<ListItem> = z.lazy(() =>
       checked: z.boolean().optional(),
       children: z.array(ListItemSchema).optional(),
     }),
-  ])
+  ]),
 );
 
 export const ListBlockSchema = z.strictObject({
@@ -132,7 +132,7 @@ export const CollapsibleBlockSchema: z.ZodType<CollapsibleBlock> = z.lazy(() =>
     type: z.literal('collapsible'),
     summary: z.string(),
     content: z.array(SectionBlockSchema),
-  })
+  }),
 );
 
 export const LinkOutBlockSchema = z.strictObject({
@@ -152,5 +152,5 @@ export const SectionBlockSchema: z.ZodType<SectionBlock> = z.lazy(() =>
     MermaidBlockSchema,
     CollapsibleBlockSchema,
     LinkOutBlockSchema,
-  ])
+  ]),
 );

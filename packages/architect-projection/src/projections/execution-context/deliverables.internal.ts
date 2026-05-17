@@ -18,7 +18,7 @@ import { normalizeExecutionContextDeliverables } from './execution-context-share
 
 export function buildDeliverableManifest(
   context: ProjectionContext,
-  patternName: string
+  patternName: string,
 ): DeliverableManifest | undefined {
   const pattern = findPatternByName(context.graph, patternName);
   if (pattern === undefined) {
@@ -35,7 +35,7 @@ export function buildDeliverableManifest(
 export function buildDeliverable(
   context: ProjectionContext,
   patternName: string,
-  name: string
+  name: string,
 ): Deliverable | undefined {
   const manifest = buildDeliverableManifest(context, patternName);
   if (manifest === undefined) {
@@ -43,7 +43,7 @@ export function buildDeliverable(
   }
 
   const match = manifest.items.find(
-    (deliverable) => deliverable.name.toLowerCase() === name.toLowerCase()
+    (deliverable) => deliverable.name.toLowerCase() === name.toLowerCase(),
   );
   return match;
 }

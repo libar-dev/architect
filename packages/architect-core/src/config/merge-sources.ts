@@ -3,7 +3,7 @@ import type { GeneratorSourceOverride, ResolvedSourcesConfig } from './project-c
 export function mergeSourcesForGenerator(
   base: ResolvedSourcesConfig,
   generatorName: string,
-  overrides: Readonly<Record<string, GeneratorSourceOverride>>
+  overrides: Readonly<Record<string, GeneratorSourceOverride>>,
 ): ResolvedSourcesConfig {
   const override = overrides[generatorName];
 

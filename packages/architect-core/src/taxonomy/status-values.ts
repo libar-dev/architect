@@ -11,5 +11,5 @@ export const DEFAULT_STATUS: ProcessStatusValue = 'roadmap';
 export const VALID_PROCESS_STATUS_SET: ReadonlySet<string> = new Set<string>(PROCESS_STATUS_VALUES);
 
 export const VALID_ACCEPTED_STATUS_SET: ReadonlySet<string> = new Set<string>(
-  ACCEPTED_STATUS_VALUES
+  ACCEPTED_STATUS_VALUES,
 );

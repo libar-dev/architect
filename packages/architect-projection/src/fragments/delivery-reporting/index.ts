@@ -7,8 +7,8 @@
  * ### When to Use
  *
  * - Re-exports the delivery-reporting fragment contracts for phase progress,
-*   status distribution, roadmap timelines, release notes, and traceability
-*   matrices.
+ *   status distribution, roadmap timelines, release notes, and traceability
+ *   matrices.
  */
 export { PhaseProgressSchema } from './phase-progress.js';
 export type { PhaseProgress } from './phase-progress.js';

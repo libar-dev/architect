@@ -99,7 +99,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         state.externality = classifyEdgeExternality(
           state.graph!,
           findPattern('AlphaCore'),
-          'BetaCore'
+          'BetaCore',
         );
       });
       Then('the edge externality equals "internal"', () => {
@@ -114,7 +114,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         state.externality = classifyEdgeExternality(
           state.graph!,
           findPattern('AlphaCore'),
-          'GammaGuard'
+          'GammaGuard',
         );
       });
       Then('the edge externality equals "external"', () => {
@@ -129,7 +129,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         state.externality = classifyEdgeExternality(
           state.graph!,
           findPattern('AlphaCore'),
-          'DeltaUnknown'
+          'DeltaUnknown',
         );
       });
       Then('the edge externality equals "dangling"', () => {
@@ -156,7 +156,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             } finally {
               spy.mockRestore();
             }
-          }
+          },
         );
 
         Then('the declared-pattern index is built {int} time', (_ctx: unknown, count: number) => {
@@ -166,7 +166,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         And('the classified edges equal "internal" and "external" in order', () => {
           expect(state.externalities).toEqual(['internal', 'external']);
         });
-      }
+      },
     );
   });
 });

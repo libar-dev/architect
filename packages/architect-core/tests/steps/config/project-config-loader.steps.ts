@@ -105,7 +105,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('project config instance should have {int} roles', (_ctx: unknown, count: number) => {
           expect(requireSuccess().instance.registry.roles).toHaveLength(count);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -116,9 +116,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           async () => {
             await fs.writeFile(
               path.join(state!.tempDir!, 'architect.config.js'),
-              EMPTY_ROLES_CONFIG
+              EMPTY_ROLES_CONFIG,
             );
-          }
+          },
         );
         When('loading project config from temp directory', async () => {
           state!.loadResult = await loadProjectConfig(state!.tempDir!);
@@ -132,7 +132,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('project config instance should have {int} roles', (_ctx: unknown, count: number) => {
           expect(requireSuccess().instance.registry.roles).toHaveLength(count);
         });
-      }
+      },
     );
   });
 
@@ -141,7 +141,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       Given('a config file without a default export', async () => {
         await fs.writeFile(
           path.join(state!.tempDir!, 'architect.config.js'),
-          NO_DEFAULT_EXPORT_CONFIG
+          NO_DEFAULT_EXPORT_CONFIG,
         );
       });
       When('loading project config from temp directory', async () => {
@@ -154,7 +154,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'the project config error message should contain {string}',
         (_ctx: unknown, text: string) => {
           expect(requireFailure().message).toContain(text);
-        }
+        },
       );
     });
 
@@ -164,7 +164,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         Given('a config file with removed preset field data', async () => {
           await fs.writeFile(
             path.join(state!.tempDir!, 'architect.config.js'),
-            REMOVED_PRESET_FIELD_CONFIG
+            REMOVED_PRESET_FIELD_CONFIG,
           );
         });
         When('loading project config from temp directory', async () => {
@@ -177,9 +177,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'the project config error message should contain {string}',
           (_ctx: unknown, text: string) => {
             expect(requireFailure().message).toContain(text);
-          }
+          },
         );
-      }
+      },
     );
   });
 });

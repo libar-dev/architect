@@ -48,7 +48,7 @@ export { BusinessRuleSetOptionsSchema } from './business-rules.internal.js';
 export function projectBusinessRule(
   context: ProjectionContext,
   feature: string,
-  ruleName: string
+  ruleName: string,
 ): ProjectionBundle<BusinessRule> | undefined {
   const businessRule = buildBusinessRule(context, feature, ruleName);
   return businessRule === undefined ? undefined : projectSingle(businessRule);
@@ -56,7 +56,7 @@ export function projectBusinessRule(
 
 export function projectBusinessRuleSet(
   context: ProjectionContext,
-  options: BusinessRuleSetOptions = { scope: 'all' }
+  options: BusinessRuleSetOptions = { scope: 'all' },
 ): ProjectionBundle<BusinessRuleSet> {
   return buildBusinessRuleSet(context, options);
 }
@@ -65,7 +65,7 @@ export const parseAndProjectBusinessRuleSet = parseAndProject(
   BusinessRuleSetOptionsSchema,
   projectBusinessRuleSet,
   'parseAndProjectBusinessRuleSet',
-  { scope: 'all' }
+  { scope: 'all' },
 );
 
 export type { BusinessRuleSetOptions } from './business-rules.internal.js';

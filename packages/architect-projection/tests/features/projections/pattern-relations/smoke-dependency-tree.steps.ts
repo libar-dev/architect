@@ -16,7 +16,7 @@ interface SmokeState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/pattern-relations/smoke-dependency-tree.feature'
+  'tests/features/projections/pattern-relations/smoke-dependency-tree.feature',
 );
 
 let state: SmokeState | null = null;
@@ -74,8 +74,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(state!.bundle!.root.nodes).toHaveLength(1);
             expect(state!.bundle!.root.nodes[0]!.name).toBe('RootLib');
           });
-        }
+        },
       );
-    }
+    },
   );
 });

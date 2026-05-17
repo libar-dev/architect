@@ -49,7 +49,7 @@ const MODE_DEFAULT_INCLUDES: Record<BundleMode, readonly BundleInclude[]> = {
 
 export function buildPatternBundle(
   context: ProjectionContext,
-  options: PatternBundleOptions
+  options: PatternBundleOptions,
 ): ProjectionBundle<PatternBundleEntry> {
   const mode = options.mode ?? DEFAULT_MODE;
   const includes = resolveIncludes(options.include, mode);
@@ -63,7 +63,7 @@ export function buildPatternBundle(
     childNames.map((childName) => [
       childName,
       buildBundleEntry(context, childName, 'member', mode, includes, estimateTokens),
-    ])
+    ]),
   ) as Record<string, PatternBundleEntry>;
 
   const root = buildBundleEntry(context, options.pattern, 'root', mode, includes, estimateTokens, {
@@ -86,7 +86,7 @@ export function buildPatternBundle(
           routing: {
             rootRouteId: createIndexRouteId('bundle'),
             childRouteIds: Object.fromEntries(
-              childNames.map((childName) => [childName, createEntityRouteId('bundle', childName)])
+              childNames.map((childName) => [childName, createEntityRouteId('bundle', childName)]),
             ),
             childPathStrategy: 'nested' as const,
             anchorStrategy: 'heading-slug' as const,
@@ -103,13 +103,13 @@ function buildBundleEntry(
   mode: BundleMode,
   includes: readonly BundleInclude[],
   estimateTokens: boolean,
-  extra: Partial<Pick<PatternBundleEntry, 'members' | 'memberCount'>> = {}
+  extra: Partial<Pick<PatternBundleEntry, 'members' | 'memberCount'>> = {},
 ): PatternBundleEntry {
   const pattern = projectPatternSummary(context, patternName).root;
   const detail = projectPatternDetail(context, patternName).root;
   const relationships = getRelationshipsForPattern(
     context.graph,
-    requirePattern(context, patternName)
+    requirePattern(context, patternName),
   );
   const rules =
     includes.includes('rules') || includes.includes('scenarios')
@@ -148,7 +148,7 @@ function buildBundleEntry(
 
 function resolveIncludes(
   requested: readonly BundleInclude[] | undefined,
-  mode: BundleMode
+  mode: BundleMode,
 ): BundleInclude[] {
   const source =
     requested !== undefined && requested.length > 0 ? requested : MODE_DEFAULT_INCLUDES[mode];
@@ -179,7 +179,7 @@ function getBlockValue(blocks: PatternBundleBlocks, include: BundleInclude): unk
 }
 
 function summarizeTokenEstimates(
-  estimates: readonly (BundleTokenEstimate | undefined)[]
+  estimates: readonly (BundleTokenEstimate | undefined)[],
 ): BundleTokenEstimate {
   const chars = estimates.reduce((sum, estimate) => sum + (estimate?.chars ?? 0), 0);
   return finalizeTokenEstimate(chars);

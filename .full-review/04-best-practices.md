@@ -18,18 +18,21 @@ Per user direction, CI/CD findings are summarized but de-emphasized — they're 
 ### High-priority
 
 **F-H1 — `sideEffects: false` is broken by 12-pass Zod parse + `Object.freeze` cascade**
+
 - **File:** `src/projections/documentation-composition/documentation-types.ts:342-344`
 - The package declares `sideEffects: false` but module-load work performs validation and freezing. Bundlers won't tree-shake despite the code being safe to drop.
 - **Why it matters:** also touches Phase 1 C2's "decompose `documentation-types.ts`" — the side-effectful initialization is one symptom of the mega-module problem.
 - **Fix:** move validation to a test (`tests/features/documentation-types.feature.steps.ts` asserting the registry shape). No code change to runtime behavior.
 
 **F-H2 — `Block` types and `SupportedDocumentationType` derived from literals/interfaces, not `z.infer`'d**
+
 - **File:** `src/blocks/schema.ts` + `documentation-types.ts`
 - Direct Zod-first doctrine inversion. Schema is the canonical definition; hand-written types diverge silently. Phase 1 H1 surfaced this at the registry; this confirms it goes deeper into block schemas.
 - **Why it matters for the campaign:** `extractZodSchemaFields` walks `.shape` of the SCHEMA. If types are inverted, the extractor reads from the wrong source.
 - **Fix:** invert — schemas are canonical, types are `z.infer<typeof X>`.
 
 **F-H3 — Zero `.describe()` across the entire package (P0: 23 fields in 6 schemas)**
+
 - **Files:** `src/projections/documentation-composition/progressive-disclosure.ts`, `disclosure-spec.ts` + the 4 disclosure-related enum schemas
 - The campaign's headline demo (`extractZodSchemaFields('ProgressiveDisclosurePolicySchema')`) renders empty until these descriptions land. One session of work.
 - **Why it matters for the campaign:** campaign cannot ship the demo without this.
@@ -38,17 +41,20 @@ Per user direction, CI/CD findings are summarized but de-emphasized — they're 
 ### Medium-priority
 
 **F-M1 — Convention-only boundaries should become lint-enforced**
+
 - 4 separate findings (F5 + F7 + F8 + F11 in raw): `LogicalRouteId` not branded; renderer reaches into projection registry; `TRUSTED_MARKDOWN` private only by export discipline; `*.internal` not enforced.
 - All four can be encoded as ESLint `no-restricted-imports` / `no-restricted-syntax` rules within the existing flat config.
 - Closes Phase 2 invariant I3 (TRUSTED_MARKDOWN) at lint-time.
 - **Fix:** one PR adding the four rules; minimal risk.
 
 **F-M2 — `MARKDOWN_NORMALIZERS` is `Partial<Record<FragmentKind, …>>`**
+
 - **File:** `src/renderers/render-markdown.ts`
 - Campaign-added normalizers can be silently omitted. Phase 3 T-H1 surfaced the test-side hole; this is the type-side hole.
 - **Fix:** switch to `satisfies CompleteKindTable<FragmentKind, …>` once ContentFragment stabilises. Defer to when the new fragment-kind enum lands.
 
 ### Notable absences (do not need fixing)
+
 - Dev-dep versions uniform across the 5 publishable packages.
 - ESM dist output correct for all 5 sub-entries.
 - No `@ts-ignore` / `eslint-disable` anywhere. Build is clean under strict mode.
@@ -60,25 +66,27 @@ This audit reframed apparent duplication through the campaign's progressive-disc
 
 ### Variation-type taxonomy (new framing this review introduced)
 
-| Variation type | Today | Under campaign | Verdict |
-|---|---|---|---|
-| Depth variation (Summary/Detail) | Two projections | Schema composition + ContentFragment-pair naming | **Keep projections separate; fix schema; name as disclosure pair** |
-| Filter variation (RoadmapTimeline / CompletedMilestones / CurrentWork) | Three projections | Spec-locked dispatch surfaces | Keep — spec coverage locks contracts |
-| Cardinality variation (Rule / RuleSet) | Two projections | Two fragment shapes (set has aggregation) | Keep — structurally distinct |
-| True duplication (same input, same output, twice) | Multiple call sites | Consolidate to one impl | Fix unconditionally |
+| Variation type                                                         | Today               | Under campaign                                   | Verdict                                                            |
+| ---------------------------------------------------------------------- | ------------------- | ------------------------------------------------ | ------------------------------------------------------------------ |
+| Depth variation (Summary/Detail)                                       | Two projections     | Schema composition + ContentFragment-pair naming | **Keep projections separate; fix schema; name as disclosure pair** |
+| Filter variation (RoadmapTimeline / CompletedMilestones / CurrentWork) | Three projections   | Spec-locked dispatch surfaces                    | Keep — spec coverage locks contracts                               |
+| Cardinality variation (Rule / RuleSet)                                 | Two projections     | Two fragment shapes (set has aggregation)        | Keep — structurally distinct                                       |
+| True duplication (same input, same output, twice)                      | Multiple call sites | Consolidate to one impl                          | Fix unconditionally                                                |
 
 The synthesis: the user's intuition that "progressive disclosure means fewer projections" is partially right at the **consumer level** (ContentFragment callers see one named pair, not two arbitrary projections) and wrong at the **producer level** (the two projections stay because feature specs lock them). The schema-composition fix (`.extend()`) and ContentFragment-pair naming together deliver the simplification without breaking specs.
 
 ### Critical findings (safe to act on under no-BC + Phase 3 spec coverage)
 
 **D-C1 — `PatternDetailSchema` re-declares every `PatternSummary` field instead of extending it**
+
 - **Files:** `src/fragments/pattern-relations/pattern-summary.ts`, `pattern-detail.ts`
 - The projection that produces `PatternDetail` literally `...spreads summary` at runtime, proving the subset relationship that the schema fails to express.
-- **Variation type:** depth variation — *the* canonical disclosure-pair candidate.
+- **Variation type:** depth variation — _the_ canonical disclosure-pair candidate.
 - **Why it matters:** this is the ContentFragment proposal's worked example. The campaign will use this pair as the proof case. The schema duplication is the wrong starting point.
 - **Fix:** `PatternDetailSchema = PatternSummarySchema.extend({ additionalFields })`. One line. Then name the pair at the ContentFragment layer above when the campaign lands.
 
 **D-C2 — Two parallel `DeliverableSchema` / `DeliverableManifestSchema` shapes coexist**
+
 - **Files:** `src/fragments/execution-context/deliverable.ts`, `deliverable-manifest.ts` (with `kind` literal) AND `src/fragments/pattern-relations/supporting.ts` (without)
 - Both exported from the package barrel — consumer can't tell which to use.
 - **Variation type:** true duplication.
@@ -86,6 +94,7 @@ The synthesis: the user's intuition that "progressive disclosure means fewer pro
 - **Fix:** consolidate to one canonical definition; remove the duplicate.
 
 **D-C3 — `slugForFilename` byte-identical to `toKebabCase` with a third degraded copy `createSlug`**
+
 - **Files:** `src/_internal/slug.ts` ≡ `src/renderers/render-markdown.ts:2135-2142`; degraded copy in `src/projections/delivery-reporting/index.ts:658-672`
 - Three identical functions across `_internal`, `render-markdown`, `delivery-reporting`.
 - **Variation type:** true duplication.
@@ -95,11 +104,13 @@ The synthesis: the user's intuition that "progressive disclosure means fewer pro
 ### High-priority findings
 
 **D-H1 — 39× identical "As a typed contract..." JSDoc boilerplate**
+
 - This is Phase 3 D-H1's framework-level confirmation: the boilerplate is everywhere, not just the 4 renderer entry points.
 - Elevates to High because the campaign's headline demo is JSDoc-prose extraction.
 - **Fix:** delete the boilerplate from fragment files (a batch sed-equivalent edit); replace with per-fragment one-sentence prose. The dispatcher script can ensure no fragment escapes without prose.
 
 **D-H2 — Renderer-helper duplication in `render-markdown.ts:657-732`**
+
 - The decision-record and decision-catalog normalizers share helpers via copy-paste, not extraction.
 - **Variation type:** related to depth variation (record = single, catalog = set) but the helpers are genuinely duplicated regardless.
 - **Why it matters:** ContentFragment will add similar peer pairs; the helper-extraction pattern needs to be settled first.

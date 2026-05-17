@@ -81,7 +81,7 @@ export declare type PerspectiveViews = Readonly<
  */
 export declare function populatePerspectiveViews(
   patterns: readonly ExtractedPattern[],
-  byName: ReadonlyMap<string, ExtractedPattern>
+  byName: ReadonlyMap<string, ExtractedPattern>,
 ): PerspectiveViews;
 
 // ---------------------------------------------------------------------------
@@ -118,7 +118,7 @@ export declare function isArchitecturalPattern(pattern: ExtractedPattern): boole
  */
 export declare function isImplementable(
   pattern: ExtractedPattern,
-  byName: ReadonlyMap<string, ExtractedPattern>
+  byName: ReadonlyMap<string, ExtractedPattern>,
 ): boolean;
 
 // ---------------------------------------------------------------------------
@@ -140,5 +140,5 @@ export declare function isImplementable(
  */
 export declare function isDepsReady(
   dependsOn: readonly string[] | undefined,
-  byName: ReadonlyMap<string, ExtractedPattern>
+  byName: ReadonlyMap<string, ExtractedPattern>,
 ): boolean;

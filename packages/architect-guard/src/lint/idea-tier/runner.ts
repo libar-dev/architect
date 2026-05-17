@@ -58,7 +58,7 @@ function readFileSafe(filePath: string): string | null {
 // if a future rule emits something other than `warning`.
 function buildSummary(
   violationsByFile: Map<string, LintViolation[]>,
-  filesScanned: number
+  filesScanned: number,
 ): LintSummary {
   const results: LintResult[] = [];
   let errorCount = 0;

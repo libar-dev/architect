@@ -46,7 +46,7 @@ export function resolveSessionsDir(baseDir: string, sessionsDir?: string): strin
  * Find the currently active session, if one exists.
  */
 export async function readActiveSession(
-  config: SessionStateReaderConfig
+  config: SessionStateReaderConfig,
 ): Promise<Result<SessionState | undefined>> {
   const { baseDir } = config;
   const sessionsDir = resolveSessionsDir(baseDir, config.sessionsDir);
@@ -90,7 +90,7 @@ export async function readActiveSession(
  */
 export function isInSessionScope(
   state: Pick<ProcessState, 'activeSession'>,
-  relativePath: string
+  relativePath: string,
 ): boolean {
   if (!state.activeSession) {
     return true;
@@ -111,7 +111,7 @@ export function isInSessionScope(
  */
 export function isSessionExcluded(
   state: Pick<ProcessState, 'activeSession'>,
-  relativePath: string
+  relativePath: string,
 ): boolean {
   if (!state.activeSession) {
     return false;
@@ -129,7 +129,7 @@ export function isSessionExcluded(
 
 async function parseSessionFile(
   filePath: string,
-  baseDir: string
+  baseDir: string,
 ): Promise<Result<SessionState | undefined>> {
   const scanResult = await scanGherkinFiles({
     patterns: [filePath],
@@ -144,8 +144,8 @@ async function parseSessionFile(
     const firstError = scanResult.value.errors[0];
     return R.err(
       new Error(
-        `Failed to parse session file "${filePath}": ${firstError?.error.message ?? 'Unknown parse error'}`
-      )
+        `Failed to parse session file "${filePath}": ${firstError?.error.message ?? 'Unknown parse error'}`,
+      ),
     );
   }
 
@@ -206,7 +206,7 @@ function extractExcludedSpecs(background: GherkinBackground | undefined): readon
 
 function extractDataTableColumnValues(
   background: GherkinBackground | undefined,
-  columnKeys: readonly string[]
+  columnKeys: readonly string[],
 ): readonly string[] {
   if (background === undefined) {
     return [];

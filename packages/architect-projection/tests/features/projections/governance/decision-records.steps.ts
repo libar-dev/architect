@@ -143,7 +143,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ],
           });
         });
-      }
+      },
     );
 
     RuleScenario('Missing decisions surface the available ids', ({ Given, When, Then }) => {

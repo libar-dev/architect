@@ -126,7 +126,7 @@ export function getCLIPath(cliName: string): string {
 export async function runCLI(
   cliName: string,
   args: string[],
-  options: CLIOptions = {}
+  options: CLIOptions = {},
 ): Promise<CLIResult> {
   const {
     cwd = process.cwd(),
@@ -264,7 +264,7 @@ export function parseCommand(commandString: string): { command: string; args: st
  */
 export async function runCommand(
   commandString: string,
-  options: CLIOptions = {}
+  options: CLIOptions = {},
 ): Promise<CLIResult> {
   const { command, args } = parseCommand(commandString);
   return runCLI(command, args, options);

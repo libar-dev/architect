@@ -87,11 +87,11 @@ A single parameterized MCP tool that invokes any registered documentation projec
 returns a `RenderableDocument`. The CLI counterpart is
 `pnpm architect:query documentation <document-type> [--disclosure <level>] [--filter <status=csv>]…`.
 
-| Parameter      | Type   | Required | Description                                                                                          |
-| -------------- | ------ | -------- | ---------------------------------------------------------------------------------------------------- |
-| `documentType` | string | MUST     | Document type key from `DOCUMENT_TYPES` (e.g., `"patterns"`, `"architecture"`, `"business-rules"`)   |
-| `disclosure`   | string | MAY      | Progressive disclosure level supported by the projection (e.g., `"summary"`, `"standard"`)           |
-| `filter`       | object | MAY      | Projection-specific filters (e.g., `{ status: "active,completed" }`)                                 |
+| Parameter      | Type   | Required | Description                                                                                        |
+| -------------- | ------ | -------- | -------------------------------------------------------------------------------------------------- |
+| `documentType` | string | MUST     | Document type key from `DOCUMENT_TYPES` (e.g., `"patterns"`, `"architecture"`, `"business-rules"`) |
+| `disclosure`   | string | MAY      | Progressive disclosure level supported by the projection (e.g., `"summary"`, `"standard"`)         |
+| `filter`       | object | MAY      | Projection-specific filters (e.g., `{ status: "active,completed" }`)                               |
 
 **Response:** the typed `RenderableDocument` envelope described in
 "RenderableDocument as API Response Format" below, augmented with cache/metadata

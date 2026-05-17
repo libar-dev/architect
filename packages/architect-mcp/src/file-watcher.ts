@@ -109,11 +109,11 @@ export class McpFileWatcher {
     try {
       const session = await this.options.sessionManager.rebuild();
       this.options.log(
-        `Rebuilt dataset in ${String(session.buildTimeMs)}ms with ${String(session.dataset.counts.total)} patterns.`
+        `Rebuilt dataset in ${String(session.buildTimeMs)}ms with ${String(session.dataset.counts.total)} patterns.`,
       );
     } catch (error) {
       this.options.log(
-        `Rebuild failed; previous dataset remains active: ${error instanceof Error ? error.message : String(error)}`
+        `Rebuild failed; previous dataset remains active: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }

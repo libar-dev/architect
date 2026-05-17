@@ -13,26 +13,32 @@ The audit identified **2 low-severity defense-in-depth gaps** and **5 trust-boun
 **Severity:** Low (defense-in-depth)
 **File:** `src/renderers/render-markdown.ts:1700-1702`
 
-```ts
+`````ts
 case 'code': {
   const fence = block.content.includes('```') ? '````' : '```';
   return [`${fence}${block.language ?? ''}`, block.content, fence, ''];
 }
-```
+`````
 
 The renderer escalates to a 4-backtick fence only when content contains ` ``` ` (3 backticks). If `content` contains ` ```` ` (4 backticks), the closing fence matches the embedded sequence and downstream text is parsed as markdown.
 
 **Reproduction:**
-```ts
-code('````\nMALICIOUS <script>alert(1)</script>\n````', 'js')
-```
+
+`````ts
+code('````\nMALICIOUS <script>alert(1)</script>\n````', 'js');
+`````
+
 emits:
-````
+
+`````
 ````js
-````
+`````
+
 MALICIOUS <script>alert(1)</script>
-````
-````
+
+```
+
+```
 
 Renderers interpreting this with a permissive markdown parser may treat `MALICIOUS …` as raw markdown / inline HTML.
 
@@ -41,6 +47,7 @@ Renderers interpreting this with a permissive markdown parser may treat `MALICIO
 **Why it matters for the doc-gen campaign:** ContentFragment proposal routes hand-authored markdown (preambles) through the projection layer. If preamble parsing emits `code` blocks whose content originated from less-trusted sources (e.g., `_claude-md/` includes), the dormant path activates. The fix is to compute the required fence length dynamically.
 
 **Fix:**
+
 ```ts
 function pickFence(content: string): string {
   const longestRun = (content.match(/`{3,}/g) ?? [])
@@ -74,6 +81,7 @@ The mermaid branch at line 1704 has the same bug at `\`\`\`` (3 backticks) witho
 **Why it matters for the doc-gen campaign:** any new caller that lets external text reach `code(content, language)` reopens this. The shape constraint belongs in the schema, not in caller discipline.
 
 **Fix:**
+
 ```ts
 language: z
   .string()
@@ -95,7 +103,7 @@ The following are not bugs — they are load-bearing properties of the current d
 Every `link-out` → markdown link path is funneled through `toMarkdownLink` → `sanitizeMarkdownLinkTarget`. The sanitizer:
 
 - Trims and rejects empty / `//`-prefixed targets
-- Decodes HTML entities (`&#x3a;`, `&colon;`, `&NewLine;`, etc.) *before* scheme classification — defeats entity-encoded `javascript:` payloads
+- Decodes HTML entities (`&#x3a;`, `&colon;`, `&NewLine;`, etc.) _before_ scheme classification — defeats entity-encoded `javascript:` payloads
 - Rejects control characters (U+0000–U+001F, U+007F) including tab, LF, CR after decoding
 - Scheme allowlist: `http`, `https`, `mailto` only — everything else (`javascript:`, `data:`, `vbscript:`, `file:`) is rejected
 - `encodeURI` + paren-escaping the accepted target

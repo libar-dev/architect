@@ -60,7 +60,7 @@ export interface ParseDirectivesResult {
 
 function extractSingleValue(commentText: string, fullTag: string): string | undefined {
   const regex = getCachedRegex(
-    `(?:^|\\n)\\s*\\*?\\s*${escapeRegex(fullTag)}(?:\\s*:\\s*|\\s+)(.+?)(?=\\s+@[A-Za-z][\\w-]*|\\n|\\*|$)`
+    `(?:^|\\n)\\s*\\*?\\s*${escapeRegex(fullTag)}(?:\\s*:\\s*|\\s+)(.+?)(?=\\s+@[A-Za-z][\\w-]*|\\n|\\*|$)`,
   );
   return regex.exec(commentText)?.[1]?.trim();
 }
@@ -68,7 +68,7 @@ function extractSingleValue(commentText: string, fullTag: string): string | unde
 function extractEnumValue(
   commentText: string,
   fullTag: string,
-  validValues: string[]
+  validValues: string[],
 ): string | undefined {
   const valuesPattern = validValues.join('|');
   const regex = getCachedRegex(`${escapeRegex(fullTag)}(?:\\s*:\\s*|\\s+)(${valuesPattern})`);
@@ -78,7 +78,7 @@ function extractEnumValue(
 function extractQuotedValue(commentText: string, fullTag: string): string[] {
   const regex = getCachedRegex(
     `${escapeRegex(fullTag)}(?:\\s*:\\s*|\\s+)(?:"([^"]+)"|([^\\n*]+?)(?=\\s+@[A-Za-z][\\w-]*|\\n|\\*|$))`,
-    'g'
+    'g',
   );
   const values: string[] = [];
   for (let match = regex.exec(commentText); match !== null; match = regex.exec(commentText)) {
@@ -147,7 +147,7 @@ function buildValueTakingTagsPattern(registry: TagRegistry): string {
 function extractMetadataTag(
   commentText: string,
   tagDef: MetadataTagDefinition,
-  prefix: string
+  prefix: string,
 ): unknown {
   const fullTag = `${prefix}${tagDef.tag}`;
   switch (tagDef.format) {
@@ -173,7 +173,7 @@ function extractMetadataTag(
 export function parseFileDirectives(
   content: string,
   filePath: string,
-  registry?: TagRegistry
+  registry?: TagRegistry,
 ): Result<ParseDirectivesResult, FileParseError> {
   const effectiveRegistry = registry ?? createDefaultTagRegistry();
   let ast: TSESTree.Program;
@@ -186,7 +186,7 @@ export function parseFileDirectives(
         ? { line: tsError.lineNumber, column: tsError.column }
         : undefined;
     return Result.err(
-      createFileParseError(filePath, tsError.message || 'Unknown parse error', location, error)
+      createFileParseError(filePath, tsError.message || 'Unknown parse error', location, error),
     );
   }
 
@@ -226,7 +226,7 @@ function parseDirective(
   commentText: string,
   loc: TSESTree.SourceLocation,
   filePath: string,
-  registry: TagRegistry
+  registry: TagRegistry,
 ): Result<DocDirective, DirectiveValidationError> {
   const lines = commentText.split('\n').map((line) => line.trim().replace(/^\*\s?/, ''));
   const patterns = buildDirectivePatterns(registry);
@@ -394,8 +394,8 @@ function parseDirective(
         filePath,
         loc.start.line,
         `Invalid directive structure: ${reason}`,
-        commentText.substring(0, 100)
-      )
+        commentText.substring(0, 100),
+      ),
     );
   }
 
@@ -405,7 +405,7 @@ function parseDirective(
 function extractCodeBlockAfterComment(
   content: string,
   ast: TSESTree.Program,
-  comment: TSESTree.Comment
+  comment: TSESTree.Comment,
 ): { code: string; startLine: number; endLine: number } | null {
   const nextNode = findNextNodeAfterPosition(ast, comment.range[1]);
   if (!nextNode) return null;
@@ -431,7 +431,7 @@ function findNextNodeAfterPosition(ast: TSESTree.Program, position: number): TSE
 function extractExportsFromBlock(
   ast: TSESTree.Program,
   block: { code: string; startLine: number; endLine: number },
-  sourceCode: string
+  sourceCode: string,
 ): readonly ExportInfo[] {
   const exports: ExportInfo[] = [];
 
@@ -460,7 +460,7 @@ function extractExportsFromBlock(
 
 function buildFunctionSignature(
   declaration: TSESTree.FunctionDeclaration,
-  sourceCode: string
+  sourceCode: string,
 ): string {
   const beforeBody = sourceCode.slice(declaration.range[0], declaration.body.range[0]);
   const withoutExport = beforeBody.startsWith('export ')
@@ -521,13 +521,13 @@ function getExportType(declaration: TSESTree.Node): ExportInfo['type'] {
 
 function extractWhenToUse(
   commentText: string,
-  fileOptInTag: string
+  fileOptInTag: string,
 ): readonly string[] | undefined {
   const cleanedLines = commentText.split('\n').map((line) =>
     line
       .trim()
       .replace(/^\*\s?/, '')
-      .trim()
+      .trim(),
   );
   const cleanedText = cleanedLines.join('\n');
 

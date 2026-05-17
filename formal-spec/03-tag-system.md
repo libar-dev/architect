@@ -92,14 +92,14 @@ In TypeScript files, tags appear within JSDoc blocks with a space separator for 
 
 Each tag has a defined format type that determines how its value is parsed:
 
-| Format Type    | Description                        | Syntax (Gherkin)  | Syntax (JSDoc)    | Example                             |
-| -------------- | ---------------------------------- | ----------------- | ----------------- | ----------------------------------- |
-| `value`        | Free-form string                   | `@tag:MyValue`    | `@tag MyValue`    | `@architect-pattern:UserService`    |
-| `enum`         | One of a fixed set of values       | `@tag:active`     | `@tag active`     | `@architect-status:active`          |
-| `csv`          | Comma-separated list of values     | `@tag:A,B,C`      | `@tag A, B, C`    | `@architect-uses:Auth,Tokens`       |
-| `number`       | Numeric value                      | `@tag:3`          | `@tag 3`          | `@architect-phase:2`                |
-| `quoted-value` | String value (may contain spaces)  | `@tag:"My Value"` | `@tag "My Value"` | (rare, used internally)             |
-| `flag`         | Boolean presence (no value needed) | `@tag`            | `@tag`            | `@architect` (the gate tag)         |
+| Format Type    | Description                        | Syntax (Gherkin)  | Syntax (JSDoc)    | Example                          |
+| -------------- | ---------------------------------- | ----------------- | ----------------- | -------------------------------- |
+| `value`        | Free-form string                   | `@tag:MyValue`    | `@tag MyValue`    | `@architect-pattern:UserService` |
+| `enum`         | One of a fixed set of values       | `@tag:active`     | `@tag active`     | `@architect-status:active`       |
+| `csv`          | Comma-separated list of values     | `@tag:A,B,C`      | `@tag A, B, C`    | `@architect-uses:Auth,Tokens`    |
+| `number`       | Numeric value                      | `@tag:3`          | `@tag 3`          | `@architect-phase:2`             |
+| `quoted-value` | String value (may contain spaces)  | `@tag:"My Value"` | `@tag "My Value"` | (rare, used internally)          |
+| `flag`         | Boolean presence (no value needed) | `@tag`            | `@tag`            | `@architect` (the gate tag)      |
 
 **Validation rules:**
 
@@ -176,15 +176,15 @@ Candidate specs (`@architect-status:candidate`) have reduced tag requirements:
 
 Accepted specs (`@architect-status:roadmap` or later) require the full tag set:
 
-| Tag                          | Required | Notes                     |
-| ---------------------------- | -------- | ------------------------- |
-| `@architect-product-area`    | MUST     | Product area              |
-| `@architect-bounded-context` | MUST     | Architecture grouping     |
-| `@architect-arch-layer`      | MUST     | Architecture layer        |
-| `@architect-role`            | MUST     | Canonical role            |
-| `@architect-uses`            | SHOULD   | If dependencies exist     |
-| `@architect-see-also`        | SHOULD   | If related patterns exist |
-| `@architect-level`           | SHOULD   | Hierarchy level (when meaningful) |
+| Tag                          | Required | Notes                              |
+| ---------------------------- | -------- | ---------------------------------- |
+| `@architect-product-area`    | MUST     | Product area                       |
+| `@architect-bounded-context` | MUST     | Architecture grouping              |
+| `@architect-arch-layer`      | MUST     | Architecture layer                 |
+| `@architect-role`            | MUST     | Canonical role                     |
+| `@architect-uses`            | SHOULD   | If dependencies exist              |
+| `@architect-see-also`        | SHOULD   | If related patterns exist          |
+| `@architect-level`           | SHOULD   | Hierarchy level (when meaningful)  |
 | `@architect-parent`          | SHOULD   | Hierarchy parent (when applicable) |
 
 ### Level 2 (Standard) — ADRs
@@ -209,9 +209,9 @@ Accepted specs (`@architect-status:roadmap` or later) require the full tag set:
 
 ### Level 2 (Standard) — Release Manifests
 
-| Tag                       | Required | Notes              |
-| ------------------------- | -------- | ------------------ |
-| `@architect-product-area` | MUST     | Product area       |
+| Tag                       | Required | Notes        |
+| ------------------------- | -------- | ------------ |
+| `@architect-product-area` | MUST     | Product area |
 
 > _Informative:_ Earlier drafts of this spec listed `@architect-release` as the version
 > identifier on release manifests. That tag is not part of the v0.2.0 canonical taxonomy;

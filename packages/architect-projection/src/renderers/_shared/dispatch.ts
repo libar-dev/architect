@@ -21,7 +21,7 @@ export function dispatchByKind<Out, Options>(
   fragment: Fragment,
   table: KindTable<Out, Options>,
   fallback: (fragment: Fragment, options: Options) => Out,
-  options: Options
+  options: Options,
 ): Out {
   const fn = table[fragment.kind];
   return fn

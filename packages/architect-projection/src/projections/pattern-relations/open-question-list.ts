@@ -26,14 +26,14 @@ export type { OpenQuestionListOptions };
 
 export function projectOpenQuestionList(
   context: ProjectionContext,
-  options: OpenQuestionListOptions = {}
+  options: OpenQuestionListOptions = {},
 ): ProjectionBundle<OpenQuestionList> {
   return projectSingle(buildOpenQuestionList(context, options));
 }
 
 export function parseAndProjectOpenQuestionList(
   context: ProjectionContext,
-  rawOptions: unknown = {}
+  rawOptions: unknown = {},
 ): ProjectionBundle<OpenQuestionList> {
   return projectOpenQuestionList(context, OpenQuestionListOptionsSchema.parse(rawOptions));
 }

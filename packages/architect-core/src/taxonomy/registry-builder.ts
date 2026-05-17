@@ -44,7 +44,7 @@ export interface RegisteredRoleValue {
 }
 
 export function buildRegisteredRoleValues(
-  roles: readonly RoleDefinition[]
+  roles: readonly RoleDefinition[],
 ): readonly RegisteredRoleValue[] {
   const registeredByTag = new Map<string, RegisteredRoleValue>();
 
@@ -90,7 +90,7 @@ const stripQuotes = (value: string): string => value.replace(/^["']|["']$/g, '')
 
 export function registerUnifiedRoleTaxonomy(
   registry: MutableTagRegistry,
-  roles: readonly RoleDefinition[]
+  roles: readonly RoleDefinition[],
 ): void {
   const registeredRoles = buildRegisteredRoleValues(roles);
 
@@ -104,7 +104,7 @@ export function registerUnifiedRoleTaxonomy(
         'context',
         'layer',
         BOUNDED_CONTEXT_TAG,
-      ].includes(tag.tag)
+      ].includes(tag.tag),
   );
 
   const exampleRoleValue = roles[0]?.tag ?? 'service';

@@ -16,7 +16,7 @@ interface PatternBundleState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/pattern-relations/pattern-bundle.feature'
+  'tests/features/projections/pattern-relations/pattern-bundle.feature',
 );
 
 let state: PatternBundleState | null = null;
@@ -134,9 +134,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 openQuestions: ['What beta rollout signal is durable?'],
               },
             });
-          }
+          },
         );
-      }
+      },
     );
 
     RuleScenario('mode defaults populate implement includes', ({ Given, When, Then, And }) => {
@@ -152,7 +152,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             mode: 'implement',
             estimateTokens: true,
           });
-        }
+        },
       );
 
       Then('the bundle root should use the implement default includes', () => {
@@ -169,13 +169,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.bundle?.root.bundleTokenEstimate?.method).toBe('char/4');
         expect(state!.bundle?.root.tokenEstimate?.method).toBe('char/4');
         for (const child of Object.values(
-          (state!.bundle?.children ?? {}) as Record<string, PatternBundleEntry>
+          (state!.bundle?.children ?? {}) as Record<string, PatternBundleEntry>,
         )) {
           expect(child.tokenEstimate?.method).toBe('char/4');
           expect(
             child.blockTokenEstimates?.every(
-              (entry: { estimate: { method?: string } }) => entry.estimate.method === 'char/4'
-            )
+              (entry: { estimate: { method?: string } }) => entry.estimate.method === 'char/4',
+            ),
           ).toBe(true);
         }
       });
@@ -202,9 +202,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         () => {
           expect(state!.caughtError).toBeInstanceOf(Error);
           expect((state!.caughtError as Error).message).toContain(
-            'Pattern not found: "UnknownParent"'
+            'Pattern not found: "UnknownParent"',
           );
-        }
+        },
       );
     });
   });

@@ -8,7 +8,7 @@
  * ### When to Use
  *
  * - Defines the PhaseProgress fragment shape for one phase's delivery totals
-*   and completion rate.
+ *   and completion rate.
  */
 import { z } from 'zod';
 

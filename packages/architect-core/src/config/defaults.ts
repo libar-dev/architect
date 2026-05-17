@@ -7,7 +7,7 @@ export const DEFAULT_FILE_OPT_IN_TAG = '@architect';
 
 export const DEFAULT_REGEX_BUILDERS: RegexBuilders = createRegexBuilders(
   DEFAULT_TAG_PREFIX,
-  DEFAULT_FILE_OPT_IN_TAG
+  DEFAULT_FILE_OPT_IN_TAG,
 );
 
 export const DEFAULT_OUTPUT_DIRECTORY = 'docs-generated';

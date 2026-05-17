@@ -27,7 +27,7 @@ export function printGlobalHelp(stream: NodeJS.WriteStream = process.stdout): vo
       optionLines +
       '\n' +
       'Agent environments: load the `architect-data-api` skill for verb shapes,\n' +
-      'deterministic gates, JSON shapes, and known quirks.\n'
+      'deterministic gates, JSON shapes, and known quirks.\n',
   );
 }
 
@@ -39,7 +39,7 @@ export function printCommandHelp(command: string): void {
   // everything else falls back to the generic message.
   if (def?.usage === undefined) {
     process.stdout.write(
-      `No detailed help for subcommand "${command}". See --help for global usage.\n`
+      `No detailed help for subcommand "${command}". See --help for global usage.\n`,
     );
     return;
   }
@@ -68,6 +68,6 @@ export function printVersion(): void {
 
 export function printReplHelp(): void {
   process.stdout.write(
-    'Available commands: status, list, context, dep-tree, files, scope-validate, handoff, reload, help, quit\n'
+    'Available commands: status, list, context, dep-tree, files, scope-validate, handoff, reload, help, quit\n',
   );
 }

@@ -235,7 +235,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(getResult().stdout).toContain(row.text);
           }
         });
-      }
+      },
     );
   });
 
@@ -249,7 +249,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a TypeScript file {string} with pattern annotations',
         async (_ctx: unknown, relativePath: string) => {
           await writeTempFile(getTempDir(), relativePath, createPatternFile());
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -265,7 +265,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         async (_ctx: unknown, relativePath: string) => {
           const exists = await fileExists(getTempDir(), relativePath);
           expect(exists).toBe(true);
-        }
+        },
       );
     });
 
@@ -276,7 +276,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'a TypeScript file {string} with pattern annotations',
           async (_ctx: unknown, relativePath: string) => {
             await writeTempFile(getTempDir(), relativePath, createPatternFile());
-          }
+          },
         );
 
         When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -292,7 +292,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           async (_ctx: unknown, relativePath: string) => {
             const exists = await fileExists(getTempDir(), relativePath);
             expect(exists).toBe(true);
-          }
+          },
         );
 
         And(
@@ -304,9 +304,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             };
 
             expect(manifest.generators?.[generatorName]?.rootPath).toBe(rootPath);
-          }
+          },
         );
-      }
+      },
     );
 
     RuleScenario(
@@ -316,7 +316,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'a TypeScript file {string} with pattern annotations',
           async (_ctx: unknown, relativePath: string) => {
             await writeTempFile(getTempDir(), relativePath, createPatternFile());
-          }
+          },
         );
 
         When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -330,7 +330,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('stdout contains {string}', (_ctx: unknown, text: string) => {
           expect(getResult().stdout).toContain(text);
         });
-      }
+      },
     );
 
     RuleScenario('Generate docs with disclosure override', ({ Given, When, Then, And }) => {
@@ -338,7 +338,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a TypeScript file {string} with pattern annotations',
         async (_ctx: unknown, relativePath: string) => {
           await writeTempFile(getTempDir(), relativePath, createPatternFile());
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -354,7 +354,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         async (_ctx: unknown, relativePath: string) => {
           const exists = await fileExists(getTempDir(), relativePath);
           expect(exists).toBe(true);
-        }
+        },
       );
     });
 
@@ -363,14 +363,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a TypeScript file {string} with completed pattern annotations',
         async (_ctx: unknown, relativePath: string) => {
           await writeTempFile(getTempDir(), relativePath, createCompletedPatternFile());
-        }
+        },
       );
 
       And(
         'a TypeScript file {string} with active pattern annotations',
         async (_ctx: unknown, relativePath: string) => {
           await writeTempFile(getTempDir(), relativePath, createActivePatternFile());
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -386,7 +386,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         async (_ctx: unknown, relativePath: string, text: string) => {
           const content = await readFile(`${getTempDir()}/${relativePath}`, 'utf8');
           expect(content).toContain(text);
-        }
+        },
       );
 
       And(
@@ -394,7 +394,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         async (_ctx: unknown, relativePath: string, text: string) => {
           const content = await readFile(`${getTempDir()}/${relativePath}`, 'utf8');
           expect(content).not.toContain(text);
-        }
+        },
       );
     });
 
@@ -408,14 +408,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a TypeScript file {string} with completed pattern annotations',
         async (_ctx: unknown, relativePath: string) => {
           await writeTempFile(getTempDir(), relativePath, createCompletedPatternFile());
-        }
+        },
       );
 
       And(
         'a TypeScript file {string} with active pattern annotations',
         async (_ctx: unknown, relativePath: string) => {
           await writeTempFile(getTempDir(), relativePath, createActivePatternFile());
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -431,7 +431,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         async (_ctx: unknown, relativePath: string, text: string) => {
           const content = await readFile(`${getTempDir()}/${relativePath}`, 'utf8');
           expect(content).toContain(text);
-        }
+        },
       );
 
       And(
@@ -439,7 +439,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         async (_ctx: unknown, relativePath: string, text: string) => {
           const content = await readFile(`${getTempDir()}/${relativePath}`, 'utf8');
           expect(content).toContain(text);
-        }
+        },
       );
     });
   });

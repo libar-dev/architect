@@ -78,7 +78,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         'I extract a Gherkin feature with header tag "uses:pkg:CandidateExtraction, studio:PatternBrowserView"',
         () => {
           runExtraction('uses:pkg:CandidateExtraction, studio:PatternBrowserView');
-        }
+        },
       );
 
       Then(
@@ -89,7 +89,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             'pkg:CandidateExtraction',
             'studio:PatternBrowserView',
           ]);
-        }
+        },
       );
     });
   });
@@ -102,7 +102,7 @@ describeFeature(feature, ({ Background, Rule }) => {
           'I extract a Gherkin feature with header tag "bounded-context:delivery-reporting"',
           () => {
             runExtraction('bounded-context:delivery-reporting');
-          }
+          },
         );
 
         Then('the extracted pattern\'s boundedContext equals "delivery-reporting"', () => {
@@ -110,7 +110,7 @@ describeFeature(feature, ({ Background, Rule }) => {
           expect(state.pattern?.boundedContext).toBe('delivery-reporting');
         });
       });
-    }
+    },
   );
 
   Rule('level (enum) propagates to ExtractedPattern.level', ({ RuleScenario }) => {

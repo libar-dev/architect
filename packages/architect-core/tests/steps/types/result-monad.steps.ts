@@ -94,7 +94,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           const row = table[0]!;
           const obj = { name: row['name']!, count: parseInt(row['count']!) };
           state!.result = Result.ok(obj);
-        }
+        },
       );
 
       Then('the result should be ok', () => {
@@ -274,7 +274,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         (_ctx: unknown, expectedMessage: string) => {
           expect(state!.unwrapError).toBeInstanceOf(Error);
           expect(state!.unwrapError!.message).toBe(expectedMessage);
-        }
+        },
       );
     });
 
@@ -301,9 +301,9 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           'the thrown error message should contain {string}',
           (_ctx: unknown, substring: string) => {
             expect(state!.unwrapError!.message).toContain(substring);
-          }
+          },
         );
-      }
+      },
     );
 
     RuleScenario(
@@ -332,9 +332,9 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             for (const row of table) {
               expect(state!.unwrapError!.message).toContain(row['substring']!);
             }
-          }
+          },
         );
-      }
+      },
     );
   });
 
@@ -379,7 +379,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
       When('I call unwrapOr with default {int}', (_ctx: unknown, defaultValue: number) => {
         state!.unwrapOrValue = Result.unwrapOr(
           state!.result! as ResultType<number, Error>,
-          defaultValue
+          defaultValue,
         );
       });
 
@@ -402,7 +402,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
       When('I map the result with a function that doubles the value', () => {
         state!.mappedResult = Result.map(
           state!.result! as ResultType<number, unknown>,
-          (v) => v * 2
+          (v) => v * 2,
         );
       });
 
@@ -441,7 +441,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
 
       When('I map with uppercase then map with length', () => {
         const step1 = Result.map(state!.result! as ResultType<string, unknown>, (s) =>
-          s.toUpperCase()
+          s.toUpperCase(),
         );
         state!.mappedResult = Result.map(step1, (s) => s.length);
       });
@@ -469,7 +469,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
       When('I mapErr the result to prefix with {string}', (_ctx: unknown, prefix: string) => {
         state!.mappedResult = Result.mapErr(
           state!.result! as ResultType<unknown, string>,
-          (e) => prefix + e
+          (e) => prefix + e,
         );
       });
 
@@ -490,7 +490,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
       When('I mapErr the result to prefix with {string}', (_ctx: unknown, prefix: string) => {
         state!.mappedResult = Result.mapErr(
           state!.result! as ResultType<string, string>,
-          (e) => prefix + e
+          (e) => prefix + e,
         );
       });
 

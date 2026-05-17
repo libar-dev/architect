@@ -17,7 +17,7 @@
  * ### When to Use
  *
  * - Projects the registry-driven documentation bundle for the retained
-*   document types.
+ *   document types.
  */
 import type { ProjectionContext } from '../../context/projection-context.js';
 import type { ProjectionBundle } from '../../fragments/base.js';
@@ -34,7 +34,7 @@ export { ProjectDocumentationBundleOptionsSchema } from './documentation-bundle.
 
 export function projectDocumentationBundle(
   context: ProjectionContext,
-  options: ProjectDocumentationBundleOptions
+  options: ProjectDocumentationBundleOptions,
 ): ProjectionBundle<Fragment> {
   return projectDocumentationBundleInternal(context, options);
 }
@@ -42,7 +42,7 @@ export function projectDocumentationBundle(
 export const parseAndProjectDocumentationBundle = parseAndProject(
   RawProjectDocumentationBundleOptionsSchema,
   projectDocumentationBundleInternal,
-  'parseAndProjectDocumentationBundle'
+  'parseAndProjectDocumentationBundle',
 );
 
 export type { ProjectDocumentationBundleOptions } from './documentation-bundle.internal.js';

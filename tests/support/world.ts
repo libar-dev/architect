@@ -61,7 +61,7 @@ export function getRequiredTableRow(rows: readonly DataTableRow[], index = 0): D
  */
 export function getRequiredExampleValue(
   examples: Readonly<Record<string, unknown>>,
-  field: string
+  field: string,
 ): string {
   const value = examples[field];
   if (typeof value !== 'string') {
@@ -84,14 +84,14 @@ export function compactDefined<T>(values: readonly (T | null | undefined)[]): T[
  *   | name  | Test  |
  */
 export function tableRowsToObject(
-  rows: Array<{ field: string; value: string }>
+  rows: Array<{ field: string; value: string }>,
 ): Record<string, string> {
   return rows.reduce(
     (acc, row) => {
       acc[row.field] = row.value;
       return acc;
     },
-    {} as Record<string, string>
+    {} as Record<string, string>,
   );
 }
 

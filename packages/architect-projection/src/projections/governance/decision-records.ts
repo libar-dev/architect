@@ -36,13 +36,13 @@ import { buildDecisionCatalog, buildDecisionRecord } from './decision-records.in
 
 export function projectDecisionRecord(
   context: ProjectionContext,
-  id: string
+  id: string,
 ): ProjectionBundle<DecisionRecord> {
   return projectSingle(buildDecisionRecord(context, id));
 }
 
 export function projectDecisionCatalog(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<DecisionCatalog> {
   return buildDecisionCatalog(context);
 }

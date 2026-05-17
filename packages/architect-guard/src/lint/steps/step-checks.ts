@@ -34,7 +34,7 @@ const PHRASE_IN_STEP = /(?:Given|When|Then|And|But)\s*\(\s*['"][^'"]*\{phrase\}[
  */
 export function checkRegexStepPatterns(
   content: string,
-  filePath: string
+  filePath: string,
 ): readonly LintViolation[] {
   const violations: LintViolation[] = [];
   const lines = content.split('\n');
@@ -119,7 +119,7 @@ const STEP_REGISTRATION = /^\s*(Given|When|Then|And|But)\s*\(\s*(['"])(.*?)\2/;
  */
 export function checkRepeatedStepPattern(
   content: string,
-  filePath: string
+  filePath: string,
 ): readonly LintViolation[] {
   const violations: LintViolation[] = [];
   const lines = content.split('\n');

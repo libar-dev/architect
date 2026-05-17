@@ -56,7 +56,7 @@ describeFeature(feature, ({ Rule }) => {
             expect(state!.error).not.toBeNull();
             expect(state!.error?.message).toContain(expected);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -71,7 +71,7 @@ describeFeature(feature, ({ Rule }) => {
             expect(state!.error).not.toBeNull();
             expect(state!.error?.message).toContain(expected);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -86,8 +86,8 @@ describeFeature(feature, ({ Rule }) => {
             expect(state!.error).not.toBeNull();
             expect(state!.error?.message).toContain(expected);
           });
-        }
+        },
       );
-    }
+    },
   );
 });

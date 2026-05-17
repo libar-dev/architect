@@ -18,7 +18,7 @@ export const PositionSchema = z
 export type Position = z.output<typeof PositionSchema>;
 
 export const createDirectiveTagSchema = (
-  tagPrefix: string
+  tagPrefix: string,
 ): z.ZodPipe<z.ZodString, z.ZodTransform<DirectiveTag, string>> =>
   z
     .string()

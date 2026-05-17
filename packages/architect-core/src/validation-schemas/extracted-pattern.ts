@@ -41,7 +41,7 @@ const SourceFilePathSchema = z
     {
       message:
         'Source file must be a TypeScript file (.ts) or Gherkin feature file (.feature or .feature.md)',
-    }
+    },
   )
   .transform((path) => asSourceFilePath(path));
 

@@ -8,7 +8,7 @@
  * ### When to Use
  *
  * - Defines the ArchitectureDiagram fragment shape for scoped Mermaid diagrams
-*   and pattern lists.
+ *   and pattern lists.
  */
 import { z } from 'zod';
 

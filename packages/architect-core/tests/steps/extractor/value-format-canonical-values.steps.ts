@@ -90,7 +90,7 @@ describeFeature(feature, ({ Background, Rule }) => {
               repeatable: false,
               values: ['Alpha', 'Beta'],
             });
-          }
+          },
         );
 
         When('I extract a feature using "@architect-test-area:Gamma"', () => {
@@ -103,17 +103,17 @@ describeFeature(feature, ({ Background, Rule }) => {
             const match = state.diagnostics.find(
               (d) =>
                 d.code === 'invalid-enum-value' &&
-                d.message.includes("Unrecognized value 'Gamma' for @architect-test-area")
+                d.message.includes("Unrecognized value 'Gamma' for @architect-test-area"),
             );
             expect(match).toBeDefined();
-          }
+          },
         );
 
         And('the diagnostic lists valid values "Alpha, Beta"', () => {
           const match = state.diagnostics.find((d) => d.code === 'invalid-enum-value');
           expect(match?.suggestion).toContain('Alpha, Beta');
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -130,7 +130,7 @@ describeFeature(feature, ({ Background, Rule }) => {
               repeatable: false,
               values: ['Alpha', 'Beta'],
             });
-          }
+          },
         );
 
         When('I extract a feature using "@architect-test-area:Alpha"', () => {
@@ -139,7 +139,7 @@ describeFeature(feature, ({ Background, Rule }) => {
 
         Then('no "invalid-enum-value" diagnostic is emitted', () => {
           const match = state.diagnostics.find(
-            (d) => d.code === 'invalid-enum-value' && d.message.includes('@architect-test-area')
+            (d) => d.code === 'invalid-enum-value' && d.message.includes('@architect-test-area'),
           );
           expect(match).toBeUndefined();
         });
@@ -147,7 +147,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         And('the metadata records test-area as "Alpha"', () => {
           expect(state.metadata?.['testArea']).toBe('Alpha');
         });
-      }
+      },
     );
   });
 });

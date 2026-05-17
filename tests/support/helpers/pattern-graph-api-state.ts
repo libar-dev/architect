@@ -54,7 +54,7 @@ export function getResult(state: CLITestState | null): CLIResult {
 export async function runCLICommand(
   state: CLITestState | null,
   commandString: string,
-  options: { timeout?: number } = {}
+  options: { timeout?: number } = {},
 ): Promise<void> {
   const s = getState(state);
   s.result = await runCommand(commandString, {
@@ -440,7 +440,7 @@ export async function writeBlockedPatternFiles(state: CLITestState | null): Prom
 }
 
 export async function writeCandidateAndDeliveryPatternFiles(
-  state: CLITestState | null
+  state: CLITestState | null,
 ): Promise<void> {
   const dir = getTempDir(state);
   for (const file of createCandidateAndDeliveryPatternFiles()) {
@@ -469,7 +469,7 @@ export async function writeFeatureFilesWithRules(state: CLITestState | null): Pr
       '  ],',
       '};',
       '',
-    ].join('\n')
+    ].join('\n'),
   );
   for (const file of createFeatureFilesWithRules()) {
     await writeTempFile(dir, file.path, file.content);
@@ -488,7 +488,7 @@ export async function writeParentHierarchyFeatureFiles(state: CLITestState | nul
       '  ],',
       '};',
       '',
-    ].join('\n')
+    ].join('\n'),
   );
   for (const file of createPatternFiles()) {
     await writeTempFile(dir, file.path, file.content);

@@ -12,7 +12,7 @@ export function requireFirstPositional(
   context: CommandRuntimeContext,
   positional: readonly string[],
   usage: string,
-  replUsage = usage
+  replUsage = usage,
 ): string | undefined {
   const value = positional[0];
   if (value !== undefined) {

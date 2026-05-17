@@ -93,7 +93,7 @@ const NUMERIC_BASE_COLLATOR = new Intl.Collator(undefined, {
 export function buildBusinessRule(
   context: ProjectionContext,
   feature: string,
-  ruleName: string
+  ruleName: string,
 ): BusinessRule | undefined {
   const pattern = requirePatternByName(context, feature);
 
@@ -102,13 +102,13 @@ export function buildBusinessRule(
   }
 
   const rule = (pattern.rules ?? []).find(
-    (entry) => entry.name.toLowerCase() === ruleName.toLowerCase()
+    (entry) => entry.name.toLowerCase() === ruleName.toLowerCase(),
   );
 
   if (rule === undefined) {
     throw new ProjectionError(
       'RULE_NOT_FOUND',
-      `Business rule not found: "${ruleName}" in feature "${getPatternName(pattern)}".`
+      `Business rule not found: "${ruleName}" in feature "${getPatternName(pattern)}".`,
     );
   }
 
@@ -117,7 +117,7 @@ export function buildBusinessRule(
 
 export function buildBusinessRuleSet(
   context: ProjectionContext,
-  options: BusinessRuleSetOptions = { scope: 'all' }
+  options: BusinessRuleSetOptions = { scope: 'all' },
 ): ProjectionBundle<BusinessRuleSet> {
   const groupedBy = options.groupedBy;
   const rules = filterBusinessRules(collectBusinessRules(context, options), options);
@@ -128,10 +128,10 @@ export function buildBusinessRuleSet(
     rules,
     groupedBy === undefined
       ? undefined
-      : createBusinessRuleGroupingEntries(groupedChildren, groupedBy)
+      : createBusinessRuleGroupingEntries(groupedChildren, groupedBy),
   );
   const children = Object.fromEntries(
-    groupedChildren.map(({ key, root: childRoot }) => [key, childRoot])
+    groupedChildren.map(({ key, root: childRoot }) => [key, childRoot]),
   );
 
   return {
@@ -142,7 +142,7 @@ export function buildBusinessRuleSet(
           routing: {
             rootRouteId: createIndexRouteId('business-rules'),
             childRouteIds: Object.fromEntries(
-              groupedChildren.map(({ key }) => [key, createEntityRouteId('business-rules', key)])
+              groupedChildren.map(({ key }) => [key, createEntityRouteId('business-rules', key)]),
             ),
             childPathStrategy: 'nested' as const,
             anchorStrategy: 'heading-slug' as const,
@@ -154,13 +154,13 @@ export function buildBusinessRuleSet(
 
 function collectBusinessRules(
   context: ProjectionContext,
-  options: BusinessRuleSetOptions
+  options: BusinessRuleSetOptions,
 ): BusinessRule[] {
   return filterPatterns(context.graph.patterns, context.projectionFilter)
     .filter((pattern) => (pattern.rules?.length ?? 0) > 0)
     .filter((pattern) => patternMatchesRuleSetScope(context, pattern, options))
     .flatMap((pattern) =>
-      (pattern.rules ?? []).map((rule) => createBusinessRuleFragment(context, pattern, rule))
+      (pattern.rules ?? []).map((rule) => createBusinessRuleFragment(context, pattern, rule)),
     )
     .filter((rule) => options.onlyInvariants !== true || rule.invariant !== undefined)
     .sort(compareBusinessRules);
@@ -169,7 +169,7 @@ function collectBusinessRules(
 function patternMatchesRuleSetScope(
   context: ProjectionContext,
   pattern: ExtractedPattern,
-  options: BusinessRuleSetOptions
+  options: BusinessRuleSetOptions,
 ): boolean {
   if (options.scope === 'package') {
     const canonicalPackageName = inferWorkspacePackageName(pattern.source.file);
@@ -190,7 +190,7 @@ function patternMatchesRuleSetScope(
 function createBusinessRuleFragment(
   context: ProjectionContext,
   pattern: ExtractedPattern,
-  rule: ExtractedRule
+  rule: ExtractedRule,
 ): BusinessRule {
   const annotations = parseBusinessRuleAnnotations(rule.description);
 
@@ -211,14 +211,14 @@ function createBusinessRuleFragment(
 
 function filterBusinessRules(
   rules: readonly BusinessRule[],
-  options: BusinessRuleSetOptions
+  options: BusinessRuleSetOptions,
 ): BusinessRule[] {
   switch (options.scope) {
     case 'all':
       return [...rules];
     case 'product-area':
       return rules.filter(
-        (rule) => rule.productArea?.toLowerCase() === options.scopeValue.toLowerCase()
+        (rule) => rule.productArea?.toLowerCase() === options.scopeValue.toLowerCase(),
       );
     case 'package':
       return [...rules];
@@ -229,7 +229,7 @@ function filterBusinessRules(
         return [...rules];
       }
       return rules.filter(
-        (rule) => rule.feature.toLowerCase() === options.scopeValue.toLowerCase()
+        (rule) => rule.feature.toLowerCase() === options.scopeValue.toLowerCase(),
       );
   }
 }
@@ -237,7 +237,7 @@ function filterBusinessRules(
 function createBusinessRuleSetRoot(
   options: BusinessRuleSetOptions,
   rules: readonly BusinessRule[],
-  groupingEntries?: BusinessRuleSet['groupingEntries']
+  groupingEntries?: BusinessRuleSet['groupingEntries'],
 ): BusinessRuleSet {
   switch (options.scope) {
     case 'all':
@@ -290,12 +290,12 @@ function createBusinessRuleSetRoot(
 function createBusinessRuleChildren(
   rules: readonly BusinessRule[],
   groupedBy: NonNullable<BusinessRuleSetOptions['groupedBy']>,
-  options: BusinessRuleSetOptions
+  options: BusinessRuleSetOptions,
 ): GroupedBusinessRuleChild[] {
   if (groupedBy === 'phase' && rules.some((rule) => rule.phase === undefined)) {
     throw new ProjectionError(
       'INVALID_SCOPE',
-      'Cannot group business rules by phase when one or more projected rules have no phase.'
+      'Cannot group business rules by phase when one or more projected rules have no phase.',
     );
   }
 
@@ -398,7 +398,7 @@ function createBusinessRuleChildren(
 
 function createBusinessRuleGroupingEntries(
   children: readonly GroupedBusinessRuleChild[],
-  groupedBy: NonNullable<BusinessRuleSetOptions['groupedBy']>
+  groupedBy: NonNullable<BusinessRuleSetOptions['groupedBy']>,
 ): NonNullable<BusinessRuleSet['groupingEntries']> | undefined {
   if (children.length === 0) {
     return undefined;
@@ -421,7 +421,7 @@ function compareBusinessRules(left: BusinessRule, right: BusinessRule): number {
     [
       BASE_COLLATOR.compare(
         left.productArea ?? DEFAULT_PRODUCT_AREA,
-        right.productArea ?? DEFAULT_PRODUCT_AREA
+        right.productArea ?? DEFAULT_PRODUCT_AREA,
       ),
       (left.phase ?? Number.MAX_SAFE_INTEGER) - (right.phase ?? Number.MAX_SAFE_INTEGER),
       BASE_COLLATOR.compare(left.feature, right.feature),
@@ -544,7 +544,7 @@ function parseBusinessRuleAnnotations(description: string): BusinessRuleAnnotati
   } = {};
 
   for (const match of normalizeLineEndings(description).matchAll(
-    BUSINESS_RULE_ANNOTATION_PATTERN
+    BUSINESS_RULE_ANNOTATION_PATTERN,
   )) {
     const label = match[1]?.toLowerCase();
     const rawValue = match[2] ?? '';
@@ -578,7 +578,7 @@ function parseBusinessRuleAnnotations(description: string): BusinessRuleAnnotati
 
 function deduplicateScenarioNames(
   scenarioNames: readonly string[],
-  verifiedBy: readonly string[] | undefined
+  verifiedBy: readonly string[] | undefined,
 ): string[] {
   const seen = new Map<string, string>();
 

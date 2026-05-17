@@ -35,7 +35,7 @@ function isSourceDeclaration(sourceFile: string): boolean {
 }
 
 export function buildDeclaredPatternIndex(
-  patterns: readonly ExtractedPattern[]
+  patterns: readonly ExtractedPattern[],
 ): ReadonlyMap<string, readonly DeclaredPatternTarget[]> {
   const index = new Map<string, DeclaredPatternTarget[]>();
 
@@ -58,7 +58,7 @@ export function buildDeclaredPatternIndex(
 export function resolveUsesTarget(
   sourcePattern: ExtractedPattern,
   reference: string,
-  declaredTargetsByName: ReadonlyMap<string, readonly DeclaredPatternTarget[]>
+  declaredTargetsByName: ReadonlyMap<string, readonly DeclaredPatternTarget[]>,
 ): string | undefined {
   const parsed = parsePatternReference(reference);
   if (parsed === undefined) return undefined;
@@ -70,21 +70,21 @@ export function resolveUsesTarget(
 
   if (parsed.packageId !== undefined) {
     const prefixedMatches = candidates.filter(
-      (candidate) => candidate.packageId === parsed.packageId
+      (candidate) => candidate.packageId === parsed.packageId,
     );
     const [prefixedMatch] = prefixedMatches;
     return prefixedMatches.length === 1 && prefixedMatch ? prefixedMatch.canonicalName : undefined;
   }
 
   const samePackageMatches = candidates.filter(
-    (candidate) => candidate.packageId === sourcePackageId
+    (candidate) => candidate.packageId === sourcePackageId,
   );
   const [samePackageMatch] = samePackageMatches;
   if (samePackageMatches.length === 1 && samePackageMatch) return samePackageMatch.canonicalName;
   if (samePackageMatches.length > 1) return undefined;
 
   const externalSourceMatches = candidates.filter(
-    (candidate) => candidate.packageId !== sourcePackageId && candidate.isSourceDeclaration
+    (candidate) => candidate.packageId !== sourcePackageId && candidate.isSourceDeclaration,
   );
   const [externalSourceMatch] = externalSourceMatches;
   if (externalSourceMatches.length === 1 && externalSourceMatch)
@@ -109,7 +109,7 @@ export function createRelationshipEntry(pattern: ExtractedPattern): Relationship
 }
 
 export function buildCanonicalRelationshipIndex(
-  patterns: readonly ExtractedPattern[]
+  patterns: readonly ExtractedPattern[],
 ): Record<string, RelationshipEntry> {
   const relationshipIndex: Record<string, RelationshipEntry> = {};
 
@@ -123,7 +123,7 @@ export function buildCanonicalRelationshipIndex(
 
 export function buildReverseLookups(
   patterns: readonly ExtractedPattern[],
-  relationshipIndex: Record<string, RelationshipEntry>
+  relationshipIndex: Record<string, RelationshipEntry>,
 ): void {
   const declaredTargetsByName = buildDeclaredPatternIndex(patterns);
 
@@ -136,7 +136,7 @@ export function buildReverseLookups(
       const target = relationshipIndex[implemented];
       if (target) {
         const alreadyAdded = target.implementedBy.some(
-          (impl: ImplementationRef) => impl.name === patternKey
+          (impl: ImplementationRef) => impl.name === patternKey,
         );
         if (!alreadyAdded) {
           const desc = pattern.directive.description;
@@ -185,7 +185,7 @@ export function buildReverseLookups(
 
   for (const entry of Object.values(relationshipIndex)) {
     entry.implementedBy.sort((a: ImplementationRef, b: ImplementationRef) =>
-      a.file.localeCompare(b.file)
+      a.file.localeCompare(b.file),
     );
     entry.extendedBy.sort((a, b) => a.localeCompare(b));
     entry.enables.sort((a, b) => a.localeCompare(b));
@@ -195,7 +195,7 @@ export function buildReverseLookups(
 
 export function detectDanglingReferences(
   patterns: readonly ExtractedPattern[],
-  allPatternNames: ReadonlySet<string>
+  allPatternNames: ReadonlySet<string>,
 ): DanglingReference[] {
   const danglingReferences: DanglingReference[] = [];
   const declaredTargetsByName = buildDeclaredPatternIndex(patterns);

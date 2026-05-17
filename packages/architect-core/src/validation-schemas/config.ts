@@ -39,7 +39,7 @@ function createOutputDirSchema(baseDir: string): z.ZodType<string> {
         }
         return resolvedDir.startsWith(resolvedBase) || !path.isAbsolute(dir);
       },
-      { message: 'Output directory must be within project (no parent traversal)' }
+      { message: 'Output directory must be within project (no parent traversal)' },
     );
 }
 
@@ -81,7 +81,7 @@ export function isScannerConfig(value: unknown): value is ScannerConfig {
 
 export function isGeneratorConfig(
   value: unknown,
-  baseDir = process.cwd()
+  baseDir = process.cwd(),
 ): value is GeneratorConfig {
   return createGeneratorConfigSchema(baseDir).safeParse(value).success;
 }

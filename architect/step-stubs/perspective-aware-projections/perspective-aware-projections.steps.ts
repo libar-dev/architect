@@ -81,13 +81,13 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     RuleScenario('Delivery perspective excludes candidates', ({ Given, When, Then, And }) => {
       Given('15 delivery patterns and 4 candidate patterns', () => {
         throw new Error(
-          'Not implemented: create test PatternGraph with 15 delivery patterns (various statuses) and 4 candidate patterns'
+          'Not implemented: create test PatternGraph with 15 delivery patterns (various statuses) and 4 candidate patterns',
         );
       });
 
       When('getDeliveryPatterns() is called', () => {
         throw new Error(
-          'Not implemented: call getDeliveryPatterns() on the PatternGraphAPI and store result'
+          'Not implemented: call getDeliveryPatterns() on the PatternGraphAPI and store result',
         );
       });
 
@@ -107,29 +107,29 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           '2 roadmap patterns with design maturity, 3 active patterns, and 5 completed patterns',
           () => {
             throw new Error(
-              'Not implemented: create test graph with 2 roadmap/design-maturity patterns, 3 active, 5 completed'
+              'Not implemented: create test graph with 2 roadmap/design-maturity patterns, 3 active, 5 completed',
             );
-          }
+          },
         );
 
         When('getImplementablePatterns() is called', () => {
           throw new Error(
-            'Not implemented: call getImplementablePatterns() on the PatternGraphAPI and store result'
+            'Not implemented: call getImplementablePatterns() on the PatternGraphAPI and store result',
           );
         });
 
         Then('it returns the 2 design-ready roadmap patterns and 3 active patterns', () => {
           throw new Error(
-            'Not implemented: assert filteredPatterns.length === 5 (2 roadmap + 3 active)'
+            'Not implemented: assert filteredPatterns.length === 5 (2 roadmap + 3 active)',
           );
         });
 
         And('the 5 completed patterns are excluded', () => {
           throw new Error(
-            'Not implemented: assert no pattern in result has status === "completed"'
+            'Not implemented: assert no pattern in result has status === "completed"',
           );
         });
-      }
+      },
     );
   });
 
@@ -141,7 +141,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     RuleScenario('Completion percentage with mixed patterns', ({ Given, When, Then, And }) => {
       Given('10 delivery patterns with 3 completed and 4 candidate patterns', () => {
         throw new Error(
-          'Not implemented: create test graph with 10 delivery patterns (3 completed) and 4 candidate patterns'
+          'Not implemented: create test graph with 10 delivery patterns (3 completed) and 4 candidate patterns',
         );
       });
 
@@ -155,7 +155,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
 
       And('the denominator is 10, not 14', () => {
         throw new Error(
-          'Not implemented: verify 4 candidate patterns are excluded from the denominator'
+          'Not implemented: verify 4 candidate patterns are excluded from the denominator',
         );
       });
     });
@@ -163,19 +163,19 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     RuleScenario('Adding candidates does not change percentage', ({ Given, When, Then }) => {
       Given('10 delivery patterns with 3 completed and completion at 30 percent', () => {
         throw new Error(
-          'Not implemented: create initial test graph with 10 delivery patterns (3 completed) and verify 30% baseline'
+          'Not implemented: create initial test graph with 10 delivery patterns (3 completed) and verify 30% baseline',
         );
       });
 
       When('5 new candidate patterns are added and completion recalculated', () => {
         throw new Error(
-          'Not implemented: add 5 candidate patterns to the graph and recalculate completion percentage'
+          'Not implemented: add 5 candidate patterns to the graph and recalculate completion percentage',
         );
       });
 
       Then('the result is still 30 percent', () => {
         throw new Error(
-          'Not implemented: assert completionPercentage === 30 after adding candidates'
+          'Not implemented: assert completionPercentage === 30 after adding candidates',
         );
       });
     });
@@ -189,25 +189,25 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     RuleScenario('OverviewCodec excludes candidates by default', ({ Given, When, Then, And }) => {
       Given('a PatternGraph with 10 delivery patterns and 3 candidate patterns', () => {
         throw new Error(
-          'Not implemented: create test PatternGraph with 10 delivery + 3 candidate patterns'
+          'Not implemented: create test PatternGraph with 10 delivery + 3 candidate patterns',
         );
       });
 
       When('the OverviewCodec decodes the graph', () => {
         throw new Error(
-          'Not implemented: call OverviewCodec.decode(graph) with no perspective override'
+          'Not implemented: call OverviewCodec.decode(graph) with no perspective override',
         );
       });
 
       Then('the progress section shows counts from 10 delivery patterns only', () => {
         throw new Error(
-          'Not implemented: assert overview progress counts total 10 (excludes 3 candidates)'
+          'Not implemented: assert overview progress counts total 10 (excludes 3 candidates)',
         );
       });
 
       And('candidate patterns do not affect the progress numbers', () => {
         throw new Error(
-          'Not implemented: verify candidate patterns are not counted in planned/active/completed totals'
+          'Not implemented: verify candidate patterns are not counted in planned/active/completed totals',
         );
       });
     });
@@ -221,7 +221,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     RuleScenario('getDeliveryPatterns excludes candidates', ({ Given, When, Then, And }) => {
       Given('12 delivery patterns and 5 candidate patterns', () => {
         throw new Error(
-          'Not implemented: create test PatternGraph with 12 delivery + 5 candidate patterns'
+          'Not implemented: create test PatternGraph with 12 delivery + 5 candidate patterns',
         );
       });
 
@@ -235,7 +235,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
 
       And('no pattern has status "candidate"', () => {
         throw new Error(
-          'Not implemented: assert every pattern in result has status !== "candidate"'
+          'Not implemented: assert every pattern in result has status !== "candidate"',
         );
       });
     });
@@ -249,19 +249,19 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     RuleScenario('Multiple filters compose cumulatively', ({ Given, When, Then }) => {
       Given('a PatternGraph with diverse patterns', () => {
         throw new Error(
-          'Not implemented: create test graph with patterns at various statuses, maturities, and roles'
+          'Not implemented: create test graph with patterns at various statuses, maturities, and roles',
         );
       });
 
       When('architect_list is called with status "roadmap" and maturity "design"', () => {
         throw new Error(
-          'Not implemented: call architect_list MCP tool with status="roadmap" and maturity="design" filters'
+          'Not implemented: call architect_list MCP tool with status="roadmap" and maturity="design" filters',
         );
       });
 
       Then('only patterns that are BOTH roadmap AND design maturity are returned', () => {
         throw new Error(
-          'Not implemented: assert all returned patterns have status "roadmap" AND maturity "design" (AND logic)'
+          'Not implemented: assert all returned patterns have status "roadmap" AND maturity "design" (AND logic)',
         );
       });
     });
@@ -275,25 +275,25 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     RuleScenario('Overview shows separate candidates section', ({ Given, When, Then, And }) => {
       Given('4 candidate patterns with 2 at idea maturity and 2 at plan maturity', () => {
         throw new Error(
-          'Not implemented: create test graph with 4 candidates (2 idea, 2 plan maturity)'
+          'Not implemented: create test graph with 4 candidates (2 idea, 2 plan maturity)',
         );
       });
 
       When('the OverviewCodec renders the overview', () => {
         throw new Error(
-          'Not implemented: call OverviewCodec.decode(graph) and inspect output sections'
+          'Not implemented: call OverviewCodec.decode(graph) and inspect output sections',
         );
       });
 
       Then('a Candidates section appears below the delivery progress', () => {
         throw new Error(
-          'Not implemented: assert overview output contains a separate Candidates section'
+          'Not implemented: assert overview output contains a separate Candidates section',
         );
       });
 
       And('the section shows 4 candidates with maturity breakdown', () => {
         throw new Error(
-          'Not implemented: assert Candidates section displays count of 4 with idea:2, plan:2 breakdown'
+          'Not implemented: assert Candidates section displays count of 4 with idea:2, plan:2 breakdown',
         );
       });
     });

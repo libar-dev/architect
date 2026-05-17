@@ -32,7 +32,7 @@
  * ### When to Use
  *
  * - Provides shared delivery-reporting helpers for phase, status, timeline,
-*   release, and traceability projections.
+ *   release, and traceability projections.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';
@@ -65,7 +65,7 @@ import { createEntityRouteId, createIndexRouteId } from '../../routing/route-id.
 
 export function buildPhaseProgress(
   context: ProjectionContext,
-  phase: number
+  phase: number,
 ): PhaseProgress | undefined {
   const phaseGroup = context.graph.byPhase.find((entry) => entry.phaseNumber === phase);
   if (phaseGroup === undefined) {
@@ -86,7 +86,7 @@ export function buildPhaseProgress(
 
 export function buildStatusDistribution(context: ProjectionContext): StatusDistribution {
   const counts = createStatusCounts(
-    filterPatterns(context.graph.patterns, context.projectionFilter)
+    filterPatterns(context.graph.patterns, context.projectionFilter),
   );
   const deliveryTotal = getDeliveryTotal(counts);
 
@@ -112,7 +112,7 @@ export function buildStatusDistribution(context: ProjectionContext): StatusDistr
 
 export function buildTimelineBundle(
   context: ProjectionContext,
-  view: RoadmapTimeline['view']
+  view: RoadmapTimeline['view'],
 ): ProjectionBundle<RoadmapTimeline> {
   const patterns =
     view === 'roadmap'
@@ -123,13 +123,13 @@ export function buildTimelineBundle(
 
   return createTimelineBundle(
     view,
-    buildQuarterEntries(filterPatterns(patterns, context.projectionFilter))
+    buildQuarterEntries(filterPatterns(patterns, context.projectionFilter)),
   );
 }
 
 export function buildReleaseNotes(
   context: ProjectionContext,
-  release?: string
+  release?: string,
 ): ProjectionBundle<ReleaseNotesDigest> {
   const entries = buildReleaseEntries(context, release);
   const children = createChildren(
@@ -138,7 +138,7 @@ export function buildReleaseNotes(
     (entry): ReleaseNotesDigest => ({
       kind: 'ReleaseNotesDigest',
       releases: [entry],
-    })
+    }),
   );
   const root: ReleaseNotesDigest = {
     kind: 'ReleaseNotesDigest',
@@ -151,7 +151,7 @@ export function buildReleaseNotes(
     routing: {
       rootRouteId: createIndexRouteId('changelog'),
       childRouteIds: Object.fromEntries(
-        Object.keys(children).map((key) => [key, createEntityRouteId('changelog', key)])
+        Object.keys(children).map((key) => [key, createEntityRouteId('changelog', key)]),
       ),
       childPathStrategy: 'nested',
       anchorStrategy: 'heading-slug',
@@ -160,7 +160,7 @@ export function buildReleaseNotes(
 }
 
 export function buildTraceabilityMatrix(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<TraceabilityMatrix> {
   const rows = buildTraceRows(context);
   const children = createChildren(
@@ -169,7 +169,7 @@ export function buildTraceabilityMatrix(
     (row): TraceabilityMatrix => ({
       kind: 'TraceabilityMatrix',
       rows: [row],
-    })
+    }),
   );
   const root: TraceabilityMatrix = {
     kind: 'TraceabilityMatrix',
@@ -182,7 +182,7 @@ export function buildTraceabilityMatrix(
     routing: {
       rootRouteId: createIndexRouteId('traceability'),
       childRouteIds: Object.fromEntries(
-        Object.keys(children).map((key) => [key, createEntityRouteId('traceability', key)])
+        Object.keys(children).map((key) => [key, createEntityRouteId('traceability', key)]),
       ),
       childPathStrategy: 'nested',
       anchorStrategy: 'heading-slug',
@@ -192,7 +192,7 @@ export function buildTraceabilityMatrix(
 
 function createTimelineBundle(
   view: RoadmapTimeline['view'],
-  quarters: QuarterEntry[]
+  quarters: QuarterEntry[],
 ): ProjectionBundle<RoadmapTimeline> {
   const children = createChildren(
     quarters,
@@ -201,7 +201,7 @@ function createTimelineBundle(
       kind: 'RoadmapTimeline',
       view,
       quarters: [entry],
-    })
+    }),
   );
   const root: RoadmapTimeline = {
     kind: 'RoadmapTimeline',
@@ -270,7 +270,7 @@ function buildUnreleasedEntries(context: ProjectionContext): ReleaseEntry[] {
       ...context.graph.byNormalizedStatus.active,
       ...context.graph.patterns.filter((pattern) => pattern.release === 'vNEXT'),
     ],
-    context.projectionFilter
+    context.projectionFilter,
   );
   const patterns = deduplicatePatterns(unreleasedCandidates);
 
@@ -282,7 +282,7 @@ function buildTaggedReleaseEntries(context: ProjectionContext): ReleaseEntry[] {
 
   for (const pattern of filterPatterns(
     context.graph.byNormalizedStatus.completed,
-    context.projectionFilter
+    context.projectionFilter,
   )) {
     const release = pattern.release?.trim();
     if (!release || release === 'vNEXT') {
@@ -296,7 +296,7 @@ function buildTaggedReleaseEntries(context: ProjectionContext): ReleaseEntry[] {
 
   return [...grouped.entries()]
     .sort(([left], [right]) =>
-      right.localeCompare(left, undefined, { numeric: true, sensitivity: 'base' })
+      right.localeCompare(left, undefined, { numeric: true, sensitivity: 'base' }),
     )
     .map(([release, patterns]) => createReleaseEntry(release, patterns));
 }
@@ -306,7 +306,7 @@ function buildQuarterFallbackEntries(context: ProjectionContext): ReleaseEntry[]
 
   for (const pattern of filterPatterns(
     context.graph.byNormalizedStatus.completed,
-    context.projectionFilter
+    context.projectionFilter,
   )) {
     if (pattern.release?.trim()) {
       continue;
@@ -330,7 +330,7 @@ function buildQuarterFallbackEntries(context: ProjectionContext): ReleaseEntry[]
 function buildEarlierFallbackEntries(context: ProjectionContext): ReleaseEntry[] {
   const patterns = filterPatterns(
     context.graph.byNormalizedStatus.completed,
-    context.projectionFilter
+    context.projectionFilter,
   ).filter((pattern) => {
     const release = pattern.release?.trim();
     const quarter = pattern.quarter?.trim();
@@ -377,8 +377,8 @@ function deduplicateDeliverables(patterns: readonly ExtractedPattern[]): Deliver
 function buildTraceRows(context: ProjectionContext): TraceRow[] {
   return sortPatterns(
     filterPatterns(context.graph.bySourceType.gherkin, context.projectionFilter).filter(
-      (pattern) => pattern.phase !== undefined
-    )
+      (pattern) => pattern.phase !== undefined,
+    ),
   ).map((pattern) => ({
     pattern: getPatternName(pattern),
     status: pattern.status,
@@ -388,14 +388,14 @@ function buildTraceRows(context: ProjectionContext): TraceRow[] {
     ]),
     specs: [pattern.source.file],
     deliverables: deduplicateStrings(
-      (pattern.deliverables ?? []).map((deliverable) => deliverable.location)
+      (pattern.deliverables ?? []).map((deliverable) => deliverable.location),
     ),
   }));
 }
 
 function getTimelineRouting(
   view: RoadmapTimeline['view'],
-  childKeys: readonly string[]
+  childKeys: readonly string[],
 ): NonNullable<ProjectionBundle<RoadmapTimeline>['routing']> {
   const documentType =
     view === 'roadmap' ? 'roadmap' : view === 'milestones' ? 'milestones' : 'current-work';
@@ -403,7 +403,7 @@ function getTimelineRouting(
   return {
     rootRouteId: createIndexRouteId(documentType),
     childRouteIds: Object.fromEntries(
-      childKeys.map((key) => [key, createEntityRouteId(documentType, key)])
+      childKeys.map((key) => [key, createEntityRouteId(documentType, key)]),
     ),
     childPathStrategy: 'nested',
     anchorStrategy: 'heading-slug',
@@ -416,7 +416,7 @@ function createChildren<
 >(
   entries: readonly TEntry[],
   label: (entry: TEntry) => string,
-  createFragment: (entry: TEntry) => TFragment
+  createFragment: (entry: TEntry) => TFragment,
 ): Record<string, TFragment> {
   const children: Record<string, TFragment> = {};
   const seen = new Map<string, number>();
@@ -566,7 +566,7 @@ function parseQuarterLabel(value: string): { year: number; quarter: number } | u
  */
 export function projectPhaseProgress(
   context: ProjectionContext,
-  phase: number
+  phase: number,
 ): ProjectionBundle<PhaseProgress> | undefined {
   const fragment = buildPhaseProgress(context, phase);
   return fragment === undefined ? undefined : projectSingle(fragment);
@@ -603,10 +603,10 @@ export function projectPhaseProgress(
  * ### When to Use
  *
  * - Projects graph-wide status counts and percentages as a StatusDistribution
-*   bundle.
+ *   bundle.
  */
 export function projectStatusDistribution(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<StatusDistribution> {
   return projectSingle(buildStatusDistribution(context));
 }
@@ -644,16 +644,16 @@ export function projectStatusDistribution(
  * ### When to Use
  *
  * - Projects roadmap, milestone, or current-work views as RoadmapTimeline
-*   bundles.
+ *   bundles.
  */
 export function projectRoadmapTimeline(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<RoadmapTimeline> {
   return buildTimelineBundle(context, 'roadmap');
 }
 
 export function projectCompletedMilestones(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<RoadmapTimeline> {
   return buildTimelineBundle(context, 'milestones');
 }
@@ -696,7 +696,7 @@ export function projectCurrentWork(context: ProjectionContext): ProjectionBundle
  */
 export function projectReleaseNotesDigest(
   context: ProjectionContext,
-  release?: string
+  release?: string,
 ): ProjectionBundle<ReleaseNotesDigest> {
   return buildReleaseNotes(context, release);
 }
@@ -736,7 +736,7 @@ export function projectReleaseNotesDigest(
  * - Projects phased traceability rows as a TraceabilityMatrix bundle.
  */
 export function projectTraceabilityMatrix(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<TraceabilityMatrix> {
   return buildTraceabilityMatrix(context);
 }

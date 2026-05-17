@@ -39,7 +39,7 @@ import { projectOutgoingEdges } from './dependency-edges.internal.js';
 
 export function projectDependencyEdges(
   context: ProjectionContext,
-  from: string
+  from: string,
 ): ProjectionBundle<DependencyEdgeSet> {
   const items: DependencyEdge[] = projectOutgoingEdges(context, from).map((edge) => ({
     kind: 'DependencyEdge',

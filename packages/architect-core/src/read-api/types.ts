@@ -143,7 +143,7 @@ export class QueryApiError extends Error {
   constructor(
     readonly code: QueryErrorCode,
     message: string,
-    readonly details?: unknown
+    readonly details?: unknown,
   ) {
     super(message);
     this.name = 'QueryApiError';

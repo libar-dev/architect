@@ -71,7 +71,7 @@ export function createDefaultTagRegistry(): TagRegistry {
         ...(tag.example !== undefined ? { example: tag.example } : {}),
         ...(tag.metadataKey !== undefined ? { metadataKey: tag.metadataKey } : {}),
         ...(tag.transform !== undefined ? { transform: tag.transform } : {}),
-      })
+      }),
     ),
     aggregationTags: [...registry.aggregationTags],
     formatOptions: [...registry.formatOptions],
@@ -83,7 +83,7 @@ export function createDefaultTagRegistry(): TagRegistry {
 export function mergeTagRegistries(base: TagRegistry, override: Partial<TagRegistry>): TagRegistry {
   function mergeByTag<T extends { tag: string }>(
     baseArr: readonly T[],
-    overrideArr?: readonly T[]
+    overrideArr?: readonly T[],
   ): T[] {
     if (!overrideArr) return [...baseArr];
 

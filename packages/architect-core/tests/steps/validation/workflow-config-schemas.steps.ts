@@ -60,7 +60,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             statuses: [{ name: 'roadmap', emoji: '📋' }],
             phases: [{ name: 'Inception' }],
           });
-        }
+        },
       );
       Then('the workflow config should be valid', () => {
         expect(state!.validationResult!.success).toBe(true);
@@ -104,7 +104,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             statuses: [],
             phases: [{ name: 'Inception' }],
           });
-        }
+        },
       );
       Then('the workflow config should be invalid', () => {
         expect(state!.validationResult!.success).toBe(false);
@@ -121,7 +121,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             statuses: [{ name: 'roadmap', emoji: '📋' }],
             phases: [],
           });
-        }
+        },
       );
       Then('the workflow config should be invalid', () => {
         expect(state!.validationResult!.success).toBe(false);

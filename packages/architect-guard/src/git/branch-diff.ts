@@ -45,7 +45,7 @@ import { parseGitNameStatus } from './name-status.js';
  */
 export function getChangedFilesList(
   baseDir: string,
-  baseBranch = 'main'
+  baseBranch = 'main',
 ): Result<readonly string[]> {
   try {
     const safeBranch = sanitizeBranchName(baseBranch);

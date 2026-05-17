@@ -10,12 +10,12 @@ The package is in **better shape than the volume of findings might suggest**. Do
 
 The findings cluster around **one structural problem and three preparation gaps**, each with concrete fixes that are small in scope and high in campaign leverage:
 
-| | Finding cluster | Phase sources | Effort | Campaign leverage |
-|---|---|---|---|---|
-| **1** | The closed dispatch core in `documentation-composition/` is the campaign's substrate, not an obstacle around it | 1-C1, 1-C2, 4-F-H1, 4-F-H2 | Days | Critical — campaign cannot land as a layer on top |
-| **2** | Zod schemas need `.describe()` + `z.infer`'d types for the campaign's headline demo to work on day one | 3-D-C2, 4-F-H3 | Hours | Critical — demo silently produces an empty table without this |
-| **3** | Security invariants (5) and load-bearing conventions (`TRUSTED_MARKDOWN`, single options chokepoint) need JSDoc + lint enforcement so the campaign doesn't accidentally violate them | 2-I1–I5, 3-D-C1, 4-F-M1 | Hours | Critical — invariants are invisible today; a refactor breaks them silently |
-| **4** | Schema-composition + duplication cleanup (Pattern/Decision pairs, slug functions, JSDoc boilerplate) | 4-D-C1–C3, 4-D-H1 | Hours | High — the pairs are the campaign's worked example; fixing them sets the right shape |
+|       | Finding cluster                                                                                                                                                                      | Phase sources              | Effort | Campaign leverage                                                                    |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------- | ------ | ------------------------------------------------------------------------------------ |
+| **1** | The closed dispatch core in `documentation-composition/` is the campaign's substrate, not an obstacle around it                                                                      | 1-C1, 1-C2, 4-F-H1, 4-F-H2 | Days   | Critical — campaign cannot land as a layer on top                                    |
+| **2** | Zod schemas need `.describe()` + `z.infer`'d types for the campaign's headline demo to work on day one                                                                               | 3-D-C2, 4-F-H3             | Hours  | Critical — demo silently produces an empty table without this                        |
+| **3** | Security invariants (5) and load-bearing conventions (`TRUSTED_MARKDOWN`, single options chokepoint) need JSDoc + lint enforcement so the campaign doesn't accidentally violate them | 2-I1–I5, 3-D-C1, 4-F-M1    | Hours  | Critical — invariants are invisible today; a refactor breaks them silently           |
+| **4** | Schema-composition + duplication cleanup (Pattern/Decision pairs, slug functions, JSDoc boilerplate)                                                                                 | 4-D-C1–C3, 4-D-H1          | Hours  | High — the pairs are the campaign's worked example; fixing them sets the right shape |
 
 Nothing in the review describes a production bug or a security exposure. Every Critical/High finding describes **substrate work the campaign needs done before W-DOCS-1**, not patches to ship today.
 
@@ -129,16 +129,16 @@ Nothing in the review describes a production bug or a security exposure. Every C
 
 ## Findings by category
 
-| Category | Critical | High | Medium | Low | Total |
-|---|---|---|---|---|---|
-| Code Quality | 2 | 4 | 1 | 0 | 7 |
-| Architecture | 1 | 3 | 2 | 1 | 7 |
-| Security | 0 | 0 | 0 | 2 | 2 (+5 invariants documented) |
-| Performance | 0 | 2 | 3 | 0 | 5 |
-| Testing | 1 | 2 | 2 | 0 | 5 |
-| Documentation | 2 | 3 | 0 | 1 | 6 |
-| Framework | 0 | 3 | 2 | 0 | 5 |
-| Duplication | 1 | 2 | 1 | 0 | 4 |
+| Category      | Critical | High | Medium | Low | Total                        |
+| ------------- | -------- | ---- | ------ | --- | ---------------------------- |
+| Code Quality  | 2        | 4    | 1      | 0   | 7                            |
+| Architecture  | 1        | 3    | 2      | 1   | 7                            |
+| Security      | 0        | 0    | 0      | 2   | 2 (+5 invariants documented) |
+| Performance   | 0        | 2    | 3      | 0   | 5                            |
+| Testing       | 1        | 2    | 2      | 0   | 5                            |
+| Documentation | 2        | 3    | 0      | 1   | 6                            |
+| Framework     | 0        | 3    | 2      | 0   | 5                            |
+| Duplication   | 1        | 2    | 1      | 0   | 4                            |
 
 (Single root causes counted in their primary phase; cross-phase confirmations referenced in the body.)
 
@@ -146,10 +146,10 @@ Nothing in the review describes a production bug or a security exposure. Every C
 
 **Pre-W-DOCS-1 substrate (1–2 days):**
 
-1. **Decompose `documentation-types.ts`** along Extractors / Routing / Composition / Output-routing — delete the `'dropped'` entries, move side-effectful validation into a test. (Findings 1, 2, framework F-H1) — *enables Critical 1, 2, and 8.*
-2. **Invert types → schemas** — `Block` types and `SupportedDocumentationType` become `z.infer<typeof X>`. (Finding 4) — *enables Critical 3 to actually work.*
-3. **Add `.describe()` to 23 P0 fields** — see `04a-framework-raw.md` for the exact list. (Finding 3) — *the campaign's headline demo starts working.*
-4. **JSDoc + tests for security invariants I1–I5** — 5 JSDoc blocks + 2 rejection tests + 1 ESLint rule. (Finding 5) — *campaign authors can no longer accidentally violate them.*
+1. **Decompose `documentation-types.ts`** along Extractors / Routing / Composition / Output-routing — delete the `'dropped'` entries, move side-effectful validation into a test. (Findings 1, 2, framework F-H1) — _enables Critical 1, 2, and 8._
+2. **Invert types → schemas** — `Block` types and `SupportedDocumentationType` become `z.infer<typeof X>`. (Finding 4) — _enables Critical 3 to actually work._
+3. **Add `.describe()` to 23 P0 fields** — see `04a-framework-raw.md` for the exact list. (Finding 3) — _the campaign's headline demo starts working._
+4. **JSDoc + tests for security invariants I1–I5** — 5 JSDoc blocks + 2 rejection tests + 1 ESLint rule. (Finding 5) — _campaign authors can no longer accidentally violate them._
 
 **Pre-headline-demo prep (½ day each):**
 

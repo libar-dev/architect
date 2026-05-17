@@ -206,7 +206,7 @@ const resolved = result.value;
 const effectiveSources = mergeSourcesForGenerator(
   resolved.project.sources,
   'changelog',
-  resolved.project.generatorOverrides
+  resolved.project.generatorOverrides,
 );
 ```
 

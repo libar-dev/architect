@@ -46,7 +46,7 @@ import type {
 
 export interface PatternGraphAPI {
   getPatternsByNormalizedStatus(
-    status: 'completed' | 'active' | 'planned' | 'candidate'
+    status: 'completed' | 'active' | 'planned' | 'candidate',
   ): ExtractedPattern[];
   getPatternsByStatus(status: AcceptedStatusValue): ExtractedPattern[];
   getStatusCounts(): StatusCounts;
@@ -271,7 +271,7 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
           location: d.location,
           finding: d.finding,
           release: d.release,
-        }))
+        })),
       );
     },
     listRoles() {
@@ -282,7 +282,7 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
           priority,
           count: dataset.byRole[tag]?.length ?? 0,
           ...(description !== undefined ? { description } : {}),
-        }))
+        })),
       );
     },
     getPatternsByRole(role) {
@@ -319,7 +319,7 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
             };
             return { quarter, patterns, counts };
           })
-          .sort((a, b) => a.quarter.localeCompare(b.quarter))
+          .sort((a, b) => a.quarter.localeCompare(b.quarter)),
       );
     },
     getCurrentWork() {

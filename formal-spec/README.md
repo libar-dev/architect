@@ -40,13 +40,13 @@ and the `@libar-dev/architect-*` package family (currently 260 delivery patterns
 candidates / 347 rules / 9 ADRs+PDRs as of this draft):
 
 | Metric                   | Without Spec Format | With Spec Format (reported peak across the two codebases) |
-| ------------------------ | ------------------- | ---------------------------------------------------------- |
-| Daily velocity           | ~1,900 LOC/day      | ~10,100 LOC/day                                            |
-| Specification coverage   | 50 files            | 530 files                                                  |
-| Architecture decisions   | Ad hoc              | 33 formal ADRs (studio)                                    |
-| Patterns tracked         | None                | 386 (258 completed) (studio peak)                          |
-| Business rules extracted | None                | 929 machine-extractable rules (studio peak)                |
-| Major rewrites           | Multiple            | Zero                                                       |
+| ------------------------ | ------------------- | --------------------------------------------------------- |
+| Daily velocity           | ~1,900 LOC/day      | ~10,100 LOC/day                                           |
+| Specification coverage   | 50 files            | 530 files                                                 |
+| Architecture decisions   | Ad hoc              | 33 formal ADRs (studio)                                   |
+| Patterns tracked         | None                | 386 (258 completed) (studio peak)                         |
+| Business rules extracted | None                | 929 machine-extractable rules (studio peak)               |
+| Major rewrites           | Multiple            | Zero                                                      |
 
 > _Informative:_ The current `@libar-dev/architect` reference repo runs a much smaller
 > dogfood instance — its purpose is to govern the toolchain itself, not to be a
@@ -95,14 +95,14 @@ Start at Level 1. Graduate when you need more.
 
 The `@libar-dev/architect-*` package family is the **reference implementation** of this spec. As of v2.0 the implementation is split into five publishable packages plus a bin-only meta:
 
-| Package | Role |
-| --- | --- |
-| `@libar-dev/architect-core` | Canonical model, ingestion, graph build, scanner/extractor, taxonomy, config, read API (`PatternGraphAPI`). |
-| `@libar-dev/architect-projection` | Fragment-based projection pipeline (Zod-validated `RenderableDocument` blocks, renderers). |
-| `@libar-dev/architect-guard` | Policy, validation, ProcessGuard, step-lint, anti-pattern detection. |
-| `@libar-dev/architect-cli` | Composition root and 7 bins (`architect`, `architect-generate`, `architect-guard`, `architect-validate`, `architect-lint-steps`, `architect-lint-patterns`, `architect-mcp`). |
-| `@libar-dev/architect-mcp` | MCP server, tool registry, file watcher, pipeline session. |
-| `@libar-dev/architect` (meta) | Bin-only re-export of the 7 bins. No JS API — JS consumers must import from the split that owns each symbol. |
+| Package                           | Role                                                                                                                                                                          |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@libar-dev/architect-core`       | Canonical model, ingestion, graph build, scanner/extractor, taxonomy, config, read API (`PatternGraphAPI`).                                                                   |
+| `@libar-dev/architect-projection` | Fragment-based projection pipeline (Zod-validated `RenderableDocument` blocks, renderers).                                                                                    |
+| `@libar-dev/architect-guard`      | Policy, validation, ProcessGuard, step-lint, anti-pattern detection.                                                                                                          |
+| `@libar-dev/architect-cli`        | Composition root and 7 bins (`architect`, `architect-generate`, `architect-guard`, `architect-validate`, `architect-lint-steps`, `architect-lint-patterns`, `architect-mcp`). |
+| `@libar-dev/architect-mcp`        | MCP server, tool registry, file watcher, pipeline session.                                                                                                                    |
+| `@libar-dev/architect` (meta)     | Bin-only re-export of the 7 bins. No JS API — JS consumers must import from the split that owns each symbol.                                                                  |
 
 Together they provide:
 
@@ -117,11 +117,11 @@ This spec defines the format. The toolchain implements it.
 
 ## Publication Trajectory
 
-| Phase       | Location                                                | Status               |
-| ----------- | ------------------------------------------------------- | -------------------- |
-| **Phase 1** | `formal-spec/` folder in libar-dev/architect repo       | Current (v0.2 draft) |
-| **Phase 2** | Standalone npm package (`@libar-dev/architect-spec`)    | Planned              |
-| **Phase 3** | Published HTML specification at `spec.libar.dev`        | Future               |
+| Phase       | Location                                             | Status               |
+| ----------- | ---------------------------------------------------- | -------------------- |
+| **Phase 1** | `formal-spec/` folder in libar-dev/architect repo    | Current (v0.2 draft) |
+| **Phase 2** | Standalone npm package (`@libar-dev/architect-spec`) | Planned              |
+| **Phase 3** | Published HTML specification at `spec.libar.dev`     | Future               |
 
 ## CHANGELOG
 

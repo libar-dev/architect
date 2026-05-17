@@ -79,7 +79,7 @@ export async function createTempDir(options: TempDirOptions = {}): Promise<TempD
 export async function writeTempFile(
   dir: string,
   relativePath: string,
-  content: string
+  content: string,
 ): Promise<string> {
   const fullPath = path.join(dir, relativePath);
   await fs.mkdir(path.dirname(fullPath), { recursive: true });

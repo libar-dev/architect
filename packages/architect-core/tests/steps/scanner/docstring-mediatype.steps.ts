@@ -111,7 +111,7 @@ function isCodeBlock(block: SectionBlock | null): block is CodeBlock {
 
 function renderDocString(
   docString: string | { content: string; mediaType?: string },
-  defaultLanguage: string
+  defaultLanguage: string,
 ): SectionBlock {
   if (typeof docString === 'string') {
     return { type: 'code', language: defaultLanguage, content: docString };
@@ -163,7 +163,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         (_ctx: unknown, scenarioIdx: number, stepIdx: number, expectedContent: string) => {
           const step = getStep(scenarioIdx, stepIdx);
           expect(step?.docString?.content).toContain(expectedContent);
-        }
+        },
       );
 
       And(
@@ -171,7 +171,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         (_ctx: unknown, scenarioIdx: number, stepIdx: number, expectedMediaType: string) => {
           const step = getStep(scenarioIdx, stepIdx);
           expect(step?.docString?.mediaType).toBe(expectedMediaType);
-        }
+        },
       );
     });
 
@@ -190,7 +190,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           expect(state!.parseResult?.ok).toBe(true);
           const step = getStep(scenarioIdx, stepIdx);
           expect(step?.docString?.mediaType).toBe(expectedMediaType);
-        }
+        },
       );
     });
 
@@ -209,7 +209,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           expect(state!.parseResult?.ok).toBe(true);
           const step = getStep(scenarioIdx, stepIdx);
           expect(step?.docString?.mediaType).toBe(expectedMediaType);
-        }
+        },
       );
     });
 
@@ -230,7 +230,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
             expect(state!.parseResult?.ok).toBe(true);
             const step = getStep(scenarioIdx, stepIdx);
             expect(step?.docString?.content).toBe(expectedContent);
-          }
+          },
         );
 
         And(
@@ -238,9 +238,9 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           (_ctx: unknown, scenarioIdx: number, stepIdx: number) => {
             const step = getStep(scenarioIdx, stepIdx);
             expect(step?.docString?.mediaType).toBeUndefined();
-          }
+          },
         );
-      }
+      },
     );
   });
 
@@ -256,7 +256,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           'a docString with content {string} and mediaType {string}',
           (_ctx: unknown, content: string, mediaType: string) => {
             state!.docString = { content, mediaType };
-          }
+          },
         );
 
         When('the step docString is rendered', () => {
@@ -269,7 +269,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
             expect(state!.renderedBlock.language).toBe(expectedLanguage);
           }
         });
-      }
+      },
     );
 
     RuleScenario('JSDoc mediaType prevents asterisk escaping', ({ Given, When, Then, And }) => {
@@ -277,7 +277,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         'a docString with content {string} and mediaType {string}',
         (_ctx: unknown, content: string, mediaType: string) => {
           state!.docString = { content, mediaType };
-        }
+        },
       );
 
       When('the step docString is rendered', () => {
@@ -312,7 +312,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         'a docString with content {string} and no mediaType',
         (_ctx: unknown, content: string) => {
           state!.docString = { content };
-        }
+        },
       );
 
       When(
@@ -320,7 +320,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         (_ctx: unknown, defaultLang: string) => {
           state!.defaultLanguage = defaultLang;
           state!.renderedBlock = renderDocString(state!.docString!, state!.defaultLanguage);
-        }
+        },
       );
 
       Then('the code block language is {string}', (_ctx: unknown, expectedLanguage: string) => {
@@ -349,7 +349,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           (_ctx: unknown, language: string) => {
             state!.defaultLanguage = language;
             state!.renderedBlock = renderDocString(state!.docString!, state!.defaultLanguage);
-          }
+          },
         );
 
         Then('the code block contains {string}', (_ctx: unknown, expectedContent: string) => {
@@ -365,7 +365,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
             expect(state!.renderedBlock.language).toBe(expectedLanguage);
           }
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -375,7 +375,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           'a docString with content {string} and mediaType {string}',
           (_ctx: unknown, content: string, mediaType: string) => {
             state!.docString = { content, mediaType };
-          }
+          },
         );
 
         When(
@@ -383,7 +383,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           (_ctx: unknown, language: string) => {
             state!.defaultLanguage = language;
             state!.renderedBlock = renderDocString(state!.docString!, state!.defaultLanguage);
-          }
+          },
         );
 
         Then('the code block language is {string}', (_ctx: unknown, expectedLanguage: string) => {
@@ -406,7 +406,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
             }
           }
         });
-      }
+      },
     );
   });
 });

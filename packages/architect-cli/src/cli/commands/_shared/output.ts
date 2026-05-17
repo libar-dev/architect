@@ -42,7 +42,7 @@ function looksLikeBundleCandidate(value: unknown): value is Record<string, unkno
 }
 
 function renderEnvelopeWithBundleData(
-  envelope: Record<string, unknown> & { data: ProjectionBundle<Fragment> }
+  envelope: Record<string, unknown> & { data: ProjectionBundle<Fragment> },
 ): string {
   return stringifyJsonValue({
     ...envelope,
@@ -51,7 +51,7 @@ function renderEnvelopeWithBundleData(
 }
 
 export function createValidationMetadata(
-  build: CliContext['build']
+  build: CliContext['build'],
 ): NonNullable<QueryMetadataExtra['validation']> {
   return {
     danglingReferenceCount: build.validation.danglingReferences.length,
@@ -88,8 +88,8 @@ export function writeJson(value: unknown): void {
     if (isBundle(data)) {
       process.stdout.write(
         renderEnvelopeWithBundleData(
-          value as Record<string, unknown> & { data: ProjectionBundle<Fragment> }
-        )
+          value as Record<string, unknown> & { data: ProjectionBundle<Fragment> },
+        ),
       );
       process.stdout.write('\n');
       return;
@@ -97,14 +97,14 @@ export function writeJson(value: unknown): void {
 
     if (looksLikeBundleCandidate(data)) {
       throw new Error(
-        'Received malformed projection bundle in response data for JSON output. Expected { root: Fragment, children: Record<string, Fragment>, routing?: BundleRouting }.'
+        'Received malformed projection bundle in response data for JSON output. Expected { root: Fragment, children: Record<string, Fragment>, routing?: BundleRouting }.',
       );
     }
   }
 
   if (looksLikeBundleCandidate(value)) {
     throw new Error(
-      'Received malformed projection bundle for JSON output. Expected { root: Fragment, children: Record<string, Fragment>, routing?: BundleRouting }.'
+      'Received malformed projection bundle for JSON output. Expected { root: Fragment, children: Record<string, Fragment>, routing?: BundleRouting }.',
     );
   }
 
@@ -114,7 +114,7 @@ export function writeJson(value: unknown): void {
 
 export function writeProjectionOutput(
   args: ParsedArgs,
-  input: Fragment | ProjectionBundle<Fragment>
+  input: Fragment | ProjectionBundle<Fragment>,
 ): void {
   if (args.format === 'json') {
     process.stdout.write(renderPrettyJson(input));

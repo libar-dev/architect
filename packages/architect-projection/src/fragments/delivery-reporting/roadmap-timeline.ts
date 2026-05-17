@@ -8,7 +8,7 @@
  * ### When to Use
  *
  * - Defines the RoadmapTimeline fragment shape for roadmap, milestones, and
-*   current views.
+ *   current views.
  */
 import { z } from 'zod';
 

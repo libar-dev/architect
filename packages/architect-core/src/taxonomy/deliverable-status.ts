@@ -12,7 +12,7 @@ export type DeliverableStatus = (typeof DELIVERABLE_STATUS_VALUES)[number];
 export const DEFAULT_DELIVERABLE_STATUS: DeliverableStatus = 'pending';
 
 export const VALID_DELIVERABLE_STATUS_SET: ReadonlySet<string> = new Set<string>(
-  DELIVERABLE_STATUS_VALUES
+  DELIVERABLE_STATUS_VALUES,
 );
 
 export function isDeliverableStatusComplete(status: DeliverableStatus): boolean {

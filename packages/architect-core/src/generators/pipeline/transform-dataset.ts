@@ -37,7 +37,7 @@ interface RegistryRoleDefinition {
 }
 
 function buildCanonicalRoleLookup(
-  roles: readonly RegistryRoleDefinition[]
+  roles: readonly RegistryRoleDefinition[],
 ): ReadonlyMap<string, string> {
   const canonicalRoleByValue = new Map<string, string>();
   for (const role of roles) {
@@ -50,7 +50,7 @@ function buildCanonicalRoleLookup(
 }
 
 export function sortRoleDefinitionsForOutput(
-  roles: readonly RegistryRoleDefinition[]
+  roles: readonly RegistryRoleDefinition[],
 ): readonly RegistryRoleDefinition[] {
   return [...roles].sort((a, b) => {
     const priorityDiff = a.priority - b.priority;
@@ -60,7 +60,7 @@ export function sortRoleDefinitionsForOutput(
 
 export function populateByRoleView(
   patterns: readonly ExtractedPattern[],
-  roles: readonly RegistryRoleDefinition[]
+  roles: readonly RegistryRoleDefinition[],
 ): Record<string, ExtractedPattern[]> {
   const canonicalRoleByValue = buildCanonicalRoleLookup(roles);
   const groupedByRole = new Map<string, ExtractedPattern[]>();
@@ -105,7 +105,7 @@ export function transformToPatternGraphWithValidation(raw: RawDataset): Transfor
       malformedPatterns.push({
         patternId: getPatternName(pattern),
         issues: parseResult.error.issues.map(
-          (issue) => `${issue.path.join('.')}: ${issue.message}`
+          (issue) => `${issue.path.join('.')}: ${issue.message}`,
         ),
       });
       continue;

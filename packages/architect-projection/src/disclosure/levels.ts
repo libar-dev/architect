@@ -13,20 +13,22 @@ export const PROGRESSIVE_DISCLOSURE_LEVELS = [
   'advanced',
 ] as const;
 
-export const ProgressiveDisclosureLevelSchema = z.enum(PROGRESSIVE_DISCLOSURE_LEVELS).describe(
-  'Progressive disclosure tier for documentation content. "essential" = root summaries and orientation needed before any drill-down; "important" = primary details reachable from the same bundle; "useful" = secondary or nested detail available through explicit routes; "advanced" = deep reference material intentionally separated from the primary path.'
-);
+export const ProgressiveDisclosureLevelSchema = z
+  .enum(PROGRESSIVE_DISCLOSURE_LEVELS)
+  .describe(
+    'Progressive disclosure tier for documentation content. "essential" = root summaries and orientation needed before any drill-down; "important" = primary details reachable from the same bundle; "useful" = secondary or nested detail available through explicit routes; "advanced" = deep reference material intentionally separated from the primary path.',
+  );
 export type ProgressiveDisclosureLevel = z.infer<typeof ProgressiveDisclosureLevelSchema>;
 
 export const ProgressiveDisclosurePolicySchema = z
   .strictObject({
     level: ProgressiveDisclosureLevelSchema.describe(
-      'Disclosure tier this policy applies to. Determines whether content is always present, nearby, available on request, or relegated to deep reference material.'
+      'Disclosure tier this policy applies to. Determines whether content is always present, nearby, available on request, or relegated to deep reference material.',
     ),
     availability: z
       .enum(['always', 'nearby', 'available', 'reference'])
       .describe(
-        'Where this tier surfaces relative to the primary document path. "always" = inline in the root document; "nearby" = same bundle, one hop away; "available" = explicit route the reader must follow; "reference" = deep-link only, off the primary path.'
+        'Where this tier surfaces relative to the primary document path. "always" = inline in the root document; "nearby" = same bundle, one hop away; "available" = explicit route the reader must follow; "reference" = deep-link only, off the primary path.',
       ),
     purpose: z
       .string()
@@ -34,7 +36,7 @@ export const ProgressiveDisclosurePolicySchema = z
       .describe('One-sentence rationale for placing content at this disclosure level.'),
   })
   .describe(
-    'Policy entry mapping a progressive-disclosure level to its surface availability and the editorial reason for placing content there.'
+    'Policy entry mapping a progressive-disclosure level to its surface availability and the editorial reason for placing content there.',
   );
 
 export type ProgressiveDisclosurePolicy = z.infer<typeof ProgressiveDisclosurePolicySchema>;

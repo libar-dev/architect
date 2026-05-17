@@ -257,7 +257,7 @@ export function createPatternGraphWithRoadmap(): RuntimePatternGraph {
  */
 export function createPatternGraphWithCategories(
   categories: string[],
-  patternsPerCategory = 2
+  patternsPerCategory = 2,
 ): RuntimePatternGraph {
   const patterns = createTestPatternSet({
     categories,
@@ -285,7 +285,7 @@ export function createPatternGraphWithADRs(count = 3): RuntimePatternGraph {
         category: 'decision',
         status: i <= count / 2 ? 'completed' : 'active',
         // ADR-specific fields would go in the directive metadata
-      })
+      }),
     );
   }
 
@@ -315,7 +315,7 @@ function generateValidPatternId(index: number): string {
 
 function createPatternsWithStatusDistribution(
   counts: Partial<StatusCounts>,
-  categories: string[]
+  categories: string[],
 ): ExtractedPattern[] {
   const { completed = 0, active = 0, planned = 0 } = counts;
   const patterns: ExtractedPattern[] = [];
@@ -333,7 +333,7 @@ function createPatternsWithStatusDistribution(
         name: `CompletedPattern${i + 1}`,
         category: getCategory(),
         status: 'completed',
-      })
+      }),
     );
   }
 
@@ -345,7 +345,7 @@ function createPatternsWithStatusDistribution(
         name: `ActivePattern${i + 1}`,
         category: getCategory(),
         status: 'active',
-      })
+      }),
     );
   }
 
@@ -357,7 +357,7 @@ function createPatternsWithStatusDistribution(
         name: `PlannedPattern${i + 1}`,
         category: getCategory(),
         status: 'roadmap',
-      })
+      }),
     );
   }
 

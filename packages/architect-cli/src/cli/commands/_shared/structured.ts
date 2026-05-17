@@ -68,7 +68,7 @@ function parseQueryMethod(value: string): QueryMethod {
   const parsed = QueryMethodSchema.safeParse(value);
   if (!parsed.success) {
     throw new Error(
-      `Unknown API method: ${value}. Whitelisted methods: ${QUERY_METHODS.join(', ')}`
+      `Unknown API method: ${value}. Whitelisted methods: ${QUERY_METHODS.join(', ')}`,
     );
   }
   return parsed.data;
@@ -78,7 +78,7 @@ function parseArchSubcommand(value: string): ArchSubcommand {
   const parsed = ArchSubcommandSchema.safeParse(value);
   if (!parsed.success) {
     throw new Error(
-      `Unknown arch subcommand: ${value}. Supported arch subcommands: ${ARCH_SUBCOMMANDS.join(', ')}`
+      `Unknown arch subcommand: ${value}. Supported arch subcommands: ${ARCH_SUBCOMMANDS.join(', ')}`,
     );
   }
   return parsed.data;
@@ -87,7 +87,7 @@ function parseArchSubcommand(value: string): ArchSubcommand {
 export function validateStructuredCommandArgs(
   command: 'query' | 'arch',
   args: readonly string[],
-  flags: Readonly<Record<string, unknown>> = {}
+  flags: Readonly<Record<string, unknown>> = {},
 ): void {
   const rawValue = args[0];
   if (rawValue === undefined) {
@@ -176,7 +176,7 @@ function createBaselineResponse(
   comparison: DanglingBaselineComparison,
   baselinePath: string,
   written: boolean,
-  strict: boolean
+  strict: boolean,
 ): DanglingBaselineResponse {
   const drift = comparison.newEntries.length > 0 || comparison.removedEntries.length > 0;
   return {
@@ -196,7 +196,7 @@ function createBaselineResponse(
 
 async function executeDanglingCommand(
   context: CliContext,
-  flags: ArchCommandFlags
+  flags: ArchCommandFlags,
 ): Promise<readonly DanglingReference[] | DanglingBaselineResponse> {
   const current = context.build.validation.danglingReferences;
   const baselineRequested =
@@ -220,7 +220,7 @@ async function executeDanglingCommand(
     comparison,
     baselinePath ?? DANGLING_BASELINE_SOURCE_PATH,
     flags.writeBaseline === true,
-    flags.strict === true
+    flags.strict === true,
   );
 
   if (flags.strict === true && response.drift) {
@@ -233,7 +233,7 @@ async function executeDanglingCommand(
 async function executeArchCommand(
   context: CliContext,
   args: readonly string[],
-  flags: Readonly<Record<string, unknown>> = {}
+  flags: Readonly<Record<string, unknown>> = {},
 ): Promise<unknown> {
   const rawSubcommand = args[0];
   if (rawSubcommand === undefined) {
@@ -278,7 +278,7 @@ export async function executeStructuredCommand(
   context: CliContext,
   command: string,
   args: readonly string[],
-  flags: Readonly<Record<string, unknown>> = {}
+  flags: Readonly<Record<string, unknown>> = {},
 ): Promise<unknown> {
   switch (command) {
     case 'query':
@@ -296,7 +296,7 @@ export async function writeStructuredResponse(
   context: CliContext,
   command: string,
   args: readonly string[],
-  flags: Readonly<Record<string, unknown>> = {}
+  flags: Readonly<Record<string, unknown>> = {},
 ): Promise<void> {
   const data = await executeStructuredCommand(context, command, args, flags);
   writeJson(createEnvelope(context, data));

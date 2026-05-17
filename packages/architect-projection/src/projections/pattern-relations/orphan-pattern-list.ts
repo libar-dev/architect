@@ -35,7 +35,7 @@ import type { OrphanPatternList } from '../../fragments/pattern-relations/index.
 import { buildOrphanPatternList } from './orphan-pattern-list.internal.js';
 
 export function projectOrphanPatternList(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<OrphanPatternList> {
   return projectSingle(buildOrphanPatternList(context));
 }

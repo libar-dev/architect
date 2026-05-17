@@ -95,7 +95,7 @@ export function extractProcessMetadata(feature: ScannedGherkinFile): ProcessMeta
       `Process metadata validation failed in ${feature.filePath}: ` +
         validation.error.issues
           .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
-          .join(', ')
+          .join(', '),
     );
     return null;
   }
@@ -162,7 +162,7 @@ export function extractDeliverables(feature: ScannedGherkinFile): ExtractDeliver
 
       if (!validation.success) {
         const statusIssue = validation.error.issues.find(
-          (issue) => issue.path.length === 1 && issue.path[0] === 'status'
+          (issue) => issue.path.length === 1 && issue.path[0] === 'status',
         );
         if (statusIssue) {
           const rawStatus = statusHeader ? (row[statusHeader]?.trim() ?? '') : '';
@@ -171,15 +171,15 @@ export function extractDeliverables(feature: ScannedGherkinFile): ExtractDeliver
               feature.filePath,
               'invalid-enum-value',
               `Unrecognized deliverable status '${rawStatus}'`,
-              `Valid values: ${DELIVERABLE_STATUS_VALUES.join(', ')}`
-            )
+              `Valid values: ${DELIVERABLE_STATUS_VALUES.join(', ')}`,
+            ),
           );
         } else {
           console.warn(
             `Deliverable validation failed in ${feature.filePath}: ` +
               validation.error.issues
                 .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
-                .join(', ')
+                .join(', '),
           );
         }
         continue;
@@ -194,7 +194,7 @@ export function extractDeliverables(feature: ScannedGherkinFile): ExtractDeliver
 
 export function combineSources(
   codePatterns: readonly ExtractedPattern[],
-  featureFiles: readonly ScannedGherkinFile[]
+  featureFiles: readonly ScannedGherkinFile[],
 ): DualSourceResults {
   const combined: DualSourcePattern[] = [];
   const codeOnly: ExtractedPattern[] = [];
@@ -257,7 +257,7 @@ export function combineSources(
     if (hasCollision) {
       warnings.push(
         `Pattern name collision: "${patternName}" defined in ${String(codePatternArray.length)} files: ` +
-          codePatternArray.map((pattern) => pattern.source.file).join(', ')
+          codePatternArray.map((pattern) => pattern.source.file).join(', '),
       );
     }
 
@@ -281,14 +281,14 @@ export function validateDualSource(results: DualSourceResults): ValidationSummar
   for (const pattern of results.codeOnly) {
     if (pattern.status === DEFAULT_STATUS) {
       warnings.push(
-        `Roadmap pattern "${getPatternName(pattern)}" has code stub but no feature file`
+        `Roadmap pattern "${getPatternName(pattern)}" has code stub but no feature file`,
       );
     }
   }
   for (const metadata of results.featureOnly) {
     if (metadata.status === DEFAULT_STATUS) {
       warnings.push(
-        `Feature "${metadata.pattern}" (phase ${String(metadata.phase)}) has no code stub`
+        `Feature "${metadata.pattern}" (phase ${String(metadata.phase)}) has no code stub`,
       );
     }
   }

@@ -26,11 +26,11 @@ export function createIndexRouteId(documentType: string): `${string}:index` {
 
 export function createEntityRouteId(
   documentType: string,
-  stableEntityId: string
+  stableEntityId: string,
 ): `${string}:${string}` {
   return `${assertLogicalRouteSegment(documentType, 'documentType')}:${assertLogicalRouteSegment(
     stableEntityId,
-    'stableEntityId'
+    'stableEntityId',
   )}`;
 }
 
@@ -38,14 +38,14 @@ export function createChildRouteId(
   documentType: string,
   stableEntityId: string,
   childKind: string,
-  stableChildId: string
+  stableChildId: string,
 ): `${string}:${string}:${string}:${string}` {
   return `${assertLogicalRouteSegment(documentType, 'documentType')}:${assertLogicalRouteSegment(
     stableEntityId,
-    'stableEntityId'
+    'stableEntityId',
   )}:${assertLogicalRouteSegment(childKind, 'childKind')}:${assertLogicalRouteSegment(
     stableChildId,
-    'stableChildId'
+    'stableChildId',
   )}`;
 }
 
@@ -73,7 +73,7 @@ function assertLogicalRouteSegment(value: string, label: string): string {
   }
 
   throw new Error(
-    `${label} must contain only letters, numbers, underscores, and hyphens, and must start with a letter or number.`
+    `${label} must contain only letters, numbers, underscores, and hyphens, and must start with a letter or number.`,
   );
 }
 

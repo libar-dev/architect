@@ -37,10 +37,10 @@ describeFeature(
                 JSON.parse(lastResult?.stdout ?? '') as unknown;
               }).not.toThrow();
             });
-          }
+          },
         );
-      }
+      },
     );
   },
-  { excludeTags: ['@skip'] }
+  { excludeTags: ['@skip'] },
 );

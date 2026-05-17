@@ -110,12 +110,12 @@ function resolveOptions(options: RenderUiOptions | undefined): Required<RenderUi
 
 function renderBundle(
   bundle: ProjectionBundle<Fragment>,
-  options: Required<RenderUiOptions>
+  options: Required<RenderUiOptions>,
 ): UiDocument {
   const bundleChildren = getSortedEntries(bundle.children);
   const bundleChildRefs = createChildLinkRefs(
     bundleChildren,
-    bundle.routing?.anchorStrategy ?? 'heading-slug'
+    bundle.routing?.anchorStrategy ?? 'heading-slug',
   );
   const rootDocument = renderFragment(bundle.root, options, bundleChildRefs);
   const renderedBundleChildren = renderChildren(bundleChildren, options, bundleChildRefs);
@@ -126,7 +126,7 @@ function renderBundle(
 function renderFragment(
   fragment: Fragment,
   options: Required<RenderUiOptions>,
-  inheritedChildRefs: readonly ChildLinkRef[] = []
+  inheritedChildRefs: readonly ChildLinkRef[] = [],
 ): UiDocument {
   return dispatchByKind(fragment, UI_RENDERERS, renderStructuredFragment, {
     options,
@@ -136,7 +136,7 @@ function renderFragment(
 
 function renderPatternDetail(
   fragment: PatternDetail,
-  renderOptions: RenderFragmentOptions
+  renderOptions: RenderFragmentOptions,
 ): UiDocument {
   const { options, inheritedChildRefs } = renderOptions;
   const childRefs = inheritedChildRefs;
@@ -175,7 +175,7 @@ function renderPatternDetail(
               item.location,
               item.tests.join(', '),
             ]),
-            ['left', 'left', 'left', 'left']
+            ['left', 'left', 'left', 'left'],
           ),
         ];
 
@@ -193,9 +193,9 @@ function renderPatternDetail(
           implementedBy.map((entry) =>
             entry.description !== undefined && entry.description.length > 0
               ? `${entry.name} — ${entry.file} — ${entry.description}`
-              : `${entry.name} — ${entry.file}`
-          )
-        )
+              : `${entry.name} — ${entry.file}`,
+          ),
+        ),
       );
       continue;
     }
@@ -240,7 +240,7 @@ function renderPatternDetail(
           table(
             ['Name', 'Stub File', 'Target Path'],
             fragment.stubs.map((stub) => [stub.name, stub.stubFile, stub.targetPath]),
-            ['left', 'left', 'left']
+            ['left', 'left', 'left'],
           ),
         ];
 
@@ -275,7 +275,7 @@ function renderPatternDetail(
 
 function renderStructuredFragment(
   fragment: Fragment,
-  renderOptions: RenderFragmentOptions
+  renderOptions: RenderFragmentOptions,
 ): UiDocument {
   const { options, inheritedChildRefs } = renderOptions;
   const sections = getOrderedFieldKeys(fragment)
@@ -284,8 +284,8 @@ function renderStructuredFragment(
         key,
         (fragment as Record<string, unknown>)[key],
         inheritedChildRefs,
-        options
-      )
+        options,
+      ),
     )
     .filter((section): section is UiSection => section !== null);
 
@@ -300,7 +300,7 @@ function createFieldSection(
   key: string,
   value: unknown,
   childRefs: readonly ChildLinkRef[],
-  options: Required<RenderUiOptions>
+  options: Required<RenderUiOptions>,
 ): UiSection | null {
   if (value === undefined) {
     return null;
@@ -349,10 +349,10 @@ function createFieldSection(
             columns.map(humanizeKey),
             tabularRows.map((row) =>
               columns.map((column) =>
-                formatPrimitiveLike((row[column] as PrimitiveLike | undefined) ?? '')
-              )
+                formatPrimitiveLike((row[column] as PrimitiveLike | undefined) ?? ''),
+              ),
             ),
-            columns.map((): 'left' => 'left')
+            columns.map((): 'left' => 'left'),
           ),
         ],
       };
@@ -384,7 +384,7 @@ function createFieldSection(
             humanizeKey(entryKey),
             formatPrimitiveLike(entryValue),
           ]),
-          ['left', 'left']
+          ['left', 'left'],
         ),
       ],
     };
@@ -400,7 +400,7 @@ function createFieldSection(
 function rewriteBlocks(
   blocks: readonly Block[],
   childRefs: readonly ChildLinkRef[],
-  resolveChildLinks: boolean
+  resolveChildLinks: boolean,
 ): Block[] {
   if (!resolveChildLinks || childRefs.length === 0) {
     return [...blocks];
@@ -473,16 +473,16 @@ function mergeChildren(document: UiDocument, children: Record<string, UiDocument
 function renderChildren(
   childEntries: readonly (readonly [string, Fragment])[],
   options: Required<RenderUiOptions>,
-  inheritedChildRefs: readonly ChildLinkRef[]
+  inheritedChildRefs: readonly ChildLinkRef[],
 ): Record<string, UiDocument> {
   return Object.fromEntries(
-    childEntries.map(([key, child]) => [key, renderFragment(child, options, inheritedChildRefs)])
+    childEntries.map(([key, child]) => [key, renderFragment(child, options, inheritedChildRefs)]),
   );
 }
 
 function createChildLinkRefs(
   childEntries: readonly (readonly [string, Fragment])[],
-  anchorStrategy: 'heading-slug' | 'kind-id'
+  anchorStrategy: 'heading-slug' | 'kind-id',
 ): ChildLinkRef[] {
   return childEntries.map(([key, child]) => {
     const headingValue = deriveHeading(child);

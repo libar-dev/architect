@@ -25,6 +25,7 @@ That posture is the baseline. The findings below are the residual gaps a campaig
 **File:** `src/projections/documentation-composition/documentation-types.ts:342-344` (validation loop), `:140-340` (registry literal), `:359-377` (re-frozen exports).
 
 **Current pattern.** Loading this module runs:
+
 1. A 200-LOC frozen registry literal.
 2. `DOCUMENTATION_TYPE_REGISTRY.forEach((entry) => DocumentationTypeRegistryEntrySchema.parse(entry))` — a 12-pass Zod parse at every import.
 3. Three more `Object.freeze` passes over the filtered registries.
@@ -86,19 +87,23 @@ The annotation `BlockSchema: z.ZodType<Block>` does catch drift, but it makes th
 ```ts
 export const CodeBlockSchema = z.strictObject({
   type: z.literal('code'),
-  language: z.string().optional().describe('Language hint for syntax highlighting (e.g. "ts", "bash").'),
+  language: z
+    .string()
+    .optional()
+    .describe('Language hint for syntax highlighting (e.g. "ts", "bash").'),
   content: z.string().describe('Raw code text. Rendered inside a fenced block.'),
 });
 export type CodeBlock = z.infer<typeof CodeBlockSchema>;
 
 // And the union:
 export const BlockSchema = z.discriminatedUnion('type', [
-  HeadingBlockSchema, ParagraphBlockSchema, /* ... */
+  HeadingBlockSchema,
+  ParagraphBlockSchema /* ... */,
 ]);
 export type Block = z.infer<typeof BlockSchema>;
 ```
 
-Watch for the `exactOptionalPropertyTypes` interaction — `z.string().optional()` infers to `string | undefined` on the property *value*, which behaves slightly differently than `field?: string` (omitted-vs-present-undefined). Today's hand-written types already use `language?: string | undefined`, so the inferred shape matches.
+Watch for the `exactOptionalPropertyTypes` interaction — `z.string().optional()` infers to `string | undefined` on the property _value_, which behaves slightly differently than `field?: string` (omitted-vs-present-undefined). Today's hand-written types already use `language?: string | undefined`, so the inferred shape matches.
 
 ---
 
@@ -120,7 +125,9 @@ This is the same inversion as F2 but uglier: the schema is declared (lines 35-65
 **Migration/fix.** Replace the literal-derived type with a schema-derived type:
 
 ```ts
-export type SupportedDocumentationTypeRegistryEntry = z.infer<typeof SupportedDocumentationTypeRegistryEntrySchema>;
+export type SupportedDocumentationTypeRegistryEntry = z.infer<
+  typeof SupportedDocumentationTypeRegistryEntrySchema
+>;
 export type SupportedDocumentationType = SupportedDocumentationTypeRegistryEntry['key'];
 // SupportedDocumentationType is now `string` at the type level — accurate when the
 // registry is supplied via DocDefinition. Use scope-validate/runtime checks for closed-set
@@ -148,11 +155,15 @@ Ship the campaign's `extractZodSchemaFields` against these schemas today and the
 
 ```ts
 export const ProgressiveDisclosurePolicySchema = z.strictObject({
-  level: ProgressiveDisclosureLevelSchema
-    .describe('Disclosure tier this policy applies to. Determines whether content is always included, nearby, available on request, or relegated to reference docs.'),
-  availability: z.enum(['always', 'nearby', 'available', 'reference'])
+  level: ProgressiveDisclosureLevelSchema.describe(
+    'Disclosure tier this policy applies to. Determines whether content is always included, nearby, available on request, or relegated to reference docs.',
+  ),
+  availability: z
+    .enum(['always', 'nearby', 'available', 'reference'])
     .describe('Where the content surfaces relative to the primary document path.'),
-  purpose: z.string().min(1)
+  purpose: z
+    .string()
+    .min(1)
     .describe('One-sentence rationale for placing content at this disclosure level.'),
 });
 ```
@@ -192,7 +203,8 @@ The template-literal type passes type checks for any 2/4-segment colon-separated
 export const LogicalRouteIdSchema = z
   .string()
   .refine(isLogicalRouteId, {
-    message: 'Logical route IDs must be docType:index, docType:stableEntityId, or docType:stableEntityId:childKind:stableChildId.',
+    message:
+      'Logical route IDs must be docType:index, docType:stableEntityId, or docType:stableEntityId:childKind:stableChildId.',
   })
   .brand<'LogicalRouteId'>();
 
@@ -236,7 +248,7 @@ Once ContentFragment lands and every fragment has a markdown normalizer (the goa
 
 **File:** `src/renderers/render-markdown.ts:50` (`import { getDocumentationTypeMetadata }`), `src/renderers/markdown-paths.ts:3, 26, 48`.
 
-**Current pattern.** `render-markdown.ts` and `markdown-paths.ts` both import `getDocumentationTypeMetadata` from a *projection* module and consume `disclosureMatrix`, `childDirectory`, `markdownRootTarget` at render time. Hardcoded doc-type literals leak: `'requirements-executable'` (markdown-paths:26), `'milestones'` (markdown-paths:48).
+**Current pattern.** `render-markdown.ts` and `markdown-paths.ts` both import `getDocumentationTypeMetadata` from a _projection_ module and consume `disclosureMatrix`, `childDirectory`, `markdownRootTarget` at render time. Hardcoded doc-type literals leak: `'requirements-executable'` (markdown-paths:26), `'milestones'` (markdown-paths:48).
 
 This is the doctrine-flagged issue (Phase 1 H3 + H4), but from a framework lens it is also a layer inversion: `@architect-bounded-context:rendering` modules importing from `@architect-bounded-context:documentation-composition`. The dependency graph leaks. ESLint `import/no-cycle` is on, but `no-restricted-imports` is not configured to forbid this cross-bounded-context call.
 
@@ -271,7 +283,7 @@ This is the doctrine-flagged issue (Phase 1 H3 + H4), but from a framework lens 
 
 **Why it matters for the campaign.** ContentFragment authors who want to embed hand-authored markdown will discover they need TRUSTED_MARKDOWN to bypass `escapeText`, and a well-meaning refactor will export it.
 
-**Migration/fix.** Tighten the contract with a lint rule that prevents *anyone* from importing the constant by name:
+**Migration/fix.** Tighten the contract with a lint rule that prevents _anyone_ from importing the constant by name:
 
 ```js
 // eslint.config.mjs additions:
@@ -295,6 +307,7 @@ This is the doctrine-flagged issue (Phase 1 H3 + H4), but from a framework lens 
 **File:** `packages/architect-projection/vitest.config.ts:1, 11`.
 
 **Current pattern.**
+
 ```ts
 import path from 'path';                  // CommonJS-style import
 // ...
@@ -306,12 +319,15 @@ The sibling `vitest.perf-report.config.mjs` uses the ESM-native form (`fileURLTo
 **Why it matters for the campaign.** Low. Vitest's loader shims `__dirname` for `.ts` configs, so it works today. But the campaign adds perf measurements (per Phase 2 H2) that may copy this config pattern; consistency is cheap to fix.
 
 **Migration/fix.**
+
 ```ts
 import path from 'node:path';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  test: { /* ... */ },
+  test: {
+    /* ... */
+  },
   root: import.meta.dirname,
   clearScreen: false,
 });
@@ -387,16 +403,16 @@ Wire into the existing `test:barrel-audit` script. (Confirms Phase 3 D-C2 / Phas
 
 The campaign's headline extractor will generate disclosure / routing / options tables from Zod schemas. The 8 below are sampled by their probability of being demoed first and by how much config surface their fields expose. **P0** = unblocks the headline demo; **P1** = stabilises the second-wave demos; **P2** = nice-to-have. All entries currently show `bare` for `.describe()` state.
 
-| # | Schema | File | Field count | Current `.describe()` | Campaign extractor target? | Priority |
-|---|---|---|---|---|---|---|
-| 1 | `ProgressiveDisclosurePolicySchema` | `projections/documentation-composition/progressive-disclosure.ts:16-20` | 3 (level, availability, purpose) | bare | **yes** — DEEP-DIVE headline demo | **P0** |
-| 2 | `ProgressiveDisclosureLevelSchema` | `progressive-disclosure.ts:13` | 4 enum cases | bare | **yes** — paired table | **P0** |
-| 3 | `DisclosureSpecSchema` | `projections/documentation-composition/disclosure-spec.ts:26-33` | 6 (grouping, richness, rootShape, emitChildren, committed, filter) | bare | **yes** — ContentFragment ref table | **P0** |
-| 4 | `ContentRichnessSchema` | `disclosure-spec.ts:8-13` | 4 enum cases | bare | yes | **P0** |
-| 5 | `GroupingAxisSchema` | `disclosure-spec.ts:15-22` | 6 enum cases | bare | yes | **P1** |
-| 6 | `RootShapeSchema` | `disclosure-spec.ts:24` | 2 enum cases | bare | yes | **P1** |
-| 7 | `DocumentationTypeRegistryEntrySchema` (+ Supported / Dropped variants) | `projections/documentation-composition/documentation-types.ts:35-65` | 8–10 (key, status, generatorAliases, childDirectory, markdownRootTarget, disclosureMatrix, …) | bare | yes — but module being replaced (Phase 1 C1) | **P1** if pre-replacement docs target it; **P2** otherwise |
-| 8 | `BlockSchema` variants (Heading / Paragraph / Code / List / …) | `blocks/schema.ts:73-152` | 9 schemas × 2–4 fields each | bare | likely — ContentFragment renders into Blocks; reference docs for the substrate | **P1** |
+| #   | Schema                                                                  | File                                                                    | Field count                                                                                   | Current `.describe()` | Campaign extractor target?                                                     | Priority                                                   |
+| --- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| 1   | `ProgressiveDisclosurePolicySchema`                                     | `projections/documentation-composition/progressive-disclosure.ts:16-20` | 3 (level, availability, purpose)                                                              | bare                  | **yes** — DEEP-DIVE headline demo                                              | **P0**                                                     |
+| 2   | `ProgressiveDisclosureLevelSchema`                                      | `progressive-disclosure.ts:13`                                          | 4 enum cases                                                                                  | bare                  | **yes** — paired table                                                         | **P0**                                                     |
+| 3   | `DisclosureSpecSchema`                                                  | `projections/documentation-composition/disclosure-spec.ts:26-33`        | 6 (grouping, richness, rootShape, emitChildren, committed, filter)                            | bare                  | **yes** — ContentFragment ref table                                            | **P0**                                                     |
+| 4   | `ContentRichnessSchema`                                                 | `disclosure-spec.ts:8-13`                                               | 4 enum cases                                                                                  | bare                  | yes                                                                            | **P0**                                                     |
+| 5   | `GroupingAxisSchema`                                                    | `disclosure-spec.ts:15-22`                                              | 6 enum cases                                                                                  | bare                  | yes                                                                            | **P1**                                                     |
+| 6   | `RootShapeSchema`                                                       | `disclosure-spec.ts:24`                                                 | 2 enum cases                                                                                  | bare                  | yes                                                                            | **P1**                                                     |
+| 7   | `DocumentationTypeRegistryEntrySchema` (+ Supported / Dropped variants) | `projections/documentation-composition/documentation-types.ts:35-65`    | 8–10 (key, status, generatorAliases, childDirectory, markdownRootTarget, disclosureMatrix, …) | bare                  | yes — but module being replaced (Phase 1 C1)                                   | **P1** if pre-replacement docs target it; **P2** otherwise |
+| 8   | `BlockSchema` variants (Heading / Paragraph / Code / List / …)          | `blocks/schema.ts:73-152`                                               | 9 schemas × 2–4 fields each                                                                   | bare                  | likely — ContentFragment renders into Blocks; reference docs for the substrate | **P1**                                                     |
 
 Six P0 schemas, totalling **23 fields + enum cases**, gate the headline demo. None of them changes wire shape — `.describe()` is metadata-only. Adding them is a one-session change.
 

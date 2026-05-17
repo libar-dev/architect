@@ -8,7 +8,7 @@
  * ### When to Use
  *
  * - Defines the StatusDistribution fragment shape for status counts and
-*   percentages.
+ *   percentages.
  */
 import { z } from 'zod';
 

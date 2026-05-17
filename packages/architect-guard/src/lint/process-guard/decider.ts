@@ -246,7 +246,7 @@ export function validateChanges(input: DeciderInput): DeciderOutput {
 function checkProtectionLevel(
   state: ProcessState,
   changes: ChangeDetection,
-  registry?: TagRegistry
+  registry?: TagRegistry,
 ): ProcessViolation[] {
   const tagPrefix = registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
   const violations: ProcessViolation[] = [];
@@ -268,8 +268,8 @@ function checkProtectionLevel(
           'error',
           `Cannot modify completed spec '${file}' without unlock reason`,
           file,
-          `Add ${tagPrefix}unlock-reason:'your reason' to proceed`
-        )
+          `Add ${tagPrefix}unlock-reason:'your reason' to proceed`,
+        ),
       );
     }
   }
@@ -327,7 +327,7 @@ function checkStatusTransitions(state: ProcessState, changes: ChangeDetection): 
       }
 
       violations.push(
-        createViolation('invalid-status-transition', 'error', message, file, suggestion)
+        createViolation('invalid-status-transition', 'error', message, file, suggestion),
       );
     }
   }
@@ -355,8 +355,8 @@ function checkScopeCreep(state: ProcessState, changes: ChangeDetection): Process
           'error',
           `Cannot add deliverables to active spec '${file}': ${deliverableChange.added.join(', ')}`,
           file,
-          'Create new spec or revert to roadmap status first'
-        )
+          'Create new spec or revert to roadmap status first',
+        ),
       );
     }
 
@@ -368,8 +368,8 @@ function checkScopeCreep(state: ProcessState, changes: ChangeDetection): Process
           'warning',
           `Deliverable removed from '${file}': ${deliverableChange.removed.join(', ')}`,
           file,
-          'Was this completed or descoped? Consider documenting the reason.'
-        )
+          'Was this completed or descoped? Consider documenting the reason.',
+        ),
       );
     }
   }
@@ -397,8 +397,8 @@ function checkSessionScope(state: ProcessState, changes: ChangeDetection): Proce
           'warning',
           `File '${file}' is not in session scope`,
           file,
-          `Add to session '${state.activeSession.id}' scope or use --ignore-session flag`
-        )
+          `Add to session '${state.activeSession.id}' scope or use --ignore-session flag`,
+        ),
       );
     }
   }
@@ -426,8 +426,8 @@ function checkSessionExcluded(state: ProcessState, changes: ChangeDetection): Pr
           'error',
           `File '${file}' is explicitly excluded from session '${state.activeSession.id}'`,
           file,
-          'This file was explicitly excluded and cannot be modified in this session'
-        )
+          'This file was explicitly excluded and cannot be modified in this session',
+        ),
       );
     }
   }
@@ -447,7 +447,7 @@ function createViolation(
   severity: ViolationSeverity,
   message: string,
   file: string,
-  suggestion?: string
+  suggestion?: string,
 ): ProcessViolation {
   // Build violation (handle exactOptionalPropertyTypes)
   const violation: ProcessViolation = { rule, severity, message, file };
@@ -490,7 +490,7 @@ export function getAllIssues(result: ValidationResult): readonly ProcessViolatio
  */
 export function getViolationsByRule(
   result: ValidationResult,
-  rule: ProcessGuardRule
+  rule: ProcessGuardRule,
 ): readonly ProcessViolation[] {
   return result.violations.filter((v) => v.rule === rule);
 }

@@ -67,7 +67,7 @@ function buildRoleLookup(roles: readonly { tag: string; aliases?: readonly strin
 
 function resolveCanonicalRole(
   rawValue: string,
-  lookup: ReturnType<typeof buildRoleLookup>
+  lookup: ReturnType<typeof buildRoleLookup>,
 ): string | undefined {
   if (lookup.canonical.has(rawValue)) return rawValue;
   return lookup.aliases.get(rawValue);
@@ -77,7 +77,7 @@ const IMPLICIT_BARE_ROLE_TAG_PATTERNS = [/^opportunity-\d+$/, /^capstone$/] as c
 
 function isImplicitBareRoleTag(
   rawValue: string,
-  roleLookup: ReturnType<typeof buildRoleLookup>
+  roleLookup: ReturnType<typeof buildRoleLookup>,
 ): boolean {
   return (
     roleLookup.all.has(rawValue) ||
@@ -142,7 +142,7 @@ function extractSteps(steps: readonly Messages.Step[]): GherkinStep[] {
 
 function extractExamples(
   examples: readonly Messages.Examples[],
-  registry?: TagRegistry
+  registry?: TagRegistry,
 ): GherkinExamples[] {
   return examples
     .filter((example) => example.tableHeader)
@@ -170,7 +170,7 @@ function extractExamples(
 
 export function parseFeatureFile(
   content: string,
-  filePath: string
+  filePath: string,
 ): Result<ParsedFeatureFile, GherkinFileError> {
   try {
     const tokenMatcher = filePath.endsWith('.feature.md')
@@ -347,7 +347,7 @@ export function parseFeatureFile(
 
 export function recoverPatternNameFromFeatureText(
   content: string,
-  registry: TagRegistry = createDefaultTagRegistry()
+  registry: TagRegistry = createDefaultTagRegistry(),
 ): string | undefined {
   const patternTagPrefix = `${registry.tagPrefix}pattern:`;
   for (const line of content.split(/\r?\n/)) {
@@ -363,7 +363,7 @@ export function recoverPatternNameFromFeatureText(
 
 export function extractPatternTags(
   tags: readonly string[],
-  registry: TagRegistry = createDefaultTagRegistry()
+  registry: TagRegistry = createDefaultTagRegistry(),
 ): {
   readonly pattern?: string;
   readonly boundedContext?: string;
@@ -424,7 +424,7 @@ export function extractPatternTags(
   }
 
   const getTransform = (
-    transform: MetadataTagDefinition['transform'] | undefined
+    transform: MetadataTagDefinition['transform'] | undefined,
   ): ((value: string) => string) | undefined => {
     if (typeof transform !== 'function') return undefined;
     return (value: string) => {
@@ -435,7 +435,7 @@ export function extractPatternTags(
 
   const metadata: Record<string, unknown> = {};
   const tagLookup = new Map<string, MetadataTagDefinition>(
-    registry.metadataTags.map((definition) => [definition.tag, definition] as const)
+    registry.metadataTags.map((definition) => [definition.tag, definition] as const),
   );
   const roleLookup = buildRoleLookup(registry.roles);
   const deprecatedTags: string[] = [];

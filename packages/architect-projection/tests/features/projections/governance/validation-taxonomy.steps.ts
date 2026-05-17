@@ -19,7 +19,7 @@ interface ValidationTaxonomyState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/governance/validation-taxonomy.feature'
+  'tests/features/projections/governance/validation-taxonomy.feature',
 );
 
 let state: ValidationTaxonomyState | null = null;
@@ -175,10 +175,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 needsUnlock: true,
               },
             ]);
-          }
+          },
         );
       });
-    }
+    },
   );
 
   Rule('Taxonomy overrides are explicit and per-call only', ({ RuleScenario }) => {
@@ -224,7 +224,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               enum: '@architect-status active',
               csv: '@architect-uses PatternGraphAPI, ProjectionBundle, RulesQueryAPI',
             });
-          }
+          },
         );
 
         And(
@@ -241,9 +241,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               example: '@architect-uses A, B, C',
             });
             expect(state!.secondDigest?.exampleOverrides).toBeUndefined();
-          }
+          },
         );
-      }
+      },
     );
   });
 
@@ -265,7 +265,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const metadataTags =
               state!.firstDigest?.tags
                 .flatMap((group) =>
-                  group.entries.flatMap((entry) => (entry.kind === 'metadata' ? [entry.tag] : []))
+                  group.entries.flatMap((entry) => (entry.kind === 'metadata' ? [entry.tag] : [])),
                 )
                 .sort() ?? [];
 
@@ -275,9 +275,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(metadataTags).not.toContain('shape');
             expect(metadataTags).not.toContain('target');
             expect(metadataTags).not.toContain('unlock-reason');
-          }
+          },
         );
-      }
+      },
     );
   });
 

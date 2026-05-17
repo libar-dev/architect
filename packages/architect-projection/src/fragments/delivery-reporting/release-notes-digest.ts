@@ -8,7 +8,7 @@
  * ### When to Use
  *
  * - Defines the ReleaseNotesDigest fragment shape for changelog-style release
-*   bundles.
+ *   bundles.
  */
 import { z } from 'zod';
 

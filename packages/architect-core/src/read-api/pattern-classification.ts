@@ -32,7 +32,7 @@ const declaredPatternIndexCache = new WeakMap<
 >();
 
 function getDeclaredPatternIndex(
-  graph: PatternGraph
+  graph: PatternGraph,
 ): ReadonlyMap<string, readonly DeclaredPatternTarget[]> {
   const cached = declaredPatternIndexCache.get(graph);
   if (cached !== undefined) return cached;
@@ -54,13 +54,13 @@ function getDeclaredPatternIndex(
 export function classifyEdgeExternality(
   graph: PatternGraph,
   sourcePattern: ExtractedPattern,
-  reference: string
+  reference: string,
 ): EdgeExternality {
   const declaredTargetsByName = getDeclaredPatternIndex(graph);
   const resolved = relationshipResolver.resolveUsesTarget(
     sourcePattern,
     reference,
-    declaredTargetsByName
+    declaredTargetsByName,
   );
   if (resolved === undefined) return 'dangling';
 

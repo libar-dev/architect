@@ -25,7 +25,7 @@ import {
 import { createTestPattern } from '../../../fixtures/pattern-factories.js';
 
 const feature = await loadFeature(
-  'tests/features/api/context-assembly/compact-text-renderer.feature'
+  'tests/features/api/context-assembly/compact-text-renderer.feature',
 );
 
 interface TestState {
@@ -51,7 +51,7 @@ function createProjectionContext(graph: ProjectionContext['graph']): ProjectionC
 
 function renderSessionContext(
   patterns: ExtractedPattern[],
-  sessionType: 'design' | 'implement'
+  sessionType: 'design' | 'implement',
 ): string {
   const dataset = createTestPatternGraph({ patterns });
   const focalPattern = patterns.find((pattern) => pattern.implementsPatterns === undefined);
@@ -63,7 +63,7 @@ function renderSessionContext(
     parseAndProjectSessionContext(createProjectionContext(dataset), {
       patterns: [focalPattern.patternName ?? focalPattern.name],
       sessionType,
-    })
+    }),
   );
 }
 
@@ -74,7 +74,7 @@ function renderDependencyTreeFor(patterns: ExtractedPattern[], pattern: string):
       pattern,
       maxDepth: 5,
       includeImplementationDeps: true,
-    })
+    }),
   );
 }
 
@@ -145,7 +145,7 @@ describeFeature(feature, ({ Rule }) => {
               targetPath: 'src/domain/order-saga.ts',
             }),
           ],
-          'design'
+          'design',
         );
       });
 
@@ -155,7 +155,7 @@ describeFeature(feature, ({ Rule }) => {
           for (const row of table) {
             expect(state!.output).toContain(row.section.trim());
           }
-        }
+        },
       );
     });
 
@@ -185,7 +185,7 @@ describeFeature(feature, ({ Rule }) => {
               ],
             }),
           ],
-          'implement'
+          'implement',
         );
       });
 
@@ -195,7 +195,7 @@ describeFeature(feature, ({ Rule }) => {
           for (const row of table) {
             expect(state!.output).toContain(row.section.trim());
           }
-        }
+        },
       );
 
       And('the output contains checkbox markers', () => {
@@ -217,7 +217,7 @@ describeFeature(feature, ({ Rule }) => {
             createTestPattern({ name: 'Middle', status: 'active', dependsOn: ['Root'] }),
             createTestPattern({ name: 'Leaf', status: 'roadmap', dependsOn: ['Middle'] }),
           ],
-          'Leaf'
+          'Leaf',
         );
       });
 
@@ -227,7 +227,7 @@ describeFeature(feature, ({ Rule }) => {
           for (const row of table) {
             expect(state!.output).toContain(row.section.trim());
           }
-        }
+        },
       );
     });
   });
@@ -239,7 +239,7 @@ describeFeature(feature, ({ Rule }) => {
         (_ctx: unknown, total: number, percent: number) => {
           state = initState();
           state.output = renderOverview(total, percent);
-        }
+        },
       );
 
       When('I format the overview', () => {});
@@ -250,7 +250,7 @@ describeFeature(feature, ({ Rule }) => {
           for (const row of table) {
             expect(state!.output).toContain(row.section.trim());
           }
-        }
+        },
       );
     });
 
@@ -260,7 +260,7 @@ describeFeature(feature, ({ Rule }) => {
         (_ctx: unknown, total: number, percentage: number) => {
           state = initState();
           state.output = renderOverview(total, percentage);
-        }
+        },
       );
 
       When('I format the overview', () => {});
@@ -317,7 +317,7 @@ describeFeature(feature, ({ Rule }) => {
                 implementsPatterns: ['OrderSaga'],
               }),
             ],
-            'OrderSaga'
+            'OrderSaga',
           );
         });
 
@@ -328,7 +328,7 @@ describeFeature(feature, ({ Rule }) => {
         And('the output contains {string}', (_ctx: unknown, text: string) => {
           expect(state!.output).toContain(text);
         });
-      }
+      },
     );
 
     RuleScenario('Empty file reading list renders minimal output', ({ Given, When, Then }) => {

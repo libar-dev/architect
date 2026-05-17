@@ -66,7 +66,7 @@ export const metaCommands = {
       };
       const ruleSet = projectBusinessRuleSet(
         requireCliContext(context).projection,
-        buildBusinessRuleSetProjectionOptions(parsed.flags)
+        buildBusinessRuleSetProjectionOptions(parsed.flags),
       );
       if (flags.namesOnly === true) {
         const childRuleSets = Object.values(ruleSet.children) as {
@@ -108,7 +108,7 @@ export const metaCommands = {
           return;
         }
         process.stdout.write(
-          `${String(counts.roles)} roles | ${String(counts.metadata)} metadata tags | ${String(counts.aggregation)} aggregation tags | ${String(counts.total)} total\n`
+          `${String(counts.roles)} roles | ${String(counts.metadata)} metadata tags | ${String(counts.aggregation)} aggregation tags | ${String(counts.total)} total\n`,
         );
         return;
       }
@@ -134,7 +134,7 @@ export const metaCommands = {
     execute(context): void {
       writeProjectionOutput(
         context.args,
-        projectAnnotationCoverage(requireCliContext(context).projection)
+        projectAnnotationCoverage(requireCliContext(context).projection),
       );
     },
   },

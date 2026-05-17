@@ -67,7 +67,7 @@ describeFeature(feature, ({ Rule }) => {
               expect(typeof architectProjection[exportName]).toBe('function');
             }
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -77,13 +77,13 @@ describeFeature(feature, ({ Rule }) => {
             'architect-projection hides the raw architecture diagram export from the top-level barrel',
             () => {
               expect(typeof architectProjection.parseAndProjectArchitectureDiagram).toBe(
-                'function'
+                'function',
               );
               expect('projectArchitectureDiagram' in architectProjection).toBe(false);
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
 });

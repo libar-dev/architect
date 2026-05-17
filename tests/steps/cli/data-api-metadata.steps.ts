@@ -168,7 +168,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(typeof metadata.patternCount).toBe('number');
           expect(metadata.patternCount).toBe(3);
         });
-      }
+      },
     );
   });
 });

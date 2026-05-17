@@ -220,7 +220,7 @@ export function buildGraphFromPatterns(options: GraphBuilderOptions): PatternGra
           pattern.adr === undefined &&
           (pattern.productArea !== undefined ||
             pattern.userRole !== undefined ||
-            pattern.businessValue !== undefined)
+            pattern.businessValue !== undefined),
       ),
     },
     byProductArea: buildProductAreaIndex(patterns),
@@ -256,7 +256,7 @@ function buildMaturityGroups(patterns: readonly ExtractedPattern[]): PatternGrap
 
 function buildPhaseGroups(
   patterns: readonly ExtractedPattern[],
-  phaseNames: Record<number, string>
+  phaseNames: Record<number, string>,
 ): PatternGraph['byPhase'] {
   const grouped = new Map<number, ExtractedPattern[]>();
 
@@ -322,7 +322,7 @@ function buildRoleGroups(patterns: readonly ExtractedPattern[]): PatternGraph['b
 
 function buildRelationshipIndex(
   patterns: readonly ExtractedPattern[],
-  overrides: Record<string, RelationshipEntry> | undefined
+  overrides: Record<string, RelationshipEntry> | undefined,
 ): Record<string, RelationshipEntry> {
   const index: Record<string, RelationshipEntry> = {};
 
@@ -392,7 +392,7 @@ function getPatternName(pattern: ExtractedPattern): string {
 }
 
 function buildProductAreaIndex(
-  patterns: readonly ExtractedPattern[]
+  patterns: readonly ExtractedPattern[],
 ): PatternGraph['byProductArea'] {
   const grouped: Record<string, ExtractedPattern[]> = {};
 

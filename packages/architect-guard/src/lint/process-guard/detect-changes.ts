@@ -85,7 +85,7 @@ export type ChangeDetectionOptions = WithTagRegistry & {
  */
 export function detectStagedChanges(
   baseDir: string,
-  options?: ChangeDetectionOptions
+  options?: ChangeDetectionOptions,
 ): Result<ChangeDetection> {
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
 
@@ -127,7 +127,7 @@ export function detectStagedChanges(
 export function detectBranchChanges(
   baseDir: string,
   baseBranch = 'main',
-  options?: ChangeDetectionOptions
+  options?: ChangeDetectionOptions,
 ): Result<ChangeDetection> {
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
 
@@ -175,7 +175,7 @@ export function detectBranchChanges(
 export function detectFileChanges(
   baseDir: string,
   files: readonly string[],
-  options?: ChangeDetectionOptions
+  options?: ChangeDetectionOptions,
 ): Result<ChangeDetection> {
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
 
@@ -253,7 +253,7 @@ function getProcessGuardFeaturePatterns(options?: ChangeDetectionOptions): reado
 function filterFeatureScopedFiles(
   baseDir: string,
   files: readonly string[],
-  options?: ChangeDetectionOptions
+  options?: ChangeDetectionOptions,
 ): string[] {
   const featurePatterns = getProcessGuardFeaturePatterns(options);
   if (featurePatterns.length === 0) {
@@ -265,7 +265,7 @@ function filterFeatureScopedFiles(
       cwd: baseDir,
       nodir: true,
       ignore: options?.exclude ? [...options.exclude] : [],
-    }).map((file) => path.normalize(file))
+    }).map((file) => path.normalize(file)),
   );
 
   return files.filter((file) => matchedFiles.has(path.normalize(file)));
@@ -323,7 +323,7 @@ interface DiffFileParseState {
 function detectStatusTransitions(
   diff: string,
   files: readonly string[],
-  tagPrefix: string = DEFAULT_TAG_PREFIX
+  tagPrefix: string = DEFAULT_TAG_PREFIX,
 ): [string, StatusTransition][] {
   const transitions: [string, StatusTransition][] = [];
   let currentFile = '';
@@ -488,7 +488,7 @@ function detectStatusTransitions(
  */
 export function detectDeliverableChanges(
   diff: string,
-  files: readonly string[]
+  files: readonly string[],
 ): [string, DeliverableChange][] {
   const changes: [string, DeliverableChange][] = [];
   let currentFile = '';
@@ -633,7 +633,7 @@ export function fileWasModified(detection: ChangeDetection, relativePath: string
  */
 export function getStatusTransition(
   detection: ChangeDetection,
-  relativePath: string
+  relativePath: string,
 ): StatusTransition | undefined {
   return detection.statusTransitions.get(relativePath);
 }
@@ -643,7 +643,7 @@ export function getStatusTransition(
  */
 export function getDeliverableChanges(
   detection: ChangeDetection,
-  relativePath: string
+  relativePath: string,
 ): DeliverableChange | undefined {
   return detection.deliverableChanges.get(relativePath);
 }

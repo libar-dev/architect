@@ -15,7 +15,7 @@ interface ReleaseNotesState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/delivery-reporting/release-notes.feature'
+  'tests/features/projections/delivery-reporting/release-notes.feature',
 );
 
 let state: ReleaseNotesState | null = null;
@@ -100,7 +100,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                 ],
               });
-            }
+            },
           );
 
           When('I project release notes without a filter', () => {
@@ -141,7 +141,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               'earlier',
             ]);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -166,7 +166,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                 ],
               });
-            }
+            },
           );
 
           When('I project release notes filtered to {string}', (_ctx: unknown, release: string) => {
@@ -178,10 +178,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             (_ctx: unknown, release: string) => {
               expect(state!.bundle?.root.releases).toHaveLength(1);
               expect(state!.bundle?.root.releases[0]?.release).toBe(release);
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
 });

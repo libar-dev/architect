@@ -42,7 +42,7 @@
  * ### When to Use
  *
  * - Provides shared pattern lookup, summary, relationship, deliverable, and
-*   rule normalization helpers.
+ *   rule normalization helpers.
  */
 
 import {
@@ -94,7 +94,7 @@ export function requirePattern(context: ProjectionContext, name: string): Extrac
 
 export function getRelationships(
   context: ProjectionContext,
-  name: string
+  name: string,
 ): RelationshipEntry | undefined {
   return resolveIndexedEntry(context.graph, context.graph.relationshipIndex, name);
 }
@@ -116,7 +116,7 @@ export function createPatternSummaryFragment(pattern: ExtractedPattern): Pattern
 
 export function normalizePatternRelationships(
   context: ProjectionContext,
-  patternName: string
+  patternName: string,
 ): PatternRelationships {
   const pattern = requirePattern(context, patternName);
   const relationships = getRelationships(context, patternName);
@@ -246,7 +246,7 @@ export function extractOpenQuestions(text: string): string[] {
         .trim()
         .replace(/^[-*]\s+/, '')
         .replace(/^\d+[.)]\s+/, '')
-        .trim()
+        .trim(),
     )
     .filter((line) => line.length > 0);
 }
@@ -288,7 +288,7 @@ function extractFirstSentenceRaw(text: string): string {
 function resolveIndexedEntry<T>(
   graph: PatternGraph,
   index: Readonly<Record<string, T>> | undefined,
-  name: string
+  name: string,
 ): T | undefined {
   if (index === undefined) {
     return undefined;
@@ -328,7 +328,7 @@ function resolveTestRefs(pattern: ExtractedPattern): string[] {
 
   const declaredCount = Math.max(
     ...(pattern.deliverables ?? []).map((deliverable) => deliverable.tests),
-    0
+    0,
   );
   const declaredCountLabel = String(declaredCount);
 
@@ -401,7 +401,7 @@ function parseBusinessRuleAnnotations(description: string): {
 
 function deduplicateScenarioNames(
   scenarioNames: readonly string[],
-  verifiedBy: readonly string[] | undefined
+  verifiedBy: readonly string[] | undefined,
 ): string[] {
   const seen = new Map<string, string>();
 

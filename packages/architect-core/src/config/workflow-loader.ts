@@ -59,7 +59,7 @@ const DEFAULT_LOADED_WORKFLOW: LoadedWorkflow = createLoadedWorkflow(DEFAULT_WOR
 
 export async function loadWorkflowFromPath(
   configPath: string,
-  source?: string
+  source?: string,
 ): Promise<Result<LoadedWorkflow, WorkflowLoadError>> {
   const errorSource = source ?? configPath;
 

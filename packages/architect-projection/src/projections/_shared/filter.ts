@@ -21,7 +21,7 @@ export function filterPattern(pattern: ExtractedPattern, filter: ProjectionFilte
 
 export function filterPatterns(
   patterns: readonly ExtractedPattern[],
-  filter: ProjectionFilter | undefined
+  filter: ProjectionFilter | undefined,
 ): ExtractedPattern[] {
   return filter === undefined
     ? [...patterns]
@@ -30,7 +30,7 @@ export function filterPatterns(
 
 function matchesMaturity(
   pattern: ExtractedPattern,
-  maturity: ProjectionFilter['maturity']
+  maturity: ProjectionFilter['maturity'],
 ): boolean {
   return maturity === undefined || maturity.includes(inferMaturity(pattern.status));
 }

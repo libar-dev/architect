@@ -57,7 +57,7 @@ describeFeature(
             const value = getJsonValueAtPath(doc, 'metadata.validation.warningCount');
             expect(typeof value).toBe('number');
           });
-        }
+        },
       );
 
       RuleScenario('unknown command name produces a diagnostic', ({ When, Then, And }) => {
@@ -79,5 +79,5 @@ describeFeature(
       });
     });
   },
-  { excludeTags: ['@skip'] }
+  { excludeTags: ['@skip'] },
 );

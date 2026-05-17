@@ -35,7 +35,7 @@ interface ExecutionContextState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/execution-context/context-session.feature'
+  'tests/features/projections/execution-context/context-session.feature',
 );
 
 let state: ExecutionContextState | null = null;
@@ -115,7 +115,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                 },
               });
-            }
+            },
           );
 
           When('I project scope readiness for "ProjectionBody" in the implement session', () => {
@@ -136,10 +136,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 checkId: 'dependencies-completed',
                 severity: 'error',
                 passed: false,
-              })
+              }),
             );
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -159,7 +159,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               state!.context = createProjectionContext({
                 patterns: [pattern, dependency],
               });
-            }
+            },
           );
 
           When('I project scope readiness for "ProjectionBody" in the design session', () => {
@@ -180,10 +180,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 checkId: 'stubs-from-deps-exist',
                 severity: 'warning',
                 passed: false,
-              })
+              }),
             );
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -203,7 +203,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               state!.context = createProjectionContext({
                 patterns: [pattern, dependency],
               });
-            }
+            },
           );
 
           When(
@@ -214,7 +214,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 sessionType: 'design',
                 strict: true,
               });
-            }
+            },
           );
 
           Then('the scope readiness verdict should be "BLOCKED"', () => {
@@ -228,12 +228,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 checkId: 'stubs-from-deps-exist',
                 severity: 'error',
                 passed: false,
-              })
+              }),
             );
           });
-        }
+        },
       );
-    }
+    },
   );
 
   Rule('Session context varies by session type', ({ RuleScenario }) => {
@@ -310,7 +310,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               },
               includeArchIndex: true,
             });
-          }
+          },
         );
 
         When('I project session context for the planning design and implement sessions', () => {
@@ -378,7 +378,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 file: 'packages/architect-projection/src/projections/pattern-relations/pattern-detail.ts',
               },
             ]);
-          }
+          },
         );
 
         And('the implement session context should include test files and FSM data', () => {
@@ -417,9 +417,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(rendered).not.toBeNull();
               expect(FragmentSchema.safeParse(rendered).success).toBe(true);
             }
-          }
+          },
         );
-      }
+      },
     );
 
     RuleScenario(
@@ -434,7 +434,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             });
 
             state!.context = createProjectionContext({ patterns: [pattern] });
-          }
+          },
         );
 
         When('I parse-and-project session context with an invalid session type', () => {
@@ -451,11 +451,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
         Then('parsing session context options should fail loudly', () => {
           expect(state!.invalidOptionsError).toContain(
-            'Invalid options for parseAndProjectSessionContext:'
+            'Invalid options for parseAndProjectSessionContext:',
           );
           expect(state!.invalidOptionsError).toContain('sessionType');
         });
-      }
+      },
     );
   });
 
@@ -550,7 +550,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               },
               includeArchIndex: true,
             });
-          }
+          },
         );
 
         When('I project the file reading list and deliverable views for "ProjectionBody"', () => {
@@ -559,12 +559,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           })?.root;
           state!.deliverableManifest = projectDeliverableManifest(
             state!.context!,
-            'ProjectionBody'
+            'ProjectionBody',
           )?.root;
           state!.deliverable = projectDeliverable(
             state!.context!,
             'ProjectionBody',
-            'projection tests'
+            'projection tests',
           )?.root;
         });
 
@@ -595,7 +595,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 'packages/architect-projection/src/projections/governance/business-rules.ts',
               ],
             });
-          }
+          },
         );
 
         And('the deliverable manifest should preserve the declared deliverable order', () => {
@@ -615,7 +615,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               'packages/architect-projection/tests/features/projections/execution-context/context-session.feature',
           });
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -671,7 +671,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               },
               includeArchIndex: true,
             });
-          }
+          },
         );
 
         When('I project the file reading list for "ProjectionBody" without related files', () => {
@@ -696,7 +696,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             architectureNeighbors: [],
           });
         });
-      }
+      },
     );
   });
 
@@ -747,7 +747,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 }),
               },
             });
-          }
+          },
         );
 
         When('I project handoff for "ProjectionBody" in the implement session', () => {
@@ -812,9 +812,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
             expect(completedHandoff.root.status).toBe('completed');
             expect(completedHandoff.root.pattern).toBe('PatternGraphAPICLI');
-          }
+          },
         );
-      }
+      },
     );
   });
 });
@@ -832,7 +832,9 @@ describe('Execution Context context and session projections adversarial coverage
         patterns: ['ProjectionBody'],
         sessionType: 'implement',
         extra: 'not allowed',
-      })
-    ).toThrow(/Invalid options for parseAndProjectSessionContext:[\s\S]*Unrecognized key: "extra"/u);
+      }),
+    ).toThrow(
+      /Invalid options for parseAndProjectSessionContext:[\s\S]*Unrecognized key: "extra"/u,
+    );
   });
 });

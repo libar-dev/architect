@@ -174,7 +174,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'stubs',
           ]);
         });
-      }
+      },
     );
   });
 
@@ -196,13 +196,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'pattern-detail-copy',
           ]);
           expect(state!.rendered?.children?.['documentation-child']?.heading).toBe(
-            'DocumentationChild'
+            'DocumentationChild',
           );
           expect(state!.rendered?.children?.['pattern-detail-copy']?.heading).toBe(
-            'RenderUiProjectionChild'
+            'RenderUiProjectionChild',
           );
         });
-      }
+      },
     );
   });
 });

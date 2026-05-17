@@ -10,6 +10,6 @@ describe('Documentation-type registry entries match their schema', () => {
     '$key parses against SupportedDocumentationTypeRegistryEntrySchema',
     (entry) => {
       expect(() => SupportedDocumentationTypeRegistryEntrySchema.parse(entry)).not.toThrow();
-    }
+    },
   );
 });

@@ -45,11 +45,11 @@ const DEFAULT_OPTIONS: Required<RenderJsonOptions> = {
 
 export function renderJson(
   input: ProjectionInput,
-  options: RenderJsonOptions & { pretty: true }
+  options: RenderJsonOptions & { pretty: true },
 ): string;
 export function renderJson(
   input: ProjectionInput,
-  options?: RenderJsonOptions & { pretty?: false | undefined }
+  options?: RenderJsonOptions & { pretty?: false | undefined },
 ): object;
 export function renderJson(input: ProjectionInput, options?: RenderJsonOptions): string | object {
   const resolvedOptions = resolveOptions(options);
@@ -69,14 +69,14 @@ function resolveOptions(options: RenderJsonOptions | undefined): Required<Render
 
 function serializeBundle(
   bundle: ProjectionBundle<Fragment>,
-  options: Required<RenderJsonOptions>
+  options: Required<RenderJsonOptions>,
 ): JsonBundle {
   const childrenEntries = Object.entries(bundle.children);
   const serializedChildren = Object.fromEntries(
     orderEntries(childrenEntries, options.stableKeyOrder).map(([key, child]) => [
       key,
       serializeFragment(child, options, appendPath('$.children', key)),
-    ])
+    ]),
   ) as Record<string, JsonObject>;
 
   const serializedRoot = serializeFragment(bundle.root, options, '$.root');
@@ -89,7 +89,7 @@ function serializeBundle(
         orderEntries(childrenEntries, options.stableKeyOrder).map(([key]) => [
           key,
           routing.childRouteIds[key] ?? key,
-        ])
+        ]),
       ),
       childPathStrategy: routing.childPathStrategy,
       rootRouteId: routing.rootRouteId,
@@ -111,7 +111,7 @@ function serializeBundle(
 function serializeFragment(
   fragment: Fragment,
   options: Required<RenderJsonOptions>,
-  path: string
+  path: string,
 ): JsonObject {
   return transformObject(fragment, options, path);
 }
@@ -119,7 +119,7 @@ function serializeFragment(
 function transformValue(
   value: unknown,
   options: Required<RenderJsonOptions>,
-  path: string
+  path: string,
 ): JsonValue {
   if (value === null) {
     return null;
@@ -172,7 +172,7 @@ function transformValue(
 function transformObject(
   value: Record<string, unknown>,
   options: Required<RenderJsonOptions>,
-  path: string
+  path: string,
 ): JsonObject {
   const result: JsonObject = {};
 

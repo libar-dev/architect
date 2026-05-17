@@ -260,7 +260,7 @@ async function main(): Promise<void> {
     // Report skipped directives (these are already validation failures)
     if (skippedDirectives.length > 0 && config.format === 'pretty') {
       process.stdout.write(
-        `Warning: ${String(skippedDirectives.length)} directives skipped due to validation:\n`
+        `Warning: ${String(skippedDirectives.length)} directives skipped due to validation:\n`,
       );
       for (const { file, error } of skippedDirectives) {
         process.stdout.write(`  - ${file}:${String(error.line)}: ${error.reason}\n`);
@@ -299,7 +299,7 @@ async function main(): Promise<void> {
     }
 
     const validationViolations = skippedDirectives.flatMap(({ file, error }) =>
-      createValidationViolations(file, error.line, error.reason)
+      createValidationViolations(file, error.line, error.reason),
     );
 
     // Run lint
@@ -356,7 +356,7 @@ function mergeLintSummary(summary: LintSummary, violations: readonly LintViolati
 function createValidationViolations(
   file: string,
   line: number,
-  reason: string
+  reason: string,
 ): readonly LintViolation[] {
   if (reason.includes('patternName:')) {
     return [

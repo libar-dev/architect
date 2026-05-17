@@ -32,5 +32,5 @@ describeFeature(
       });
     });
   },
-  { excludeTags: ['@skip'] }
+  { excludeTags: ['@skip'] },
 );

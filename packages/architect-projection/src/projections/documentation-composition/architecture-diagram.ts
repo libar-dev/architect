@@ -27,7 +27,7 @@
  * ### When to Use
  *
  * - Projects a schema-validated ArchitectureDiagram bundle for the requested
-*   scope.
+ *   scope.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -45,7 +45,7 @@ export { ProjectArchitectureDiagramOptionsSchema } from './architecture-diagram.
 
 export function projectArchitectureDiagram(
   context: ProjectionContext,
-  options: ProjectArchitectureDiagramOptions
+  options: ProjectArchitectureDiagramOptions,
 ): ProjectionBundle<ArchitectureDiagram> {
   return projectSingle(buildArchitectureDiagram(context, options));
 }
@@ -53,7 +53,7 @@ export function projectArchitectureDiagram(
 export const parseAndProjectArchitectureDiagram = parseAndProject(
   ProjectArchitectureDiagramOptionsSchema,
   projectArchitectureDiagram,
-  'parseAndProjectArchitectureDiagram'
+  'parseAndProjectArchitectureDiagram',
 );
 
 export type { ProjectArchitectureDiagramOptions } from './architecture-diagram.internal.js';

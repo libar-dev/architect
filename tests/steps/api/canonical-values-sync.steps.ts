@@ -22,7 +22,7 @@ import {
 
 const adrPath = resolve(
   __dirname,
-  '../../../architect/decisions/adr-001-taxonomy-canonical-values.feature'
+  '../../../architect/decisions/adr-001-taxonomy-canonical-values.feature',
 );
 
 function findRule(ruleName: string): { description: string } {
@@ -44,7 +44,7 @@ function extractColumn(ruleName: string, columnName: string): string[] {
 }
 
 const feature = await loadFeature(
-  resolve(__dirname, '../../features/api/canonical-values-sync.feature')
+  resolve(__dirname, '../../features/api/canonical-values-sync.feature'),
 );
 
 describeFeature(feature, ({ Rule }) => {
@@ -68,7 +68,7 @@ describeFeature(feature, ({ Rule }) => {
         Then('both product-area lists contain the same values', () => {
           expect([...adrValues].sort()).toEqual([...constantValues].sort());
         });
-      }
+      },
     );
   });
 
@@ -92,7 +92,7 @@ describeFeature(feature, ({ Rule }) => {
         Then('both adr-category lists contain the same values', () => {
           expect([...adrValues].sort()).toEqual([...constantValues].sort());
         });
-      }
+      },
     );
   });
 
@@ -116,7 +116,7 @@ describeFeature(feature, ({ Rule }) => {
         Then('both status lists contain the same values', () => {
           expect([...adrValues].sort()).toEqual([...constantValues].sort());
         });
-      }
+      },
     );
   });
 
@@ -138,14 +138,14 @@ describeFeature(feature, ({ Rule }) => {
 
         And('I list the pairs in VALID_TRANSITIONS', () => {
           constantPairs = Object.entries(VALID_TRANSITIONS).flatMap(([from, tos]) =>
-            tos.map((to) => `${from}->${to}`)
+            tos.map((to) => `${from}->${to}`),
           );
         });
 
         Then('both transition pair lists contain the same pairs', () => {
           expect([...adrPairs].sort()).toEqual([...constantPairs].sort());
         });
-      }
+      },
     );
   });
 
@@ -169,7 +169,7 @@ describeFeature(feature, ({ Rule }) => {
         Then('both format-type lists contain the same values', () => {
           expect([...adrValues].sort()).toEqual([...constantValues].sort());
         });
-      }
+      },
     );
   });
 
@@ -199,9 +199,9 @@ describeFeature(feature, ({ Rule }) => {
           Then('both canonical feature-only tag lists contain the same values', () => {
             expect([...adrTags].sort()).toEqual([...constantTags].sort());
           });
-        }
+        },
       );
-    }
+    },
   );
 
   Rule('ADR-001 Rule 7 quarter format regex matches QUARTER_PATTERN', ({ RuleScenario }) => {
@@ -238,7 +238,7 @@ describeFeature(feature, ({ Rule }) => {
         Then('both phase-name lists contain the same names', () => {
           expect([...adrNames].sort()).toEqual([...constantNames].sort());
         });
-      }
+      },
     );
   });
 
@@ -254,7 +254,7 @@ describeFeature(feature, ({ Rule }) => {
         When('I extract the phase ordinals from Rule 8', () => {
           adrOrdinals = extractColumn(
             'Canonical phase definitions (6-phase USDP standard)',
-            'Order'
+            'Order',
           ).map((value) => Number.parseInt(value, 10));
         });
 
@@ -265,7 +265,7 @@ describeFeature(feature, ({ Rule }) => {
         Then('both phase-ordinal lists contain the same ordinals', () => {
           expect([...adrOrdinals].sort()).toEqual([...constantOrdinals].sort());
         });
-      }
+      },
     );
   });
 
@@ -289,7 +289,7 @@ describeFeature(feature, ({ Rule }) => {
         Then('both deliverable-status lists contain the same values', () => {
           expect([...adrValues].sort()).toEqual([...constantValues].sort());
         });
-      }
+      },
     );
   });
 
@@ -313,7 +313,7 @@ describeFeature(feature, ({ Rule }) => {
         Then('both lists contain the same tags', () => {
           expect([...adrTags].sort()).toEqual([...constantTags].sort());
         });
-      }
+      },
     );
   });
 });

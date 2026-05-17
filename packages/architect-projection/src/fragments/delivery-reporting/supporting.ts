@@ -8,7 +8,7 @@
  * ### When to Use
  *
  * - Defines shared delivery-reporting support schemas for counts,
-*   percentages, quarter entries, release entries, and trace rows.
+ *   percentages, quarter entries, release entries, and trace rows.
  */
 import { z } from 'zod';
 

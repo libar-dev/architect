@@ -34,7 +34,7 @@ export const SupportedDocumentationTypeRegistryEntrySchema = z.strictObject({
     .literal('nested-index')
     .optional()
     .describe(
-      'Entity-route file layout for this doc type. When "nested-index", each entity routes to `${childDirectory}/${slug}/INDEX.md`; otherwise entities render as flat `${childDirectory}/${slug}.md` files. The bundle carries this onto `routing.entityPathLayout` so the markdown renderer never has to special-case a documentation type.'
+      'Entity-route file layout for this doc type. When "nested-index", each entity routes to `${childDirectory}/${slug}/INDEX.md`; otherwise entities render as flat `${childDirectory}/${slug}.md` files. The bundle carries this onto `routing.entityPathLayout` so the markdown renderer never has to special-case a documentation type.',
     ),
   defaultDisclosureLevel: ProgressiveDisclosureLevelSchema,
   disclosureMatrix: DisclosureMatrixSchema,
@@ -206,15 +206,15 @@ export type DocumentationTypeMetadata = SupportedDocumentationTypeMetadata;
 export type SupportedDocumentationType = SupportedDocumentationTypeMetadata['key'];
 
 export const SUPPORTED_DOCUMENTATION_TYPE_REGISTRY = Object.freeze(
-  DOCUMENTATION_TYPE_REGISTRY.map(freezeSupportedDocumentationTypeMetadata)
+  DOCUMENTATION_TYPE_REGISTRY.map(freezeSupportedDocumentationTypeMetadata),
 );
 
 export const SUPPORTED_DOCUMENTATION_TYPES = Object.freeze(
-  SUPPORTED_DOCUMENTATION_TYPE_REGISTRY.map((entry) => entry.key)
+  SUPPORTED_DOCUMENTATION_TYPE_REGISTRY.map((entry) => entry.key),
 );
 
 const SUPPORTED_BY_KEY: ReadonlyMap<string, SupportedDocumentationTypeMetadata> = new Map(
-  SUPPORTED_DOCUMENTATION_TYPE_REGISTRY.map((entry) => [entry.key, entry])
+  SUPPORTED_DOCUMENTATION_TYPE_REGISTRY.map((entry) => [entry.key, entry]),
 );
 
 export function getDocumentationTypeMetadata(key: string): DocumentationTypeMetadata | undefined {
@@ -222,7 +222,7 @@ export function getDocumentationTypeMetadata(key: string): DocumentationTypeMeta
 }
 
 export function getSupportedDocumentationTypeMetadata(
-  key: SupportedDocumentationType
+  key: SupportedDocumentationType,
 ): SupportedDocumentationTypeMetadata {
   const metadata = SUPPORTED_BY_KEY.get(key);
 
@@ -234,7 +234,7 @@ export function getSupportedDocumentationTypeMetadata(
 }
 
 export function freezeSupportedDocumentationTypeMetadata(
-  entry: SupportedDocumentationTypeMetadata
+  entry: SupportedDocumentationTypeMetadata,
 ): SupportedDocumentationTypeMetadata {
   Object.freeze(entry.generatorAliases);
   freezeDisclosureMatrix(entry.disclosureMatrix);

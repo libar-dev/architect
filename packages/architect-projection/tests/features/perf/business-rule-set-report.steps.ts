@@ -295,11 +295,7 @@ interface PerfPatternOptions {
 type ProjectionMeasure = (context: ProjectionContext) => unknown;
 type AsyncMeasure = () => Promise<unknown>;
 
-const RENDER_MARKDOWN_DOCUMENT_TYPES = [
-  'patterns',
-  'requirements-executable',
-  'roadmap',
-] as const;
+const RENDER_MARKDOWN_DOCUMENT_TYPES = ['patterns', 'requirements-executable', 'roadmap'] as const;
 type RenderMarkdownDocumentType = (typeof RENDER_MARKDOWN_DOCUMENT_TYPES)[number];
 
 let state: PerfReportState = {
@@ -309,7 +305,7 @@ let state: PerfReportState = {
 function createBusinessRuleSetPerfContext(): BusinessRuleSetPerfFixture {
   const patternNames = Array.from(
     { length: 36 },
-    (_, patternIndex) => `BusinessRulePerfPattern${String(patternIndex + 1).padStart(2, '0')}`
+    (_, patternIndex) => `BusinessRulePerfPattern${String(patternIndex + 1).padStart(2, '0')}`,
   );
   const tagRegistry = createProjectionPerfTagRegistry();
   const patterns = patternNames.map((patternName, patternIndex) => {
@@ -477,7 +473,7 @@ function measureProjection(
   context: ProjectionContext,
   project: ProjectionMeasure,
   iterations: number,
-  warmupIterations = 5
+  warmupIterations = 5,
 ): PerfSummary {
   const values: number[] = [];
 
@@ -497,7 +493,7 @@ function measureProjection(
 
 function measureRenderMarkdownBundles(
   context: ProjectionContext,
-  iterations: number
+  iterations: number,
 ): Record<RenderMarkdownDocumentType, PerfSummary> {
   const result = {} as Record<RenderMarkdownDocumentType, PerfSummary>;
 
@@ -508,7 +504,7 @@ function measureRenderMarkdownBundles(
         const bundle = parseAndProjectDocumentationBundle(projectionContext, { documentType });
         return renderMarkdown(bundle);
       },
-      iterations
+      iterations,
     );
   }
 
@@ -517,7 +513,7 @@ function measureRenderMarkdownBundles(
 
 async function measureAsyncOperation(
   measure: AsyncMeasure,
-  iterations: number
+  iterations: number,
 ): Promise<PerfSummary> {
   const values: number[] = [];
 
@@ -623,15 +619,15 @@ async function generateBusinessRuleSetPerfReport(): Promise<string> {
         },
         project: summarize(
           samples.map((sample) => sample.projectMs),
-          iterations
+          iterations,
         ),
         renderObject: summarize(
           samples.map((sample) => sample.renderObjectMs),
-          iterations
+          iterations,
         ),
         renderPretty: summarize(
           samples.map((sample) => sample.renderPrettyMs),
-          iterations
+          iterations,
         ),
         projectionHotPaths: {
           sessionContextBundle: measureProjection(
@@ -641,7 +637,7 @@ async function generateBusinessRuleSetPerfReport(): Promise<string> {
                 patterns: ['BusinessRulePerfPattern01'],
                 sessionType: 'implement',
               }),
-            hotPathIterations
+            hotPathIterations,
           ),
           scopeReadinessReport: measureProjection(
             context,
@@ -651,7 +647,7 @@ async function generateBusinessRuleSetPerfReport(): Promise<string> {
                 sessionType: 'implement',
                 strict: true,
               }),
-            hotPathIterations
+            hotPathIterations,
           ),
           documentationView: measureProjection(
             context,
@@ -659,29 +655,29 @@ async function generateBusinessRuleSetPerfReport(): Promise<string> {
               parseAndProjectDocumentationBundle(projectionContext, {
                 documentType: 'patterns',
               }),
-            hotPathIterations
+            hotPathIterations,
           ),
           requirementDigestAllAreas: measureProjection(
             context,
             (projectionContext) => projectRequirementDigest(projectionContext),
             hotPathIterations,
-            20
+            20,
           ),
           requirementDigestExecutable: measureProjection(
             context,
             (projectionContext) => projectRequirementExecutableDigest(projectionContext),
             hotPathIterations,
-            20
+            20,
           ),
           patternSatisfiesTag: measureProjection(
             context,
             (projectionContext) => projectAnnotationCoverage(projectionContext),
-            hotPathIterations
+            hotPathIterations,
           ),
           buildBoundedContext: measureProjection(
             context,
             (projectionContext) => projectBoundedContext(projectionContext),
-            hotPathIterations
+            hotPathIterations,
           ),
           graphBuild: await measureGraphBuild(repoRoot, graphBuildIterations),
         },
@@ -690,9 +686,9 @@ async function generateBusinessRuleSetPerfReport(): Promise<string> {
         samples,
       },
       null,
-      2
+      2,
     ) + '\n',
-    'utf8'
+    'utf8',
   );
 
   return reportPath;

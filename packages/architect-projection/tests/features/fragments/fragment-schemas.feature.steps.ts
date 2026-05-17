@@ -87,7 +87,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               data: state!.fixture,
             });
           });
-        }
+        },
       );
 
       RuleScenarioOutline(
@@ -109,7 +109,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Then('the schema parse should fail', () => {
             expect(state!.parseResult).toEqual({ success: false });
           });
-        }
+        },
       );
 
       RuleScenarioOutline(
@@ -129,9 +129,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Then('the round-tripped fragment should equal the original fixture', () => {
             expect(state!.roundTripResult).toEqual(state!.fixture);
           });
-        }
+        },
       );
-    }
+    },
   );
 
   Rule(
@@ -153,7 +153,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(state!.parseResult).toEqual({ success: false });
         });
       });
-    }
+    },
   );
 
   Rule('FragmentSchema discriminated union narrows on the kind tag', ({ RuleScenario }) => {
@@ -203,14 +203,14 @@ describe('Fragment schema mirror adversarial security coverage', () => {
         type: 'code',
         language: 'ts\n```\n<script>',
         content: 'console.log("x");',
-      }).success
+      }).success,
     ).toBe(false);
     expect(
       CodeBlockSchema.safeParse({
         type: 'code',
         language: 'tsx+react-18.2',
         content: 'console.log("x");',
-      }).success
+      }).success,
     ).toBe(true);
   });
 });

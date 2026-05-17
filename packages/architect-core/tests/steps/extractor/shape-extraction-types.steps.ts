@@ -112,7 +112,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
       And('the property "id" JSDoc should contain "unique identifier"', () => {
         expect(firstShape().propertyDocs?.find((p) => p.name === 'id')?.jsDoc).toContain(
-          'unique identifier'
+          'unique identifier',
         );
       });
       And('the shape should have property docs for "name"', () => {
@@ -120,7 +120,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
       And('the property "name" JSDoc should contain "display name"', () => {
         expect(firstShape().propertyDocs?.find((p) => p.name === 'name')?.jsDoc).toContain(
-          'display name'
+          'display name',
         );
       });
     });
@@ -143,7 +143,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         And('the shape should not have property docs for "name"', () => {
           expect(firstShape().propertyDocs?.find((p) => p.name === 'name')).toBeUndefined();
         });
-      }
+      },
     );
 
     RuleScenario('Mixed documented and undocumented properties', ({ Given, When, Then, And }) => {

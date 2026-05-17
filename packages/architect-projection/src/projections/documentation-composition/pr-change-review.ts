@@ -27,7 +27,7 @@
  * ### When to Use
  *
  * - Projects a schema-validated PrChangeReview bundle for one branch change
-*   set.
+ *   set.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -45,7 +45,7 @@ export { ProjectPrChangeReviewOptionsSchema } from './pr-change-review.internal.
 
 export function projectPrChangeReview(
   context: ProjectionContext,
-  options: ProjectPrChangeReviewOptions
+  options: ProjectPrChangeReviewOptions,
 ): ProjectionBundle<PrChangeReview> {
   return projectSingle(buildPrChangeReview(context, options));
 }
@@ -53,7 +53,7 @@ export function projectPrChangeReview(
 export const parseAndProjectPrChangeReview = parseAndProject(
   ProjectPrChangeReviewOptionsSchema,
   projectPrChangeReview,
-  'parseAndProjectPrChangeReview'
+  'parseAndProjectPrChangeReview',
 );
 
 export type { ProjectPrChangeReviewOptions } from './pr-change-review.internal.js';

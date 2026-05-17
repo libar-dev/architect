@@ -155,7 +155,7 @@ function buildRichSession(): PipelineSession {
   });
   if (
     dataset.patterns.find(
-      (pattern) => (pattern.patternName ?? pattern.name) === TEST_BUNDLE_PARENT_NAME
+      (pattern) => (pattern.patternName ?? pattern.name) === TEST_BUNDLE_PARENT_NAME,
     ) === undefined
   ) {
     (dataset.patterns as ExtractedPattern[]).push(parent);

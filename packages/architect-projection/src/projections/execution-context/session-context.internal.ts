@@ -50,7 +50,7 @@ export type SessionContextOptions = z.infer<typeof SessionContextOptionsSchema>;
 
 export function buildSessionContextBundle(
   context: ProjectionContext,
-  options: SessionContextOptions
+  options: SessionContextOptions,
 ): SessionContextBundle {
   const { patterns, sessionType } = options;
 
@@ -172,7 +172,7 @@ function createPatternContextMeta(pattern: ExtractedPattern): PatternContextMeta
 function createSessionDependencies(
   context: ProjectionContext,
   patternName: string,
-  sessionType: SessionType
+  sessionType: SessionType,
 ): readonly DepEntry[] {
   const relationships = getRelationships(context, patternName);
   const dependencies: DepEntry[] = [];
@@ -199,7 +199,7 @@ function createSessionDependencies(
 function resolveDepEntry(
   context: ProjectionContext,
   dependencyName: string,
-  kind: DepEntry['kind']
+  kind: DepEntry['kind'],
 ): DepEntry {
   const dependencyPattern = findPatternByName(context.graph, dependencyName);
   return {
@@ -213,7 +213,7 @@ function resolveDepEntry(
 function resolveArchitectureNeighbors(
   context: ProjectionContext,
   pattern: ExtractedPattern,
-  focalNames: ReadonlySet<string>
+  focalNames: ReadonlySet<string>,
 ): readonly NeighborEntry[] {
   if (pattern.boundedContext === undefined || context.graph.archIndex === undefined) {
     return [];
@@ -251,7 +251,7 @@ function flattenDependencies(perPatternDeps: ReadonlyMap<string, readonly DepEnt
   return {
     dependencies,
     sharedDependencies: dependencies.filter(
-      (dependency) => (dependencyCounts.get(dependency.name) ?? 0) > 1
+      (dependency) => (dependencyCounts.get(dependency.name) ?? 0) > 1,
     ),
   };
 }

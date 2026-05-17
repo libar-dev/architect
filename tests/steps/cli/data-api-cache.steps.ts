@@ -203,7 +203,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           "pattern-graph-cli -i 'src/**/*.ts' --no-cache query getStatusCounts",
           {
             timeout: CACHE_QUERY_TIMEOUT_MS,
-          }
+          },
         );
         getCacheState(state).secondResult = getResult(state);
       });

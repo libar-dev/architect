@@ -10,11 +10,12 @@ The two reviews were run independently and **converged on the same structural fi
 
 **The campaign cannot land as a layer on top of the current `documentation-composition/` subsystem. It must replace the registry-driven dispatch core. Pre-split that core before W-DOCS-1, do not retrofit.**
 
-The good news: the layers *around* that core (BlockSchema substrate, ProjectionBundle routing, parseAndProject trust boundary, OUTPUT-side disclosure with `splitOversizedDocument`) are well-positioned to host `DocDefinition` and `ContentFragment` as new peers.
+The good news: the layers _around_ that core (BlockSchema substrate, ProjectionBundle routing, parseAndProject trust boundary, OUTPUT-side disclosure with `splitOversizedDocument`) are well-positioned to host `DocDefinition` and `ContentFragment` as new peers.
 
 ## Critical issues (campaign blockers)
 
 ### C1 — Closed dispatch core is the campaign's substrate, not an obstacle to route around
+
 **File:** `src/projections/documentation-composition/documentation-bundle.internal.ts:64`
 **Convergence:** code-quality C1 + architecture F1.
 
@@ -23,6 +24,7 @@ The good news: the layers *around* that core (BlockSchema substrate, ProjectionB
 **Action:** delete the registry-driven dispatch when `DocDefinition` lands. Do not parallel-implement (no-BC). Do not extend the union — every new entry deepens the carve-out.
 
 ### C2 — `documentation-types.ts` conflates identity, output routing, disclosure policy, and CLI surface
+
 **File:** `src/projections/documentation-composition/documentation-types.ts:35-47, 140-340` (517 LOC total)
 **Convergence:** code-quality C2 + architecture F2.
 
@@ -33,6 +35,7 @@ One Zod object holds: doc identity, where it writes on disk, disclosure policy, 
 ## High-priority findings (cause major rework if not addressed pre-campaign)
 
 ### H1 — Types derived from literal, not from schema (Zod-first violation)
+
 **File:** `documentation-types.ts:140-340` (code-quality H1)
 
 Registry types are produced from the literal via `typeof REGISTRY[number]` instead of via `z.infer<DocumentationTypeSchema>`. Inverts the project's Zod-first doctrine. When `DocDefinition` arrives via config, schema/type drift is guaranteed.
@@ -40,6 +43,7 @@ Registry types are produced from the literal via `typeof REGISTRY[number]` inste
 **Action:** schema is canonical; literal is data validated by it.
 
 ### H2 — `status: 'dropped'` registry entries are a no-BC shim
+
 **File:** `documentation-types.ts:49-59, 294-339` (code-quality H2 + architecture F3)
 
 `'dropped'` entries exist to keep the registry literal type-compatible with vanished generators. Violates the no-BC doctrine directly, and will collide name-for-name with the campaign's restored `reference` doc.
@@ -47,6 +51,7 @@ Registry types are produced from the literal via `typeof REGISTRY[number]` inste
 **Action:** delete the `'dropped'` entries and any code that filters on them.
 
 ### H3 — Renderers reach into `documentation-composition/` for metadata (ADR-005/009 drift)
+
 **File:** `src/renderers/render-markdown.ts:50-52`, `src/renderers/markdown-paths.ts:3-4, 26-49` (code-quality H3 + architecture F4)
 
 `render-markdown.ts` calls `getDocumentationTypeMetadata()` and consumes `disclosureMatrix` at render time. `markdown-paths.ts` parses `routing.rootRouteId.split(':')[0]` to derive doc-type-aware behavior. Renderers are doc-type-aware — direct violation of ADR-005 (codec/renderer separation) and ADR-009 (projection trust boundary).
@@ -56,6 +61,7 @@ The ContentFragment proposal will route MORE markdown through these paths. The l
 **Action:** push disclosure onto `bundle.routing.disclosureSpec` at projection time; renderer trusts the bundle. No renderer-side lookups into the registry.
 
 ### H4 — Hardcoded doc-type strings leak across modules
+
 **File:** `src/renderers/markdown-paths.ts:26-49`, `src/fragments/delivery-reporting/index.ts` (code-quality H4)
 
 String literals `'requirements-executable'`, `'milestones'`, etc. appear at routing decision points outside the registry. Symptom of routing-as-data being incompletely realized.
@@ -63,6 +69,7 @@ String literals `'requirements-executable'`, `'milestones'`, etc. appear at rout
 **Action:** routing decisions belong on the registry entry. Renderers consume `bundle.routing`, period.
 
 ### H5 — `render-markdown.ts` is 2152 lines, 80 top-level functions, ~10 fragment-specific normalizers
+
 **File:** `src/renderers/render-markdown.ts` (code-quality H5)
 
 ContentFragment will add 6–10 more normalizers. The normalizer table needs to move into fragment-owned modules with a `toMarkdownBlocks(fragment)` contract; render-markdown.ts becomes a thin dispatcher.
@@ -70,6 +77,7 @@ ContentFragment will add 6–10 more normalizers. The normalizer table needs to 
 **Action:** move per-fragment markdown normalizers into the fragment modules themselves. Renderer dispatches on `Fragment.kind`, doesn't know fragment internals.
 
 ### H6 — `MarkdownDocument` envelope is unexported and unschema'd
+
 **File:** `render-markdown.ts` (code-quality H6)
 
 The intermediate envelope is private + structural. The campaign's `composeDoc(title, sections)` returning `RenderableDocument` will compete with it.
@@ -77,6 +85,7 @@ The intermediate envelope is private + structural. The campaign's `composeDoc(ti
 **Action:** schema-fy and export, or replace with `RenderableDocument` when that type lands. Don't ship both.
 
 ### H7 — Disclosure vocabulary lives inside `documentation-composition/` but is package-wide
+
 **File:** `src/renderers/types.ts` imports `DisclosureSpec` + `LogicalRouteId` from `projections/documentation-composition/` (architecture F5 + F17 + F18)
 
 `DisclosureSpec`, `LogicalRouteId`, and the disclosure enum are conceptually package-level primitives but live inside one projection domain. Layering inversion that the campaign's input-side disclosure axis will exacerbate.
@@ -84,6 +93,7 @@ The intermediate envelope is private + structural. The campaign's `composeDoc(ti
 **Action:** promote to `src/disclosure/` + `src/routing/` as peer concerns before adding the input-side axis.
 
 ### H8 — 43 projections have three inconsistent signature flavors
+
 **File:** various `parseAndProject*` wrappers (architecture F8)
 
 `DocDefinition.build(graph)` runners cannot call the projections uniformly without an adapter layer. Adapter layers proliferate.
@@ -93,6 +103,7 @@ The intermediate envelope is private + structural. The campaign's `composeDoc(ti
 ## Medium-priority findings (should fix before campaign starts)
 
 ### M1 — `Fragment` is a closed 43-variant discriminated union keyed on `kind`
+
 **Reference:** architecture F9 + F19
 
 `ContentFragment` and `RenderableDocument` in PROPOSED-DESIGN don't have a `kind` discriminator and shouldn't — they're composition primitives, not domain fragments. Renderer dispatch needs a top-level distinction.
@@ -100,6 +111,7 @@ The intermediate envelope is private + structural. The campaign's `composeDoc(ti
 **Action:** define `RenderInput = ProjectionBundle<Fragment> | RenderableDocument` and have renderers dispatch on input shape first, then on `kind` if it's a `Fragment`.
 
 ### M2 — `_internal/` boundary is naming convention, not enforced
+
 **Reference:** architecture F6
 
 `*.internal.ts` files are referenced externally in places. Campaign will introduce a new consumer surface (`DocDefinition` callers) — the boundary needs teeth.

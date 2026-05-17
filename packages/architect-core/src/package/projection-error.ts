@@ -7,7 +7,7 @@ export class ProjectionError extends Error {
   constructor(
     code: ProjectionErrorCode,
     message: string,
-    details: Readonly<Record<string, unknown>> = {}
+    details: Readonly<Record<string, unknown>> = {},
   ) {
     super(message);
     this.name = 'ProjectionError';

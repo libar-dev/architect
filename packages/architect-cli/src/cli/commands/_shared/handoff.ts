@@ -14,7 +14,7 @@ import type { CliContext } from '../../pattern-graph-cli-types.js';
 export function normalizeHandoffInput(
   positional: readonly string[],
   flags: Readonly<Record<string, unknown>>,
-  fallbackSessionType?: SessionType
+  fallbackSessionType?: SessionType,
 ): { pattern: string; sessionType?: HandoffSessionType; modifiedFiles: readonly string[] } {
   const usage =
     'Usage: architect handoff --pattern <pattern> [--session planning|design|implement|review] [--modified-file <path>]...';
@@ -52,7 +52,7 @@ export function requireProjectedHandoff(
     pattern: string;
     sessionType?: HandoffSessionType;
     modifiedFiles: readonly string[];
-  }
+  },
 ): ProjectionBundle<Fragment> {
   const pattern = context.api.getPattern(options.pattern);
   if (pattern === undefined) {

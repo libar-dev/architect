@@ -82,7 +82,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
 
       When('deriveEnforcementZone is called', () => {
         throw new Error(
-          'Not implemented: call deriveEnforcementZone("candidate") and store result'
+          'Not implemented: call deriveEnforcementZone("candidate") and store result',
         );
       });
 
@@ -100,14 +100,14 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         'a candidate pattern being modified with new deliverables and restructured rules',
         () => {
           throw new Error(
-            'Not implemented: create candidate pattern fixture with modifications that would normally trigger violations'
+            'Not implemented: create candidate pattern fixture with modifications that would normally trigger violations',
           );
-        }
+        },
       );
 
       When('ProcessGuard evaluates the changes', () => {
         throw new Error(
-          'Not implemented: run ProcessGuard decider against the candidate pattern modifications'
+          'Not implemented: run ProcessGuard decider against the candidate pattern modifications',
         );
       });
 
@@ -121,7 +121,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
 
       And('no invalid-status-transition violations are produced', () => {
         throw new Error(
-          'Not implemented: assert no violations with rule "invalid-status-transition"'
+          'Not implemented: assert no violations with rule "invalid-status-transition"',
         );
       });
 
@@ -139,13 +139,13 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     RuleScenario('Candidate edits produce zero violations', ({ Given, When, Then, And }) => {
       Given('a candidate spec being modified with arbitrary changes', () => {
         throw new Error(
-          'Not implemented: create candidate spec fixture with various modifications (add/remove deliverables, change rules)'
+          'Not implemented: create candidate spec fixture with various modifications (add/remove deliverables, change rules)',
         );
       });
 
       When('ProcessGuard evaluates the changes', () => {
         throw new Error(
-          'Not implemented: run ProcessGuard decider against the candidate modifications'
+          'Not implemented: run ProcessGuard decider against the candidate modifications',
         );
       });
 
@@ -171,19 +171,19 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
 
       When('ProcessGuard initializes', () => {
         throw new Error(
-          'Not implemented: initialize ProcessGuard with config lacking enforcement field, store resolved config'
+          'Not implemented: initialize ProcessGuard with config lacking enforcement field, store resolved config',
         );
       });
 
       Then('candidate patterns are excluded from enforcement', () => {
         throw new Error(
-          'Not implemented: assert DEFAULT_ENFORCEMENT.excludedStatuses includes "candidate"'
+          'Not implemented: assert DEFAULT_ENFORCEMENT.excludedStatuses includes "candidate"',
         );
       });
 
       And('all rules are at their default severity', () => {
         throw new Error(
-          'Not implemented: assert DEFAULT_ENFORCEMENT.ruleOverrides is empty (all defaults)'
+          'Not implemented: assert DEFAULT_ENFORCEMENT.ruleOverrides is empty (all defaults)',
         );
       });
 
@@ -201,25 +201,25 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     RuleScenario('Scope-creep downgraded to warning', ({ Given, When, Then, And }) => {
       Given('an enforcement config with scope-creep severity overridden to warning', () => {
         throw new Error(
-          'Not implemented: create enforcement config with ruleOverrides: { "scope-creep": { severity: "warning" } }'
+          'Not implemented: create enforcement config with ruleOverrides: { "scope-creep": { severity: "warning" } }',
         );
       });
 
       When('scope creep is detected on an active pattern', () => {
         throw new Error(
-          'Not implemented: set up active pattern with added deliverable (scope creep) and evaluate with ProcessGuard'
+          'Not implemented: set up active pattern with added deliverable (scope creep) and evaluate with ProcessGuard',
         );
       });
 
       Then('a warning is produced instead of an error', () => {
         throw new Error(
-          'Not implemented: assert deciderOutput.warnings contains scope-creep and deciderOutput.violations does not'
+          'Not implemented: assert deciderOutput.warnings contains scope-creep and deciderOutput.violations does not',
         );
       });
 
       And('the DeciderOutput contains the warning in the warnings array', () => {
         throw new Error(
-          'Not implemented: assert warning entry has ruleId "scope-creep" at severity "warning"'
+          'Not implemented: assert warning entry has ruleId "scope-creep" at severity "warning"',
         );
       });
     });
@@ -233,25 +233,25 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     RuleScenario('Candidate to roadmap accepted as promotion', ({ Given, When, Then, And }) => {
       Given('a spec changes from @architect-status:candidate to @architect-status:roadmap', () => {
         throw new Error(
-          'Not implemented: create file state transition fixture from candidate to roadmap'
+          'Not implemented: create file state transition fixture from candidate to roadmap',
         );
       });
 
       When('ProcessGuard evaluates the change', () => {
         throw new Error(
-          'Not implemented: run ProcessGuard decider with the candidate-to-roadmap transition'
+          'Not implemented: run ProcessGuard decider with the candidate-to-roadmap transition',
         );
       });
 
       Then('the change is accepted via the isValidPromotion helper', () => {
         throw new Error(
-          'Not implemented: assert isValidPromotion("candidate", "roadmap") === true'
+          'Not implemented: assert isValidPromotion("candidate", "roadmap") === true',
         );
       });
 
       And('no transition error is produced', () => {
         throw new Error(
-          'Not implemented: assert zero violations with rule "invalid-status-transition"'
+          'Not implemented: assert zero violations with rule "invalid-status-transition"',
         );
       });
     });
@@ -261,22 +261,22 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
       ({ Given, When, Then }) => {
         Given('a spec changes from @architect-status:candidate to @architect-status:active', () => {
           throw new Error(
-            'Not implemented: create file state transition fixture from candidate to active'
+            'Not implemented: create file state transition fixture from candidate to active',
           );
         });
 
         When('ProcessGuard evaluates the change', () => {
           throw new Error(
-            'Not implemented: run ProcessGuard decider with the candidate-to-active transition'
+            'Not implemented: run ProcessGuard decider with the candidate-to-active transition',
           );
         });
 
         Then('an error is produced indicating candidates must be promoted to roadmap first', () => {
           throw new Error(
-            'Not implemented: assert violation with message indicating candidate->roadmap is required before candidate->active'
+            'Not implemented: assert violation with message indicating candidate->roadmap is required before candidate->active',
           );
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -284,34 +284,34 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
       ({ Given, And, When, Then }) => {
         Given('an enforcement config with validatePromotions set to false', () => {
           throw new Error(
-            'Not implemented: create enforcement config with validatePromotions: false'
+            'Not implemented: create enforcement config with validatePromotions: false',
           );
         });
 
         And('a spec changes from @architect-status:roadmap to @architect-status:candidate', () => {
           throw new Error(
-            'Not implemented: create file state transition fixture from roadmap to candidate (demotion)'
+            'Not implemented: create file state transition fixture from roadmap to candidate (demotion)',
           );
         });
 
         When('ProcessGuard evaluates the change', () => {
           throw new Error(
-            'Not implemented: run ProcessGuard decider with the roadmap-to-candidate demotion'
+            'Not implemented: run ProcessGuard decider with the roadmap-to-candidate demotion',
           );
         });
 
         Then('an error is produced by the isDemotion helper', () => {
           throw new Error(
-            'Not implemented: assert violation from isDemotion() -- demotion always rejected regardless of validatePromotions'
+            'Not implemented: assert violation from isDemotion() -- demotion always rejected regardless of validatePromotions',
           );
         });
 
         And('demotion rejection is not affected by validatePromotions setting', () => {
           throw new Error(
-            'Not implemented: assert demotion error produced even though validatePromotions is false'
+            'Not implemented: assert demotion error produced even though validatePromotions is false',
           );
         });
-      }
+      },
     );
   });
 
@@ -325,26 +325,26 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         'an architect.config.ts with enforcement.ruleOverrides containing an unknown severity value',
         () => {
           throw new Error(
-            'Not implemented: create test config with ruleOverrides containing invalid severity (e.g., "fatal")'
+            'Not implemented: create test config with ruleOverrides containing invalid severity (e.g., "fatal")',
           );
-        }
+        },
       );
 
       When('the config is validated', () => {
         throw new Error(
-          'Not implemented: run Zod schema validation on the malformed enforcement config'
+          'Not implemented: run Zod schema validation on the malformed enforcement config',
         );
       });
 
       Then('a Zod validation error is produced', () => {
         throw new Error(
-          'Not implemented: assert validation throws or returns error with Zod parse failure'
+          'Not implemented: assert validation throws or returns error with Zod parse failure',
         );
       });
 
       And('the error identifies the invalid severity value', () => {
         throw new Error(
-          'Not implemented: assert error message references the invalid severity value'
+          'Not implemented: assert error message references the invalid severity value',
         );
       });
     });
