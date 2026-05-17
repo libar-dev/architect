@@ -1,6 +1,6 @@
 # 09 — Delivery Lifecycle
 
-> **Architect Spec v0.1.0** — FSM states, transitions, protection levels, and ProcessGuard.
+> **Architect Spec v0.2.0** — FSM states, transitions, protection levels, and ProcessGuard.
 
 ---
 
@@ -189,7 +189,7 @@ Before starting work on a pattern, implementations SHOULD run a pre-flight valid
 that checks:
 
 1. **Status readiness** — Is the pattern in a valid state for the session type?
-2. **Dependency status** — Are all `@architect-depends-on` patterns completed?
+2. **Dependency status** — Are all `@architect-uses` patterns completed?
 3. **Blocker check** — Is anything blocking this pattern?
 4. **Scope check** — Does the pattern have enough specification for the session type?
 

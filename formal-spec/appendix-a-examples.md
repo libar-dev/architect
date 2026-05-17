@@ -1,6 +1,6 @@
 # Appendix A — Examples
 
-> **Architect Spec v0.1.0** — Complete annotated examples for all artifact types.
+> **Architect Spec v0.2.0** — Complete annotated examples for all artifact types.
 
 ---
 
@@ -95,15 +95,14 @@ A complete plan-level spec with all required tags, deliverables, and structured 
 @architect
 @architect-pattern:ProjectConnection
 @architect-status:roadmap
-@architect-phase:1
 @architect-product-area:Desktop
-@architect-effort:3d
-@architect-priority:critical
-@architect-see-also:McpIntegration,AppShell
-@architect-business-value:zero-config-project-onboarding
+@architect-uses:McpIntegration,AppShell
+@architect-see-also:UserOnboarding
 @architect-bounded-context:desktop
-@architect-arch-layer:presentation
-@architect-release:vNEXT
+@architect-arch-layer:application
+@architect-role:service
+@architect-level:task
+@architect-parent:DesktopShellEpic
 Feature: ProjectConnection - Connect the desktop app to a project directory
 
   **Business Value:** Without a connected project, every other Studio feature is inert.
@@ -234,13 +233,18 @@ Feature: ProjectConnection - Connect the desktop app to a project directory
 
 **What this demonstrates:**
 
-- Complete tag header with all 12 Level 2 required tags
+- Complete tag header with the v0.2.0 canonical Level 2 tag set (gate, pattern, status,
+  product-area, uses, see-also, bounded-context, arch-layer, role, level, parent)
 - Business Value + How It Works description pattern
 - 5-column deliverables table with concrete file paths
 - 4 rules with Invariant/Rationale/Verified by structure
 - Mix of @happy-path, @validation, and @edge-case scenarios
 - Section separators for visual structure
 - 10 total scenarios across 4 rules
+
+> _Informative:_ Earlier drafts of this example included `@architect-phase`,
+> `@architect-effort`, `@architect-priority`, `@architect-business-value`, and
+> `@architect-release`. These are not part of the v0.2.0 canonical taxonomy.
 
 ---
 
@@ -391,12 +395,8 @@ A complete design stub with JSDoc annotations and interface definitions.
  * @architect-target apps/desktop/src/lib/architect-bridge.ts
  * @architect-bounded-context desktop
  * @architect-arch-layer infrastructure
- * @architect-phase 1
  * @architect-product-area Infrastructure
- * @architect-depends-on ProjectConnection
- * @architect-uses McpIntegration
- * @architect-used-by ArchitectureDashboard,PatternBrowserView,ArchitectureExplorer
- * @architect-release vNEXT
+ * @architect-uses ProjectConnection, McpIntegration
  *
  * ## IPCBridge -- Typed Electron IPC for PatternGraphAPI
  *
@@ -492,6 +492,12 @@ export class ArchitectBridge {
 - Descriptive throw messages with pattern name
 - Section separator comments for type organization
 
+> _Informative:_ Earlier drafts of this example included `@architect-phase`,
+> `@architect-depends-on`, `@architect-used-by`, and `@architect-release` in the JSDoc
+> tag block. These are not part of the v0.2.0 canonical taxonomy; reverse edges such
+> as `used-by` are derived from `@architect-uses` declarations elsewhere in the graph
+> rather than authored on the stub.
+
 ---
 
 ## Example 7: Minimal Project Configuration
@@ -499,7 +505,7 @@ export class ArchitectBridge {
 A starter `architect.config.ts` for a new project.
 
 ```typescript
-import { DEFAULT_ROLES, defineConfig } from '@libar-dev/architect/config';
+import { DEFAULT_ROLES, defineConfig } from '@libar-dev/architect-core';
 
 export default defineConfig({
   // Use the general-purpose role set (default tag taxonomy)

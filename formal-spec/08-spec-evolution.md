@@ -169,8 +169,11 @@ Feature: <PatternName> - <one-line purpose>
 **Do not:**
 
 - Add deliverables — ideas are not committed to files.
-- Add `@architect-phase`, `@architect-effort`, `@architect-priority`, or `@architect-release` —
-  planning metadata implies commitment the idea does not yet have.
+- Add planning-metadata tags (`@architect-phase`, `@architect-effort`,
+  `@architect-priority`, `@architect-release`, or any custom planning tag a project
+  has adopted) — planning metadata implies commitment the idea does not yet have.
+  Note: these planning tags are not part of the v0.2.0 canonical taxonomy (§04); they
+  exist only as project-specific custom extensions.
 - Add ADR references — if an idea requires a decision, note it in the parent epic.
 - Write narrative descriptions — one-line `Feature:` only. If you need more than one line, the
   idea is ready for promotion to candidate tier.
@@ -346,8 +349,11 @@ For each design-level spec being retired:
    has the broadest behavioral coverage of the spec's scenarios
 2. **Transfer the canonical pattern name** — the primary test file's `@architect-pattern`
    changes to the design spec's canonical name
-3. **Transfer surviving tags** — `@architect-phase` and `@architect-depends-on` are copied
-   from the design spec to the primary test file
+3. **Transfer surviving tags** — `@architect-uses`, `@architect-product-area`,
+   `@architect-bounded-context`, `@architect-arch-layer`, `@architect-role`,
+   `@architect-level`, `@architect-parent`, and any `@architect-implements` /
+   `@architect-extends` / `@architect-see-also` are copied from the design spec to the
+   primary test file
 4. **Link siblings** — other test files that implement the same spec get
    `@architect-implements:<CanonicalName>` added (N:1 mapping)
 5. **Transfer the Feature description** — if the test file lacks a Problem/Solution
@@ -361,18 +367,23 @@ For each design-level spec being retired:
 | -------------------------------- | ------------------------------------------ | ------------------------------------------ |
 | `@architect-pattern`             | **Yes** — transferred to primary test file | Pattern identity must persist in the graph |
 | `@architect-status`              | **Yes** — becomes `completed`              | Lifecycle tracking                         |
-| `@architect-phase`               | **Yes** — transferred                      | Timeline views, phase analytics            |
-| `@architect-depends-on`          | **Yes** — transferred                      | Dependency graph integrity                 |
+| `@architect-uses`                | **Yes** — transferred                      | Dependency graph integrity                 |
+| `@architect-implements`          | **Yes** — transferred                      | Realization edge into executable file      |
 | `@architect-product-area`        | **Yes** — if not already present           | Classification                             |
+| `@architect-bounded-context`     | **Yes** — if not already present           | Architecture grouping                      |
+| `@architect-arch-layer`          | **Yes** — if not already present           | Architecture layer                         |
+| `@architect-role`                | **Yes** — if not already present           | Canonical role                             |
+| `@architect-level` / `-parent`   | **Yes** — if hierarchy applies             | Hierarchy preservation                     |
 | Feature description narrative    | **Yes** — transferred if missing           | Generated docs, context assembly           |
 | Rule blocks + scenarios          | **Yes** — already in test file             | The test IS the executable spec            |
-| `@architect-effort`              | **No** — dropped                           | Historical planning data, no ongoing value |
-| `@architect-priority`            | **No** — dropped                           | Historical planning data                   |
-| `@architect-release`             | **No** — dropped                           | Historical planning data                   |
-| `@architect-business-value`      | **No** — dropped                           | Historical planning data                   |
 | `Background: Deliverables` table | **No** — dropped                           | The implementation IS the deliverable      |
 | `**Input:**` / `**Output:**`     | **No** — dropped                           | Now expressed in the implementation code   |
-| Sequence tags                    | **No** — dropped                           | Ordering was a design concern              |
+
+> _Informative:_ Earlier drafts of this table listed `@architect-phase`,
+> `@architect-effort`, `@architect-priority`, `@architect-release`,
+> `@architect-business-value`, and sequence tags. These are not part of the v0.2.0
+> canonical taxonomy and therefore do not appear in either the surviving or dropped
+> column above.
 
 ### N:1 Pattern Mapping
 
@@ -388,8 +399,7 @@ might have tests split across 4 test files by concern). In this case:
 @architect
 @architect-pattern:ShapeExtraction          # ← was ShapeExtractionTypesTesting
 @architect-status:completed
-@architect-phase:26
-@architect-depends-on:PatternGraphExtraction
+@architect-uses:PatternGraphExtraction
 
 # Sibling test file (links to primary):
 @architect
@@ -503,8 +513,7 @@ dependency relationships, and phase assignments — but sourced from executable 
 | Scenarios          | 9-15 (intent)                 | 20-40 (behavior)                       | 20-40 (executable)                                                |
 | Deliverables table | 5-column, all `pending`       | 5-column, statuses updated             | **Dropped** (implementation IS the deliverable)                   |
 | Input/Output       | —                             | Present                                | **Dropped** (in implementation code)                              |
-| Planning tags      | All present                   | All present                            | **Dropped** (effort, priority, release, business-value)           |
-| Surviving tags     | All present                   | All present                            | Pattern, status, phase, depends-on, product-area                  |
+| Surviving tags     | All present                   | All present                            | Pattern, status, uses, implements, product-area, bounded-context, arch-layer, role, level, parent |
 | Stubs              | —                             | Created alongside                      | **Deleted**                                                       |
 | Step definitions   | —                             | —                                      | Present                                                           |
 | N:1 mapping        | —                             | —                                      | Primary gets canonical name; siblings get `@architect-implements` |

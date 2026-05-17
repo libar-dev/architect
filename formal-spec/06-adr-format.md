@@ -1,6 +1,6 @@
 # 06 — ADR Format
 
-> **Architect Spec v0.1.0** — Architecture Decision Records in Gherkin format.
+> **Architect Spec v0.2.0** — Architecture Decision Records in Gherkin format.
 
 ---
 

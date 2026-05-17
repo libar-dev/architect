@@ -1,6 +1,6 @@
 # 07 — Stub Format
 
-> **Architect Spec v0.1.0** — TypeScript design stub conventions.
+> **Architect Spec v0.2.0** — TypeScript design stub conventions.
 
 ---
 
@@ -48,12 +48,8 @@ Every stub file MUST begin with a JSDoc block containing `@architect-*` annotati
  * @architect-target apps/desktop/src/lib/registration-service.ts
  * @architect-bounded-context identity
  * @architect-arch-layer domain
- * @architect-phase 2
- * @architect-product-area Desktop
- * @architect-depends-on UserService,EmailService
- * @architect-uses EventStore
- * @architect-used-by APIGateway
- * @architect-release vNEXT
+ * @architect-product-area Identity
+ * @architect-uses UserService, EmailService, EventStore
  *
  * ## UserRegistration -- Account Creation Service
  *
@@ -68,9 +64,15 @@ Every stub file MUST begin with a JSDoc block containing `@architect-*` annotati
  * - New user account creation from any entry point (web, API, CLI)
  * - Batch user import with validation
  *
- * See: feature-inventory.md F-02 UserRegistration
+ * See: architect/specs/identity/user-registration.feature
  */
 ```
+
+> _Informative:_ Reverse-edge tags such as `@architect-used-by` are derived from the
+> declared `@architect-uses` of other patterns and are not authored. Earlier drafts
+> showed `@architect-phase`, `@architect-release`, `@architect-depends-on`, and
+> `@architect-used-by` in stub JSDoc; those are not part of the v0.2.0 canonical
+> taxonomy.
 
 ### Tag Syntax in JSDoc
 

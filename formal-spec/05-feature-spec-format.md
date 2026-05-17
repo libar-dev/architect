@@ -1,6 +1,6 @@
 # 05 — Feature Spec Format
 
-> **Architect Spec v0.1.0** — The Gherkin structure conventions for feature specifications.
+> **Architect Spec v0.2.0** — The Gherkin structure conventions for feature specifications.
 
 ---
 
@@ -55,17 +55,20 @@ convention defined in §03.
 @architect
 @architect-pattern:UserRegistration
 @architect-status:roadmap
-@architect-phase:2
-@architect-product-area:Desktop
-@architect-effort:5d
-@architect-priority:high
-@architect-depends-on:UserService,EmailService
+@architect-product-area:Identity
+@architect-uses:UserService,EmailService
 @architect-see-also:UserProfile
-@architect-business-value:enable-self-service-onboarding
 @architect-bounded-context:identity
 @architect-arch-layer:domain
-@architect-release:vNEXT
+@architect-role:service
+@architect-level:task
+@architect-parent:UserManagementEpic
 ```
+
+> _Informative:_ Earlier drafts of this spec showed `@architect-phase`,
+> `@architect-effort`, `@architect-priority`, `@architect-business-value`, and
+> `@architect-release` in the Level 2 example. These planning-oriented tags are not
+> part of the v0.2.0 canonical taxonomy. See §04 for the standard tag set.
 
 ## 2. Feature Title
 

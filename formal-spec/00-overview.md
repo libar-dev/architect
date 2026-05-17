@@ -1,6 +1,6 @@
 # 00 — Overview
 
-> **Architect Spec v0.1.0** — Architecture-Connected Specification Format
+> **Architect Spec v0.2.0** — Architecture-Connected Specification Format
 
 ---
 
@@ -23,7 +23,7 @@ Traditional spec:
 Architecture-connected spec:
   @architect-pattern:UserAuthentication
   @architect-status:active
-  @architect-depends-on:UserService,TokenService
+  @architect-uses:UserService,TokenService
   @architect-bounded-context:identity
   @architect-arch-layer:domain
 
@@ -44,7 +44,7 @@ A named, tracked unit of architecture with metadata, relationships, and lifecycl
 
 Patterns are the atoms of the architecture. Every feature, service, component, decision,
 or capability is a pattern. Each pattern has an identity (`@architect-pattern:Name`), a
-delivery status (`@architect-status`), relationships to other patterns (`@architect-depends-on`),
+delivery status (`@architect-status`), relationships to other patterns (`@architect-uses`),
 and business rules (extracted from `Rule:` blocks).
 
 Patterns are expressed in two native code formats:
@@ -85,11 +85,12 @@ Candidate (Gherkin)  →  Plan-level (Gherkin)  →  Design-level (Gherkin)  →
 
 The FSM-enforced lifecycle that governs how patterns move from idea to completion.
 
-The delivery process is machine-enforced infrastructure, not a wiki page. Four states
-(`roadmap → active → completed`, with `deferred` as an escape hatch), three protection
-levels (none, scope-locked, hard-locked), and six ProcessGuard rules prevent the most
-expensive mistakes in software development: scope creep on active work and modification
-of completed artifacts.
+The delivery process is machine-enforced infrastructure, not a wiki page. Five status
+values across two tracks — `candidate` (refinement) and `roadmap → active → completed`
+with `deferred` as an escape hatch (delivery) — three protection levels (none,
+scope-locked, hard-locked), and six ProcessGuard rules prevent the most expensive
+mistakes in software development: scope creep on active work and modification of
+completed artifacts.
 
 ### 5. Projection
 
@@ -136,7 +137,7 @@ codebase:
 | **2** | Spec ↔ Spec             | Dependency graph across all specifications (blocking chains, neighborhoods) |
 | **3** | Spec ↔ Delivery State   | FSM-enforced lifecycle with scope-creep prevention                          |
 | **4** | Spec ↔ Business Rules   | Machine-extracted invariants with rationale and verification mapping        |
-| **5** | Everything ↔ AI Context | Session-aware context bundles (148:1 compression) for AI agents             |
+| **5** | Everything ↔ AI Context | Session-aware context bundles for AI agents                                 |
 
 No other specification format provides all five layers.
 

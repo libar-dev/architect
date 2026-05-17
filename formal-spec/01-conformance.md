@@ -1,6 +1,6 @@
 # 01 — Conformance
 
-> **Architect Spec v0.1.0** — Conformance levels, versioning, and keyword conventions.
+> **Architect Spec v0.2.0** — Conformance levels, versioning, and keyword conventions.
 
 ---
 
@@ -51,7 +51,7 @@ A Level 2 conformant artifact satisfies all Level 1 requirements AND:
 4. Each `Rule:` block MUST contain `**Invariant:**`, `**Rationale:**`, and `**Verified by:**` metadata
 5. Each `Scenario:` MUST be tagged with `@acceptance-criteria` and one of `@happy-path`, `@validation`, or `@edge-case`
 6. The `@architect-status` tag MUST reflect a valid FSM state (see §09)
-7. All `@architect-depends-on` references MUST name patterns that exist in the project
+7. All `@architect-uses` references MUST name patterns that exist in the project
 8. TypeScript stubs (§07) MUST use JSDoc `@architect-*` annotations with `@architect-implements` and `@architect-target`
 
 **What Level 2 enables:** A complete pattern graph with pre-computed views, machine-extractable
@@ -100,7 +100,7 @@ This specification follows [Semantic Versioning 2.0.0](https://semver.org/):
 - **Minor** (0.2.0): New optional features, new tags, new conformance requirements
 - **Patch** (0.1.1): Clarifications, typo fixes, non-normative changes
 
-The current version is **0.1.0** — a working draft. Breaking changes are expected before 1.0.0.
+The current version is **0.2.0** (Draft) — a working draft. Breaking changes are expected before 1.0.0.
 
 ## Extension Points
 

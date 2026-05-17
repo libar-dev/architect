@@ -433,3 +433,36 @@ The drift between `docs/ANNOTATION-GUIDE.md` and `docs-sources/annotation-guide.
 ### TODO #2 - License consolidation
 - `LICENSE` and `LICENSE-MCP` should be consolidated into just one MIT license
 
+### Formal specs - firs pass of fixes completed
+
+`★ Insight ─────────────────────────────────────`
+- The biggest editorial decision was treating §04's "tag registry" as **two layers**: (a) the v0.2.0 canonical authored set (~22 tags + gate + 3 aggregation) verified against `packages/architect-core/src/taxonomy/registry-builder.ts`, and (b) the wider "earlier-draft" set that the spec used to claim as standard. Marking removed groups with explicit "**Not in v0.2.0 canonical taxonomy**" callouts preserves the migration history without lying about current truth.
+- The Live Documentation API (§12) was the most surprising drift — three named tools that simply do not exist. The shipped reality is a single `architect_documentation` MCP tool with `documentType` / `disclosure` / `filter` params. This kind of drift usually means the spec was written from a design proposal, not from the shipped implementation.
+- §10's PatternGraph schema described ~10 fields that don't exist in the ExtractedPattern Zod schema (`phase`, `effort`, `priority`, `quarter`, `team`, `risk`, `workflow`, `businessValue`, `userRole`, `constraints`, `discoveredGaps`, `discoveredImprovements`, `discoveredRisks`, `discoveredLearnings`). All cleanly removed; replaced with the actual `maturity` and `unlockReason` fields that do exist.
+`─────────────────────────────────────────────────`
+
+## Summary
+
+Done. All 14 formal-spec files validated against the live taxonomy + code; 16 files modified (~404 insertions / 329 deletions).
+
+**Concrete fixes:**
+
+- Version headers normalized across all files to `v0.2.0` (was a mix of `v0.1.0` and `v0.2.0`); `package.json` bumped `0.1.0` → `0.2.0`.
+- Broken import path `@libar-dev/architect/config` → `@libar-dev/architect-core` everywhere (meta package is bin-only post-W1).
+- README's "Relationship to @libar-dev/architect" rewritten to reflect the split package family (5 publishable + bin-only meta) with correct CLI/MCP counts (22 / 21, not 20 / 18).
+- §00 FSM wording fixed: "Four states" → "Five status values across two tracks" (was missing `candidate`).
+- `@architect-depends-on` → `@architect-uses` across §00, §01, §03, §05, §07, §08, §09, §10, Appendix A.
+- §04 tag registry: every removed group (Planning, Product & Business, Release, Discovery, Sequence, plus stray relationship/hierarchy/stub/process tags) now carries a `**Not in v0.2.0 canonical taxonomy**` callout. Summary table rewritten — actual ~26 canonical tags vs the claimed 50.
+- §10 PatternGraph schema cleaned: ~10 non-existent fields removed; `archLayer` enum corrected to the 3 real values (`domain | application | infrastructure`, no `presentation`); `role` enum updated to the canonical 8.
+- §12 Live Documentation API completely rewritten: the three fictional tools (`architect_doc` etc.) replaced with the real single tool `architect_documentation`.
+- `architect/tag-taxonomy.md` references reframed from MUST/SHOULD to optional/informative (no such file exists).
+- README metrics table now explicitly labels the big numbers (386 patterns / 929 rules / 33 ADRs) as "reported peak across the two codebases" with a note that the current dogfood repo is much smaller.
+- Unsourced "148:1 compression" marketing line removed from §00.
+
+**Recorded as open items in `formal-spec/REVIEW-2026-05-17-FINDINGS.md` (delete or roll into a CHANGELOG entry):**
+
+- O-1: README CHANGELOG has both `0.2.1 (Draft)` and `0.2.0 (Draft)` sections — editorial decision needed to either bump to 0.2.1 (treating this review as the formal release) or collapse to 0.2.0.
+- O-2 / O-9: Appendix-A examples still use a "Studio desktop" problem domain — works, but somewhat awkward in a standalone repo.
+- O-3 / O-4: Aggregation tags + `@architect-maturity` deserve dedicated sub-sections in §04.
+- O-6 / O-7: §09 ProcessGuard rule enumeration and §08 line-budget claims should be cross-checked against `packages/architect-guard/src/` source. Not done in this review.
+- O-8: Studio-era proof-point numbers in the README metrics table left in place with a clarifying note; replacing with current-repo numbers is an editorial call.

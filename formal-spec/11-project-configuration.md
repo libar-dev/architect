@@ -1,6 +1,6 @@
 # 11 — Project Configuration
 
-> **Architect Spec v0.1.0** — The `architect.config.ts` format, role sets, and project layout.
+> **Architect Spec v0.2.0** — The `architect.config.ts` format, role sets, and project layout.
 
 ---
 
@@ -15,7 +15,7 @@ The configuration file MUST be named `architect.config.ts` and located at the re
 root. It exports a configuration object using the `defineConfig()` helper.
 
 ```typescript
-import { DEFAULT_ROLES, defineConfig } from '@libar-dev/architect/config';
+import { DEFAULT_ROLES, defineConfig } from '@libar-dev/architect-core';
 
 export default defineConfig({
   roles: DEFAULT_ROLES,
@@ -135,8 +135,10 @@ export default defineConfig({
 });
 ```
 
-The role taxonomy is documented in `architect/tag-taxonomy.md` — this file is either
-manually maintained or auto-generated from the configuration.
+A project MAY additionally maintain an informative `architect/tag-taxonomy.md`
+document describing its role taxonomy, but the configuration above is the source of
+truth. The reference implementation surfaces the taxonomy via
+`architect:query taxonomy` rather than a static file.
 
 ## Canonical Project Layout
 
@@ -159,7 +161,7 @@ project-root/
     briefs/                 # Optional: pre-candidate briefs (.md)
       pattern-name.md
     design-reviews/         # Optional: design review artifacts
-    tag-taxonomy.md         # Tag taxonomy reference
+    tag-taxonomy.md         # OPTIONAL: tag taxonomy reference (informative)
   architect.config.ts       # Configuration file
   docs-live/                # Generated documentation (output)
     INDEX.md
@@ -242,7 +244,7 @@ projectionOptions: {
 The simplest valid configuration for a new project:
 
 ```typescript
-import { DEFAULT_ROLES, defineConfig } from '@libar-dev/architect/config';
+import { DEFAULT_ROLES, defineConfig } from '@libar-dev/architect-core';
 
 export default defineConfig({
   roles: DEFAULT_ROLES,

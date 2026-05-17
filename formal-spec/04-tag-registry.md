@@ -11,6 +11,14 @@ MUST recognize. Projects MAY add custom tags beyond this set (see §03 — Exten
 
 Tags are organized by functional group. Within each group, tags are listed alphabetically.
 
+> **v0.2.0 canonical scope.** Several tag groups in this registry — Planning,
+> Product & Business, Discovery — describe authoring vocabulary that earlier drafts of
+> this spec considered canonical but that has been **removed from the v0.2.0 standard
+> taxonomy**. They are retained in this registry as informative reference and are
+> explicitly flagged where they appear. The CHANGELOG entries `0.2.1 (Draft)` and
+> `0.2.0 (Draft)` in the README describe the migration. Projects MAY use these tags as
+> custom extensions; the reference implementation does not recognise them.
+
 ---
 
 ## Group 1: Core Identity
@@ -51,12 +59,12 @@ Explicit `@architect-maturity` always wins over the default. See §08 for tier s
 
 Tags that classify a pattern within the project's organizational structure.
 
-| Tag                          | Format | Purpose                             | Required              | Values / Example                                                                                                   |
-| ---------------------------- | ------ | ----------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `@architect-product-area`    | value  | Product area grouping               | MUST (Level 2)        | `Desktop`, `Cloud`, `Infrastructure`                                                                               |
-| `@architect-bounded-context` | value  | Architecture domain grouping        | MUST (specs, Level 2) | `identity`, `billing`, `desktop`                                                                                   |
-| `@architect-arch-layer`      | enum   | Architecture layer                  | MUST (specs, Level 2) | `presentation`, `application`, `domain`, `infrastructure`                                                          |
-| `@architect-role`            | enum   | Canonical role tag within the layer | MUST (specs, Level 2) | `aggregate`, `service`, `repository`, `factory`, `value-object`, `event`, `command`, `query`, `projection`, `saga` |
+| Tag                          | Format | Purpose                             | Required              | Values / Example                                                              |
+| ---------------------------- | ------ | ----------------------------------- | --------------------- | ----------------------------------------------------------------------------- |
+| `@architect-product-area`    | value  | Product area grouping (project-defined enum) | MUST (Level 2)        | `Annotation`, `Configuration`, `Process`, `Projection`, `Validation`          |
+| `@architect-bounded-context` | value  | Architecture domain grouping        | MUST (specs, Level 2) | `identity`, `billing`, `delivery-reporting`                                   |
+| `@architect-arch-layer`      | enum   | Architecture layer                  | MUST (specs, Level 2) | `application`, `domain`, `infrastructure`                                     |
+| `@architect-role`            | enum   | Canonical role tag                  | MUST (specs, Level 2) | `barrel`, `codec`, `contract`, `decider`, `projection`, `read-model`, `service`, `utility` |
 
 > **Historical note:** `@architect-arch-role` appears only in older migration notes and preserved reference docs.
 
@@ -64,35 +72,62 @@ Tags that classify a pattern within the project's organizational structure.
 
 | Value            | Description                                                |
 | ---------------- | ---------------------------------------------------------- |
-| `presentation`   | UI components, views, routes, user interaction             |
 | `application`    | Use cases, orchestration, application services             |
 | `domain`         | Business logic, aggregates, domain services, value objects |
 | `infrastructure` | External integrations, databases, messaging, configuration |
 
+> _Informative:_ Earlier drafts also listed `presentation`. The reference implementation
+> exposes only the three values above (`packages/architect-core/src/taxonomy/arch-layer-values.ts`).
+> Projects that need a UI/presentation layer typically express that via a custom role or
+> bounded context rather than the `arch-layer` enum.
+
+### Role Values
+
+The canonical role set used by the reference implementation
+(`packages/architect-core/src/taxonomy/`):
+
+| Value         | Description                                                             |
+| ------------- | ----------------------------------------------------------------------- |
+| `barrel`      | Re-export surfaces and curated entrypoints                              |
+| `codec`       | Serialization, parsing, and rendering codec surfaces                    |
+| `contract`    | Published schemas and contract-bearing surfaces                         |
+| `decider`     | FSM and rule deciders enforcing process integrity                       |
+| `projection`  | Fragment projection functions deriving outputs from `PatternGraph`      |
+| `read-model`  | Query-oriented read views over the graph                                |
+| `service`     | Application and domain services                                         |
+| `utility`     | Shared helpers and narrowly focused utilities                           |
+
+> _Informative:_ Earlier drafts of this registry listed DDD-style values for `role`
+> (`aggregate`, `repository`, `factory`, `value-object`, `event`, `command`, `query`,
+> `saga`, …). Projects MAY define those as a custom role set
+> (see §11 — Project Configuration); they are not part of the v0.2.0 default taxonomy.
+
 ---
 
-## Group 3: Planning
+## Group 3: Planning (Not in v0.2.0 Canonical Taxonomy)
 
-Tags that describe a pattern's position in the delivery roadmap.
+> **v0.2.0 status:** The Planning group is **NOT part of the v0.2.0 standard authored
+> taxonomy.** The tags below are retained as informative reference for projects
+> migrating from earlier drafts. The reference implementation does not recognize
+> `@architect-phase`, `@architect-effort`, `@architect-priority`, `@architect-release`,
+> `@architect-quarter`, `@architect-team`, or `@architect-risk`. Roadmap ordering today
+> is conveyed via `@architect-uses` (a pattern is blocked by what it uses),
+> `@architect-status` (FSM state), and the hierarchy tags `@architect-level` /
+> `@architect-parent`. Projects MAY add custom planning tags as extensions.
 
-**Lifecycle note:** Planning tags are split into two categories:
+| Tag                   | Format | Purpose                | Status in v0.2.0      | Values / Example                    |
+| --------------------- | ------ | ---------------------- | --------------------- | ----------------------------------- |
+| `@architect-phase`    | number | Roadmap phase number   | **Removed** — custom  | `1`, `2`, `3`, `25b`                |
+| `@architect-effort`   | value  | Estimated effort       | **Removed** — custom  | `3d`, `5d`, `1w`, `4h`              |
+| `@architect-priority` | enum   | Priority level         | **Removed** — custom  | `critical`, `high`, `medium`, `low` |
+| `@architect-release`  | value  | Target release version | **Removed** — custom  | `vNEXT`, `v1.0.0`                   |
+| `@architect-quarter`  | value  | Target quarter         | **Removed** — custom  | `Q1-2026`, `Q2-2026`                |
+| `@architect-team`     | value  | Responsible team       | **Removed** — custom  | `platform`, `frontend`              |
+| `@architect-risk`     | enum   | Risk level             | **Removed** — custom  | `high`, `medium`, `low`             |
 
-- **Surviving tags** — transferred to executable specs during value transfer (§08)
-- **Planning-only tags** — dropped during value transfer (historical data, no ongoing value)
+### Effort Format (legacy)
 
-| Tag                   | Format | Purpose                | Required              | Survives? | Values / Example                    |
-| --------------------- | ------ | ---------------------- | --------------------- | --------- | ----------------------------------- |
-| `@architect-phase`    | number | Roadmap phase number   | MUST (specs, Level 2) | **Yes**   | `1`, `2`, `3`, `25b`                |
-| `@architect-effort`   | value  | Estimated effort       | MUST (specs, Level 2) | No        | `3d`, `5d`, `1w`, `4h`              |
-| `@architect-priority` | enum   | Priority level         | MUST (specs, Level 2) | No        | `critical`, `high`, `medium`, `low` |
-| `@architect-release`  | value  | Target release version | MUST (specs, Level 2) | No        | `vNEXT`, `v1.0.0`                   |
-| `@architect-quarter`  | value  | Target quarter         | OPTIONAL              | No        | `Q1-2026`, `Q2-2026`                |
-| `@architect-team`     | value  | Responsible team       | OPTIONAL              | No        | `platform`, `frontend`              |
-| `@architect-risk`     | enum   | Risk level             | OPTIONAL              | No        | `high`, `medium`, `low`             |
-
-### Effort Format
-
-Effort values use a number + unit suffix:
+Effort values, if used as a custom tag, use a number + unit suffix:
 
 - `h` = hours (e.g., `4h`)
 - `d` = days (e.g., `3d`, `5d`)
@@ -102,30 +137,34 @@ Effort values use a number + unit suffix:
 
 ## Group 4: Relationships
 
-Tags that express connections between patterns.
+Tags that express connections between patterns. The v0.2.0 canonical authored set
+collapses to four tags — `@architect-uses`, `@architect-implements`,
+`@architect-extends`, `@architect-see-also` — and the reverse edges are derived, not
+authored.
 
 | Tag                     | Format | Purpose                                                   | Required               | Values / Example           |
 | ----------------------- | ------ | --------------------------------------------------------- | ---------------------- | -------------------------- |
-| `@architect-depends-on` | csv    | Patterns this pattern requires to function                | SHOULD (if deps exist) | `UserService,TokenService` |
-| `@architect-enables`    | csv    | Patterns that this pattern unblocks                       | OPTIONAL               | `Dashboard,PatternBrowser` |
-| `@architect-uses`       | csv    | Patterns this pattern calls or consumes                   | OPTIONAL               | `EventStore,Logger`        |
-| `@architect-used-by`    | csv    | Patterns that call or consume this pattern                | OPTIONAL               | `APIGateway,WebUI`         |
+| `@architect-uses`       | csv    | Patterns this pattern depends on / uses                   | SHOULD (if deps exist) | `UserService,TokenService` |
 | `@architect-implements` | csv    | Patterns this code or stub realizes                       | MUST (stubs)           | `McpServerIntegration`     |
 | `@architect-extends`    | value  | Pattern this extends or specializes                       | OPTIONAL               | `BaseRepository`           |
 | `@architect-see-also`   | csv    | Related patterns, informational only and not a dependency | OPTIONAL               | `UserProfile,AuditLog`     |
-| `@architect-api-ref`    | value  | External API reference                                    | OPTIONAL               | `REST:/api/v1/users`       |
 
 ### Relationship Semantics
 
-| Relationship | Direction      | Semantics                           | Blocks?                                    |
-| ------------ | -------------- | ----------------------------------- | ------------------------------------------ |
-| `depends-on` | A depends on B | A cannot function without B         | Yes — A is blocked if B is not `completed` |
-| `enables`    | A enables B    | B is unblocked when A completes     | Yes (inverse of depends-on)                |
-| `uses`       | A uses B       | A calls B at runtime                | No                                         |
-| `used-by`    | A used by B    | B calls A at runtime                | No                                         |
-| `implements` | A implements B | A is the code realization of spec B | No                                         |
-| `extends`    | A extends B    | A specializes B                     | No                                         |
-| `see-also`   | A related to B | Informational cross-reference       | No                                         |
+| Relationship | Direction      | Semantics                           | Authored? | Blocks?                                    |
+| ------------ | -------------- | ----------------------------------- | --------- | ------------------------------------------ |
+| `uses`       | A uses B       | A calls / depends on B              | Yes       | Yes — A is blocked if B is not `completed` |
+| `usedBy`     | B used by A    | Reverse of `uses`                   | No (derived) | n/a                                      |
+| `implements` | A implements B | A is the code realization of spec B | Yes       | No                                         |
+| `implementedBy` | B implemented by A | Reverse of `implements`        | No (derived) | n/a                                      |
+| `extends`    | A extends B    | A specializes B                     | Yes       | No                                         |
+| `see-also`   | A related to B | Informational cross-reference       | Yes       | No                                         |
+
+> _Informative:_ Earlier drafts of this registry listed separate authored tags
+> `@architect-depends-on`, `@architect-enables`, `@architect-used-by`, and
+> `@architect-api-ref`. In v0.2.0 the authored vocabulary collapses to
+> `@architect-uses`; reverse edges (`usedBy`, `implementedBy`) are derived. The
+> `@architect-api-ref` tag is no longer part of the canonical taxonomy.
 
 ### Cross-Process References
 
@@ -136,15 +175,18 @@ for cross-process routing.
 
 ---
 
-## Group 5: Product & Business
+## Group 5: Product & Business (Not in v0.2.0 Canonical Taxonomy)
 
-Tags that capture business context and value.
+> **v0.2.0 status:** This group is **NOT part of the v0.2.0 standard authored taxonomy.**
+> The tags below are retained as informative reference; the reference implementation
+> does not recognise them. The single product-classification tag in v0.2.0 is
+> `@architect-product-area` (Group 2 — Classification).
 
-| Tag                         | Format | Purpose                           | Required       | Survives?          | Values / Example                                       |
-| --------------------------- | ------ | --------------------------------- | -------------- | ------------------ | ------------------------------------------------------ |
-| `@architect-business-value` | value  | Hyphenated business value slug    | SHOULD (specs) | No (planning-only) | `eliminate-context-loss`, `enforce-delivery-standards` |
-| `@architect-user-role`      | value  | Primary user role served          | OPTIONAL       | No                 | `developer`, `tech-lead`, `architect`                  |
-| `@architect-constraints`    | csv    | Business or technical constraints | OPTIONAL       | No                 | `offline-capable,sub-100ms-latency`                    |
+| Tag                         | Format | Purpose                           | Status in v0.2.0     | Values / Example                                       |
+| --------------------------- | ------ | --------------------------------- | -------------------- | ------------------------------------------------------ |
+| `@architect-business-value` | value  | Hyphenated business value slug    | **Removed** — custom | `eliminate-context-loss`, `enforce-delivery-standards` |
+| `@architect-user-role`      | value  | Primary user role served          | **Removed** — custom | `developer`, `tech-lead`, `architect`                  |
+| `@architect-constraints`    | csv    | Business or technical constraints | **Removed** — custom | `offline-capable,sub-100ms-latency`                    |
 
 ---
 
@@ -178,14 +220,16 @@ Tags that express parent-child relationships between patterns.
 | -------------------- | ------ | ------------------------------ | ------------------------------------------------------------------------------- | -------------------------------- |
 | `@architect-level`   | enum   | Hierarchy level                | OPTIONAL                                                                        | `epic`, `phase`, `task`, `slice` |
 | `@architect-parent`  | value  | Parent pattern name            | MUST (idea/candidate; except @architect-level:epic\|slice). OPTIONAL otherwise. | `IdentityModule`                 |
-| `@architect-include` | csv    | Tags to include in aggregation | OPTIONAL                                                                        | `@architect-core,@architect-api` |
+
+> _Informative:_ Earlier drafts listed `@architect-include` for aggregation. That tag
+> is not part of the v0.2.0 canonical taxonomy.
 
 ### Hierarchy Level Values
 
 | Value   | Description                                                                                                   |
 | ------- | ------------------------------------------------------------------------------------------------------------- |
 | `epic`  | Top-level grouping of related patterns delivered together                                                     |
-| `phase` | A roadmap phase grouping (typically aligns with `@architect-phase`)                                           |
+| `phase` | A roadmap phase grouping for related delivery work                                                            |
 | `task`  | A leaf-level pattern — the unit of delivery                                                                   |
 | `slice` | An architectural slice — a named, reusable view that groups N existing patterns for exploration, not delivery |
 
@@ -213,21 +257,26 @@ Tags used exclusively in TypeScript design stubs (§07).
 | Tag                 | Format | Purpose                                         | Required (stubs) | Values / Example               |
 | ------------------- | ------ | ----------------------------------------------- | ---------------- | ------------------------------ |
 | `@architect-target` | value  | Destination file path when stub moves to `src/` | MUST             | `apps/desktop/src/lib/auth.ts` |
-| `@architect-since`  | value  | Design session identifier                       | OPTIONAL         | `DS-1`, `DS-2`                 |
 
-Stub-owned types and exports remain part of the design contract, but this draft no longer
-reserves a dedicated authored tag for shape extraction. If a toolchain needs export-level
-shape data, it should derive that view from the TypeScript surface itself.
+> _Informative:_ Earlier drafts listed `@architect-since` for design session identifiers.
+> That tag is not part of the v0.2.0 canonical taxonomy. Stub-owned types and exports
+> remain part of the design contract, but this draft no longer reserves a dedicated
+> authored tag for shape extraction. If a toolchain needs export-level shape data, it
+> should derive that view from the TypeScript surface itself.
 
 ---
 
-## Group 10: Release
+## Group 10: Release (Not in v0.2.0 Canonical Taxonomy)
 
-Tags used in release manifest files (§02).
+> **v0.2.0 status:** `@architect-release` is **NOT part of the v0.2.0 standard authored
+> taxonomy.** Release manifests today take their version identifier from the file name
+> (`vNEXT.feature`, `vX.Y.Z.feature`) and may carry only the core gate + status +
+> product-area tags. The table below is retained as informative reference for projects
+> migrating from earlier drafts.
 
-| Tag                  | Format | Purpose                    | Required (releases) | Values / Example            |
-| -------------------- | ------ | -------------------------- | ------------------- | --------------------------- |
-| `@architect-release` | value  | Release version identifier | MUST                | `vNEXT`, `v1.0.0`, `v2.3.1` |
+| Tag                  | Format | Purpose                    | Status in v0.2.0      | Values / Example            |
+| -------------------- | ------ | -------------------------- | --------------------- | --------------------------- |
+| `@architect-release` | value  | Release version identifier | **Removed** — custom  | `vNEXT`, `v1.0.0`, `v2.3.1` |
 
 ---
 
@@ -238,40 +287,58 @@ Tags used by ProcessGuard (§09) for lifecycle management.
 | Tag                        | Format | Purpose                                         | Required                        | Values / Example           |
 | -------------------------- | ------ | ----------------------------------------------- | ------------------------------- | -------------------------- |
 | `@architect-unlock-reason` | value  | Justification for modifying a completed pattern | MUST (when modifying completed) | `Bug-fix-for-token-expiry` |
-| `@architect-workflow`      | value  | Active workflow identifier                      | OPTIONAL                        | `implementation`, `review` |
+
+> _Informative:_ Earlier drafts listed `@architect-workflow` for active workflow
+> identifiers. That tag is not part of the v0.2.0 canonical taxonomy.
 
 ---
 
-## Group 12: Discovery
+## Group 12: Discovery (Not in v0.2.0 Canonical Taxonomy)
 
-Tags for capturing findings during design and review sessions.
+> **v0.2.0 status:** This group is **NOT part of the v0.2.0 standard authored taxonomy.**
+> Discovery findings today live in design-review notes
+> (`architect/design-reviews/`) and in `**Open Questions:**` blocks within candidate-tier
+> specs rather than dedicated tags. The reference implementation does not recognise the
+> tags below; projects MAY add them as custom extensions.
 
-| Tag                                  | Format | Purpose                   | Required | Values / Example                           |
-| ------------------------------------ | ------ | ------------------------- | -------- | ------------------------------------------ |
-| `@architect-discovered-gaps`         | csv    | Gaps found during review  | OPTIONAL | `missing-error-handling,no-retry-logic`    |
-| `@architect-discovered-improvements` | csv    | Improvement opportunities | OPTIONAL | `cache-optimization,batch-queries`         |
-| `@architect-discovered-risks`        | csv    | Risks identified          | OPTIONAL | `rate-limit-bypass,data-loss-on-crash`     |
-| `@architect-discovered-learnings`    | csv    | Lessons learned           | OPTIONAL | `prefer-pull-over-push,avoid-deep-nesting` |
+| Tag                                  | Format | Purpose                   | Status in v0.2.0     | Values / Example                           |
+| ------------------------------------ | ------ | ------------------------- | -------------------- | ------------------------------------------ |
+| `@architect-discovered-gaps`         | csv    | Gaps found during review  | **Removed** — custom | `missing-error-handling,no-retry-logic`    |
+| `@architect-discovered-improvements` | csv    | Improvement opportunities | **Removed** — custom | `cache-optimization,batch-queries`         |
+| `@architect-discovered-risks`        | csv    | Risks identified          | **Removed** — custom | `rate-limit-bypass,data-loss-on-crash`     |
+| `@architect-discovered-learnings`    | csv    | Lessons learned           | **Removed** — custom | `prefer-pull-over-push,avoid-deep-nesting` |
 
 ---
 
 ## Summary: Tag Count by Group
 
-| Group               | Tag Count | Purpose                                                                         |
-| ------------------- | --------- | ------------------------------------------------------------------------------- |
-| Core Identity       | 3         | Pattern name, status, gate                                                      |
-| Classification      | 4         | Product area, context, layer, role                                              |
-| Planning            | 7         | Phase, effort, priority, release, quarter, team, risk                           |
-| Relationships       | 10        | Dependencies, usage, implementation, cross-references, cross-process soft links |
-| Product & Business  | 3         | Business value, user role, constraints                                          |
-| ADR                 | 6         | ADR number, status, category, theme, supersession                               |
-| Hierarchy           | 3         | Level (incl. `slice`), parent, include                                          |
-| Sequence            | 4         | Orchestrator, step, module, error                                               |
-| Stub-Specific       | 3         | Target, since, shapes                                                           |
-| Release             | 1         | Version identifier                                                              |
-| Process Enforcement | 2         | Unlock reason, workflow                                                         |
-| Discovery           | 4         | Gaps, improvements, risks, learnings                                            |
-| **Total**           | **50**    |                                                                                 |
+The v0.2.0 canonical authored tag count is **~22 tags + the `@architect` gate + 3
+aggregation tags ≈ 26 total** (the exact count depends on whether `@architect-maturity`
+is treated as authored — it is auto-defaulted from `@architect-status`).
+
+| Group               | v0.2.0 Canonical | v0.2.0 Tags                                                              |
+| ------------------- | ---------------- | ------------------------------------------------------------------------ |
+| Core Identity       | 4                | gate, pattern, status, maturity (auto-defaulted)                         |
+| Classification      | 4                | product-area, bounded-context, arch-layer, role                          |
+| Relationships       | 4                | uses, implements, extends, see-also                                      |
+| ADR                 | 7                | adr, adr-status, adr-category, adr-theme, adr-layer, adr-supersedes, adr-superseded-by |
+| Hierarchy           | 2                | level, parent                                                            |
+| Stub-Specific       | 1                | target                                                                   |
+| Process Enforcement | 1                | unlock-reason                                                            |
+| Timeline            | 1                | completed                                                                |
+| Core / Use-case     | 1                | usecase                                                                  |
+| Aggregation         | 3                | overview, decision, intro                                                |
+
+| Group               | v0.2.0 Status     | Earlier-Draft Tags (informative) |
+| ------------------- | ----------------- | -------------------------------- |
+| Planning            | **Removed**       | phase, effort, priority, release, quarter, team, risk |
+| Product & Business  | **Removed**       | business-value, user-role, constraints |
+| Sequence            | **Removed**       | orchestrator, step, module, error |
+| Discovery           | **Removed**       | discovered-gaps, discovered-improvements, discovered-risks, discovered-learnings |
+| Extra hierarchy     | **Removed**       | include                          |
+| Extra stub          | **Removed**       | since, shapes                    |
+| Extra process       | **Removed**       | workflow                         |
+| Extra relationships | **Removed**       | depends-on, enables, used-by, api-ref, depends-on-external, parent-external |
 
 ---
 

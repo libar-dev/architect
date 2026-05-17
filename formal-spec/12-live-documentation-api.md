@@ -1,6 +1,6 @@
 # 12 — Live Documentation API
 
-> **Architect Spec v0.1.0** — Structured document serving through the Data API, replacing
+> **Architect Spec v0.2.0** — Structured document serving through the Data API, replacing
 > static markdown generation for interactive consumers.
 
 ---
@@ -81,66 +81,27 @@ CONFIG → SCANNER → EXTRACTOR → PATTERN GRAPH → PROJECTION → ┐
 
 ## API Surface
 
-### Tool: `architect_doc`
+### Tool: `architect_documentation`
 
-A single parameterized tool that invokes any registered documentation projection and returns `RenderableDocument`.
+A single parameterized MCP tool that invokes any registered documentation projection and
+returns a `RenderableDocument`. The CLI counterpart is
+`pnpm architect:query documentation <document-type> [--disclosure <level>] [--filter <status=csv>]…`.
 
-| Parameter     | Type   | Required | Description                                                           |
-| ------------- | ------ | -------- | --------------------------------------------------------------------- |
-| `type`        | string | MUST     | Document type key from `DOCUMENT_TYPES` (e.g., `"design-review"`)     |
-| `options`     | object | MAY      | Projection-specific options (e.g., `{ patternName: "SetupCommand" }`) |
-| `detailLevel` | string | MAY      | `"summary"` \| `"standard"` \| `"detailed"` (default: `"standard"`)   |
-| `noCache`     | bool   | MAY      | Force fresh decode, bypassing cache (default: `false`)                |
+| Parameter      | Type   | Required | Description                                                                                          |
+| -------------- | ------ | -------- | ---------------------------------------------------------------------------------------------------- |
+| `documentType` | string | MUST     | Document type key from `DOCUMENT_TYPES` (e.g., `"patterns"`, `"architecture"`, `"business-rules"`)   |
+| `disclosure`   | string | MAY      | Progressive disclosure level supported by the projection (e.g., `"summary"`, `"standard"`)           |
+| `filter`       | object | MAY      | Projection-specific filters (e.g., `{ status: "active,completed" }`)                                 |
 
-**Response:**
+**Response:** the typed `RenderableDocument` envelope described in
+"RenderableDocument as API Response Format" below, augmented with cache/metadata
+fields supplied by the pipeline session.
 
-```typescript
-interface LiveDocumentResponse {
-  document: RenderableDocument;
-  type: string;
-  description: string;
-  decodeTimeMs: number;
-  cached: boolean;
-  additionalFileKeys: string[];
-}
-```
-
-### Tool: `architect_doc_detail`
-
-Progressive disclosure drill-down into a parent document's `additionalFiles`.
-
-| Parameter | Type   | Required | Description                                                         |
-| --------- | ------ | -------- | ------------------------------------------------------------------- |
-| `type`    | string | MUST     | Document type key (same as parent `architect_doc` call)             |
-| `key`     | string | MUST     | Key from `additionalFileKeys` (e.g., `"business-rules/desktop.md"`) |
-| `options` | object | MAY      | Same projection options as the parent document                      |
-
-**Response:**
-
-```typescript
-interface LiveDocumentDetailResponse {
-  document: RenderableDocument;
-  key: string;
-  parentType: string;
-  cached: boolean;
-}
-```
-
-### Tool: `architect_doc_types`
-
-Introspection — lists all available document types.
-
-**Response:**
-
-```typescript
-interface DocTypeEntry {
-  type: string;
-  description: string;
-  outputPath: string;
-  requiresOptions: boolean;
-  optionFields: string[];
-}
-```
+> _Informative:_ Earlier drafts of this spec described three separate tools
+> (`architect_doc`, `architect_doc_detail`, `architect_doc_types`). The shipped reference
+> implementation collapses them into the single `architect_documentation` tool above;
+> document-type introspection is served via the related `architect_help` tool and
+> progressive disclosure is handled by the `disclosure` parameter on the same tool.
 
 ---
 
@@ -194,8 +155,8 @@ Four projections selected for maximum block type coverage and practical value:
 | `parseAndProjectDocumentationView` | `architecture`   | mermaid, table, heading, paragraph        | No            | No                     |
 | `parseAndProjectPatternCatalog`    | `patterns`       | table, list, heading, paragraph, link-out | No            | Yes (per category)     |
 
-All document projections are served through the same `architect_doc` tool — expansion
-requires no API changes, only additional UI views.
+All document projections are served through the same `architect_documentation` tool —
+expansion requires no API changes, only additional UI views.
 
 ---
 
@@ -217,11 +178,11 @@ type CacheKey = string; // `${type}::${JSON.stringify(sortedOptions)}`
 
 ### Cache Lifecycle
 
-| Event                | Cache Action                                                               |
-| -------------------- | -------------------------------------------------------------------------- |
-| `architect_doc` call | Return cached if `buildGeneration` matches current; else project and cache |
-| PatternGraph rebuild | Increment `buildGeneration`; lazy invalidation on next access              |
-| Studio disconnect    | Clear cache entirely                                                       |
+| Event                          | Cache Action                                                               |
+| ------------------------------ | -------------------------------------------------------------------------- |
+| `architect_documentation` call | Return cached if `buildGeneration` matches current; else project and cache |
+| PatternGraph rebuild           | Increment `buildGeneration`; lazy invalidation on next access              |
+| Studio disconnect              | Clear cache entirely                                                       |
 
 The cache SHOULD impose a maximum entry count of 50 with LRU eviction.
 
@@ -231,13 +192,16 @@ The cache SHOULD impose a maximum entry count of 50 with LRU eviction.
 
 `RenderableDocument.additionalFiles` is an optional `Record<string, RenderableDocument>`.
 In the static pipeline, each entry becomes a separate `.md` file. In the Live Documentation
-API, each entry becomes a drill-down target accessible via `architect_doc_detail`.
+API, each entry is reachable from the parent document via the `disclosure` parameter on
+the same `architect_documentation` tool.
 
 **Workflow:**
 
-1. Client calls `architect_doc` → receives `additionalFileKeys`.
+1. Client calls `architect_documentation` with `documentType` only → receives the parent
+   document plus an `additionalFileKeys` list.
 2. Client renders navigation affordances for each key.
-3. User clicks a drill-down target → client calls `architect_doc_detail` with the key.
+3. User clicks a drill-down target → client re-invokes `architect_documentation` with
+   the matching `disclosure` level (and/or `filter`).
 4. API returns the nested `RenderableDocument` from cache.
 
 Keys use static pipeline path format (e.g., `"business-rules/platform.md"`).
@@ -246,8 +210,8 @@ Keys use static pipeline path format (e.g., `"business-rules/platform.md"`).
 
 ## Security Considerations
 
-- The `type` parameter MUST be validated against `DOCUMENT_TYPES` before projection dispatch.
-- The `options` parameter MUST be validated by the projection boundary.
+- The `documentType` parameter MUST be validated against `DOCUMENT_TYPES` before projection dispatch.
+- The `disclosure` and `filter` parameters MUST be validated by the projection boundary.
 - Text fields may contain user-authored content. The UI renderer MUST sanitize text to
   prevent HTML injection.
 - Documents SHOULD NOT exceed 5 MB serialized over IPC.

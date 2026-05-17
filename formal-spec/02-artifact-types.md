@@ -1,6 +1,6 @@
 # 02 — Artifact Types
 
-> **Architect Spec v0.1.0** — The four artifact types, their directory conventions, and naming rules.
+> **Architect Spec v0.2.0** — The four artifact types, their directory conventions, and naming rules.
 
 ---
 
@@ -35,7 +35,7 @@ project-root/
       <pattern-name>/       # kebab-case directory matching pattern name
     releases/               # Release manifests (.feature)
     briefs/                 # Optional: pre-candidate Markdown briefs
-    tag-taxonomy.md         # Project-specific tag taxonomy reference
+    tag-taxonomy.md         # OPTIONAL: project-specific tag taxonomy reference (informative)
   architect.config.ts       # Project configuration (§11)
   tests/
     features/               # Executable specs (.feature + step definitions, permanent)
@@ -113,18 +113,20 @@ The executable spec is the permanent artifact. The design-level spec is construc
 
 **Required tags (Level 2):**
 
-| Tag                          | Purpose                 |
-| ---------------------------- | ----------------------- |
-| `@architect`                 | Gate tag (opt-in)       |
-| `@architect-pattern`         | PascalCase pattern name |
-| `@architect-status`          | FSM state               |
-| `@architect-phase`           | Roadmap phase number    |
-| `@architect-product-area`    | Product area grouping   |
-| `@architect-effort`          | Estimated effort        |
-| `@architect-priority`        | Priority level          |
-| `@architect-bounded-context` | Architecture grouping   |
-| `@architect-arch-layer`      | Architecture layer      |
-| `@architect-release`         | Target release          |
+| Tag                          | Purpose                       |
+| ---------------------------- | ----------------------------- |
+| `@architect`                 | Gate tag (opt-in)             |
+| `@architect-pattern`         | PascalCase pattern name       |
+| `@architect-status`          | FSM state                     |
+| `@architect-product-area`    | Product area grouping         |
+| `@architect-bounded-context` | Architecture grouping         |
+| `@architect-arch-layer`      | Architecture layer (`domain` \| `application` \| `infrastructure`) |
+| `@architect-role`            | Canonical role                |
+
+> _Informative:_ Earlier draft versions of this spec also listed `@architect-phase`,
+> `@architect-effort`, `@architect-priority`, and `@architect-release` as required.
+> These planning-oriented tags are not part of the v0.2.0 canonical taxonomy. Projects MAY
+> add them as custom extensions; the reference implementation does not recognise them.
 
 **Required structural sections:**
 
@@ -215,9 +217,13 @@ and no Scenarios.
 | Tag                       | Purpose                                            |
 | ------------------------- | -------------------------------------------------- |
 | `@architect`              | Gate tag                                           |
-| `@architect-release`      | Version identifier (e.g., `vNEXT`, `v1.0.0`)       |
 | `@architect-status`       | Typically `active` for the current staging release |
 | `@architect-product-area` | Product area                                       |
+
+> _Informative:_ The release version identifier comes from the file name
+> (`vNEXT.feature` / `vX.Y.Z.feature`) rather than a dedicated tag. Earlier drafts of
+> this spec listed `@architect-release` as a required tag; it is not part of the v0.2.0
+> canonical taxonomy.
 
 **Structural conventions:**
 

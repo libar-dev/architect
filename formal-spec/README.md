@@ -34,16 +34,24 @@ link specs to implementation artifacts.
 
 ## Why Formalize This
 
-The approach described in this spec has been proven across two production codebases:
+The approach described in this spec has been proven across two production codebases —
+the `architect-studio` desktop app (then ~386 patterns / ~929 rules / 33 ADRs at peak)
+and the `@libar-dev/architect-*` package family (currently 260 delivery patterns + 8
+candidates / 347 rules / 9 ADRs+PDRs as of this draft):
 
-| Metric                   | Without Spec Format | With Spec Format              |
-| ------------------------ | ------------------- | ----------------------------- |
-| Daily velocity           | ~1,900 LOC/day      | ~10,100 LOC/day               |
-| Specification coverage   | 50 files            | 530 files                     |
-| Architecture decisions   | Ad hoc              | 33 formal ADRs                |
-| Patterns tracked         | None                | 386 (258 completed)           |
-| Business rules extracted | None                | 929 machine-extractable rules |
-| Major rewrites           | Multiple            | Zero                          |
+| Metric                   | Without Spec Format | With Spec Format (reported peak across the two codebases) |
+| ------------------------ | ------------------- | ---------------------------------------------------------- |
+| Daily velocity           | ~1,900 LOC/day      | ~10,100 LOC/day                                            |
+| Specification coverage   | 50 files            | 530 files                                                  |
+| Architecture decisions   | Ad hoc              | 33 formal ADRs (studio)                                    |
+| Patterns tracked         | None                | 386 (258 completed) (studio peak)                          |
+| Business rules extracted | None                | 929 machine-extractable rules (studio peak)                |
+| Major rewrites           | Multiple            | Zero                                                       |
+
+> _Informative:_ The current `@libar-dev/architect` reference repo runs a much smaller
+> dogfood instance — its purpose is to govern the toolchain itself, not to be a
+> production application. Numbers above are reported historical peaks across the two
+> codebases, not current-repo measurements.
 
 Formalizing the format enables:
 
@@ -85,12 +93,23 @@ Start at Level 1. Graduate when you need more.
 
 ## Relationship to @libar-dev/architect
 
-`@libar-dev/architect` is the **reference implementation** of this spec. It provides:
+The `@libar-dev/architect-*` package family is the **reference implementation** of this spec. As of v2.0 the implementation is split into five publishable packages plus a bin-only meta:
 
-- A scanner/extractor pipeline that parses annotated code and Gherkin specs
-- `buildPatternGraph()` that produces the pattern graph data model described in §10
-- A CLI with 20 commands for querying the graph
-- An MCP server with 18 tools for AI context delivery
+| Package | Role |
+| --- | --- |
+| `@libar-dev/architect-core` | Canonical model, ingestion, graph build, scanner/extractor, taxonomy, config, read API (`PatternGraphAPI`). |
+| `@libar-dev/architect-projection` | Fragment-based projection pipeline (Zod-validated `RenderableDocument` blocks, renderers). |
+| `@libar-dev/architect-guard` | Policy, validation, ProcessGuard, step-lint, anti-pattern detection. |
+| `@libar-dev/architect-cli` | Composition root and 7 bins (`architect`, `architect-generate`, `architect-guard`, `architect-validate`, `architect-lint-steps`, `architect-lint-patterns`, `architect-mcp`). |
+| `@libar-dev/architect-mcp` | MCP server, tool registry, file watcher, pipeline session. |
+| `@libar-dev/architect` (meta) | Bin-only re-export of the 7 bins. No JS API — JS consumers must import from the split that owns each symbol. |
+
+Together they provide:
+
+- A scanner/extractor pipeline that parses annotated TypeScript and Gherkin
+- `buildPatternGraph()` / `createPatternGraphAPI()` from `architect-core` producing and querying the pattern-graph data model described in §10
+- A CLI with 22 user-facing subcommands (`overview`, `context`, `dep-tree`, `scope-validate`, `arch`, `rules`, …) for querying the graph
+- An MCP server with 21 tools (`architect_overview`, `architect_context`, `architect_documentation`, …) for AI context delivery
 - Projection-based documentation generation from the graph
 - ProcessGuard for FSM enforcement described in §09
 
@@ -111,7 +130,7 @@ This spec defines the format. The toolchain implements it.
 - Removed `@architect-depends-on-external` and `@architect-parent-external` from the formal authored tag set. Cross-process soft links are now derived from surviving relationship data instead of separate authored tags.
 - Removed the authored `@architect-sequence-orchestrator`, `@architect-sequence-step`, `@architect-sequence-module`, and `@architect-sequence-error` examples from the formal spec. Design ordering now lives in ordinary rule prose and scenario structure.
 - Removed `@architect-extract-shapes` from the formal stub guidance. Exported TypeScript declarations are now the canonical contract surface for shape-oriented tooling.
-- Narrowed the draft's migration story to the surviving authored taxonomy. Use `@architect-uses` for authored dependency vocabulary, and see `packages/architect-claude-plugin/MIGRATION.md` for the Wave 1 through Wave 4 campaign record.
+- Narrowed the draft's migration story to the surviving authored taxonomy. Use `@architect-uses` for authored dependency vocabulary. The Wave 1–Wave 4 migration campaign record lived in `architect-studio/packages/architect-claude-plugin/MIGRATION.md` at the time of authoring; the same content will be reproduced in this repo's `MIGRATION.md` at the `2.0.0-pre.1` release (see Wave 4 of the repo `REMAINING-WORK.md`).
 
 ### 0.2.0 (Draft) - 2026-04-29
 

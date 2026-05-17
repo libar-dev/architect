@@ -1,6 +1,6 @@
 # 10 — Pattern Graph
 
-> **Architect Spec v0.1.0** — The data model produced by parsing all architect artifacts.
+> **Architect Spec v0.2.0** — The data model produced by parsing all architect artifacts.
 
 ---
 
@@ -54,41 +54,37 @@ of the architecture — the fundamental unit from which everything else is deriv
 
 ### Status and Lifecycle
 
-| Field          | Type                                                 | Description                     |
-| -------------- | ---------------------------------------------------- | ------------------------------- |
-| `status`       | `'roadmap' \| 'active' \| 'completed' \| 'deferred'` | FSM state                       |
-| `phase`        | number                                               | Roadmap phase                   |
-| `priority`     | `'critical' \| 'high' \| 'medium' \| 'low'`          | Priority level                  |
-| `effort`       | string                                               | Effort estimate (e.g., `5d`)    |
-| `effortActual` | string?                                              | Actual effort (post-completion) |
-| `quarter`      | string?                                              | Target quarter                  |
-| `completed`    | ISO8601?                                             | Completion date                 |
-| `team`         | string?                                              | Responsible team                |
-| `risk`         | `'high' \| 'medium' \| 'low'`?                       | Risk level                      |
-| `workflow`     | string?                                              | Active workflow identifier      |
+| Field          | Type                                                              | Description                     |
+| -------------- | ----------------------------------------------------------------- | ------------------------------- |
+| `status`       | `'candidate' \| 'roadmap' \| 'active' \| 'completed' \| 'deferred'` | FSM state                       |
+| `maturity`     | `'idea' \| 'plan' \| 'design' \| 'executable'`?                    | Spec maturity (auto-defaulted from status when absent — see §04) |
+| `completed`    | ISO8601?                                                           | Completion date                 |
+| `unlockReason` | string?                                                            | Required when modifying a `completed` pattern (§09) |
 
 ### Relationships
 
-| Field                | Type     | Description                        |
-| -------------------- | -------- | ---------------------------------- |
-| `dependsOn`          | string[] | Pattern names this depends on      |
-| `enables`            | string[] | Pattern names this enables         |
-| `uses`               | string[] | Pattern names this uses at runtime |
-| `usedBy`             | string[] | Pattern names that use this        |
-| `implementsPatterns` | string[] | Spec patterns this implements      |
-| `extendsPattern`     | string?  | Pattern this extends               |
-| `seeAlso`            | string[] | Related pattern names              |
-| `apiRef`             | string?  | External API reference             |
+| Field                | Type     | Description                                                  |
+| -------------------- | -------- | ------------------------------------------------------------ |
+| `uses`               | string[] | Pattern names this depends on / uses (authored)              |
+| `usedBy`             | string[] | Pattern names that declare `uses` of this (derived reverse)  |
+| `implementsPatterns` | string[] | Spec patterns this code or stub realizes (authored)          |
+| `implementedBy`      | string[] | Pattern names that implement this (derived reverse)          |
+| `extendsPattern`     | string?  | Pattern this extends or specializes (authored)               |
+| `seeAlso`            | string[] | Related pattern names — informational cross-reference        |
+
+> _Informative:_ Earlier drafts surfaced separate `dependsOn`, `enables`, and `apiRef`
+> fields. In v0.2.0 the authored vocabulary collapses to `@architect-uses`; reverse
+> edges (`usedBy`, `implementedBy`) are derived, not authored.
 
 ### Architecture
 
-| Field            | Type                                                               | Description                                    |
-| ---------------- | ------------------------------------------------------------------ | ---------------------------------------------- |
-| `roleDefinition` | RoleDefinition?                                                    | Resolved role metadata (diagram shape, labels) |
-| `archContext`    | string?                                                            | Bounded context                                |
-| `archLayer`      | `'presentation' \| 'application' \| 'domain' \| 'infrastructure'`? | Layer                                          |
-| `productArea`    | string?                                                            | Product area                                   |
-| `boundedContext` | string?                                                            | Bounded context (alias)                        |
+| Field            | Type                                                  | Description                                    |
+| ---------------- | ----------------------------------------------------- | ---------------------------------------------- |
+| `roleDefinition` | RoleDefinition?                                       | Resolved role metadata (diagram shape, labels) |
+| `archContext`    | string?                                                | Bounded context                                |
+| `archLayer`      | `'domain' \| 'application' \| 'infrastructure'`?       | Layer                                          |
+| `productArea`    | string?                                                | Product area                                   |
+| `boundedContext` | string?                                                | Bounded context (alias)                        |
 
 > **Historical note:** `archRole` appears in legacy extraction aliases and preserved reference docs only.
 
@@ -134,30 +130,18 @@ Each `Deliverable`:
 | `adrSupersedes`   | string?                                                     | ADR this supersedes      |
 | `adrSupersededBy` | string?                                                     | ADR that supersedes this |
 
-### Product & Business
-
-| Field           | Type      | Description                       |
-| --------------- | --------- | --------------------------------- |
-| `businessValue` | string?   | Business value slug               |
-| `userRole`      | string?   | Primary user role                 |
-| `constraints`   | string[]? | Business or technical constraints |
-
 ### Hierarchy
 
-| Field      | Type                           | Description                    |
-| ---------- | ------------------------------ | ------------------------------ |
-| `level`    | `'epic' \| 'phase' \| 'task'`? | Hierarchy level                |
-| `parent`   | string?                        | Parent pattern name            |
-| `children` | string[]?                      | Child pattern names (computed) |
+| Field      | Type                                          | Description                    |
+| ---------- | --------------------------------------------- | ------------------------------ |
+| `level`    | `'epic' \| 'phase' \| 'task' \| 'slice'`?     | Hierarchy level                |
+| `parent`   | string?                                        | Parent pattern name            |
+| `children` | string[]?                                      | Child pattern names (computed) |
 
-### Discovery
-
-| Field                    | Type      | Description               |
-| ------------------------ | --------- | ------------------------- |
-| `discoveredGaps`         | string[]? | Gaps found during review  |
-| `discoveredImprovements` | string[]? | Improvement opportunities |
-| `discoveredRisks`        | string[]? | Risks identified          |
-| `discoveredLearnings`    | string[]? | Lessons learned           |
+> _Informative:_ Earlier drafts of this spec also surfaced "Product & Business" and
+> "Discovery" field groups (`businessValue`, `userRole`, `constraints`,
+> `discoveredGaps`, …). Those authored tags are not part of the v0.2.0 canonical
+> taxonomy and are not surfaced in the read model.
 
 ## Pre-Computed Views
 
