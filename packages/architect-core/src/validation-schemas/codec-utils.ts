@@ -78,7 +78,7 @@ export function createJsonInputCodec<T>(schema: ZodType<T>): JsonInputCodec<T> {
 
       const configData =
         typeof data === 'object' && data !== null && '$schema' in data
-          ? (({ $schema: _, ...rest }) => rest)(data as Record<string, unknown>)
+          ? (({ $schema: _, ...rest }) => rest)(data)
           : data;
 
       const parseResult = schema.safeParse(configData);

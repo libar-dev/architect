@@ -266,7 +266,7 @@ async function executeArchCommand(
     case 'coverage':
       return projectAnnotationCoverage(context.projection);
     case 'dangling':
-      return executeDanglingCommand(context, flags as ArchCommandFlags);
+      return executeDanglingCommand(context, flags);
     case 'orphans':
       return projectOrphanPatternList(context.projection).root.items;
     case 'blocking':

@@ -642,7 +642,7 @@ export async function extractPatternsFromGherkinAsync(
     patternsToVerify.map(async ({ pattern, behaviorPathToVerify }) => {
       if (behaviorPathToVerify) {
         const exists = await fileExistsAsync(behaviorPathToVerify);
-        return { ...pattern, behaviorFileVerified: exists } as ExtractedPattern;
+        return { ...pattern, behaviorFileVerified: exists };
       }
       return pattern;
     })
@@ -666,7 +666,7 @@ export function computeHierarchyChildren(
   return patterns.map((pattern) => {
     const children = parentToChildren.get(getPatternName(pattern));
     if (children && children.length > 0) {
-      return { ...pattern, children } as ExtractedPattern;
+      return { ...pattern, children };
     }
     return pattern;
   });

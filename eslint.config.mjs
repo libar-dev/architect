@@ -2,6 +2,45 @@ import tseslint from 'typescript-eslint';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import importPlugin from 'eslint-plugin-import';
 
+// No-BC doctrine: source files must not carry suppression or
+// backwards-compatibility marker comments. See AGENTS.md → "Engineering
+// doctrine → No-BC" and `scripts/guard-no-suppressions.mjs` for the
+// out-of-band ratcheting guard with the same rule pattern.
+const SUPPRESSION_COMMENT_PATTERN = /(?:eslint-disable|@ts-ignore|@ts-expect-error|@ts-nocheck)/u;
+
+const architectLocalPlugin = {
+  rules: {
+    'no-suppression-comments': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description: 'Disallow suppression and backwards-compatibility marker comments.',
+        },
+        messages: {
+          forbidden:
+            '[no-bc:no-suppression-comments] Do not add suppression or backwards-compatibility marker comments (`eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck`). Fix the root cause. See AGENTS.md → "Engineering doctrine → No-BC".',
+        },
+        schema: [],
+      },
+      create(context) {
+        return {
+          Program() {
+            const sourceCode = context.sourceCode;
+            for (const comment of sourceCode.getAllComments()) {
+              if (SUPPRESSION_COMMENT_PATTERN.test(comment.value)) {
+                context.report({
+                  loc: comment.loc,
+                  messageId: 'forbidden',
+                });
+              }
+            }
+          },
+        };
+      },
+    },
+  },
+};
+
 export default tseslint.config(
   // Ignore patterns
   {
@@ -11,6 +50,24 @@ export default tseslint.config(
   // Base recommended configs
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
+
+  // Register the local plugin globally; specific rule activation lives in
+  // file-scoped blocks below so test/fixture surfaces stay opt-in.
+  {
+    plugins: {
+      'architect-local': architectLocalPlugin,
+    },
+  },
+
+  // No-suppression doctrine — production source only. Tests stay free to use
+  // type-narrowing tools the rule would otherwise forbid.
+  {
+    files: ['packages/*/src/**/*.ts', 'src/**/*.ts'],
+    ignores: ['**/tests/**', '**/*.steps.ts', '**/*.spec.ts', '**/*.test.ts'],
+    rules: {
+      'architect-local/no-suppression-comments': 'error',
+    },
+  },
 
   // architect-projection src — honour the `_`-prefix unused convention used by factory wrappers
   {
@@ -101,7 +158,8 @@ export default tseslint.config(
             '[trust-boundary:trusted-markdown-firewall] `TRUSTED_MARKDOWN` is renderer-private and must not be imported or exported. See packages/architect-projection/README.md "Markdown/content trust boundary".',
         },
         {
-          selector: 'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator[id.name="TRUSTED_MARKDOWN"]',
+          selector:
+            'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator[id.name="TRUSTED_MARKDOWN"]',
           message:
             '[trust-boundary:trusted-markdown-firewall] `TRUSTED_MARKDOWN` is renderer-private and must not be imported or exported. See packages/architect-projection/README.md "Markdown/content trust boundary".',
         },
@@ -372,5 +430,5 @@ export default tseslint.config(
   },
 
   // Prettier config - must be last to override style rules
-  eslintConfigPrettier
+  eslintConfigPrettier,
 );
