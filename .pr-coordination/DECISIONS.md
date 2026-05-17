@@ -137,36 +137,92 @@ The existing tag-registry schema (`tag`, `kind`, `format`, `purpose`,
 already drives the section headings in the generated TAXONOMY.md. No new
 fields are added.
 
-### D4 — `docs/ANNOTATION-GUIDE.md` is the W-DOCS-1 acceptance case
+### D4' — W-DOCS-1 acceptance is a meta-self-documentation PoC
 
-The trivial port target proposed in `PROPOSED-DESIGN.md` § 7 changes from
-`CLI-REFERENCE.md` to `ANNOTATION-GUIDE.md`. The new case exercises
-tag-registry extraction + wiki-index emission + multi-page output in one
-end-to-end slice. The resulting tree shape:
+Supersedes the earlier D4 (`docs/ANNOTATION-GUIDE.md`) and the
+`CLI-REFERENCE.md` placeholder in `PROPOSED-DESIGN.md` § 7. The W-DOCS-1
+acceptance target becomes a **small, self-contained PoC that generates two
+documents about the wiki-doc-generation machinery itself** — the design
+round-trips on its own description.
 
-```
-docs-live/annotation-guide/
-  INDEX.md                          ← projectWikiIndex output
-  1-getting-started.md              ← preamble + JSDoc lifted from a canonical example
-  2-ownership-model.md              ← projectTaxonomyDigest grouped by source-of-truth
-  3-shape-extraction.md             ← extractJSDocProse on shape-extractor module
-  4-tag-reference/                  ← bundle child directory; one page per groupName
-    4-1-core-tags.md
-    4-2-relationship-tags.md
-    4-3-architecture-tags.md
-    …
-  5-format-types.md                 ← formatTypes[] from the taxonomy JSON
-  6-patterns-by-file-type.md        ← preamble (genuinely editorial)
-  7-verification/
-    7-1-cli-commands.md             ← extractCliCommands (W-DOCS-2)
-    7-2-common-issues.md            ← preamble
-```
+Pilot targets:
 
-Acceptance: `pnpm docs:all` produces the tree above; `INDEX.md` carries File
-Map, Concept Index (from Gherkin scenario/rule/feature titles of patterns
-that contribute to any child page), Key Entities Reference, Diagram
-Catalog, and Reading Paths; the manual `docs/ANNOTATION-GUIDE.md` is
-deleted in the same PR.
+- **Target A — agent-context skill.** A new
+  `.claude/skills/wiki-doc-generation/SKILL.md` describing how to use the
+  `DocDefinition` / `ContentFragment` / `WikiIndexDefinition` machinery in a
+  session. Shorter, denser, embeds fragments at INPUT disclosure
+  `important` / `useful`, links to the canonical wiki for full content.
+- **Target B — canonical wiki tree.** A new `docs-live/wiki-doc-generation/`
+  wiki tree with `INDEX.md` + child pages, embedding the same fragments at
+  INPUT disclosure `advanced`. Same source content, different shape, no
+  drift possible.
+
+Acceptance is **not** parity with a hand-authored baseline — the PoC is
+green when both documents are generated end-to-end from the same source,
+the shared fragments render at the agreed depths in each target, and the
+cross-references from skill → wiki resolve. ANNOTATION-GUIDE.md, the
+formal-spec migration, and the pre-refactor 11 reference docs port move to
+later waves (W-DOCS-5 onward).
+
+### D10 — PoC content-source coverage requirements
+
+The W-DOCS-1 PoC (D4') is green only if the two pilot targets exercise the
+full data-source surface that the design promises. Concretely:
+
+| Required surface                              | PoC instance                                                                                                                            |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| ≥ 2 output documents                          | Target A (skill) + Target B (wiki tree).                                                                                                |
+| Shared content across both                    | At least 2 ContentFragments embedded in both targets at different INPUT disclosure depths.                                              |
+| Per-target unique content                     | Skill carries trigger-detection / when-this-fires section; wiki carries verb reference + type schemas at full depth.                    |
+| Different level of detail per target          | Fragments emit reduced section sets at lower disclosure; readers descend via `linkToCanonical` from skill → wiki.                       |
+| Data source — JSDoc from annotated block      | `extractJSDocProse` on the JSDoc block above `WikiIndexDefinition` (or `ContentFragment`) in `architect-projection`.                    |
+| Data source — interface / code-snippet shape  | `extractTypeShapes` on the `WikiIndexDefinition` interface; source-text or structured renderer for the code-snippet form.               |
+| Data source — small live mermaid diagram      | `extractGraphDiagram` or hand-built `MermaidBlock` — the generation pipeline (source → `DocDefinition.build` → `projectWikiIndex` → INDEX + pages). |
+| Data source — business rule                   | `extractBehaviors({ tag })` against a Gherkin `Rule:` block authored as part of the PoC (e.g. "INDEX disclosure summarizes content"). |
+
+The four data-source kinds cover the substrate the design must support
+end-to-end. Any additional extractors (CLI commands, MCP tools, lint
+rules) are deferred to W-DOCS-2 — the PoC does not block on them.
+
+### D11 — Full information-duplication mapping deferred to execution waves
+
+The multi-agent mapping pass described in `REMAINING-WORK.md` (catalog
+every duplication site across `docs/`, `formal-spec/`, `.claude/skills/`,
+package READMEs; classify each as ContentFragment / generated-insert /
+multi-target / per-target unique) is required for the **execution** waves
+(W-DOCS-5+), not for the PoC (W-DOCS-1).
+
+The PoC works on a contained, self-described scope that needs no
+duplication-mapping prerequisite. Once the PoC is green, the mapping pass
+becomes the input to W-DOCS-5 and beyond, with the PoC machinery as
+ground-truth implementation.
+
+### D12 — Methodology: design-from-target, not bottom-up substrate spike
+
+The plan/design sequence is driven by the picked PoC artifacts (D4'), not
+by a projection-walk spike. The methodology:
+
+1. **Reverse-engineer the PoC targets.** For each of Target A and Target B,
+   write down: on-disk shape, fragments embedded, reading paths, extractor
+   call sites, editorial vs generated split.
+2. **Surface design questions concretely.** The reverse-engineering surfaces
+   real questions ("how does the skill's frontmatter survive a fragment
+   re-embed?", "how does the wiki's mermaid block render if the
+   `MermaidBlock` schema changes?") that hypothetical exploration would
+   miss.
+3. **Plan-tier spec captures the questions + the targets.** Use the
+   `architect-plan-session` skill; the candidate-tier spec lifts decisions
+   from this file and pulls open questions from step 2.
+4. **Design-tier spec emerges from answered questions.** `skill-creator` is
+   loaded at this point for the agent-context half (Target A); the wiki
+   half (Target B) uses the existing projection substrate.
+5. **Implementation matches the targets.** W-DOCS-1 closes when both
+   targets are generated from one source and the design has round-tripped
+   on its own description.
+
+This methodology is doc-generation's analogue of the executable-feature
+discipline elsewhere in the codebase: the artifact IS the spec, and the
+design's job is to produce that artifact without drift.
 
 ### D5 — `docs/` and `formal-spec/` are deletion targets
 
@@ -186,7 +242,7 @@ Resequence the wave breakdown in `PROPOSED-DESIGN.md` § 7:
 
 - **W-DOCS-1**: `DocDefinition` + `WikiIndexDefinition` types,
   `projectWikiIndex` projection, `composeDoc` helpers, runner integration.
-  Acceptance: ANNOTATION-GUIDE.md ported (see D4).
+  Acceptance: the meta-self-documentation PoC (see D4').
 - **W-DOCS-2**: extractor catalog (unchanged from `PROPOSED-DESIGN.md`).
 - **W-DOCS-2d**: ContentFragments + INPUT-side disclosure integration
   (unchanged).
