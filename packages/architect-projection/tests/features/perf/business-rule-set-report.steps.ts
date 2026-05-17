@@ -23,6 +23,7 @@ import {
   parseAndProjectScopeReadinessReport,
   parseAndProjectSessionContext,
   renderJson,
+  renderMarkdown,
   type ProjectionContext,
 } from '../../../src/index.js';
 import { createTestPackageResolver } from '../../support/test-package-resolver.js';
@@ -294,6 +295,13 @@ interface PerfPatternOptions {
 type ProjectionMeasure = (context: ProjectionContext) => unknown;
 type AsyncMeasure = () => Promise<unknown>;
 
+const RENDER_MARKDOWN_DOCUMENT_TYPES = [
+  'patterns',
+  'requirements-executable',
+  'roadmap',
+] as const;
+type RenderMarkdownDocumentType = (typeof RENDER_MARKDOWN_DOCUMENT_TYPES)[number];
+
 let state: PerfReportState = {
   reportPath: null,
 };
@@ -487,6 +495,26 @@ function measureProjection(
   return summarize(values, iterations);
 }
 
+function measureRenderMarkdownBundles(
+  context: ProjectionContext,
+  iterations: number
+): Record<RenderMarkdownDocumentType, PerfSummary> {
+  const result = {} as Record<RenderMarkdownDocumentType, PerfSummary>;
+
+  for (const documentType of RENDER_MARKDOWN_DOCUMENT_TYPES) {
+    result[documentType] = measureProjection(
+      context,
+      (projectionContext) => {
+        const bundle = parseAndProjectDocumentationBundle(projectionContext, { documentType });
+        return renderMarkdown(bundle);
+      },
+      iterations
+    );
+  }
+
+  return result;
+}
+
 async function measureAsyncOperation(
   measure: AsyncMeasure,
   iterations: number
@@ -657,6 +685,7 @@ async function generateBusinessRuleSetPerfReport(): Promise<string> {
           ),
           graphBuild: await measureGraphBuild(repoRoot, graphBuildIterations),
         },
+        renderMarkdownBundles: measureRenderMarkdownBundles(context, hotPathIterations),
         isBundleP50Micros: p50(samples.map((sample) => sample.isBundleMicros)),
         samples,
       },

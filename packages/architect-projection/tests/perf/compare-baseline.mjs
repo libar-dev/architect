@@ -27,6 +27,8 @@ const HOT_PATH_BUDGETS = {
   graphBuild: { field: 'avgMs', budget: 2000, unit: 'ms' },
 };
 
+const RENDER_MARKDOWN_BUNDLE_BUDGET = { field: 'avgMs', budget: 15, unit: 'ms' };
+
 const BASELINE_MULTIPLIER = 1.5;
 
 const [report, baseline] = await Promise.all([
@@ -40,6 +42,7 @@ const failures = [
   checkAverageMetric('renderPretty'),
   checkScalarMetric('isBundleP50Micros'),
   ...Object.keys(HOT_PATH_BUDGETS).map((metricName) => checkHotPathAverageMetric(metricName)),
+  ...checkRenderMarkdownBundleMetrics(),
 ].filter((failure) => failure !== undefined);
 
 if (failures.length > 0) {
@@ -124,6 +127,54 @@ function checkHotPathAverageMetric(metricName) {
       `(hard ${format(budget.budget, budget.unit)}, baseline ${format(baselineBudget, budget.unit)})`
   );
   return undefined;
+}
+
+function checkRenderMarkdownBundleMetrics() {
+  const reportBundles = report.renderMarkdownBundles;
+  const baselineBundles = baseline.renderMarkdownBundles;
+
+  if (
+    reportBundles === undefined ||
+    typeof reportBundles !== 'object' ||
+    reportBundles === null
+  ) {
+    throw new Error('Missing renderMarkdownBundles section in perf report');
+  }
+
+  if (
+    baselineBundles === undefined ||
+    typeof baselineBundles !== 'object' ||
+    baselineBundles === null
+  ) {
+    throw new Error('Missing renderMarkdownBundles section in perf baseline');
+  }
+
+  const budget = RENDER_MARKDOWN_BUNDLE_BUDGET;
+  const results = [];
+
+  for (const documentType of Object.keys(reportBundles)) {
+    const actual = getMetricValue(reportBundles, documentType, budget.field);
+    const baselineValue = getMetricValue(baselineBundles, documentType, budget.field);
+    const baselineBudget = baselineValue * BASELINE_MULTIPLIER;
+    const allowed = Math.min(budget.budget, baselineBudget);
+    const label = `renderMarkdownBundles.${documentType}.${budget.field}`;
+
+    if (actual > allowed) {
+      console.error(
+        `FAIL ${label}: ${format(actual, budget.unit)} exceeds ${format(allowed, budget.unit)} ` +
+          `(hard ${format(budget.budget, budget.unit)}, baseline ${format(baselineBudget, budget.unit)})`
+      );
+      results.push(`${label} ${format(actual, budget.unit)} > ${format(allowed, budget.unit)}`);
+      continue;
+    }
+
+    console.log(
+      `PASS ${label}: ${format(actual, budget.unit)} <= ${format(allowed, budget.unit)} ` +
+        `(hard ${format(budget.budget, budget.unit)}, baseline ${format(baselineBudget, budget.unit)})`
+    );
+  }
+
+  return results;
 }
 
 function getMetricValue(source, metricName, fieldName) {
