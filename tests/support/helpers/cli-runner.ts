@@ -60,7 +60,7 @@ const PROJECT_ROOT = path.resolve(__dirname, '../../..');
  * Path to the split CLI package source tree.
  */
 const CLI_PACKAGE_ROOT = path.resolve(__dirname, '../../../packages/architect-cli');
-const GUARD_PACKAGE_ROOT = path.resolve(__dirname, '../../../../architect-guard');
+const GUARD_PACKAGE_ROOT = path.resolve(__dirname, '../../../packages/architect-guard');
 
 /**
  * Resolve the tsx binary from node_modules/.bin/ rather than relying on npx.

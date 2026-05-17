@@ -59,6 +59,8 @@ const FROZEN_GLOBAL_FLAGS = [
   '--depth <n>          Dependency tree depth',
   '-h, --help               Show help',
   '-v, --version            Show version',
+  'Agent environments: load the `architect-data-api` skill for verb shapes,',
+  'deterministic gates, JSON shapes, and known quirks.',
 ] as const;
 
 interface FrozenFormatJsonResult {
