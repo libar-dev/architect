@@ -121,6 +121,7 @@ Captured here to close the loop: the changesets config (`.changeset/config.json`
 ### 1.5.x — Hardening backlog (deferred)
 
 - [ ] **Revisit `architect-cli/src/cli/runtime-helpers.ts:36 resolveInvocationDir()`.** Prefers `process.env.PWD` over `process.cwd()`. Likely intentional for symlinked-shell scenarios, but it makes embedding the CLI in other processes brittle (subprocess inherits parent PWD, `execFile({ cwd })` doesn't update it). The test harness already strips PWD/INIT_CWD as a workaround. Considering: invert the precedence, or add a CLI flag to force `cwd`-only, or document explicitly that consumers must pass `--base-dir` rather than relying on cwd. Not part of any planned wave yet; revisit when CLI gets exercised more outside test contexts.
+- [ ] **Split `tests/features/cli/pattern-graph-cli-modifiers-rules.feature`.** Surfaced during W9 Phase 2 cleanup verification — file has 38 scenarios vs the 30 threshold, so `pnpm validate:all` emits a `scenario-bloat` warning that fails CI. Pre-existing; not introduced by W9. Fix per the validator's hint: split into multiple `.feature` files organized by component, use case, or business capability.
 
 ## Wave 2 — Root tooling (eslint, lint-staged, husky, turbo)
 
@@ -191,12 +192,53 @@ Once the published artifacts are stable, decide on studio's dependency.
 
 ## Wave 9 — Consolidate agent skills into the architect package
 
-> **Status:** placeholder for a focused future session. Plugin/skill consolidation is **out of scope for the W1.5 session** that landed this revision. Below: findings from exploration (so the next session doesn't re-derive them) + the user's strategic shape for the consolidation.
+> **Status:** Phase 1 (lift to `.agents/skills/`) + Phase 2 (doctrine cleanup, dual-instance removal, citation fixes) **landed in the uncommitted working tree** as of this writing. Phases 3+ (additional harness adapters, npm publication, skill exposure to consumers as a default package) remain open. Findings + strategic shape preserved below.
+
+### Phase 1 + Phase 2 — DONE (uncommitted)
+
+**Phase 1 — lift.** All 8 session skills + the router + the 9-file `_shared/` doctrine kernel were lifted from `architect-studio/packages/architect-claude-plugin/` into `.agents/skills/` at this repo's root. `.claude/skills/` is a symlink projection of `.agents/skills/` (one symlink per skill folder + one for `_shared/`) so Claude Code discovers them. Skill discovery validated — all 8 SKILL.md frontmatters parse, descriptions sit in the 190–510-token range. The verbatim lift surfaced the residue cleanly: dual-instance language (`pkg:query`, `architect-pkg`, "Architect Studio"), `<cli-prefix>` placeholders (50+), 9 hook-enforcement claims, and 11 references to the deleted `feedback:cli` infrastructure.
+
+**Phase 2 — doctrine cleanup.** Four cleanup passes landed:
+
+| Class | Examples | Result |
+|---|---|---|
+| Temporal/wave language stripped | "Wave 1.5", "Phase 1" inside skill bodies | Skills now read as evergreen kernel doctrine |
+| Dual-instance routing collapsed | `pkg:query`, `architect-pkg`, "package instance", "Architect Studio", `<cli-prefix>` | All references rewritten to single-instance shape (`pnpm architect:query`, one `architect.config.ts`, one MCP namespace `mcp__architect__*`) |
+| Hook-enforcement claims softened | `PreToolUse`, `UserPromptSubmit` framed as gates | Reframed as "Data API discipline, not enforced gate" — MCP-over-CLI latency advantage preserved as the actual reason to prefer it |
+| Deleted-infrastructure references removed | `feedback:cli`, `.architect-cli-feedback.md`, `feedback/` failure-capture flow | Wholesale removed; archived in W9 future-resurrection note below |
+| Stale paths (post-W1.5.5) | 5× `spec/…` → `formal-spec/…` | Repointed. `spec/08-spec-evolution.md:456-468` (which pointed into an ASCII-art diagram after section growth) repointed to section reference |
+| Broken anchor citations | `#status--maturity-defaults` against the renamed `Status → Maturity Defaults` heading | Switched to `§ "Status → Maturity Defaults"` form |
+| Studio-era doc names | `VALUE-TRANSFER-NOTES.md`, `01-minimum-gherkin-at-every-level.md`, `tag-taxonomy.md`, `METHODOLOGY.md`, `GHERKIN-PATTERNS.md` | Repointed to `formal-spec/` sections or the live taxonomy query (`pnpm architect:query taxonomy --format json`) |
+| Validation cadence | Skills cited `pnpm ci:phase-gate` / `:full` which don't exist in this repo's `package.json` (studio-only script) | Replaced with real composite: `pnpm typecheck` between phases, `pnpm typecheck && pnpm test && pnpm validate:all` before commit/handoff. The studio's `phase-gate.mjs` bundled checks specific to its monorepo shape (`ci:typecheck`, `lint:dirty`, `architect-dev-tests`); not worth recreating here |
+| Dual-instance residue in handoff | `Instance` row in handoff field table; `<instance>` in handoff note template | Both dropped |
+| Missing tier folders | Skills referenced `git mv` to `architect/specs/candidates/` and slice files in `architect/slices/` — neither dir existed | Created both with READMEs. `architect/specs/ideas/README.md` also rewritten (had studio-era refs + contradicted "maturity is derived" doctrine) |
+| `architect:query --` vs `architect:query` | Style mismatch — 5 `_shared/*` refs used `--`, all 8 skill bodies didn't | Standardized to no `--` everywhere (modern pnpm passes positionals automatically) |
+| `MIGRATION.md` reference in AGENTS.md | File doesn't exist yet (W1.5.7 appendix here is the prep) | Reworded as forward-looking placeholder pointing at this file's W1.5.7 appendix |
+
+`AGENTS.md` gained a `## Delivery process` section during Phase 1 codifying this repo's single-instance shape (`architect.config.ts`, `architect/`, `pnpm architect:query`, `mcp__architect__*` tools) plus a note that consumers override that table in their own AGENTS.md. The router skill (`architect-session-router/SKILL.md`) was rewritten holistically rather than patched — bulk sed left nonsense like "Replace `pnpm architect:query` with the instance you picked in Step 1" after the dual-instance prose was stripped.
+
+**Verification (uncommitted, pre-commit):**
+- `pnpm typecheck` — green
+- Skill discovery — all 8 frontmatters parse, descriptions 190–510 tok
+- Audit grep — zero residue of `ci:phase-gate`, stale `spec/N` paths, studio doc names, `<instance>`, `architect:query --`
+- `pnpm validate:all` — emits the pre-existing `scenario-bloat` warning on `tests/features/cli/pattern-graph-cli-modifiers-rules.feature` (now captured in 1.5.x hardening backlog); not introduced by W9
+
+### Phase 3+ — open work
+
+The skills are present and clean in `.agents/skills/`, with `.claude/skills/` symlinks. What remains:
+
+- **Skill exposure to package consumers.** When a project depends on the architect package family, they should get the 8 skills + router + `_shared/` kernel out of the box. Today the skills only exist in this repo's working tree, not in any published artifact. Open: which package ships them (the meta `@libar-dev/architect`? a sibling `@libar-dev/architect-skills`?), where they install to in the consumer (`node_modules/.../skills/` symlinked to `.agents/skills/`? a `postinstall` step? a CLI subcommand `pnpm architect init-skills`?), and how parameterization works when consumers have different conventions than `pnpm architect:query`.
+- **OpenCode harness adapter.** The studio's `.opencode/` directory had slash commands and symlinked skills back to `architect-claude-plugin/`. None of that exists in this repo yet. Decide whether the OpenCode adapter ships in the same package as the universal skills or as a sibling `@libar-dev/architect-opencode-adapter`.
+- **Oh My OpenCode (OmO) embedded-MCP variant.** The `.omo-architect-stash` prototype embeds MCP servers inside skills. Not present in this repo. Same packaging question as OpenCode.
+- **Slash commands.** The studio plugin had 7 slash commands (`/architect-plan`, `/architect-design`, etc.) that wrapped the skill invocations. Not lifted because slash commands are harness-specific (Claude Code only). Decide whether to ship them per-harness or rely on skill description-based activation as the only entry point. Phase 1 + 2 went all-in on description-based activation; slash commands would be additive.
+- **Hooks decision.** The studio plugin had 5 hooks (`UserPromptSubmit`, `PreToolUse`, `CwdChanged`, `PostToolUseFailure`, `PostCompact`) that enforced bootstrap, gated Read/Glob/Grep, and captured failures. Phase 2 reframed all of these in skill prose as "discipline, not gate." Decide whether to ship optional safety-net hooks as a per-harness add-on, or rely on skill-level routing alone. Current direction: skill-level routing alone, hooks become optional per-harness observability.
+- **Dogfooding feedback capture.** The `.architect-cli-feedback.md` failure-capture flow (one `PostToolUseFailure` hook + one bin to append entries) was wholesale removed in Phase 2 because its implementation is gone. If you ever want to dogfood the CLI by capturing CLI failures, this would be a clean addition: one Claude Code post-tool-use hook + one bin. Not on any wave today.
+- **`_shared/multi-session-coordination.md` spot-check.** The 205-line file is the largest doctrine doc. Bulk sed + Phase 2 audit caught all known patterns, but it's the file most likely to harbor residue not visible to the patterns we tested. Worth a deep read before W9 closes.
 
 ### Source inventory (from exploration)
 
 - **`/Users/darkomijic/dev-projects/architect-studio/.opencode/`** is a near-empty harness stub. Only `opencode.jsonc` (disabled plugin reference), `package.json` (one dep on `@opencode-ai/plugin`), and `commands/`+`skills/` directories filled with **symlinks** back to `architect-claude-plugin/`. **Not a parallel codebase** — it's a thin harness shell that mirrors the Claude plugin content.
-- **`/Users/darkomijic/dev-projects/architect-studio/packages/architect-claude-plugin/`** has the real content: plugin manifest (`@libar-dev/architect-claude-plugin@0.1.0`), `src/hooks/`, 8 session-typed skills + 1 router, `_shared/` doctrine kernel (9 files), 7 slash commands, dogfooding feedback capture, `MIGRATION.md`.
+- **`/Users/darkomijic/dev-projects/architect-studio/packages/architect-claude-plugin/`** had the real content: plugin manifest (`@libar-dev/architect-claude-plugin@0.1.0`), `src/hooks/`, 8 session-typed skills + 1 router, `_shared/` doctrine kernel (9 files), 7 slash commands, dogfooding feedback capture, `MIGRATION.md`. **Source for Phase 1 lift.**
 - **`/Users/darkomijic/dev-projects/architect-studio/.omo-architect-stash`** — outdated Oh My OpenCode (OmO) skills prototype. Reference for the OmO embedded-MCP-in-skills pattern.
 
 ### 8 session skills + 1 router (REMAINING-WORK.md's earlier list was missing `architect-refactor-session`)
@@ -241,16 +283,8 @@ The plugin currently routes between two instances (`architect` and `architect-pk
 
 ### Coordination
 
-- W8 (studio cutover) depends on W9 — studio's `pkg:*` shortcuts and plugin invocations need a destination.
-- The dogfood instance at repo root will be the first consumer of the relocated skills.
-
-### Out of scope until details land
-
-- Exact package name(s) and npm publication strategy.
-- How universal skills get parameterised per harness.
-- Whether the OmO `.opencode/` adapter ships in the same package or a sibling.
-- Migration sequencing for `.architect-cli-feedback.md` and the dogfooding feedback CLI.
-- The user has the implementation plan; treat this section as findings + shape, not a recipe.
+- W8 (studio cutover) depends on W9 Phase 3+ — studio's `pkg:*` shortcuts and plugin invocations need a destination (the published `@libar-dev/architect-*` skills artifact, whatever it ends up being called).
+- The dogfood instance at repo root is **already** the first consumer of the relocated skills (Phase 1 + 2 landed in working tree; commit pending).
 
 ## Cross-cutting open questions (capture before publish)
 
@@ -264,18 +298,24 @@ The plugin currently routes between two instances (`architect` and `architect-pk
 
 ```
 architect/
+├── .agents/                        # universal skill source (W9 Phase 1+2 — uncommitted)
+│   └── skills/                     # 8 session skills + router + _shared/ kernel
+├── .claude/                        # Claude Code skill projection (symlinks → .agents/skills/)
 ├── .changeset/                     # config.json (fixed group of 6), README — W7
 ├── .gitignore                      # node_modules, dist, docs-live/, .DS_Store, .sisyphus/, .architect-cli-feedback.md, .claude-layers/, .plans/, etc.
 ├── .node-version                   # 22
 ├── .npmrc                          # auto-install-peers, no shameful hoist
 ├── .prettierrc, .prettierignore
-├── AGENTS.md                       # authored in W1.5.4
+├── AGENTS.md                       # authored in W1.5.4; gained "Delivery process" section in W9 Phase 1
 ├── CLAUDE.md                       # symlink → AGENTS.md
 ├── CONTRIBUTING.md, LICENSE, LICENSE-MCP, MAINTAINERS.md, SECURITY.md
 ├── README.md                       # minimal sweep done in W1.5; full polish pending in W4
 ├── REMAINING-WORK.md               # this file
 ├── architect.config.ts             # dogfood config (promoted to root in W1.5.1)
 ├── architect/                      # dogfood specs/decisions/releases/stubs/...
+│                                   #   specs/ideas/ (README clean post-W9 P2)
+│                                   #   specs/candidates/ (created W9 P2, README only)
+│                                   #   slices/ (created W9 P2, README only)
 ├── docs/                           # manual docs
 ├── docs-sources/                   # doc-gen inputs
 ├── docs-live/                      # GITIGNORED — generated docs output
