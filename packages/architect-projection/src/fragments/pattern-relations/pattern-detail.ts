@@ -13,8 +13,8 @@ import { z } from 'zod';
 
 import { PatternIdentitySchema } from './pattern-summary.js';
 import {
-  DeliverableManifestSchema,
-  DeliverableSchema,
+  EmbeddedDeliverableManifestSchema,
+  EmbeddedDeliverableSchema,
   EmbeddedRuleRefSchema,
   PatternHierarchySchema,
   PatternRelationshipsSchema,
@@ -25,12 +25,12 @@ export const PatternDetailSchema = PatternIdentitySchema.extend({
   kind: z.literal('PatternDetail'),
   description: z.string().optional(),
   openQuestions: z.array(z.string()).optional(),
-  deliverables: z.array(DeliverableSchema),
+  deliverables: z.array(EmbeddedDeliverableSchema),
   relationships: PatternRelationshipsSchema,
   hierarchy: PatternHierarchySchema.optional(),
   rules: z.array(EmbeddedRuleRefSchema),
   stubs: z.array(StubRefSchema),
-  deliverableManifest: DeliverableManifestSchema.optional(),
+  deliverableManifest: EmbeddedDeliverableManifestSchema.optional(),
 });
 
 export type PatternDetail = z.infer<typeof PatternDetailSchema>;

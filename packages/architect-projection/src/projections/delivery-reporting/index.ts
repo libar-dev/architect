@@ -59,7 +59,7 @@ import {
   normalizeDeliverables,
 } from '../_shared/pattern-helpers.internal.js';
 import { slugForFilename } from '../../_internal/slug.js';
-import type { Deliverable } from '../../fragments/pattern-relations/supporting.js';
+import type { EmbeddedDeliverable } from '../../fragments/pattern-relations/supporting.js';
 import { filterPatterns } from '../_shared/filter.js';
 import { createEntityRouteId, createIndexRouteId } from '../../routing/route-id.js';
 
@@ -355,9 +355,9 @@ function createReleaseEntry(release: string, patterns: readonly ExtractedPattern
   };
 }
 
-function deduplicateDeliverables(patterns: readonly ExtractedPattern[]): Deliverable[] {
+function deduplicateDeliverables(patterns: readonly ExtractedPattern[]): EmbeddedDeliverable[] {
   const seen = new Set<string>();
-  const deliverables: Deliverable[] = [];
+  const deliverables: EmbeddedDeliverable[] = [];
 
   for (const pattern of patterns) {
     for (const deliverable of normalizeDeliverables(pattern)) {

@@ -13,7 +13,7 @@
 import { z } from 'zod';
 
 import { PatternSummarySchema } from '../pattern-relations/index.js';
-import { DeliverableSchema } from '../pattern-relations/supporting.js';
+import { EmbeddedDeliverableSchema } from '../pattern-relations/supporting.js';
 
 export const StatusCountsSchema = z.strictObject({
   completed: z.number().int().nonnegative(),
@@ -40,7 +40,7 @@ export const ReleaseEntrySchema = z.strictObject({
   release: z.string(),
   date: z.string().optional(),
   patterns: z.array(PatternSummarySchema),
-  deliverables: z.array(DeliverableSchema),
+  deliverables: z.array(EmbeddedDeliverableSchema),
   notes: z.string().optional(),
 });
 

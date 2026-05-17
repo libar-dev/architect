@@ -57,7 +57,7 @@ import type { ProjectionContext } from '../../context/projection-context.js';
 import { ProjectionError } from '../errors.js';
 import type { PatternSummary } from '../../fragments/pattern-relations/pattern-summary.js';
 import type {
-  Deliverable,
+  EmbeddedDeliverable,
   EmbeddedRuleRef,
   ImplementationRef,
   PatternHierarchy,
@@ -152,7 +152,7 @@ export function normalizePatternRelationships(
   };
 }
 
-export function normalizeDeliverables(pattern: ExtractedPattern): Deliverable[] {
+export function normalizeDeliverables(pattern: ExtractedPattern): EmbeddedDeliverable[] {
   const testRefs = resolveTestRefs(pattern);
 
   return (pattern.deliverables ?? []).map((deliverable) => ({

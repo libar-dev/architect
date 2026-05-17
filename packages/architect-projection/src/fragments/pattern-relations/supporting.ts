@@ -11,8 +11,8 @@
  */
 import { z } from 'zod';
 
-import { DeliverableManifestSchema as ExecutionContextDeliverableManifestSchema } from '../execution-context/deliverable-manifest.js';
-import { DeliverableSchema as ExecutionContextDeliverableSchema } from '../execution-context/deliverable.js';
+import { DeliverableManifestSchema } from '../execution-context/deliverable-manifest.js';
+import { DeliverableSchema } from '../execution-context/deliverable.js';
 
 export const PatternSourceSchema = z.enum(['typescript', 'gherkin']);
 
@@ -49,12 +49,12 @@ export const EmbeddedRuleRefSchema = z.strictObject({
   scenarioCount: z.number().int().nonnegative(),
 });
 
-export const DeliverableSchema = ExecutionContextDeliverableSchema.omit({ kind: true });
+export const EmbeddedDeliverableSchema = DeliverableSchema.omit({ kind: true });
 
-export const DeliverableManifestSchema = ExecutionContextDeliverableManifestSchema.omit({
+export const EmbeddedDeliverableManifestSchema = DeliverableManifestSchema.omit({
   kind: true,
 }).extend({
-  items: z.array(DeliverableSchema),
+  items: z.array(EmbeddedDeliverableSchema),
 });
 
 export const StubRefSchema = z.strictObject({
@@ -96,7 +96,7 @@ export type ImplementationRef = z.infer<typeof ImplementationRefSchema>;
 export type PatternRelationships = z.infer<typeof PatternRelationshipsSchema>;
 export type PatternHierarchy = z.infer<typeof PatternHierarchySchema>;
 export type EmbeddedRuleRef = z.infer<typeof EmbeddedRuleRefSchema>;
-export type Deliverable = z.infer<typeof DeliverableSchema>;
-export type DeliverableManifest = z.infer<typeof DeliverableManifestSchema>;
+export type EmbeddedDeliverable = z.infer<typeof EmbeddedDeliverableSchema>;
+export type EmbeddedDeliverableManifest = z.infer<typeof EmbeddedDeliverableManifestSchema>;
 export type StubRef = z.infer<typeof StubRefSchema>;
 export type DependencyRelationKind = z.infer<typeof DependencyRelationKindSchema>;
