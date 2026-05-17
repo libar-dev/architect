@@ -39,20 +39,13 @@ export async function runCli(invocation: string): Promise<CliResult> {
   }
   const binPath = path.join(cliPackageRoot, relBin);
 
-  // The CLI's resolveInvocationDir() prefers process.env.PWD over process.cwd().
-  // execFile inherits parent's PWD, so we strip PWD/INIT_CWD to let the child
-  // fall through to process.cwd() — which is the directory we set via `cwd:`.
-  const childEnv = { ...process.env };
-  delete childEnv['PWD'];
-  delete childEnv['INIT_CWD'];
-
   return await new Promise<CliResult>((resolve) => {
     execFile(
       process.execPath,
       [binPath, ...tokens],
       {
         cwd: dogfoodRoot,
-        env: childEnv,
+        env: process.env,
         maxBuffer: 32 * 1024 * 1024,
         encoding: 'utf8',
       },

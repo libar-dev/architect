@@ -34,15 +34,25 @@ export function readCliPackageMetadata(): PackageMetadata {
 }
 
 export function resolveInvocationDir(): string {
-  const pwd = process.env['PWD'];
-  const initCwd = process.env['INIT_CWD'];
-  if (pwd !== undefined && pwd.length > 0) {
-    return pwd;
+  // process.cwd() is canonical so execFile({ cwd }) embedding is respected.
+  // INIT_CWD and PWD remain as fallbacks if cwd resolution throws (rare).
+  try {
+    const cwd = process.cwd();
+    if (cwd.length > 0) {
+      return cwd;
+    }
+  } catch {
+    /* fall through to env fallbacks */
   }
+  const initCwd = process.env['INIT_CWD'];
   if (initCwd !== undefined && initCwd.length > 0) {
     return initCwd;
   }
-  return process.cwd();
+  const pwd = process.env['PWD'];
+  if (pwd !== undefined && pwd.length > 0) {
+    return pwd;
+  }
+  throw new Error('resolveInvocationDir: unable to resolve invocation directory');
 }
 
 export function resolveWorkspaceRoot(): string {
