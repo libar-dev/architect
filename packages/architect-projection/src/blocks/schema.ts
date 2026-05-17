@@ -84,11 +84,11 @@ export type LinkOutBlock = z.infer<typeof LinkOutBlockSchema>;
 // The `content` field uses z.lazy so it can reference BlockSchema (declared below).
 // Block is hand-written and BlockSchema carries an explicit z.ZodType annotation
 // because Zod cannot infer recursive lazy unions.
-export type CollapsibleBlock = {
+export interface CollapsibleBlock {
   type: 'collapsible';
   summary: string;
   content: Block[];
-};
+}
 export type Block =
   | HeadingBlock
   | ParagraphBlock
@@ -137,7 +137,7 @@ export function isBlock(value: unknown): value is Block {
     typeof value === 'object' &&
     value !== null &&
     'type' in value &&
-    BLOCK_TYPES.has((value as { type: unknown }).type as BlockType)
+    BLOCK_TYPES.has((value as { type: BlockType }).type)
   );
 }
 
