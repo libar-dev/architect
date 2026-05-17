@@ -95,7 +95,21 @@ export function projectDocumentationBundleInternal(
 ): ProjectionBundle<Fragment> {
   const documentType = assertSupportedDocumentType(options.documentType);
   const filteredContext = withDocumentationFilter(context, documentType, options.disclosureLevel);
-  return DOCUMENTATION_PROJECTION_FACTORIES[documentType](filteredContext);
+  const bundle = DOCUMENTATION_PROJECTION_FACTORIES[documentType](filteredContext);
+
+  const metadata = getDocumentationTypeMetadata(documentType);
+  if (metadata !== undefined && bundle.routing !== undefined) {
+    const level = options.disclosureLevel ?? metadata.defaultDisclosureLevel;
+    return {
+      ...bundle,
+      routing: {
+        ...bundle.routing,
+        disclosureSpec: metadata.disclosureMatrix[level],
+      },
+    };
+  }
+
+  return bundle;
 }
 
 function withDocumentationFilter(

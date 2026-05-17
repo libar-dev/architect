@@ -262,9 +262,21 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
           When('I project every supported documentation bundle', () => {
             for (const documentType of supportedDocumentTypes) {
+              // Project requirements bundles at 'useful' disclosure so the
+              // bundle.routing.disclosureSpec carries emitChildren=true;
+              // the requirement-documentation-link assertions below depend on
+              // fan-out child routes resolved at projection time.
+              const projectionOptions: {
+                documentType: typeof documentType;
+                disclosureLevel?: 'useful';
+              } =
+                documentType === 'requirements-executable' ||
+                documentType === 'requirements-specs'
+                  ? { documentType, disclosureLevel: 'useful' }
+                  : { documentType };
               state!.documentationViews[documentType] = parseAndProjectDocumentationBundle(
                 state!.context!,
-                { documentType }
+                projectionOptions
               );
             }
           });

@@ -1,11 +1,13 @@
 import type { Fragment } from './fragment-schema.internal.js';
 import { isLogicalRouteId, type LogicalRouteId } from '../routing/route-id.js';
+import { DisclosureSpecSchema, type DisclosureSpec } from '../disclosure/spec.js';
 
 export interface BundleRouting {
   rootRouteId: LogicalRouteId;
   childRouteIds: Readonly<Record<string, LogicalRouteId>>;
   childPathStrategy: 'flat' | 'nested';
   anchorStrategy: 'heading-slug' | 'kind-id';
+  disclosureSpec?: DisclosureSpec;
 }
 
 export interface ProjectionBundle<T extends Fragment> {
@@ -52,8 +54,13 @@ function isRoutingLike(value: unknown): value is BundleRouting {
     isPlainObject(value['childRouteIds']) &&
     Object.values(value['childRouteIds']).every(isRouteIdValue) &&
     isChildPathStrategy(value['childPathStrategy']) &&
-    isAnchorStrategy(value['anchorStrategy'])
+    isAnchorStrategy(value['anchorStrategy']) &&
+    isValidDisclosureSpec(value['disclosureSpec'])
   );
+}
+
+function isValidDisclosureSpec(value: unknown): boolean {
+  return value === undefined || DisclosureSpecSchema.safeParse(value).success;
 }
 
 function isChildPathStrategy(value: unknown): value is BundleRouting['childPathStrategy'] {

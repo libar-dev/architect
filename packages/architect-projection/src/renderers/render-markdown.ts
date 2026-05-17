@@ -47,7 +47,6 @@ import {
   type TraceabilityMatrix,
   type ValidationRuleDigest,
 } from '../fragments/index.js';
-import { getDocumentationTypeMetadata } from '../projections/documentation-composition/documentation-type-registry.js';
 import { defaultMarkdownRouteProfile } from './markdown-paths.js';
 import type { DisclosureSpec } from '../disclosure/spec.js';
 import {
@@ -401,22 +400,12 @@ function resolveBundleDisclosureSpec(
   bundle: ProjectionBundle<Fragment>,
   options: ResolvedMarkdownOptions
 ): DisclosureSpec | undefined {
+  // Renderer-side override wins (per-render-call disclosureSpec option).
   if (options.disclosureSpec !== undefined) {
     return options.disclosureSpec;
   }
-
-  const documentType = bundle.routing?.rootRouteId.split(':')[0];
-  if (documentType === undefined) {
-    return undefined;
-  }
-
-  const metadata = getDocumentationTypeMetadata(documentType);
-  if (metadata === undefined) {
-    return undefined;
-  }
-
-  const level = options.disclosureLevel ?? metadata.defaultDisclosureLevel;
-  return metadata.disclosureMatrix[level];
+  // Otherwise trust the bundle's projection-time resolution.
+  return bundle.routing?.disclosureSpec;
 }
 
 function createUniqueRoutedPath(path: string, stableId: string, usedPaths: Set<string>): string {
