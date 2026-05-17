@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 
@@ -261,6 +261,7 @@ interface BusinessRuleSetPerfFixture {
 
 interface PerfPatternOptions {
   readonly patternName: string;
+  readonly title?: string;
   readonly status: ExtractedPattern['status'];
   readonly role: ExtractedPattern['role'];
   readonly phase: ExtractedPattern['phase'];
@@ -290,12 +291,15 @@ interface PerfPatternOptions {
   readonly risk: string;
   readonly since: string;
   readonly rules: readonly ReturnType<typeof createRule>[];
+  readonly adr?: string;
+  readonly adrStatus?: ExtractedPattern['adrStatus'];
+  readonly adrCategory?: ExtractedPattern['adrCategory'];
 }
 
 type ProjectionMeasure = (context: ProjectionContext) => unknown;
 type AsyncMeasure = () => Promise<unknown>;
 
-const RENDER_MARKDOWN_DOCUMENT_TYPES = ['patterns', 'requirements-executable', 'roadmap'] as const;
+const RENDER_MARKDOWN_DOCUMENT_TYPES = ['patterns', 'decisions', 'requirements-executable'] as const;
 type RenderMarkdownDocumentType = (typeof RENDER_MARKDOWN_DOCUMENT_TYPES)[number];
 
 let state: PerfReportState = {
@@ -317,8 +321,18 @@ function createBusinessRuleSetPerfContext(): BusinessRuleSetPerfFixture {
     const dependencyPattern =
       patternNames[(patternIndex + patternNames.length - 1) % patternNames.length]!;
 
+    const adrNumber = patternIndex % 6 === 0 ? String(Math.floor(patternIndex / 6) + 1) : undefined;
+
     return createPerfPattern(patternName, {
       patternName,
+      ...(adrNumber !== undefined
+        ? {
+            title: `${productArea} projection decision ${adrNumber}`,
+            adr: adrNumber,
+            adrStatus: 'accepted',
+            adrCategory: 'architecture',
+          }
+        : {}),
       status: STATUSES[patternIndex % STATUSES.length]!,
       role: patternIndex % 2 === 0 ? 'projection' : 'service',
       phase: 49 + (patternIndex % 4),
@@ -418,6 +432,7 @@ function createProjectionPerfTagRegistry(): TagRegistry {
 function createPerfPattern(name: string, options: PerfPatternOptions): ExtractedPattern {
   const pattern = buildPatternStub(name, {
     patternName: options.patternName,
+    ...(options.title !== undefined ? { title: options.title } : {}),
     status: options.status,
     role: options.role,
     phase: options.phase,
@@ -444,6 +459,9 @@ function createPerfPattern(name: string, options: PerfPatternOptions): Extracted
     seeAlso: options.seeAlso,
     apiRef: options.apiRef,
     rules: options.rules,
+    ...(options.adr !== undefined ? { adr: options.adr } : {}),
+    ...(options.adrStatus !== undefined ? { adrStatus: options.adrStatus } : {}),
+    ...(options.adrCategory !== undefined ? { adrCategory: options.adrCategory } : {}),
   });
 
   return {
@@ -702,14 +720,39 @@ describeFeature(feature, ({ BeforeEachScenario, Rule }) => {
   });
 
   Rule('Projection hot paths stay under committed budgets', ({ RuleScenario }): void => {
-    RuleScenario('Write a budgetable BusinessRuleSet perf report', ({ When, Then }): void => {
-      When('I generate the BusinessRuleSet perf report', async () => {
-        state.reportPath = await generateBusinessRuleSetPerfReport();
-      });
+    RuleScenario(
+      'Write a budgetable projection perf report for representative documentation bundles',
+      ({ When, Then, And }): void => {
+        When('I generate the BusinessRuleSet perf report', async () => {
+          state.reportPath = await generateBusinessRuleSetPerfReport();
+        });
 
-      Then('the perf report evidence file should be written', () => {
-        expect(state.reportPath).toContain('task-3-business-rule-set-perf-report.json');
-      });
-    });
+        Then('the perf report evidence file should be written', () => {
+          expect(state.reportPath).toContain('task-3-business-rule-set-perf-report.json');
+        });
+
+        And(
+          'the perf report should include renderMarkdown metrics for representative documentation bundles',
+          async () => {
+            expect(state.reportPath).not.toBeNull();
+            const report = JSON.parse(await readFile(state.reportPath!, 'utf8')) as {
+              readonly renderMarkdownBundles?: Record<string, PerfSummary>;
+            };
+
+            expect(Object.keys(report.renderMarkdownBundles ?? {}).sort()).toEqual(
+              [...RENDER_MARKDOWN_DOCUMENT_TYPES].sort(),
+            );
+
+            for (const documentType of RENDER_MARKDOWN_DOCUMENT_TYPES) {
+              const summary = report.renderMarkdownBundles?.[documentType];
+              expect(summary).toBeDefined();
+              expect(Number.isFinite(summary!.avgMs)).toBe(true);
+              expect(Number.isFinite(summary!.p50Ms)).toBe(true);
+              expect(summary!.iterations).toBeGreaterThan(0);
+            }
+          },
+        );
+      },
+    );
   });
 });
