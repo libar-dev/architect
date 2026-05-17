@@ -1,6 +1,10 @@
 # Remaining work — architect repo ejection campaign
 
-Status snapshot: **bootstrap, lift, Wave 1 verification, and Wave 1.5 structural cleanup are complete.** As of the post-W1.5 commit, `pnpm install` → `build` → `typecheck` → `test` all pass green (2828 tests across 5 publishable packages), the dogfood instance lives at the repo root, `spec/` is renamed to `formal-spec/`, `scripts/` is audited, all 7 bins smoke, and `AGENTS.md`/`CLAUDE.md` are in place. What follows is everything still owed before this repo can publish a `2.0.0-pre.1` release and replace `github.com/libar-dev/architect` history.
+Status snapshot: **bootstrap, lift, Wave 1 verification, Wave 1.5 structural cleanup, Wave 9 skills lift Phases 1+2, license consolidation, scenario-bloat split, and MIGRATION.md authorship are complete.** As of the most recent commit, `pnpm install` → `build` → `typecheck` → `test` all pass green (2828 tests across 5 publishable packages), the dogfood instance lives at the repo root, `spec/` is renamed to `formal-spec/`, `scripts/` is audited, all 7 bins smoke, `AGENTS.md`/`CLAUDE.md` are in place, the license is consolidated to single MIT, and `MIGRATION.md` is published.
+
+A comprehensive multi-phase review of `packages/architect-projection/` has landed at `.full-review/`, scoped to readiness for the doc-generation consolidation campaign drafted in `.pr-coordination/`.
+
+What follows is everything still owed before this repo can publish a `2.0.0-pre.1` release and replace `github.com/libar-dev/architect` history.
 
 ## Operating model
 
@@ -118,10 +122,11 @@ Drafted bin + JS API mapping tables. **See appendix at the end of this file** fo
 
 Captured here to close the loop: the changesets config (`.changeset/config.json`) is correct as-is. Fixed group of 6 publishable packages (they version in lockstep), spec + dogfood ignored, public access, `main` base branch. Nothing to do until W7 produces the first changeset for the initial publish.
 
-### 1.5.x — Hardening backlog (deferred)
+### 1.5.x — Hardening backlog
 
 - [ ] **Revisit `architect-cli/src/cli/runtime-helpers.ts:36 resolveInvocationDir()`.** Prefers `process.env.PWD` over `process.cwd()`. Likely intentional for symlinked-shell scenarios, but it makes embedding the CLI in other processes brittle (subprocess inherits parent PWD, `execFile({ cwd })` doesn't update it). The test harness already strips PWD/INIT_CWD as a workaround. Considering: invert the precedence, or add a CLI flag to force `cwd`-only, or document explicitly that consumers must pass `--base-dir` rather than relying on cwd. Not part of any planned wave yet; revisit when CLI gets exercised more outside test contexts.
-- [ ] **Split `tests/features/cli/pattern-graph-cli-modifiers-rules.feature`.** Surfaced during W9 Phase 2 cleanup verification — file has 38 scenarios vs the 30 threshold, so `pnpm validate:all` emits a `scenario-bloat` warning that fails CI. Pre-existing; not introduced by W9. Fix per the validator's hint: split into multiple `.feature` files organized by component, use case, or business capability.
+- [x] **Split `tests/features/cli/pattern-graph-cli-modifiers-rules.feature`.** DONE — split along the existing three Rule blocks into `pattern-graph-cli-output-modifiers.feature` (15 scenarios), `pattern-graph-cli-arch-health.feature` (6 scenarios), `pattern-graph-cli-rules-subcommand.feature` (17 scenarios). `validate:all` anti-pattern detector now reports zero issues.
+- [ ] **Dangling-reference baseline regression.** `validate:all` reports 2 current entries not in `packages/architect-guard/src/lint/dangling-baseline.json` — both `seeAlso` edges to `ADR005CodecRendererSeparation` (from `ArchitectBriefDeterministicBundle` and `ModelEnrichedDataAPI`). Pre-existing; surfaced after the scenario-bloat fix uncovered it. Decision: refresh the baseline or fix the dangling refs. Likely the former since these are valid forward references to an ADR.
 
 ## Wave 2 — Root tooling (eslint, lint-staged, husky, turbo)
 
@@ -144,7 +149,7 @@ All sub-items in the original W3 were covered by 1.5.1 (path-reference sweep, re
 - [ ] Polish the root `README.md` (W1.5 did a minimal sweep to fix broken `examples/self-host/` link and update workspace layout — full rewrite still pending). Add usage examples, migration-from-v1 note, philosophy summary lifted/rewritten from `AGENTS.md`.
 - [ ] Author per-package READMEs for the 5 splits and the meta — `packages/architect/README.md` was rewritten during W1 for the bin-only meta; the splits still have none.
 - [ ] Migrate `CONTRIBUTING.md`, `MAINTAINERS.md`, `SECURITY.md` (already lifted to repo root) — they reference studio-specific URLs; sweep for `delivery-process` and `architect-studio` mentions.
-- [ ] Author `MIGRATION.md` at repo root using the bin + JS-API map drafted in W1.5.7 (see appendix below). Include the v1→v2 import path table for the 8 collision symbols.
+- [x] Author `MIGRATION.md` at repo root using the bin + JS-API map drafted in W1.5.7. DONE — see `MIGRATION.md` at repo root.
 
 ## Wave 5 — CI (GitHub Actions)
 
@@ -288,7 +293,7 @@ The plugin currently routes between two instances (`architect` and `architect-pk
 
 ## Cross-cutting open questions (capture before publish)
 
-- License audit: is `(MIT AND BUSL-1.1)` still the intended compound license, and is the BUSL-1.1 portion still scoped only to the MCP subset (per `LICENSE-MCP`)? Confirm before first publish — license metadata is hard to change retroactively.
+- ~~License audit: `(MIT AND BUSL-1.1)` compound license.~~ **RESOLVED** — consolidated to single MIT in the post-W1.5 cleanup. `LICENSE-MCP` deleted, six `package.json` license fields updated, README sections rewritten.
 - npm scope provenance: `@libar-dev` org on npm — confirm publishing rights and 2FA setup before W7.
 - Changesets pre-mode: stay in `next` tag until 2.0.0 stable, then `pnpm changeset pre exit`. Decide when "stable" means.
 
@@ -308,7 +313,7 @@ architect/
 ├── .prettierrc, .prettierignore
 ├── AGENTS.md                       # authored in W1.5.4; gained "Delivery process" section in W9 Phase 1
 ├── CLAUDE.md                       # symlink → AGENTS.md
-├── CONTRIBUTING.md, LICENSE, LICENSE-MCP, MAINTAINERS.md, SECURITY.md
+├── CONTRIBUTING.md, LICENSE, MAINTAINERS.md, SECURITY.md, MIGRATION.md
 ├── README.md                       # minimal sweep done in W1.5; full polish pending in W4
 ├── REMAINING-WORK.md               # this file
 ├── architect.config.ts             # dogfood config (promoted to root in W1.5.1)
@@ -341,55 +346,19 @@ architect/
 
 ---
 
-## Appendix — W1.5.7 MIGRATION.md content draft (for W4)
+## Inputs for upcoming campaigns
 
-### Bin → package map (all 7 bins)
+### `.full-review/` — architect-projection comprehensive review
 
-All 7 bins remain reachable via the meta package `@libar-dev/architect` (which is now bin-only — no JS exports). They are also directly reachable from the split that publishes each.
+Multi-phase review (16 files, ~3,076 lines) scoped to readiness for the doc-generation consolidation campaign. Final synthesis at `.full-review/05-final-report.md`. Key inputs the campaign will consume:
 
-| Bin | Published by | Purpose |
-|---|---|---|
-| `architect` | `@libar-dev/architect-cli` | Pattern-graph query CLI: `overview`, `status`, `context`, `dep-tree`, `scope-validate`, `list`, etc. |
-| `architect-generate` | `@libar-dev/architect-cli` | Doc generation; ~13 topics via `-g` flag (architecture, roadmap, requirements-executable, decisions, taxonomy, patterns, etc.) |
-| `architect-guard` | `@libar-dev/architect-cli` | Process / FSM guard for pre-commit / pre-merge gates (`--staged`, `--all`, `--files`) |
-| `architect-validate` | `@libar-dev/architect-cli` | Pattern annotation vs Gherkin feature cross-validation (`--dod`, `--anti-patterns`) |
-| `architect-lint-steps` | `@libar-dev/architect-cli` | vitest-cucumber feature/step compatibility checks |
-| `architect-lint-patterns` | `@libar-dev/architect-cli` | Pattern annotation quality lint |
-| `architect-mcp` | `@libar-dev/architect-mcp` | MCP server (18 tools) — file watcher, pipeline session |
+- **One structural blocker:** the closed dispatch core in `packages/architect-projection/src/projections/documentation-composition/` must be **replaced** (not extended) by `DocDefinition.build(graph)`. The convergent finding across the code-quality and architecture phases ranks this Critical.
+- **Three preparation gaps:** zero `.describe()` coverage across 135 source files (breaks the campaign's headline demo); five undocumented security invariants in markdown rendering; schema-composition cleanup (Pattern/Decision pairs, slug functions, JSDoc boilerplate).
+- **Three no-BC shims worth deleting independently of the campaign:** `status: 'dropped'` registry entries (`documentation-types.ts:49-59, 294-339`), types derived from literal instead of `z.infer` (`documentation-types.ts:140-340`), and `addRoutedDocument`'s 2N+2-render bug (`render-markdown.ts:308-325`). These can land before the campaign without depending on `DocDefinition`.
 
-**Meta package:** `@libar-dev/architect` continues to expose all 7 bins via re-export. Consumers can install just the meta and get the full CLI surface.
+### `.pr-coordination/` — doc-generation campaign design
 
-### JS API → package map (8 collision symbols)
-
-In v1, these symbols were re-exported by the monolith `@libar-dev/architect`. In v2, the meta is bin-only, and **same-name symbols live in different splits with different shapes**. Consumers who imported these from `@libar-dev/architect` must repoint imports to the owning split.
-
-| v1 import from `@libar-dev/architect` | v2 import path | Notes |
-|---|---|---|
-| `BusinessRule`, `BusinessRuleSchema` (extraction shape) | `@libar-dev/architect-core` | The Gherkin scanner / extraction shape: `{ name, description, scenarioCount, scenarioNames, tags }`. |
-| `BusinessRule`, `BusinessRuleSchema` (projection-fragment shape) | `@libar-dev/architect-projection` | The projection fragment shape — 12 fields including `id`, `feature`, `ruleName`, `package`, `invariant`, `rationale`, `verifiedBy`, `pattern`, `phase`, `productArea`. **Different type with the same name** — v1 hid this collision because the monolith chose one. v2 forces an explicit choice. |
-| `Deliverable`, `DeliverableSchema` | `@libar-dev/architect-projection` | Two definitions exist within `-projection`: `fragments/pattern-relations/supporting.ts` and `fragments/execution-context/deliverable.ts`. Use whichever matches the projection context. |
-| `DeliverableManifest`, `DeliverableManifestSchema` | `@libar-dev/architect-projection` | Same dual-definition note as above. |
-| `PhaseProgress`, `PhaseProgressSchema` | `@libar-dev/architect-projection` | From `fragments/delivery-reporting/phase-progress.ts`. |
-| `StatusDistribution`, `StatusDistributionSchema` | `@libar-dev/architect-projection` | From `fragments/delivery-reporting/status-distribution.ts`. |
-| `ProjectionError`, `ProjectionErrorCode` | `@libar-dev/architect-core` | From `core/src/package/`. Confusingly named — it's the package-resolver error type, not a projection-pipeline error. |
-
-### Migration cheatsheet for common v1 consumers
-
-```ts
-// v1
-import { buildPatternGraph, BusinessRule, BusinessRuleSchema } from '@libar-dev/architect';
-
-// v2 — extraction context (the most common use)
-import { buildPatternGraph } from '@libar-dev/architect-core';
-import type { BusinessRule } from '@libar-dev/architect-core';
-import { BusinessRuleSchema } from '@libar-dev/architect-core';
-
-// v2 — projection-fragment context
-import type { BusinessRule } from '@libar-dev/architect-projection';
-import { BusinessRuleSchema } from '@libar-dev/architect-projection';
-```
-
-The meta package `@libar-dev/architect` is **no longer importable as JS** — it's bin-only. Any v1 code that did `import ... from '@libar-dev/architect'` will fail to resolve. The migration is mechanical (repoint to the owning split), but unavoidable.
+Three documents drafted before the review: `DEEP-DIVE.md`, `INVENTORY.md`, `PROPOSED-DESIGN.md`, with a short `README.md`. These define the campaign's intended outcome (reference-codec restoration, `DocDefinition.build`, ContentFragments, multi-target output). The full-review judges this design against the projection package and recommends decompose-before-build sequencing.
 
 ## TODO - Required work that needs additional detailing and specification
 
@@ -430,8 +399,9 @@ The drift between `docs/ANNOTATION-GUIDE.md` and `docs-sources/annotation-guide.
 `─────────────────────────────────────────────────`
 ```
 
-### TODO #2 - License consolidation
-- `LICENSE` and `LICENSE-MCP` should be consolidated into just one MIT license
+### TODO #2 - License consolidation — DONE
+
+- ~~`LICENSE` and `LICENSE-MCP` should be consolidated into just one MIT license~~ — landed in the post-W1.5 cleanup. `LICENSE-MCP` deleted, `LICENSE` rewritten as plain MIT, six `package.json` license fields updated to `"MIT"`, README sections rewritten. `formal-spec/` stays `UNLICENSED` while private.
 
 ### Formal specs - firs pass of fixes completed
 
