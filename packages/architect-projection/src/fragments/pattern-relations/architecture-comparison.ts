@@ -7,7 +7,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `ArchitectureComparison` fragment shape for side-by-side bounded-context comparisons, including shared/unique dependencies and integration points.
  */
 import { z } from 'zod';
 

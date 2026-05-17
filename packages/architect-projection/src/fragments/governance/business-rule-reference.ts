@@ -7,7 +7,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the minimal `BusinessRuleReference` fragment shape used to point back to the owning route.
  */
 import { z } from 'zod';
 

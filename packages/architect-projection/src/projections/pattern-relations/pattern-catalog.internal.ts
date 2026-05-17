@@ -2,9 +2,7 @@
  * @architect-bounded-context:pattern-relations
  */
 /**
- * Private helpers used exclusively by the pattern-catalog fragment.
- *
- * Part of the PatternRelationsProjectionSupport utility surface.
+ * Builds the filtered pattern catalog and its name-resolution helpers for list and search surfaces.
  */
 
 import { AcceptedStatusSchema, findPatternByName, MaturitySchema } from '@libar-dev/architect-core';

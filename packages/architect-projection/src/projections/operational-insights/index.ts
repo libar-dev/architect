@@ -32,7 +32,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the operational-insights support surface used by the fragment builders below.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';
@@ -758,7 +758,7 @@ function resolveRequirementTestFiles(pattern: ExtractedPattern): string[] {
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the annotation coverage fragment for CI gates and dashboards.
  */
 export function projectAnnotationCoverage(
   context: ProjectionContext
@@ -796,7 +796,7 @@ export function projectAnnotationCoverage(
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the overview digest used by session-start workflows and CLI bootstrap hints.
  */
 export function projectOverviewDigest(
   context: ProjectionContext
@@ -842,7 +842,7 @@ export function projectOverviewDigest(
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the general requirement digest used by Studio UI and MCP consumers.
  */
 export function projectRequirementDigest(
   context: ProjectionContext,
@@ -882,7 +882,7 @@ export function projectRequirementDigest(
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the executable requirements digest for implemented patterns.
  */
 export function projectRequirementExecutableDigest(
   context: ProjectionContext
@@ -919,7 +919,7 @@ export function projectRequirementExecutableDigest(
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the spec-tier requirements digest for design-level patterns.
  */
 export function projectRequirementSpecsDigest(
   context: ProjectionContext
@@ -1105,7 +1105,7 @@ function createRequirementChildRouteIdForBucket(
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects role profile output for one configured role or the full role catalog.
  */
 export function projectRoleProfile(
   context: ProjectionContext,
@@ -1156,7 +1156,7 @@ export function projectRoleProfiles(
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the tag usage matrix that summarizes metadata-tag counts across the graph.
  */
 export function projectSourceInventoryDigest(
   context: ProjectionContext
@@ -1199,7 +1199,7 @@ export function projectSourceInventoryDigest(
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the tag usage matrix that summarizes metadata-tag counts across the graph.
  */
 export function projectTagUsage(context: ProjectionContext): ProjectionBundle<TagUsageMatrix> {
   return projectSingle(buildTagUsageMatrix(context));

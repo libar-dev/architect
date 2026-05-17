@@ -11,7 +11,10 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - When generating documentation output such as docs-live pages, package README
+ *   content, or the `architect documentation` CLI surface, especially when the
+ *   output needs frontmatter, h2 splitting, routed child files, or relative
+ *   child-link rewriting.
  */
 import { humanizeKey, isPrimitive, stableStringify } from '../_internal/format-utils.js';
 import {
@@ -30,6 +33,7 @@ import {
   type ListItem,
   type TableBlock,
 } from '../blocks/schema.js';
+import { slugForFilename } from '../_internal/slug.js';
 import {
   isBundle,
   summarizeTaxonomyDigest,
@@ -81,6 +85,12 @@ interface MarkdownMetadata {
   readonly detailLevel?: string;
 }
 
+/**
+ * Module-private bypass marker for renderer-authored Markdown. Helpers below
+ * mint trusted values when the renderer intentionally emits raw Markdown and
+ * bypasses escaping.
+ */
+// @invariant: module-private trusted-markdown bypass marker; do not export or widen
 const TRUSTED_MARKDOWN = Symbol('trustedMarkdown');
 
 interface TrustedMarkdownText {
@@ -421,7 +431,7 @@ function createUniqueRoutedPath(path: string, stableId: string, usedPaths: Set<s
     return path;
   }
 
-  const suffix = toKebabCase(stableId) || 'route';
+  const suffix = slugForFilename(stableId) || 'route';
   const directory = extractDirectory(path);
   const fileName = extractFileName(path);
   const extensionStart = fileName.lastIndexOf('.');
@@ -683,10 +693,10 @@ function normalizeDecisionCatalog(fragment: DecisionCatalog): MarkdownDocument {
       ['left', 'left']
     ),
     heading(2, 'ADR Index'),
-    table(
-      ['ADR', 'Title', 'Status', 'Type'],
-      decisions.map((decision) => [
-        toMarkdownLink(decision.id, `decisions/${toKebabCase(decision.id)}.md`) ?? decision.id,
+      table(
+        ['ADR', 'Title', 'Status', 'Type'],
+        decisions.map((decision) => [
+        toMarkdownLink(decision.id, `decisions/${slugForFilename(decision.id)}.md`) ?? decision.id,
         decision.title,
         decision.status,
         decision.type,
@@ -1703,11 +1713,13 @@ function renderBlock(block: MarkdownRenderableBlock): string[] {
     case 'list':
       return renderList(block);
     case 'code': {
-      const fence = block.content.includes('```') ? '````' : '```';
+      const fence = pickFence(block.content);
       return [`${fence}${block.language ?? ''}`, block.content, fence, ''];
     }
-    case 'mermaid':
-      return ['```mermaid', block.content, '```', ''];
+    case 'mermaid': {
+      const fence = pickFence(block.content);
+      return [`${fence}mermaid`, block.content, fence, ''];
+    }
     case 'collapsible':
       return renderCollapsible(block);
     case 'link-out':
@@ -1716,6 +1728,14 @@ function renderBlock(block: MarkdownRenderableBlock): string[] {
       return [`<!-- Unknown block type: ${JSON.stringify(block)} -->`, ''];
     }
   }
+}
+
+function pickFence(content: string): string {
+  const longestRun = (content.match(/`{3,}/g) ?? []).reduce(
+    (max, run) => Math.max(max, run.length),
+    0
+  );
+  return '`'.repeat(Math.max(3, longestRun + 1));
 }
 
 function renderTable(block: TableBlock | TrustedTableBlock): string[] {
@@ -1941,6 +1961,11 @@ function escapeTableCell(cell: MarkdownText): string {
   return rendered.replace(/\|/g, '\\|').replace(/\n/g, '<br>');
 }
 
+/**
+ * Single chokepoint for markdown-link href values: decode HTML entities before
+ * classification, reject control characters and protocol-relative URLs, and
+ * enforce the scheme allowlist accepted by link rendering.
+ */
 function sanitizeMarkdownLinkTarget(value: string): string | null {
   const trimmed = value.trim();
   if (trimmed.length === 0) {
@@ -2084,7 +2109,7 @@ function splitOversizedDocument(
     const subLineCount = countLines(renderFn(subDocument));
 
     if (subLineCount <= budget) {
-      const subFileName = `${toKebabCase(group.heading)}.md`;
+      const subFileName = `${slugForFilename(group.heading)}.md`;
       const subPath = directory ? `${directory}/${subFileName}` : subFileName;
       subFiles[subPath] = {
         title: group.heading,
@@ -2136,15 +2161,6 @@ function groupByH2(sections: readonly MarkdownRenderableBlock[]): H2Group[] {
   }
 
   return groups;
-}
-
-function toKebabCase(text: string): string {
-  return text
-    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
 }
 
 function extractDirectory(filePath: string): string {

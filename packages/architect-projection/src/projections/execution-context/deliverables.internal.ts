@@ -2,9 +2,7 @@
  * @architect-bounded-context:execution-context
  */
 /**
- * Private helpers used exclusively by the deliverables fragment.
- *
- * Part of the ExecutionContextProjectionSupport utility surface.
+ * Builds the deliverable manifest and single-deliverable lookup used by the execution-context projection.
  */
 
 import { findPatternByName } from '@libar-dev/architect-core';

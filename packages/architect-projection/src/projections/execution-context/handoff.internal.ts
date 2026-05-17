@@ -2,9 +2,7 @@
  * @architect-bounded-context:execution-context
  */
 /**
- * Private helpers used exclusively by the handoff fragment.
- *
- * Part of the ExecutionContextProjectionSupport utility surface.
+ * Builds the handoff record, including default checkbox summaries, discovered items, blockers, and next-session text.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';

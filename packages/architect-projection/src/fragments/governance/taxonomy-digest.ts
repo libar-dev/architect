@@ -7,7 +7,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `TaxonomyDigest` fragment shape for summarized tag and format-type counts.
  */
 import { z } from 'zod';
 

@@ -31,7 +31,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Provides shared delivery-reporting helpers for phase, status, timeline,
+*   release, and traceability projections.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';
@@ -57,6 +58,7 @@ import {
   getPatternName,
   normalizeDeliverables,
 } from '../_shared/pattern-helpers.internal.js';
+import { slugForFilename } from '../../_internal/slug.js';
 import type { Deliverable } from '../../fragments/pattern-relations/supporting.js';
 import { filterPatterns } from '../_shared/filter.js';
 import { createEntityRouteId, createIndexRouteId } from '../../routing/route-id.js';
@@ -420,7 +422,7 @@ function createChildren<
   const seen = new Map<string, number>();
 
   for (const entry of entries) {
-    const baseKey = createSlug(label(entry));
+    const baseKey = slugForFilename(label(entry)) || 'item';
     const collisionCount = seen.get(baseKey) ?? 0;
     const collisionSuffix = String(collisionCount + 1);
     const key = collisionCount === 0 ? baseKey : `${baseKey}-${collisionSuffix}`;
@@ -525,16 +527,6 @@ function parseQuarterLabel(value: string): { year: number; quarter: number } | u
   return undefined;
 }
 
-function createSlug(value: string): string {
-  const slug = value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-
-  return slug.length > 0 ? slug : 'item';
-}
-
 // ===========================================================================
 // Public projection API for the delivery-reporting subdomain.
 // Each exported projectX function has its own @architect-pattern annotation
@@ -570,7 +562,7 @@ function createSlug(value: string): string {
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects one phase's delivery progress as a PhaseProgress bundle.
  */
 export function projectPhaseProgress(
   context: ProjectionContext,
@@ -610,7 +602,8 @@ export function projectPhaseProgress(
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects graph-wide status counts and percentages as a StatusDistribution
+*   bundle.
  */
 export function projectStatusDistribution(
   context: ProjectionContext
@@ -650,7 +643,8 @@ export function projectStatusDistribution(
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects roadmap, milestone, or current-work views as RoadmapTimeline
+*   bundles.
  */
 export function projectRoadmapTimeline(
   context: ProjectionContext
@@ -698,7 +692,7 @@ export function projectCurrentWork(context: ProjectionContext): ProjectionBundle
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects changelog-shaped release notes as a ReleaseNotesDigest bundle.
  */
 export function projectReleaseNotesDigest(
   context: ProjectionContext,
@@ -739,7 +733,7 @@ export function projectReleaseNotesDigest(
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects phased traceability rows as a TraceabilityMatrix bundle.
  */
 export function projectTraceabilityMatrix(
   context: ProjectionContext

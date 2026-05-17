@@ -8,7 +8,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the open-question list for patterns, optionally filtered to a parent scope.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

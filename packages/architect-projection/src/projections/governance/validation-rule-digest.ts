@@ -28,7 +28,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the governance validation digest from the fixed rule catalog, FSM transitions, and protection-level buckets.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -37,7 +37,7 @@ import type { ValidationRuleDigest } from '../../fragments/governance/index.js';
 import { buildValidationRuleDigest } from './validation-rule-digest.internal.js';
 
 export function projectValidationRuleDigest(
-  context: ProjectionContext
+  _context: ProjectionContext
 ): ProjectionBundle<ValidationRuleDigest> {
-  return projectSingle(buildValidationRuleDigest(context));
+  return projectSingle(buildValidationRuleDigest());
 }

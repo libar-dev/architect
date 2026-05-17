@@ -25,7 +25,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Provides the shared governance projection helpers for pattern-name resolution, annotation normalization, and slug generation.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';

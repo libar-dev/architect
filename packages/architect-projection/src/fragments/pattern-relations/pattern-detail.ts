@@ -7,30 +7,22 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `PatternDetail` fragment shape for the expanded per-pattern bundle, including summary, deliverables, relationships, rules, stubs, and manifest.
  */
-import { MaturitySchema } from '@libar-dev/architect-core';
 import { z } from 'zod';
 
+import { PatternSummarySchema } from './pattern-summary.js';
 import {
   DeliverableManifestSchema,
   DeliverableSchema,
   EmbeddedRuleRefSchema,
   PatternHierarchySchema,
   PatternRelationshipsSchema,
-  PatternSourceSchema,
   StubRefSchema,
 } from './supporting.js';
 
-export const PatternDetailSchema = z.strictObject({
+export const PatternDetailSchema = PatternSummarySchema.extend({
   kind: z.literal('PatternDetail'),
-  patternName: z.string(),
-  status: z.string().optional(),
-  maturity: MaturitySchema.optional(),
-  role: z.string(),
-  phase: z.number().int().optional(),
-  file: z.string(),
-  source: PatternSourceSchema,
   description: z.string().optional(),
   openQuestions: z.array(z.string()).optional(),
   deliverables: z.array(DeliverableSchema),

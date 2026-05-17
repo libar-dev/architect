@@ -30,7 +30,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the filtered pattern catalog used by list/search surfaces, including name-only and count-only modes.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

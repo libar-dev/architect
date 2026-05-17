@@ -33,7 +33,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the expanded detail bundle for one pattern, normalizing summary, deliverables, relationships, rules, stubs, and manifest.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

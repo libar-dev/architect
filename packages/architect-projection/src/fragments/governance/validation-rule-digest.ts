@@ -7,7 +7,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `ValidationRuleDigest` fragment shape for rule entries, FSM graph data, and protection levels.
  */
 import { z } from 'zod';
 

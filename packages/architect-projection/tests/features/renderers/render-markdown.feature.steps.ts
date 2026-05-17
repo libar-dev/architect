@@ -1,5 +1,5 @@
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
-import { expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   REQUIREMENTS_EXECUTABLE_AREA_LABEL,
@@ -1911,4 +1911,116 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       );
     }
   );
+});
+
+describe('renderMarkdown adversarial security coverage', () => {
+  it('uses five-backtick fences when code and mermaid content contains four-backtick runs', () => {
+    const rendered = renderMarkdown(
+      documentationFixtureToFragment({
+        kind: 'SectionedDocumentFixture',
+        documentType: 'security',
+        title: 'Fence Security',
+        sections: [
+          {
+            id: 'fences',
+            title: 'Fences',
+            blocks: [
+              { type: 'code', language: 'ts', content: 'const nested = "````";' },
+              { type: 'mermaid', content: 'graph TD; A[````] --> B[ok]' },
+            ],
+          },
+        ],
+      })
+    );
+
+    const markdown = assertRenderedString(rendered);
+    expect(markdown).toContain('`````ts\nconst nested = "````";\n`````');
+    expect(markdown).toContain('`````mermaid\ngraph TD; A[````] --> B[ok]\n`````');
+  });
+
+  it('renders data URL link targets as plain text', () => {
+    const rendered = renderMarkdown(
+      documentationFixtureToFragment({
+        kind: 'SectionedDocumentFixture',
+        documentType: 'security',
+        title: 'Link Security',
+        sections: [
+          {
+            id: 'links',
+            title: 'Links',
+            blocks: [{ type: 'link-out', text: 'Data URL', path: 'data:text/html,<script>x</script>' }],
+          },
+        ],
+      })
+    );
+
+    const markdown = assertRenderedString(rendered);
+    expect(markdown).toContain('Data URL');
+    expect(markdown).not.toContain('[Data URL](');
+  });
+
+  it('renders file URL link targets as plain text', () => {
+    const rendered = renderMarkdown(
+      documentationFixtureToFragment({
+        kind: 'SectionedDocumentFixture',
+        documentType: 'security',
+        title: 'Link Security',
+        sections: [
+          {
+            id: 'links',
+            title: 'Links',
+            blocks: [{ type: 'link-out', text: 'File URL', path: 'file:///etc/passwd' }],
+          },
+        ],
+      })
+    );
+
+    const markdown = assertRenderedString(rendered);
+    expect(markdown).toContain('File URL');
+    expect(markdown).not.toContain('[File URL](');
+  });
+
+  it('renders entity-encoded javascript URL link targets as plain text', () => {
+    const rendered = renderMarkdown(
+      documentationFixtureToFragment({
+        kind: 'SectionedDocumentFixture',
+        documentType: 'security',
+        title: 'Link Security',
+        sections: [
+          {
+            id: 'links',
+            title: 'Links',
+            blocks: [
+              { type: 'link-out', text: 'Encoded JavaScript', path: 'javascript&#x3a;alert(1)' },
+            ],
+          },
+        ],
+      })
+    );
+
+    const markdown = assertRenderedString(rendered);
+    expect(markdown).toContain('Encoded JavaScript');
+    expect(markdown).not.toContain('[Encoded JavaScript](');
+  });
+
+  it('renders control-character link targets as plain text', () => {
+    const rendered = renderMarkdown(
+      documentationFixtureToFragment({
+        kind: 'SectionedDocumentFixture',
+        documentType: 'security',
+        title: 'Link Security',
+        sections: [
+          {
+            id: 'links',
+            title: 'Links',
+            blocks: [{ type: 'link-out', text: 'Control Target', path: 'https://example.com/\u0000x' }],
+          },
+        ],
+      })
+    );
+
+    const markdown = assertRenderedString(rendered);
+    expect(markdown).toContain('Control Target');
+    expect(markdown).not.toContain('[Control Target](');
+  });
 });

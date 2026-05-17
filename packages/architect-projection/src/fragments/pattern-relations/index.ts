@@ -6,7 +6,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Re-exports the pattern-relations fragment contracts for catalog, detail, bundle, dependency, neighborhood, and context projections.
  */
 export { ArchitectureComparisonSchema } from './architecture-comparison.js';
 export type { ArchitectureComparison } from './architecture-comparison.js';

@@ -32,9 +32,7 @@
  *   `normalizeDeliverables` helper and lifts each entry into a
  *   `Deliverable` fragment.
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Execution-context projections use these helpers when they need shared test-file discovery or deliverable normalization.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';

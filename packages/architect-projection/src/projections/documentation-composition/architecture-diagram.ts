@@ -26,7 +26,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects a schema-validated ArchitectureDiagram bundle for the requested
+*   scope.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

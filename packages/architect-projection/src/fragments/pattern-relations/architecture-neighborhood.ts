@@ -7,7 +7,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `ArchitectureNeighborhood` fragment shape for a focal pattern's relationships, same-context peers, and implementation references.
  */
 import { z } from 'zod';
 

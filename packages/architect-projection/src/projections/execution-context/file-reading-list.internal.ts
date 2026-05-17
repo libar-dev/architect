@@ -2,9 +2,7 @@
  * @architect-bounded-context:execution-context
  */
 /**
- * Private helpers used exclusively by the file-reading-list fragment.
- *
- * Part of the ExecutionContextProjectionSupport utility surface.
+ * Builds the file-reading list that groups primary files, completed dependencies, roadmap dependencies, and architecture neighbors.
  */
 
 import { findPatternByName, isPatternComplete } from '@libar-dev/architect-core';

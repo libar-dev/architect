@@ -7,7 +7,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `BusinessRuleSet` fragment shape for a scoped collection of business rules, including optional grouping metadata.
  */
 import { z } from 'zod';
 

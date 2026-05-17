@@ -28,7 +28,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the session-opening context across patterns, dependencies, stubs, deliverables, and FSM data.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

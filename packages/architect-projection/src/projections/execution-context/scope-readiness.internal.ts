@@ -2,9 +2,7 @@
  * @architect-bounded-context:execution-context
  */
 /**
- * Private helpers used exclusively by the scope-readiness fragment.
- *
- * Part of the ExecutionContextProjectionSupport utility surface.
+ * Builds the scope-readiness checks and verdicts for design and implement sessions.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';

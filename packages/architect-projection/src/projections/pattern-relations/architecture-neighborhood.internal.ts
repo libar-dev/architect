@@ -2,9 +2,7 @@
  * @architect-bounded-context:pattern-relations
  */
 /**
- * Private helpers used exclusively by the architecture-neighborhood fragment.
- *
- * Part of the PatternRelationsProjectionSupport utility surface.
+ * Builds the architectural neighborhood for one pattern, including relationships, peers, and implementation references.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

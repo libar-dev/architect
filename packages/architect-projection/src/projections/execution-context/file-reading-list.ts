@@ -27,7 +27,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the reading-list fragment that orders a pattern's primary, dependency, and neighbor files.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

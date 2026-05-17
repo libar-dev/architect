@@ -2,9 +2,7 @@
  * @architect-bounded-context:pattern-relations
  */
 /**
- * Private helpers used exclusively by the dependency-tree fragment.
- *
- * Part of the PatternRelationsProjectionSupport utility surface.
+ * Builds a rooted dependency tree for one pattern with the configured depth and traversal rules.
  */
 
 import { findPatternByName } from '@libar-dev/architect-core';

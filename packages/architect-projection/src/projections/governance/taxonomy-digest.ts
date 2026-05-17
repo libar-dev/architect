@@ -29,7 +29,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the governance taxonomy digest and merges per-call example overrides without mutating the default examples.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

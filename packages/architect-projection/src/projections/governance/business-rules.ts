@@ -29,7 +29,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects normalized business rules and grouped rule sets into schema-validated fragments for render consumers.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

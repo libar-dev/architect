@@ -45,6 +45,16 @@ must already be canonical relative `.md` paths. Traversal, absolute paths,
 schemes, duplicate route-id aliases, and unresolved internal child references do
 not become emitted files or clickable links.
 
+Both boundaries are now ESLint-enforced for renderer code. The repo-root
+`eslint.config.mjs` ships four boundary rules scoped to `src/renderers/**/*.ts`
+(documentation-composition import ban, route-construction ban, cross-layer
+`.internal.js` ban, and a five-selector `TRUSTED_MARKDOWN` firewall). Each
+violation carries a stable `[arch-boundary:*]` or `[trust-boundary:*]` tag in
+its error message — grep the tag to land in `packages/architect-projection/README.md`
+"Architecture invariants → Enforced at lint time". v1→v2 consumers porting
+renderer-shaped code should expect these rules to surface latent boundary
+violations; no `eslint-disable` escape is provided.
+
 ---
 
 ## Performance gate

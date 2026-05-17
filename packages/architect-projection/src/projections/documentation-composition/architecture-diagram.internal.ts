@@ -2,9 +2,8 @@
  * @architect-bounded-context:documentation-composition
  */
 /**
- * Private helpers used exclusively by the architecture-diagram fragment.
- *
- * Part of the DocumentationCompositionProjectionSupport utility surface.
+ * Builds the architecture-diagram options schema and scope-filtered Mermaid
+ * projection helpers.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';

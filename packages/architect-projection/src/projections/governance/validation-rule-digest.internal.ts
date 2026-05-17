@@ -2,9 +2,7 @@
  * @architect-bounded-context:governance
  */
 /**
- * Private helpers used exclusively by the validation-rule-digest fragment.
- *
- * Part of the GovernanceProjectionSupport utility surface.
+ * Builds the governance validation digest from core FSM status constants and protection-level mappings.
  */
 
 import {
@@ -13,12 +11,11 @@ import {
   VALID_TRANSITIONS,
 } from '@libar-dev/architect-core';
 
-import type { ProjectionContext } from '../../context/projection-context.js';
 import type { ValidationRuleDigest } from '../../fragments/governance/index.js';
 
 const PROTECTION_LEVEL_ORDER = ['none', 'scope', 'hard'] as const;
 
-export function buildValidationRuleDigest(_context: ProjectionContext): ValidationRuleDigest {
+export function buildValidationRuleDigest(): ValidationRuleDigest {
   const rules: ValidationRuleDigest['rules'] = [
     {
       id: 'completed-protection',

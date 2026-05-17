@@ -6,7 +6,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the discriminated union that collects every projection fragment
+*   kind into one read model.
  */
 import { z } from 'zod';
 

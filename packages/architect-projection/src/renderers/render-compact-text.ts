@@ -11,7 +11,9 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - When MCP tools or CLI surfaces need compact, marker-delimited plain text for
+ *   LLM consumption, especially for overview, session context, dependency,
+ *   reading-list, scope-readiness, or handoff fragments.
  */
 import {
   isDeliverableStatusComplete,

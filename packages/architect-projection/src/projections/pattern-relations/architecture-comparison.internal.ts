@@ -2,9 +2,7 @@
  * @architect-bounded-context:pattern-relations
  */
 /**
- * Private helpers used exclusively by the architecture-comparison fragment.
- *
- * Part of the PatternRelationsProjectionSupport utility surface.
+ * Builds the side-by-side comparison data for two bounded contexts from the pattern-relationship graph.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

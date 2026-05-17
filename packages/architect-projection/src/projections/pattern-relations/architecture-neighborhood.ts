@@ -32,7 +32,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects a single pattern's architectural neighborhood bundle, including relationship directions, same-context peers, and implementation refs.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

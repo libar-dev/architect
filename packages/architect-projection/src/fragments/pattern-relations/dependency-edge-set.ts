@@ -7,7 +7,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `DependencyEdgeSet` fragment shape for a pattern's outgoing dependency edges.
  */
 import { z } from 'zod';
 

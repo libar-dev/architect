@@ -24,7 +24,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects deliverable manifests and single deliverable lookups for execution-context consumers.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

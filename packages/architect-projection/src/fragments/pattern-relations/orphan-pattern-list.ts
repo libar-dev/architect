@@ -7,7 +7,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `OrphanPatternList` fragment shape for patterns with no incoming or outgoing relationships.
  */
 import { z } from 'zod';
 

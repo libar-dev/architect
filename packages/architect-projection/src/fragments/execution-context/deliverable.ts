@@ -5,9 +5,7 @@
  * @architect-role:contract
  * @architect-bounded-context:execution-context
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Defines the `Deliverable` fragment shape for one execution-context deliverable record.
  */
 import { z } from 'zod';
 

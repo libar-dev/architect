@@ -5,9 +5,7 @@
  * @architect-role:contract
  * @architect-bounded-context:operational-insights
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Defines the `RequirementDigest` fragment shape for product requirements, resolved test files, and linked governance rules.
  */
 import { z } from 'zod';
 

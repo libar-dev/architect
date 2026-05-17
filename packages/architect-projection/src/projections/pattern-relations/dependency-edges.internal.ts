@@ -2,9 +2,7 @@
  * @architect-bounded-context:pattern-relations
  */
 /**
- * Private helpers used exclusively by the dependency-edges fragment.
- *
- * Part of the PatternRelationsProjectionSupport utility surface.
+ * Builds the normalized outgoing dependency edges for one pattern from graph relationships.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

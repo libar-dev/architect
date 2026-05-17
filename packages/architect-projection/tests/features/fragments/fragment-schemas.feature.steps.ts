@@ -1,7 +1,12 @@
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
-import { expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { ArchitectureDiagramSchema, FragmentSchema, type Fragment } from '../../../src/index.js';
+import {
+  ArchitectureDiagramSchema,
+  CodeBlockSchema,
+  FragmentSchema,
+  type Fragment,
+} from '../../../src/index.js';
 import {
   FRAGMENT_INVALID_FIXTURES,
   FRAGMENT_SCHEMAS,
@@ -188,5 +193,24 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         });
       });
     });
+  });
+});
+
+describe('Fragment schema mirror adversarial security coverage', () => {
+  it('rejects hostile code languages and accepts identifier-shaped languages', () => {
+    expect(
+      CodeBlockSchema.safeParse({
+        type: 'code',
+        language: 'ts\n```\n<script>',
+        content: 'console.log("x");',
+      }).success
+    ).toBe(false);
+    expect(
+      CodeBlockSchema.safeParse({
+        type: 'code',
+        language: 'tsx+react-18.2',
+        content: 'console.log("x");',
+      }).success
+    ).toBe(true);
   });
 });

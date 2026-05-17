@@ -7,7 +7,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the ProjectConfigSnapshot fragment shape for config, source glob,
+*   and graph metrics.
  */
 import { z } from 'zod';
 

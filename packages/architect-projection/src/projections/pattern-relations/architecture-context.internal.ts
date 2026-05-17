@@ -2,9 +2,7 @@
  * @architect-bounded-context:pattern-relations
  */
 /**
- * Private helpers used exclusively by the architecture-context fragment.
- *
- * Part of the PatternRelationsProjectionSupport utility surface.
+ * Builds bounded-context catalog entries with per-context pattern counts, layers, and roles.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';

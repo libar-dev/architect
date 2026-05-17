@@ -7,7 +7,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the PrChangeReview fragment shape for branch changes and reviewer
+*   recommendations.
  */
 import { z } from 'zod';
 

@@ -2,9 +2,7 @@
  * @architect-bounded-context:governance
  */
 /**
- * Private helpers used exclusively by the business-rules fragment.
- *
- * Part of the GovernanceProjectionSupport utility surface.
+ * Builds governance business-rule fragments and sets from extracted patterns and annotation metadata.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';

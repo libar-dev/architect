@@ -2,9 +2,7 @@
  * @architect-bounded-context:documentation-composition
  */
 /**
- * Private helpers used exclusively by the pr-change-review fragment.
- *
- * Part of the DocumentationCompositionProjectionSupport utility surface.
+ * Builds the PR change review options schema and branch-matching helpers.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';

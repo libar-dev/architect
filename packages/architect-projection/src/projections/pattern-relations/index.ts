@@ -1,5 +1,7 @@
 /**
  * @architect-bounded-context:pattern-relations
+ *
+ * Re-exports the pattern-relations projection entrypoints and option schemas for bundle, catalog, detail, dependency, neighborhood, and context surfaces.
  */
 export { projectArchitectureComparison } from './architecture-comparison.js';
 export { projectBoundedContext } from './architecture-context.js';

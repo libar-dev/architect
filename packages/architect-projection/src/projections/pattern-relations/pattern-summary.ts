@@ -28,7 +28,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the canonical short pattern summary reused by catalog and detail views.
  */
 
 import type { PatternSummary } from '../../fragments/pattern-relations/index.js';

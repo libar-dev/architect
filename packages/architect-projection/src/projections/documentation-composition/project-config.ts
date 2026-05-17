@@ -27,7 +27,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects a normalized ProjectConfigSnapshot bundle from config input and
+*   graph metadata.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

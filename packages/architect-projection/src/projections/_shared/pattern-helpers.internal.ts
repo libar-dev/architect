@@ -41,7 +41,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Provides shared pattern lookup, summary, relationship, deliverable, and
+*   rule normalization helpers.
  */
 
 import {

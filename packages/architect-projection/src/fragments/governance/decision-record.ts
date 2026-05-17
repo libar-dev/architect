@@ -7,7 +7,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `DecisionRecord` fragment shape for one ADR/PDR/DDR/TDR record with structured context, decision, consequences, and related pattern links.
  */
 import { z } from 'zod';
 

@@ -1,8 +1,9 @@
 import { readFile } from 'node:fs/promises';
 
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
-import { expect, expectTypeOf } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 
+import * as publicSurface from '../../../src/index.js';
 import {
   type BundleRouting,
   isBundle,
@@ -14,6 +15,7 @@ import {
   type RenderMarkdownOptions,
   type RenderUiOptions,
 } from '../../../src/index.js';
+import * as rendererSurface from '../../../src/renderers/index.js';
 import type {
   renderCompactText,
   renderJson,
@@ -449,4 +451,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     }
   );
+});
+
+describe('Renderer and progressive disclosure contract adversarial coverage', () => {
+  it('keeps TRUSTED_MARKDOWN private to the markdown renderer module API', () => {
+    expect(Object.hasOwn(publicSurface, 'TRUSTED_MARKDOWN')).toBe(false);
+    expect(Object.hasOwn(rendererSurface, 'TRUSTED_MARKDOWN')).toBe(false);
+  });
 });

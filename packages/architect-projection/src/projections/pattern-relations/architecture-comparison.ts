@@ -28,7 +28,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects a side-by-side bounded-context comparison bundle from the pattern-relations fragment helpers.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

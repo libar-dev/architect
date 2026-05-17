@@ -2,9 +2,7 @@
  * @architect-bounded-context:execution-context
  */
 /**
- * Private helpers used exclusively by the session-context fragment.
- *
- * Part of the ExecutionContextProjectionSupport utility surface.
+ * Builds the session-context bundle, including metadata, dependencies, neighbors, deliverables, and FSM context.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';

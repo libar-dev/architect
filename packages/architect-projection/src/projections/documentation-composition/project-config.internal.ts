@@ -2,9 +2,8 @@
  * @architect-bounded-context:documentation-composition
  */
 /**
- * Private helpers used exclusively by the project-config fragment.
- *
- * Part of the DocumentationCompositionProjectionSupport utility surface.
+ * Builds the project-config options schema and snapshot helpers for
+ * documentation-composition projections.
  */
 
 import { z } from 'zod';

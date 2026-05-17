@@ -5,9 +5,7 @@
  * @architect-role:contract
  * @architect-bounded-context:execution-context
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Houses the shared execution-context helper schemas for session type, verdicts, dependencies, neighbors, FSM data, and related refs.
  */
 import { z } from 'zod';
 import { HandoffSessionTypeSchema, SessionTypeSchema } from '@libar-dev/architect-core';

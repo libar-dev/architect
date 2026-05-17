@@ -16,7 +16,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the registry-driven documentation bundle for the retained
+*   document types.
  */
 import type { ProjectionContext } from '../../context/projection-context.js';
 import type { ProjectionBundle } from '../../fragments/base.js';

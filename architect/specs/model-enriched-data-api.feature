@@ -4,7 +4,7 @@
 @architect-product-area:DataAPI
 @architect-uses:ArchitectBriefDeterministicBundle
 @architect-bounded-context:api
-@architect-see-also:ADR006SingleReadModelArchitecture,ADR005CodecRendererSeparation
+@architect-see-also:ADR006SingleReadModelArchitecture,ADR005CodecBasedMarkdownRendering
 Feature: ModelEnrichedDataAPI
 
   **Problem:**

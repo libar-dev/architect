@@ -2,9 +2,7 @@
  * @architect-bounded-context:pattern-relations
  */
 /**
- * Private helpers used exclusively by the orphan-pattern-list fragment.
- *
- * Part of the PatternRelationsProjectionSupport utility surface.
+ * Builds the list of patterns that have no incoming or outgoing relationships in the current graph.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

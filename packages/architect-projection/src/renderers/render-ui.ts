@@ -8,10 +8,14 @@
  * Renders fragments into UiDocument blocks consumed by the Studio desktop UI.
  * It preserves block-level structure, rewrites child links to bundle anchors,
  * and keeps React/component rendering outside the projection package.
+ * @invariant The UI renderer does not sanitize URL targets and is not a
+ * hardening boundary for untrusted links; sanitize before this layer.
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - When the Studio desktop app needs UiDocument trees for BlockRenderer,
+ *   including ordered section layouts, routed bundle children, or PatternDetail
+ *   field ordering.
  */
 import { slugify } from '@libar-dev/architect-core';
 
@@ -473,7 +477,7 @@ function renderChildren(
 ): Record<string, UiDocument> {
   return Object.fromEntries(
     childEntries.map(([key, child]) => [key, renderFragment(child, options, inheritedChildRefs)])
-  ) as Record<string, UiDocument>;
+  );
 }
 
 function createChildLinkRefs(

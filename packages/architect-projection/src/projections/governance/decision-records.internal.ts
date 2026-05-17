@@ -2,9 +2,7 @@
  * @architect-bounded-context:governance
  */
 /**
- * Private helpers used exclusively by the decision-records fragment.
- *
- * Part of the GovernanceProjectionSupport utility surface.
+ * Builds governance decision-record fragments and catalogs from extracted decision patterns and rule sections.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';

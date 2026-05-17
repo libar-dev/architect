@@ -7,7 +7,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the StatusDistribution fragment shape for status counts and
+*   percentages.
  */
 import { z } from 'zod';
 

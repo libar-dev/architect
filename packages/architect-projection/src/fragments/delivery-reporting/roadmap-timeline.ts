@@ -7,7 +7,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the RoadmapTimeline fragment shape for roadmap, milestones, and
+*   current views.
  */
 import { z } from 'zod';
 

@@ -112,8 +112,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
         And('the traceability child keys should be deterministic', () => {
           expect(Object.keys(state!.bundle?.children ?? {})).toEqual([
-            'behaviorphaseone',
-            'behaviorphasetwo',
+            'behavior-phase-one',
+            'behavior-phase-two',
           ]);
         });
       }

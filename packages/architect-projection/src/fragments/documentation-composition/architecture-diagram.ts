@@ -7,7 +7,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the ArchitectureDiagram fragment shape for scoped Mermaid diagrams
+*   and pattern lists.
  */
 import { z } from 'zod';
 

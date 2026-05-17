@@ -2,9 +2,7 @@
  * @architect-bounded-context:governance
  */
 /**
- * Private helpers used exclusively by the taxonomy-digest fragment.
- *
- * Part of the GovernanceProjectionSupport utility surface.
+ * Builds the governance taxonomy digest from the graph's tag registry and optional example overrides.
  */
 
 import type {
@@ -189,7 +187,7 @@ function cloneExampleOverrides(
     Object.entries(overrides).flatMap(([format, override]) =>
       override === undefined ? [] : [[format, { ...override }] as const]
     )
-  ) as TagExampleOverrides;
+  );
 }
 
 type GroupKey = keyof typeof METADATA_TAGS_BY_GROUP;

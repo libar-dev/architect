@@ -7,7 +7,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the PhaseProgress fragment shape for one phase's delivery totals
+*   and completion rate.
  */
 import { z } from 'zod';
 

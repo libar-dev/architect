@@ -7,7 +7,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `PatternCatalog` fragment shape for filtered pattern-summary catalogs, including counts, names-only mode, and filters.
  */
 import { z } from 'zod';
 

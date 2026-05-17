@@ -12,6 +12,108 @@ export default tseslint.config(
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
 
+  // architect-projection src — honour the `_`-prefix unused convention used by factory wrappers
+  {
+    files: ['src/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+    },
+  },
+
+  // architect-projection boundary rules — each message carries a `[arch-boundary:<id>]` tag
+  // so contributors can grep the codebase (and `packages/architect-projection/README.md` →
+  // "Architecture invariants → Enforced at lint time") for the rule by id.
+  {
+    files: ['src/renderers/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '../projections/documentation-composition/architecture-diagram.js',
+              message:
+                '[arch-boundary:renderer-no-doc-composition] Renderers must not import documentation-composition projections or its registry. See packages/architect-projection/README.md "Architecture invariants → Enforced at lint time".',
+            },
+            {
+              name: '../projections/documentation-composition/documentation-bundle.js',
+              message:
+                '[arch-boundary:renderer-no-doc-composition] Renderers must not import documentation-composition projections or its registry. See packages/architect-projection/README.md "Architecture invariants → Enforced at lint time".',
+            },
+            {
+              name: '../projections/documentation-composition/documentation-type-registry.js',
+              message:
+                '[arch-boundary:renderer-no-doc-composition] Renderers must not import documentation-composition projections or its registry. See packages/architect-projection/README.md "Architecture invariants → Enforced at lint time".',
+            },
+            {
+              name: '../projections/documentation-composition/index.js',
+              message:
+                '[arch-boundary:renderer-no-doc-composition] Renderers must not import documentation-composition projections or its registry. See packages/architect-projection/README.md "Architecture invariants → Enforced at lint time".',
+            },
+            {
+              name: '../projections/documentation-composition/pr-change-review.js',
+              message:
+                '[arch-boundary:renderer-no-doc-composition] Renderers must not import documentation-composition projections or its registry. See packages/architect-projection/README.md "Architecture invariants → Enforced at lint time".',
+            },
+            {
+              name: '../projections/documentation-composition/project-config.js',
+              message:
+                '[arch-boundary:renderer-no-doc-composition] Renderers must not import documentation-composition projections or its registry. See packages/architect-projection/README.md "Architecture invariants → Enforced at lint time".',
+            },
+            {
+              name: '../routing/route-id.js',
+              importNames: ['createIndexRouteId', 'createEntityRouteId'],
+              message:
+                '[arch-boundary:renderer-no-route-construction] Renderers must not construct route ids directly; keep route construction in projection helpers. Type-only `LogicalRouteId` imports are allowed. See packages/architect-projection/README.md "Architecture invariants → Enforced at lint time".',
+            },
+          ],
+          patterns: [
+            {
+              group: ['../**/*.internal.js'],
+              message:
+                '[arch-boundary:renderer-no-cross-layer-internal] Renderers must not import foreign `.internal.js` modules; keep renderer-private wrappers local to `src/renderers/`. See packages/architect-projection/README.md "Architecture invariants → Enforced at lint time".',
+            },
+          ],
+        },
+      ],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'ImportSpecifier[imported.name="TRUSTED_MARKDOWN"]',
+          message:
+            '[trust-boundary:trusted-markdown-firewall] `TRUSTED_MARKDOWN` is renderer-private and must not be imported or exported; it authorizes raw-markdown emission strictly within the renderer module that owns it. See packages/architect-projection/README.md "Markdown/content trust boundary".',
+        },
+        {
+          selector: 'ExportSpecifier[local.name="TRUSTED_MARKDOWN"]',
+          message:
+            '[trust-boundary:trusted-markdown-firewall] `TRUSTED_MARKDOWN` is renderer-private and must not be imported or exported. See packages/architect-projection/README.md "Markdown/content trust boundary".',
+        },
+        {
+          selector: 'ExportSpecifier[exported.name="TRUSTED_MARKDOWN"]',
+          message:
+            '[trust-boundary:trusted-markdown-firewall] `TRUSTED_MARKDOWN` is renderer-private and must not be imported or exported. See packages/architect-projection/README.md "Markdown/content trust boundary".',
+        },
+        {
+          selector: 'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator[id.name="TRUSTED_MARKDOWN"]',
+          message:
+            '[trust-boundary:trusted-markdown-firewall] `TRUSTED_MARKDOWN` is renderer-private and must not be imported or exported. See packages/architect-projection/README.md "Markdown/content trust boundary".',
+        },
+        {
+          selector: 'ExportNamedDeclaration > FunctionDeclaration[id.name="TRUSTED_MARKDOWN"]',
+          message:
+            '[trust-boundary:trusted-markdown-firewall] `TRUSTED_MARKDOWN` is renderer-private and must not be imported or exported. See packages/architect-projection/README.md "Markdown/content trust boundary".',
+        },
+      ],
+    },
+  },
+
   // TypeScript files configuration
   {
     files: ['architect.config.ts', 'tests/**/*.ts', 'scripts/**/*.ts'],

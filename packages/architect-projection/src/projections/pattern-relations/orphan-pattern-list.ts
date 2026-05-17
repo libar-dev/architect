@@ -25,7 +25,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the list of disconnected patterns with no incoming or outgoing relationships.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

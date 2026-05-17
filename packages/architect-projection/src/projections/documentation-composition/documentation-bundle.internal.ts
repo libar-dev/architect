@@ -60,6 +60,12 @@ type RawProjectDocumentationBundleOptions = z.infer<
 
 type DocumentationProjectionFactory = (context: ProjectionContext) => ProjectionBundle<Fragment>;
 
+/**
+ * WARNING: This table is a campaign deletion target for W-DOCS-1.
+ * `DocDefinition.build(graph)` is the replacement path.
+ * Do NOT add new entries here.
+ * See `.pr-coordination/PROPOSED-DESIGN.md`.
+ */
 const DOCUMENTATION_PROJECTION_FACTORIES = {
   architecture: (context) =>
     projectSingle(buildArchitectureDiagram(context, { scope: 'component' })),

@@ -1,5 +1,5 @@
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
-import { expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   FragmentSchema,
@@ -816,5 +816,23 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         );
       }
     );
+  });
+});
+
+describe('Execution Context context and session projections adversarial coverage', () => {
+  it('rejects extra session-context option properties at the strict parse boundary', () => {
+    const pattern = createPattern('ProjectionBody', {
+      status: 'active',
+      file: 'architect/specs/projection-body.feature',
+    });
+    const context = createProjectionContext({ patterns: [pattern] });
+
+    expect(() =>
+      parseAndProjectSessionContext(context, {
+        patterns: ['ProjectionBody'],
+        sessionType: 'implement',
+        extra: 'not allowed',
+      })
+    ).toThrow(/Invalid options for parseAndProjectSessionContext:[\s\S]*Unrecognized key: "extra"/u);
   });
 });

@@ -5,9 +5,7 @@
  * @architect-role:contract
  * @architect-bounded-context:execution-context
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Defines the `SessionContextBundle` fragment shape for the session-opening context across patterns, dependencies, stubs, deliverables, and FSM data.
  */
 import { z } from 'zod';
 

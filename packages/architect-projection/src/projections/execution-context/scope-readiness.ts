@@ -28,7 +28,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects scope-readiness checks and verdicts for design and implement sessions.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

@@ -11,7 +11,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - When MCP or CLI consumers need structured JSON output, including bundle
+ *   routing metadata, stable key order, or pretty-printed payloads.
  */
 import type { Fragment, ProjectionBundle } from '../fragments/index.js';
 import { isBundle } from '../fragments/index.js';
@@ -112,7 +113,7 @@ function serializeFragment(
   options: Required<RenderJsonOptions>,
   path: string
 ): JsonObject {
-  return transformObject(fragment as Record<string, unknown>, options, path);
+  return transformObject(fragment, options, path);
 }
 
 function transformValue(
@@ -200,6 +201,11 @@ function appendPath(basePath: string, key: string): string {
     : `${basePath}[${JSON.stringify(key)}]`;
 }
 
+/**
+ * Reject non-plain objects at the JSON boundary so the renderer only recurses
+ * through plain records and never accepts prototype-pollution carriers or
+ * class instances.
+ */
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   if (!isRecord(value)) {
     return false;

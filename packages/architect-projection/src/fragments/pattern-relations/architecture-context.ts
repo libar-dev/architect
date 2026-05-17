@@ -6,7 +6,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `BoundedContext` fragment shape for bounded-context catalogs, with per-context pattern counts, pattern lists, layers, and roles.
  */
 import { z } from 'zod';
 

@@ -1,5 +1,5 @@
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
-import { expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   PatternSummarySchema,
@@ -25,6 +25,10 @@ interface RenderJsonState {
 
 class UnsupportedJsonValue {
   constructor(readonly label: string) {}
+}
+
+class CustomPrototypeValue {
+  readonly payload = 'custom';
 }
 
 const feature = await loadFeature('tests/features/renderers/render-json.feature');
@@ -490,6 +494,34 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           );
         });
       }
+    );
+  });
+});
+
+describe('renderJson adversarial security coverage', () => {
+  it('rejects class-instance custom-prototype nested objects', () => {
+    const input = {
+      ...createPatternSummaryFixture(),
+      file: new CustomPrototypeValue() as unknown as string,
+    };
+
+    expect(() => renderJson(input)).toThrow(
+      'renderJson encountered a non-JSON-safe CustomPrototypeValue at $.file.'
+    );
+  });
+
+  it('rejects prototype-polluted nested objects', () => {
+    const pollutedPrototype = { polluted: true };
+    const pollutedObject = Object.assign(Object.create(pollutedPrototype) as Record<string, unknown>, {
+      path: 'polluted.md',
+    });
+    const input = {
+      ...createPatternSummaryFixture(),
+      file: pollutedObject as unknown as string,
+    };
+
+    expect(() => renderJson(input)).toThrow(
+      'renderJson encountered a non-JSON-safe Object at $.file.'
     );
   });
 });

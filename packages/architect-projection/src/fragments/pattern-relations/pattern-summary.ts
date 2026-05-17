@@ -7,7 +7,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `PatternSummary` fragment shape for the canonical short pattern summary reused by catalog and detail projections.
  */
 import { MaturitySchema } from '@libar-dev/architect-core';
 import { z } from 'zod';

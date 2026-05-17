@@ -26,7 +26,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects a single decision record or the full decision catalog, with missing ids failing fast and catalog children routed by id.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

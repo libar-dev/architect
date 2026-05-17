@@ -6,7 +6,9 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Re-exports the projection fragment contracts across pattern-relations,
+*   delivery-reporting, governance, execution-context, operational-insights,
+*   and documentation-composition.
  */
 export {
   ArchitectureComparisonSchema,

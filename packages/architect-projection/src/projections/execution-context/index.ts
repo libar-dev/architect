@@ -1,4 +1,5 @@
 /**
+ * Re-exports the execution-context projection entrypoints and option types.
  * @architect-bounded-context:execution-context
  */
 export { projectDeliverable, projectDeliverableManifest } from './deliverables.js';

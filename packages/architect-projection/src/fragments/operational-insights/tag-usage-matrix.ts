@@ -5,9 +5,7 @@
  * @architect-role:contract
  * @architect-bounded-context:operational-insights
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Defines the `TagUsageMatrix` fragment shape for tag usage counts across the pattern graph.
  */
 import { z } from 'zod';
 

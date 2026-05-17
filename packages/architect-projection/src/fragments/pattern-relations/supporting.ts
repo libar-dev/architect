@@ -7,9 +7,11 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Houses the shared pattern-relations helper schemas for sources, relationships, hierarchy, deliverables, stubs, dependency kinds, and tree nodes.
  */
 import { z } from 'zod';
+
+import { DeliverableSchema as ExecutionContextDeliverableSchema } from '../execution-context/deliverable.js';
 
 export const PatternSourceSchema = z.enum(['typescript', 'gherkin']);
 
@@ -46,14 +48,7 @@ export const EmbeddedRuleRefSchema = z.strictObject({
   scenarioCount: z.number().int().nonnegative(),
 });
 
-export const DeliverableSchema = z.strictObject({
-  name: z.string(),
-  status: z.string(),
-  tests: z.array(z.string()),
-  location: z.string(),
-  finding: z.string().optional(),
-  release: z.string().optional(),
-});
+export const DeliverableSchema = ExecutionContextDeliverableSchema.omit({ kind: true });
 
 export const DeliverableManifestSchema = z.strictObject({
   pattern: z.string(),

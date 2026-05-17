@@ -7,7 +7,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines shared delivery-reporting support schemas for counts,
+*   percentages, quarter entries, release entries, and trace rows.
  */
 import { z } from 'zod';
 

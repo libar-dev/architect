@@ -5,9 +5,7 @@
  * @architect-role:contract
  * @architect-bounded-context:operational-insights
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Defines the `SourceInventoryDigest` fragment shape for grouped source-file inventory summaries.
  */
 import { z } from 'zod';
 

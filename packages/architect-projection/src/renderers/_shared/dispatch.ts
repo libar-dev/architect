@@ -7,7 +7,9 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - When a renderer needs the shared `FragmentKind` dispatch bridge and must
+ *   keep kind-specific normalizers wired through the compile-time
+ *   `FragmentByKind<K>` handler table.
  */
 import type { Fragment, FragmentKind, FragmentByKind } from '../../fragments/index.js';
 

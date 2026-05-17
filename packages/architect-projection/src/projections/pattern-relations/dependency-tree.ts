@@ -30,7 +30,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects a rooted dependency tree with bounded depth, cycle protection, and optional implementation dependencies.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

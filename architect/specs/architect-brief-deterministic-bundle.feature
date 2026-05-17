@@ -4,7 +4,7 @@
 @architect-product-area:DataAPI
 @architect-uses:ValueTransferState,SessionContextProjection,MCPToolRegistry,PatternGraphCliSubcommands
 @architect-bounded-context:api
-@architect-see-also:ModelEnrichedDataAPI,ADR006SingleReadModelArchitecture,ADR005CodecRendererSeparation
+@architect-see-also:ModelEnrichedDataAPI,ADR006SingleReadModelArchitecture,ADR005CodecBasedMarkdownRendering
 Feature: ArchitectBriefDeterministicBundle
 
   **Problem:**

@@ -7,7 +7,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Houses the shared governance helper schemas for decisions, validation, taxonomy, FSMs, tags, and format types.
  */
 import { z } from 'zod';
 

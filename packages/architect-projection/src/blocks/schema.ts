@@ -62,7 +62,11 @@ export type ListBlock = z.infer<typeof ListBlockSchema>;
 
 export const CodeBlockSchema = z.strictObject({
   type: z.literal('code'),
-  language: z.string().optional(),
+  language: z
+    .string()
+    .regex(/^[A-Za-z0-9_+\-.]*$/u, 'language must be identifier-shaped')
+    .max(64)
+    .optional(),
   content: z.string(),
 });
 export type CodeBlock = z.infer<typeof CodeBlockSchema>;

@@ -5,9 +5,7 @@
  * @architect-role:contract
  * @architect-bounded-context:operational-insights
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Defines the `OverviewDigest` fragment shape for delivery progress, active phase counts, blocking patterns, and CLI hints.
  */
 import { z } from 'zod';
 

@@ -7,7 +7,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the ReleaseNotesDigest fragment shape for changelog-style release
+*   bundles.
  */
 import { z } from 'zod';
 

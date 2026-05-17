@@ -5,9 +5,7 @@
  * @architect-role:contract
  * @architect-bounded-context:execution-context
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Defines the `FileReadingList` fragment shape for the primary, dependency, and neighbor files used to read a pattern.
  */
 import { z } from 'zod';
 

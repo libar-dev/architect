@@ -29,7 +29,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the outgoing dependency edge set for one pattern as stable `DependencyEdge` rows.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

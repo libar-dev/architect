@@ -7,7 +7,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `DecisionCatalog` fragment shape that collects normalized decision records for a governance surface.
  */
 import { z } from 'zod';
 

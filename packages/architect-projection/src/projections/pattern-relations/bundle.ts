@@ -8,7 +8,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects a pattern bundle entry and exposes parse-and-project option handling for bundle mode and include selection.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';

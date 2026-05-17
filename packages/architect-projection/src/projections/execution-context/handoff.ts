@@ -28,7 +28,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the handoff record used to share completed work, blockers, and next-session context.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
