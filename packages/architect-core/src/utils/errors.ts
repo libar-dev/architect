@@ -20,3 +20,19 @@ export function parseOrThrow<TSchema extends z.ZodType>(
 ): z.infer<TSchema> {
   return parseAtBoundary(schema, raw, context);
 }
+
+export function exitWithErrorMessage(message: string, exitCode = 1): never {
+  process.stderr.write(`${message}\n`);
+  process.exit(exitCode);
+}
+
+export function exitWithProcessError(error: unknown, exitCode = 1): never {
+  const message = error instanceof Error ? error.message : String(error);
+  process.stderr.write(`Error: ${message}\n`);
+
+  if (process.env['DEBUG'] && error instanceof Error && error.stack !== undefined) {
+    process.stderr.write(`Stack trace: ${error.stack}\n`);
+  }
+
+  process.exit(exitCode);
+}

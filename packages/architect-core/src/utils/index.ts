@@ -8,7 +8,7 @@ export {
 export { groupBy } from './collection-utils.js';
 export { generatePatternId } from './id-utils.js';
 export { parseMarkdownTableRows } from './parse-markdown-table-rows.js';
-export { formatZodError, parseOrThrow } from './errors.js';
+export { exitWithErrorMessage, exitWithProcessError, formatZodError, parseOrThrow } from './errors.js';
 export {
   readPackageMetadata,
   resolveInvocationDir,

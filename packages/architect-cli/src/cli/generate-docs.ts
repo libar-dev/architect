@@ -37,6 +37,7 @@ import {
   resolveInvocationDir,
 } from './runtime-helpers.js';
 import { createCliProjectionContext } from './projection-context.js';
+import { handleCliError } from './error-handler.js';
 
 interface ParsedArgs {
   readonly help: boolean;
@@ -657,6 +658,5 @@ async function main(): Promise<void> {
 }
 
 void main().catch((error: unknown) => {
-  process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
-  process.exit(error instanceof BoundaryParseError ? 2 : 1);
+  handleCliError(error, error instanceof BoundaryParseError ? 2 : 1);
 });

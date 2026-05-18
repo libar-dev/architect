@@ -23,7 +23,7 @@
  * - When checking if an unknown error is a DocError
  */
 
-import type { DocError } from '@libar-dev/architect-core';
+import { exitWithErrorMessage, exitWithProcessError, type DocError } from '@libar-dev/architect-core';
 
 function stringifyJsonValue(value: unknown): string {
   if (value === undefined) {
@@ -215,18 +215,8 @@ export function formatDocError(error: DocError): string {
  */
 export function handleCliError(error: unknown, exitCode = 1): never {
   if (isDocError(error)) {
-    // Structured DocError - format with full context
-    console.error(formatDocError(error));
-  } else if (error instanceof Error) {
-    // Standard Error - use message and optionally stack
-    console.error('Error:', error.message);
-    if (process.env['DEBUG']) {
-      console.error('Stack trace:', error.stack);
-    }
-  } else {
-    // Unknown error type - stringify
-    console.error('Error:', String(error));
+    return exitWithErrorMessage(formatDocError(error), exitCode);
   }
 
-  process.exit(exitCode);
+  return exitWithProcessError(error, exitCode);
 }

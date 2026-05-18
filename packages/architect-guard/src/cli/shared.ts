@@ -21,19 +21,6 @@ export function printVersionAndExit(cliName: string): never {
   process.exit(0);
 }
 
-export function handleCliError(error: unknown, exitCode = 1): never {
-  if (error instanceof Error) {
-    console.error('Error:', error.message);
-    if (process.env['DEBUG']) {
-      console.error('Stack trace:', error.stack);
-    }
-  } else {
-    console.error('Error:', String(error));
-  }
-
-  process.exit(exitCode);
-}
-
 export function isDirectCliEntrypoint(metaUrl: string): boolean {
   const argv1 = process.argv[1];
   return argv1 !== undefined && metaUrl === pathToFileURL(argv1).href;

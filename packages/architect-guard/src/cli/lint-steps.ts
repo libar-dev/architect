@@ -13,7 +13,8 @@
 // See src/cli/error-handler.ts for the unified handler.
 // ────────────────────────────────────────────────────────────────────────
 
-import { printVersionAndExit, handleCliError, isDirectCliEntrypoint } from './shared.js';
+import { exitWithProcessError } from '@libar-dev/architect-core';
+import { printVersionAndExit, isDirectCliEntrypoint } from './shared.js';
 import { runStepLint } from '../lint/steps/index.js';
 import { formatPretty, formatJson, hasFailures } from '../lint/engine.js';
 
@@ -215,7 +216,7 @@ function main(): void {
     const failed = hasFailures(summary, config.strict);
     process.exit(failed ? 1 : 0);
   } catch (error) {
-    handleCliError(error, 1);
+    exitWithProcessError(error, 1);
   }
 }
 

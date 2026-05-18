@@ -32,10 +32,14 @@
 // See src/cli/error-handler.ts for the unified handler.
 // ────────────────────────────────────────────────────────────────────────
 
-import { printVersionAndExit, handleCliError, isDirectCliEntrypoint } from './shared.js';
-import { getPatternName, getRelationships } from '@libar-dev/architect-core';
-import { scanPatterns } from '@libar-dev/architect-core';
-import { scanGherkinFiles } from '@libar-dev/architect-core';
+import {
+  exitWithProcessError,
+  getPatternName,
+  getRelationships,
+  scanGherkinFiles,
+  scanPatterns,
+} from '@libar-dev/architect-core';
+import { printVersionAndExit, isDirectCliEntrypoint } from './shared.js';
 import {
   loadConfig,
   applyProjectSourceDefaults,
@@ -915,7 +919,7 @@ async function main(): Promise<void> {
       process.exit(0);
     }
   } catch (error) {
-    handleCliError(error, 1);
+    exitWithProcessError(error, 1);
   }
 }
 
@@ -929,6 +933,6 @@ export async function runValidatePatternsCli(
 
 if (isDirectCliEntrypoint(import.meta.url)) {
   void main().catch((error: unknown) => {
-    handleCliError(error, 1);
+    exitWithProcessError(error, 1);
   });
 }

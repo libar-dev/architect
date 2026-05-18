@@ -27,9 +27,13 @@
 // See src/cli/error-handler.ts for the unified handler.
 // ────────────────────────────────────────────────────────────────────────
 
-import { printVersionAndExit, handleCliError, isDirectCliEntrypoint } from './shared.js';
-import { formatConfigError, loadProjectConfig } from '@libar-dev/architect-core';
-import { buildPatternGraph } from '@libar-dev/architect-core';
+import {
+  buildPatternGraph,
+  exitWithProcessError,
+  formatConfigError,
+  loadProjectConfig,
+} from '@libar-dev/architect-core';
+import { printVersionAndExit, isDirectCliEntrypoint } from './shared.js';
 import {
   deriveProcessState,
   detectStagedChanges,
@@ -383,7 +387,7 @@ async function main(): Promise<void> {
 
     process.exit(failed ? 1 : 0);
   } catch (error) {
-    handleCliError(error, 1);
+    exitWithProcessError(error, 1);
   }
 }
 

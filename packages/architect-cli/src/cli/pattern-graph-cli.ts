@@ -39,6 +39,7 @@ import {
 } from './pattern-graph-cli-commands.js';
 import { parseIntegerValue, parseSessionTypeValue } from './commands/_shared/schemas.js';
 import { printCommandHelp, printGlobalHelp, printVersion } from './commands/_shared/help.js';
+import { handleCliError } from './error-handler.js';
 import { buildCliContext, writeDryRun } from './pattern-graph-cli-runtime.js';
 import { ParsedArgsSchema, type ParsedArgs } from './pattern-graph-cli-types.js';
 import { resolveCliBaseDirArg, resolveInvocationDir } from './runtime-helpers.js';
@@ -269,6 +270,5 @@ async function main(): Promise<void> {
 }
 
 void main().catch((error: unknown) => {
-  process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
-  process.exit(1);
+  handleCliError(error, 1);
 });

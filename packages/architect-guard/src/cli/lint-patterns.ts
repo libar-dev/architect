@@ -26,11 +26,16 @@
 // See src/cli/error-handler.ts for the unified handler.
 // ────────────────────────────────────────────────────────────────────────
 
-import { printVersionAndExit, handleCliError, isDirectCliEntrypoint } from './shared.js';
-import { scanPatterns } from '@libar-dev/architect-core';
-import { ScannerConfigSchema } from '@libar-dev/architect-core';
-import { loadConfig, formatConfigError } from '@libar-dev/architect-core';
-import type { DocDirective, LintViolation } from '@libar-dev/architect-core';
+import {
+  exitWithProcessError,
+  formatConfigError,
+  loadConfig,
+  ScannerConfigSchema,
+  scanPatterns,
+  type DocDirective,
+  type LintViolation,
+} from '@libar-dev/architect-core';
+import { printVersionAndExit, isDirectCliEntrypoint } from './shared.js';
 import {
   defaultRules,
   filterRulesBySeverity,
@@ -316,7 +321,7 @@ async function main(): Promise<void> {
     if (config.format === 'json') {
       const jsonResult = formatJson(summary);
       if (!jsonResult.ok) {
-        handleCliError(jsonResult.error, 1);
+        exitWithProcessError(jsonResult.error, 1);
       }
       process.stdout.write(`${jsonResult.value}\n`);
     } else {
@@ -327,7 +332,7 @@ async function main(): Promise<void> {
     // Determine exit code
     process.exit(hasFailures(summary, config.strict) ? 1 : 0);
   } catch (error) {
-    handleCliError(error, 1);
+    exitWithProcessError(error, 1);
   }
 }
 
