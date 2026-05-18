@@ -26,5 +26,8 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+      - run: pnpm validate:all
+      - run: pnpm docs:all
+      - run: pnpm architect:query -- arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict
       - run: pnpm --filter @libar-dev/architect-projection test:perf
       - run: pnpm audit:subtractive
