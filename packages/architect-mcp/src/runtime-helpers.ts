@@ -1,38 +1,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-export interface PackageMetadata {
-  readonly name: string;
-  readonly version: string;
-}
+import {
+  readPackageMetadata,
+  resolveInvocationDir,
+  type PackageMetadata,
+} from '@libar-dev/architect-core';
+
+export type { PackageMetadata } from '@libar-dev/architect-core';
 
 export function readMcpPackageMetadata(): PackageMetadata {
-  return JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
-    name: string;
-    version: string;
-  };
-}
-
-export function resolveInvocationDir(): string {
-  // process.cwd() is canonical so execFile({ cwd }) embedding is respected.
-  // INIT_CWD and PWD remain as fallbacks if cwd resolution throws (rare).
-  try {
-    const cwd = process.cwd();
-    if (cwd.length > 0) {
-      return cwd;
-    }
-  } catch {
-    /* fall through to env fallbacks */
-  }
-  const initCwd = process.env['INIT_CWD'];
-  if (initCwd !== undefined && initCwd.length > 0) {
-    return initCwd;
-  }
-  const pwd = process.env['PWD'];
-  if (pwd !== undefined && pwd.length > 0) {
-    return pwd;
-  }
-  throw new Error('resolveInvocationDir: unable to resolve invocation directory');
+  return readPackageMetadata(new URL('../package.json', import.meta.url));
 }
 
 export function resolveMcpBaseDirArg(value: string): string {

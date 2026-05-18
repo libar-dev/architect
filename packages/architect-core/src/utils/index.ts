@@ -10,6 +10,12 @@ export { generatePatternId } from './id-utils.js';
 export { parseMarkdownTableRows } from './parse-markdown-table-rows.js';
 export { formatZodError, parseOrThrow } from './errors.js';
 export {
+  readPackageMetadata,
+  resolveInvocationDir,
+  runBuiltPackageEntrypoint,
+  type PackageMetadata,
+} from './runtime-helpers.js';
+export {
   assertHasValue,
   assertNoNullBytes,
   hasNullByte,

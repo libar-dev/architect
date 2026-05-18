@@ -529,11 +529,6 @@ export function extractPatternTags(
       continue;
     }
 
-    if (tagName === 'arch-role' || tagName === 'arch-context' || tagName === 'arch-layer') {
-      deprecatedTags.push(normalized);
-      continue;
-    }
-
     if (definition === undefined) continue;
 
     const key = definition.metadataKey ?? kebabToCamel(tagName);

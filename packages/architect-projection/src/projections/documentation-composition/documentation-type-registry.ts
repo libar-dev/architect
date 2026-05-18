@@ -52,15 +52,6 @@ export type SupportedDocumentationTypeMetadata = Readonly<
 
 export type DocumentationTypeMetadata = SupportedDocumentationTypeMetadata;
 
-/**
- * Documentation-type registry — closed dispatch table for legacy doc-gen.
- *
- * **DO NOT ADD ENTRIES HERE.** New documentation surfaces must arrive as
- * `DocDefinition` instances via the upcoming doc-gen consolidation campaign
- * (see `.pr-coordination/PROPOSED-DESIGN.md`). This module exists only to
- * carry the 12 pre-campaign entries until they migrate; it will be deleted
- * once the campaign lands.
- */
 const DOCUMENTATION_TYPE_REGISTRY: readonly SupportedDocumentationTypeMetadata[] =
   SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES.map((identity) =>
     composeSupportedDocumentationTypeMetadata(identity),

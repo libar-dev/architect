@@ -340,14 +340,6 @@ function parseDirective(
     if (deprecatedFlagTags.has(tag)) deprecatedTags.push(tag);
   }
 
-  const legacyArchRole = extractSingleValue(commentText, `${registry.tagPrefix}arch-role`);
-  const legacyArchContext = extractSingleValue(commentText, `${registry.tagPrefix}arch-context`);
-  const legacyArchLayer = extractSingleValue(commentText, `${registry.tagPrefix}arch-layer`);
-  if (legacyArchRole) deprecatedTags.push(`${registry.tagPrefix}arch-role:${legacyArchRole}`);
-  if (legacyArchContext)
-    deprecatedTags.push(`${registry.tagPrefix}arch-context:${legacyArchContext}`);
-  if (legacyArchLayer) deprecatedTags.push(`${registry.tagPrefix}arch-layer:${legacyArchLayer}`);
-
   const whenToUse = extractWhenToUse(commentText, registry.fileOptInTag);
 
   const descriptionLines: string[] = [];
