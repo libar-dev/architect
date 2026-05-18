@@ -46,3 +46,6 @@ pnpm-debug.log*
 _ideation/
 _pr-review/
 _working-docs/
+
+# Pi Agent state
+.pi/
