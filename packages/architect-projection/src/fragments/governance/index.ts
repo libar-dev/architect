@@ -11,7 +11,6 @@ export type { DecisionRecord } from './decision-record.js';
 export {
   TaxonomyDigestCountSummarySchema,
   TaxonomyDigestSchema,
-  summarizeTaxonomyDigest,
 } from './taxonomy-digest.js';
 export type { TaxonomyDigest, TaxonomyDigestCountSummary } from './taxonomy-digest.js';
 export { ValidationRuleDigestSchema } from './validation-rule-digest.js';

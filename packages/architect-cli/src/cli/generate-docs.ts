@@ -8,7 +8,6 @@ import {
   buildPatternGraph,
   type BuildResult,
   createDefaultResolvedConfig,
-  createPackageResolver,
   findConfigFile,
   isProjectConfig,
   loadProjectConfig,
@@ -37,6 +36,7 @@ import {
   resolveCliBaseDirArg,
   resolveInvocationDir,
 } from './runtime-helpers.js';
+import { createCliProjectionContext } from './projection-context.js';
 
 interface ParsedArgs {
   readonly help: boolean;
@@ -384,22 +384,6 @@ async function buildGraph(config: ResolvedConfig, baseDir: string): Promise<Buil
   return result.value;
 }
 
-function createProjectionContext(
-  config: ResolvedConfig,
-  graph: Awaited<ReturnType<typeof buildGraph>>['graph'],
-  projectionFilter: ProjectionFilter | undefined,
-): ProjectionContext {
-  return {
-    graph,
-    packageResolver: createPackageResolver(config.project.packages),
-    ...(projectionFilter !== undefined ? { projectionFilter } : {}),
-    ...(config.project.project !== undefined ? { projectMetadata: config.project.project } : {}),
-    ...(config.project.tagExampleOverrides !== undefined
-      ? { tagExampleOverrides: config.project.tagExampleOverrides }
-      : {}),
-  };
-}
-
 function renderProjectionDocument(
   context: ProjectionContext,
   generator: ProjectionGenerator,
@@ -579,11 +563,17 @@ async function main(): Promise<void> {
     args.generators.length > 0 ? args.generators : effectiveConfig.project.generators;
   const requestedGenerators = resolveRequestedGenerators(requestedGeneratorNames);
   const build = await buildGraph(effectiveConfig, args.baseDir);
-  const projectionContext = createProjectionContext(
-    effectiveConfig,
-    build.graph,
-    args.projectionFilter,
-  );
+  const projectionContext = createCliProjectionContext({
+    graph: build.graph,
+    packageEntries: effectiveConfig.project.packages,
+    ...(args.projectionFilter !== undefined ? { projectionFilter: args.projectionFilter } : {}),
+    ...(effectiveConfig.project.project !== undefined
+      ? { projectMetadata: effectiveConfig.project.project }
+      : {}),
+    ...(effectiveConfig.project.tagExampleOverrides !== undefined
+      ? { tagExampleOverrides: effectiveConfig.project.tagExampleOverrides }
+      : {}),
+  });
   const overwrite = args.overwrite || effectiveConfig.project.output.overwrite;
 
   // Phase 1: render each generator's projection. Rendering is synchronous

@@ -14,6 +14,7 @@
 import type { ProjectionContext } from '../../context/projection-context.js';
 import { projectSingle, type ProjectionBundle } from '../../fragments/base.js';
 import type { OpenQuestionList } from '../../fragments/pattern-relations/index.js';
+import { parseAndProject } from '../_shared/parse-and-project.internal.js';
 
 import {
   buildOpenQuestionList,
@@ -31,9 +32,9 @@ export function projectOpenQuestionList(
   return projectSingle(buildOpenQuestionList(context, options));
 }
 
-export function parseAndProjectOpenQuestionList(
-  context: ProjectionContext,
-  rawOptions: unknown = {},
-): ProjectionBundle<OpenQuestionList> {
-  return projectOpenQuestionList(context, OpenQuestionListOptionsSchema.parse(rawOptions));
-}
+export const parseAndProjectOpenQuestionList = parseAndProject(
+  OpenQuestionListOptionsSchema,
+  projectOpenQuestionList,
+  'parseAndProjectOpenQuestionList',
+  {},
+);

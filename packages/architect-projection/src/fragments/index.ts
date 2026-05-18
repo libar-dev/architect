@@ -40,7 +40,6 @@ export {
   TaxonomyDigestCountSummarySchema,
   TaxonomyDigestSchema,
   ValidationRuleDigestSchema,
-  summarizeTaxonomyDigest,
 } from './governance/index.js';
 export {
   DeliverableManifestSchema,

@@ -5,7 +5,6 @@ import path from 'node:path';
 import {
   buildPatternGraph,
   createArchitect,
-  createPackageResolver,
   createPatternGraphAPI,
   findConfigFile,
   findFilesToScan,
@@ -13,13 +12,15 @@ import {
   loadProjectConfig,
   resolveWorkspaceSources,
   WORKSPACE_TAG_REGISTRY,
-  PatternGraphSchema,
-  type BuildResult,
   type QueryMetadataExtra,
   type TagRegistry,
 } from '@libar-dev/architect-core';
 import type { ProjectionContext } from '@libar-dev/architect-projection';
 import { createValidationMetadata, stringifyJsonValue } from './commands/_shared/output.js';
+import {
+  createCliProjectionContext,
+  createCliTaxonomyProjectionContext,
+} from './projection-context.js';
 import {
   CacheRecordSchema,
   type CacheRecord,
@@ -140,16 +141,6 @@ function writeCacheRecord(cacheFilePath: string, record: CacheRecord): void {
   fs.writeFileSync(cacheFilePath, `${stringifyJsonValue(record)}\n`, 'utf8');
 }
 
-function createProjectionContext(
-  graph: BuildResult['graph'],
-  sourcePlan: SourcePlan,
-): ProjectionContext {
-  return {
-    graph,
-    packageResolver: createPackageResolver(sourcePlan.packages),
-  };
-}
-
 async function resolveTagRegistryForTaxonomy(args: ParsedArgs): Promise<TagRegistry> {
   const workspaceSources = resolveWorkspaceSources(args.baseDir);
   const hasWorkspaceSources =
@@ -174,30 +165,7 @@ async function resolveTagRegistryForTaxonomy(args: ParsedArgs): Promise<TagRegis
 
 export async function buildTaxonomyProjectionContext(args: ParsedArgs): Promise<ProjectionContext> {
   const tagRegistry = await resolveTagRegistryForTaxonomy(args);
-
-  const graph: ProjectionContext['graph'] = {
-    patterns: [],
-    tagRegistry: { ...tagRegistry, $schema: tagRegistry.$schema ?? '' },
-    byStatus: { candidate: [], roadmap: [], active: [], completed: [], deferred: [] },
-    byNormalizedStatus: { completed: [], active: [], planned: [], candidate: [] },
-    byMaturity: {},
-    byPhase: [],
-    byQuarter: {},
-    byRole: {},
-    bySourceType: { typescript: [], gherkin: [], roadmap: [], prd: [] },
-    byProductArea: {},
-    counts: { completed: 0, active: 0, planned: 0, candidate: 0, total: 0 },
-    phaseCount: 0,
-    roleCount: 0,
-    relationshipIndex: {},
-  };
-
-  PatternGraphSchema.parse(graph);
-
-  return {
-    graph,
-    packageResolver: createPackageResolver([]),
-  };
+  return createCliTaxonomyProjectionContext(tagRegistry);
 }
 
 export async function buildCliContext(args: ParsedArgs): Promise<CliContext> {
@@ -243,7 +211,10 @@ export async function buildCliContext(args: ParsedArgs): Promise<CliContext> {
     build: result.value,
     graph: result.value.graph,
     api: createPatternGraphAPI(result.value.graph),
-    projection: createProjectionContext(result.value.graph, sourcePlan),
+    projection: createCliProjectionContext({
+      graph: result.value.graph,
+      packageEntries: sourcePlan.packages,
+    }),
     metadata: {
       validation: createValidationMetadata(result.value),
       cache: cacheMetadata,

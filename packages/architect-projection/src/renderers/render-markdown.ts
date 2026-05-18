@@ -34,9 +34,9 @@ import {
   type TableBlock,
 } from '../blocks/schema.js';
 import { slugForFilename } from '../_internal/slug.js';
+import { summarizeTaxonomyDigest } from '../projections/governance/taxonomy-digest.js';
 import {
   isBundle,
-  summarizeTaxonomyDigest,
   type ArchitectureDiagram,
   type BusinessRule,
   type BusinessRuleSet,

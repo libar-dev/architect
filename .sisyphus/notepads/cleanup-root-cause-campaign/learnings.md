@@ -1,5 +1,14 @@
 ## Session Notes
 
+## 2026-05-18 — Cluster 4 seam map
+- `ProjectionContextSchema` is already strict and readonly at `packages/architect-projection/src/context/projection-context.ts:83-92`; the shared parse-at-boundary wrapper lives at `packages/architect-projection/src/projections/_shared/parse-and-project.internal.ts:22-36`.
+- The current projection entrypoint owners are split across `packages/architect-projection/src/projections/pattern-relations/index.ts:6-30`, `execution-context/index.ts:5-16`, `governance/index.ts:4-19`, and `documentation-composition/index.ts:4-37`; the top-level public barrel still re-exports raw `project*` functions at `packages/architect-projection/src/projections/index.ts:9-93`.
+- The open-question-list outlier still parses raw options directly in `packages/architect-projection/src/projections/pattern-relations/open-question-list.ts:27-39`.
+- Renderer disclosure ownership is still split: the public options schema exposes `disclosureSpec` in `packages/architect-projection/src/renderers/types.ts:43-69`, and `render-markdown.ts:444-453,512-565` still lets per-call disclosure override bundle routing.
+- Documentation registry replacement work is not yet landed; `packages/architect-projection/src/projections/documentation-composition/documentation-bundle.internal.ts:63-67` still only contains the `DocDefinition.build(graph)` deletion note, and no implementation exists in-tree.
+- `summarizeTaxonomyDigest` is still exported from both `packages/architect-projection/src/fragments/governance/taxonomy-digest.ts:33-45` and `packages/architect-projection/src/projections/governance/taxonomy-digest.ts:45-70`.
+- The projection and CLI source trees were clean under LSP diagnostics when checked (`packages/architect-projection/src`, `packages/architect-cli/src`, and `packages/architect-projection/tests` all reported 0 errors).
+
 ## 2026-05-18T07:05:03.633Z Task: plan-risk-review
 - Oracle review: main orchestration risk is oversized Cluster 1 and Cluster 4; treat cluster boundaries as hard stop/replan gates rather than stretching scope.
 - Run targeted graph/doc checks inside any cluster that edits Architect State (`architect/specs`, `architect/decisions`, docs sources, or dangling baselines), not only in Cluster 7.
@@ -80,3 +89,9 @@
 - PatternGraphSchema now behaves as a required graph/read-model contract end-to-end: core step tests no longer treat relationshipIndex as optional, and the read-api step fixture always builds the canonical index instead of accepting an omitted seam.
 - The malformedPatterns and malformedPatternCount lane was dead contract residue after S1 and S2 tightened parsing at the extraction boundary; removing it required trimming both the core pipeline validation shape and the root CLI metadata feature so the observable envelope now matches the surviving seam signals: danglingReferenceCount, unknownStatusCount, and warningCount.
 - Because packages/architect-cli/tsconfig.json sets disableSourceOfProjectReferenceRedirect to true, CLI typecheck reads architect-core built declarations instead of live source. After changing exported core metadata types, a clean rebuild of packages/architect-core was required before CLI typecheck reflected the new seam contract.
+
+## 2026-05-18 — Cluster 4 seam completion
+- `packages/architect-projection/src/projections/pattern-relations/open-question-list.ts` now matches the other validated projection entrypoints by delegating raw option parsing to the shared `parseAndProject(...)` wrapper instead of calling `OpenQuestionListOptionsSchema.parse(...)` inline.
+- CLI projection-context ownership is now centralized in `packages/architect-cli/src/cli/projection-context.ts`; both `pattern-graph-cli-runtime.ts` and `generate-docs.ts` build `ProjectionContext` values through the same helper instead of carrying their own local factories.
+- `summarizeTaxonomyDigest` now lives in `packages/architect-projection/src/projections/governance/taxonomy-digest.ts`, while the fragment barrels under `src/fragments/**` reverted to schema/type-only ownership.
+- The projection perf harness is now script-addressable from `packages/architect-projection/package.json` via `test:perf` (report run) and `test:perf:baseline` (explicit baseline comparison), so the current tree exposes both the report generator and the baseline checker without forcing the noisier baseline gate into the default package perf command.

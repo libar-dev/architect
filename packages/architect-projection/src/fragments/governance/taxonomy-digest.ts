@@ -29,17 +29,3 @@ export const TaxonomyDigestSchema = z.strictObject({
 
 export type TaxonomyDigest = z.infer<typeof TaxonomyDigestSchema>;
 export type TaxonomyDigestCountSummary = z.infer<typeof TaxonomyDigestCountSummarySchema>;
-
-export function summarizeTaxonomyDigest(digest: TaxonomyDigest): TaxonomyDigestCountSummary {
-  const allEntries = digest.tags.flatMap((group) => group.entries);
-  const roles = allEntries.filter((entry) => entry.kind === 'role').length;
-  const metadata = allEntries.filter((entry) => entry.kind === 'metadata').length;
-  const aggregation = allEntries.filter((entry) => entry.kind === 'aggregation').length;
-
-  return {
-    roles,
-    metadata,
-    aggregation,
-    total: roles + metadata + aggregation,
-  };
-}

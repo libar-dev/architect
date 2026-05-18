@@ -34,7 +34,10 @@
 
 import type { ProjectionContext } from '../../context/projection-context.js';
 import { projectSingle, type ProjectionBundle } from '../../fragments/base.js';
-import type { TaxonomyDigest } from '../../fragments/governance/index.js';
+import type {
+  TaxonomyDigest,
+  TaxonomyDigestCountSummary,
+} from '../../fragments/governance/index.js';
 import {
   TaxonomyDigestOptionsSchema,
   buildTaxonomyDigest,
@@ -43,7 +46,20 @@ import {
 import { parseAndProject } from '../_shared/parse-and-project.internal.js';
 
 export { TaxonomyDigestOptionsSchema } from './taxonomy-digest.internal.js';
-export { summarizeTaxonomyDigest } from '../../fragments/governance/index.js';
+
+export function summarizeTaxonomyDigest(digest: TaxonomyDigest): TaxonomyDigestCountSummary {
+  const allEntries = digest.tags.flatMap((group) => group.entries);
+  const roles = allEntries.filter((entry) => entry.kind === 'role').length;
+  const metadata = allEntries.filter((entry) => entry.kind === 'metadata').length;
+  const aggregation = allEntries.filter((entry) => entry.kind === 'aggregation').length;
+
+  return {
+    roles,
+    metadata,
+    aggregation,
+    total: roles + metadata + aggregation,
+  };
+}
 
 export function projectTaxonomyDigest(
   context: ProjectionContext,
