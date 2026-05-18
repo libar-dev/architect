@@ -58,7 +58,7 @@ function createPatternDetailFixture(patternName = 'RenderUiProjection'): Pattern
       enables: ['StudioProjectionConsumption'],
       uses: ['BlockSchema'],
       usedBy: ['StudioProjectionConsumption'],
-      implementsPatterns: ['PerspectiveAwareProjections'],
+      implementsPatterns: ['SessionContextProjection'],
       implementedBy: [
         {
           name: 'renderUi',

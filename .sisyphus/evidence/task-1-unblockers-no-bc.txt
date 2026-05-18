@@ -1,11 +1,15 @@
-Scenario: Hottest unblockers are not papered over with BC shims
+# Task 1 — No-BC verification
 
-Checks run:
-- `rg -n "@deprecated|kept for compat|eslint-disable|@ts-ignore|@ts-expect-error" <touched files>`
-- manual review of the Cluster 1 diff stat and changed-file set
+## Commands and checks
+- lsp_diagnostics on all touched files: PASS (0 diagnostics)
+- GIT_MASTER=1 git diff --check -- <cluster files>: PASS
+- grep for `@deprecated|kept for compat|eslint-disable|@ts-ignore|@ts-expect-error` in touched projection test files: no matches
+- inspected patch via `GIT_MASTER=1 git diff --unified=0 -- <cluster files>`
 
-Observed results:
-- The touched-file marker scan returned no matches.
-- No compatibility aliases, `@deprecated` bridges, `eslint-disable`, `@ts-ignore`, or `@ts-expect-error` markers were introduced.
-- The FSM bridge landed as direct exports/schema anchors, not wrapper shims.
-- The cleanup removed dead public surface (`cli-schema.ts`, `architect-cli` root JS API, dead barrel exports, stale Architect-State artifacts) instead of preserving fallback paths.
+## Findings
+- No compatibility shims, wrapper aliases, suppression comments, or deprecation markers were added in the Cluster 1 diff.
+- The only `@deprecated` grep hit in `docs/reverse-engineering/decision-rationale.md` is an existing doctrine table entry explaining the policy; it was not introduced by this change.
+- No whitespace or merge-marker issues exist in the Cluster 1 patch.
+
+## Scope guard
+- `AGENTS.md` is independently modified in the worktree and has a pre-existing trailing-whitespace diff. It is outside Cluster 1 scope and is excluded from the commit.

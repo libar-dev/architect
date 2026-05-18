@@ -95,9 +95,9 @@ The nine on-disk decisions, summarized. Each lives in `architect/decisions/<id>-
 
 ### ADR-007 — Coordinated taxonomy redesign
 
-- **Status:** accepted / **active** (the only currently-active ADR) · **Category:** architecture · **Uses ADR-001, EnforcementConfiguration, PerspectiveAwareProjections.**
+- **Status:** accepted / **active** (the only currently-active ADR) · **Category:** architecture · **Uses ADR-001 and PDR-005.**
 - **Context:** Supersedes three independently-designed specs (CandidateStatusExtraction, TrackTagSupport, TaxonomyPresetArchitecture) whose design overlap revealed redundancy. Also fixes two silent drops in the extraction pipeline making candidate specs invisible to the PatternGraph, and removes a category system where 10 of 21 DDD categories had zero usage in a 242K-LOC project.
-- **Decision:** Replace the binary track tag with a maturity axis (`idea` / `plan` / `design` / `executable`); replace categories+presets with a unified role system; add `EnforcementConfiguration` for ProcessGuard; add `PerspectiveAwareProjections`; migrate `derive-state.ts` and `DoDValidator` to the PatternGraph; add Zod output schemas for MCP tools. **"All seven changes ship as ONE coordinated breaking change. Three internal consumers, no public users, pre-release only. All consumers update simultaneously."**
+- **Decision:** Supersede the earlier overlapping specs with a coordinated five-spec redesign: `StatusMaturityExtraction`, `UnifiedRoleSystem`, `ProcessGuardPatternGraphMigration`, `ValidatePatternsPipelineConsolidation`, and `McpOutputSchemaValidation`. Replace the binary track tag with a maturity axis (`idea` / `plan` / `design` / `executable`), replace categories+presets with a unified role system, keep ProcessGuard on the explicit four-state FSM contract, and finish the remaining phase-49 work on the current projection surface. **"All five changes ship as ONE coordinated breaking change. Three internal consumers, no public users, pre-release only. All consumers update simultaneously."**
 - **Rationale:** Eliminates redundancy, enables coordinated migration without merge conflicts, surfaces silent extraction failures. _"Net simplification — fewer concepts, more capability."_
 - **Consequences:** Larger single-phase scope but smaller long-term surface; tags `arch-context` / `arch-layer` migrate across three consumers.
 

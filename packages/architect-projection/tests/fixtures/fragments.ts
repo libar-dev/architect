@@ -278,81 +278,75 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
   },
   SessionContextBundle: {
     kind: 'SessionContextBundle',
-    patterns: ['PerspectiveAwareProjections'],
+    patterns: ['SessionContextProjection'],
     sessionType: 'implement',
     metadata: [
       {
-        name: 'PerspectiveAwareProjections',
-        status: 'active',
+        name: 'SessionContextProjection',
+        status: 'completed',
         phase: 49,
-        role: 'service',
-        file: 'packages/architect-query/src/api/context-assembler.ts',
-        summary: 'Builds session-oriented context for implementation work.',
+        role: 'projection',
+        file: 'packages/architect-projection/src/projections/execution-context/session-context.ts',
+        summary: 'Builds session-oriented context bundles for planning, design, and implement sessions.',
       },
     ],
-    specFiles: ['architect/specs/perspective-aware-projections.feature'],
-    stubs: [
-      {
-        stubFile: 'architect/stubs/perspectives.stub.ts',
-        targetPath: 'packages/architect-query/src/api/context-assembler.ts',
-        name: 'PerspectiveAwareProjectionsStub',
-      },
-    ],
+    specFiles: ['packages/architect-projection/tests/features/projections/execution-context/context-session.feature'],
+    stubs: [],
     dependencies: [
       {
-        name: 'EnforcementConfiguration',
+        name: 'ExecutionContextProjectionSupport',
         status: 'completed',
-        file: 'packages/architect-core/src/config/enforcement.ts',
-        kind: 'planning',
+        file: 'packages/architect-projection/src/projections/execution-context/execution-context-shared.internal.ts',
+        kind: 'implementation',
       },
     ],
     sharedDependencies: [
       {
-        name: 'EnforcementConfiguration',
-        status: 'completed',
-        file: 'packages/architect-core/src/config/enforcement.ts',
-        kind: 'planning',
+        name: 'ProjectionFragmentContracts',
+        status: 'active',
+        file: 'packages/architect-projection/src/fragments/index.ts',
+        kind: 'implementation',
       },
     ],
     consumers: [
       {
-        name: 'ArchitectMcpServer',
-        status: 'active',
-        file: 'packages/architect-mcp/src/tool-registry.ts',
-        kind: 'implementation',
+        name: 'ArchitectBriefDeterministicBundle',
+        status: 'candidate',
+        file: 'architect/specs/architect-brief-deterministic-bundle.feature',
+        kind: 'planning',
       },
     ],
     architectureNeighbors: [
       {
-        name: 'ContextAssemblerImpl',
-        status: 'active',
-        role: 'service',
-        archContext: 'api',
-        file: 'packages/architect-query/src/api/context-assembler.ts',
+        name: 'ScopeReadinessProjection',
+        status: 'completed',
+        role: 'projection',
+        archContext: 'execution-context',
+        file: 'packages/architect-projection/src/projections/execution-context/scope-readiness.ts',
       },
     ],
     deliverables: [validDeliverable],
     fsm: {
-      currentStatus: 'active',
-      validTransitions: ['completed', 'deferred'],
-      protectionLevel: 'scope',
+      currentStatus: 'completed',
+      validTransitions: [],
+      protectionLevel: 'hard',
     },
     fsmByPattern: [
       {
-        pattern: 'PerspectiveAwareProjections',
+        pattern: 'SessionContextProjection',
         fsm: {
-          currentStatus: 'active',
-          validTransitions: ['completed', 'deferred'],
-          protectionLevel: 'scope',
+          currentStatus: 'completed',
+          validTransitions: [],
+          protectionLevel: 'hard',
         },
       },
     ],
-    testFiles: ['tests/features/query/context.feature'],
+    testFiles: ['packages/architect-projection/tests/features/projections/execution-context/context-session.feature'],
   },
   ScopeReadinessCheck: validScopeReadinessCheck,
   ScopeReadinessReport: {
     kind: 'ScopeReadinessReport',
-    pattern: 'PerspectiveAwareProjections',
+    pattern: 'ScopeReadinessProjection',
     sessionType: 'implement',
     checks: [
       validScopeReadinessCheck,
@@ -377,18 +371,18 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
   },
   HandoffRecord: {
     kind: 'HandoffRecord',
-    pattern: 'PerspectiveAwareProjections',
+    pattern: 'HandoffProjection',
     status: 'active',
     sessionType: 'review',
     completed: [
-      'Projection schema bundle (packages/architect-projection/src/fragments/execution-context)',
+      'Execution-context projection bundle (packages/architect-projection/src/projections/execution-context)',
     ],
     inProgress: [
-      'Projection schema tests (packages/architect-projection/tests/features/fragments/execution-context-schemas.feature)',
+      'Execution-context projection tests (packages/architect-projection/tests/features/projections/execution-context/context-session.feature)',
     ],
     filesModified: [
-      'packages/architect-projection/src/fragments/execution-context/handoff-record.ts',
-      'packages/architect-projection/tests/features/fragments/execution-context-schemas.feature.steps.ts',
+      'packages/architect-projection/src/projections/execution-context/handoff.ts',
+      'packages/architect-projection/tests/features/projections/execution-context/context-session.steps.ts',
     ],
     discovered: [
       'Scope readiness and handoff contracts must align to the plan, not the legacy formatter shape.',
@@ -399,19 +393,19 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
   },
   FileReadingList: {
     kind: 'FileReadingList',
-    pattern: 'PerspectiveAwareProjections',
+    pattern: 'FileReadingListProjection',
     primary: [
-      'packages/architect-query/src/api/context-assembler.ts',
-      'packages/architect-query/src/api/scope-validator.ts',
+      'packages/architect-projection/src/projections/execution-context/session-context.ts',
+      'packages/architect-projection/src/projections/execution-context/scope-readiness.ts',
     ],
-    completedDeps: ['packages/architect-core/src/config/enforcement.ts'],
-    roadmapDeps: ['architect/specs/enforcement-configuration.feature'],
-    architectureNeighbors: ['packages/architect-query/src/api/handoff-generator.ts'],
+    completedDeps: ['packages/architect-projection/src/projections/execution-context/execution-context-shared.internal.ts'],
+    roadmapDeps: ['packages/architect-projection/src/fragments/index.ts'],
+    architectureNeighbors: ['packages/architect-projection/src/projections/execution-context/handoff.ts'],
   },
   Deliverable: validDeliverable,
   DeliverableManifest: {
     kind: 'DeliverableManifest',
-    pattern: 'PerspectiveAwareProjections',
+    pattern: 'SessionContextProjection',
     items: [
       validDeliverable,
       {
@@ -1112,20 +1106,20 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   },
   SessionContextBundle: {
     kind: 'SessionContextBundle',
-    patterns: ['PerspectiveAwareProjections'],
+    patterns: ['SessionContextProjection'],
     sessionType: 'implement',
     metadata: [
       {
-        name: 'PerspectiveAwareProjections',
+        name: 'SessionContextProjection',
         role: 'service',
-        file: 'packages/architect-query/src/api/context-assembler.ts',
+        file: 'packages/architect-projection/src/projections/execution-context/session-context.ts',
         summary: 'Builds session-oriented context for implementation work.',
       },
     ],
     specFiles: [],
     stubs: [],
     dependencies: [],
-    sharedDependencies: ['EnforcementConfiguration'],
+    sharedDependencies: ['ProjectionFragmentContracts'],
     consumers: [],
     architectureNeighbors: [],
     deliverables: [],
@@ -1143,7 +1137,7 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   },
   ScopeReadinessReport: {
     kind: 'ScopeReadinessReport',
-    pattern: 'PerspectiveAwareProjections',
+    pattern: 'ScopeReadinessProjection',
     sessionType: 'planning',
     checks: [
       {
@@ -1160,7 +1154,7 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   },
   HandoffRecord: {
     kind: 'HandoffRecord',
-    pattern: 'PerspectiveAwareProjections',
+    pattern: 'HandoffProjection',
     sessionType: 'review',
     completed: [],
     inProgress: [],
@@ -1170,7 +1164,7 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   },
   FileReadingList: {
     kind: 'FileReadingList',
-    pattern: 'PerspectiveAwareProjections',
+    pattern: 'FileReadingListProjection',
     primary: [],
     completedDeps: [],
     roadmapDeps: [],
@@ -1188,7 +1182,7 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   },
   DeliverableManifest: {
     kind: 'DeliverableManifest',
-    pattern: 'PerspectiveAwareProjections',
+    pattern: 'SessionContextProjection',
     items: [
       {
         kind: 'Deliverable',

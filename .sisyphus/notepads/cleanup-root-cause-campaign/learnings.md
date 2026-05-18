@@ -33,3 +33,26 @@
 - The stale `EnforcementConfiguration` / `PerspectiveAwareProjections` cluster can be removed cleanly by deleting the design/spec/stub artifacts together and trimming only the live Architect-State references (`ADR-001`, `ADR-007`, `McpOutputSchemaValidation`, `ModelEnrichedDataAPI`); no dangling baseline update was needed once those references were rewritten.
 - `packages/architect-cli` can be normalized to a bin-only package by removing the dead `src/index.ts` JS API surface and dropping the root `.` export trio from `package.json`; the bins and tests continue to run through the explicit `./bin/*` entries.
 - The workspace subtractive audit is safe as a non-strict root script plus CI step: it reports all seven required rule families from the repo root, while `pnpm build && pnpm lint && pnpm typecheck && pnpm test` and `pnpm docs:all` stay green.
+
+
+## 2026-05-18 — Cluster 1 blocker locations research
+- FSM core barrel exists at `packages/architect-core/src/validation/fsm/index.ts:1-28`; root core export also forwards it at `packages/architect-core/src/index.ts:204`.
+- `StatusValueSchema` source/re-export chain is `packages/architect-core/src/domain-enums.ts:25-28` → `packages/architect-core/src/validation/fsm/states.ts:41-42` → `packages/architect-core/src/validation/fsm/index.ts:1-9` → `packages/architect-core/src/index.ts:204-245`.
+- `StatusValueSchema` also has the projection alias/re-export at `packages/architect-projection/src/projections/_shared/filter.ts:5-13`, surfaced again by `packages/architect-projection/src/projections/index.ts:1-8` and `packages/architect-projection/src/index.ts:16-23`.
+- `ExtractedPatternDraftSchema` already exists in `packages/architect-core/src/validation-schemas/extracted-pattern.ts:126-134` and is barrel-exported from `packages/architect-core/src/validation-schemas/index.ts:24-34`.
+- `PatternGraphSchema` already exists as a strict schema in `packages/architect-core/src/validation-schemas/pattern-graph.ts:116-135` and is barrel-exported from `packages/architect-core/src/validation-schemas/index.ts:150-163`.
+- `ProjectionContextSchema` already exists in `packages/architect-projection/src/context/projection-context.ts:74-92` and is public via `packages/architect-projection/src/index.ts:23-29`.
+- `RendererOptionsSchema` already exists in `packages/architect-projection/src/renderers/types.ts:107-112` and is public via `packages/architect-projection/src/renderers/index.ts:13-19`.
+
+
+## 2026-05-18 — Cluster 1 CI substrate research
+- `actions/setup-node` officially supports `cache: 'pnpm'` plus `cache-dependency-path` for monorepo/subdirectory lockfiles, and it does **not** cache `node_modules`.
+- pnpm CI guidance says installs switch to frozen-lockfile mode automatically in CI; workspace installs cover all projects, and `pnpm audit --prod` plus `auditConfig.ignoreGhsas` are the current audit knobs.
+- `pnpm/action-setup` supports `cache: true`, multi-lockfile `cache_dependency_path`, and recursive install examples for workspace-style repos.
+- Strong public examples: `sveltejs/kit` uses setup-node pnpm caching + `pnpm install --frozen-lockfile` + `pnpm audit --prod`; `remix-run/remix` uses setup-node pnpm caching + `pnpm install --frozen-lockfile` on PRs.
+
+
+## 2026-05-18 — Cluster 1 stale-reference cleanup
+- Current-tree verification showed the Cluster 1 kernel substrate was already present: root `audit:subtractive`, both GitHub workflows, the FSM/`StatusValueSchema` bridges, removal of `./roles`, and deletion of `packages/architect-core/src/config/cli-schema.ts` plus `packages/architect-cli/src/index.ts`.
+- `pnpm audit:subtractive` already runs from the workspace root and emits all seven required rule families; Cluster 1 work only needed to preserve that scaffold, not reinvent it.
+- The remaining live Cluster 1 residue was stale `PerspectiveAwareProjections` / `EnforcementConfiguration` references in projection fixtures and reverse-engineering docs, so those were retargeted to current execution-context patterns (`SessionContextProjection`, `ScopeReadinessProjection`, `HandoffProjection`, `FileReadingListProjection`) and the real ADR-007/PDR-005 state.
