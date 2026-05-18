@@ -113,19 +113,21 @@ Mixing them up causes the most painful "why doesn't my spec work?" debugging in 
 
 Nine architect skills live under `.agents/skills/`, the single source of truth. Claude Code discovers them via symlinks at `.claude/skills/` (a projection — do not edit there).
 
-Two of the nine are **kernels** that every architect-scoped session loads first (see [Session bootstrap](#session-bootstrap-mandatory) at the bottom of this file); the other seven are intent-specific session skills the router hands off to.
+One **kernel** that every architect-scoped session loads first (see [Session bootstrap](#session-bootstrap-mandatory) at the bottom of this file); 
+the other seven are intent-specific **and are being updated just now, -18th May 26**. **`architect-base`** covers the full context which is
+expa`architect-baseded on in the remaining skills listed below.
 
-| Skill                             | Role       | Intent                                                                                  |
-| --------------------------------- | ---------- | --------------------------------------------------------------------------------------- |
-| `architect-session-router`        | **Kernel** | Detect intent and route to the right session skill; surface `_shared/` doctrine         |
-| `architect-data-api`              | **Kernel** | Canonical reference for CLI + MCP verbs, deterministic gates, JSON shapes, known quirks |
-| `architect-plan-session`          | Session    | Idea/candidate-tier spec authoring                                                      |
-| `architect-design-session`        | Session    | Design-tier spec; runs `scope-validate design`                                          |
-| `architect-implement-spec`        | Session    | Build spec end-to-end; transfer value to annotations + executable Gherkin               |
-| `architect-review-spec`           | Session    | Pre-implementation readiness review of a design spec                                    |
-| `architect-review-implementation` | Session    | Post-merge implementation review; batch spec deletion                                   |
-| `architect-refactor-session`      | Session    | Modify shipped code with no extant design spec                                          |
-| `architect-verify-handoff`        | Session    | Wrap session; capture state and blockers                                                |
+| Skill                                | Role       | Intent                                                                                  |
+| ------------------------------------ | ---------- | --------------------------------------------------------------------------------------- |
+| `architect-base`                     | **Kernel** | Detect intent and route to the right session skill.                                      |
+| ~~`architect-data-api`~~             | Universal  | All mandatory essentials are in the `-base` skill, full details for CLI + MCP verbs.    |
+| ~~`architect-plan-session`~~         | Session    | Idea/candidate-tier spec authoring                                                      |
+| ~~`architect-design-session`~~       | Session    | Design-tier spec; runs `scope-validate design`                                          |
+| ~~`architect-implement-spec`~~       | Session    | Build spec end-to-end; transfer value to annotations + executable Gherkin               |
+| ~~`architect-review-spec`~~          | Session    | Pre-implementation readiness review of a design spec                                    |
+| ~~`architect-review-implementation`~~| Session    | Post-merge implementation review; batch spec deletion                                   |
+| ~~`architect-refactor-session`~~     | Session    | Modify shipped code with no extant design spec                                          |
+| ~~`architect-verify-handoff`~~       | Session    | Wrap session; capture state and blockers                                                |
 
 The router is the entry point for any architect-scoped session. The data-api skill is the reference the router (and every downstream session skill) defers to for the actual verb shapes — every "run this CLI command first" instruction in a session skill ultimately points at `architect-data-api/SKILL.md` §"Pre-flight by session intent". Skill activation is description-based — no hooks, no slash-command bootstrap — which is why the kernel pair is restated in the [Session bootstrap](#session-bootstrap-mandatory) block below.
 
@@ -211,15 +213,203 @@ pnpm architect:guard --staged     # pre-commit gate
 
 ---
 
-## Session bootstrap (mandatory)
+## Session bootstrap with `architect-base` skill (mandatory)
 
-> **Every architect-scoped session in this repo MUST load the two kernel skills before any other work:**
->
-> 1. **`architect-session-router`** — resolves session intent (planning / design / implement / refactor / review / review-implement / handoff), surfaces the relevant `_shared/` doctrine files, and hands off to the matching session skill.
-> 2. **`architect-data-api`** — the canonical reference for the CLI + MCP surface: verb shapes, deterministic gates (`scope-validate`, `query isValidTransition`, `arch dangling --strict`), JSON shapes, parity table, and known quirks.
->
-> Load both before running any architect-scoped `Read` / `Glob` / `Grep`, before invoking any other architect-\_ session skill, and before calling `pnpm architect:query` or any `architect\__` MCP tool. The Data API (CLI / MCP) is the canonical source of truth about patterns, specs, FSM state, and executable features — file scanning is not.
->
-> Harness-agnostic load instruction: if the harness supports skill description-based activation (Claude Code, OpenCode), simply mentioning this section in the system prompt is sufficient — both skill descriptions are written to trigger on the verbs and surface names a session uses. Harnesses without description-based skill activation should inline `.agents/skills/architect-session-router/SKILL.md` and `.agents/skills/architect-data-api/SKILL.md` into their system prompt.
->
-> The router then routes to exactly one downstream session skill; that skill is the only other architect-\* skill the session needs.
+**Every architect-scoped session in this repo MUST load the `architect-base` skill:**
+
+- **`architect-base`**   — covers the full context required for working in the Architect package. Other, skills are configured as needed for speciazlied spec-driven work.
+
+### `architect-base` skill overview
+
+#### We are building Libar Architect in this repo and doogfooding it's functionality
+
+- **The product** — the `@libar-dev/architect-*` package family is the piece of software being in this very repo.
+- **The delivery process** — the architect functionality and the toolchain is used to manage work done in this repo (doogfood).
+
+The **canonical source of truth** is annotated production code + executable Gherkin (`tests/features/`). Everything else is a projection.
+The `architect/` holds **working state**, not the source of truth. It is parsed by `@cucumber/gherkin` for projection / extraction 
+and is explicitly **excluded from TypeScript compile, ESLint, vitest**.
+The `PatternGraph` — the central abstraction and the complete state of the delivery process.
+
+A **pattern** is a named architectural unit (a feature, service, component, contract, codec, spec). 
+The graph nodes are patterns; the edges are typed relationships.
+
+**Tag taxonomy** (verify live via `pnpm architect:query taxonomy --format json`):
+
+- **Identity**: `@architect-pattern:<Name>` (one file owns identity)
+- **State**: `@architect-status:<candidate|roadmap|active|completed|deferred>`
+- **Structure**: `@architect-bounded-context:<context>`, `@architect-role:<closed-enum>`
+- **Edges**: `@architect-uses:<Pattern>` (dependency), `@architect-implements:<Pattern>` (realization, test → production), `@architect-parent:<Pattern>` (hierarchy)
+- **Hierarchy axis**: `@architect-level:<epic|phase|task|slice>` (independent of maturity)
+- **Implementation enrichment** (on production TS): `@architect-usecase`, `@architect-decision:<ADR>`, `@architect-target` (stub forward pointer)
+- **Forward link**: `@architect-executable-specs:<path>` (design spec → executable feature)
+- **Audit**: `@architect-unlock-reason:<reason>` (required for non-standard FSM transitions)
+
+**Instances** of patterns live in two surfaces:
+
+- `.feature` files (canonical for behavioral patterns) — tags at the feature level
+- `.ts` files (canonical for code-originated patterns: codecs, contracts, utilities) — JSDoc `@architect-*` blocks
+
+**Edges**: `depends-on` / `uses` / `implements` / `see-also` / `parent`.
+
+**Projections** are Zod-validated **Named Domain Fragments** (`@libar-dev/architect-projection`). The same graph projects into markdown, JSON, context bundles, architecture views, release notes. Fragments are the trust boundary — anything outside a fragment is anecdote.
+
+#### Entry points
+
+- **`architect.config.ts`** — config loader; taxonomy customization, source globs, validation rules.
+- **`pnpm architect:query <verb>`** — primary CLI; deterministic, JSON-pipeable. **This is the default; use it.**
+- **`architect_*` MCP tools** — sub-ms per call, same verbs, **snake_case end-to-end** (`architect_scope_validate`, not `architect_scope-validate`). Reach for MCP only when bursting ≥5 verbs in close sequence.
+- File scanning architect-scoped paths to learn pattern state is a smell — every "what's the status of X?" question has a verb.
+
+#### Validation layers
+
+| Layer                 | Command                                                         | What it checks                                                           |
+| --------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Type system           | `pnpm typecheck`                                                | Strict TS (see CLAUDE.md "TypeScript strictness")                        |
+| Annotation lint + DoD | `pnpm validate:all`                                             | Definition-of-done, anti-patterns, dangling references                   |
+| Process Guard (FSM)   | `pnpm architect:guard --staged`                                 | FSM transitions, `@architect-unlock-reason` rules, structural invariants |
+| Graph integrity       | `pnpm architect:query arch dangling --strict --baseline <path>` | Cross-pattern reference drift                                            |
+
+
+#### Key ADRs (load-bearing, decisions-only)
+
+These records carry _decisions_ and the rationale for them. They do not carry operational or temporal context (status, work-in-progress, ETAs). Read before changing anything in the relevant area.
+
+- **ADR-003** — Source-First Pattern Architecture
+- **ADR-005** — Codec / Renderer Separation
+- **ADR-006** — Single Read Model
+- **ADR-007** — Coordinated Taxonomy Redesign
+- **ADR-009** — Projection Trust Boundary
+- **PDR-001** — Session Workflow Commands
+
+Decisions are amended via a new ADR, never by editing the old one.
+
+#### Annotation ownership (operational)
+
+**Split-ownership principle**:
+
+- Feature files own **what + when** (planning surface).
+- Production TS owns **how + with what** (implementation surface).
+- Neither duplicates the other.
+
+A pattern is **identified** by exactly one surface — the feature file for behavioral patterns, the `.ts` file for code-originated patterns (codecs, contracts, utilities). Production TS realizes a feature-owned pattern via `@architect-implements:<Pattern>` — a relation, not an identity claim.
+
+Production-TS `@architect-*` **JSDoc is additive, not mandatory:** 
+
+- A pattern can be `@architect-status:completed` with zero `@architect-*` JSDoc on its source, provided the executable feature carries the full surface (identity, status, deps, invariants, scenarios). Annotations enrich discoverability; they do not gate completion.
+- Sampled completed patterns like `ConfigLoader` and `DefineConfig` carry zero JSDoc on the production source and are legitimately complete. A reviewer flagging "no annotations on `<file.ts>`" as a value-transfer blocker is mistaken.
+
+#### Key tiers and maturity levels of the specs
+
+| Level       | Where                                           | What it adds vs the level above                                                          |
+| ----------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Idea        | `architect/specs/ideas/`                        | User story + 1-3 invariant-only rules; **≤30 lines soft cap**                            |
+| Candidate   | `architect/specs/candidates/`                   | `**Open Questions:**` block + 1-2 happy-path scenarios                                   |
+| Plan        | `architect/specs/`                              | Deliverables table, full scenario set, `**Rationale:**` / `**Verified by:**`             |
+| Design      | `architect/specs/`                              | Stubs in `architect/stubs/<pattern>/`, error/edge/integration scenarios, ADR refs        |
+| Executable  | `tests/features/`, `packages/*/tests/features/` | Realization (`@architect-implements:`) + executable scenarios that prove invariants hold |
+| Maintenance | Shipped code + its executable feature           | Evolves in place; scenarios grow as behavior grows                                       |
+
+**Promotion is linear**: `idea → candidate → plan → design → executable`. 
+- Skipping rungs is rejected EXCEPT for the **refactoring carve-out** — backfilling coverage for code that already ships skips directly to design or executable tier, using the `<Pattern>ExecutableTests` convention.
+
+**The detail-level doctrine — CRITICAL, easy to get wrong:** 
+- The level of detail at idea / plan / design is **contextual** — **it is up to the design judgment of the executor.**
+
+**FSM lifecycle (high level)**
+
+```
+                ┌─ (maturity flip, human acceptance gate, not process-guard)
+                │
+    candidate ──┴──► roadmap ──► active ──► completed
+                                │              │
+                                ▼              ▼
+                            deferred       (terminal — reopen requires unlock-reason)
+```
+
+- `candidate → roadmap` is a **maturity flip** (acceptance gate, human judgment). NOT a process-guard transition.
+- `roadmap → active`, `active → completed`, `active → roadmap`, `roadmap → deferred`, `deferred → roadmap` are process-guard-validated. Invalid jumps are rejected.
+- `completed` is terminal. Reopening requires `@architect-unlock-reason:<≥10 char, not a placeholder>`.
+
+Verify any transition before flipping:
+
+```bash
+pnpm architect:query scope-validate <Pattern> design|implement
+pnpm architect:query query isValidTransition <from> <to>   # deterministic boolean
+```
+
+#### Spec ↔ Pattern relationships (bipartite)
+
+Production patterns and test patterns are **two nodes** joined by `@architect-implements:`. A test feature carries two file-level tags:
+
+```gherkin
+@architect-pattern:DefineConfigExecutableTests
+@architect-implements:DefineConfig
+```
+
+Two sanctioned suffix conventions:
+
+- `<Name>Testing` — test pattern accompanying a deliberately designed pattern (flowed through plan / design).
+- `<Name>ExecutableTests` — test pattern backfilling shipped code (the formal escape from retroactive plan-level specs).
+
+The PatternGraph treats them identically; the suffix is human-facing.
+
+#### Value transfer and design-spec deletion (high level)
+
+Design-level specs are **scaffolds, not permanent documentation**. 
+Once implementation completes, the spec's value moves to durable surfaces and the spec is deleted:
+
+- **Executable Gherkin** (canonical) — pattern identity, status, dependencies, invariants, scenarios that prove them.
+- **JSDoc `@architect-*` on production code** (additive) — rationale that doesn't fit in Gherkin, decisions, usecases, roles.
+
+#### Data API — essentials
+
+Default surface: **CLI**. Reach for MCP only when bursting ≥5 verbs.
+
+```bash
+# Health / inventory
+pnpm architect:query overview                               # progress + blockers
+pnpm architect:query status                                 # status distribution
+pnpm architect:query list [--status v] [--names-only]
+pnpm architect:query search <query>                         # fuzzy pattern-name match
+
+# Per-pattern detail
+pnpm architect:query pattern <Name>                         # full PatternDetail
+pnpm architect:query context <Pattern> --session <intent>   # curated bundle
+pnpm architect:query files <Pattern> [--related]
+pnpm architect:query dep-tree <Pattern> [--depth n]
+pnpm architect:query rules --pattern <Pattern> [--only-invariants]
+
+# Composite (default pre-flight when a pattern name is known)
+pnpm architect:query bundle <Pattern> --mode <plan|design|implement|review> --format json
+
+# Gates (deterministic)
+pnpm architect:query scope-validate <Pattern> <design|implement>      # PASS / WARN / BLOCKED
+pnpm architect:query query isValidTransition <from> <to>              # JSON boolean
+pnpm architect:query arch dangling --baseline <path> --strict         # non-zero exit on drift
+
+# Architecture views
+pnpm architect:query arch blocking                          # global blocker view
+pnpm architect:query arch neighborhood <Pattern>
+pnpm architect:query taxonomy [--count] [--format json]
+```
+
+**MCP twins** use snake_case end-to-end: `architect_overview`, `architect_scope_validate`, `architect_bundle`, etc. Source of truth: `packages/architect-mcp/src/tool-registry.ts`. Current inventory: 21 tools.
+
+**Quirks worth knowing now** (full list in the dedicated data-API skill):
+
+- `scope-validate` only accepts `design` and `implement`. `planning` / `review` error with `Scope type must be design or implement`.
+- `bundle --include` keeps only the **last** repeated flag — use the comma form: `--include rules,deps,open-questions`.
+- `pattern <Name>` "not found" can mean parse failure (with provenance) OR doesn't exist — cross-check with `search` or `list --names-only`.
+
+**Before any architect-scoped `Read` / `Glob` / `Grep`:**
+
+```bash
+pnpm architect:query overview
+```
+
+```bash
+pnpm architect:query bundle <Pattern> --mode <plan|design|implement|review> --format json
+```
+
+**Load this essential skill for expanded version of this overview, essential and mandatory for all work!**
