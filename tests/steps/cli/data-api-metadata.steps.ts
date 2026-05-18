@@ -22,7 +22,6 @@ import {
 
 interface ValidationMetadata {
   danglingReferenceCount: number;
-  malformedPatternCount: number;
   unknownStatusCount: number;
   warningCount: number;
 }
@@ -98,7 +97,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         const metadata = parseResponseMetadata(getResult(state).stdout);
         expect(metadata.validation).toBeDefined();
         expect(typeof metadata.validation!.danglingReferenceCount).toBe('number');
-        expect(typeof metadata.validation!.malformedPatternCount).toBe('number');
         expect(typeof metadata.validation!.unknownStatusCount).toBe('number');
         expect(typeof metadata.validation!.warningCount).toBe('number');
       });

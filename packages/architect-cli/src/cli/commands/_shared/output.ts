@@ -55,7 +55,6 @@ export function createValidationMetadata(
 ): NonNullable<QueryMetadataExtra['validation']> {
   return {
     danglingReferenceCount: build.validation.danglingReferences.length,
-    malformedPatternCount: build.validation.malformedPatterns.length,
     unknownStatusCount: build.validation.unknownStatuses.length,
     warningCount: build.validation.warningCount,
   };

@@ -29,13 +29,19 @@ export interface StatusValidationResult {
   warnings?: string[];
 }
 
-export interface TransitionValidationResult {
-  valid: boolean;
-  from: ProcessStatusValue;
-  to: ProcessStatusValue;
-  error?: string;
-  validAlternatives?: readonly ProcessStatusValue[];
-}
+export type TransitionValidationResult =
+  | {
+      valid: true;
+      from: ProcessStatusValue;
+      to: ProcessStatusValue;
+    }
+  | {
+      valid: false;
+      from: string;
+      to: string;
+      error: string;
+      validAlternatives?: readonly ProcessStatusValue[];
+    };
 
 export interface CompletionMetadataValidationResult {
   valid: boolean;
@@ -89,8 +95,8 @@ export function validateTransition(from: string, to: string): TransitionValidati
   if (!isValidStatusValue(from)) {
     return {
       valid: false,
-      from: from as ProcessStatusValue,
-      to: to as ProcessStatusValue,
+      from,
+      to,
       error: `Invalid source status '${from}'. Valid values: ${PROCESS_STATUS_VALUES.join(', ')}.`,
     };
   }
@@ -99,7 +105,7 @@ export function validateTransition(from: string, to: string): TransitionValidati
     return {
       valid: false,
       from,
-      to: to as ProcessStatusValue,
+      to,
       error: `Invalid target status '${to}'. Valid values: ${PROCESS_STATUS_VALUES.join(', ')}.`,
     };
   }

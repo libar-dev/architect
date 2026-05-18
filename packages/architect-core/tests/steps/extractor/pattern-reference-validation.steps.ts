@@ -210,7 +210,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       And(
         'relationship entry {string} has usedBy value {string}',
         (_ctx: unknown, pattern: string, usedBy: string) => {
-          expect(state!.buildResult?.graph.relationshipIndex?.[pattern]?.usedBy).toContain(usedBy);
+          const buildResult = state!.buildResult;
+          expect(buildResult).toBeDefined();
+          const relationshipEntry = buildResult!.graph.relationshipIndex[pattern];
+          expect(relationshipEntry).toBeDefined();
+          if (relationshipEntry === undefined) {
+            throw new Error(`Missing relationship entry for ${pattern}`);
+          }
+          expect(relationshipEntry.usedBy).toContain(usedBy);
         },
       );
     });
@@ -244,14 +251,28 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       And(
         'relationship entry {string} preserves uses target {string}',
         (_ctx: unknown, pattern: string, target: string) => {
-          expect(state!.buildResult?.graph.relationshipIndex?.[pattern]?.uses).toContain(target);
+          const buildResult = state!.buildResult;
+          expect(buildResult).toBeDefined();
+          const relationshipEntry = buildResult!.graph.relationshipIndex[pattern];
+          expect(relationshipEntry).toBeDefined();
+          if (relationshipEntry === undefined) {
+            throw new Error(`Missing relationship entry for ${pattern}`);
+          }
+          expect(relationshipEntry.uses).toContain(target);
         },
       );
 
       And(
         'relationship entry {string} has usedBy value {string}',
         (_ctx: unknown, pattern: string, usedBy: string) => {
-          expect(state!.buildResult?.graph.relationshipIndex?.[pattern]?.usedBy).toContain(usedBy);
+          const buildResult = state!.buildResult;
+          expect(buildResult).toBeDefined();
+          const relationshipEntry = buildResult!.graph.relationshipIndex[pattern];
+          expect(relationshipEntry).toBeDefined();
+          if (relationshipEntry === undefined) {
+            throw new Error(`Missing relationship entry for ${pattern}`);
+          }
+          expect(relationshipEntry.usedBy).toContain(usedBy);
         },
       );
     });

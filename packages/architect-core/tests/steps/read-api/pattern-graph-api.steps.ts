@@ -59,10 +59,7 @@ function makePattern(
   });
 }
 
-function makeGraph(
-  patterns: ExtractedPattern[],
-  relationshipIndex?: Record<string, RelationshipEntry>,
-): PatternGraph {
+function makeGraph(patterns: ExtractedPattern[]): PatternGraph {
   const graph: PatternGraph = {
     patterns,
     tagRegistry: createDefaultTagRegistry(),
@@ -83,11 +80,46 @@ function makeGraph(
     },
     phaseCount: 0,
     roleCount: 0,
-    ...(relationshipIndex !== undefined ? { relationshipIndex } : {}),
+    relationshipIndex: buildRelationshipIndex(patterns),
   };
 
   PatternGraphSchema.parse(graph);
   return graph;
+}
+
+function buildRelationshipIndex(
+  patterns: readonly ExtractedPattern[],
+): Record<string, RelationshipEntry> {
+  const index: Record<string, RelationshipEntry> = {};
+
+  for (const pattern of patterns) {
+    const patternName = pattern.patternName ?? pattern.name;
+    const uses = [...(pattern.uses ?? [])];
+    index[patternName] = {
+      uses,
+      usedBy: [],
+      dependsOn: uses,
+      enables: [],
+      implementsPatterns: [],
+      implementedBy: [],
+      extendedBy: [],
+      seeAlso: [],
+      apiRef: [],
+    };
+  }
+
+  for (const pattern of patterns) {
+    const patternName = pattern.patternName ?? pattern.name;
+    for (const target of pattern.uses ?? []) {
+      const targetEntry = index[target];
+      if (targetEntry !== undefined) {
+        targetEntry.usedBy.push(patternName);
+        targetEntry.enables.push(patternName);
+      }
+    }
+  }
+
+  return index;
 }
 
 describeFeature(feature, ({ Background, Rule }) => {
@@ -108,11 +140,11 @@ describeFeature(feature, ({ Background, Rule }) => {
     });
   });
 
-  Rule('Missing relationship index still resolves reverse lookups', ({ RuleScenario }) => {
+  Rule('Canonical relationship index resolves reverse lookups', ({ RuleScenario }) => {
     RuleScenario(
-      'Reverse relationships derive when relationshipIndex is unavailable',
+      'Reverse relationships read from the canonical relationship index',
       ({ Given, When, Then, And }) => {
-        Given('the graph omits relationshipIndex', () => {
+        Given('the graph includes the canonical relationship index', () => {
           state.graph = makeGraph(state.graph!.patterns);
         });
 
@@ -132,58 +164,29 @@ describeFeature(feature, ({ Background, Rule }) => {
     );
   });
 
-  Rule(
-    'Stale relationship index does not return false-empty reverse lookups',
-    ({ RuleScenario }) => {
-      RuleScenario(
-        'Reverse relationships ignore stale empty reverse arrays',
-        ({ Given, When, Then, And }) => {
-          Given(
-            'the graph has a stale relationshipIndex with empty reverse arrays for "BetaCore"',
-            () => {
-              state.graph = makeGraph(state.graph!.patterns, {
-                AlphaCore: {
-                  uses: ['BetaCore'],
-                  usedBy: [],
-                  dependsOn: ['BetaCore'],
-                  enables: [],
-                  implementsPatterns: [],
-                  implementedBy: [],
-                  extendedBy: [],
-                  seeAlso: [],
-                  apiRef: [],
-                },
-                BetaCore: {
-                  uses: [],
-                  usedBy: [],
-                  dependsOn: [],
-                  enables: [],
-                  implementsPatterns: [],
-                  implementedBy: [],
-                  extendedBy: [],
-                  seeAlso: [],
-                  apiRef: [],
-                },
-              });
-            },
-          );
+  Rule('Dependency queries reuse the same canonical relationship index', ({ RuleScenario }) => {
+    RuleScenario(
+      'Reverse relationships stay canonical through dependency queries',
+      ({ Given, When, Then, And }) => {
+        Given('the graph includes the canonical relationship index', () => {
+          state.graph = makeGraph(state.graph!.patterns);
+        });
 
-          When('I query pattern dependencies for "BetaCore"', () => {
-            state.dependencies =
-              createPatternGraphAPI(state.graph!).getPatternDependencies('BetaCore') ?? null;
-          });
+        When('I query pattern dependencies for "BetaCore"', () => {
+          state.dependencies =
+            createPatternGraphAPI(state.graph!).getPatternDependencies('BetaCore') ?? null;
+        });
 
-          Then('the dependencies field "usedBy" contains "AlphaCore"', () => {
-            expect(state.dependencies?.usedBy).toContain('AlphaCore');
-          });
+        Then('the dependencies field "usedBy" contains "AlphaCore"', () => {
+          expect(state.dependencies?.usedBy).toContain('AlphaCore');
+        });
 
-          And('the dependencies field "enables" contains "AlphaCore"', () => {
-            expect(state.dependencies?.enables).toContain('AlphaCore');
-          });
-        },
-      );
-    },
-  );
+        And('the dependencies field "enables" contains "AlphaCore"', () => {
+          expect(state.dependencies?.enables).toContain('AlphaCore');
+        });
+      },
+    );
+  });
 
   Rule('Shared read-api helpers fail loudly for missing canonical entries', ({ RuleScenario }) => {
     RuleScenario(
@@ -213,9 +216,9 @@ describeFeature(feature, ({ Background, Rule }) => {
 
   Rule('Neighbor queries reuse the shared canonical relationship seam', ({ RuleScenario }) => {
     RuleScenario(
-      'Neighborhood lookup derives reverse relationships without relationshipIndex',
+      'Neighborhood lookup reads the canonical relationship index',
       ({ Given, When, Then, And }) => {
-        Given('the graph omits relationshipIndex', () => {
+        Given('the graph includes the canonical relationship index', () => {
           state.graph = makeGraph(state.graph!.patterns);
         });
 

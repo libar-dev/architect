@@ -1,5 +1,4 @@
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
-import { ExtractedPatternSchema } from '../../validation-schemas/index.js';
 import { getPatternName } from '../../read-api/pattern-helpers.js';
 import type {
   ExactStatusGroups,
@@ -18,7 +17,6 @@ import {
   detectDanglingReferences,
 } from './relationship-resolver.js';
 import type {
-  MalformedPattern,
   ValidationSummary,
   TransformResult,
   RuntimePatternGraph,
@@ -94,28 +92,15 @@ export function transformToPatternGraphWithValidation(raw: RawDataset): Transfor
   const roleDefinitions: readonly RegistryRoleDefinition[] = tagRegistry.roles;
   const canonicalRoleByValue = buildCanonicalRoleLookup(roleDefinitions);
 
-  const malformedPatterns: MalformedPattern[] = [];
   const unknownStatusSet = new Set<string>();
   const patterns: ExtractedPattern[] = [];
   const allPatternNames = new Set<string>();
 
   for (const pattern of rawPatterns) {
-    const parseResult = ExtractedPatternSchema.safeParse(pattern);
-    if (!parseResult.success) {
-      malformedPatterns.push({
-        patternId: getPatternName(pattern),
-        issues: parseResult.error.issues.map(
-          (issue) => `${issue.path.join('.')}: ${issue.message}`,
-        ),
-      });
-      continue;
-    }
-
-    const normalizedPattern = parseResult.data;
-    patterns.push(normalizedPattern);
-    allPatternNames.add(getPatternName(normalizedPattern));
-    if (!isKnownStatus(normalizedPattern.status)) {
-      unknownStatusSet.add(normalizedPattern.status);
+    patterns.push(pattern);
+    allPatternNames.add(getPatternName(pattern));
+    if (!isKnownStatus(pattern.status)) {
+      unknownStatusSet.add(pattern.status);
     }
   }
 
@@ -260,17 +245,10 @@ export function transformToPatternGraphWithValidation(raw: RawDataset): Transfor
 
   const validation: ValidationSummary = {
     totalPatterns: patterns.length,
-    malformedPatterns,
     danglingReferences,
     unknownStatuses: [...unknownStatusSet],
-    warningCount: malformedPatterns.length + danglingReferences.length + unknownStatusSet.size,
+    warningCount: danglingReferences.length + unknownStatusSet.size,
   };
-
-  const nameIndex = new Map<string, ExtractedPattern>();
-  for (const pattern of patterns) {
-    const key = getPatternName(pattern).toLowerCase();
-    if (!nameIndex.has(key)) nameIndex.set(key, pattern);
-  }
 
   const dataset: RuntimePatternGraph = {
     patterns,
@@ -287,16 +265,11 @@ export function transformToPatternGraphWithValidation(raw: RawDataset): Transfor
     phaseCount: byPhaseMap.size,
     roleCount: Object.keys(byRole).length,
     relationshipIndex,
-    nameIndex,
     ...(raw.featureParseFailures !== undefined
       ? { featureParseFailures: [...raw.featureParseFailures] }
       : {}),
     ...(archIndex.all.length > 0 && { archIndex }),
   };
-
-  if (workflow !== undefined) {
-    return { dataset: { ...dataset, workflow }, validation };
-  }
 
   return { dataset, validation };
 }

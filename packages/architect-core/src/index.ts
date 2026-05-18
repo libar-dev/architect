@@ -211,7 +211,6 @@ export {
   transformToPatternGraphWithValidation,
   type BuildResult,
   type DanglingReference,
-  type MalformedPattern,
   type PipelineError,
   type PipelineOptions,
   type PipelineWarning,

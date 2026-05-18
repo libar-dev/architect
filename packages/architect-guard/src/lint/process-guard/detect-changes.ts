@@ -38,8 +38,10 @@ import { globSync } from 'glob';
 import type { Result } from '@libar-dev/architect-core';
 import { Result as R } from '@libar-dev/architect-core';
 import {
+  BoundaryParseError,
   DEFAULT_STATUS,
-  PROCESS_STATUS_VALUES,
+  ProcessStatusSchema,
+  parseAtBoundary,
   type ProcessStatusValue,
 } from '@libar-dev/architect-core';
 import { execGitSafe, sanitizeBranchName, parseGitNameStatus } from '../../git/index.js';
@@ -63,6 +65,25 @@ export type ChangeDetectionOptions = WithTagRegistry & {
   readonly featurePatterns?: readonly string[];
   readonly exclude?: readonly string[];
 };
+
+function tryParseProcessStatusValue(rawValue: string | undefined): ProcessStatusValue | undefined {
+  if (rawValue === undefined) {
+    return undefined;
+  }
+
+  try {
+    return parseAtBoundary(
+      ProcessStatusSchema,
+      rawValue.toLowerCase(),
+      `Invalid process status value in git diff: ${rawValue}`,
+    );
+  } catch (error: unknown) {
+    if (error instanceof BoundaryParseError) {
+      return undefined;
+    }
+    throw error;
+  }
+}
 
 // =============================================================================
 // Core Functions
@@ -410,8 +431,8 @@ function detectStatusTransitions(
     if (line.startsWith('+') && !line.startsWith('+++')) {
       const newMatch = statusPattern.exec(line);
       if (newMatch?.[1]) {
-        const toStatus = newMatch[1].toLowerCase();
-        if (PROCESS_STATUS_VALUES.includes(toStatus as ProcessStatusValue)) {
+        const toStatus = tryParseProcessStatusValue(newMatch[1]);
+        if (toStatus !== undefined) {
           const location: StatusTagLocation = {
             lineNumber: state.newLineNumber,
             insideDocstring: state.insideDocstring,
@@ -435,9 +456,8 @@ function detectStatusTransitions(
 
     // Extract status values
     const toMatch = statusPattern.exec(state.validAddedTag.rawLine);
-    const toStatusRaw = toMatch?.[1]?.toLowerCase();
-    if (!toStatusRaw) continue;
-    const toStatus = toStatusRaw as ProcessStatusValue;
+    const toStatus = tryParseProcessStatusValue(toMatch?.[1]);
+    if (toStatus === undefined) continue;
 
     const isNewFile = state.removedTag === null;
     let fromStatus: ProcessStatusValue;
@@ -448,8 +468,7 @@ function detectStatusTransitions(
     } else {
       // state.removedTag is guaranteed to exist here
       const fromMatch = statusPattern.exec(state.removedTag.rawLine);
-      const fromStatusRaw = fromMatch?.[1]?.toLowerCase();
-      fromStatus = fromStatusRaw ? (fromStatusRaw as ProcessStatusValue) : DEFAULT_STATUS;
+      fromStatus = tryParseProcessStatusValue(fromMatch?.[1]) ?? DEFAULT_STATUS;
     }
 
     // Skip if no actual change

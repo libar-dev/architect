@@ -6,29 +6,27 @@
 Feature: PatternGraphAPI reverse lookups stay canonical
 
   `createPatternGraphAPI` should never silently report empty reverse
-  relationship collections for an existing pattern just because the runtime
-  graph omitted `relationshipIndex` or because the stored index is stale.
-  The API must derive reverse lookups from the canonical relationship builder
-  or fail loudly; it must not pretend there are no `usedBy` or `enables`
-  callers when the source patterns say otherwise.
+  relationship collections for an existing pattern. The graph seam now owns a
+  canonical `relationshipIndex`, and the read API must consume that index
+  directly instead of rebuilding or guessing local fallback state.
 
   Background: Synthetic graph with one dependency edge
     Given a synthetic graph where "AlphaCore" uses "BetaCore"
 
-  Rule: Missing relationship index still resolves reverse lookups
+  Rule: Canonical relationship index resolves reverse lookups
 
     @acceptance-criteria @happy-path
-    Scenario: Reverse relationships derive when relationshipIndex is unavailable
-      Given the graph omits relationshipIndex
+    Scenario: Reverse relationships read from the canonical relationship index
+      Given the graph includes the canonical relationship index
       When I query pattern relationships for "BetaCore"
       Then the relationships field "usedBy" contains "AlphaCore"
       And the relationships field "enables" contains "AlphaCore"
 
-  Rule: Stale relationship index does not return false-empty reverse lookups
+  Rule: Dependency queries reuse the same canonical relationship index
 
     @acceptance-criteria @error-path
-    Scenario: Reverse relationships ignore stale empty reverse arrays
-      Given the graph has a stale relationshipIndex with empty reverse arrays for "BetaCore"
+    Scenario: Reverse relationships stay canonical through dependency queries
+      Given the graph includes the canonical relationship index
       When I query pattern dependencies for "BetaCore"
       Then the dependencies field "usedBy" contains "AlphaCore"
       And the dependencies field "enables" contains "AlphaCore"
@@ -44,8 +42,8 @@ Feature: PatternGraphAPI reverse lookups stay canonical
   Rule: Neighbor queries reuse the shared canonical relationship seam
 
     @acceptance-criteria @happy-path
-    Scenario: Neighborhood lookup derives reverse relationships without relationshipIndex
-      Given the graph omits relationshipIndex
+    Scenario: Neighborhood lookup reads the canonical relationship index
+      Given the graph includes the canonical relationship index
       When I compute the neighborhood for "BetaCore"
       Then the neighborhood field "usedBy" contains "AlphaCore"
       And the neighborhood field "enables" contains "AlphaCore"

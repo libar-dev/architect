@@ -63,7 +63,6 @@ function makeGraph(patterns: ExtractedPattern[]): PatternGraph {
     phaseCount: 0,
     roleCount: 0,
     relationshipIndex: {},
-    nameIndex: new Map(patterns.map((p) => [(p.patternName ?? p.name).toLowerCase(), p])),
   };
 
   PatternGraphSchema.parse(graph);

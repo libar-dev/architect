@@ -51,11 +51,13 @@ import {
 import { Result } from '../../types/result.js';
 import type { ExtractionDiagnostic } from '../../extractor/extraction-diagnostics.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
+import { PatternGraphSchema } from '../../validation-schemas/pattern-graph.js';
 import { createFeatureParseError } from '../../types/errors.js';
 import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
 import type { PatternParseFailure } from '../../validation-schemas/pattern-graph.js';
 import type { RuntimePatternGraph, ValidationSummary } from './transform-types.js';
 import type { ContextInferenceRule } from './context-inference.js';
+import { BoundaryParseError, parseAtBoundary } from '../../validation/boundary.js';
 
 export interface PipelineOptions {
   readonly input: readonly string[];
@@ -102,6 +104,17 @@ export interface BuildResult {
   readonly warnings: readonly PipelineWarning[];
   readonly scanMetadata: ScanMetadata;
   readonly diagnostics: readonly ExtractionDiagnostic[];
+}
+
+function validatePatternGraphDataset(graph: RuntimePatternGraph): Result<RuntimePatternGraph, PipelineError> {
+  try {
+    return Result.ok(parseAtBoundary(PatternGraphSchema, graph, 'PatternGraph validation failed'));
+  } catch (error: unknown) {
+    if (error instanceof BoundaryParseError) {
+      return Result.err({ step: 'transform', message: error.message });
+    }
+    return Result.err({ step: 'transform', message: error instanceof Error ? error.message : String(error) });
+  }
 }
 
 function normalizeFeaturePath(baseDir: string, filePath: string): string {
@@ -312,12 +325,14 @@ export async function buildPatternGraph(
   };
 
   if (options.includeValidation === false) {
-    const dataset = transformToPatternGraph(rawDataset);
+    const datasetResult = validatePatternGraphDataset(transformToPatternGraph(rawDataset));
+    if (!datasetResult.ok) {
+      return datasetResult;
+    }
     return Result.ok({
-      graph: dataset,
+      graph: datasetResult.value,
       validation: {
         totalPatterns: allPatterns.length,
-        malformedPatterns: [],
         danglingReferences: [],
         unknownStatuses: [],
         warningCount: 0,
@@ -329,8 +344,13 @@ export async function buildPatternGraph(
   }
 
   const { dataset, validation } = transformToPatternGraphWithValidation(rawDataset);
+  const datasetResult = validatePatternGraphDataset(dataset);
+  if (!datasetResult.ok) {
+    return datasetResult;
+  }
+
   return Result.ok({
-    graph: dataset,
+    graph: datasetResult.value,
     validation,
     warnings,
     scanMetadata,

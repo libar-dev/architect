@@ -16,7 +16,7 @@ Feature: Pattern Graph CLI - Response Metadata
 
   Rule: Response metadata includes validation summary
 
-    **Invariant:** Every JSON response envelope must include a metadata.validation object with danglingReferenceCount, malformedPatternCount, unknownStatusCount, and warningCount fields, plus a numeric pipelineMs timing.
+    **Invariant:** Every JSON response envelope must include a metadata.validation object with danglingReferenceCount, unknownStatusCount, and warningCount fields, plus a numeric pipelineMs timing.
     **Rationale:** Consumers use validation counts to detect annotation quality degradation without running a separate validation pass. Pipeline timing enables performance regression detection in CI.
 
     @acceptance-criteria @happy-path

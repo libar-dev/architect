@@ -19,9 +19,7 @@
 import { z } from 'zod';
 
 import { ExtractedPatternSchema } from './extracted-pattern.js';
-import type { ExtractedPattern } from './extracted-pattern.js';
 import { TagRegistrySchema } from './tag-registry.js';
-import type { TagRegistry } from './tag-registry.js';
 
 export const FeatureParseErrorSchema = z.strictObject({
   type: z.literal('FEATURE_PARSE_ERROR'),
@@ -103,16 +101,6 @@ export const ArchIndexSchema = z.strictObject({
   all: z.array(ExtractedPatternSchema),
 });
 
-export const NameIndexSchema = z.custom<ReadonlyMap<string, ExtractedPattern>>(
-  (value) => value instanceof Map,
-  'Expected a nameIndex map',
-);
-
-export const WorkflowRuntimeSchema = z.custom<unknown>(
-  (value) => value !== null && typeof value === 'object',
-  'Expected a loaded workflow object',
-);
-
 export const PatternGraphSchema = z.strictObject({
   patterns: z.array(ExtractedPatternSchema),
   tagRegistry: TagRegistrySchema,
@@ -127,65 +115,18 @@ export const PatternGraphSchema = z.strictObject({
   counts: StatusCountsSchema,
   phaseCount: z.number().int().nonnegative(),
   roleCount: z.number().int().nonnegative(),
-  relationshipIndex: z.record(z.string(), RelationshipEntrySchema).optional(),
+  relationshipIndex: z.record(z.string(), RelationshipEntrySchema),
   archIndex: ArchIndexSchema.optional(),
-  nameIndex: NameIndexSchema.optional(),
-  workflow: WorkflowRuntimeSchema.optional(),
   featureParseFailures: z.array(PatternParseFailureSchema).readonly().optional(),
 });
 
-export interface ExactStatusGroups {
-  candidate: ExtractedPattern[];
-  roadmap: ExtractedPattern[];
-  active: ExtractedPattern[];
-  completed: ExtractedPattern[];
-  deferred: ExtractedPattern[];
-}
-export interface StatusGroups {
-  completed: ExtractedPattern[];
-  active: ExtractedPattern[];
-  planned: ExtractedPattern[];
-  candidate: ExtractedPattern[];
-}
+export type ExactStatusGroups = z.infer<typeof ExactStatusGroupsSchema>;
+export type StatusGroups = z.infer<typeof StatusGroupsSchema>;
 export type StatusCounts = z.infer<typeof StatusCountsSchema>;
-export interface PhaseGroup {
-  phaseNumber: number;
-  phaseName?: string | undefined;
-  patterns: ExtractedPattern[];
-  counts: StatusCounts;
-}
-export interface SourceViews {
-  typescript: ExtractedPattern[];
-  gherkin: ExtractedPattern[];
-  roadmap: ExtractedPattern[];
-  prd: ExtractedPattern[];
-}
+export type PhaseGroup = z.infer<typeof PhaseGroupSchema>;
+export type SourceViews = z.infer<typeof SourceViewsSchema>;
 export type ImplementationRef = z.infer<typeof ImplementationRefSchema>;
 export type RelationshipEntry = z.infer<typeof RelationshipEntrySchema>;
 export type PatternParseFailure = z.infer<typeof PatternParseFailureSchema>;
-export interface ArchIndex {
-  byRole: Record<string, ExtractedPattern[]>;
-  byContext: Record<string, ExtractedPattern[]>;
-  byLayer: Record<string, ExtractedPattern[]>;
-  byView: Record<string, ExtractedPattern[]>;
-  all: ExtractedPattern[];
-}
-export interface PatternGraph {
-  patterns: ExtractedPattern[];
-  tagRegistry: TagRegistry;
-  byStatus: ExactStatusGroups;
-  byNormalizedStatus: StatusGroups;
-  byMaturity: Record<string, ExtractedPattern[]>;
-  byPhase: PhaseGroup[];
-  byQuarter: Record<string, ExtractedPattern[]>;
-  byRole: Record<string, ExtractedPattern[]>;
-  bySourceType: SourceViews;
-  byProductArea: Record<string, ExtractedPattern[]>;
-  counts: StatusCounts;
-  phaseCount: number;
-  roleCount: number;
-  relationshipIndex?: Record<string, RelationshipEntry> | undefined;
-  archIndex?: ArchIndex | undefined;
-  nameIndex?: ReadonlyMap<string, ExtractedPattern> | undefined;
-  featureParseFailures?: readonly PatternParseFailure[] | undefined;
-}
+export type ArchIndex = z.infer<typeof ArchIndexSchema>;
+export type PatternGraph = z.infer<typeof PatternGraphSchema>;

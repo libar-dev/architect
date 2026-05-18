@@ -5,11 +5,6 @@ import type { PatternParseFailure } from '../../validation-schemas/pattern-graph
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
 
-export interface MalformedPattern {
-  patternId: string;
-  issues: string[];
-}
-
 export interface DanglingReference {
   pattern: string;
   field: string;
@@ -18,7 +13,6 @@ export interface DanglingReference {
 
 export interface ValidationSummary {
   totalPatterns: number;
-  malformedPatterns: MalformedPattern[];
   danglingReferences: DanglingReference[];
   unknownStatuses: string[];
   warningCount: number;
@@ -29,9 +23,7 @@ export interface TransformResult {
   validation: ValidationSummary;
 }
 
-export interface RuntimePatternGraph extends PatternGraph {
-  readonly workflow?: LoadedWorkflow;
-}
+export type RuntimePatternGraph = PatternGraph;
 
 export interface RawDataset {
   readonly patterns: readonly ExtractedPattern[];

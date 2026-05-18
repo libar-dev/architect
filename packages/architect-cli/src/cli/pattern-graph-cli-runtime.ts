@@ -189,6 +189,7 @@ export async function buildTaxonomyProjectionContext(args: ParsedArgs): Promise<
     counts: { completed: 0, active: 0, planned: 0, candidate: 0, total: 0 },
     phaseCount: 0,
     roleCount: 0,
+    relationshipIndex: {},
   };
 
   PatternGraphSchema.parse(graph);

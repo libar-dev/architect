@@ -61,3 +61,22 @@
 ## 2026-05-18 — Cluster 1 verification repair
 - The projection fixture still had two `affectedPatterns` survivors for `PerspectiveAwareProjections` inside `DecisionRecord`/`DecisionCatalog`; the clean replacement at that ADR-006 fixture site is `ProjectionFragmentContracts`, which matches the current fragment-contract seam instead of the deleted perspective cluster.
 - `docs/reverse-engineering/decision-rationale.md` also carried a stale infrastructure claim about missing GitHub workflows; the current-tree truth is that `.github/workflows/ci.yml` and `publish.yml` exist, so the durable takeaway is reverse-engineering docs can drift behind the live repository.
+
+
+## 2026-05-18 — Cluster 3 seam research
+- Canonical seam owners in `architect-core` are `validation-schemas/pattern-graph.ts:116-191` (`PatternGraphSchema` + `PatternGraph`), `generators/pipeline/transform-types.ts:27-42` (`RuntimePatternGraph`), `generators/pipeline/transform-dataset.ts:88-301`, `generators/pipeline/build-pipeline.ts:124-338`, and `read-api/pattern-graph-api.ts:89-327`.
+- Public exposure is a straight barrel chain: `validation-schemas/index.ts:150-163` → `src/index.ts:192-225`, plus `read-api/index.ts:21-22`.
+- Remaining local fallback / residue lives in `read-api/pattern-helpers.ts:24-57,93-121` (canonical relationship cache + invariant guard), `validation/boundary.ts:54-65`, `utils/errors.ts:16-21`, and the upstream parser trust boundaries in `extractor/doc-extractor.ts:267-289` and `extractor/gherkin-extractor.ts:458-499`.
+- Test-only duplicate schema checks remain at `tests/steps/read-api/pattern-graph-api.steps.ts:89-90` and `tests/steps/extractor/edge-classification.steps.ts:69-70`; they are not production owners.
+
+
+## 2026-05-18 — Cluster 3 seam completion
+-  now behaves as a required graph/read-model contract end-to-end: core step tests no longer treat  as optional, and the read-api step fixture always builds the canonical index instead of accepting an omitted seam.
+-  /  was dead contract residue after S1/S2 tightened parsing at the extraction boundary; removing it required trimming both the core pipeline validation shape and the root CLI metadata feature so the observable envelope matches the surviving seam signals (, , ).
+- Because  sets , CLI typecheck reads architect-core's built declarations instead of live source. After changing exported core metadata types, a clean rebuild of  was required before CLI typecheck reflected the new seam contract.
+
+
+## 2026-05-18 — Cluster 3 seam completion (corrected note)
+- PatternGraphSchema now behaves as a required graph/read-model contract end-to-end: core step tests no longer treat relationshipIndex as optional, and the read-api step fixture always builds the canonical index instead of accepting an omitted seam.
+- The malformedPatterns and malformedPatternCount lane was dead contract residue after S1 and S2 tightened parsing at the extraction boundary; removing it required trimming both the core pipeline validation shape and the root CLI metadata feature so the observable envelope now matches the surviving seam signals: danglingReferenceCount, unknownStatusCount, and warningCount.
+- Because packages/architect-cli/tsconfig.json sets disableSourceOfProjectReferenceRedirect to true, CLI typecheck reads architect-core built declarations instead of live source. After changing exported core metadata types, a clean rebuild of packages/architect-core was required before CLI typecheck reflected the new seam contract.

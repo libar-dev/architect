@@ -16,15 +16,11 @@ import type {
   RelationshipEntry,
 } from '../validation-schemas/pattern-graph.js';
 import { resolveCanonicalRole as resolveTagRegistryRole } from '../validation-schemas/tag-registry.js';
-import { buildCanonicalRelationshipIndex } from '../generators/pipeline/relationship-resolver.js';
 import { findBestMatch } from '../utils/fuzzy-match.js';
 
 type RegistryRoleDefinition = NonNullable<PatternGraph['tagRegistry']['roles']>[number];
 
-const canonicalRelationshipIndexCache = new WeakMap<
-  PatternGraph,
-  Readonly<Record<string, RelationshipEntry>>
->();
+const lowercaseNameIndexCache = new WeakMap<PatternGraph, ReadonlyMap<string, ExtractedPattern>>();
 
 function createMissingCanonicalRelationshipEntryError(patternName: string): Error {
   return new Error(
@@ -34,11 +30,9 @@ function createMissingCanonicalRelationshipEntryError(patternName: string): Erro
 
 function resolveIndexedEntry<T>(
   dataset: PatternGraph,
-  index: Readonly<Record<string, T>> | undefined,
+  index: Readonly<Record<string, T>>,
   name: string,
 ): T | undefined {
-  if (index === undefined) return undefined;
-
   const exact = index[name];
   if (exact !== undefined) return exact;
 
@@ -54,6 +48,22 @@ function resolveIndexedEntry<T>(
   }
 
   return undefined;
+}
+
+function getLowercaseNameIndex(dataset: PatternGraph): ReadonlyMap<string, ExtractedPattern> {
+  const cachedIndex = lowercaseNameIndexCache.get(dataset);
+  if (cachedIndex !== undefined) return cachedIndex;
+
+  const index = new Map<string, ExtractedPattern>();
+  for (const pattern of dataset.patterns) {
+    const key = getPatternName(pattern).toLowerCase();
+    if (!index.has(key)) {
+      index.set(key, pattern);
+    }
+  }
+
+  lowercaseNameIndexCache.set(dataset, index);
+  return index;
 }
 
 export function getPatternName(p: ExtractedPattern): string {
@@ -74,10 +84,7 @@ export function findPatternByName(
   if (isPatternArray(source)) {
     return source.find((p) => getPatternName(p).toLowerCase() === lower);
   }
-  return (
-    source.nameIndex?.get(lower) ??
-    source.patterns.find((p) => getPatternName(p).toLowerCase() === lower)
-  );
+  return getLowercaseNameIndex(source).get(lower);
 }
 
 export function findPatternParseFailure(
@@ -93,12 +100,7 @@ export function findPatternParseFailure(
 export function getCanonicalRelationshipIndex(
   dataset: PatternGraph,
 ): Readonly<Record<string, RelationshipEntry>> {
-  const cachedIndex = canonicalRelationshipIndexCache.get(dataset);
-  if (cachedIndex !== undefined) return cachedIndex;
-
-  const canonicalIndex = buildCanonicalRelationshipIndex(dataset.patterns);
-  canonicalRelationshipIndexCache.set(dataset, canonicalIndex);
-  return canonicalIndex;
+  return dataset.relationshipIndex;
 }
 
 export function getRelationshipsForPattern(

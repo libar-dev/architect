@@ -14,7 +14,6 @@ import type {
   PatternGraph,
   PatternParseFailure,
   RelationshipEntry,
-  PhaseGroup as SchemaPhaseGroup,
 } from '../validation-schemas/pattern-graph.js';
 import type { AcceptedStatusValue, ProcessStatusValue } from '../taxonomy/index.js';
 import { isPatternComplete, isPatternActive, isPatternPlanned } from '../taxonomy/index.js';
@@ -78,73 +77,76 @@ export interface PatternGraphAPI {
   getPatternGraph(): PatternGraph;
 }
 
-function cloneValue<T>(value: T): T {
-  return structuredClone(value);
-}
+function deepFreeze<T>(value: T, seen = new WeakSet()): T {
+  if (value === null || typeof value !== 'object') {
+    return value;
+  }
 
-function clonePatternGraph(graph: PatternGraph): PatternGraph {
-  return cloneValue(graph);
+  if (seen.has(value)) {
+    return value;
+  }
+
+  seen.add(value);
+
+  for (const child of Object.values(value)) {
+    deepFreeze(child, seen);
+  }
+
+  return Object.freeze(value);
 }
 
 export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
+  const frozenGraph = deepFreeze(dataset);
+
   function filterByExactStatus(status: AcceptedStatusValue): ExtractedPattern[] {
-    return cloneValue(dataset.byStatus[status]);
+    return frozenGraph.byStatus[status];
   }
 
   type RegistryRoleDefinition = NonNullable<PatternGraph['tagRegistry']['roles']>[number];
 
-  const configuredRoles: readonly RegistryRoleDefinition[] = dataset.tagRegistry.roles;
-
-  function convertPhaseGroup(mpg: SchemaPhaseGroup): PhaseGroup {
-    return cloneValue({
-      phaseNumber: mpg.phaseNumber,
-      phaseName: mpg.phaseName,
-      patterns: mpg.patterns,
-      counts: mpg.counts,
-    });
-  }
+  const configuredRoles: readonly RegistryRoleDefinition[] = frozenGraph.tagRegistry.roles;
 
   function getCanonicalRelationshipEntry(name: string): RelationshipEntry | undefined {
-    return getRelationships(dataset, name);
+    return getRelationships(frozenGraph, name);
   }
 
   return {
     getPatternsByNormalizedStatus(status) {
-      return cloneValue(dataset.byNormalizedStatus[status]);
+      return frozenGraph.byNormalizedStatus[status];
     },
     getPatternsByStatus(status) {
       return filterByExactStatus(status);
     },
     getStatusCounts() {
-      return cloneValue(dataset.counts);
+      return frozenGraph.counts;
     },
     getStatusDistribution() {
-      const deliveryTotal = dataset.counts.total - dataset.counts.candidate;
+      const deliveryTotal = frozenGraph.counts.total - frozenGraph.counts.candidate;
       const total = deliveryTotal === 0 ? 1 : deliveryTotal;
       return {
-        counts: cloneValue(dataset.counts),
+        counts: frozenGraph.counts,
         percentages: {
-          completed: Math.round((dataset.counts.completed / total) * 100),
-          active: Math.round((dataset.counts.active / total) * 100),
-          planned: Math.round((dataset.counts.planned / total) * 100),
+          completed: Math.round((frozenGraph.counts.completed / total) * 100),
+          active: Math.round((frozenGraph.counts.active / total) * 100),
+          planned: Math.round((frozenGraph.counts.planned / total) * 100),
           candidate:
-            dataset.counts.total === 0
+            frozenGraph.counts.total === 0
               ? 0
-              : Math.round((dataset.counts.candidate / dataset.counts.total) * 100),
+              : Math.round((frozenGraph.counts.candidate / frozenGraph.counts.total) * 100),
         },
       };
     },
     getCompletionPercentage() {
-      const deliveryTotal = dataset.counts.total - dataset.counts.candidate;
+      const deliveryTotal = frozenGraph.counts.total - frozenGraph.counts.candidate;
       const total = deliveryTotal === 0 ? 1 : deliveryTotal;
-      return Math.round((dataset.counts.completed / total) * 100);
+      return Math.round((frozenGraph.counts.completed / total) * 100);
     },
     getPatternsByPhase(phase) {
-      const phaseGroup = dataset.byPhase.find((p) => p.phaseNumber === phase);
-      return cloneValue(phaseGroup?.patterns ?? []);
+      const phaseGroup = frozenGraph.byPhase.find((p) => p.phaseNumber === phase);
+      return phaseGroup?.patterns ?? [];
     },
     getPhaseProgress(phase) {
-      const phaseGroup = dataset.byPhase.find((p) => p.phaseNumber === phase);
+      const phaseGroup = frozenGraph.byPhase.find((p) => p.phaseNumber === phase);
       if (!phaseGroup) return undefined;
 
       const deliveryTotal = phaseGroup.counts.total - phaseGroup.counts.candidate;
@@ -161,61 +163,52 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
       };
     },
     getActivePhases() {
-      return dataset.byPhase.filter((p) => p.counts.active > 0).map(convertPhaseGroup);
+      return frozenGraph.byPhase.filter((p) => p.counts.active > 0);
     },
     getAllPhases() {
-      return dataset.byPhase.map(convertPhaseGroup);
+      return frozenGraph.byPhase;
     },
     isValidTransition(from, to) {
       return isValidTransition(from, to);
     },
     checkTransition(from, to) {
-      const result = validateTransition(from, to);
-      return cloneValue({
-        from: result.from,
-        to: result.to,
-        valid: result.valid,
-        error: result.error,
-        validAlternatives: result.validAlternatives,
-      });
+      return validateTransition(from, to);
     },
     getValidTransitionsFrom(status) {
-      return cloneValue(getValidTransitionsFrom(status));
+      return getValidTransitionsFrom(status);
     },
     getProtectionInfo(status) {
       const summary = getProtectionSummary(status);
-      return cloneValue({
+      return {
         status,
         level: summary.level,
         description: summary.description,
         canAddDeliverables: summary.canAddDeliverables,
         requiresUnlock: summary.requiresUnlock,
-      });
+      };
     },
     getPattern(name) {
-      const pattern = findPatternByName(dataset.patterns, name);
-      return pattern === undefined ? undefined : cloneValue(pattern);
+      return findPatternByName(frozenGraph.patterns, name);
     },
     getPatternParseFailure(name) {
-      const failure = findPatternParseFailure(dataset, name);
-      return failure === undefined ? undefined : cloneValue(failure);
+      return findPatternParseFailure(frozenGraph, name);
     },
     getPatternDependencies(name) {
       const entry = getCanonicalRelationshipEntry(name);
       if (!entry) return undefined;
 
-      return cloneValue({
+      return {
         dependsOn: entry.dependsOn,
         enables: entry.enables,
         uses: entry.uses,
         usedBy: entry.usedBy,
-      });
+      };
     },
     getPatternRelationships(name) {
       const entry = getCanonicalRelationshipEntry(name);
       if (!entry) return undefined;
 
-      return cloneValue({
+      return {
         dependsOn: entry.dependsOn,
         enables: entry.enables,
         uses: entry.uses,
@@ -226,80 +219,74 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
         extendedBy: entry.extendedBy,
         seeAlso: entry.seeAlso,
         apiRef: entry.apiRef,
-      });
+      };
     },
     getRelatedPatterns(name) {
       const entry = getCanonicalRelationshipEntry(name);
       if (!entry) return [];
-      return cloneValue(entry.seeAlso);
+      return entry.seeAlso;
     },
     getApiReferences(name) {
       const entry = getCanonicalRelationshipEntry(name);
       if (!entry) return [];
-      return cloneValue(entry.apiRef);
+      return entry.apiRef;
     },
     getPatternDeliverables(name) {
       const pattern = this.getPattern(name);
       if (!pattern?.deliverables) return [];
 
-      return cloneValue(
-        pattern.deliverables.map((d) => ({
-          name: d.name,
-          status: d.status,
-          tests: d.tests,
-          location: d.location,
-          finding: d.finding,
-          release: d.release,
-        })),
-      );
+      return pattern.deliverables.map((d) => ({
+        name: d.name,
+        status: d.status,
+        tests: d.tests,
+        location: d.location,
+        finding: d.finding,
+        release: d.release,
+      }));
     },
     listRoles() {
-      return cloneValue(
-        configuredRoles.map(({ tag, domain, priority, description }) => ({
-          tag,
-          domain,
-          priority,
-          count: dataset.byRole[tag]?.length ?? 0,
-          ...(description !== undefined ? { description } : {}),
-        })),
-      );
-    },
-    getPatternsByRole(role) {
-      const definition = resolveRoleDefinition(dataset, role);
-      const canonicalRole = definition?.tag ?? role.toLowerCase();
-      return cloneValue(dataset.byRole[canonicalRole] ?? []);
-    },
-    getRoleInfo(role) {
-      const definition = resolveRoleDefinition(dataset, role);
-      if (definition === undefined) return null;
-
-      const { tag, domain, priority, description } = definition;
-      return cloneValue({
+      return configuredRoles.map(({ tag, domain, priority, description }) => ({
         tag,
         domain,
         priority,
-        count: dataset.byRole[tag]?.length ?? 0,
+        count: frozenGraph.byRole[tag]?.length ?? 0,
         ...(description !== undefined ? { description } : {}),
-      });
+      }));
+    },
+    getPatternsByRole(role) {
+      const definition = resolveRoleDefinition(frozenGraph, role);
+      const canonicalRole = definition?.tag ?? role.toLowerCase();
+      return frozenGraph.byRole[canonicalRole] ?? [];
+    },
+    getRoleInfo(role) {
+      const definition = resolveRoleDefinition(frozenGraph, role);
+      if (definition === undefined) return null;
+
+      const { tag, domain, priority, description } = definition;
+      return {
+        tag,
+        domain,
+        priority,
+        count: frozenGraph.byRole[tag]?.length ?? 0,
+        ...(description !== undefined ? { description } : {}),
+      };
     },
     getPatternsByQuarter(quarter) {
-      return cloneValue(dataset.byQuarter[quarter] ?? []);
+      return frozenGraph.byQuarter[quarter] ?? [];
     },
     getQuarters() {
-      return cloneValue(
-        Object.entries(dataset.byQuarter)
-          .map(([quarter, patterns]) => {
-            const counts = {
-              completed: patterns.filter((p) => isPatternComplete(p.status)).length,
-              active: patterns.filter((p) => isPatternActive(p.status)).length,
-              planned: patterns.filter((p) => isPatternPlanned(p.status)).length,
-              candidate: patterns.filter((p) => p.status === 'candidate').length,
-              total: patterns.length,
-            };
-            return { quarter, patterns, counts };
-          })
-          .sort((a, b) => a.quarter.localeCompare(b.quarter)),
-      );
+      return Object.entries(frozenGraph.byQuarter)
+        .map(([quarter, patterns]) => {
+          const counts = {
+            completed: patterns.filter((p) => isPatternComplete(p.status)).length,
+            active: patterns.filter((p) => isPatternActive(p.status)).length,
+            planned: patterns.filter((p) => isPatternPlanned(p.status)).length,
+            candidate: patterns.filter((p) => p.status === 'candidate').length,
+            total: patterns.length,
+          };
+          return { quarter, patterns, counts };
+        })
+        .sort((a, b) => a.quarter.localeCompare(b.quarter));
     },
     getCurrentWork() {
       return filterByExactStatus('active');
@@ -321,7 +308,7 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
         .slice(0, limit);
     },
     getPatternGraph() {
-      return clonePatternGraph(dataset);
+      return frozenGraph;
     },
   };
 }

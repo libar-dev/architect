@@ -6,7 +6,6 @@ import type { ProcessStatusValue } from '../taxonomy/index.js';
 export interface QueryMetadataExtra {
   readonly validation?: {
     readonly danglingReferenceCount: number;
-    readonly malformedPatternCount: number;
     readonly unknownStatusCount: number;
     readonly warningCount: number;
   };
@@ -116,11 +115,11 @@ export interface QuarterGroup {
 }
 
 export interface TransitionCheck {
-  from: ProcessStatusValue;
-  to: ProcessStatusValue;
+  from: string;
+  to: string;
   valid: boolean;
-  error: string | undefined;
-  validAlternatives: readonly ProcessStatusValue[] | undefined;
+  error?: string;
+  validAlternatives?: readonly ProcessStatusValue[];
 }
 
 export interface ProtectionInfo {
