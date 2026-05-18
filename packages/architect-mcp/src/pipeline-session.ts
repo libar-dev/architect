@@ -87,9 +87,7 @@ export class PipelineSessionManager {
     }
 
     if (input.length === 0 || features.length === 0) {
-      const applied = await this.withWorkingDirectory(baseDir, () =>
-        applyProjectSourceDefaults({ baseDir, input, features }),
-      );
+      const applied = await applyProjectSourceDefaults({ baseDir, input, features });
       if (!applied) {
         this.applyFallbackDefaults({ baseDir, input, features });
       }
@@ -101,9 +99,7 @@ export class PipelineSessionManager {
       );
     }
 
-    const session = await this.withWorkingDirectory(baseDir, () =>
-      this.buildSession(baseDir, input, features, tagRegistryOverride),
-    );
+    const session = await this.buildSession(baseDir, input, features, tagRegistryOverride);
     this.session = session;
     return session;
   }
@@ -146,13 +142,11 @@ export class PipelineSessionManager {
     let latestSession = this.session;
 
     for (;;) {
-      const newSession = await this.withWorkingDirectory(latestSession.baseDir, () =>
-        this.buildSession(
-          latestSession.baseDir,
-          [...latestSession.sourceGlobs.input],
-          [...latestSession.sourceGlobs.features],
-          latestSession.tagRegistryOverride,
-        ),
+      const newSession = await this.buildSession(
+        latestSession.baseDir,
+        [...latestSession.sourceGlobs.input],
+        [...latestSession.sourceGlobs.features],
+        latestSession.tagRegistryOverride,
       );
       this.session = newSession;
       latestSession = newSession;
@@ -253,20 +247,6 @@ export class PipelineSessionManager {
       if (fs.existsSync(releasesDir)) {
         config.features.push('architect/releases/*.feature');
       }
-    }
-  }
-
-  private async withWorkingDirectory<T>(baseDir: string, operation: () => Promise<T>): Promise<T> {
-    const previousCwd = process.cwd();
-    if (previousCwd === baseDir) {
-      return operation();
-    }
-
-    process.chdir(baseDir);
-    try {
-      return await operation();
-    } finally {
-      process.chdir(previousCwd);
     }
   }
 }
