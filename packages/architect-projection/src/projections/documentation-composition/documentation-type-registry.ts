@@ -4,18 +4,11 @@
 import { z } from 'zod';
 
 import { DisclosureSpecSchema } from '../../disclosure/spec.js';
-import { freezeDisclosureMatrix } from './disclosure-matrix.js';
 import { ProgressiveDisclosureLevelSchema } from '../../disclosure/levels.js';
 import { LogicalRouteIdSchema } from '../../routing/route-id.js';
 
-import { DOCUMENTATION_TYPE_CLI_SURFACE } from './documentation-type-registry.cli-surface.js';
-import { DOCUMENTATION_TYPE_DISCLOSURE } from './documentation-type-registry.disclosure.js';
-import {
-  SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES,
-  type DocumentationTypeIdentity,
-  type SupportedDocumentationType,
-} from './documentation-type-registry.identity.js';
-import { DOCUMENTATION_TYPE_OUTPUT_ROUTING } from './documentation-type-registry.output-routing.js';
+import { DOCUMENTATION_DEFINITIONS } from './documentation-definition.internal.js';
+import { type SupportedDocumentationType } from './documentation-type-registry.identity.js';
 
 export type { SupportedDocumentationType } from './documentation-type-registry.identity.js';
 
@@ -52,114 +45,40 @@ export type SupportedDocumentationTypeMetadata = Readonly<
 
 export type DocumentationTypeMetadata = SupportedDocumentationTypeMetadata;
 
-const DOCUMENTATION_TYPE_REGISTRY: readonly SupportedDocumentationTypeMetadata[] =
-  SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES.map((identity) =>
-    composeSupportedDocumentationTypeMetadata(identity),
-  );
+const DOCUMENTATION_TYPE_REGISTRY = Object.freeze(
+  DOCUMENTATION_DEFINITIONS.map((definition) => {
+    const { project: _project, ...metadata } = definition;
+    const parsed = SupportedDocumentationTypeRegistryEntrySchema.parse(metadata);
 
-interface SupportedDocumentationTypeRegistryState {
-  readonly registry: readonly SupportedDocumentationTypeMetadata[];
-  readonly supportedTypes: readonly SupportedDocumentationType[];
-  readonly byKey: ReadonlyMap<string, SupportedDocumentationTypeMetadata>;
-}
-
-let supportedDocumentationTypeRegistryState: SupportedDocumentationTypeRegistryState | undefined;
-
-export const SUPPORTED_DOCUMENTATION_TYPE_REGISTRY = createLazyReadonlyArrayFacade(
-  () => getSupportedDocumentationTypeRegistryState().registry,
+    return Object.freeze({
+      ...parsed,
+      key: definition.key,
+    });
+  }),
 );
 
-export const SUPPORTED_DOCUMENTATION_TYPES = createLazyReadonlyArrayFacade(
-  () => getSupportedDocumentationTypeRegistryState().supportedTypes,
+const DOCUMENTATION_TYPE_METADATA_BY_KEY = new Map<string, DocumentationTypeMetadata>(
+  DOCUMENTATION_TYPE_REGISTRY.map((entry) => [entry.key, entry] as const),
+);
+
+export const SUPPORTED_DOCUMENTATION_TYPE_REGISTRY = DOCUMENTATION_TYPE_REGISTRY;
+
+export const SUPPORTED_DOCUMENTATION_TYPES = Object.freeze(
+  DOCUMENTATION_TYPE_REGISTRY.map((entry) => entry.key),
 );
 
 export function getDocumentationTypeMetadata(key: string): DocumentationTypeMetadata | undefined {
-  return getSupportedDocumentationTypeRegistryState().byKey.get(key);
+  return DOCUMENTATION_TYPE_METADATA_BY_KEY.get(key);
 }
 
 export function getSupportedDocumentationTypeMetadata(
   key: SupportedDocumentationType,
 ): SupportedDocumentationTypeMetadata {
-  const metadata = getSupportedDocumentationTypeRegistryState().byKey.get(key);
+  const metadata = DOCUMENTATION_TYPE_METADATA_BY_KEY.get(key);
 
   if (metadata === undefined) {
     throw new Error(`Unsupported documentation type: ${key}`);
   }
 
   return metadata;
-}
-
-export function freezeSupportedDocumentationTypeMetadata(
-  entry: SupportedDocumentationTypeMetadata,
-): SupportedDocumentationTypeMetadata {
-  Object.freeze(entry.generatorAliases);
-  freezeDisclosureMatrix(entry.disclosureMatrix);
-  return Object.freeze(entry);
-}
-
-function composeSupportedDocumentationTypeMetadata(
-  identity: DocumentationTypeIdentity,
-): SupportedDocumentationTypeMetadata {
-  return {
-    ...identity,
-    ...DOCUMENTATION_TYPE_OUTPUT_ROUTING[identity.key],
-    ...DOCUMENTATION_TYPE_DISCLOSURE[identity.key],
-    ...DOCUMENTATION_TYPE_CLI_SURFACE[identity.key],
-  };
-}
-
-function getSupportedDocumentationTypeRegistryState(): SupportedDocumentationTypeRegistryState {
-  supportedDocumentationTypeRegistryState ??= buildSupportedDocumentationTypeRegistryState();
-  return supportedDocumentationTypeRegistryState;
-}
-
-function buildSupportedDocumentationTypeRegistryState(): SupportedDocumentationTypeRegistryState {
-  const registry = Object.freeze(
-    DOCUMENTATION_TYPE_REGISTRY.map((entry) => freezeSupportedDocumentationTypeMetadata(entry)),
-  );
-  const supportedTypes = Object.freeze(registry.map((entry) => entry.key));
-
-  return {
-    registry,
-    supportedTypes,
-    byKey: new Map(registry.map((entry) => [entry.key, entry])),
-  };
-}
-
-function createLazyReadonlyArrayFacade<TValue>(load: () => readonly TValue[]): readonly TValue[] {
-  const target: TValue[] = [];
-  let initialized = false;
-
-  function initialize(): void {
-    if (initialized) {
-      return;
-    }
-
-    initialized = true;
-    target.push(...load());
-    Object.freeze(target);
-  }
-
-  return new Proxy(target, {
-    get(currentTarget, property, receiver): unknown {
-      initialize();
-      return Reflect.get(currentTarget, property, receiver) as unknown;
-    },
-    getOwnPropertyDescriptor(currentTarget, property) {
-      initialize();
-      return Reflect.getOwnPropertyDescriptor(currentTarget, property);
-    },
-    has(currentTarget, property) {
-      initialize();
-      return Reflect.has(currentTarget, property);
-    },
-    ownKeys(currentTarget) {
-      initialize();
-      return Reflect.ownKeys(currentTarget);
-    },
-    set() {
-      initialize();
-      return false;
-    },
-  });
 }

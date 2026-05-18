@@ -1,6 +1,6 @@
 # Documentation composition documentation types
 
-`projectDocumentationBundle(context, options)` accepts exactly these document types:
+`parseAndProjectDocumentationBundle(context, options)` accepts exactly these document types:
 
 | Type                      | Source projection/composition                                              | Notes                                                                                                  |
 | ------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |

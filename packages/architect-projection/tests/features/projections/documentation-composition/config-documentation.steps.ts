@@ -11,6 +11,7 @@ import {
   ProjectionError,
   SupportedDocumentationTypeRegistryEntrySchema,
   SUPPORTED_DOCUMENTATION_TYPE_REGISTRY,
+  parseAndProjectArchitectureDiagram,
   parseAndProjectConfig,
   parseAndProjectDocumentationBundle,
   parseAndProjectPrChangeReview,
@@ -23,7 +24,6 @@ import {
   type ProjectionContext,
   type SupportedDocumentationType,
 } from '../../../../src/index.js';
-import { projectArchitectureDiagram } from '../../../../src/projections/documentation-composition/index.js';
 import { createPattern, createProjectionContext, createRelationshipEntry } from './support.js';
 
 interface DocumentationCompositionState {
@@ -585,9 +585,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect((rejection as ProjectionError).code).toBe('UNKNOWN_DOCUMENT_TYPE');
             }
 
-            const [rootBarrel, projectionsBarrel] = await Promise.all([
+            const [rootBarrel, projectionsBarrel, documentationCompositionBarrel] = await Promise.all([
               readFile(new URL('../../../../src/index.ts', import.meta.url), 'utf8'),
               readFile(new URL('../../../../src/projections/index.ts', import.meta.url), 'utf8'),
+              readFile(
+                new URL(
+                  '../../../../src/projections/documentation-composition/index.ts',
+                  import.meta.url,
+                ),
+                'utf8',
+              ),
             ]);
 
             for (const barrel of [rootBarrel, projectionsBarrel]) {
@@ -600,6 +607,21 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(barrel).not.toMatch(/\bDocumentationTypeRegistryEntry\b/u);
               expect(barrel).not.toMatch(/\bDocumentationTypeStatus\b/u);
               expect(barrel).not.toMatch(/\bisDroppedDocumentationType\b/u);
+            }
+
+            for (const barrel of [rootBarrel, projectionsBarrel, documentationCompositionBarrel]) {
+              expect(barrel).not.toMatch(/\bprojectArchitectureDiagram\b/u);
+              expect(barrel).not.toMatch(/\bprojectConfig\b/u);
+              expect(barrel).not.toMatch(/\bprojectDocumentationBundle\b/u);
+              expect(barrel).not.toMatch(/\bprojectPrChangeReview\b/u);
+            }
+
+            expect(rootBarrel).toContain("export * from './projections/index.js';");
+            for (const barrel of [projectionsBarrel, documentationCompositionBarrel]) {
+              expect(barrel).toMatch(/\bparseAndProjectArchitectureDiagram\b/u);
+              expect(barrel).toMatch(/\bparseAndProjectConfig\b/u);
+              expect(barrel).toMatch(/\bparseAndProjectDocumentationBundle\b/u);
+              expect(barrel).toMatch(/\bparseAndProjectPrChangeReview\b/u);
             }
           });
         },
@@ -621,20 +643,26 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           );
 
           When('I project architecture diagrams for each supported scope', () => {
-            state!.architectureDiagrams['component'] = projectArchitectureDiagram(state!.context!, {
-              scope: 'component',
-            });
-            state!.architectureDiagrams['layered'] = projectArchitectureDiagram(state!.context!, {
-              scope: 'layered',
-            });
-            state!.architectureDiagrams['bounded-context'] = projectArchitectureDiagram(
+            state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+              state!.context!,
+              {
+                scope: 'component',
+              },
+            );
+            state!.architectureDiagrams['layered'] = parseAndProjectArchitectureDiagram(
+              state!.context!,
+              {
+                scope: 'layered',
+              },
+            );
+            state!.architectureDiagrams['bounded-context'] = parseAndProjectArchitectureDiagram(
               state!.context!,
               {
                 scope: 'bounded-context',
                 scopeValue: 'projection',
               },
             );
-            state!.architectureDiagrams['product-area'] = projectArchitectureDiagram(
+            state!.architectureDiagrams['product-area'] = parseAndProjectArchitectureDiagram(
               state!.context!,
               {
                 scope: 'product-area',

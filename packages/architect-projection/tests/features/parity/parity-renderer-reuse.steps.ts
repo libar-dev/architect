@@ -3,7 +3,7 @@ import { expect } from 'vitest';
 
 import {
   parseAndProjectBusinessRuleSet,
-  projectDocumentationBundle,
+  parseAndProjectDocumentationBundle,
   renderJson,
   renderMarkdown,
   renderUi,
@@ -42,7 +42,7 @@ function projectBusinessRulesAt(
   context: ProjectionContext,
   disclosureLevel: ProgressiveDisclosureLevel,
 ): ProjectionBundle<Fragment> {
-  return projectDocumentationBundle(context, {
+  return parseAndProjectDocumentationBundle(context, {
     documentType: 'business-rules',
     disclosureLevel,
   });

@@ -41,10 +41,10 @@ import {
   type ProjectionContext,
 } from '@libar-dev/architect-projection';
 import {
+  parseAndProjectConfig,
+  parseAndProjectDocumentationBundle,
   projectBusinessRuleSet,
-  projectConfig,
   projectDependencyTree,
-  projectDocumentationBundle,
   projectFileReadingList,
   projectHandoffRecord,
   projectOpenQuestionList,
@@ -577,7 +577,7 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
     handle: async (_input, _session, sessionManager) => {
       const nextSession = await sessionManager.rebuild();
       return renderTextToolResult(
-        projectConfig(getProjectionContext(nextSession), {
+        parseAndProjectConfig(getProjectionContext(nextSession), {
           baseDir: nextSession.baseDir,
           configPath: nextSession.configPath,
           buildTimeMs: nextSession.buildTimeMs,
@@ -594,7 +594,7 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
     inputSchema: EmptyInputSchema,
     handle: (_input, session) =>
       renderJsonToolResult(
-        projectConfig(getProjectionContext(session), {
+        parseAndProjectConfig(getProjectionContext(session), {
           baseDir: session.baseDir,
           configPath: session.configPath,
           buildTimeMs: session.buildTimeMs,
@@ -614,7 +614,7 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
     handle: ({ documentType, disclosure, filter }, session) => {
       const context = getProjectionContext(session);
       return renderJsonToolResult(
-        projectDocumentationBundle(
+        parseAndProjectDocumentationBundle(
           filter === undefined ? context : { ...context, projectionFilter: filter },
           {
             documentType,

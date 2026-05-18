@@ -149,7 +149,7 @@ Every tool registered in `packages/architect-mcp/src/tool-registry.ts`:
 | `architect_arch_blocking`     | `projectOverviewDigest` (reads `.blocking`) + inline `SectionedDocument`            | `renderJson`        | No parameters                                                                                          |
 | `architect_rebuild`           | validated config projection (after rebuild)                                         | `renderCompactText` | Triggers session rebuild                                                                               |
 | `architect_config`            | validated config projection                                                         | `renderJson`        | No parameters                                                                                          |
-| `architect_documentation`     | `projectDocumentationBundle`                                                        | `renderJson`        | `documentType` required; text includes bundle `children` and logical `routing` metadata                |
+| `architect_documentation`     | `parseAndProjectDocumentationBundle`                                                | `renderJson`        | `documentType` required; text includes bundle `children` and logical `routing` metadata                |
 | `architect_help`              | None (inline `SectionedDocument`)                                                   | `renderJson`        | Static help text                                                                                       |
 
 ---

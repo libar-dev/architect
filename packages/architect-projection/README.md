@@ -2,9 +2,10 @@
 
 Fragment/Projection/Renderer pipeline for the Architect toolchain. Consumes a
 `PatternGraph` (from `@libar-dev/architect-core`) through typed projection
-functions. Prefer the validated public `parseAndProject*` entrypoints whenever a
+functions. Use the validated public `parseAndProject*` entrypoints whenever a
 projection exposes both validated and raw forms. Canonical `project*` exports
-remain public for projections that do not have a separate validated wrapper.
+remain public only for projections that do not have a separate validated
+wrapper.
 
 Replaces the deleted `@libar-dev/architect-presentation` codec stack and the
 `architect-query/api/*` assemblers with a single pipeline:
@@ -47,7 +48,8 @@ console.log(renderCompactText(bundle));
 ```
 
 `parseAndProject*` variants run `OptionsSchema.parse(options)` at the
-entrypoint; plain `project*` functions assume pre-validated options.
+entrypoint. Plain `project*` functions are internal helpers for projections that
+already own validated entrypoints.
 
 For surfaces without a validated/raw pair, use the canonical `project*` export,
 for example `projectOverviewDigest`, `projectStatusDistribution`, or

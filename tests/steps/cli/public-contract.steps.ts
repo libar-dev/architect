@@ -80,6 +80,9 @@ describeFeature(feature, ({ Rule }) => {
                 'function',
               );
               expect('projectArchitectureDiagram' in architectProjection).toBe(false);
+              expect('projectConfig' in architectProjection).toBe(false);
+              expect('projectDocumentationBundle' in architectProjection).toBe(false);
+              expect('projectPrChangeReview' in architectProjection).toBe(false);
             },
           );
         },

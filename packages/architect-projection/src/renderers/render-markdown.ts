@@ -443,13 +443,8 @@ function resolveChildRoutePath(
 
 function resolveBundleDisclosureSpec(
   bundle: ProjectionBundle<Fragment>,
-  options: ResolvedMarkdownOptions,
+  _options: ResolvedMarkdownOptions,
 ): DisclosureSpec | undefined {
-  // Renderer-side override wins (per-render-call disclosureSpec option).
-  if (options.disclosureSpec !== undefined) {
-    return options.disclosureSpec;
-  }
-  // Otherwise trust the bundle's projection-time resolution.
   return bundle.routing?.disclosureSpec;
 }
 

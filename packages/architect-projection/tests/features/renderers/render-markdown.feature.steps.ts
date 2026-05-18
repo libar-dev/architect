@@ -6,6 +6,7 @@ import {
   REQUIREMENTS_SPECS_AREA_LABEL,
 } from '../../../src/fragments/operational-insights/requirement-digest.js';
 import {
+  type DisclosureSpec,
   getSupportedDocumentationTypeMetadata,
   renderMarkdown,
   type Block,
@@ -446,7 +447,8 @@ function createBusinessRulesDisclosureBundle(): ProjectionBundle<Fragment> {
     ],
   };
 
-  return {
+  return withBundleDisclosureSpec(
+    {
     root: documentationFixtureToFragment(root),
     children: {
       'business-rules:projection-api': documentationFixtureToFragment(child),
@@ -459,7 +461,14 @@ function createBusinessRulesDisclosureBundle(): ProjectionBundle<Fragment> {
       childPathStrategy: 'nested',
       anchorStrategy: 'heading-slug',
     },
-  };
+    },
+    {
+      grouping: 'flat',
+      richness: 'full',
+      emitChildren: true,
+      committed: true,
+    },
+  );
 }
 
 function createBusinessRuleSetDisclosureBundle(): ProjectionBundle<BusinessRuleSet> {
@@ -494,7 +503,8 @@ function createBusinessRuleSetDisclosureBundle(): ProjectionBundle<BusinessRuleS
     },
   ];
 
-  return {
+  return withBundleDisclosureSpec(
+    {
     root: {
       kind: 'BusinessRuleSet',
       scope: 'all',
@@ -542,7 +552,9 @@ function createBusinessRuleSetDisclosureBundle(): ProjectionBundle<BusinessRuleS
       childPathStrategy: 'nested',
       anchorStrategy: 'heading-slug',
     },
-  };
+    },
+    getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix.important,
+  );
 }
 
 function createBusinessRuleSetHostileGroupingBundle(): ProjectionBundle<BusinessRuleSet> {
@@ -586,12 +598,16 @@ function createBusinessRuleSetHostileGroupingBundle(): ProjectionBundle<Business
       },
       childPathStrategy: routing.childPathStrategy,
       anchorStrategy: routing.anchorStrategy,
+      ...(routing.disclosureSpec !== undefined ? { disclosureSpec: routing.disclosureSpec } : {}),
     },
   };
 }
 
-function createBusinessRuleSetRichnessFixture(): ProjectionBundle<Fragment> {
-  return {
+function createBusinessRuleSetRichnessFixture(
+  disclosureSpec: DisclosureSpec,
+): ProjectionBundle<Fragment> {
+  return withBundleDisclosureSpec(
+    {
     root: {
       kind: 'BusinessRuleSet',
       scope: 'all',
@@ -638,6 +654,35 @@ function createBusinessRuleSetRichnessFixture(): ProjectionBundle<Fragment> {
       ],
     },
     children: {},
+    },
+    disclosureSpec,
+  );
+}
+
+function withBundleDisclosureSpec<TFragment extends Fragment>(
+  bundle: ProjectionBundle<TFragment>,
+  disclosureSpec: DisclosureSpec,
+): ProjectionBundle<TFragment> {
+  const routing = bundle.routing;
+
+  return {
+    ...bundle,
+    routing: {
+      rootRouteId: routing?.rootRouteId ?? 'documentation:index',
+      childRouteIds: routing?.childRouteIds ?? {},
+      childPathStrategy: routing?.childPathStrategy ?? 'nested',
+      anchorStrategy: routing?.anchorStrategy ?? 'heading-slug',
+      disclosureSpec,
+      ...(routing?.markdownRootTarget !== undefined
+        ? { markdownRootTarget: routing.markdownRootTarget }
+        : {}),
+      ...(routing?.markdownChildDirectory !== undefined
+        ? { markdownChildDirectory: routing.markdownChildDirectory }
+        : {}),
+      ...(routing?.entityPathLayout !== undefined
+        ? { entityPathLayout: routing.entityPathLayout }
+        : {}),
+    },
   };
 }
 
@@ -1277,12 +1322,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
           When('I render the bundle as markdown without H2 splitting', () => {
             state!.rendered = renderMarkdown(state!.input!, {
-              disclosureSpec: {
-                grouping: 'flat',
-                richness: 'full',
-                emitChildren: true,
-                committed: true,
-              },
               includeChildren: true,
               splitStrategy: 'never',
             });
@@ -1315,8 +1354,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           When('I render the bundle as important business-rules markdown disclosure', () => {
             state!.rendered = renderMarkdown(state!.input!, {
               disclosureLevel: 'important',
-              disclosureSpec:
-                getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix.important,
               includeChildren: true,
               splitStrategy: 'never',
             });
@@ -1359,8 +1396,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           When('I render the bundle with an unsafe business-rules route profile', () => {
             state!.rendered = renderMarkdown(state!.input!, {
               disclosureLevel: 'important',
-              disclosureSpec:
-                getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix.important,
               includeChildren: true,
               splitStrategy: 'never',
               routeProfile: {
@@ -1399,8 +1434,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           When('I render the bundle with traversal business-rules route targets', () => {
             state!.rendered = renderMarkdown(state!.input!, {
               disclosureLevel: 'important',
-              disclosureSpec:
-                getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix.important,
               includeChildren: true,
               splitStrategy: 'never',
               routeProfile: {
@@ -1448,11 +1481,17 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           When(
             'I render the bundle as important business-rules markdown disclosure without child pages',
             () => {
-              const importantDisclosure =
-                getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix.important;
+              const importantDisclosure = withBundleDisclosureSpec(
+                createBusinessRuleSetDisclosureBundle(),
+                {
+                  ...getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix
+                    .important,
+                  emitChildren: false,
+                },
+              );
+              state!.input = importantDisclosure;
               state!.rendered = renderMarkdown(state!.input!, {
                 disclosureLevel: 'important',
-                disclosureSpec: { ...importantDisclosure, emitChildren: false },
                 includeChildren: false,
                 splitStrategy: 'never',
               });
@@ -1485,16 +1524,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       RuleScenarioOutline(
         'BusinessRule table column count per richness',
         ({ Given, When, Then }, examples: Record<string, unknown>) => {
-          Given('a BusinessRuleSet bundle of 3 rules', () => {
-            state!.input = createBusinessRuleSetRichnessFixture();
-          });
+          Given('a BusinessRuleSet bundle of 3 rules', () => void 0);
 
           When('I render the bundle to markdown at disclosure {string}', () => {
             const level = examples['level'] as 'essential' | 'important' | 'useful' | 'advanced';
-            const disclosureSpec =
-              getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix[level];
+            state!.input = createBusinessRuleSetRichnessFixture(
+              getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix[level],
+            );
             state!.rendered = renderMarkdown(state!.input!, {
-              disclosureSpec,
               disclosureLevel: level,
               includeChildren: false,
               splitStrategy: 'never',
@@ -1935,6 +1972,25 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 });
 
 describe('renderMarkdown adversarial security coverage', () => {
+  it('uses bundle routing disclosure instead of a per-render-call override', () => {
+    const bundle = createBusinessRuleSetDisclosureBundle();
+    const rendered = renderMarkdown(bundle, {
+      disclosureLevel: 'important',
+      disclosureSpec: {
+        grouping: 'flat',
+        richness: 'full',
+        emitChildren: true,
+        committed: true,
+      },
+      includeChildren: true,
+      splitStrategy: 'never',
+    });
+
+    const markdown = assertRenderedRecord(rendered)['BUSINESS-RULES.md'];
+    expect(markdown).toContain('## Package Detail');
+    expect(markdown).not.toContain('## Rules');
+  });
+
   it('uses five-backtick fences when code and mermaid content contains four-backtick runs', () => {
     const rendered = renderMarkdown(
       documentationFixtureToFragment({

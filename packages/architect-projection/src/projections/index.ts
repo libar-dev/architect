@@ -84,12 +84,9 @@ export {
   ProjectConfigOptionsSchema,
   SourceGlobGroupsSchema,
   parseAndProjectConfig,
-  projectConfig,
   ProjectDocumentationBundleOptionsSchema,
   parseAndProjectDocumentationBundle,
-  projectDocumentationBundle,
   parseAndProjectPrChangeReview,
-  projectPrChangeReview,
 } from './documentation-composition/index.js';
 export type {
   PatternBundleOptions,

@@ -3,22 +3,19 @@
  */
 export {
   parseAndProjectArchitectureDiagram,
-  projectArchitectureDiagram,
 } from './architecture-diagram.js';
 export type { ProjectArchitectureDiagramOptions } from './architecture-diagram.js';
 export {
   ProjectConfigOptionsSchema,
   SourceGlobGroupsSchema,
   parseAndProjectConfig,
-  projectConfig,
 } from './project-config.js';
 export {
   ProjectDocumentationBundleOptionsSchema,
   parseAndProjectDocumentationBundle,
-  projectDocumentationBundle,
 } from './documentation-bundle.js';
 export type { ProjectDocumentationBundleOptions } from './documentation-bundle.js';
-export { parseAndProjectPrChangeReview, projectPrChangeReview } from './pr-change-review.js';
+export { parseAndProjectPrChangeReview } from './pr-change-review.js';
 export {
   SupportedDocumentationTypeRegistryEntrySchema,
   SUPPORTED_DOCUMENTATION_TYPE_REGISTRY,
