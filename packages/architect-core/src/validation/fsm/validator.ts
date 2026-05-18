@@ -13,7 +13,7 @@
  */
 
 import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from '../../taxonomy/index.js';
-import type { TagRegistry } from '../../config/tag-registry-contract.js';
+import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
 import {
   VALID_TRANSITIONS,
   getValidTransitionsFrom,

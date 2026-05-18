@@ -2,6 +2,7 @@ import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 
 import { buildRegistry, type MetadataTagDefinition, type TagRegistry } from '../../../src/index.js';
+import { applyKnownTransform } from '../../../src/taxonomy/metadata-transforms.js';
 import type { DataTableRow } from '../../support/world.js';
 
 interface TagRegistryTestState {
@@ -107,7 +108,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           const tag = findMetadataTag(state!.registry!, tagName);
           expect(tag).toBeDefined();
           expect(tag!.transform).toBeDefined();
-          expect(typeof tag!.transform).toBe('function');
+          expect(typeof tag!.transform).toBe('string');
           state!.foundTag = tag!;
         },
       );
@@ -117,7 +118,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         (_ctx: unknown, _tagName: string, input: string, expected: string) => {
           expect(state!.foundTag).toBeDefined();
           expect(state!.foundTag!.transform).toBeDefined();
-          state!.transformResult = state!.foundTag!.transform!(input);
+          state!.transformResult = applyKnownTransform(state!.foundTag!.transform, input);
           expect(state!.transformResult).toBe(expected);
         },
       );

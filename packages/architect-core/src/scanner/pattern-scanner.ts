@@ -21,7 +21,7 @@ import { glob } from 'glob';
 import type { ScannerConfig } from '../types/index.js';
 import { DEFAULT_REGEX_BUILDERS } from '../config/defaults.js';
 import { createRegexBuilders } from '../config/regex-builders.js';
-import type { TagRegistry } from '../config/tag-registry-contract.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 
 export async function findFilesToScan(config: ScannerConfig): Promise<readonly string[]> {
   const defaultExclude = [

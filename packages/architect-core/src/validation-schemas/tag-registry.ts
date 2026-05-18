@@ -1,36 +1,33 @@
 import { z } from 'zod';
 
 import { DIAGRAM_SHAPE_VALUES, FORMAT_TYPES, buildRegistry } from '../taxonomy/index.js';
-import type { RoleDefinition as ConfigRoleDefinition } from '../config/role-constants.js';
-import type {
-  AggregationTagDefinition,
-  MetadataTagDefinition,
-  TagRegistry,
-} from '../config/tag-registry-contract.js';
+import { KNOWN_TRANSFORM_NAMES } from '../taxonomy/metadata-transforms.js';
 
 export const RoleDefinitionSchema = z.strictObject({
   tag: z.string().min(1, 'Role tag cannot be empty').max(100),
   domain: z.string().min(1, 'Role domain cannot be empty').max(200),
   priority: z.number().int().positive('Priority must be a positive integer'),
   description: z.string().max(1000).optional(),
-  aliases: z.array(z.string().max(100)).max(20).optional().default([]),
+  aliases: z.array(z.string().max(100)).max(20).optional(),
   diagramShape: z.enum(DIAGRAM_SHAPE_VALUES).optional(),
 });
 
-export type RoleDefinition = ConfigRoleDefinition;
+export type RoleDefinition = z.output<typeof RoleDefinitionSchema>;
 
 export const MetadataTagDefinitionSchema = z.strictObject({
   tag: z.string().min(1, 'Metadata tag cannot be empty').max(100),
   format: z.enum(FORMAT_TYPES),
   purpose: z.string().max(1000),
-  required: z.boolean().optional().default(false),
-  repeatable: z.boolean().optional().default(false),
+  required: z.boolean().optional(),
+  repeatable: z.boolean().optional(),
   values: z.array(z.string().max(200)).max(50).optional(),
   default: z.string().max(200).optional(),
   example: z.string().max(500).optional(),
   metadataKey: z.string().max(100).optional(),
-  transform: z.function().optional(),
+  transform: z.enum(KNOWN_TRANSFORM_NAMES).optional(),
 });
+
+export type MetadataTagDefinition = z.output<typeof MetadataTagDefinitionSchema>;
 
 export const AggregationTagDefinitionSchema = z.strictObject({
   tag: z.string().min(1, 'Aggregation tag cannot be empty').max(100),
@@ -38,18 +35,72 @@ export const AggregationTagDefinitionSchema = z.strictObject({
   purpose: z.string().max(1000),
 });
 
+export type AggregationTagDefinition = z.output<typeof AggregationTagDefinitionSchema>;
+
 export const TagRegistrySchema = z.strictObject({
   $schema: z.string().max(500).optional(),
-  version: z.string().max(20).default('1.0.0'),
+  version: z.string().max(20),
   roles: z.array(RoleDefinitionSchema).max(1000),
   metadataTags: z.array(MetadataTagDefinitionSchema).max(100),
   aggregationTags: z.array(AggregationTagDefinitionSchema).max(50),
-  formatOptions: z.array(z.string().max(50)).max(20).default(['full', 'list', 'summary']),
-  tagPrefix: z.string().max(50).default('@architect-'),
-  fileOptInTag: z.string().max(50).default('@architect'),
+  formatOptions: z.array(z.string().max(50)).max(20),
+  tagPrefix: z.string().max(50),
+  fileOptInTag: z.string().max(50),
 });
 
-export type { AggregationTagDefinition, MetadataTagDefinition, TagRegistry };
+export type TagRegistry = z.output<typeof TagRegistrySchema>;
+
+export interface RoleLookup {
+  readonly canonical: ReadonlyMap<string, string>;
+  readonly aliases: ReadonlyMap<string, string>;
+  readonly all: ReadonlySet<string>;
+}
+
+const roleLookupCache = new WeakMap<TagRegistry, RoleLookup>();
+
+export function buildRoleLookup(registry: TagRegistry): RoleLookup {
+  const cached = roleLookupCache.get(registry);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  const canonical = new Map<string, string>();
+  const aliases = new Map<string, string>();
+  for (const role of registry.roles) {
+    canonical.set(role.tag, role.tag);
+    for (const alias of role.aliases ?? []) {
+      aliases.set(alias, role.tag);
+    }
+  }
+
+  const lookup: RoleLookup = {
+    canonical,
+    aliases,
+    all: new Set([...canonical.keys(), ...aliases.keys()]),
+  };
+  roleLookupCache.set(registry, lookup);
+  return lookup;
+}
+
+export function resolveCanonicalRole(
+  registry: TagRegistry,
+  rawValue: string | undefined,
+): string | undefined {
+  if (rawValue === undefined) {
+    return undefined;
+  }
+
+  const lookup = buildRoleLookup(registry);
+  if (lookup.canonical.has(rawValue)) {
+    return rawValue;
+  }
+
+  return lookup.aliases.get(rawValue);
+}
+
+export function isKnownRoleTag(registry: TagRegistry, rawValue: string): boolean {
+  return buildRoleLookup(registry).all.has(rawValue);
+}
 
 export function createDefaultTagRegistry(): TagRegistry {
   const registry = buildRegistry();

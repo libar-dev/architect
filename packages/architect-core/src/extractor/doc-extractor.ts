@@ -30,10 +30,11 @@ import type {
 import { Result } from '../types/index.js';
 import { asPatternId, asSourceFilePath, createPatternValidationError } from '../types/index.js';
 import {
-  ExtractedPatternSchema,
+  ExtractedPatternDraftSchema,
   createDefaultTagRegistry,
-  type TagRegistry,
 } from '../validation-schemas/index.js';
+import { BoundaryParseError, parseAtBoundary } from '../validation/boundary.js';
+import { resolveCanonicalRole, type TagRegistry } from '../validation-schemas/tag-registry.js';
 import { generatePatternId } from '../utils/index.js';
 import { inferMaturity } from '../taxonomy/index.js';
 import {
@@ -50,35 +51,7 @@ export interface ExtractionResults {
   readonly diagnostics: readonly ExtractionDiagnostic[];
 }
 
-interface RoleLike {
-  readonly tag: string;
-  readonly aliases?: readonly string[];
-}
-
-function buildRoleLookup(roles: readonly RoleLike[]): {
-  readonly canonical: ReadonlyMap<string, string>;
-  readonly aliases: ReadonlyMap<string, string>;
-} {
-  const canonical = new Map<string, string>();
-  const aliases = new Map<string, string>();
-  for (const role of roles) {
-    canonical.set(role.tag, role.tag);
-    for (const alias of role.aliases ?? []) aliases.set(alias, role.tag);
-  }
-  return { canonical, aliases };
-}
-
-function resolveCanonicalRole(
-  rawValue: string | undefined,
-  roles: readonly RoleLike[],
-): string | undefined {
-  if (rawValue === undefined) return undefined;
-  const lookup = buildRoleLookup(roles);
-  if (lookup.canonical.has(rawValue)) return rawValue;
-  return lookup.aliases.get(rawValue);
-}
-
-function createRoleValuesSuggestion(roles: readonly RoleLike[]): string {
+function createRoleValuesSuggestion(roles: TagRegistry['roles']): string {
   return roles
     .map((role) => role.tag)
     .filter((value, index, values) => values.indexOf(value) === index)
@@ -127,7 +100,7 @@ function collectRoleDiagnostics(
 
     if (normalized.startsWith('arch-role:')) {
       const value = normalized.substring('arch-role:'.length);
-      const canonicalRole = resolveCanonicalRole(value, registry.roles) ?? value;
+      const canonicalRole = resolveCanonicalRole(registry, value) ?? value;
       diagnostics.push(
         createDeprecatedTagDiagnostic(filePath, deprecatedTag, `@architect-role:${canonicalRole}`),
       );
@@ -151,7 +124,7 @@ function collectRoleDiagnostics(
       continue;
     }
 
-    const canonicalRole = resolveCanonicalRole(normalized, registry.roles);
+    const canonicalRole = resolveCanonicalRole(registry, normalized);
     if (canonicalRole !== undefined) {
       diagnostics.push(
         createDeprecatedTagDiagnostic(filePath, deprecatedTag, `@architect-role:${canonicalRole}`),
@@ -219,7 +192,7 @@ export function buildPattern(
   const relativePath = path.relative(baseDir, filePath);
   const id = asPatternId(generatePatternId(relativePath, directive.position.startLine));
   const name = inferPatternName(directive, exports, registry);
-  const role = resolveCanonicalRole(directive.role, registry.roles);
+  const role = resolveCanonicalRole(registry, directive.role);
 
   let extractedShapes: ExtractedPattern['extractedShapes'];
   const extractionWarnings: string[] = [];
@@ -291,19 +264,30 @@ export function buildPattern(
       directive.convention.length > 0 && { convention: directive.convention }),
   };
 
-  const validation = ExtractedPatternSchema.safeParse(pattern);
-  if (!validation.success) {
+  try {
+    const validatedPattern = parseAtBoundary(
+      ExtractedPatternDraftSchema,
+      pattern,
+      `ExtractedPatternDraft validation failed for ${relativePath}`,
+    );
+    return Result.ok(validatedPattern);
+  } catch (error: unknown) {
+    if (!(error instanceof BoundaryParseError)) {
+      throw error;
+    }
+
     return Result.err(
       createPatternValidationError(
         asSourceFilePath(relativePath),
         name,
         'Pattern validation failed',
-        validation.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`),
+        error.details.map((detail) => {
+          const pathLabel = detail.path.length > 0 ? detail.path.join('.') : 'pattern';
+          return `${pathLabel}: expected ${detail.expected}, received ${detail.received}`;
+        }),
       ),
     );
   }
-
-  return Result.ok(validation.data);
 }
 
 export function inferPatternName(

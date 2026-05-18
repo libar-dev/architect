@@ -62,7 +62,7 @@ export {
   isProjectConfig,
 } from './config/project-config-schema.js';
 export { SectionBlockSchema, type SectionBlock } from './config/section-block.js';
-export { DEFAULT_ROLES, DDD_ES_CQRS_ROLES, type RoleDefinition } from './config/role-constants.js';
+export { BUILTIN_ROLES, type RoleDefinition } from './config/role-constants.js';
 export { DEFAULT_GENERATORS, type DefaultGenerator } from './config/default-generators.js';
 export type { ArchitectConfig, ArchitectInstance, RegexBuilders } from './config/types.js';
 export type {
@@ -80,7 +80,7 @@ export type {
   AggregationTagDefinition,
   MetadataTagDefinition,
   TagRegistry,
-} from './config/tag-registry-contract.js';
+} from './validation-schemas/tag-registry.js';
 export {
   ACCEPTANCE_CRITERIA_FORMAT,
   ACCEPTED_STATUS_VALUES,

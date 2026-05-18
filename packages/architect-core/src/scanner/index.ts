@@ -9,7 +9,7 @@ import type {
   ScannerConfig,
 } from '../types/index.js';
 import { Result as R, createFileParseError } from '../types/index.js';
-import type { TagRegistry } from '../config/tag-registry-contract.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 import { parseFileDirectives } from './ast-parser.js';
 import { findFilesToScan, hasDocDirectives, hasFileOptIn } from './pattern-scanner.js';
 

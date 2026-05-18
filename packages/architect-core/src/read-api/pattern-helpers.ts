@@ -15,6 +15,7 @@ import type {
   PatternParseFailure,
   RelationshipEntry,
 } from '../validation-schemas/pattern-graph.js';
+import { resolveCanonicalRole as resolveTagRegistryRole } from '../validation-schemas/tag-registry.js';
 import { buildCanonicalRelationshipIndex } from '../generators/pipeline/relationship-resolver.js';
 import { findBestMatch } from '../utils/fuzzy-match.js';
 
@@ -135,7 +136,7 @@ export function resolveRoleDefinition(
 }
 
 export function resolveCanonicalRole(dataset: PatternGraph, role: string): string | undefined {
-  return resolveRoleDefinition(dataset, role)?.tag;
+  return resolveTagRegistryRole(dataset.tagRegistry, role);
 }
 
 export function suggestPattern(query: string, candidates: readonly string[]): string {

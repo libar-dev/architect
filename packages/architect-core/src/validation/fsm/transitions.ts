@@ -12,7 +12,7 @@
  */
 
 import type { ProcessStatusValue } from '../../taxonomy/index.js';
-import type { TagRegistry } from '../../config/tag-registry-contract.js';
+import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
 import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
 
 export interface TransitionMessageOptions {

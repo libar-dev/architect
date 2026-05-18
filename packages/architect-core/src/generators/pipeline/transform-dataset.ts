@@ -33,7 +33,7 @@ function isKnownStatus(status: string | undefined): boolean {
 interface RegistryRoleDefinition {
   readonly tag: string;
   readonly priority: number;
-  readonly aliases?: readonly string[];
+  readonly aliases?: readonly string[] | undefined;
 }
 
 function buildCanonicalRoleLookup(

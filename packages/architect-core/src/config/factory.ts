@@ -1,8 +1,7 @@
 import type { ArchitectInstance } from './types.js';
-import type { TagRegistry } from './tag-registry-contract.js';
-import type { RoleDefinition } from './role-constants.js';
+import type { TagRegistry, RoleDefinition } from '../validation-schemas/tag-registry.js';
 import { DEFAULT_FILE_OPT_IN_TAG, DEFAULT_TAG_PREFIX } from './defaults.js';
-import { DEFAULT_ROLES } from './role-constants.js';
+import { BUILTIN_ROLES } from './role-constants.js';
 import { createRegexBuilders } from './regex-builders.js';
 import { buildRegistry } from '../taxonomy/registry-builder.js';
 
@@ -27,7 +26,7 @@ export interface CreateArchitectOptions {
 export function createArchitect(options: CreateArchitectOptions = {}): ArchitectInstance {
   const tagPrefix = options.tagPrefix ?? DEFAULT_TAG_PREFIX;
   const fileOptInTag = options.fileOptInTag ?? DEFAULT_FILE_OPT_IN_TAG;
-  const roles = options.roles ?? DEFAULT_ROLES;
+  const roles = options.roles ?? BUILTIN_ROLES;
 
   const baseRegistry = buildRegistry({
     roles,

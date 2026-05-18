@@ -9,6 +9,7 @@
  *
  * - As a typed contract / data shape consumed by projection or render layers.
  */
+import { z } from 'zod';
 import {
   Parser,
   AstBuilder,
@@ -35,13 +36,22 @@ import {
 import type { Result } from '../types/index.js';
 import { Result as R } from '../types/index.js';
 import {
+  ADR_CATEGORY_VALUES,
+  ADR_LAYER_VALUES,
+  ADR_STATUS_VALUES,
+  ADR_THEME_VALUES,
+  ACCEPTED_STATUS_VALUES,
+  HIERARCHY_LEVELS,
   type AcceptedStatusValue,
   type AdrStatusValue,
   type HierarchyLevel,
 } from '../taxonomy/index.js';
+import { applyKnownTransform } from '../taxonomy/metadata-transforms.js';
 import { createRegexBuilders } from '../config/regex-builders.js';
 import {
   createDefaultTagRegistry,
+  isKnownRoleTag,
+  resolveCanonicalRole,
   type MetadataTagDefinition,
   type TagRegistry,
 } from '../validation-schemas/tag-registry.js';
@@ -51,36 +61,11 @@ const DEFAULT_BUILDERS = (() => {
   return createRegexBuilders(registry.tagPrefix, registry.fileOptInTag);
 })();
 
-function buildRoleLookup(roles: readonly { tag: string; aliases?: readonly string[] }[]): {
-  readonly canonical: ReadonlyMap<string, string>;
-  readonly aliases: ReadonlyMap<string, string>;
-  readonly all: ReadonlySet<string>;
-} {
-  const canonical = new Map<string, string>();
-  const aliases = new Map<string, string>();
-  for (const role of roles) {
-    canonical.set(role.tag, role.tag);
-    for (const alias of role.aliases ?? []) aliases.set(alias, role.tag);
-  }
-  return { canonical, aliases, all: new Set([...canonical.keys(), ...aliases.keys()]) };
-}
-
-function resolveCanonicalRole(
-  rawValue: string,
-  lookup: ReturnType<typeof buildRoleLookup>,
-): string | undefined {
-  if (lookup.canonical.has(rawValue)) return rawValue;
-  return lookup.aliases.get(rawValue);
-}
-
 const IMPLICIT_BARE_ROLE_TAG_PATTERNS = [/^opportunity-\d+$/, /^capstone$/] as const;
 
-function isImplicitBareRoleTag(
-  rawValue: string,
-  roleLookup: ReturnType<typeof buildRoleLookup>,
-): boolean {
+function isImplicitBareRoleTag(rawValue: string, registry: TagRegistry): boolean {
   return (
-    roleLookup.all.has(rawValue) ||
+    isKnownRoleTag(registry, rawValue) ||
     IMPLICIT_BARE_ROLE_TAG_PATTERNS.some((pattern) => pattern.test(rawValue))
   );
 }
@@ -104,6 +89,101 @@ export interface ParsedFeatureFile {
   readonly background?: GherkinBackground;
   readonly rules?: readonly GherkinRule[];
   readonly scenarios: readonly GherkinScenario[];
+}
+
+const UnrecognizedEnumEntrySchema = z.strictObject({
+  tag: z.string(),
+  value: z.string(),
+  validValues: z.array(z.string()).readonly(),
+});
+
+const CustomMetadataValueSchema = z.union([
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.array(z.string()).readonly(),
+]);
+
+export const FeatureTagMetadataSchema = z.strictObject({
+  pattern: z.string().optional(),
+  boundedContext: z.string().optional(),
+  phase: z.number().int().positive().optional(),
+  release: z.string().optional(),
+  status: z.enum(ACCEPTED_STATUS_VALUES).optional(),
+  unlockReason: z.string().optional(),
+  uses: z.array(z.string()).readonly().optional(),
+  implementsPatterns: z.array(z.string()).readonly().optional(),
+  extendsPattern: z.string().optional(),
+  seeAlso: z.array(z.string()).readonly().optional(),
+  apiRef: z.array(z.string()).readonly().optional(),
+  role: z.string().optional(),
+  quarter: z.string().optional(),
+  completed: z.string().optional(),
+  effort: z.string().optional(),
+  effortActual: z.string().optional(),
+  team: z.string().optional(),
+  workflow: z.string().optional(),
+  risk: z.string().optional(),
+  priority: z.string().optional(),
+  productArea: z.string().optional(),
+  userRole: z.string().optional(),
+  businessValue: z.string().optional(),
+  level: z.enum(HIERARCHY_LEVELS).optional(),
+  parent: z.string().optional(),
+  title: z.string().optional(),
+  behaviorFile: z.string().optional(),
+  discoveredGaps: z.array(z.string()).readonly().optional(),
+  discoveredImprovements: z.array(z.string()).readonly().optional(),
+  discoveredRisks: z.array(z.string()).readonly().optional(),
+  discoveredLearnings: z.array(z.string()).readonly().optional(),
+  constraints: z.array(z.string()).readonly().optional(),
+  adr: z.string().optional(),
+  adrStatus: z.enum(ADR_STATUS_VALUES).optional(),
+  adrCategory: z.enum(ADR_CATEGORY_VALUES).optional(),
+  adrSupersedes: z.string().optional(),
+  adrSupersededBy: z.string().optional(),
+  adrTheme: z.enum(ADR_THEME_VALUES).optional(),
+  adrLayer: z.enum(ADR_LAYER_VALUES).optional(),
+  target: z.string().optional(),
+  since: z.string().optional(),
+  convention: z.array(z.string()).readonly().optional(),
+  executableSpecs: z.array(z.string()).readonly().optional(),
+  roadmapSpec: z.string().optional(),
+  archRole: z.string().optional(),
+  include: z.array(z.string()).readonly().optional(),
+  usecase: z.string().optional(),
+  customMetadata: z.record(z.string(), CustomMetadataValueSchema).readonly().optional(),
+  _deprecatedTags: z.array(z.string()).readonly().optional(),
+  _roleTagValues: z.array(z.string()).readonly().optional(),
+  _unrecognizedRoleValues: z.array(z.string()).readonly().optional(),
+  _unrecognizedEnums: z.array(UnrecognizedEnumEntrySchema).readonly().optional(),
+});
+
+export type FeatureTagMetadata = z.output<typeof FeatureTagMetadataSchema>;
+
+function appendStringValues(
+  existing: readonly string[] | undefined,
+  values: readonly string[],
+): readonly string[] {
+  return existing === undefined ? [...values] : [...existing, ...values];
+}
+
+function appendSingleStringValue(
+  existing: readonly string[] | undefined,
+  value: string,
+): readonly string[] {
+  return existing === undefined ? [value] : [...existing, value];
+}
+
+function readCustomStringArray(
+  value: z.output<typeof CustomMetadataValueSchema> | undefined,
+): readonly string[] | undefined {
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+
+  const stringValues = value.filter((entry): entry is string => typeof entry === 'string');
+  return stringValues.length === value.length ? stringValues : undefined;
 }
 
 function extractDataTable(dataTable: Messages.DataTable): GherkinDataTable {
@@ -364,84 +444,62 @@ export function recoverPatternNameFromFeatureText(
 export function extractPatternTags(
   tags: readonly string[],
   registry: TagRegistry = createDefaultTagRegistry(),
-): {
-  readonly pattern?: string;
-  readonly boundedContext?: string;
-  readonly phase?: number;
-  readonly release?: string;
-  readonly status?: AcceptedStatusValue;
-  readonly unlockReason?: string;
-  readonly uses?: readonly string[];
-  readonly implementsPatterns?: readonly string[];
-  readonly extendsPattern?: string;
-  readonly seeAlso?: readonly string[];
-  readonly apiRef?: readonly string[];
-  readonly role?: string;
-  readonly quarter?: string;
-  readonly completed?: string;
-  readonly effort?: string;
-  readonly effortActual?: string;
-  readonly team?: string;
-  readonly workflow?: string;
-  readonly risk?: string;
-  readonly priority?: string;
-  readonly productArea?: string;
-  readonly userRole?: string;
-  readonly businessValue?: string;
-  readonly level?: HierarchyLevel;
-  readonly parent?: string;
-  readonly title?: string;
-  readonly behaviorFile?: string;
-  readonly discoveredGaps?: readonly string[];
-  readonly discoveredImprovements?: readonly string[];
-  readonly discoveredRisks?: readonly string[];
-  readonly discoveredLearnings?: readonly string[];
-  readonly constraints?: readonly string[];
-  readonly adr?: string;
-  readonly adrStatus?: AdrStatusValue;
-  readonly adrCategory?: string;
-  readonly adrSupersedes?: string;
-  readonly adrSupersededBy?: string;
-  readonly adrTheme?: string;
-  readonly adrLayer?: string;
-  readonly target?: string;
-  readonly since?: string;
-  readonly convention?: readonly string[];
-  readonly executableSpecs?: readonly string[];
-  readonly roadmapSpec?: string;
-  readonly archRole?: string;
-  readonly _deprecatedTags?: readonly string[];
-  readonly _roleTagValues?: readonly string[];
-  readonly _unrecognizedRoleValues?: readonly string[];
-  readonly include?: readonly string[];
-  readonly usecase?: string;
-  readonly [key: string]: unknown;
-} {
-  interface UnrecognizedEnumEntry {
-    tag: string;
-    value: string;
-    validValues: readonly string[];
-  }
-
-  const getTransform = (
-    transform: MetadataTagDefinition['transform'] | undefined,
-  ): ((value: string) => string) | undefined => {
-    if (typeof transform !== 'function') return undefined;
-    return (value: string) => {
-      const result = (transform as (value: string) => unknown)(value);
-      return typeof result === 'string' ? result : value;
-    };
-  };
-
-  const metadata: Record<string, unknown> = {};
+): FeatureTagMetadata {
   const tagLookup = new Map<string, MetadataTagDefinition>(
     registry.metadataTags.map((definition) => [definition.tag, definition] as const),
   );
-  const roleLookup = buildRoleLookup(registry.roles);
   const deprecatedTags: string[] = [];
   const roleTagValues: string[] = [];
   const unrecognizedRoleValues: string[] = [];
+  const unrecognizedEnums: z.output<typeof UnrecognizedEnumEntrySchema>[] = [];
   let resolvedRole: string | undefined;
+  let pattern: string | undefined;
+  let boundedContext: string | undefined;
+  let phase: number | undefined;
+  let release: string | undefined;
+  let status: AcceptedStatusValue | undefined;
+  let unlockReason: string | undefined;
+  let uses: readonly string[] | undefined;
+  let implementsPatterns: readonly string[] | undefined;
+  let extendsPattern: string | undefined;
+  let seeAlso: readonly string[] | undefined;
+  let apiRef: readonly string[] | undefined;
+  let quarter: string | undefined;
+  let completed: string | undefined;
+  let effort: string | undefined;
+  let effortActual: string | undefined;
+  let team: string | undefined;
+  let workflow: string | undefined;
+  let risk: string | undefined;
+  let priority: string | undefined;
+  let productArea: string | undefined;
+  let userRole: string | undefined;
+  let businessValue: string | undefined;
+  let level: HierarchyLevel | undefined;
+  let parent: string | undefined;
+  let title: string | undefined;
+  let behaviorFile: string | undefined;
+  let discoveredGaps: readonly string[] | undefined;
+  let discoveredImprovements: readonly string[] | undefined;
+  let discoveredRisks: readonly string[] | undefined;
+  let discoveredLearnings: readonly string[] | undefined;
+  let constraints: readonly string[] | undefined;
+  let adr: string | undefined;
+  let adrStatus: AdrStatusValue | undefined;
+  let adrCategory: string | undefined;
+  let adrSupersedes: string | undefined;
+  let adrSupersededBy: string | undefined;
+  let adrTheme: string | undefined;
+  let adrLayer: string | undefined;
+  let target: string | undefined;
+  let since: string | undefined;
+  let convention: readonly string[] | undefined;
+  let executableSpecs: readonly string[] | undefined;
+  let roadmapSpec: string | undefined;
+  let archRole: string | undefined;
+  let include: readonly string[] | undefined;
+  let usecase: string | undefined;
+  let customMetadata: Record<string, z.output<typeof CustomMetadataValueSchema>> | undefined;
 
   for (const tag of tags) {
     const normalized = normalizeTag(tag);
@@ -452,7 +510,7 @@ export function extractPatternTags(
         normalized !== 'acceptance-criteria' &&
         !normalized.startsWith('happy-path') &&
         normalized !== 'architect' &&
-        isImplicitBareRoleTag(normalized, roleLookup)
+        isImplicitBareRoleTag(normalized, registry)
       ) {
         deprecatedTags.push(normalized);
       }
@@ -465,7 +523,7 @@ export function extractPatternTags(
 
     if (tagName === 'role') {
       roleTagValues.push(rawValue);
-      const canonicalRole = resolveCanonicalRole(rawValue, roleLookup);
+      const canonicalRole = resolveCanonicalRole(registry, rawValue);
       if (canonicalRole === undefined) unrecognizedRoleValues.push(rawValue);
       else resolvedRole ??= canonicalRole;
       continue;
@@ -479,23 +537,43 @@ export function extractPatternTags(
     if (definition === undefined) continue;
 
     const key = definition.metadataKey ?? kebabToCamel(tagName);
-    const transform = getTransform(definition.transform);
 
     switch (definition.format) {
       case 'number': {
-        const num = parseInt(rawValue, 10);
-        if (!isNaN(num)) metadata[key] = num;
+        const num = Number.parseInt(rawValue, 10);
+        if (!Number.isNaN(num)) {
+          if (key === 'phase') {
+            phase = num;
+          } else {
+            customMetadata = { ...(customMetadata ?? {}), [key]: num };
+          }
+        }
         break;
       }
       case 'enum': {
         if (definition.values?.includes(rawValue) === true) {
-          metadata[key] = rawValue;
+          switch (key) {
+            case 'status':
+              status = rawValue as AcceptedStatusValue;
+              break;
+            case 'level':
+              level = rawValue as HierarchyLevel;
+              break;
+            case 'adrStatus':
+              adrStatus = rawValue as AdrStatusValue;
+              break;
+            case 'adrTheme':
+              adrTheme = rawValue;
+              break;
+            case 'adrLayer':
+              adrLayer = rawValue;
+              break;
+            default:
+              customMetadata = { ...(customMetadata ?? {}), [key]: rawValue };
+              break;
+          }
         } else if (definition.values !== undefined) {
-          const existing = metadata['_unrecognizedEnums'] as UnrecognizedEnumEntry[] | undefined;
-          metadata['_unrecognizedEnums'] = [
-            ...(existing ?? []),
-            { tag: tagName, value: rawValue, validValues: definition.values },
-          ];
+          unrecognizedEnums.push({ tag: tagName, value: rawValue, validValues: definition.values });
         }
         break;
       }
@@ -509,43 +587,218 @@ export function extractPatternTags(
           validValues !== undefined
             ? values.filter((value) => validValues.includes(value))
             : values;
-        const transformed = transform !== undefined ? validated.map(transform) : validated;
-        const existing = metadata[key] as string[] | undefined;
-        metadata[key] = [...(existing ?? []), ...transformed];
+        const transformed = validated.map((value) => applyKnownTransform(definition.transform, value));
+        switch (key) {
+          case 'uses':
+            uses = appendStringValues(uses, transformed);
+            break;
+          case 'implementsPatterns':
+            implementsPatterns = appendStringValues(implementsPatterns, transformed);
+            break;
+          case 'seeAlso':
+            seeAlso = appendStringValues(seeAlso, transformed);
+            break;
+          case 'apiRef':
+            apiRef = appendStringValues(apiRef, transformed);
+            break;
+          case 'discoveredGaps':
+            discoveredGaps = appendStringValues(discoveredGaps, transformed);
+            break;
+          case 'discoveredImprovements':
+            discoveredImprovements = appendStringValues(discoveredImprovements, transformed);
+            break;
+          case 'discoveredRisks':
+            discoveredRisks = appendStringValues(discoveredRisks, transformed);
+            break;
+          case 'discoveredLearnings':
+            discoveredLearnings = appendStringValues(discoveredLearnings, transformed);
+            break;
+          case 'constraints':
+            constraints = appendStringValues(constraints, transformed);
+            break;
+          case 'convention':
+            convention = appendStringValues(convention, transformed);
+            break;
+          case 'executableSpecs':
+            executableSpecs = appendStringValues(executableSpecs, transformed);
+            break;
+          case 'include':
+            include = appendStringValues(include, transformed);
+            break;
+          default:
+            customMetadata = { ...(customMetadata ?? {}), [key]: transformed };
+            break;
+        }
         break;
       }
       case 'flag': {
-        metadata[key] = true;
+        customMetadata = { ...(customMetadata ?? {}), [key]: true };
         break;
       }
       case 'quoted-value':
       case 'value':
       default: {
         if (definition.values !== undefined && !definition.values.includes(rawValue)) {
-          const existing = metadata['_unrecognizedEnums'] as UnrecognizedEnumEntry[] | undefined;
-          metadata['_unrecognizedEnums'] = [
-            ...(existing ?? []),
-            { tag: tagName, value: rawValue, validValues: definition.values },
-          ];
+          unrecognizedEnums.push({ tag: tagName, value: rawValue, validValues: definition.values });
           break;
         }
-        const value = transform !== undefined ? transform(rawValue) : rawValue;
+        const value = applyKnownTransform(definition.transform, rawValue);
         if (definition.repeatable) {
-          const existing = metadata[key] as string[] | undefined;
-          metadata[key] = [...(existing ?? []), value];
+          const existingCustomValue = customMetadata === undefined ? undefined : customMetadata[key];
+          customMetadata = {
+            ...(customMetadata ?? {}),
+            [key]: appendSingleStringValue(readCustomStringArray(existingCustomValue), value),
+          };
         } else {
-          metadata[key] = value;
+          switch (key) {
+            case 'pattern':
+              pattern = value;
+              break;
+            case 'boundedContext':
+              boundedContext = value;
+              break;
+            case 'release':
+              release = value;
+              break;
+            case 'unlockReason':
+              unlockReason = value;
+              break;
+            case 'extendsPattern':
+              extendsPattern = value;
+              break;
+            case 'quarter':
+              quarter = value;
+              break;
+            case 'completed':
+              completed = value;
+              break;
+            case 'effort':
+              effort = value;
+              break;
+            case 'effortActual':
+              effortActual = value;
+              break;
+            case 'team':
+              team = value;
+              break;
+            case 'workflow':
+              workflow = value;
+              break;
+            case 'risk':
+              risk = value;
+              break;
+            case 'priority':
+              priority = value;
+              break;
+            case 'productArea':
+              productArea = value;
+              break;
+            case 'userRole':
+              userRole = value;
+              break;
+            case 'businessValue':
+              businessValue = value;
+              break;
+            case 'parent':
+              parent = value;
+              break;
+            case 'title':
+              title = value;
+              break;
+            case 'behaviorFile':
+              behaviorFile = value;
+              break;
+            case 'adr':
+              adr = value;
+              break;
+            case 'adrCategory':
+              adrCategory = value;
+              break;
+            case 'adrSupersedes':
+              adrSupersedes = value;
+              break;
+            case 'adrSupersededBy':
+              adrSupersededBy = value;
+              break;
+            case 'target':
+              target = value;
+              break;
+            case 'since':
+              since = value;
+              break;
+            case 'roadmapSpec':
+              roadmapSpec = value;
+              break;
+            case 'archRole':
+              archRole = value;
+              break;
+            case 'usecase':
+              usecase = value;
+              break;
+            default:
+              customMetadata = { ...(customMetadata ?? {}), [key]: value };
+              break;
+          }
         }
         break;
       }
     }
   }
 
-  if (resolvedRole !== undefined) metadata['role'] = resolvedRole;
-  if (deprecatedTags.length > 0) metadata['_deprecatedTags'] = deprecatedTags;
-  if (roleTagValues.length > 0) metadata['_roleTagValues'] = roleTagValues;
-  if (unrecognizedRoleValues.length > 0)
-    metadata['_unrecognizedRoleValues'] = unrecognizedRoleValues;
-
-  return metadata;
+  return FeatureTagMetadataSchema.parse({
+    ...(pattern !== undefined ? { pattern } : {}),
+    ...(boundedContext !== undefined ? { boundedContext } : {}),
+    ...(phase !== undefined ? { phase } : {}),
+    ...(release !== undefined ? { release } : {}),
+    ...(status !== undefined ? { status } : {}),
+    ...(unlockReason !== undefined ? { unlockReason } : {}),
+    ...(uses !== undefined ? { uses } : {}),
+    ...(implementsPatterns !== undefined ? { implementsPatterns } : {}),
+    ...(extendsPattern !== undefined ? { extendsPattern } : {}),
+    ...(seeAlso !== undefined ? { seeAlso } : {}),
+    ...(apiRef !== undefined ? { apiRef } : {}),
+    ...(resolvedRole !== undefined ? { role: resolvedRole } : {}),
+    ...(quarter !== undefined ? { quarter } : {}),
+    ...(completed !== undefined ? { completed } : {}),
+    ...(effort !== undefined ? { effort } : {}),
+    ...(effortActual !== undefined ? { effortActual } : {}),
+    ...(team !== undefined ? { team } : {}),
+    ...(workflow !== undefined ? { workflow } : {}),
+    ...(risk !== undefined ? { risk } : {}),
+    ...(priority !== undefined ? { priority } : {}),
+    ...(productArea !== undefined ? { productArea } : {}),
+    ...(userRole !== undefined ? { userRole } : {}),
+    ...(businessValue !== undefined ? { businessValue } : {}),
+    ...(level !== undefined ? { level } : {}),
+    ...(parent !== undefined ? { parent } : {}),
+    ...(title !== undefined ? { title } : {}),
+    ...(behaviorFile !== undefined ? { behaviorFile } : {}),
+    ...(discoveredGaps !== undefined ? { discoveredGaps } : {}),
+    ...(discoveredImprovements !== undefined ? { discoveredImprovements } : {}),
+    ...(discoveredRisks !== undefined ? { discoveredRisks } : {}),
+    ...(discoveredLearnings !== undefined ? { discoveredLearnings } : {}),
+    ...(constraints !== undefined ? { constraints } : {}),
+    ...(adr !== undefined ? { adr } : {}),
+    ...(adrStatus !== undefined ? { adrStatus } : {}),
+    ...(adrCategory !== undefined ? { adrCategory } : {}),
+    ...(adrSupersedes !== undefined ? { adrSupersedes } : {}),
+    ...(adrSupersededBy !== undefined ? { adrSupersededBy } : {}),
+    ...(adrTheme !== undefined ? { adrTheme } : {}),
+    ...(adrLayer !== undefined ? { adrLayer } : {}),
+    ...(target !== undefined ? { target } : {}),
+    ...(since !== undefined ? { since } : {}),
+    ...(convention !== undefined ? { convention } : {}),
+    ...(executableSpecs !== undefined ? { executableSpecs } : {}),
+    ...(roadmapSpec !== undefined ? { roadmapSpec } : {}),
+    ...(archRole !== undefined ? { archRole } : {}),
+    ...(include !== undefined ? { include } : {}),
+    ...(usecase !== undefined ? { usecase } : {}),
+    ...(customMetadata !== undefined ? { customMetadata } : {}),
+    ...(deprecatedTags.length > 0 ? { _deprecatedTags: deprecatedTags } : {}),
+    ...(roleTagValues.length > 0 ? { _roleTagValues: roleTagValues } : {}),
+    ...(unrecognizedRoleValues.length > 0
+      ? { _unrecognizedRoleValues: unrecognizedRoleValues }
+      : {}),
+    ...(unrecognizedEnums.length > 0 ? { _unrecognizedEnums: unrecognizedEnums } : {}),
+  });
 }

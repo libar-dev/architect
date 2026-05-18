@@ -2,7 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { createArchitect } from './factory.js';
-import type { RoleDefinition } from './role-constants.js';
+import type { RoleDefinition } from '../validation-schemas/tag-registry.js';
 
 const workspaceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 

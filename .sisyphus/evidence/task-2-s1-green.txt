@@ -1,0 +1,21 @@
+Cluster 2 — S1 seam verification
+Date: 2026-05-18
+
+Commands run:
+- pnpm --filter @libar-dev/architect-core test
+- pnpm build
+- pnpm lint
+- pnpm typecheck
+
+Results:
+- @libar-dev/architect-core tests: PASS (24 files, 1070 tests)
+- workspace build: PASS
+- workspace lint: PASS
+- workspace typecheck: PASS
+
+Diagnostics run:
+- lsp_diagnostics on touched architect-core files under extractor/scanner/config/taxonomy/read-api/pipeline
+
+Notes:
+- Directory-scoped diagnostics and compiler-backed gates are clean for the touched Cluster 2 surfaces.
+- File-scoped LSP for packages/architect-core/src/extractor/gherkin-extractor.ts still reports stale TS1128 at 541:0 against a 540-line file, while build/typecheck pass and symbol indexing succeeds.

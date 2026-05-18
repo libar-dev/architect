@@ -82,29 +82,8 @@ function cloneValue<T>(value: T): T {
   return structuredClone(value);
 }
 
-function cloneTagRegistry(tagRegistry: PatternGraph['tagRegistry']): PatternGraph['tagRegistry'] {
-  return {
-    ...tagRegistry,
-    roles: tagRegistry.roles.map((role) => ({
-      ...role,
-      ...(role.aliases !== undefined ? { aliases: [...role.aliases] } : {}),
-    })),
-    metadataTags: tagRegistry.metadataTags.map((tag) => ({
-      ...tag,
-      ...(tag.values !== undefined ? { values: [...tag.values] } : {}),
-      ...(tag.transform !== undefined ? { transform: tag.transform } : {}),
-    })),
-    aggregationTags: tagRegistry.aggregationTags.map((tag) => ({ ...tag })),
-    formatOptions: [...tagRegistry.formatOptions],
-  };
-}
-
 function clonePatternGraph(graph: PatternGraph): PatternGraph {
-  const { tagRegistry, ...rest } = graph;
-  return {
-    ...cloneValue(rest),
-    tagRegistry: cloneTagRegistry(tagRegistry),
-  };
+  return cloneValue(graph);
 }
 
 export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {

@@ -52,7 +52,7 @@ import { Result } from '../../types/result.js';
 import type { ExtractionDiagnostic } from '../../extractor/extraction-diagnostics.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import { createFeatureParseError } from '../../types/errors.js';
-import type { TagRegistry } from '../../config/tag-registry-contract.js';
+import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
 import type { PatternParseFailure } from '../../validation-schemas/pattern-graph.js';
 import type { RuntimePatternGraph, ValidationSummary } from './transform-types.js';
 import type { ContextInferenceRule } from './context-inference.js';
@@ -234,7 +234,7 @@ export async function buildPatternGraph(
         });
       }
 
-      const gherkinResult = extractPatternsFromGherkin(gherkinFiles, {
+      const gherkinResult = await extractPatternsFromGherkin(gherkinFiles, {
         baseDir,
         tagRegistry: registry,
         scenariosAsUseCases: true,

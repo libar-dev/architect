@@ -2,8 +2,9 @@ import type {
   AggregationTagDefinition,
   MetadataTagDefinition,
   TagRegistry,
-} from '../config/tag-registry-contract.js';
-import { DEFAULT_ROLES, type RoleDefinition } from '../config/role-constants.js';
+  RoleDefinition,
+} from '../validation-schemas/tag-registry.js';
+import { BUILTIN_ROLES } from '../config/role-constants.js';
 import { DEFAULT_FILE_OPT_IN_TAG, DEFAULT_TAG_PREFIX } from '../config/defaults.js';
 import {
   ADR_LAYER_VALUES,
@@ -12,6 +13,7 @@ import {
   GLOBAL_FORMAT_OPTIONS,
 } from './generator-options.js';
 import { HIERARCHY_LEVELS } from './hierarchy-levels.js';
+import type { KnownTransformName } from './metadata-transforms.js';
 import { ACCEPTED_STATUS_VALUES, DEFAULT_STATUS } from './status-values.js';
 import { ADR_CATEGORY_VALUES } from './adr-category-values.js';
 
@@ -19,19 +21,19 @@ export type {
   AggregationTagDefinition as AggregationTagDefinitionForRegistry,
   MetadataTagDefinition as MetadataTagDefinitionForRegistry,
   TagRegistry,
-} from '../config/tag-registry-contract.js';
+} from '../validation-schemas/tag-registry.js';
 
 interface MutableTagRegistry {
   version: string;
-  roles: readonly RoleDefinition[];
+  roles: RoleDefinition[];
   metadataTags: MetadataTagDefinition[];
   aggregationTags: AggregationTagDefinition[];
-  formatOptions: readonly string[];
+  formatOptions: string[];
   tagPrefix: string;
   fileOptInTag: string;
 }
 
-function cloneRoleDefinitions(roles: readonly RoleDefinition[]): readonly RoleDefinition[] {
+function cloneRoleDefinitions(roles: readonly RoleDefinition[]): RoleDefinition[] {
   return roles.map((role) => ({
     ...role,
     aliases: [...(role.aliases ?? [])],
@@ -85,8 +87,8 @@ export const METADATA_TAGS_BY_GROUP = {
   convention: [] as const,
 } as const;
 
-const padAdr = (value: string): string => value.padStart(3, '0');
-const stripQuotes = (value: string): string => value.replace(/^["']|["']$/g, '');
+const PAD_ADR_TRANSFORM: KnownTransformName = 'padAdr';
+const STRIP_QUOTES_TRANSFORM: KnownTransformName = 'stripQuotes';
 
 export function registerUnifiedRoleTaxonomy(
   registry: MutableTagRegistry,
@@ -143,7 +145,7 @@ export interface BuildRegistryOptions {
 }
 
 export function buildRegistry(options: BuildRegistryOptions = {}): TagRegistry {
-  const roles = options.roles ?? DEFAULT_ROLES;
+  const roles = options.roles ?? BUILTIN_ROLES;
   const productAreas = options.productAreas;
   const registry: MutableTagRegistry = {
     version: '2.0.0',
@@ -223,7 +225,7 @@ export function buildRegistry(options: BuildRegistryOptions = {}): TagRegistry {
         tag: 'adr',
         format: 'value',
         purpose: 'ADR/PDR number for decision tracking',
-        transform: padAdr,
+        transform: PAD_ADR_TRANSFORM,
         example: '@architect-adr 015',
       },
       {
@@ -245,14 +247,14 @@ export function buildRegistry(options: BuildRegistryOptions = {}): TagRegistry {
         tag: 'adr-supersedes',
         format: 'value',
         purpose: 'ADR/PDR number this decision supersedes',
-        transform: padAdr,
+        transform: PAD_ADR_TRANSFORM,
         example: '@architect-adr-supersedes 012',
       },
       {
         tag: 'adr-superseded-by',
         format: 'value',
         purpose: 'ADR/PDR number that supersedes this decision',
-        transform: padAdr,
+        transform: PAD_ADR_TRANSFORM,
         example: '@architect-adr-superseded-by 020',
       },
       {
@@ -273,7 +275,7 @@ export function buildRegistry(options: BuildRegistryOptions = {}): TagRegistry {
         tag: 'title',
         format: 'quoted-value',
         purpose: 'Human-readable display title (supports quoted values with spaces)',
-        transform: stripQuotes,
+        transform: STRIP_QUOTES_TRANSFORM,
         example: '@architect-title:"Process Guard Linter"',
       },
       {

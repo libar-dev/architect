@@ -170,6 +170,39 @@ function extractMetadataTag(
   }
 }
 
+function readStringMetadata(
+  metadataResults: ReadonlyMap<string, unknown>,
+  key: string,
+): string | undefined {
+  const value = metadataResults.get(key);
+  return typeof value === 'string' ? value : undefined;
+}
+
+function readNumberMetadata(
+  metadataResults: ReadonlyMap<string, unknown>,
+  key: string,
+): number | undefined {
+  const value = metadataResults.get(key);
+  return typeof value === 'number' ? value : undefined;
+}
+
+function readStringArrayMetadata(
+  metadataResults: ReadonlyMap<string, unknown>,
+  key: string,
+): string[] | undefined {
+  const value = metadataResults.get(key);
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+
+  const stringValues = value.filter((entry): entry is string => typeof entry === 'string');
+  if (stringValues.length !== value.length) {
+    return undefined;
+  }
+
+  return stringValues;
+}
+
 export function parseFileDirectives(
   content: string,
   filePath: string,
@@ -276,24 +309,24 @@ function parseDirective(
     if (result !== undefined) metadataResults.set(tagDef.tag, result);
   }
 
-  const patternName = metadataResults.get('pattern') as string | undefined;
-  const status = metadataResults.get('status') as AcceptedStatusValue | undefined;
-  const boundedContext = metadataResults.get('bounded-context') as string | undefined;
-  const uses = metadataResults.get('uses') as string[] | undefined;
-  const phase = metadataResults.get('phase') as number | undefined;
-  const level = metadataResults.get('level') as DocDirective['level'];
-  const parent = metadataResults.get('parent') as string | undefined;
-  const implementsPatterns = metadataResults.get('implements') as string[] | undefined;
-  const extendsPattern = metadataResults.get('extends') as string | undefined;
-  const seeAlso = metadataResults.get('see-also') as string[] | undefined;
-  const apiRef = metadataResults.get('api-ref') as string[] | undefined;
-  const role = metadataResults.get('role') as string | undefined;
-  const unlockReason = metadataResults.get('unlock-reason') as string | undefined;
-  const target = metadataResults.get('target') as string | undefined;
-  const since = metadataResults.get('since') as string | undefined;
-  const executableSpecs = metadataResults.get('executable-specs') as string[] | undefined;
-  const productArea = metadataResults.get('product-area') as string | undefined;
-  const convention = metadataResults.get('convention') as string[] | undefined;
+  const patternName = readStringMetadata(metadataResults, 'pattern');
+  const status = readStringMetadata(metadataResults, 'status') as AcceptedStatusValue | undefined;
+  const boundedContext = readStringMetadata(metadataResults, 'bounded-context');
+  const uses = readStringArrayMetadata(metadataResults, 'uses');
+  const phase = readNumberMetadata(metadataResults, 'phase');
+  const level = readStringMetadata(metadataResults, 'level') as DocDirective['level'];
+  const parent = readStringMetadata(metadataResults, 'parent');
+  const implementsPatterns = readStringArrayMetadata(metadataResults, 'implements');
+  const extendsPattern = readStringMetadata(metadataResults, 'extends');
+  const seeAlso = readStringArrayMetadata(metadataResults, 'see-also');
+  const apiRef = readStringArrayMetadata(metadataResults, 'api-ref');
+  const role = readStringMetadata(metadataResults, 'role');
+  const unlockReason = readStringMetadata(metadataResults, 'unlock-reason');
+  const target = readStringMetadata(metadataResults, 'target');
+  const since = readStringMetadata(metadataResults, 'since');
+  const executableSpecs = readStringArrayMetadata(metadataResults, 'executable-specs');
+  const productArea = readStringMetadata(metadataResults, 'product-area');
+  const convention = readStringArrayMetadata(metadataResults, 'convention');
 
   const deprecatedTags: string[] = [];
   const deprecatedFlagTags = new Set<string>();

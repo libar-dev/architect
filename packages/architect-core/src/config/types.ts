@@ -1,6 +1,5 @@
 import type { ContextInferenceRule } from '../generators/pipeline/context-inference.js';
-import type { TagRegistry } from './tag-registry-contract.js';
-import type { RoleDefinition } from './role-constants.js';
+import type { TagRegistry, RoleDefinition } from '../validation-schemas/tag-registry.js';
 
 export interface ArchitectConfig {
   readonly tagPrefix: string;
