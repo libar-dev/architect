@@ -179,18 +179,18 @@ Examples:
  * Main CLI function
  */
 function main(): void {
-  const config = parseArgs();
-
-  if (config.version) {
-    printVersionAndExit('architect-lint-steps');
-  }
-
-  if (config.help) {
-    printHelp();
-    process.exit(0);
-  }
-
   try {
+    const config = parseArgs();
+
+    if (config.version) {
+      printVersionAndExit('architect-lint-steps');
+    }
+
+    if (config.help) {
+      printHelp();
+      process.exit(0);
+    }
+
     process.stdout.write('Step Lint: checking vitest-cucumber compatibility...\n');
 
     const summary = runStepLint({

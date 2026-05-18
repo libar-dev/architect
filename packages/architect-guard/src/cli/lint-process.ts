@@ -250,18 +250,18 @@ function formatJson(output: ReturnType<typeof validateChanges>): string {
  * Main CLI function
  */
 async function main(): Promise<void> {
-  const config = parseArgs();
-
-  if (config.version) {
-    printVersionAndExit('architect-guard');
-  }
-
-  if (config.help) {
-    printHelp();
-    process.exit(0);
-  }
-
   try {
+    const config = parseArgs();
+
+    if (config.version) {
+      printVersionAndExit('architect-guard');
+    }
+
+    if (config.help) {
+      printHelp();
+      process.exit(0);
+    }
+
     process.stdout.write(`Process Guard: validating ${config.mode} changes...\n`);
     process.stdout.write(`  Base directory: ${config.baseDir}\n`);
 

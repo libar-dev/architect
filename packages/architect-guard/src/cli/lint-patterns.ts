@@ -201,24 +201,24 @@ Examples:
  * Main CLI function
  */
 async function main(): Promise<void> {
-  const config = parseArgs();
-
-  if (config.version) {
-    printVersionAndExit('architect-lint-patterns');
-  }
-
-  if (config.help) {
-    printHelp();
-    process.exit(0);
-  }
-
-  if (config.input.length === 0) {
-    console.error('Error: No input patterns specified. Use --input <pattern>');
-    printHelp();
-    process.exit(1);
-  }
-
   try {
+    const config = parseArgs();
+
+    if (config.version) {
+      printVersionAndExit('architect-lint-patterns');
+    }
+
+    if (config.help) {
+      printHelp();
+      process.exit(0);
+    }
+
+    if (config.input.length === 0) {
+      console.error('Error: No input patterns specified. Use --input <pattern>');
+      printHelp();
+      process.exit(1);
+    }
+
     // Load configuration (discovers architect.config.ts)
     const configResult = await loadConfig(config.baseDir);
     if (!configResult.ok) {
