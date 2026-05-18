@@ -11,7 +11,7 @@ importing scanner internals or re-validating already trusted projection output.
 
 Use the shared boundary helpers instead of re-defining local parse wrappers:
 
-- `src/zod-primitives.ts` — canonical shared Zod primitives.
-- `src/utils/errors.ts` — `formatZodError` and `parseOrThrow` for trust-boundary parsing.
-- `src/utils/session-helpers.ts` — shared session enums and user-facing Zod formatting helpers.
 - `src/utils/argv-hygiene.ts` — null-byte checks and safe CLI/MCP string schemas.
+- `src/utils/errors.ts` — `formatZodError` and `parseOrThrow` for trust-boundary parsing.
+- `src/utils/session-helpers.ts` — shared session enums, handoff inference, and user-facing Zod formatting helpers.
+- `src/utils/runtime-helpers.ts` — package metadata reads, invocation-dir resolution, and built-entrypoint helpers used by the published runtimes.

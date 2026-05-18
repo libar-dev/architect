@@ -13,7 +13,7 @@ Engineering lifecycle platform for AI-assisted development — annotate your cod
 | `@libar-dev/architect-projection` | Fragment-based projection pipeline — Named Domain Fragments, block types, renderers.               |
 | `@libar-dev/architect-guard`      | Policy, validation, process guard, step-lint, DoD, anti-pattern detection, git helpers.            |
 | `@libar-dev/architect-cli`        | Thin composition root for `architect`, `architect-generate`, `architect-guard`, etc.               |
-| `@libar-dev/architect-mcp`        | MCP server (18 tools), tool registry, file watcher, pipeline session.                              |
+| `@libar-dev/architect-mcp`        | MCP server (21 tools), tool registry, file watcher, pipeline session.                              |
 | `@libar-dev/architect-spec`       | Architect Spec — formal specification (currently `private: true`; promotes to standalone at v1.0). |
 
 **Dependency direction (acyclic):** `core ← projection`, `core ← guard ← cli`, `core,projection ← mcp`. The meta-package depends on all five and has no inbound runtime deps.
