@@ -2,11 +2,11 @@
  * @architect-bounded-context:_shared
  */
 import type { ExtractedPattern } from '@libar-dev/architect-core';
-import { AcceptedStatusSchema, inferMaturity, MaturitySchema } from '@libar-dev/architect-core';
+import { inferMaturity, MaturitySchema, StatusValueSchema } from '@libar-dev/architect-core';
 import { z } from 'zod';
 
 export const MaturityValueSchema = MaturitySchema;
-export const StatusValueSchema = AcceptedStatusSchema;
+export { StatusValueSchema };
 
 export const ProjectionFilterSchema = z.strictObject({
   maturity: z.array(MaturityValueSchema).min(1).optional(),

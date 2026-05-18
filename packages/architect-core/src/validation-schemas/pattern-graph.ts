@@ -39,14 +39,14 @@ export const PatternParseFailureSchema = z.strictObject({
   parseError: FeatureParseErrorSchema,
 });
 
-export const StatusGroupsSchema = z.object({
+export const StatusGroupsSchema = z.strictObject({
   completed: z.array(ExtractedPatternSchema),
   active: z.array(ExtractedPatternSchema),
   planned: z.array(ExtractedPatternSchema),
   candidate: z.array(ExtractedPatternSchema),
 });
 
-export const ExactStatusGroupsSchema = z.object({
+export const ExactStatusGroupsSchema = z.strictObject({
   candidate: z.array(ExtractedPatternSchema),
   roadmap: z.array(ExtractedPatternSchema),
   active: z.array(ExtractedPatternSchema),
@@ -54,7 +54,7 @@ export const ExactStatusGroupsSchema = z.object({
   deferred: z.array(ExtractedPatternSchema),
 });
 
-export const StatusCountsSchema = z.object({
+export const StatusCountsSchema = z.strictObject({
   completed: z.number().int().nonnegative(),
   active: z.number().int().nonnegative(),
   planned: z.number().int().nonnegative(),
@@ -62,27 +62,27 @@ export const StatusCountsSchema = z.object({
   total: z.number().int().nonnegative(),
 });
 
-export const PhaseGroupSchema = z.object({
+export const PhaseGroupSchema = z.strictObject({
   phaseNumber: z.number().int(),
   phaseName: z.string().optional(),
   patterns: z.array(ExtractedPatternSchema),
   counts: StatusCountsSchema,
 });
 
-export const SourceViewsSchema = z.object({
+export const SourceViewsSchema = z.strictObject({
   typescript: z.array(ExtractedPatternSchema),
   gherkin: z.array(ExtractedPatternSchema),
   roadmap: z.array(ExtractedPatternSchema),
   prd: z.array(ExtractedPatternSchema),
 });
 
-export const ImplementationRefSchema = z.object({
+export const ImplementationRefSchema = z.strictObject({
   name: z.string(),
   file: z.string(),
   description: z.string().optional(),
 });
 
-export const RelationshipEntrySchema = z.object({
+export const RelationshipEntrySchema = z.strictObject({
   uses: z.array(z.string()),
   usedBy: z.array(z.string()),
   dependsOn: z.array(z.string()),
@@ -95,7 +95,7 @@ export const RelationshipEntrySchema = z.object({
   apiRef: z.array(z.string()),
 });
 
-export const ArchIndexSchema = z.object({
+export const ArchIndexSchema = z.strictObject({
   byRole: z.record(z.string(), z.array(ExtractedPatternSchema)),
   byContext: z.record(z.string(), z.array(ExtractedPatternSchema)),
   byLayer: z.record(z.string(), z.array(ExtractedPatternSchema)),
@@ -103,7 +103,17 @@ export const ArchIndexSchema = z.object({
   all: z.array(ExtractedPatternSchema),
 });
 
-export const PatternGraphSchema = z.object({
+export const NameIndexSchema = z.custom<ReadonlyMap<string, ExtractedPattern>>(
+  (value) => value instanceof Map,
+  'Expected a nameIndex map',
+);
+
+export const WorkflowRuntimeSchema = z.custom<unknown>(
+  (value) => value !== null && typeof value === 'object',
+  'Expected a loaded workflow object',
+);
+
+export const PatternGraphSchema = z.strictObject({
   patterns: z.array(ExtractedPatternSchema),
   tagRegistry: TagRegistrySchema,
   byStatus: ExactStatusGroupsSchema,
@@ -119,6 +129,8 @@ export const PatternGraphSchema = z.object({
   roleCount: z.number().int().nonnegative(),
   relationshipIndex: z.record(z.string(), RelationshipEntrySchema).optional(),
   archIndex: ArchIndexSchema.optional(),
+  nameIndex: NameIndexSchema.optional(),
+  workflow: WorkflowRuntimeSchema.optional(),
   featureParseFailures: z.array(PatternParseFailureSchema).readonly().optional(),
 });
 

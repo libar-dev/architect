@@ -120,7 +120,7 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     **Invariant:** Only these FSM transitions are valid. All others are
     rejected by Process Guard. Candidate-to-roadmap is not an FSM
     transition — it is a promotion (lifecycle gate preceding the FSM),
-    validated separately. See EnforcementConfiguration Rule 4.
+    validated separately by PDR-005.
     **Rationale:** Allowing arbitrary transitions (e.g., roadmap to completed) bypasses the active phase where scope-lock and deliverable tracking provide quality assurance.
     **Verified by:** Canonical values are enforced
 

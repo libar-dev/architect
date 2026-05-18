@@ -234,17 +234,6 @@ export {
   type ShapeSelector,
 } from './config/presentation-contracts.js';
 export {
-  CLI_SCHEMA,
-  type CLIOptionDef,
-  type CLIOptionGroup,
-  type CLISchema,
-  type CommandNarrative,
-  type CommandNarrativeGroup,
-  type RecipeExample,
-  type RecipeGroup,
-  type RecipeStep,
-} from './config/cli-schema.js';
-export {
   AcceptedStatusSchema,
   DeliverableStatusSchema,
   HandoffSessionTypeSchema,
@@ -253,6 +242,7 @@ export {
   RenderFormatSchema,
   ScopeTypeSchema,
   SessionTypeSchema,
+  StatusValueSchema,
   type HandoffSessionType,
   type RenderFormat,
   type ScopeType,

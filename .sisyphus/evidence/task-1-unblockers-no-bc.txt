@@ -1,0 +1,11 @@
+Scenario: Hottest unblockers are not papered over with BC shims
+
+Checks run:
+- `rg -n "@deprecated|kept for compat|eslint-disable|@ts-ignore|@ts-expect-error" <touched files>`
+- manual review of the Cluster 1 diff stat and changed-file set
+
+Observed results:
+- The touched-file marker scan returned no matches.
+- No compatibility aliases, `@deprecated` bridges, `eslint-disable`, `@ts-ignore`, or `@ts-expect-error` markers were introduced.
+- The FSM bridge landed as direct exports/schema anchors, not wrapper shims.
+- The cleanup removed dead public surface (`cli-schema.ts`, `architect-cli` root JS API, dead barrel exports, stale Architect-State artifacts) instead of preserving fallback paths.

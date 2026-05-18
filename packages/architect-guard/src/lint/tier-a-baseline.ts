@@ -78,12 +78,6 @@ export const TIER_A_LINT_BASELINE: readonly TierABaselineEntry[] = [
     message: 'Pattern missing explicit name. Add @architect-pattern YourPatternName',
   },
   {
-    path: 'packages/architect-core/src/config/cli-schema.ts',
-    rule: 'missing-relationship-target',
-    line: 1,
-    message: "Implementation target 'CliReferenceGeneration' not found in known patterns",
-  },
-  {
     path: 'packages/architect-core/src/generators/pipeline/build-pipeline.ts',
     rule: 'missing-pattern-name',
     line: 1,

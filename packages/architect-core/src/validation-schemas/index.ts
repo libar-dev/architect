@@ -23,10 +23,12 @@ export {
 export { ExportInfoSchema, isExportInfo, type ExportInfo } from './export-info.js';
 export {
   SourceInfoSchema,
+  ExtractedPatternDraftSchema,
   ExtractedPatternSchema,
   BusinessRuleSchema,
   isExtractedPattern,
   type SourceInfo,
+  type ExtractedPatternDraft,
   type ExtractedPattern,
   type BusinessRule,
 } from './extracted-pattern.js';
@@ -71,16 +73,6 @@ export {
   type ScannedGherkinFile,
   type GherkinFileError,
   type GherkinScanResults,
-  ParsedStepSchema,
-  ParsedScenarioSchema,
-  ParsedBackgroundSchema,
-  ParsedFeatureSchema,
-  FeatureFileSchema,
-  type ParsedStep,
-  type ParsedScenario,
-  type ParsedBackground,
-  type ParsedFeature,
-  type FeatureFile,
 } from './feature.js';
 export {
   LintSeveritySchema,
@@ -132,8 +124,6 @@ export {
 export {
   createJsonInputCodec,
   createJsonOutputCodec,
-  createFileLoader,
-  formatCodecError,
   type CodecError,
   type JsonInputCodec,
   type JsonOutputCodec,

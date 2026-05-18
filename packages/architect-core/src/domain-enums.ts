@@ -24,5 +24,6 @@ export type RenderFormat = z.infer<typeof RenderFormatSchema>;
 
 export const AcceptedStatusSchema = z.enum(ACCEPTED_STATUS_VALUES);
 export const ProcessStatusSchema = z.enum(PROCESS_STATUS_VALUES);
+export const StatusValueSchema = AcceptedStatusSchema;
 export const DeliverableStatusSchema = z.enum(DELIVERABLE_STATUS_VALUES);
 export const MaturitySchema = z.enum(MATURITY_VALUES);

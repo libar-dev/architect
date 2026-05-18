@@ -2,9 +2,8 @@ export {
   PROTECTION_LEVELS,
   type ProtectionLevel,
   getProtectionLevel,
+  StatusValueSchema,
   isTerminalState,
-  isFullyEditable,
-  isScopeLocked,
   PROCESS_STATUS_VALUES,
   type ProcessStatusValue,
 } from './states.js';
@@ -23,9 +22,7 @@ export {
   type CompletionMetadataValidationResult,
   type PatternMetadata,
   type FSMValidationOptions,
-  validateStatus,
+  isValidStatusValue,
   validateTransition,
-  validateCompletionMetadata,
-  validatePatternStatus,
   getProtectionSummary,
 } from './validator.js';

@@ -96,15 +96,3 @@ export type GherkinFeature = z.infer<typeof GherkinFeatureSchema>;
 export type ScannedGherkinFile = z.infer<typeof ScannedGherkinFileSchema>;
 export type GherkinFileError = z.infer<typeof GherkinFileErrorSchema>;
 export type GherkinScanResults = z.infer<typeof GherkinScanResultsSchema>;
-
-export const ParsedStepSchema = GherkinStepSchema;
-export const ParsedScenarioSchema = GherkinScenarioSchema;
-export const ParsedBackgroundSchema = GherkinBackgroundSchema;
-export const ParsedFeatureSchema = GherkinFeatureSchema;
-export const FeatureFileSchema = ScannedGherkinFileSchema;
-
-export type ParsedStep = z.infer<typeof ParsedStepSchema>;
-export type ParsedScenario = z.infer<typeof ParsedScenarioSchema>;
-export type ParsedBackground = z.infer<typeof ParsedBackgroundSchema>;
-export type ParsedFeature = z.infer<typeof ParsedFeatureSchema>;
-export type FeatureFile = z.infer<typeof FeatureFileSchema>;

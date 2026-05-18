@@ -10,4 +10,11 @@ export type {
   RenderMarkdownOptions,
   RenderUiOptions,
 } from './types.js';
+export {
+  RendererOptionsSchema,
+  RenderCompactOptionsSchema,
+  RenderJsonOptionsSchema,
+  RenderMarkdownOptionsSchema,
+  RenderUiOptionsSchema,
+} from './types.js';
 export type { UiDocument, UiSection } from './render-ui.js';

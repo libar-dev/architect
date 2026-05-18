@@ -49,7 +49,7 @@ export interface PatternMetadata {
   effortPlanned?: string;
 }
 
-function isValidStatusValue(status: string): status is ProcessStatusValue {
+export function isValidStatusValue(status: string): status is ProcessStatusValue {
   return (PROCESS_STATUS_VALUES as readonly string[]).includes(status);
 }
 

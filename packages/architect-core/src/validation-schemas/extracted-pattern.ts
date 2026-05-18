@@ -125,7 +125,13 @@ const ExtractedPatternBaseSchema = z.strictObject({
 
 export const ExtractedPatternSchema = ExtractedPatternBaseSchema;
 
+export const ExtractedPatternDraftSchema = z.strictObject({
+  ...ExtractedPatternBaseSchema.shape,
+  _diagnostics: z.array(z.string().min(1)).readonly().optional(),
+});
+
 export type ExtractedPattern = z.output<typeof ExtractedPatternBaseSchema>;
+export type ExtractedPatternDraft = z.output<typeof ExtractedPatternDraftSchema>;
 
 export function isExtractedPattern(value: unknown): value is ExtractedPattern {
   return ExtractedPatternSchema.safeParse(value).success;

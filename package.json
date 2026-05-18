@@ -18,6 +18,7 @@
     "clean": "pnpm -r clean",
     "format": "prettier --write \"**/*.{ts,tsx,json,md,yml,yaml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,json,md,yml,yaml}\"",
+    "audit:subtractive": "node ./scripts/workspace-subtractive-audit.mjs",
     "guard:no-suppressions": "node ./scripts/guard-no-suppressions.mjs",
     "architect:query": "tsx ./packages/architect-cli/src/cli/pattern-graph-cli.ts --base-dir .",
     "architect:overview": "tsx ./packages/architect-cli/src/cli/pattern-graph-cli.ts --base-dir . overview",

@@ -5,7 +5,7 @@
 @architect-pattern:ADR007CoordinatedTaxonomyRedesign
 @architect-status:active
 @architect-product-area:Process
-@architect-uses:ADR001TaxonomyCanonicalValues,EnforcementConfiguration,PerspectiveAwareProjections
+@architect-uses:ADR001TaxonomyCanonicalValues,PDR005ProcessGuardFSM
 Feature: ADR-007 - Coordinated Taxonomy Redesign
 
   **Context:**
@@ -27,23 +27,21 @@ Feature: ADR-007 - Coordinated Taxonomy Redesign
   field on `DDD_ES_CQRS_PRESET` is dead code that the factory ignores.
 
   **Decision:**
-  Supersede all three specs with a coordinated four-spec redesign at phase 49:
+  Supersede all three specs with a coordinated five-spec redesign at phase 49:
 
   | Spec | Scope | Supersedes |
   | StatusMaturityExtraction | Status expansion + maturity axis + diagnostics | CandidateStatusExtraction, TrackTagSupport |
   | UnifiedRoleSystem | Role merge + preset removal | TaxonomyPresetArchitecture |
-  | EnforcementConfiguration | Configurable ProcessGuard + promotion validation | (new) |
-  | PerspectiveAwareProjections | Consumer-specific PatternGraph slices | (new) |
   | ProcessGuardPatternGraphMigration | Migrate derive-state.ts to PatternGraph (ADR-006) | (new) |
   | ValidatePatternsPipelineConsolidation | Migrate DoDValidator to PatternGraph + eliminate double-scan | (new) |
   | McpOutputSchemaValidation | Zod output schemas for all MCP tool responses (candidate) | (new) |
 
   Replace the binary track tag with a maturity axis (idea/plan/design/executable) that
   captures the same lifecycle semantics with finer graduation. Replace categories and
-  presets with a unified role system. Add enforcement configuration for ProcessGuard.
-  Add perspective-aware projections to expose the new axes to all consumers.
+  presets with a unified role system. Keep ProcessGuard on the explicit four-state FSM
+  contract and finish the remaining phase-49 work on the current projection surface.
 
-  All seven changes ship as ONE coordinated breaking change. Three internal consumers,
+  All five changes ship as ONE coordinated breaking change. Three internal consumers,
   no public users, pre-release only. All consumers update simultaneously.
 
   **Consequences:**
@@ -51,7 +49,6 @@ Feature: ADR-007 - Coordinated Taxonomy Redesign
   | Positive | Eliminates track tag redundancy -- maturity axis subsumes consideration/delivery semantics |
   | Positive | Removes preset system complexity -- role-based configuration is simpler and more flexible |
   | Positive | Coordinated file modifications prevent merge conflicts across overlapping specs |
-  | Positive | Perspective-aware projections give every consumer the correct default view |
   | Positive | Diagnostic output eliminates silent extraction failures (the original bug) |
   | Positive | Net simplification -- fewer concepts, more capability |
   | Negative | Supersedes prior design work across three specs |
@@ -63,8 +60,6 @@ Feature: ADR-007 - Coordinated Taxonomy Redesign
       | Deliverable | Status | Location |
       | StatusMaturityExtraction spec | complete | architect/specs/status-maturity-extraction.feature |
       | UnifiedRoleSystem spec | complete | architect/specs/unified-role-system.feature |
-      | EnforcementConfiguration spec | pending | architect/specs/enforcement-configuration.feature |
-      | PerspectiveAwareProjections spec | pending | architect/specs/perspective-aware-projections.feature |
       | ProcessGuardPatternGraphMigration spec | complete | architect/specs/process-guard-patterngraph-migration.feature |
       | ValidatePatternsPipelineConsolidation spec | complete | architect/specs/validate-patterns-pipeline-consolidation.feature |
       | McpOutputSchemaValidation spec | pending | architect/specs/mcp-output-schema-validation.feature |
@@ -137,7 +132,6 @@ Feature: ADR-007 - Coordinated Taxonomy Redesign
     files and depend on each other's type changes. The dependency chain is:
     StatusMaturityExtraction (foundation) -> UnifiedRoleSystem +
     ProcessGuardPatternGraphMigration + ValidatePatternsPipelineConsolidation ->
-    EnforcementConfiguration -> PerspectiveAwareProjections ->
     McpOutputSchemaValidation.
 
     **Rationale:** Three internal consumers, no public users, pre-release only.

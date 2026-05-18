@@ -19,7 +19,7 @@ export {
   type ProcessMetadata,
   type ValidationSummary,
 } from './dual-source-extractor.js';
-export { inferFeatureLayer, FEATURE_LAYERS, type FeatureLayer } from './layer-inference.js';
+export { inferFeatureLayer, type FeatureLayer } from './layer-inference.js';
 export {
   extractPatternsFromGherkin,
   extractPatternsFromGherkinAsync,

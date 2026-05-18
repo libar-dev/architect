@@ -223,8 +223,8 @@ Feature: ModelEnrichedDataAPI
     tool choice is part of the response identity).
 
   - Q-PHASE: Tagged `@architect-phase:50` as the natural next slot after the
-    active 49 cluster. Confirm against epic ordering once
-    PerspectiveAwareProjections + ADR007CoordinatedTaxonomyRedesign close out.
+    active 49 cluster. Confirm against epic ordering once the remaining
+    ADR007CoordinatedTaxonomyRedesign cleanup closes out.
     The 99-104 phase block appears reserved for a different campaign.
 
   - Q-FAILURE-VERB: When `model_status: failed`, do we surface the underlying
