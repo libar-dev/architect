@@ -1,0 +1,106 @@
+{
+    "skills": {
+        "sources": [
+            {
+                "path": ".opencode/skills/*/SKILL.md",
+                "recursive": false
+            }
+        ],
+        "enable": [
+            "architect-base"
+        ]
+    },
+    "agents": {
+        "build": {
+            "skills": [
+                "architect-base"
+            ]
+        },
+        "hephaestus": {
+            "skills": [
+                "architect-base"
+            ]
+        },
+        "oracle": {
+            "skills": [
+                "architect-base"
+            ]
+        },
+        "librarian": {
+            "skills": [
+                "architect-base"
+            ]
+        },
+        "explore": {
+            "skills": [
+                "architect-base"
+            ]
+        },
+        "multimodal-looker": {
+            "skills": [
+                "architect-base"
+            ]
+        },
+        "atlas": {
+            "skills": [
+                "architect-base"
+            ]
+        },
+        "prometheus": {
+            "skills": [
+                "architect-base"
+            ]
+        },
+        "sisyphus": {
+            "skills": [
+                "architect-base"
+            ]
+        },
+        "sisyphus-junior": {
+            "skills": [
+                "architect-base"
+            ]
+        },
+        "metis": {
+            "skills": [
+                "architect-base"
+            ]
+        },
+        "momus": {
+            "skills": [
+                "architect-base"
+            ]
+        },
+        "plan": {
+            "skills": [
+                "architect-base"
+            ]
+        }
+    },
+    "categories": {
+        "quick": {
+            "prompt_append": "file://./prompts/architect-kernel-bootstrap.md"
+        },
+        "deep": {
+            "prompt_append": "file://./prompts/architect-kernel-bootstrap.md"
+        },
+        "ultrabrain": {
+            "prompt_append": "file://./prompts/architect-kernel-bootstrap.md"
+        },
+        "artistry": {
+            "prompt_append": "file://./prompts/architect-kernel-bootstrap.md"
+        },
+        "visual-engineering": {
+            "prompt_append": "file://./prompts/architect-kernel-bootstrap.md"
+        },
+        "writing": {
+            "prompt_append": "file://./prompts/architect-kernel-bootstrap.md"
+        },
+        "unspecified-low": {
+            "prompt_append": "file://./prompts/architect-kernel-bootstrap.md"
+        },
+        "unspecified-high": {
+            "prompt_append": "file://./prompts/architect-kernel-bootstrap.md"
+        }
+    }
+}
