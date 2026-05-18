@@ -1,7 +1,7 @@
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 
-import { resolveInvocationDir } from '../../../src/cli/runtime-helpers.js';
+import { resolveInvocationDir } from '@libar-dev/architect-core';
 
 const feature = await loadFeature('tests/features/cli-invocation-dir.feature');
 

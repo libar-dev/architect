@@ -27,6 +27,7 @@ import {
   assertNoNullBytes,
   parseAtBoundary,
   RenderFormatSchema,
+  resolveInvocationDir,
   type SessionType,
 } from '@libar-dev/architect-core';
 import {
@@ -42,7 +43,7 @@ import { printCommandHelp, printGlobalHelp, printVersion } from './commands/_sha
 import { handleCliError } from './error-handler.js';
 import { buildCliContext, writeDryRun } from './pattern-graph-cli-runtime.js';
 import { ParsedArgsSchema, type ParsedArgs } from './pattern-graph-cli-types.js';
-import { resolveCliBaseDirArg, resolveInvocationDir } from './runtime-helpers.js';
+import { resolveCliBaseDirArg } from './runtime-helpers.js';
 
 function parseArgs(argv: readonly string[]): ParsedArgs {
   const args = argv

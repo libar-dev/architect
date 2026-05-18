@@ -12,6 +12,7 @@ import {
   isProjectConfig,
   loadProjectConfig,
   parseAtBoundary,
+  resolveInvocationDir,
   resolveProjectConfig,
   resolveWorkspaceSources,
   type ResolvedConfig,
@@ -34,7 +35,6 @@ import { createPublishedEntries, upsertGeneratedDocsManifest } from './generated
 import {
   readCliPackageMetadata,
   resolveCliBaseDirArg,
-  resolveInvocationDir,
 } from './runtime-helpers.js';
 import { createCliProjectionContext } from './projection-context.js';
 import { handleCliError } from './error-handler.js';

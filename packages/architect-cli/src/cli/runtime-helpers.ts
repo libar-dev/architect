@@ -23,12 +23,9 @@ import { fileURLToPath } from 'node:url';
 
 import {
   readPackageMetadata,
-  resolveInvocationDir as resolveInvocationDirFromCore,
+  resolveInvocationDir,
   type PackageMetadata,
 } from '@libar-dev/architect-core';
-
-export type { PackageMetadata } from '@libar-dev/architect-core';
-export const resolveInvocationDir = resolveInvocationDirFromCore;
 
 export function readCliPackageMetadata(): PackageMetadata {
   return readPackageMetadata(new URL('../../package.json', import.meta.url));

@@ -7,8 +7,6 @@ import {
   type PackageMetadata,
 } from '@libar-dev/architect-core';
 
-export type { PackageMetadata } from '@libar-dev/architect-core';
-
 export function readMcpPackageMetadata(): PackageMetadata {
   return readPackageMetadata(new URL('../package.json', import.meta.url));
 }

@@ -270,6 +270,27 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(combined).toContain(text);
       });
     });
+
+    RuleScenario('Reject invalid output format without stack trace', ({ When, Then, And }) => {
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And('output contains {string}', (_ctx: unknown, text: string) => {
+        const combined = getResult().stdout + getResult().stderr;
+        expect(combined).toContain(text);
+      });
+
+      And('output does not contain raw stack markers', () => {
+        const combined = getResult().stdout + getResult().stderr;
+        expect(combined).not.toContain('at parseArgs');
+        expect(combined).not.toContain('Node.js v');
+      });
+    });
   });
 
   // ---------------------------------------------------------------------------
