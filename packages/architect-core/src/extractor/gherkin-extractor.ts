@@ -19,14 +19,15 @@
 import { access } from 'node:fs/promises';
 import * as path from 'node:path';
 
-import { asPatternId, asSourceFilePath, asDirectiveTag } from '../types/branded.js';
+import { asDirectiveTag, asPatternId, asSourceFilePath } from '../types/branded.js';
 import {
   createGherkinPatternValidationError,
   type GherkinPatternValidationError,
 } from '../types/errors.js';
 import { BoundaryParseError, parseAtBoundary } from '../validation/boundary.js';
-import { generatePatternId } from '../utils/index.js';
 import { getPatternName } from '../read-api/pattern-helpers.js';
+import { ACCEPTED_STATUS_VALUES } from '../taxonomy/index.js';
+import { generatePatternId } from '../utils/index.js';
 import type {
   GherkinRule,
   GherkinScenario,
@@ -43,16 +44,15 @@ import {
   type TagRegistry,
 } from '../validation-schemas/tag-registry.js';
 import { extractPatternTags, type FeatureTagMetadata } from '../scanner/gherkin-ast-parser.js';
-import { inferFeatureLayer } from './layer-inference.js';
 import { extractDeliverables, type Deliverable } from './dual-source-extractor.js';
-import { ACCEPTED_STATUS_VALUES } from '../taxonomy/index.js';
 import {
-  createPatternContractDiagnostics,
-  createDeprecatedTagDiagnostic,
-  createRemovedLayerTagDiagnostic,
   createDiagnostic,
+  createDeprecatedTagDiagnostic,
+  createPatternContractDiagnostics,
+  createRemovedLayerTagDiagnostic,
   type ExtractionDiagnostic,
 } from './extraction-diagnostics.js';
+import { inferFeatureLayer } from './layer-inference.js';
 
 export const SEMANTIC_SCENARIO_TAGS = [
   'happy-path',
@@ -72,7 +72,10 @@ function validateUnlockReason(
   rawValue: string | undefined,
   filePath: string,
 ): { unlockReason?: string; diagnostic?: ExtractionDiagnostic } {
-  if (rawValue === undefined) return {};
+  if (rawValue === undefined) {
+    return {};
+  }
+
   const unlockReason = rawValue.trim();
   if (
     unlockReason.length >= MIN_UNLOCK_REASON_LENGTH &&
@@ -80,6 +83,7 @@ function validateUnlockReason(
   ) {
     return { unlockReason };
   }
+
   return {
     diagnostic: createDiagnostic(
       filePath,
@@ -130,6 +134,7 @@ function collectDeprecatedTagDiagnostics(
       );
       continue;
     }
+
     if (tag.startsWith('arch-context:')) {
       const value = tag.substring('arch-context:'.length);
       diagnostics.push(
@@ -137,6 +142,7 @@ function collectDeprecatedTagDiagnostics(
       );
       continue;
     }
+
     if (tag.startsWith('arch-layer:')) {
       diagnostics.push(createRemovedLayerTagDiagnostic(filePath, tag));
       continue;
@@ -188,21 +194,23 @@ function buildGherkinPatternDraft(input: {
   const draft: Omit<ExtractedPatternDraft, '_diagnostics'> = {
     id: patternId,
     name: patternName,
-    ...(metadata.role !== undefined && { role: metadata.role }),
+    ...(metadata.role !== undefined ? { role: metadata.role } : {}),
     directive: {
       tags: feature.tags.map((tag) => asDirectiveTag(`@architect-${tag}`)),
       description: feature.description,
       examples: [],
       position: { startLine: feature.line, endLine: feature.line },
       status: metadata.status,
-      ...(unlockReason !== undefined && { unlockReason }),
-      ...(metadata.boundedContext !== undefined && { boundedContext: metadata.boundedContext }),
-      phase: metadata.phase,
-      ...(metadata.role !== undefined && { role: metadata.role }),
-      ...(metadata.uses !== undefined && metadata.uses.length > 0 && { uses: metadata.uses }),
-      ...(metadata.level !== undefined && { level: metadata.level }),
-      ...(metadata.parent !== undefined && { parent: metadata.parent }),
-      ...(metadata.executableSpecs !== undefined && { executableSpecs: metadata.executableSpecs }),
+      ...(unlockReason !== undefined ? { unlockReason } : {}),
+      ...(metadata.boundedContext !== undefined
+        ? { boundedContext: metadata.boundedContext }
+        : {}),
+      ...(metadata.phase !== undefined ? { phase: metadata.phase } : {}),
+      ...(metadata.role !== undefined ? { role: metadata.role } : {}),
+      ...(metadata.uses !== undefined && metadata.uses.length > 0 ? { uses: metadata.uses } : {}),
+      ...(metadata.level !== undefined ? { level: metadata.level } : {}),
+      ...(metadata.parent !== undefined ? { parent: metadata.parent } : {}),
+      ...(metadata.executableSpecs !== undefined ? { executableSpecs: metadata.executableSpecs } : {}),
     },
     code: '',
     source: {
@@ -347,6 +355,7 @@ export async function extractPatternsFromGherkin(
   const { baseDir } = config;
   const scenariosAsUseCases = config.scenariosAsUseCases ?? true;
   const effectiveRegistry = config.tagRegistry ?? createDefaultTagRegistry();
+
   interface PatternWithPendingVerification {
     pattern: ExtractedPattern;
     behaviorPathToVerify?: string;
@@ -362,13 +371,16 @@ export async function extractPatternsFromGherkin(
     const metadata = extractPatternTags(feature.tags, effectiveRegistry);
 
     const hasOptIn = feature.tags.some((tag) => tag === 'architect');
-    if (!hasOptIn) continue;
+    if (!hasOptIn) {
+      continue;
+    }
 
     for (const entry of metadata._unrecognizedEnums ?? []) {
       const code =
         entry.tag === 'status'
           ? ('unrecognized-status' as const)
           : ('invalid-enum-value' as const);
+
       diagnostics.push(
         createDiagnostic(
           relativePath,
@@ -394,9 +406,10 @@ export async function extractPatternsFromGherkin(
     }
 
     if (!hasRequiredStatus(metadata)) {
-      const nonCandidateStatuses = ACCEPTED_STATUS_VALUES.filter((value) => value !== 'candidate').join(
-        '/',
-      );
+      const nonCandidateStatuses = ACCEPTED_STATUS_VALUES.filter(
+        (value) => value !== 'candidate',
+      ).join('/');
+
       diagnostics.push(
         createDiagnostic(
           relativePath,
@@ -421,6 +434,7 @@ export async function extractPatternsFromGherkin(
     const patternId = asPatternId(generatePatternId(relativePath, feature.line));
     const { deliverables, diagnostics: deliverableDiagnostics } = extractDeliverables(file);
     diagnostics.push(...deliverableDiagnostics);
+
     const { unlockReason, diagnostic: unlockReasonDiagnostic } = validateUnlockReason(
       metadata.unlockReason,
       relativePath,
@@ -476,6 +490,7 @@ export async function extractPatternsFromGherkin(
         const pathLabel = detail.path.length > 0 ? detail.path.join('.') : 'pattern';
         return `${pathLabel}: expected ${detail.expected}, received ${detail.received}`;
       });
+
       diagnostics.push(...createPatternContractDiagnostics(relativePath, validationErrors));
       errors.push(
         createGherkinPatternValidationError(
@@ -535,6 +550,9 @@ export function computeHierarchyChildren(
     if (children && children.length > 0) {
       return { ...pattern, children };
     }
+
     return pattern;
   });
 }
+
+export {};

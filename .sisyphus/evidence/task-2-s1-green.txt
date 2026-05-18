@@ -6,16 +6,21 @@ Commands run:
 - pnpm build
 - pnpm lint
 - pnpm typecheck
+- pnpm test
+- pnpm audit:subtractive
 
 Results:
 - @libar-dev/architect-core tests: PASS (24 files, 1070 tests)
 - workspace build: PASS
 - workspace lint: PASS
 - workspace typecheck: PASS
+- workspace test: PASS
+- workspace subtractive audit: PASS (command succeeded; findings remain pre-existing and unrelated)
 
 Diagnostics run:
-- lsp_diagnostics on touched architect-core files under extractor/scanner/config/taxonomy/read-api/pipeline
+- lsp_diagnostics(packages/architect-core/src/extractor/gherkin-extractor.ts): PASS
+- lsp_diagnostics(packages/architect-core/src/extractor): PASS
 
 Notes:
-- Directory-scoped diagnostics and compiler-backed gates are clean for the touched Cluster 2 surfaces.
-- File-scoped LSP for packages/architect-core/src/extractor/gherkin-extractor.ts still reports stale TS1128 at 541:0 against a 540-line file, while build/typecheck pass and symbol indexing succeeds.
+- The clean final state requires an in-place replacement of `packages/architect-core/src/extractor/gherkin-extractor.ts`; restoring the `HEAD` version from `0c941a0` reproduces stale impossible TS1128 diagnostics beyond EOF.
+- After the in-place replacement, file-scoped and directory-scoped extractor LSP checks are both clean and all compiler/test gates still pass.
